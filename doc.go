@@ -1,6 +1,7 @@
-// BUG(telyn): Unsure of the default hwprofile
 // BUG(telyn): Needs more create-vm flags. Also boot-script isn't here yet.
 // BUG(telyn): Flesh out the list of commands
+// BUG(telyn): Can you remove a disk from a running VM?
+// BUG(telyn): Not default to "wheezy" and 25GiB, default to whatever the API says are the defaults? https://projects.bytemark.co.uk/issues/9378
 /*
 BigV API Client
 
@@ -40,27 +41,63 @@ Basic Usage:
 	Dashes in commands may be replaced with spaces, for example: create vm is an alias for create-vm.
 
 	New is always an alias for create, for example: new-vm is an alias for create-vm.
+	You may also misspell disk as disc, at no penalty ;-)
 
 Commands available:
 
-	create-vm [flags] <name> [image] [disc-specs]
-	create [flags] <name> [image] [disc-specs]
-	new-vm [flags] <name> [image] [disc-specs]
-	new [flags] <name> [image] [disc-specs]
+	create-vm [flags] <name> [image] [disk-specs]
+	new-vm [flags] <name> [image] [disk-specs]
 
-		Creates a VM with the provided name, image and disc-specs.
+		Creates a VM with the provided name, image and disk-specs.
 
-		If image and disc-specs are not provided, will interactively prompt for them, or default to "wheezy" and a 25GiB SATA SSD.
+		Disk specs must match the following format: [storage-grade:]size[MgGtT] and are comma or space separated. The available storage grades can be listed with the list-storage-grades command. See the create-disk documentation below for the size suffixes.
+
+		If image and disk-specs are not provided, will interactively prompt for them, or default to "wheezy" and a 25GiB SATA SSD if the --force flag is present.
+
+		The VM's full specification will be given and you will be prompted to confirm it unless the --force flag is present.
 
 		Flags available:
 
 			--boot-script - A filename of a boot-script to upload from the local machine. This script will be run the first time the virtual machine starts up.
-			--hwprofile   - Sets the hardware profile. Defaults to virtio2013 probably.
+			--hwprofile   - Sets the hardware profile. See the output of list-hwprofiles.
 			--lock        - Locks the hardware profile, preventing automatic upgrades. Not set by default
 
+	create-disk [flags] <vm> <disk spec> [name]
+	new-disk [flags] <vm> <disk spec> [name]
 
+		Creates a disk attached to the VM provided, with the given spec
 
+		Disk specs must match the following format: [storage-grade:]size[MgGtT]. The available storage grades can be listed with the list-storage-grades command.
 
+		Size must be a positive integer, and the suffixes are as follows:
+			M - Megabytes - default
+			g - GB  (1000 megabytes)
+			G - GiB (1024 megabytes)
+			t - TB  (1000 GB)
+			T - TiB (1024 GiB)
+
+		The disk's specification will be given and you will be prompted to confirm it unless the --force flag is present.
+
+		Flags available: 
+
+			--grade - Specifies what storage grade to use. Overridden if the storage-grade is part of the disk-spec. 
+
+	resize-disk <vm> <disk> [size]
+
+		Resizes the disk named <disk> attached to the specified VM.
+		If size begins with a +, will increase the disk's size by the amount specified.
+
+		You'll be prompted to confirm the new size unless the --force flag is given.
+
+		Disks cannot be resized to a lower size than they currently have.
+
+	delete-disk <vm> <disk>
+	remove-disk <vm> <disk>
+
+		Removes the named disk from the specified VM.
+		This operation can probably only be performed on stopped VMs.
+
+		You will be prompted for confirmation unless the --force flag is given.
 
 */
 package main
