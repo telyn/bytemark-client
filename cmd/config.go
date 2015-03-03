@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -15,6 +18,7 @@ import (
 // endpoint_auth - the default auth_endpoint to use - if not present, https://auth.bytemark.co.uk
 type Config struct {
 	Dir         string
+	Memo        []string
 	Definitions map[string]string
 }
 
@@ -22,37 +26,63 @@ type Config struct {
 
 func NewConfig(configDir string) (config *Config) {
 	config = new(Config)
-	config.Dir = filepath.join(os.Getenv("HOME"), "/.go-bigv")
+	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
+	if os.Getenv("BIGV_CONFIG_DIR") != "" {
+		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
+	}
 
 	if configDir != "" {
+		// TODO should probably just try to make config.Dir and if it already exists, bonus.
+		// if it can't be made panic()
 		stat, err := os.Stat(configDir)
 
-		if os.IsNotExists(err) {
+		if os.IsNotExist(err) {
 			panic("Specified config directory doesn't exist!")
 		}
 		if !stat.IsDir() {
 			fmt.Printf("%s is not a directory", configDir)
 			panic("Cannot continue")
 		}
+		config.Dir = configDir
 	}
-
+	return config
 }
 
 // Just to make my code prettier really!
 // Joins the string onto the end of the Config.Dir path.
-func (config *Config) GetPath(name string) {
-	return filepath(config.Dir, name)
+func (config *Config) GetPath(name string) string {
+	return filepath.Join(config.Dir, name)
+}
+func (config *Config) GetUrl(path ...string) *url.URL {
+	url, err := url.Parse(config.Get("endpoint"))
+	if err != nil {
+		panic("Endpoint is not a valid URL")
+	}
+	url.Parse("/" + strings.Join([]string(path), "/"))
+	return url
 }
 
 func (config *Config) LoadDefinitions() {
 	stat, err := os.Stat(config.GetPath("definitions"))
 
-	if err != nil || time.Since(stat.ModTime()) > 24*time.Duration.Hour {
+	if err != nil || time.Since(stat.ModTime()) > 24*time.Hour {
 		// TODO grab it off the internet
+		//		url := config.GetUrl("definitions.json")
 	} else {
+		_, err := ioutil.ReadFile(config.GetPath("definitions"))
+		if err != nil {
+			panic("Couldn't load definitions")
+		}
 		// TODO grab it off the filesystem
 	}
 
+}
+
+func (config *Config) Get(name string) string {
+	// try to read the Memo
+	// try to read the file
+	// or default
+	return ""
 }
 
 func (config *Config) GetDefault(name string) string {
@@ -70,14 +100,14 @@ func (config *Config) GetDefault(name string) string {
 }
 
 func (config *Config) Read(name string) string {
-	contents, err := ioutil.ReadAll(config.Dir)
+	contents, err := ioutil.ReadFile(config.GetPath(name))
 	if err != nil {
-		if os.IsNotExists(err) {
+		if os.IsNotExist(err) {
 			return config.GetDefault(name)
 		}
 		fmt.Printf("Couldn't read config for %s", name)
 		panic(err)
 	}
 
-	return contents
+	return string(contents)
 }
