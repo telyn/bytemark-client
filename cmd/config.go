@@ -18,7 +18,7 @@ import (
 // endpoint_auth - the default auth_endpoint to use - if not present, https://auth.bytemark.co.uk
 type Config struct {
 	Dir         string
-	Memo        []string
+	Memo        map[string]string
 	Definitions map[string]string
 }
 
@@ -80,8 +80,17 @@ func (config *Config) LoadDefinitions() {
 
 func (config *Config) Get(name string) string {
 	// try to read the Memo
-	// try to read the file
-	// or default
+	if val, ok := config.Memo[name]; ok {
+		return val
+	} else {
+		// try to read the file
+		val, err := ioutil.ReadFile(config.GetPath(name))
+		if err != nil {
+			return config.GetDefault(name)
+		}
+		return string(val)
+		// or default
+	}
 	return ""
 }
 
