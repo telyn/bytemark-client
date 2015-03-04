@@ -120,6 +120,7 @@ func (config *Config) Get(name string) string {
 }
 
 func (config *Config) GetDefault(name string) string {
+	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
 		return FirstNotEmpty(os.Getenv("BIGV_USER"), os.Getenv("USER"))
