@@ -43,13 +43,18 @@ func NewConfig(configDir string) (config *Config) {
 	}
 
 	if configDir != "" {
-		// TODO should probably just try to make config.Dir and if it already exists, bonus.
-		// if it can't be made panic()
-		stat, err := os.Stat(configDir)
-
-		if os.IsNotExist(err) {
-			panic("Specified config directory doesn't exist!")
+		err := os.MkdirAll(configDir, 0600)
+		if err != nil && os.IsExist(err) {
+			// TODO(telyn): Better error handling here
+			panic(err)
 		}
+
+		stat, err := os.Stat(configDir)
+		if err != nil {
+			// TODO(telyn): Better error handling here
+			panic(err)
+		}
+
 		if !stat.IsDir() {
 			fmt.Printf("%s is not a directory", configDir)
 			panic("Cannot continue")
