@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -35,7 +36,7 @@ type Config struct {
 // Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
-func NewConfig(configDir string) (config *Config) {
+func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 	config = new(Config)
 	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
 	if os.Getenv("BIGV_CONFIG_DIR") != "" {
@@ -60,6 +61,14 @@ func NewConfig(configDir string) (config *Config) {
 			panic("Cannot continue")
 		}
 		config.Dir = configDir
+	}
+
+	if flags != nil {
+		// dump all the flags into the memo
+		// should be reet...reet?
+		flags.Visit(func(f *flag.Flag) {
+			config.Memo[f.Name] = f.Value.String()
+		})
 	}
 	return config
 }
