@@ -82,14 +82,13 @@ func (config *Config) LoadDefinitions() {
 	stat, err := os.Stat(config.GetPath("definitions"))
 
 	if err != nil || time.Since(stat.ModTime()) > 24*time.Hour {
-		// TODO grab it off the internet
+		// TODO(telyn): grab it off the internet
 		//		url := config.GetUrl("definitions.json")
 	} else {
 		_, err := ioutil.ReadFile(config.GetPath("definitions"))
 		if err != nil {
 			panic("Couldn't load definitions")
 		}
-		// TODO grab it off the filesystem
 	}
 
 }
@@ -102,6 +101,7 @@ func (config *Config) Get(name string) string {
 		// try to read the file
 		val, err := ioutil.ReadFile(config.GetPath(name))
 		if err != nil {
+			// TODO(telyn): create file with default config because being a bit explicit about things is probably good
 			return config.GetDefault(name)
 		}
 		return string(val)
