@@ -10,20 +10,29 @@ import (
 	"time"
 )
 
-// Reads the config (usually in ~/.go-bigv)
-// which is a set of flat files
+// Params currently used:
 // token - an OAuth 2.0 bearer token to use when authenticating
 // username - the default username to use - if not present, $USER
 // endpoint - the default endpoint to use - if not present, https://uk0.bigv.io
-// endpoint_auth - the default auth_endpoint to use - if not present, https://auth.bytemark.co.uk
+// auth-endpoint - the default auth API endpoint to use - if not present, https://auth.bytemark.co.uk
+
+// A Config determines the configuration of the bigv client.
+// It's responsible for handling things like the credentials to use and what endpoints to talk to.
+//
+// Each configuration item is read from the following places, falling back to successive places:
+//
+// Per-command command-line flags, global command-line flags, environment variables, configuration directory, hard-coded defaults
+//
+//The location of the configuration directory is read from global command-line flags, or is otherwise ~/.go-bigv
+//
 type Config struct {
 	Dir         string
 	Memo        map[string]string
 	Definitions map[string]string
 }
 
-// Sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
 
+// NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
 func NewConfig(configDir string) (config *Config) {
 	config = new(Config)
 	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
