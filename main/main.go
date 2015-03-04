@@ -4,7 +4,7 @@ import (
 	"bigv.io/client/cmd"
 	//	bigv "bigv.io/client/lib"
 	"flag"
-	//	"fmt"
+	"fmt"
 	"os"
 )
 
@@ -14,7 +14,9 @@ var (
 
 func main() {
 	flag.Parse()
-	config := cmd.NewConfig(configDir)
+	config := cmd.NewConfig(*configDir)
 
+	// this line is just to make it build, will be removed
+	fmt.Printf("Using configuration in %s\n", config.Dir)
 	os.Exit(0)
 }
