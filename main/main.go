@@ -1,8 +1,8 @@
 package main
 
 import (
-	bigv "bigv.io/client"
 	"bigv.io/client/cmd"
+	bigv "bigv.io/client/lib"
 	"flag"
 	"fmt"
 	"os"
