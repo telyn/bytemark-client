@@ -31,6 +31,8 @@ type Config struct {
 	Definitions map[string]string
 }
 
+// Do I really need to have the flags passed in here?
+// Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
 func NewConfig(configDir string) (config *Config) {
