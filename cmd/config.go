@@ -116,7 +116,7 @@ func (config *Config) GetDefault(name string) string {
 		return FirstNotEmpty(os.Getenv("BIGV_USER"), os.Getenv("USER"))
 	case "endpoint":
 		return FirstNotEmpty(os.Getenv("BIGV_ENDPOINT"), "https://uk0.bigv.io")
-	case "endpoint_auth":
+	case "auth-endpoint":
 		return FirstNotEmpty(os.Getenv("BIGV_AUTH_ENDPOINT"), "https://auth.bytemark.co.uk")
 	case "account":
 		return FirstNotEmpty(os.Getenv("BIGV_ACCOUNT"), os.Getenv("BIGV_USER"), os.Getenv("USER"))
