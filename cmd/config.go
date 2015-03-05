@@ -107,14 +107,7 @@ func (config *Config) Get(name string) string {
 	if val, ok := config.Memo[name]; ok {
 		return val
 	} else {
-		// try to read the file
-		val, err := ioutil.ReadFile(config.GetPath(name))
-		if err != nil {
-			// TODO(telyn): create file with default config because being a bit explicit about things is probably good
-			return config.GetDefault(name)
-		}
-		return string(val)
-		// or default
+		return config.Read(name)
 	}
 	return ""
 }
