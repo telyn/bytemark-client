@@ -1,4 +1,4 @@
-package client
+package lib
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"

@@ -1,4 +1,4 @@
-package client
+package lib
 
 type DiskSpec struct {
 	label         string
