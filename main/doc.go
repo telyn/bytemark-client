@@ -9,7 +9,7 @@
 // BUG(telyn): List of privileges?
 
 /*
-BigV API Client
+Package main provides a command-line client for Bytemark's BigV service
 
 
 Basic Usage:

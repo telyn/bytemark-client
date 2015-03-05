@@ -1,6 +1,4 @@
 /*
-Reference implementation of a BigV API consumer
-
-Does magic, looks cool doing it.
+Package lib provides a reference implementation of a BigV API library, which you can use in your projects!
 */
 package lib
