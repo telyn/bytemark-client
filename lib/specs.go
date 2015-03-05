@@ -1,6 +1,6 @@
 package lib
 
-type DiskSpec struct {
+type Disk struct {
 	label         string
 	storage_grade string
 	size          int
@@ -10,19 +10,19 @@ type DiskSpec struct {
 	storage_pool       string
 }
 
-type ImageSpec struct {
+type Image struct {
 	distribution  string
 	root_password string
 }
 
-type IPSpec struct {
+type IP struct {
 	rdns string
 
 	// this cannot be set.
 	ip string
 }
 
-type NetworkInterfaceSpec struct {
+type NetworkInterface struct {
 	label string
 	mac   string
 
@@ -35,7 +35,7 @@ type NetworkInterfaceSpec struct {
 	virtual_machine_id int
 }
 
-type UserSpec struct {
+type User struct {
 	username        string
 	email           string
 	authorized_keys string
@@ -47,7 +47,7 @@ type UserSpec struct {
 	account_name string
 }
 
-type VirtualMachineSpec struct {
+type VirtualMachine struct {
 	autoreboot_on           bool
 	cdrom_url               string
 	cores                   int
@@ -67,29 +67,29 @@ type VirtualMachineSpec struct {
 	deleted            bool
 	hostname           string
 	head               string
-	network_interfaces []NetworkInterfaceSpec
+	network_interfaces []NetworkInterface
 }
 
-type VirtualMachineExtendedSpec struct {
-	virtual_machine VirtualMachineSpec
-	discs           []DiskSpec
-	reimage         ImageSpec
+type VirtualMachineExtended struct {
+	virtual_machine VirtualMachine
+	discs           []Disk
+	reimage         Image
 }
 
-type GroupSpec struct {
+type Group struct {
 	name string
 
 	// the following cannot be set
 	account_id       int
 	id               int
-	virtual_machiens []VirtualMachineSpec
+	virtual_machiens []VirtualMachine
 }
 
-type AccountSpec struct {
+type Account struct {
 	name string
 
 	// the following cannot be set
 	id        int
 	suspended bool
-	groups    []GroupSpec
+	groups    []Group
 }
