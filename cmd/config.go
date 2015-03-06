@@ -38,6 +38,7 @@ type Config struct {
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
 func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 	config = new(Config)
+	config.Memo = make(map[string]string)
 	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
 	if os.Getenv("BIGV_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
@@ -110,6 +111,10 @@ func (config *Config) Get(name string) string {
 		return config.Read(name)
 	}
 	return ""
+}
+
+func (config *Config) Set(name string, value string) {
+	config.Memo[name] = value
 }
 
 func (config *Config) GetDefault(name string) string {
