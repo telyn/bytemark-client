@@ -33,6 +33,9 @@ func NewWithCredentials(credentials auth3.Credentials) (bigv *Client, err error)
 	}
 
 	session, err := auth.CreateSession(credentials)
+	if err != nil {
+		return nil, err
+	}
 
 	return NewWithSession(auth, session)
 }
