@@ -16,7 +16,10 @@ func main() {
 	flag.Parse()
 	config := cmd.NewConfig(*configDir, flag.CommandLine)
 
-	// this line is just to make it build, will be removed
-	fmt.Printf("Using configuration in %s\n", config.Dir)
+	fmt.Fprintf(os.Stderr, "Using config in %s \r\n", config.Dir)
+
+	dispatch := cmd.NewDispatcher(config)
+
+	dispatch.Do(flag.Args())
 	os.Exit(0)
 }
