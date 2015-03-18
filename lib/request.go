@@ -18,7 +18,7 @@ func (bigv *Client) Request(method string, location string, requestBody string) 
 	defer res.Body.Close()
 
 	if bigv.DebugLevel > 1 {
-		fmt.Printf("%s: %s: %d\r\n", req.URL, res.StatusCode)
+		fmt.Printf("%s %s: %d\r\n", method, req.URL, res.StatusCode)
 	}
 
 	responseBody, err = ioutil.ReadAll(res.Body)
