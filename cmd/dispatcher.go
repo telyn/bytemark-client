@@ -86,5 +86,8 @@ func (dispatch *Dispatcher) Do(args []string) {
 	case "debug":
 		dispatch.Debug(args[1:])
 		return
+	case "show-account":
+		dispatch.ShowAccount(args[1:])
+		return
 	}
 }
