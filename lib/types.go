@@ -1,5 +1,15 @@
 package lib
 
+type VirtualMachineName struct {
+	VirtualMachine string
+	Group          string
+	Account        string
+}
+type GroupName struct {
+	Group   string
+	Account string
+}
+
 type Disk struct {
 	Label        string `json:"label"`
 	StorageGrade string `json:"storage_grade"`
