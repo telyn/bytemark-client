@@ -46,8 +46,9 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 
 	if configDir != "" {
 		err := os.MkdirAll(configDir, 0600)
-		if err != nil && os.IsExist(err) {
+		if err != nil {
 			// TODO(telyn): Better error handling here
+
 			panic(err)
 		}
 
