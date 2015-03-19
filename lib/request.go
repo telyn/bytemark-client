@@ -8,9 +8,37 @@ import (
 	"strings"
 )
 
+// RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
+func (bigv *Client) RequestAndUnmarshal(method, path string, output interface{}) error {
+
+	data, err := bigv.Request(method, path, "")
+
+	//TODO(telyn): extract to Request
+	if bigv.DebugLevel >= 3 {
+		fmt.Printf("'%s'\r\n", data)
+	}
+
+	if err != nil {
+		//TODO(telyn): good error handling here
+		return err
+	}
+
+	err = json.Unmarshal(data, output)
+	if err != nil {
+		// BUG(telyn): this is a bad error message and you should feel bad
+		fmt.Printf("Data returned was not the right type.\r\n")
+		fmt.Printf("%+v\r\n", output)
+
+		return err
+	}
+
+	return nil
+
+}
+
 // Make a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
-func (bigv *Client) Request(method string, location string, requestBody string) (responseBody []byte, err error) {
+func (bigv *Client) Request(method, location, requestBody string) (responseBody []byte, err error) {
 	req, res, err := bigv.FireRequest(method, location, requestBody)
 	if err != nil {
 		return nil, err
