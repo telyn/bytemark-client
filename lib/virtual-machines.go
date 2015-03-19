@@ -10,7 +10,10 @@ func (bigv *Client) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachi
 	path := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s?view=overview", name.Account, name.Group, name.VirtualMachine)
 	data, err := bigv.Request("GET", path, "")
 
-	fmt.Printf("'%s'\r\n", data)
+	//TODO(telyn): extract to Request
+	if bigv.DebugLevel >= 3 {
+		fmt.Printf("'%s'\r\n", data)
+	}
 
 	if err != nil {
 		//TODO(telyn): good error handling here
