@@ -128,6 +128,8 @@ func (config *Config) GetDefault(name string) string {
 		return FirstNotEmpty(os.Getenv("BIGV_AUTH_ENDPOINT"), "https://auth.bytemark.co.uk")
 	case "account":
 		return FirstNotEmpty(os.Getenv("BIGV_ACCOUNT"), os.Getenv("BIGV_USER"), os.Getenv("USER"))
+	case "debug-level":
+		return FirstNotEmpty(os.Getenv("BIGV_DEBUG_LEVEL"), "0")
 	}
 	return ""
 }

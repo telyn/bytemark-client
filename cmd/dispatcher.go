@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -40,6 +41,10 @@ func NewDispatcher(config *Config) (d *Dispatcher) {
 			fmt.Fprintf(os.Stderr, "Failed to use credentials.\r\n")
 			panic(err)
 		}
+	}
+	debugLevel, err := strconv.ParseInt(config.Get("debug-level"), 10, 0)
+	if err == nil {
+		c.DebugLevel = int(debugLevel)
 	}
 	d.BigV = c
 	return d

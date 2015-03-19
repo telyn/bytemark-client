@@ -21,6 +21,7 @@ func CleanEnv() {
 	os.Setenv("BIGV_ACCOUNT", "")
 	os.Setenv("BIGV_ENDPOINT", "")
 	os.Setenv("BIGV_AUTH_ENDPOINT", "")
+	os.Setenv("BIGV_DEBUG_LEVEL", "")
 }
 
 func JunkEnv() {
@@ -29,6 +30,7 @@ func JunkEnv() {
 	os.Setenv("BIGV_ACCOUNT", "junk-env-account")
 	os.Setenv("BIGV_ENDPOINT", "junk-env-endpoint")
 	os.Setenv("BIGV_AUTH_ENDPOINT", "junk-env-auth-endpoint")
+	os.Setenv("BIGV_DEBUG_LEVEL", "junk-env-debug-level")
 }
 
 func FixtureEnv() (fixture map[string]string) {
@@ -38,12 +40,14 @@ func FixtureEnv() (fixture map[string]string) {
 		"user":          "fixture-env-user",
 		"account":       "fixture-env-account",
 		"auth-endpoint": "https://fixture.env.auth.localhost.local",
+		"debug-level":   "fixture-env-debug-level",
 	}
 	os.Setenv("BIGV_CONFIG_DIR", fixture["config-dir"])
 	os.Setenv("BIGV_USER", fixture["user"])
 	os.Setenv("BIGV_ACCOUNT", fixture["account"])
 	os.Setenv("BIGV_ENDPOINT", fixture["endpoint"])
 	os.Setenv("BIGV_AUTH_ENDPOINT", fixture["auth-endpoint"])
+	os.Setenv("BIGV_DEBUG_LEVEL", fixture["debug-level"])
 	return fixture
 }
 
@@ -69,6 +73,7 @@ func JunkDir() (name string) {
 		"user":          "junk-dir-user",
 		"account":       "junk-dir-account",
 		"auth-endpoint": "https://junk.dir.auth.localhost.local",
+		"debug-level":   "junk-dir-debug-level",
 	}
 
 	dir, err := ioutil.TempDir("", "bigv-client-test")
@@ -88,6 +93,7 @@ func FixtureDir() (dir string, fixture map[string]string) {
 		"user":          "fixture-dir-user",
 		"account":       "fixture-dir-account",
 		"auth-endpoint": "https://fixture.dir.auth.localhost.local",
+		"debug-level":   "fixture-dir-debug-level",
 	}
 
 	dir, err := ioutil.TempDir("", "bigv-client-test")
@@ -112,6 +118,7 @@ func AssertConfigMatchesFixture(t *testing.T, fixture map[string]string, config 
 	assert.Equal(t, fixture["auth-endpoint"], config.Get("auth-endpoint"))
 	assert.Equal(t, fixture["user"], config.Get("user"))
 	assert.Equal(t, fixture["account"], config.Get("account"))
+	assert.Equal(t, fixture["debug-level"], config.Get("debug-level"))
 }
 
 /*
