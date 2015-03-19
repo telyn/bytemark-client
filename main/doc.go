@@ -81,7 +81,7 @@ Flags available:
 
 COMMAND: delete
 
-	delete <vm>
+	delete [--purge] <vm>
 
 Deletes the specified VM. After some period the machine will purged, at which point it will no longer be possible to undelete.
 
@@ -91,11 +91,6 @@ COMMAND: undelete
 
 	undelete <vm>
 
-COMMAND: purge
-
-	purge <vm>
-
-Irreversibly deletes the given VM. Use with care!
 
 This command will prompt you to confirm deletion unless --purge is set.
 
