@@ -75,8 +75,7 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 	return config
 }
 
-// Just to make my code prettier really!
-// Joins the string onto the end of the Config.Dir path.
+// GetPath joins the given string onto the end of the Config.Dir path
 func (config *Config) GetPath(name string) string {
 	return filepath.Join(config.Dir, name)
 }
