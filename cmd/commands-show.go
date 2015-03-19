@@ -22,6 +22,8 @@ func (dispatch *Dispatcher) ShowVM(args []string) {
 
 	totalDiscSize = totalDiscSize / 1024
 
+	// TODO(telyn): chuck this in favour of a better pretty-printer.
+
 	fmt.Printf("= VM %s, %d cores, %d GiB RAM, %d GiB on %d discs =\r\n", vm.Name, vm.Cores, vm.Memory, totalDiscSize, len(vm.Discs))
 	fmt.Printf("Hostname:		    %s\r\n", vm.Hostname)
 	fmt.Printf("Hardware profile:	    %s\r\n", vm.HardwareProfile)
@@ -32,20 +34,21 @@ func (dispatch *Dispatcher) ShowVM(args []string) {
 
 	for _, nic := range vm.NetworkInterfaces {
 		fmt.Printf("Network interface %s: %s\r\n", nic.Label, strings.Join(nic.IPs, ", "))
-		//do something with extra IPs
+
+		// this is stupid
+		if len(nic.ExtraIPs) > 0 {
+
+			fmt.Printf("  Extra IPs: ")
+			for ip, _ := range nic.ExtraIPs {
+				fmt.Print(ip)
+			}
+			fmt.Printf("\r\n")
+
+		}
+
 	}
 
-	// now I gotta decide how to pretty-print a vm.
 
-	// --------------------------  VM main: 1 core, 2 GiB RAM, 635.0 GiB on 2 discs  -
-	// Hostname:         main.personal.telyn.uk0.bigv.io
-	// Hardware profile: virtio2013
-	// CD-ROM:           (none)
-	// VM host:          head05
-	// Disc vda:                                            35.0 GiB,    sata grade
-	// Disc vdb:                                           600.0 GiB, archive grade
-	// Net :                    213.138.111.200, 2001:41c8:51:6c8:fcff:ff:fe00:3fe0
-	// Extra IPs via 213.138.111.200:                               213.138.112.169
 
 }
 
