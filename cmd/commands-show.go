@@ -33,13 +33,13 @@ func (dispatch *Dispatcher) ShowVM(args []string) {
 	}
 
 	for _, nic := range vm.NetworkInterfaces {
-		fmt.Printf("Network interface %s: %s\r\n", nic.Label, strings.Join(nic.IPs, ", "))
+		fmt.Printf("Network interface %s: %s\r\n", nic.Label, strings.Join(nic.Ips, ", "))
 
 		// this is stupid
-		if len(nic.ExtraIPs) > 0 {
+		if len(nic.ExtraIps) > 0 {
 
-			fmt.Printf("  Extra IPs: ")
-			for ip, _ := range nic.ExtraIPs {
+			fmt.Printf("  Extra Ips: ")
+			for ip, _ := range nic.ExtraIps {
 				fmt.Print(ip)
 			}
 			fmt.Printf("\r\n")
@@ -47,8 +47,6 @@ func (dispatch *Dispatcher) ShowVM(args []string) {
 		}
 
 	}
-
-
 
 }
 
