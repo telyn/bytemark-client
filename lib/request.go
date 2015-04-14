@@ -10,7 +10,7 @@ import (
 )
 
 // RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
-func (bigv *Client) RequestAndUnmarshal(method, path string, output interface{}) error {
+func (bigv *Client) RequestAndUnmarshal(method, path, requestBody string, output interface{}) error {
 
 	data, err := bigv.Request(method, path, "")
 

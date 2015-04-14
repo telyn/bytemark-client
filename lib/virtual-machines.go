@@ -10,7 +10,7 @@ func (bigv *Client) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachi
 
 	err = bigv.RequestAndUnmarshal("GET", path, "", vm)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return vm, nil
 }
