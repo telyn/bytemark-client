@@ -86,7 +86,13 @@ func (dispatch *Dispatcher) Do(args []string) {
 
 	if /*help == true || */ len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		fmt.Printf("No command specified.\n\n")
-		os.Exit(1)
+		dispatch.OutputHelp(args)
+	}
+
+	// do this
+	if len(args) == 1 {
+		dispatch.OutputHelp(args)
+		return
 	}
 
 	switch strings.ToLower(args[0]) {
@@ -100,4 +106,5 @@ func (dispatch *Dispatcher) Do(args []string) {
 		dispatch.ShowAccount(args[1:])
 		return
 	}
+	dispatch.OutputHelp(args)
 }
