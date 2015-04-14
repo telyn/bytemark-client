@@ -89,6 +89,13 @@ func (dispatch *Dispatcher) Do(args []string) {
 		dispatch.OutputHelp(args)
 	}
 
+	// short-circuit commands that don't take arguments
+	switch strings.ToLower(args[0]) {
+	case "help":
+		dispatch.OutputHelp(args)
+		return
+	}
+
 	// do this
 	if len(args) == 1 {
 		dispatch.OutputHelp(args)
