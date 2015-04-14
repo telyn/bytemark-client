@@ -20,7 +20,7 @@ type Disk struct {
 	StoragePool      string `json:"storage_pool"`
 }
 
-type Image struct {
+type ImageInstall struct {
 	Distribution string `json:"distribution"`
 	RootPassword string `json:"root_password"`
 }
@@ -85,7 +85,7 @@ type VirtualMachine struct {
 type VirtualMachineSpec struct {
 	VirtualMachine VirtualMachine `json:"virtual_machine"`
 	Discs          []Disk         `json:"discs"`
-	Reimage        Image          `json:"reimage"`
+	Reimage        ImageInstall   `json:"reimage"`
 }
 
 type Group struct {
