@@ -15,7 +15,7 @@ func (bigv *Client) RequestAndUnmarshal(method, path string, output interface{})
 	data, err := bigv.Request(method, path, "")
 
 	//TODO(telyn): extract to Request
-	if bigv.DebugLevel >= 3 {
+	if bigv.DebugLevel >= 4 {
 		fmt.Printf("'%s'\r\n", data)
 	}
 
@@ -31,6 +31,12 @@ func (bigv *Client) RequestAndUnmarshal(method, path string, output interface{})
 		fmt.Printf("%+v\r\n", output)
 
 		return err
+	}
+
+	if bigv.DebugLevel >= 3 {
+		buf := new(bytes.Buffer)
+		json.Indent(buf, data, "", "    ")
+		fmt.Printf("%s", buf)
 	}
 
 	return nil
