@@ -43,7 +43,7 @@ func (bigv *Client) RequestAndUnmarshal(method, path string, output interface{})
 
 }
 
-// Make a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
+// Request makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
 func (bigv *Client) Request(method, location, requestBody string) (responseBody []byte, err error) {
 	req, res, err := bigv.FireRequest(method, location, requestBody)

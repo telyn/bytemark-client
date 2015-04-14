@@ -8,7 +8,7 @@ func (bigv *Client) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachi
 	vm = new(VirtualMachine)
 	path := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s?view=overview", name.Account, name.Group, name.VirtualMachine)
 
-	err = bigv.RequestAndUnmarshal("GET", path, vm)
+	err = bigv.RequestAndUnmarshal("GET", path, "", vm)
 	if err != nil {
 		panic(err)
 	}
