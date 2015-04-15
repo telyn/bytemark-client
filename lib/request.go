@@ -12,9 +12,8 @@ import (
 // RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
 func (bigv *Client) RequestAndUnmarshal(method, path, requestBody string, output interface{}) error {
 
-	data, err := bigv.Request(method, path, "")
+	data, err := bigv.RequestAndRead(method, path, requestBody)
 
-	//TODO(telyn): extract to Request
 	if bigv.DebugLevel >= 4 {
 		fmt.Printf("'%s'\r\n", data)
 	}
@@ -45,8 +44,8 @@ func (bigv *Client) RequestAndUnmarshal(method, path, requestBody string, output
 
 // Request makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
-func (bigv *Client) Request(method, location, requestBody string) (responseBody []byte, err error) {
-	req, res, err := bigv.FireRequest(method, location, requestBody)
+func (bigv *Client) RequestAndRead(method, location, requestBody string) (responseBody []byte, err error) {
+	req, res, err := bigv.Request(method, location, requestBody)
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +68,8 @@ func (bigv *Client) Request(method, location, requestBody string) (responseBody 
 }
 
 // Make an HTTP request and then request it, returning the request object, response object and any errors
-// For use by Client.MakeAndReadRequest, do not use externally except for testing
-func (bigv *Client) FireRequest(method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
+// For use by Client.RequestAndRead, do not use externally except for testing
+func (bigv *Client) Request(method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
 	url := location
 
 	if strings.HasPrefix(location, "/") {
