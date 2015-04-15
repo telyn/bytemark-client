@@ -18,20 +18,26 @@ type Dispatcher struct {
 	BigV   *client.Client
 }
 
-// NewDispatcher creates a new Dispatcher given a config. It will check the auth for whatever token config can find, then try to grab credents from config, prompting if needed.
+// NewDispatcher creates a new Dispatcher given a config.
 func NewDispatcher(config *Config) (d *Dispatcher) {
 	d = new(Dispatcher)
 	d.Config = config
-	c, err := client.NewWithToken(config.Get("token"))
+	return d
+}
+
+// EnsureAuth makes sure a valid token is stored in config.
+// This should be called by anything that needs auth.
+func (d *Dispatcher) EnsureAuth() {
+	c, err := client.NewWithToken(d.Config.Get("token"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to use token, trying credentials.\r\n\r\n")
 		d.PromptForCredentials()
 		credents := map[string]string{
-			"username": config.Get("user"),
-			"password": config.Get("pass"),
+			"username": d.Config.Get("user"),
+			"password": d.Config.Get("pass"),
 		}
-		if config.Get("yubikey") != "" {
-			credents["yubikey"] = config.Get("yubikey-otp")
+		if d.Config.Get("yubikey") != "" {
+			credents["yubikey"] = d.Config.Get("yubikey-otp")
 		}
 
 		c, err = client.NewWithCredentials(credents)
@@ -40,36 +46,39 @@ func NewDispatcher(config *Config) (d *Dispatcher) {
 			panic(err)
 		}
 	}
-	debugLevel, err := strconv.ParseInt(config.Get("debug-level"), 10, 0)
+	debugLevel, err := strconv.ParseInt(d.Config.Get("debug-level"), 10, 0)
 	if err == nil {
 		c.DebugLevel = int(debugLevel)
 	}
 	d.BigV = c
-	return d
+
+	d.Config.SetPersistent("token", d.BigV.AuthSession.Token)
 }
 
 // PromptForCredentials ensures that user, pass and yubikey-otp are defined, by prompting the user for them.
-// needs more for loop to ensure that they don't stay empty.
+// needs a for loop to ensure that they don't stay empty.
 func (d *Dispatcher) PromptForCredentials() {
 	buf := bufio.NewReader(os.Stdin)
-	if d.Config.Get("user") == "" {
+	for d.Config.Get("user") == "" {
 		fmt.Fprintf(os.Stderr, "User: ")
 		user, _ := buf.ReadString('\n')
 		d.Config.Set("user", strings.TrimSpace(user))
 		fmt.Fprintf(os.Stderr, "\r\n")
 	}
 
-	if d.Config.Get("pass") == "" {
+	for d.Config.Get("pass") == "" {
 		fmt.Fprintf(os.Stderr, "Pass: ")
 		pass, _ := buf.ReadString('\n')
 		d.Config.Set("pass", strings.TrimSpace(pass))
 		fmt.Fprintf(os.Stderr, "\r\n")
 	}
 
-	if d.Config.Get("yubikey") != "" && d.Config.Get("yubikey-otp") == "" {
-		fmt.Fprintf(os.Stderr, "Press yubikey: ")
-		yubikey, _ := buf.ReadString('\n')
-		d.Config.Set("yubikey-otp", strings.TrimSpace(yubikey))
+	if d.Config.Get("yubikey") != "" {
+		for d.Config.Get("yubikey-otp") == "" {
+			fmt.Fprintf(os.Stderr, "Press yubikey: ")
+			yubikey, _ := buf.ReadString('\n')
+			d.Config.Set("yubikey-otp", strings.TrimSpace(yubikey))
+		}
 	}
 
 }

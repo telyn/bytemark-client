@@ -12,6 +12,7 @@ import (
 // command syntax: debug <method> <url>
 // URL probably needs to start with a /
 func (dispatch *Dispatcher) Debug(args []string) {
+	dispatch.EnsureAuth()
 	dispatch.BigV.DebugLevel = 1
 
 	// make sure the command is well-formed

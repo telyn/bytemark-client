@@ -113,8 +113,19 @@ func (config *Config) Get(name string) string {
 	return ""
 }
 
+// TODO(telyn): write a test for Set
+
+// Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.
 func (config *Config) Set(name string, value string) {
 	config.Memo[name] = value
+}
+
+// TODO(telyn): write a test for SetPersistent
+
+// SetPersistent writes a file to the config directory for the given key-value pair.
+func (config *Config) SetPersistent(name, value string) {
+	config.Set(name, value)
+	// TODO(telyn): write a file here
 }
 
 func (config *Config) GetDefault(name string) string {

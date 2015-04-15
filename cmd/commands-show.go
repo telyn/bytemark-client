@@ -6,6 +6,8 @@ import (
 )
 
 func (dispatch *Dispatcher) ShowVM(args []string) {
+	dispatch.EnsureAuth()
+
 	name := ParseVirtualMachineName(args[0])
 
 	vm, err := dispatch.BigV.GetVirtualMachine(name)
