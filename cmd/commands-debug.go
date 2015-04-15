@@ -16,7 +16,7 @@ func (dispatch *Dispatcher) Debug(args []string) {
 
 	// make sure the command is well-formed
 
-	body, err := dispatch.BigV.Request(args[0], args[1], "")
+	body, err := dispatch.BigV.RequestAndRead(args[0], args[1], "")
 	if err != nil {
 		panic(err)
 	}
