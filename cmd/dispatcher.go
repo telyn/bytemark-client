@@ -18,8 +18,6 @@ type Dispatcher struct {
 	BigV   *client.Client
 }
 
-// This is trying to do a little too much
-
 // NewDispatcher creates a new Dispatcher given a config. It will check the auth for whatever token config can find, then try to grab credents from config, prompting if needed.
 func NewDispatcher(config *Config) (d *Dispatcher) {
 	d = new(Dispatcher)

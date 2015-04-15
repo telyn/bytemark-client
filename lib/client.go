@@ -4,6 +4,7 @@ import (
 	auth3 "bytemark.co.uk/auth3/client"
 )
 
+// Client is the main type in the BigV client library.
 type Client struct {
 	Endpoint    string
 	Auth        *auth3.Client
@@ -11,9 +12,8 @@ type Client struct {
 	DebugLevel  int
 }
 
-// Creates a new Client using the auth.Client you specify.
+// NewWithSession creates a new Client using the bytemark auth.Client you specify.
 func NewWithSession(auth *auth3.Client, session *auth3.SessionData) (bigv *Client, err error) {
-	// check your session's good or smth
 
 	bigv = new(Client)
 	bigv.Endpoint = "https://uk0.bigv.io"
@@ -24,9 +24,9 @@ func NewWithSession(auth *auth3.Client, session *auth3.SessionData) (bigv *Clien
 	return bigv, nil
 }
 
-// Creates a new Client authenticating against auth.bytemark.co.uk
+// NewWithCredentials creates a new Client authenticating against auth.bytemark.co.uk using the given credentials.
+// If an alternative auth endpoint is needed, use NewWithSession
 func NewWithCredentials(credentials auth3.Credentials) (bigv *Client, err error) {
-	// sort out all the auth shit yo
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
@@ -40,7 +40,8 @@ func NewWithCredentials(credentials auth3.Credentials) (bigv *Client, err error)
 	return NewWithSession(auth, session)
 }
 
-// Creates a new Client authenticating against auth.bytemark.co.uk
+// NewWithToken creates a new Client authenticating against auth.bytemark.co.uk using the given token
+// If an alternative auth endpoint is needed, use NewWithSession
 func NewWithToken(token string) (bigv *Client, err error) {
 
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
