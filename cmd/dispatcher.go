@@ -86,19 +86,19 @@ func (dispatch *Dispatcher) Do(args []string) {
 
 	if /*help == true || */ len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		fmt.Printf("No command specified.\n\n")
-		dispatch.OutputHelp(args)
+		dispatch.Help(args)
 	}
 
 	// short-circuit commands that don't take arguments
 	switch strings.ToLower(args[0]) {
 	case "help":
-		dispatch.OutputHelp(args)
+		dispatch.Help(args)
 		return
 	}
 
 	// do this
 	if len(args) == 1 {
-		dispatch.OutputHelp(args)
+		dispatch.Help(args)
 		return
 	}
 
@@ -113,5 +113,5 @@ func (dispatch *Dispatcher) Do(args []string) {
 		dispatch.ShowAccount(args[1:])
 		return
 	}
-	dispatch.OutputHelp(args)
+	dispatch.Help(args)
 }
