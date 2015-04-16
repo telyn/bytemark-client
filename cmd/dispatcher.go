@@ -107,11 +107,17 @@ func (dispatch *Dispatcher) Do(args []string) {
 	case "debug":
 		dispatch.Debug(args[1:])
 		return
-	case "show-vm":
-		dispatch.ShowVM(args[1:])
+	case "set":
+		dispatch.Set(args[1:])
 		return
 	case "show-account":
 		dispatch.ShowAccount(args[1:])
+		return
+	case "show-vm":
+		dispatch.ShowVM(args[1:])
+		return
+	case "unset":
+		dispatch.Unset(args[1:])
 		return
 	}
 }

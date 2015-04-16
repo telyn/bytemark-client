@@ -159,3 +159,10 @@ func (config *Config) SetPersistent(name, value string) {
 		panic(err)
 	}
 }
+
+// Unset removes the named key from both config's Memo and the user's config directory.
+func (config *Config) Unset(name string) {
+	delete(config.Memo, name)
+	// TODO(telyn): handle errors here or don't
+	os.Remove(config.GetPath(name))
+}
