@@ -12,12 +12,15 @@ import (
 // command syntax: debug <method> <url>
 // URL probably needs to start with a /
 func (dispatch *Dispatcher) Debug(args []string) {
+	// TODO(telyn): add a flag to disable auth
+	// TODO(telyn): add a flag to junk the token
+	shouldAuth := true
 	dispatch.EnsureAuth()
 	dispatch.BigV.DebugLevel = 1
 
 	// make sure the command is well-formed
 
-	body, err := dispatch.BigV.RequestAndRead(args[0], args[1], "")
+	body, err := dispatch.BigV.RequestAndRead(shouldAuth, args[0], args[1], "")
 	if err != nil {
 		panic(err)
 	}
