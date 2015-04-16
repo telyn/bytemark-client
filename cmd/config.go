@@ -113,21 +113,6 @@ func (config *Config) Get(name string) string {
 	return ""
 }
 
-// Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.
-func (config *Config) Set(name string, value string) {
-	config.Memo[name] = value
-}
-
-// SetPersistent writes a file to the config directory for the given key-value pair.
-func (config *Config) SetPersistent(name, value string) {
-	config.Set(name, value)
-	err := ioutil.WriteFile(config.GetPath("user"), []byte(value), 0600)
-	if err != nil {
-		fmt.Println("Couldn't write to config directory " + config.Dir)
-		panic(err)
-	}
-}
-
 func (config *Config) GetDefault(name string) string {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
@@ -156,4 +141,19 @@ func (config *Config) Read(name string) string {
 	}
 
 	return string(contents)
+}
+
+// Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.
+func (config *Config) Set(name string, value string) {
+	config.Memo[name] = value
+}
+
+// SetPersistent writes a file to the config directory for the given key-value pair.
+func (config *Config) SetPersistent(name, value string) {
+	config.Set(name, value)
+	err := ioutil.WriteFile(config.GetPath("user"), []byte(value), 0600)
+	if err != nil {
+		fmt.Println("Couldn't write to config directory " + config.Dir)
+		panic(err)
+	}
 }
