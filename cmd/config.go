@@ -45,24 +45,25 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 	}
 
 	if configDir != "" {
-		err := os.MkdirAll(configDir, 0600)
-		if err != nil {
-			// TODO(telyn): Better error handling here
-
-			panic(err)
-		}
-
-		stat, err := os.Stat(configDir)
-		if err != nil {
-			// TODO(telyn): Better error handling here
-			panic(err)
-		}
-
-		if !stat.IsDir() {
-			fmt.Printf("%s is not a directory", configDir)
-			panic("Cannot continue")
-		}
 		config.Dir = configDir
+	}
+
+	err := os.MkdirAll(config.Dir, 0700)
+	if err != nil {
+		// TODO(telyn): Better error handling here
+
+		panic(err)
+	}
+
+	stat, err := os.Stat(config.Dir)
+	if err != nil {
+		// TODO(telyn): Better error handling here
+		panic(err)
+	}
+
+	if !stat.IsDir() {
+		fmt.Printf("%s is not a directory", config.Dir)
+		panic("Cannot continue")
 	}
 
 	if flags != nil {
@@ -113,21 +114,18 @@ func (config *Config) Get(name string) string {
 	return ""
 }
 
-func (config *Config) Set(name string, value string) {
-	config.Memo[name] = value
-}
-
 func (config *Config) GetDefault(name string) string {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
-		return FirstNotEmpty(os.Getenv("BIGV_USER"), os.Getenv("USER"))
+		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bigv config set user <youruser>"
+		return os.Getenv("BIGV_USER")
 	case "endpoint":
 		return FirstNotEmpty(os.Getenv("BIGV_ENDPOINT"), "https://uk0.bigv.io")
 	case "auth-endpoint":
 		return FirstNotEmpty(os.Getenv("BIGV_AUTH_ENDPOINT"), "https://auth.bytemark.co.uk")
 	case "account":
-		return FirstNotEmpty(os.Getenv("BIGV_ACCOUNT"), os.Getenv("BIGV_USER"), os.Getenv("USER"))
+		return FirstNotEmpty(os.Getenv("BIGV_ACCOUNT"), config.Get("user"))
 	case "debug-level":
 		return FirstNotEmpty(os.Getenv("BIGV_DEBUG_LEVEL"), "0")
 	}
@@ -145,4 +143,26 @@ func (config *Config) Read(name string) string {
 	}
 
 	return string(contents)
+}
+
+// Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.
+func (config *Config) Set(name string, value string) {
+	config.Memo[name] = value
+}
+
+// SetPersistent writes a file to the config directory for the given key-value pair.
+func (config *Config) SetPersistent(name, value string) {
+	config.Set(name, value)
+	err := ioutil.WriteFile(config.GetPath(name), []byte(value), 0600)
+	if err != nil {
+		fmt.Println("Couldn't write to config directory " + config.Dir)
+		panic(err)
+	}
+}
+
+// Unset removes the named key from both config's Memo and the user's config directory.
+func (config *Config) Unset(name string) {
+	delete(config.Memo, name)
+	// TODO(telyn): handle errors here or don't
+	os.Remove(config.GetPath(name))
 }

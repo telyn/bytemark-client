@@ -26,10 +26,10 @@ type ImageInstall struct {
 }
 
 type IP struct {
-	RDNS string `json:"rdns"`
+	RDns string `json:"rdns"`
 
 	// this cannot be set.
-	IP string `json:"ip"`
+	Ip string `json:"ip"`
 }
 
 type NetworkInterface struct {
@@ -39,10 +39,10 @@ type NetworkInterface struct {
 
 	// the following can't be set (or at least, so I'm assuming..)
 
-	ID               int               `json:"id"`
+	Id               int               `json:"id"`
 	VlanNum          int               `json:"vlan_num"`
-	IPs              []string          `json:"ips"`
-	ExtraIPs         map[string]string `json:"extra_ips"`
+	Ips              []string          `json:"ips"`
+	ExtraIps         map[string]string `json:"extra_ips"`
 	VirtualMachineId int               `json:"virtual_machine_id"`
 }
 
@@ -58,13 +58,14 @@ type User struct {
 	AccountName string `json:"account_name"`
 }
 
+// TODO(telyn): new fields (last_imaged_with and
 type VirtualMachine struct {
 	Autoreboot            bool   `json:"autoreboot_on"`
-	CdromURL              string `json:"cdrom_url"`
+	CdromUrl              string `json:"cdrom_url"`
 	Cores                 int    `json:"cores"`
 	Memory                int    `json:"memory"`
 	Name                  string `json:"name"`
-	Power                 bool   `json:"power_on"`
+	PowerOn               bool   `json:"power_on"`
 	HardwareProfile       string `json:"hardware_profile"`
 	HardwareProfileLocked bool   `json:"hardware_profile_locked"`
 	GroupId               int    `json:"group_id"`
