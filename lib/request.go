@@ -10,7 +10,7 @@ import (
 )
 
 // RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
-func (bigv *Client) RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error {
+func (bigv *BigVClient) RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error {
 
 	data, err := bigv.RequestAndRead(auth, method, path, requestBody)
 
@@ -44,7 +44,7 @@ func (bigv *Client) RequestAndUnmarshal(auth bool, method, path, requestBody str
 
 // Request makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
-func (bigv *Client) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
+func (bigv *BigVClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
 	req, res, err := bigv.Request(auth, method, location, requestBody)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (bigv *Client) RequestAndRead(auth bool, method, location, requestBody stri
 
 // Make an HTTP request and then request it, returning the request object, response object and any errors
 // For use by Client.RequestAndRead, do not use externally except for testing
-func (bigv *Client) Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
+func (bigv *BigVClient) Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
 	url := location
 
 	if strings.HasPrefix(location, "/") {

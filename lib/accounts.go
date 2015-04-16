@@ -5,7 +5,7 @@ import (
 )
 
 // GetAccount takes an account name and returns a filled-out Account object
-func (bigv *Client) GetAccount(name string) (account *Account, err error) {
+func (bigv *BigVClient) GetAccount(name string) (account *Account, err error) {
 	account = new(Account)
 	path := fmt.Sprintf("/accounts/%s", name)
 
