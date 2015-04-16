@@ -3,7 +3,8 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
+	"github.com/cheekybits/is"
+	"reflect"
 	"testing"
 )
 
@@ -69,7 +70,21 @@ var (
 }`
 )
 
+// Contains loops over the given list looking for element
+// Returns (true, true) if found, (true, false) if not, and (false, false) if there was an error
+func Contains(list, element interface{}) (found bool) {
+	listValue := reflect.ValueOf(list)
+
+	for i := 0; i < listValue.Len(); i++ {
+		if listValue.Index(i).Interface() == element {
+			return true
+		}
+	}
+	return false
+}
+
 func TestDiskUnmarshal(t *testing.T) {
+	is := is.New(t)
 	disk := new(Disk)
 	err := json.Unmarshal([]byte(fixtureDiskOne), disk)
 
@@ -77,15 +92,17 @@ func TestDiskUnmarshal(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, 99994, disk.Id)
-	assert.Equal(t, "vda", disk.Label)
-	assert.Equal(t, 35840, disk.Size)
-	assert.Equal(t, "sata", disk.StorageGrade)
-	assert.Equal(t, "tail99-sata9", disk.StoragePool)
-	assert.Equal(t, 99999, disk.VirtualMachineId)
+	is.Equal(99994, disk.Id)
+	is.Equal("vda", disk.Label)
+	is.Equal(35840, disk.Size)
+	is.Equal("sata", disk.StorageGrade)
+	is.Equal("tail99-sata9", disk.StoragePool)
+	is.Equal(99999, disk.VirtualMachineId)
 }
 
 func TestNicUnmarshal(t *testing.T) {
+	is := is.New(t)
+
 	nic := new(NetworkInterface)
 	err := json.Unmarshal([]byte(fixtureNic), nic)
 
@@ -93,19 +110,20 @@ func TestNicUnmarshal(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, 99996, nic.Id)
-	assert.Equal(t, 99999, nic.VirtualMachineId)
-	assert.Equal(t, "ff:ff:ff:ff:ff:fe", nic.Mac)
-	assert.Equal(t, 999, nic.VlanNum)
+	is.Equal(99996, nic.Id)
+	is.Equal(99999, nic.VirtualMachineId)
+	is.Equal("ff:ff:ff:ff:ff:fe", nic.Mac)
+	is.Equal(999, nic.VlanNum)
 
-	assert.Contains(t, nic.Ips, "192.168.99.1")
-	assert.Contains(t, nic.Ips, "fe80::9999")
-	assert.NotNil(t, nic.ExtraIps["192.168.99.2"])
-	assert.Equal(t, "192.168.99.1", nic.ExtraIps["192.168.99.2"])
+	is.Equal(true, Contains(nic.Ips, "192.168.99.1"))
+	is.Equal(true, Contains(nic.Ips, "fe80::9999"))
+	is.OK(t, nic.ExtraIps["192.168.99.2"])
+	is.Equal("192.168.99.1", nic.ExtraIps["192.168.99.2"])
 
 }
 
 func TestVirtualMachineUnmarshal(t *testing.T) {
+	is := is.New(t)
 
 	vm := new(VirtualMachine)
 	err := json.Unmarshal([]byte(fixtureVm), vm)
@@ -115,52 +133,53 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 		panic("Cannot continue")
 	}
 
-	assert.True(t, vm.Autoreboot)
-	assert.Equal(t, "", vm.CdromUrl)
-	assert.Equal(t, 1, vm.Cores)
-	assert.False(t, vm.Deleted)
-	assert.Equal(t, 9999, vm.GroupId)
-	assert.Equal(t, "virtio2013", vm.HardwareProfile)
-	assert.False(t, vm.HardwareProfileLocked)
-	assert.Equal(t, "head99", vm.Head)
-	assert.Equal(t, "example.notarealgroup.bytemark.uk0.bigv.io", vm.Hostname)
-	assert.Equal(t, 99999, vm.Id)
-	assert.Equal(t, "10.0.0.1", vm.ManagementAddress)
-	assert.Equal(t, 2048, vm.Memory)
-	assert.Equal(t, "example", vm.Name)
-	assert.True(t, vm.PowerOn)
-	assert.Equal(t, "default", vm.ZoneName)
+	is.Equal(true, vm.Autoreboot)
+	is.Equal("", vm.CdromUrl)
+	is.Equal(1, vm.Cores)
+	is.Equal(false, vm.Deleted)
+	is.Equal(9999, vm.GroupId)
+	is.Equal("virtio2013", vm.HardwareProfile)
+	is.Equal(false, vm.HardwareProfileLocked)
+	is.Equal("head99", vm.Head)
+	is.Equal("example.notarealgroup.bytemark.uk0.bigv.io", vm.Hostname)
+	is.Equal(99999, vm.Id)
+	is.Equal("10.0.0.1", vm.ManagementAddress)
+	is.Equal(2048, vm.Memory)
+	is.Equal("example", vm.Name)
+	is.Equal(true, vm.PowerOn)
+	is.Equal("default", vm.ZoneName)
 
 	disk := vm.Discs[0]
 
-	assert.Equal(t, 99994, disk.Id)
-	assert.Equal(t, "vda", disk.Label)
-	assert.Equal(t, 35840, disk.Size)
-	assert.Equal(t, "sata", disk.StorageGrade)
-	assert.Equal(t, "tail99-sata9", disk.StoragePool)
-	assert.Equal(t, 99999, disk.VirtualMachineId)
+	is.Equal(99994, disk.Id)
+	is.Equal("vda", disk.Label)
+	is.Equal(35840, disk.Size)
+	is.Equal("sata", disk.StorageGrade)
+	is.Equal("tail99-sata9", disk.StoragePool)
+	is.Equal(99999, disk.VirtualMachineId)
 
 	disk = vm.Discs[1]
 
-	assert.Equal(t, 99995, disk.Id)
-	assert.Equal(t, "vdb", disk.Label)
-	assert.Equal(t, 666666, disk.Size)
-	assert.Equal(t, "archive", disk.StorageGrade)
-	assert.Equal(t, "tail98-sata9", disk.StoragePool)
-	assert.Equal(t, 99999, disk.VirtualMachineId)
+	is.Equal(99995, disk.Id)
+	is.Equal("vdb", disk.Label)
+	is.Equal(666666, disk.Size)
+	is.Equal("archive", disk.StorageGrade)
+	is.Equal("tail98-sata9", disk.StoragePool)
+	is.Equal(99999, disk.VirtualMachineId)
 
 	nic := vm.NetworkInterfaces[0]
 
-	assert.Equal(t, 99996, nic.Id)
-	assert.Equal(t, 99999, nic.VirtualMachineId)
-	assert.Equal(t, "ff:ff:ff:ff:ff:fe", nic.Mac)
-	assert.Equal(t, 999, nic.VlanNum)
+	is.Equal(99996, nic.Id)
+	is.Equal(99999, nic.VirtualMachineId)
+	is.Equal("ff:ff:ff:ff:ff:fe", nic.Mac)
+	is.Equal(999, nic.VlanNum)
 
-	assert.Contains(t, nic.Ips, "192.168.99.1")
-	assert.Contains(t, nic.Ips, "fe80::9999")
-	assert.NotNil(t, nic.ExtraIps["192.168.99.2"])
-	assert.Equal(t, "192.168.99.1", nic.ExtraIps["192.168.99.2"])
+	is.Equal(true, Contains(nic.Ips, "192.168.99.1"))
+	is.Equal(true, Contains(nic.Ips, "fe80::9999"))
+	is.OK(t, nic.ExtraIps["192.168.99.2"])
+	is.Equal("192.168.99.1", nic.ExtraIps["192.168.99.2"])
 }
 
 func TestImageUnmarshal(t *testing.T) {
+	//is := is.New(t)
 }
