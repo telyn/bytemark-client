@@ -17,16 +17,17 @@ func (dispatch *Dispatcher) Help(args []string) {
 		dispatch.HelpForHelp()
 		return
 	}
+
+	// please try and keep these in alphabetical order
 	switch strings.ToLower(args[0]) {
-	case "show":
-		dispatch.HelpForShow()
-		return
+	case "debug":
+		dispatch.HelpForDebug()
 	case "set":
 		dispatch.HelpForSet()
-		return
+	case "show":
+		dispatch.HelpForShow()
 	case "unset":
 		dispatch.HelpForUnset()
-		return
 	}
 
 }
