@@ -45,24 +45,25 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 	}
 
 	if configDir != "" {
-		err := os.MkdirAll(configDir, 0600)
-		if err != nil {
-			// TODO(telyn): Better error handling here
-
-			panic(err)
-		}
-
-		stat, err := os.Stat(configDir)
-		if err != nil {
-			// TODO(telyn): Better error handling here
-			panic(err)
-		}
-
-		if !stat.IsDir() {
-			fmt.Printf("%s is not a directory", configDir)
-			panic("Cannot continue")
-		}
 		config.Dir = configDir
+	}
+
+	err := os.MkdirAll(config.Dir, 0700)
+	if err != nil {
+		// TODO(telyn): Better error handling here
+
+		panic(err)
+	}
+
+	stat, err := os.Stat(config.Dir)
+	if err != nil {
+		// TODO(telyn): Better error handling here
+		panic(err)
+	}
+
+	if !stat.IsDir() {
+		fmt.Printf("%s is not a directory", config.Dir)
+		panic("Cannot continue")
 	}
 
 	if flags != nil {
