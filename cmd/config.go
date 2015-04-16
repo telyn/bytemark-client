@@ -118,13 +118,14 @@ func (config *Config) GetDefault(name string) string {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
-		return FirstNotEmpty(os.Getenv("BIGV_USER"), os.Getenv("USER"))
+		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bigv config set user <youruser>"
+		return os.Getenv("BIGV_USER")
 	case "endpoint":
 		return FirstNotEmpty(os.Getenv("BIGV_ENDPOINT"), "https://uk0.bigv.io")
 	case "auth-endpoint":
 		return FirstNotEmpty(os.Getenv("BIGV_AUTH_ENDPOINT"), "https://auth.bytemark.co.uk")
 	case "account":
-		return FirstNotEmpty(os.Getenv("BIGV_ACCOUNT"), os.Getenv("BIGV_USER"), os.Getenv("USER"))
+		return FirstNotEmpty(os.Getenv("BIGV_ACCOUNT"), config.Get("user"))
 	case "debug-level":
 		return FirstNotEmpty(os.Getenv("BIGV_DEBUG_LEVEL"), "0")
 	}
