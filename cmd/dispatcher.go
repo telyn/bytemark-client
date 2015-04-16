@@ -83,11 +83,18 @@ func (d *Dispatcher) PromptForCredentials() {
 
 }
 
+// TODO(telyn): Write a test for Do. Somehow.
+
 // Do takes the command line arguments and figures out what to do
 func (dispatch *Dispatcher) Do(args []string) {
 	//	help := dispatch.Flags.Lookup("help")
 	///	fmt.Printf("%+v", help)
-	if dispatch.BigV.DebugLevel >= 1 {
+	debugLevel, err := strconv.ParseInt(dispatch.Config.Get("debug-level"), 10, 0)
+	if err != nil {
+		debugLevel = 0
+	}
+
+	if debugLevel >= 1 {
 		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
 	}
 

@@ -152,7 +152,7 @@ func (config *Config) Set(name string, value string) {
 // SetPersistent writes a file to the config directory for the given key-value pair.
 func (config *Config) SetPersistent(name, value string) {
 	config.Set(name, value)
-	err := ioutil.WriteFile(config.GetPath("user"), []byte(value), 0600)
+	err := ioutil.WriteFile(config.GetPath(name), []byte(value), 0600)
 	if err != nil {
 		fmt.Println("Couldn't write to config directory " + config.Dir)
 		panic(err)
