@@ -7,29 +7,28 @@ import (
 
 func (dispatch *Dispatcher) HelpForSet() {
 	fmt.Println("bigv set")
-	fmt.Println("")
+	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("    bigv set <variable> <value>")
-	fmt.Println("")
+	fmt.Println()
 	fmt.Println("Sets a variable by writing to your bigv config (usually ~/.go-bigv)")
-	fmt.Println("")
+	fmt.Println()
 	fmt.Println("Available variables:")
 	fmt.Println("    endpoint - the BigV endpoint to connect to. https://uk0.bigv.io is the default")
 	fmt.Println("    auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.")
 	fmt.Println("    debug-level - the default debug level. Set to 0 unless you like lots of output")
-	fmt.Println("")
-	fmt.Println("")
+	fmt.Println()
 }
 
 func (dispatch *Dispatcher) HelpForUnset() {
 	fmt.Println("bigv unset")
-	fmt.Println("")
+	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("    bigv unset <variable>")
-	fmt.Println("")
+	fmt.Println()
 	fmt.Println("Unsets a variable by removing data from bigv config (usually ~/.go-bigv)")
 	fmt.Println("See the set command for the list of available variables")
-	fmt.Println("")
+	fmt.Println()
 }
 
 // Set provides the bigv set command, which sets variables in the user's config

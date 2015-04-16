@@ -106,13 +106,13 @@ func (dispatch *Dispatcher) Do(args []string) {
 	// short-circuit commands that don't take arguments
 	switch strings.ToLower(args[0]) {
 	case "help":
-		dispatch.Help(args)
+		dispatch.Help(args[1:])
 		return
 	}
 
 	// do this
 	if len(args) == 1 {
-		dispatch.Help(args)
+		dispatch.Help(args[1:])
 		return
 	}
 

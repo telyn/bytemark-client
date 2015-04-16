@@ -16,6 +16,7 @@ func (dispatch *Dispatcher) HelpForShow() {
 	fmt.Println()
 	fmt.Println("Displays information about the given virtual machine, group, or account.")
 	fmt.Println("If the --verbose flag is given to bigv show group or bigv show account, full details are given for each VM.")
+	fmt.Println()
 }
 
 func (dispatch *Dispatcher) ShowVM(args []string) {
