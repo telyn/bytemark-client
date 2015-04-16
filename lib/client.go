@@ -56,3 +56,16 @@ func NewWithToken(token string) (bigv *BigVClient, err error) {
 
 	return NewWithSession(auth, session)
 }
+
+func (bigv *BigVClient) GetEndpoint() string {
+	return bigv.endpoint
+}
+
+func (bigv *BigVClient) SetDebugLevel(debugLevel int) {
+	bigv.debugLevel = debugLevel
+}
+
+// TODO(telyn): remove GetSessionToken - Dispatcher should get the AuthSession and pass it to NewWithSession
+func (bigv *BigVClient) GetSessionToken() string {
+	return bigv.authSession.Token
+}

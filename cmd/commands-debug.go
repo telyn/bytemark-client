@@ -16,7 +16,7 @@ func (dispatch *Dispatcher) Debug(args []string) {
 	// TODO(telyn): add a flag to junk the token
 	shouldAuth := true
 	dispatch.EnsureAuth()
-	dispatch.BigV.DebugLevel = 1
+	dispatch.BigV.SetDebugLevel(1)
 
 	// make sure the command is well-formed
 

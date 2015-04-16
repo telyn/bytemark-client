@@ -15,7 +15,7 @@ import (
 type Dispatcher struct {
 	Config *Config
 	Flags  *flag.FlagSet
-	BigV   *client.Client
+	BigV   client.Client
 }
 
 // NewDispatcher creates a new Dispatcher given a config.
@@ -48,11 +48,11 @@ func (d *Dispatcher) EnsureAuth() {
 	}
 	debugLevel, err := strconv.ParseInt(d.Config.Get("debug-level"), 10, 0)
 	if err == nil {
-		c.DebugLevel = int(debugLevel)
+		c.SetDebugLevel(int(debugLevel))
 	}
 	d.BigV = c
 
-	d.Config.SetPersistent("token", d.BigV.AuthSession.Token)
+	d.Config.SetPersistent("token", d.BigV.GetSessionToken())
 }
 
 // PromptForCredentials ensures that user, pass and yubikey-otp are defined, by prompting the user for them.
