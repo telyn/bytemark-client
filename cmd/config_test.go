@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/cheekybits/is"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -52,9 +52,9 @@ func FixtureEnv() (fixture map[string]string) {
 }
 
 /*
- =====================
-  Environment Helpers
- =====================
+ ===================
+  Directory Helpers
+ ===================
 */
 
 func CleanDir() (name string) {
@@ -108,49 +108,41 @@ func FixtureDir() (dir string, fixture map[string]string) {
 }
 
 /*
- ===================
-  Assertion Helpers
- ===================
-*/
-
-func AssertConfigMatchesFixture(t *testing.T, fixture map[string]string, config *Config) {
-	assert.Equal(t, fixture["endpoint"], config.Get("endpoint"))
-	assert.Equal(t, fixture["auth-endpoint"], config.Get("auth-endpoint"))
-	assert.Equal(t, fixture["user"], config.Get("user"))
-	assert.Equal(t, fixture["account"], config.Get("account"))
-	assert.Equal(t, fixture["debug-level"], config.Get("debug-level"))
-}
-
-/*
  =========================
   Environment-based Tests
  =========================
 */
 
 func TestDefaultConfigDir(t *testing.T) {
+	is := is.New(t)
+
 	CleanEnv()
 
 	config := NewConfig("", nil)
 	expected := filepath.Join(os.Getenv("HOME"), "/.go-bigv")
-	assert.Equal(t, expected, config.Dir)
+	is.Equal(expected, config.Dir)
 }
 
 func TestEnvConfigDir(t *testing.T) {
+	is := is.New(t)
+
 	CleanEnv()
 
 	expected := "/tmp"
 	os.Setenv("BIGV_CONFIG_DIR", expected)
 
 	config := NewConfig("", nil)
-	assert.Equal(t, expected, config.Dir)
+	is.Equal(expected, config.Dir)
 }
 
 func TestPassedConfigDir(t *testing.T) {
+	is := is.New(t)
+
 	JunkEnv()
 
 	expected := "/home"
 	config := NewConfig(expected, nil)
-	assert.Equal(t, expected, config.Dir)
+	is.Equal(expected, config.Dir)
 }
 
 /*
@@ -161,22 +153,26 @@ func TestPassedConfigDir(t *testing.T) {
 // Tests to make sure we get the right defaults given the environment
 
 func TestConfigDefaultsCleanEnv(t *testing.T) {
+	is := is.New(t)
+
 	CleanEnv()
 	dir := CleanDir()
 
 	config := NewConfig(dir, nil)
 
 	// TODO(telyn): Update me when we move to api.bigv.io
-	assert.Equal(t, "https://uk0.bigv.io", config.Get("endpoint"))
-	assert.Equal(t, "https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
+	is.Equal("https://uk0.bigv.io", config.Get("endpoint"))
+	is.Equal("https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
 
-	assert.Equal(t, os.Getenv("USER"), config.Get("user"))
-	assert.Equal(t, os.Getenv("USER"), config.Get("account"))
+	is.Equal(os.Getenv("USER"), config.Get("user"))
+	is.Equal(os.Getenv("USER"), config.Get("account"))
 
 	os.RemoveAll(dir)
 }
 
 func TestConfigDefaultsWithEnvUser(t *testing.T) {
+	is := is.New(t)
+
 	CleanEnv()
 	dir := CleanDir()
 
@@ -185,21 +181,28 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 
 	config := NewConfig(dir, nil)
 
-	assert.Equal(t, "https://uk0.bigv.io", config.Get("endpoint"))
-	assert.Equal(t, "https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
-	assert.Equal(t, expected, config.Get("user"))
-	assert.Equal(t, expected, config.Get("account"))
+	is.Equal("https://uk0.bigv.io", config.Get("endpoint"))
+	is.Equal("https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
+	is.Equal(expected, config.Get("user"))
+	is.Equal(expected, config.Get("account"))
 
 	os.RemoveAll(dir)
 }
 
 func TestConfigDefaultsFixtureEnv(t *testing.T) {
+	is := is.New(t)
+
 	fixture := FixtureEnv()
 	dir := CleanDir()
 
 	config := NewConfig(dir, nil)
 
-	AssertConfigMatchesFixture(t, fixture, config)
+	is.Equal(fixture["endpoint"], config.Get("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
+	is.Equal(fixture["user"], config.Get("user"))
+	is.Equal(fixture["account"], config.Get("account"))
+	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	os.RemoveAll(dir)
 }
 
 /*
@@ -210,12 +213,18 @@ func TestConfigDefaultsFixtureEnv(t *testing.T) {
 // Tests to ensure that we get given the value in the directory if we didn't specify it as a flag
 
 func TestConfigDir(t *testing.T) {
+	is := is.New(t)
+
 	JunkEnv()
 	dir, fixture := FixtureDir()
 
 	config := NewConfig(dir, nil)
 
-	AssertConfigMatchesFixture(t, fixture, config)
+	is.Equal(fixture["endpoint"], config.Get("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
+	is.Equal(fixture["user"], config.Get("user"))
+	is.Equal(fixture["account"], config.Get("account"))
+	is.Equal(fixture["debug-level"], config.Get("debug-level"))
 
 	os.RemoveAll(dir)
 }
@@ -227,3 +236,68 @@ func TestConfigDir(t *testing.T) {
 */
 
 // TODO(telyn): no i don't want to write flag tests today
+
+/*
+ ===========
+  Set Tests
+ ===========
+*/
+
+func TestSet(t *testing.T) {
+	is := is.New(t)
+
+	CleanEnv()
+	dir, fixture := FixtureDir()
+	config := NewConfig(dir, nil)
+
+	is.Equal(fixture["endpoint"], config.Get("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
+	is.Equal(fixture["user"], config.Get("user"))
+	is.Equal(fixture["account"], config.Get("account"))
+	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+
+	config.Set("user", "test-user")
+	fixture["user"] = "test-user"
+
+	is.Equal(fixture["endpoint"], config.Get("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
+	is.Equal(fixture["user"], config.Get("user"))
+	is.Equal(fixture["account"], config.Get("account"))
+	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	os.RemoveAll(dir)
+}
+
+func TestSetPersistent(t *testing.T) {
+	is := is.New(t)
+
+	CleanEnv()
+	dir, fixture := FixtureDir()
+	config := NewConfig(dir, nil)
+
+	is.Equal(fixture["endpoint"], config.Get("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
+	is.Equal(fixture["user"], config.Get("user"))
+	is.Equal(fixture["account"], config.Get("account"))
+	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+
+	config.SetPersistent("user", "test-user")
+	fixture["user"] = "test-user"
+
+	is.Equal(fixture["endpoint"], config.Get("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
+	is.Equal(fixture["user"], config.Get("user"))
+	is.Equal(fixture["account"], config.Get("account"))
+	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+
+	CleanEnv() // in case for some wacky reason I write to the environment
+	//create a new config (blanking the memo) to test the file in the directory has changed.
+	config2 := NewConfig(dir, nil)
+
+	is.Equal(fixture["endpoint"], config2.Get("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config2.Get("auth-endpoint"))
+	is.Equal(fixture["user"], config2.Get("user"))
+	is.Equal(fixture["account"], config2.Get("account"))
+	is.Equal(fixture["debug-level"], config2.Get("debug-level"))
+
+	os.RemoveAll(dir)
+}
