@@ -16,6 +16,10 @@ func (dispatch *Dispatcher) Help(args []string) {
 	switch strings.ToLower(args[0]) {
 	case "help":
 		dispatch.HelpForShow()
+	case "set":
+		dispatch.HelpForSet()
+	case "unset":
+		dispatch.HelpForUnset()
 	}
 
 }
