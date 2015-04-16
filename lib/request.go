@@ -14,7 +14,7 @@ func (bigv *BigVClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 
 	data, err := bigv.RequestAndRead(auth, method, path, requestBody)
 
-	if bigv.DebugLevel >= 4 {
+	if bigv.debugLevel >= 4 {
 		fmt.Printf("'%s'\r\n", data)
 	}
 
@@ -32,7 +32,7 @@ func (bigv *BigVClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 		return err
 	}
 
-	if bigv.DebugLevel >= 3 {
+	if bigv.debugLevel >= 3 {
 		buf := new(bytes.Buffer)
 		json.Indent(buf, data, "", "    ")
 		fmt.Printf("%s", buf)
@@ -51,7 +51,7 @@ func (bigv *BigVClient) RequestAndRead(auth bool, method, location, requestBody 
 	}
 	defer res.Body.Close()
 
-	if bigv.DebugLevel > 1 {
+	if bigv.debugLevel > 1 {
 		fmt.Printf("%s %s: %d\r\n", method, req.URL, res.StatusCode)
 	}
 
@@ -60,7 +60,7 @@ func (bigv *BigVClient) RequestAndRead(auth bool, method, location, requestBody 
 		return nil, err
 	}
 
-	if bigv.DebugLevel > 2 {
+	if bigv.debugLevel > 2 {
 		fmt.Printf(string(responseBody))
 	}
 
@@ -73,7 +73,7 @@ func (bigv *BigVClient) Request(auth bool, method string, location string, reque
 	url := location
 
 	if strings.HasPrefix(location, "/") {
-		url = bigv.Endpoint + location
+		url = bigv.endpoint + location
 	}
 	cli := &http.Client{}
 
@@ -85,7 +85,7 @@ func (bigv *BigVClient) Request(auth bool, method string, location string, reque
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	if auth {
-		req.Header.Add("Authorization", "Bearer "+bigv.AuthSession.Token)
+		req.Header.Add("Authorization", "Bearer "+bigv.authSession.Token)
 	}
 
 	res, err = cli.Do(req)

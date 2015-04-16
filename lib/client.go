@@ -6,20 +6,20 @@ import (
 
 // Client is the main type in the BigV client library.
 type BigVClient struct {
-	Endpoint    string
-	Auth        *auth3.Client
-	AuthSession *auth3.SessionData
-	DebugLevel  int
+	endpoint    string
+	auth        *auth3.Client
+	authSession *auth3.SessionData
+	debugLevel  int
 }
 
 // NewWithSession creates a new Client using the bytemark auth.Client you specify.
 func NewWithSession(auth *auth3.Client, session *auth3.SessionData) (bigv *BigVClient, err error) {
 
-	bigv = new(Client)
-	bigv.Endpoint = "https://uk0.bigv.io"
-	bigv.Auth = auth
-	bigv.AuthSession = session
-	bigv.DebugLevel = 0
+	bigv = new(BigVClient)
+	bigv.endpoint = "https://uk0.bigv.io"
+	bigv.auth = auth
+	bigv.authSession = session
+	bigv.debugLevel = 0
 
 	return bigv, nil
 }
