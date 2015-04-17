@@ -55,7 +55,7 @@ func (cmds *CommandSet) Set(args []string) {
 }
 
 func (cmds *CommandSet) Unset(args []string) {
-	if len(args) != 2 {
+	if len(args) == 0 {
 		cmds.HelpForUnset()
 		return
 	}
