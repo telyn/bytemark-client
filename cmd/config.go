@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -27,6 +28,7 @@ import (
 //The location of the configuration directory is read from global command-line flags, or is otherwise ~/.go-bigv
 //
 type Config struct {
+	debugLevel  int
 	Dir         string
 	Memo        map[string]string
 	Definitions map[string]string
@@ -73,7 +75,15 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 			config.Memo[f.Name] = f.Value.String()
 		})
 	}
+	debugLevel, err := strconv.ParseInt(config.Get("debug-level"), 10, 0)
+	if err == nil {
+		config.debugLevel = int(debugLevel)
+	}
 	return config
+}
+
+func (config *Config) GetDebugLevel() int {
+	return config.debugLevel
 }
 
 // GetPath joins the given string onto the end of the Config.Dir path

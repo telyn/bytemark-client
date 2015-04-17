@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func (dispatch *Dispatcher) HelpForDebug() {
+func (commands *CommandSet) HelpForDebug() {
 	fmt.Println("bigv debug")
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -21,20 +21,20 @@ func (dispatch *Dispatcher) HelpForDebug() {
 // Debug makes an HTTP <method> request to the URL specified in the arguments.
 // command syntax: debug <method> <url>
 // URL probably needs to start with a /
-func (dispatch *Dispatcher) Debug(args []string) {
+func (commands *CommandSet) Debug(args []string) {
 	if len(args) < 2 {
-		dispatch.HelpForDebug()
+		commands.HelpForDebug()
 		return
 	}
 	// TODO(telyn): add a flag to disable auth
 	// TODO(telyn): add a flag to junk the token
 	shouldAuth := true
-	dispatch.EnsureAuth()
-	dispatch.BigV.SetDebugLevel(1)
+	commands.EnsureAuth()
+	commands.bigv.SetDebugLevel(1)
 
 	// make sure the command is well-formed
 
-	body, err := dispatch.BigV.RequestAndRead(shouldAuth, args[0], args[1], "")
+	body, err := commands.bigv.RequestAndRead(shouldAuth, args[0], args[1], "")
 	if err != nil {
 		panic(err)
 	}

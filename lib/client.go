@@ -12,49 +12,43 @@ type BigVClient struct {
 	debugLevel  int
 }
 
-// NewWithSession creates a new Client using the bytemark auth.Client you specify.
-func NewWithSession(auth *auth3.Client, session *auth3.SessionData) (bigv *BigVClient, err error) {
-
+func New(endpoint string) (bigv *BigVClient, err error) {
 	bigv = new(BigVClient)
-	bigv.endpoint = "https://uk0.bigv.io"
-	bigv.auth = auth
-	bigv.authSession = session
+	bigv.endpoint = endpoint
 	bigv.debugLevel = 0
 
+	auth, err := auth3.New("https://auth.bytemark.co.uk")
+	if err != nil {
+		return nil, err
+	}
+	bigv.auth = auth
 	return bigv, nil
 }
 
-// NewWithCredentials creates a new Client authenticating against auth.bytemark.co.uk using the given credentials.
-// If an alternative auth endpoint is needed, use NewWithSession
-func NewWithCredentials(credentials auth3.Credentials) (bigv *BigVClient, err error) {
-	auth, err := auth3.New("https://auth.bytemark.co.uk")
-	if err != nil {
-		return nil, err
-	}
-
-	session, err := auth.CreateSession(credentials)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewWithSession(auth, session)
+func NewWithAuth(endpoint string, auth *auth3.Client) (bigv *BigVClient) {
+	bigv = new(BigVClient)
+	bigv.endpoint = endpoint
+	bigv.debugLevel = 0
+	bigv.auth = auth
+	return bigv
 }
 
-// NewWithToken creates a new Client authenticating against auth.bytemark.co.uk using the given token
-// If an alternative auth endpoint is needed, use NewWithSession
-func NewWithToken(token string) (bigv *BigVClient, err error) {
-
-	auth, err := auth3.New("https://auth.bytemark.co.uk")
-	if err != nil {
-		return nil, err
+func (bigv *BigVClient) AuthWithCredentials(credentials auth3.Credentials) error {
+	session, err := bigv.auth.CreateSession(credentials)
+	if err == nil {
+		bigv.authSession = session
 	}
+	return err
+}
 
-	session, err := auth.ReadSession(token)
-	if err != nil {
-		return nil, err
+func (bigv *BigVClient) AuthWithToken(token string) error {
+
+	session, err := bigv.auth.ReadSession(token)
+	if err == nil {
+		bigv.authSession = session
 	}
+	return err
 
-	return NewWithSession(auth, session)
 }
 
 func (bigv *BigVClient) GetEndpoint() string {

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (dispatch *Dispatcher) HelpForSet() {
+func (cmds *CommandSet) HelpForSet() {
 	fmt.Println("bigv set")
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -20,7 +20,7 @@ func (dispatch *Dispatcher) HelpForSet() {
 	fmt.Println()
 }
 
-func (dispatch *Dispatcher) HelpForUnset() {
+func (cmds *CommandSet) HelpForUnset() {
 	fmt.Println("bigv unset")
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -33,18 +33,18 @@ func (dispatch *Dispatcher) HelpForUnset() {
 
 // Set provides the bigv set command, which sets variables in the user's config
 // It's slightly more user friendly than echo "value" > ~/.go-bigv/
-func (dispatch *Dispatcher) Set(args []string) {
+func (cmds *CommandSet) Set(args []string) {
 	if len(args) != 2 {
-		dispatch.HelpForSet()
+		cmds.HelpForSet()
 		return
 	}
 
 	variable := strings.ToLower(args[0])
 
-	oldVar := dispatch.Config.Get(variable)
+	oldVar := cmds.config.Get(variable)
 
 	// TODO(telyn): input validation ha ha ha
-	dispatch.Config.SetPersistent(variable, args[1])
+	cmds.config.SetPersistent(variable, args[1])
 
 	if oldVar != "" {
 		fmt.Printf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar, args[1])
@@ -54,17 +54,17 @@ func (dispatch *Dispatcher) Set(args []string) {
 
 }
 
-func (dispatch *Dispatcher) Unset(args []string) {
+func (cmds *CommandSet) Unset(args []string) {
 	if len(args) != 2 {
-		dispatch.HelpForUnset()
+		cmds.HelpForUnset()
 		return
 	}
 
 	variable := strings.ToLower(args[0])
 
-	oldVar := dispatch.Config.Get(variable)
+	oldVar := cmds.config.Get(variable)
 
-	dispatch.Config.Unset(variable)
+	cmds.config.Unset(variable)
 	fmt.Printf("%s has been unset.\r\nOld value: %s\r\n", variable, oldVar)
 
 }

@@ -1,6 +1,7 @@
 package lib
 
 import (
+	auth3 "bytemark.co.uk/auth3/client"
 	"net/http"
 )
 
@@ -8,7 +9,12 @@ type Client interface {
 	// Getters
 	GetEndpoint() string
 	GetSessionToken() string
+
+	// Setters
 	SetDebugLevel(int)
+
+	AuthWithToken(string) error
+	AuthWithCredentials(auth3.Credentials) error
 
 	RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error
 	RequestAndRead(auth bool, method, path, requestBody string) (responseBody []byte, err error)

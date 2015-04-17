@@ -2,137 +2,91 @@ package cmd
 
 import (
 	client "bigv.io/client/lib"
-	"bufio"
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
-// type Dispatcher is used to create API requests and direct output to views,
+// type der is used to create API requests and direct output to views,
 // except probably when those API requests don't require authorisation (e.g. /definitions, new user)
 type Dispatcher struct {
-	Config *Config
-	Flags  *flag.FlagSet
-	BigV   client.Client
+	//Config *Config
+	Flags      *flag.FlagSet
+	cmds       Commands
+	debugLevel int
 }
 
 // NewDispatcher creates a new Dispatcher given a config.
 func NewDispatcher(config *Config) (d *Dispatcher) {
 	d = new(Dispatcher)
-	d.Config = config
+	bigv, err := client.New(config.Get("endpoint"))
+	if err != nil {
+		panic("Couldn't create a BigVClient - is auth down?")
+	}
+
+	d.debugLevel = config.GetDebugLevel()
+
+	d.cmds = NewCommandSet(config, bigv)
+	return d
+}
+
+// NewderWithCommands is for writing tests with mock CommandSets
+func NewDispatcherWithCommands(config *Config, commands Commands) *Dispatcher {
+	d := NewDispatcher(config)
+	d.cmds = commands
 	return d
 }
 
 // EnsureAuth makes sure a valid token is stored in config.
 // This should be called by anything that needs auth.
-func (d *Dispatcher) EnsureAuth() {
-	c, err := client.NewWithToken(d.Config.Get("token"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to use token, trying credentials.\r\n\r\n")
-		d.PromptForCredentials()
-		credents := map[string]string{
-			"username": d.Config.Get("user"),
-			"password": d.Config.Get("pass"),
-		}
-		if d.Config.Get("yubikey") != "" {
-			credents["yubikey"] = d.Config.Get("yubikey-otp")
-		}
-
-		c, err = client.NewWithCredentials(credents)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to use credentials.\r\n")
-			panic(err)
-		}
-	}
-	debugLevel, err := strconv.ParseInt(d.Config.Get("debug-level"), 10, 0)
-	if err == nil {
-		c.SetDebugLevel(int(debugLevel))
-	}
-	d.BigV = c
-
-	d.Config.SetPersistent("token", d.BigV.GetSessionToken())
-}
-
-// PromptForCredentials ensures that user, pass and yubikey-otp are defined, by prompting the user for them.
-// needs a for loop to ensure that they don't stay empty.
-func (d *Dispatcher) PromptForCredentials() {
-	buf := bufio.NewReader(os.Stdin)
-	for d.Config.Get("user") == "" {
-		fmt.Fprintf(os.Stderr, "User: ")
-		user, _ := buf.ReadString('\n')
-		d.Config.Set("user", strings.TrimSpace(user))
-		fmt.Fprintf(os.Stderr, "\r\n")
-	}
-
-	for d.Config.Get("pass") == "" {
-		fmt.Fprintf(os.Stderr, "Pass: ")
-		pass, _ := buf.ReadString('\n')
-		d.Config.Set("pass", strings.TrimSpace(pass))
-		fmt.Fprintf(os.Stderr, "\r\n")
-	}
-
-	if d.Config.Get("yubikey") != "" {
-		for d.Config.Get("yubikey-otp") == "" {
-			fmt.Fprintf(os.Stderr, "Press yubikey: ")
-			yubikey, _ := buf.ReadString('\n')
-			d.Config.Set("yubikey-otp", strings.TrimSpace(yubikey))
-		}
-	}
-
-}
 
 // TODO(telyn): Write a test for Do. Somehow.
 
 // Do takes the command line arguments and figures out what to do
-func (dispatch *Dispatcher) Do(args []string) {
-	//	help := dispatch.Flags.Lookup("help")
+func (d *Dispatcher) Do(args []string) {
+	//	help := d.Flags.Lookup("help")
 	///	fmt.Printf("%+v", help)
-	debugLevel, err := strconv.ParseInt(dispatch.Config.Get("debug-level"), 10, 0)
-	if err != nil {
-		debugLevel = 0
-	}
-
-	if debugLevel >= 1 {
+	if d.debugLevel >= 1 {
 		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
 	}
 
 	if /*help == true || */ len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		fmt.Printf("No command specified.\n\n")
-		dispatch.Help(args)
+		d.cmds.Help(args)
 		return
 	}
 
 	// short-circuit commands that don't take arguments
 	switch strings.ToLower(args[0]) {
 	case "help":
-		dispatch.Help(args[1:])
+		d.cmds.Help(args[1:])
 		return
 	}
 
 	// do this
 	if len(args) == 1 {
-		dispatch.Help(args)
+		d.cmds.Help(args)
 		return
 	}
 
 	switch strings.ToLower(args[0]) {
 	case "debug":
-		dispatch.Debug(args[1:])
+		d.cmds.Debug(args[1:])
 		return
 	case "set":
-		dispatch.Set(args[1:])
+		d.cmds.Set(args[1:])
 		return
 	case "show-account":
-		dispatch.ShowAccount(args[1:])
+		d.cmds.ShowAccount(args[1:])
 		return
 	case "show-vm":
-		dispatch.ShowVM(args[1:])
+		d.cmds.ShowVM(args[1:])
 		return
 	case "unset":
-		dispatch.Unset(args[1:])
+		d.cmds.Unset(args[1:])
 		return
 	}
-	dispatch.Help(args)
+	fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", args[0])
+	d.cmds.Help(args)
 }

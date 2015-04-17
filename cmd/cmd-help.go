@@ -5,29 +5,29 @@ import (
 	"strings"
 )
 
-func (dispatch *Dispatcher) HelpForHelp() {
+func (cmds *CommandSet) HelpForHelp() {
 	fmt.Println("bigv command-line client (the new, cool one)")
 	fmt.Println()
 	fmt.Println("There would be some usage output here if I had actually written any.")
 	fmt.Println()
 }
 
-func (dispatch *Dispatcher) Help(args []string) {
+func (cmds *CommandSet) Help(args []string) {
 	if len(args) == 0 {
-		dispatch.HelpForHelp()
+		cmds.HelpForHelp()
 		return
 	}
 
 	// please try and keep these in alphabetical order
 	switch strings.ToLower(args[0]) {
 	case "debug":
-		dispatch.HelpForDebug()
+		cmds.HelpForDebug()
 	case "set":
-		dispatch.HelpForSet()
+		cmds.HelpForSet()
 	case "show":
-		dispatch.HelpForShow()
+		cmds.HelpForShow()
 	case "unset":
-		dispatch.HelpForUnset()
+		cmds.HelpForUnset()
 	}
 
 }

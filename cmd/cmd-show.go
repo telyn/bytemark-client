@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (dispatch *Dispatcher) HelpForShow() {
+func (cmds *CommandSet) HelpForShow() {
 	// TODO(telyn): Replace instances of bigv with $0, however you get $0 in go?
 	fmt.Println("bigv show")
 	fmt.Println()
@@ -19,12 +19,12 @@ func (dispatch *Dispatcher) HelpForShow() {
 	fmt.Println()
 }
 
-func (dispatch *Dispatcher) ShowVM(args []string) {
-	dispatch.EnsureAuth()
+func (cmds *CommandSet) ShowVM(args []string) {
+	cmds.EnsureAuth()
 
 	name := ParseVirtualMachineName(args[0])
 
-	vm, err := dispatch.BigV.GetVirtualMachine(name)
+	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
 		panic(err)
@@ -66,10 +66,10 @@ func (dispatch *Dispatcher) ShowVM(args []string) {
 
 }
 
-func (dispatch *Dispatcher) ShowAccount(args []string) {
+func (cmds *CommandSet) ShowAccount(args []string) {
 	name := ParseAccountName(args[0])
 
-	acc, err := dispatch.BigV.GetAccount(name)
+	acc, err := cmds.bigv.GetAccount(name)
 
 	if err != nil {
 		panic(err)
