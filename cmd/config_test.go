@@ -113,7 +113,7 @@ func FixtureDir() (dir string, fixture map[string]string) {
  =========================
 */
 
-func TestDefaultConfigDir(t *testing.T) {
+func TestConfigDefaultConfigDir(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
@@ -123,7 +123,7 @@ func TestDefaultConfigDir(t *testing.T) {
 	is.Equal(expected, config.Dir)
 }
 
-func TestEnvConfigDir(t *testing.T) {
+func TestConfigEnvConfigDir(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
@@ -135,7 +135,7 @@ func TestEnvConfigDir(t *testing.T) {
 	is.Equal(expected, config.Dir)
 }
 
-func TestPassedConfigDir(t *testing.T) {
+func TestConfigPassedConfigDir(t *testing.T) {
 	is := is.New(t)
 
 	JunkEnv()
@@ -152,7 +152,7 @@ func TestPassedConfigDir(t *testing.T) {
 */
 // Tests to make sure we get the right defaults given the environment
 
-func TestConfigDefaultsCleanEnv(t *testing.T) {
+func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
@@ -243,7 +243,7 @@ func TestConfigDir(t *testing.T) {
  ===========
 */
 
-func TestSet(t *testing.T) {
+func TestConfigSet(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
@@ -267,7 +267,7 @@ func TestSet(t *testing.T) {
 	os.RemoveAll(dir)
 }
 
-func TestSetPersistent(t *testing.T) {
+func TestConfigSetPersistent(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
