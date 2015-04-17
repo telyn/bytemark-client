@@ -25,10 +25,10 @@ type Commands interface {
 
 type CommandSet struct {
 	bigv   bigv.Client
-	config *Config
+	config ConfigManager
 }
 
-func NewCommandSet(config *Config, client bigv.Client) *CommandSet {
+func NewCommandSet(config ConfigManager, client bigv.Client) *CommandSet {
 	commandSet := new(CommandSet)
 	commandSet.config = config
 	commandSet.bigv = client

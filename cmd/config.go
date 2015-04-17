@@ -12,6 +12,14 @@ import (
 	"time"
 )
 
+type ConfigManager interface {
+	Get(string) string
+	Set(string, string)
+	SetPersistent(string, string)
+	Unset(string)
+	GetDebugLevel() int
+}
+
 // Params currently used:
 // token - an OAuth 2.0 bearer token to use when authenticating
 // username - the default username to use - if not present, $USER

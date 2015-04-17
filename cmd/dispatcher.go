@@ -18,7 +18,7 @@ type Dispatcher struct {
 }
 
 // NewDispatcher creates a new Dispatcher given a config.
-func NewDispatcher(config *Config) (d *Dispatcher) {
+func NewDispatcher(config ConfigManager) (d *Dispatcher) {
 	d = new(Dispatcher)
 	bigv, err := client.New(config.Get("endpoint"))
 	if err != nil {
