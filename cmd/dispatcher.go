@@ -32,7 +32,7 @@ func NewDispatcher(config ConfigManager) (d *Dispatcher) {
 }
 
 // NewderWithCommands is for writing tests with mock CommandSets
-func NewDispatcherWithCommands(config *Config, commands Commands) *Dispatcher {
+func NewDispatcherWithCommands(config ConfigManager, commands Commands) *Dispatcher {
 	d := NewDispatcher(config)
 	d.cmds = commands
 	return d
