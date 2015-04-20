@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	fixtureDiskOne = `{
+	fixtureDiscOne = `{
     "id": 99994,
     "label": "vda",
     "size": 35840,
@@ -19,7 +19,7 @@ var (
     "virtual_machine_id": 99999
 }`
 
-	fixtureDiskTwo = `{
+	fixtureDiscTwo = `{
     "id": 99995,
     "label": "vdb",
     "size": 666666,
@@ -49,7 +49,7 @@ var (
     "cdrom_url": null,
     "cores": 1,
     "deleted": false,
-    "discs": [` + fixtureDiskOne + `,` + fixtureDiskTwo + `
+    "discs": [` + fixtureDiscOne + `,` + fixtureDiscTwo + `
     ],
     "group_id": 9999,
     "hardware_profile": "virtio2013",
@@ -83,21 +83,21 @@ func Contains(list, element interface{}) (found bool) {
 	return false
 }
 
-func TestDiskUnmarshal(t *testing.T) {
+func TestDiscUnmarshal(t *testing.T) {
 	is := is.New(t)
-	disk := new(Disk)
-	err := json.Unmarshal([]byte(fixtureDiskOne), disk)
+	disc := new(Disc)
+	err := json.Unmarshal([]byte(fixtureDiscOne), disc)
 
 	if err != nil {
 		panic(err)
 	}
 
-	is.Equal(99994, disk.Id)
-	is.Equal("vda", disk.Label)
-	is.Equal(35840, disk.Size)
-	is.Equal("sata", disk.StorageGrade)
-	is.Equal("tail99-sata9", disk.StoragePool)
-	is.Equal(99999, disk.VirtualMachineId)
+	is.Equal(99994, disc.Id)
+	is.Equal("vda", disc.Label)
+	is.Equal(35840, disc.Size)
+	is.Equal("sata", disc.StorageGrade)
+	is.Equal("tail99-sata9", disc.StoragePool)
+	is.Equal(99999, disc.VirtualMachineId)
 }
 
 func TestNicUnmarshal(t *testing.T) {
@@ -149,23 +149,23 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 	is.Equal(true, vm.PowerOn)
 	is.Equal("default", vm.ZoneName)
 
-	disk := vm.Discs[0]
+	disc := vm.Discs[0]
 
-	is.Equal(99994, disk.Id)
-	is.Equal("vda", disk.Label)
-	is.Equal(35840, disk.Size)
-	is.Equal("sata", disk.StorageGrade)
-	is.Equal("tail99-sata9", disk.StoragePool)
-	is.Equal(99999, disk.VirtualMachineId)
+	is.Equal(99994, disc.Id)
+	is.Equal("vda", disc.Label)
+	is.Equal(35840, disc.Size)
+	is.Equal("sata", disc.StorageGrade)
+	is.Equal("tail99-sata9", disc.StoragePool)
+	is.Equal(99999, disc.VirtualMachineId)
 
-	disk = vm.Discs[1]
+	disc = vm.Discs[1]
 
-	is.Equal(99995, disk.Id)
-	is.Equal("vdb", disk.Label)
-	is.Equal(666666, disk.Size)
-	is.Equal("archive", disk.StorageGrade)
-	is.Equal("tail98-sata9", disk.StoragePool)
-	is.Equal(99999, disk.VirtualMachineId)
+	is.Equal(99995, disc.Id)
+	is.Equal("vdb", disc.Label)
+	is.Equal(666666, disc.Size)
+	is.Equal("archive", disc.StorageGrade)
+	is.Equal("tail98-sata9", disc.StoragePool)
+	is.Equal(99999, disc.VirtualMachineId)
 
 	nic := vm.NetworkInterfaces[0]
 

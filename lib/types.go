@@ -10,7 +10,7 @@ type GroupName struct {
 	Account string
 }
 
-type Disk struct {
+type Disc struct {
 	Label        string `json:"label"`
 	StorageGrade string `json:"storage_grade"`
 	Size         int    `json:"size"`
@@ -74,7 +74,7 @@ type VirtualMachine struct {
 	ZoneName string `json:"zone_name"`
 
 	// the following cannot be set
-	Discs             []*Disk             `json:"discs"`
+	Discs             []*Disc             `json:"discs"`
 	Id                int                 `json:"id"`
 	ManagementAddress string              `json:"management_address"`
 	Deleted           bool                `json:"deleted"`
@@ -85,7 +85,7 @@ type VirtualMachine struct {
 
 type VirtualMachineSpec struct {
 	VirtualMachine VirtualMachine `json:"virtual_machine"`
-	Discs          []Disk         `json:"discs"`
+	Discs          []Disc         `json:"discs"`
 	Reimage        ImageInstall   `json:"reimage"`
 }
 
