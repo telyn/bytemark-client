@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 	config := cmd.NewConfig(*configDir, flag.CommandLine)
 
-	fmt.Fprintf(os.Stderr, "Using config in %s \r\n", config.Dir)
+	fmt.Fprintf(os.Stderr, "Using config in %s \r\n\r\n", config.Dir)
 
 	dispatch := cmd.NewDispatcher(config)
 

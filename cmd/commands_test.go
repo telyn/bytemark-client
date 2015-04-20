@@ -5,24 +5,16 @@ import (
 	//"github.com/cheekybits/is"
 )
 
-func TestCommandSet(t *testing.T) {
+func TestCommandConfig(t *testing.T) {
 	config := &mockConfig{}
-	config.When("SetPersistent", "user", "test-user").Times(1)
-	config.When("Get", "user").Return("old-test-user")
-	cmds := NewCommandSet(config, nil)
-	cmds.Set([]string{"user", "test-user"})
 
-	if ok, err := config.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
-func TestCommandUnset(t *testing.T) {
-	config := &mockConfig{}
-	config.When("Unset", "user").Times(1)
+	config.When("GetV", "user").Return(ConfigVar{"user", "old-test-user", "config"})
 	config.When("Get", "user").Return("old-test-user")
+
+	config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
+
 	cmds := NewCommandSet(config, nil)
-	cmds.Unset([]string{"user"})
+	cmds.Config([]string{"set", "user", "test-user"})
 
 	if ok, err := config.Verify(); !ok {
 		t.Fatal(err)

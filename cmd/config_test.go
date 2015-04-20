@@ -183,8 +183,16 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 
 	is.Equal("https://uk0.bigv.io", config.Get("endpoint"))
 	is.Equal("https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
-	is.Equal(expected, config.Get("user"))
-	is.Equal(expected, config.Get("account"))
+
+	v := config.GetV("user")
+	is.Equal("user", v.Name)
+	is.Equal(expected, v.Value)
+	is.Equal("ENV BIGV_USER", v.Source)
+
+	v = config.GetV("account")
+	is.Equal("user", v.Name)
+	is.Equal(expected, v.Value)
+	is.Equal("ENV BIGV_USER", v.Source)
 
 	os.RemoveAll(dir)
 }
@@ -256,7 +264,7 @@ func TestConfigSet(t *testing.T) {
 	is.Equal(fixture["account"], config.Get("account"))
 	is.Equal(fixture["debug-level"], config.Get("debug-level"))
 
-	config.Set("user", "test-user")
+	config.Set("user", "test-user", "TEST")
 	fixture["user"] = "test-user"
 
 	is.Equal(fixture["endpoint"], config.Get("endpoint"))
@@ -280,7 +288,7 @@ func TestConfigSetPersistent(t *testing.T) {
 	is.Equal(fixture["account"], config.Get("account"))
 	is.Equal(fixture["debug-level"], config.Get("debug-level"))
 
-	config.SetPersistent("user", "test-user")
+	config.SetPersistent("user", "test-user", "TEST")
 	fixture["user"] = "test-user"
 
 	is.Equal(fixture["endpoint"], config.Get("endpoint"))

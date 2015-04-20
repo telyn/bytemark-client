@@ -11,15 +11,14 @@ import (
 type Commands interface {
 	EnsureAuth()
 
+	Config([]string)
 	Debug([]string)
 	Help([]string)
-	Set([]string)
 	ShowAccount([]string)
 	ShowVM([]string)
-	Unset([]string)
 
+	HelpForConfig()
 	HelpForHelp()
-	HelpForSet()
 	HelpForShow()
 }
 
@@ -55,7 +54,7 @@ func (cmds *CommandSet) EnsureAuth() {
 		}
 	}
 
-	cmds.config.SetPersistent("token", cmds.bigv.GetSessionToken())
+	cmds.config.SetPersistent("token", cmds.bigv.GetSessionToken(), "AUTH")
 }
 
 // PromptForCredentials ensures that user, pass and yubikey-otp are defined, by prompting the user for them.
@@ -65,14 +64,14 @@ func (cmds *CommandSet) PromptForCredentials() {
 	for cmds.config.Get("user") == "" {
 		fmt.Fprintf(os.Stderr, "User: ")
 		user, _ := buf.ReadString('\n')
-		cmds.config.Set("user", strings.TrimSpace(user))
+		cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
 		fmt.Fprintf(os.Stderr, "\r\n")
 	}
 
 	for cmds.config.Get("pass") == "" {
 		fmt.Fprintf(os.Stderr, "Pass: ")
 		pass, _ := buf.ReadString('\n')
-		cmds.config.Set("pass", strings.TrimSpace(pass))
+		cmds.config.Set("pass", strings.TrimSpace(pass), "INTERACTION")
 		fmt.Fprintf(os.Stderr, "\r\n")
 	}
 
@@ -80,7 +79,7 @@ func (cmds *CommandSet) PromptForCredentials() {
 		for cmds.config.Get("yubikey-otp") == "" {
 			fmt.Fprintf(os.Stderr, "Press yubikey: ")
 			yubikey, _ := buf.ReadString('\n')
-			cmds.config.Set("yubikey-otp", strings.TrimSpace(yubikey))
+			cmds.config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
 		}
 	}
 

@@ -5,16 +5,6 @@ import (
 	"strings"
 )
 
-func FirstNotEmpty(choices ...string) string {
-	for _, choice := range choices {
-		if choice != "" {
-			return choice
-
-		}
-	}
-	return ""
-}
-
 // by convention this function uses DEFAULT in all-caps to mean "the default group/account", as set in the config, rather than the "default" group in BigV itself.
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format

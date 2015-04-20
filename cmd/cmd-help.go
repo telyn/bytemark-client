@@ -20,14 +20,12 @@ func (cmds *CommandSet) Help(args []string) {
 
 	// please try and keep these in alphabetical order
 	switch strings.ToLower(args[0]) {
+	case "config":
+		cmds.HelpForConfig()
 	case "debug":
 		cmds.HelpForDebug()
-	case "set":
-		cmds.HelpForSet()
 	case "show":
 		cmds.HelpForShow()
-	case "unset":
-		cmds.HelpForUnset()
 	}
 
 }

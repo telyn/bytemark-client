@@ -12,10 +12,30 @@ import (
 	"time"
 )
 
+var CONFIG_VARIABLES = [...]string{
+	"endpoint",
+	"auth-endpoint",
+	"user",
+	"account",
+	"token",
+	"debug-level",
+}
+
+// ConfigVar is a struct which contains a name-value-source triplet
+// Source is up to two words separated by a space. The first word is the source type: FLAG, ENV, DIR, CODE.
+// The second is the name of the flag/file/environment var used.
+type ConfigVar struct {
+	Name   string
+	Value  string
+	Source string
+}
+
 type ConfigManager interface {
 	Get(string) string
-	Set(string, string)
-	SetPersistent(string, string)
+	GetV(string) ConfigVar
+	GetAll() []ConfigVar
+	Set(string, string, string)
+	SetPersistent(string, string, string)
 	Unset(string)
 	GetDebugLevel() int
 }
@@ -38,7 +58,7 @@ type ConfigManager interface {
 type Config struct {
 	debugLevel  int
 	Dir         string
-	Memo        map[string]string
+	Memo        map[string]ConfigVar
 	Definitions map[string]string
 }
 
@@ -48,7 +68,7 @@ type Config struct {
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
 func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 	config = new(Config)
-	config.Memo = make(map[string]string)
+	config.Memo = make(map[string]ConfigVar)
 	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
 	if os.Getenv("BIGV_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
@@ -80,7 +100,11 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 		// dump all the flags into the memo
 		// should be reet...reet?
 		flags.Visit(func(f *flag.Flag) {
-			config.Memo[f.Name] = f.Value.String()
+			config.Memo[f.Name] = ConfigVar{
+				f.Name,
+				f.Value.String(),
+				"FLAG " + f.Name,
+			}
 		})
 	}
 	debugLevel, err := strconv.ParseInt(config.Get("debug-level"), 10, 0)
@@ -123,34 +147,72 @@ func (config *Config) LoadDefinitions() {
 }
 
 func (config *Config) Get(name string) string {
+	return config.GetV(name).Value
+}
+
+func (config *Config) GetV(name string) ConfigVar {
 	// try to read the Memo
+	name = strings.ToLower(name)
 	if val, ok := config.Memo[name]; ok {
 		return val
 	} else {
-		return config.Read(name)
+		return config.read(name)
 	}
-	return ""
 }
 
-func (config *Config) GetDefault(name string) string {
+func (config *Config) GetAll() []ConfigVar {
+	vars := make([]ConfigVar, 4)
+	for _, v := range CONFIG_VARIABLES {
+		vars = append(vars, config.GetV(v))
+	}
+	return vars
+}
+
+func (config *Config) GetDefault(name string) ConfigVar {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
 		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bigv config set user <youruser>"
-		return os.Getenv("BIGV_USER")
+		return ConfigVar{"user", os.Getenv("BIGV_USER"), "ENV BIGV_USER"}
 	case "endpoint":
-		return FirstNotEmpty(os.Getenv("BIGV_ENDPOINT"), "https://uk0.bigv.io")
+		v := ConfigVar{"endpoint", "https://uk0.bigv.io", "CODE"}
+
+		val := os.Getenv("BIGV_ENDPOINT")
+		if val != "" {
+			v.Value = val
+			v.Source = "ENV BIGV_ENDPOINT"
+		}
+		return v
 	case "auth-endpoint":
-		return FirstNotEmpty(os.Getenv("BIGV_AUTH_ENDPOINT"), "https://auth.bytemark.co.uk")
+		v := ConfigVar{"endpoint", "https://auth.bytemark.co.uk", "CODE"}
+
+		val := os.Getenv("BIGV_AUTH_ENDPOINT")
+		if val != "" {
+			v.Value = val
+			v.Source = "ENV BIGV_AUTH_ENDPOINT"
+		}
+		return v
 	case "account":
-		return FirstNotEmpty(os.Getenv("BIGV_ACCOUNT"), config.Get("user"))
+		val := os.Getenv("BIGV_ACCOUNT")
+		if val != "" {
+			return ConfigVar{
+				"account",
+				val,
+				"ENV BIGV_AUTH_ENDPOINT",
+			}
+		}
+		return config.GetDefault("user")
 	case "debug-level":
-		return FirstNotEmpty(os.Getenv("BIGV_DEBUG_LEVEL"), "0")
+		v := ConfigVar{"debug-level", "0", "CODE"}
+		if val := os.Getenv("BIGV_DEBUG_LEVEL"); val != "" {
+			v.Value = val
+		}
+		return v
 	}
-	return ""
+	return ConfigVar{"", "", ""}
 }
 
-func (config *Config) Read(name string) string {
+func (config *Config) read(name string) ConfigVar {
 	contents, err := ioutil.ReadFile(config.GetPath(name))
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -160,17 +222,17 @@ func (config *Config) Read(name string) string {
 		panic(err)
 	}
 
-	return string(contents)
+	return ConfigVar{name, string(contents), "FILE " + config.GetPath(name)}
 }
 
 // Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.
-func (config *Config) Set(name string, value string) {
-	config.Memo[name] = value
+func (config *Config) Set(name, value, source string) {
+	config.Memo[name] = ConfigVar{name, value, source}
 }
 
 // SetPersistent writes a file to the config directory for the given key-value pair.
-func (config *Config) SetPersistent(name, value string) {
-	config.Set(name, value)
+func (config *Config) SetPersistent(name, value, source string) {
+	config.Set(name, value, source)
 	err := ioutil.WriteFile(config.GetPath(name), []byte(value), 0600)
 	if err != nil {
 		fmt.Println("Couldn't write to config directory " + config.Dir)

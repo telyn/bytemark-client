@@ -59,6 +59,9 @@ func (d *Dispatcher) Do(args []string) {
 
 	// short-circuit commands that don't take arguments
 	switch strings.ToLower(args[0]) {
+	case "config":
+		d.cmds.Config(args[1:])
+		return
 	case "help":
 		d.cmds.Help(args[1:])
 		return
@@ -74,17 +77,11 @@ func (d *Dispatcher) Do(args []string) {
 	case "debug":
 		d.cmds.Debug(args[1:])
 		return
-	case "set":
-		d.cmds.Set(args[1:])
-		return
 	case "show-account":
 		d.cmds.ShowAccount(args[1:])
 		return
 	case "show-vm":
 		d.cmds.ShowVM(args[1:])
-		return
-	case "unset":
-		d.cmds.Unset(args[1:])
 		return
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", args[0])

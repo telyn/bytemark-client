@@ -13,13 +13,23 @@ func (c *mockConfig) Get(name string) string {
 	return ret.String(0)
 }
 
-func (c *mockConfig) Set(name, value string) {
-	c.Called(name, value)
+func (c *mockConfig) GetV(name string) ConfigVar {
+	ret := c.Called(name)
+	return ret.Get(0).(ConfigVar)
+}
+
+func (c *mockConfig) GetAll() []ConfigVar {
+	ret := c.Called()
+	return ret.Get(0).([]ConfigVar)
+}
+
+func (c *mockConfig) Set(name, value, source string) {
+	c.Called(name, value, source)
 	return
 }
 
-func (c *mockConfig) SetPersistent(name, value string) {
-	c.Called(name, value)
+func (c *mockConfig) SetPersistent(name, value, source string) {
+	c.Called(name, value, source)
 	return
 }
 
@@ -45,7 +55,7 @@ func (cmds *mockCommands) Help(args []string) {
 	cmds.Called(args)
 }
 
-func (cmds *mockCommands) Set(args []string) {
+func (cmds *mockCommands) Config(args []string) {
 	cmds.Called(args)
 }
 
@@ -57,23 +67,18 @@ func (cmds *mockCommands) ShowVM(args []string) {
 	cmds.Called(args)
 }
 
-func (cmds *mockCommands) Unset(args []string) {
-	cmds.Called(args)
-}
-
 func (cmds *mockCommands) EnsureAuth() {
 	cmds.Called()
 }
 
+func (cmds *mockCommands) HelpForConfig() {
+	cmds.Called()
+}
 func (cmds *mockCommands) HelpForDebug() {
 	cmds.Called()
 }
 
 func (cmds *mockCommands) HelpForHelp() {
-	cmds.Called()
-}
-
-func (cmds *mockCommands) HelpForSet() {
 	cmds.Called()
 }
 
