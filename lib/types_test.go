@@ -29,6 +29,16 @@ var (
     "virtual_machine_id": 99999
 }`
 
+	fixtureDiscThree = `{
+    "id": 99993,
+    "label": "vdc",
+    "size": 333333,
+    "storage_grade": "archive",
+    "storage_pool": "tail97-sata9",
+    "type": "application/vnd.bigv.disc",
+    "virtual_machine_id": 99999
+}`
+
 	fixtureNic = `{
     "extra_ips": {
 	"192.168.99.2": "192.168.99.1"
@@ -49,7 +59,7 @@ var (
     "cdrom_url": null,
     "cores": 1,
     "deleted": false,
-    "discs": [` + fixtureDiscOne + `,` + fixtureDiscTwo + `
+    "discs": [` + fixtureDiscOne + `,` + fixtureDiscTwo + `,` + fixtureDiscThree + `
     ],
     "group_id": 9999,
     "hardware_profile": "virtio2013",
@@ -178,6 +188,21 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 	is.Equal(true, Contains(nic.Ips, "fe80::9999"))
 	is.OK(t, nic.ExtraIps["192.168.99.2"])
 	is.Equal("192.168.99.1", nic.ExtraIps["192.168.99.2"])
+}
+
+func TestTotalDiscSize(t *testing.T) {
+	is := is.New(t)
+
+	vm := new(VirtualMachine)
+	err := json.Unmarshal([]byte(fixtureVm), vm)
+	if err != nil {
+		panic(err)
+	}
+
+	// FixtureDiscOne + fixtureDiscTwo + fixtureDiscThree
+	is.Equal(35840+666666+333333, vm.TotalDiscSize(""))
+	// fixtureDiscTwo + fixtureDiscThree
+	is.Equal(999999, vm.TotalDiscSize("archive"))
 }
 
 func TestImageUnmarshal(t *testing.T) {

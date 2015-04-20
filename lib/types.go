@@ -83,6 +83,16 @@ type VirtualMachine struct {
 	NetworkInterfaces []*NetworkInterface `json:"network_interfaces"`
 }
 
+func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
+	total = 0
+	for _, disc := range vm.Discs {
+		if storageGrade == "" || storageGrade == disc.StorageGrade {
+			total += disc.Size
+		}
+	}
+	return total
+}
+
 type VirtualMachineSpec struct {
 	VirtualMachine VirtualMachine `json:"virtual_machine"`
 	Discs          []Disc         `json:"discs"`
