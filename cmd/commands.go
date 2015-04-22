@@ -39,23 +39,45 @@ func (cmds *CommandSet) EnsureAuth() {
 	err := cmds.bigv.AuthWithToken(cmds.config.Get("token"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to use token, trying credentials.\r\n\r\n")
-		cmds.PromptForCredentials()
-		credents := map[string]string{
-			"username": cmds.config.Get("user"),
-			"password": cmds.config.Get("pass"),
-		}
-		if cmds.config.Get("yubikey") != "" {
-			credents["yubikey"] = cmds.config.Get("yubikey-otp")
-		}
+		attempts := 3
 
-		err = cmds.bigv.AuthWithCredentials(credents)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to use credentials.\r\n")
-			panic(err)
+		for err != nil {
+			attempts--
+
+			cmds.PromptForCredentials()
+			credents := map[string]string{
+				"username": cmds.config.Get("user"),
+				"password": cmds.config.Get("pass"),
+			}
+			if cmds.config.Get("yubikey") != "" {
+				credents["yubikey"] = cmds.config.Get("yubikey-otp")
+			}
+
+			err = cmds.bigv.AuthWithCredentials(credents)
+			if err == nil {
+				// sucess!
+				cmds.config.SetPersistent("token", cmds.bigv.GetSessionToken(), "AUTH")
+				break
+			} else {
+				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
+					if attempts > 0 {
+						fmt.Fprintf(os.Stderr, "Invalid credentials, please try again\r\n")
+						cmds.config.Set("user", "", "INVALID")
+						cmds.config.Set("pass", "", "INVALID")
+						cmds.config.Set("yubikey-otp", "", "INVALID")
+					} else {
+						fmt.Fprintf(os.Stderr, "Invalid credentials, giving up after three attempts.\r\n")
+						// TODO(telyn): define exit codes
+						os.Exit(1)
+					}
+				} else {
+					panic(err)
+				}
+
+			}
 		}
 	}
 
-	cmds.config.SetPersistent("token", cmds.bigv.GetSessionToken(), "AUTH")
 }
 
 // PromptForCredentials ensures that user, pass and yubikey-otp are defined, by prompting the user for them.
