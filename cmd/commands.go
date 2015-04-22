@@ -4,6 +4,7 @@ import (
 	bigv "bigv.io/client/lib"
 	"bufio"
 	"fmt"
+	"github.com/bgentry/speakeasy"
 	"os"
 	"strings"
 )
@@ -69,8 +70,11 @@ func (cmds *CommandSet) PromptForCredentials() {
 	}
 
 	for cmds.config.Get("pass") == "" {
-		fmt.Fprintf(os.Stderr, "Pass: ")
-		pass, _ := buf.ReadString('\n')
+		pass, err := speakeasy.Ask("Pass: ")
+
+		if err != nil {
+			panic(err)
+		}
 		cmds.config.Set("pass", strings.TrimSpace(pass), "INTERACTION")
 		fmt.Fprintf(os.Stderr, "\r\n")
 	}
