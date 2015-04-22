@@ -7,7 +7,7 @@ all: go-bigv-client
 go-bigv-client:
 	go build -o go-bigv-client bigv.io/client
 
-install: 
+install: all
 	cp go-bigv-client /usr/bin/go-bigv-client
 
 test:
