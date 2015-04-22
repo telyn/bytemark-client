@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
 )
 
 func (commands *CommandSet) HelpForDebug() {
@@ -11,6 +12,7 @@ func (commands *CommandSet) HelpForDebug() {
 	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("    bigv debug GET <path>")
+	fmt.Println("    bigv debug DELETE <path>")
 	fmt.Println()
 	fmt.Println("GET sends an HTTP GET request with a valid authorization header to the given path on the BigV endpoint and pretty-prints the received json.")
 	fmt.Println()
@@ -22,24 +24,34 @@ func (commands *CommandSet) HelpForDebug() {
 // command syntax: debug <method> <url>
 // URL probably needs to start with a /
 func (commands *CommandSet) Debug(args []string) {
-	if len(args) < 2 {
+	if len(args) < 1 {
 		commands.HelpForDebug()
 		return
 	}
-	// TODO(telyn): add a flag to disable auth
-	// TODO(telyn): add a flag to junk the token
-	shouldAuth := true
-	commands.EnsureAuth()
-	commands.bigv.SetDebugLevel(1)
 
-	// make sure the command is well-formed
+	switch args[0] {
+	case "GET", "PUT", "POST", "DELETE":
+		// TODO(telyn): add a flag to disable auth
+		// TODO(telyn): add a flag to junk the token
+		shouldAuth := true
+		commands.EnsureAuth()
+		body, err := commands.bigv.RequestAndRead(shouldAuth, args[0], args[1], "")
+		if err != nil {
+			fmt.Printf("error (type %T): %s", err.Error())
+			os.Exit(1)
+		}
 
-	body, err := commands.bigv.RequestAndRead(shouldAuth, args[0], args[1], "")
-	if err != nil {
-		panic(err)
+		buf := new(bytes.Buffer)
+		json.Indent(buf, body, "", "    ")
+		fmt.Printf("%s", buf)
+	case "config":
+		indented, err := json.MarshalIndent(commands.config.GetAll(), "", "    ")
+		if err != nil {
+			fmt.Printf("Your config is so weird it broke json.MarshalIndent")
+			panic(err)
+		}
+		fmt.Printf("%s", indented)
+	default:
+		commands.HelpForDebug()
 	}
-
-	buf := new(bytes.Buffer)
-	json.Indent(buf, body, "", "    ")
-	fmt.Printf("%s", buf)
 }
