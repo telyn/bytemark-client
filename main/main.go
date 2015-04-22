@@ -4,7 +4,6 @@ import (
 	"bigv.io/client/cmd"
 	//	bigv "bigv.io/client/lib"
 	"flag"
-	"fmt"
 	"os"
 )
 
@@ -17,8 +16,6 @@ var (
 func main() {
 	flag.Parse()
 	config := cmd.NewConfig(*configDir, flag.CommandLine)
-
-	fmt.Fprintf(os.Stderr, "Using config in %s \r\n\r\n", config.Dir)
 
 	dispatch := cmd.NewDispatcher(config)
 
