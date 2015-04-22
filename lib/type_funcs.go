@@ -1,6 +1,13 @@
 package lib
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
+
+func (vm VirtualMachineName) String() string {
+	return fmt.Sprintf("%s.%s.%s", vm.VirtualMachine, vm.Group, vm.Account)
+}
 
 func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
 	total = 0

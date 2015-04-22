@@ -11,7 +11,16 @@ func (bigv *BigVClient) GetAccount(name string) (account *Account, err error) {
 
 	err = bigv.RequestAndUnmarshal(true, "GET", path, "", account)
 	if err != nil {
-		return nil, err
+		switch err.(type) {
+		case NotFoundError:
+			newErr := err.(NotFoundError)
+			newErr.Thing = name
+			newErr.ThingType = "account"
+		case NotAuthorizedError:
+			newErr := err.(NotAuthorizedError)
+			newErr.Thing = name
+			newErr.ThingType = "account"
+		}
 	}
 
 	return account, nil

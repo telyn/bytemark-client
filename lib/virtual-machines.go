@@ -11,7 +11,18 @@ func (bigv *BigVClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 
 	err = bigv.RequestAndUnmarshal(true, "GET", path, "", vm)
 	if err != nil {
-		return nil, err
+		return nil, bigv.PopulateError(err, name.String(), "virtual machine", "delete")
 	}
 	return vm, nil
+}
+
+// returns nil on success. Probably.
+func (bigv *BigVClient) DeleteVirtualMachine(name VirtualMachineName) (err error) {
+	path := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "DELETE", path, "")
+	if err != nil {
+		return bigv.PopulateError(err, name.String(), "virtual machine", "delete")
+	}
+	return nil
 }

@@ -19,7 +19,6 @@ func (bigv *BigVClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 	}
 
 	if err != nil {
-		//TODO(telyn): good error handling here (need to see more errors first)
 		return err
 	}
 
@@ -92,5 +91,21 @@ func (bigv *BigVClient) Request(auth bool, method string, location string, reque
 	if err != nil {
 		return req, res, err
 	}
-	return req, res, nil
+	switch res.StatusCode {
+	case 403:
+		err = NotAuthorizedError{BigVError{
+			ThingType: "",
+			Thing:     "",
+			User:      "",
+			Action:    method,
+		}}
+	case 404:
+		err = NotFoundError{BigVError{
+			ThingType: "",
+			Thing:     "",
+			User:      "",
+			Action:    method,
+		}}
+	}
+	return req, res, err
 }
