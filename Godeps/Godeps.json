@@ -1,0 +1,14 @@
+{
+	"ImportPath": "bigv.io/client",
+	"GoVersion": "go1.3.3",
+	"Deps": [
+		{
+			"ImportPath": "bytemark.co.uk/auth3/client",
+			"Rev": "f70f0c3ecf10e43c42b510e8db430d8323632d25"
+		},
+		{
+			"ImportPath": "github.com/bgentry/speakeasy",
+			"Rev": "5dfe43257d1f86b96484e760f2f0c4e2559089c7"
+		}
+	]
+}
