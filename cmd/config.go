@@ -161,9 +161,9 @@ func (config *Config) GetV(name string) ConfigVar {
 }
 
 func (config *Config) GetAll() []ConfigVar {
-	vars := make([]ConfigVar, 4)
-	for _, v := range CONFIG_VARIABLES {
-		vars = append(vars, config.GetV(v))
+	vars := make([]ConfigVar, len(CONFIG_VARIABLES))
+	for i, v := range CONFIG_VARIABLES {
+		vars[i] = config.GetV(v)
 	}
 	return vars
 }
@@ -184,7 +184,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		}
 		return v
 	case "auth-endpoint":
-		v := ConfigVar{"endpoint", "https://auth.bytemark.co.uk", "CODE"}
+		v := ConfigVar{"auth-endpoint", "https://auth.bytemark.co.uk", "CODE"}
 
 		val := os.Getenv("BIGV_AUTH_ENDPOINT")
 		if val != "" {
@@ -201,7 +201,9 @@ func (config *Config) GetDefault(name string) ConfigVar {
 				"ENV BIGV_AUTH_ENDPOINT",
 			}
 		}
-		return config.GetDefault("user")
+		def := config.GetDefault("user")
+		def.Name = "account"
+		return def
 	case "debug-level":
 		v := ConfigVar{"debug-level", "0", "CODE"}
 		if val := os.Getenv("BIGV_DEBUG_LEVEL"); val != "" {

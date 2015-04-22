@@ -190,7 +190,7 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	is.Equal("ENV BIGV_USER", v.Source)
 
 	v = config.GetV("account")
-	is.Equal("user", v.Name)
+	is.Equal("account", v.Name)
 	is.Equal(expected, v.Value)
 	is.Equal("ENV BIGV_USER", v.Source)
 
