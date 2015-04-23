@@ -29,7 +29,21 @@ func TestDispatchDoDebug(t *testing.T) {
 	doDispatchTest(t, config, commands, "debug", "GET", "/test")
 
 	commands.Reset()
+}
 
+func TestDispatchDoDelete(t *testing.T) {
+	commands := &mockCommands{}
+	config := &mockConfig{}
+	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("GetDebugLevel").Return(0)
+
+	commands.When("Help", []string{"delete-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "delete-vm")
+	commands.Reset()
+
+	commands.When("DeleteVM", []string{"test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "delete-vm", "test.virtual.machine")
+	commands.Reset()
 }
 
 func TestDispatchDoHelp(t *testing.T) {

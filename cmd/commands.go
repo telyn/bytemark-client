@@ -13,12 +13,15 @@ type Commands interface {
 	EnsureAuth()
 
 	Config([]string)
+	DeleteVM([]string)
 	Debug([]string)
 	Help([]string)
 	ShowAccount([]string)
 	ShowVM([]string)
 
 	HelpForConfig()
+	HelpForDebug()
+	HelpForDelete()
 	HelpForHelp()
 	HelpForShow()
 }

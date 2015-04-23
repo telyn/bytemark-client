@@ -51,6 +51,10 @@ func (cmds *mockCommands) Debug(args []string) {
 	cmds.Called(args)
 }
 
+func (cmds *mockCommands) DeleteVM(args []string) {
+	cmds.Called(args)
+}
+
 func (cmds *mockCommands) Help(args []string) {
 	cmds.Called(args)
 }
@@ -75,6 +79,9 @@ func (cmds *mockCommands) HelpForConfig() {
 	cmds.Called()
 }
 func (cmds *mockCommands) HelpForDebug() {
+	cmds.Called()
+}
+func (cmds *mockCommands) HelpForDelete() {
 	cmds.Called()
 }
 

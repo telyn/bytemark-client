@@ -26,5 +26,6 @@ type Client interface {
 	// GROUPS
 
 	// VIRTUAL MACHINES
+	DeleteVirtualMachine(name VirtualMachineName) error
 	GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error)
 }
