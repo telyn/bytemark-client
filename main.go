@@ -4,7 +4,9 @@ import (
 	"bigv.io/client/cmd"
 	//	bigv "bigv.io/client/lib"
 	"flag"
+	"fmt"
 	"os"
+	"os/signal"
 )
 
 var (
@@ -14,6 +16,16 @@ var (
 )
 
 func main() {
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, os.Interrupt)
+	go func() {
+		for _ = range ch {
+			fmt.Printf("\r\nCaught an interrupt - exiting.\r\n")
+			os.Exit(1)
+		}
+
+	}()
+
 	flag.Parse()
 	config := cmd.NewConfig(*configDir, flag.CommandLine)
 
