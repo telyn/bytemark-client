@@ -88,7 +88,6 @@ func (cmds *CommandSet) PromptForCredentials() {
 		fmt.Fprintf(os.Stderr, "User: ")
 		user, _ := buf.ReadString('\n')
 		cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
-		fmt.Fprintf(os.Stderr, "\r\n")
 	}
 
 	for cmds.config.Get("pass") == "" {
@@ -98,7 +97,6 @@ func (cmds *CommandSet) PromptForCredentials() {
 			panic(err)
 		}
 		cmds.config.Set("pass", strings.TrimSpace(pass), "INTERACTION")
-		fmt.Fprintf(os.Stderr, "\r\n")
 	}
 
 	if cmds.config.Get("yubikey") != "" {
@@ -108,5 +106,6 @@ func (cmds *CommandSet) PromptForCredentials() {
 			cmds.config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
 		}
 	}
+	fmt.Fprintf(os.Stderr, "\r\n")
 
 }
