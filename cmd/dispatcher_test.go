@@ -46,6 +46,21 @@ func TestDispatchDoDelete(t *testing.T) {
 	commands.Reset()
 }
 
+func TestDispatchDoUndelete(t *testing.T) {
+	commands := &mockCommands{}
+	config := &mockConfig{}
+	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("GetDebugLevel").Return(0)
+
+	commands.When("Help", []string{"undelete-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "undelete-vm")
+	commands.Reset()
+
+	commands.When("UndeleteVM", []string{"test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "undelete-vm", "test.virtual.machine")
+	commands.Reset()
+}
+
 func TestDispatchDoHelp(t *testing.T) {
 	commands := &mockCommands{}
 	config := &mockConfig{}

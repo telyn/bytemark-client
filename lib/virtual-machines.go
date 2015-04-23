@@ -17,10 +17,24 @@ func (bigv *BigVClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 }
 
 // returns nil on success. Probably.
-func (bigv *BigVClient) DeleteVirtualMachine(name VirtualMachineName) (err error) {
+func (bigv *BigVClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
+	// TODO(telyn): URL escaping
 	path := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if purge {
+		path += "?purge=true"
+	}
 
 	_, _, err = bigv.Request(true, "DELETE", path, "")
+	if err != nil {
+		return bigv.PopulateError(err, name.String(), "virtual machine", "delete")
+	}
+	return nil
+}
+
+func (bigv *BigVClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
+	path := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "PUT", path, "{deleted:false}")
 	if err != nil {
 		return bigv.PopulateError(err, name.String(), "virtual machine", "delete")
 	}

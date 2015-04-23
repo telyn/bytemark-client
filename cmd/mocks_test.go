@@ -71,6 +71,10 @@ func (cmds *mockCommands) ShowVM(args []string) {
 	cmds.Called(args)
 }
 
+func (cmds *mockCommands) UndeleteVM(args []string) {
+	cmds.Called(args)
+}
+
 func (cmds *mockCommands) EnsureAuth() {
 	cmds.Called()
 }
