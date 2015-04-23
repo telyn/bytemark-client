@@ -5,13 +5,13 @@ ALL_PACKAGES := bigv.io/client/lib bigv.io/client/cmd bigv.io/client
 
 .PHONY: test update-dependencies
 
-all: go-bigv-client
+all: go-bigv
 
-go-bigv-client:
-	$(BUILD_GO) build -o go-bigv-client bigv.io/client
+go-bigv:
+	$(BUILD_GO) build -o go-bigv bigv.io/client
 
 install: all
-	cp go-bigv-client /usr/bin/go-bigv-client
+	cp go-bigv /usr/bin/go-bigv
 
 test:
 	$(TEST_GO) test $(ALL_PACKAGES)
