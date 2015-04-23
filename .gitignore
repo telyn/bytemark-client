@@ -1,3 +1,5 @@
 .*.swp
 main/main
-go-bigv-client
+go-bigv
+go-bigv.exe
+BigV.app
