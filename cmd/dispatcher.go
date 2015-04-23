@@ -26,6 +26,7 @@ func NewDispatcher(config ConfigManager) (d *Dispatcher) {
 	}
 
 	d.debugLevel = config.GetDebugLevel()
+	bigv.SetDebugLevel(d.debugLevel)
 
 	d.cmds = NewCommandSet(config, bigv)
 	return d
