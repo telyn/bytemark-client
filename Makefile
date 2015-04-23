@@ -19,7 +19,7 @@ clean:
 	rm -rf BigV.app
 	rm -f go-bigv
 
-go-bigv:
+go-bigv: main.go cmd/*.go lib/*.go
 	go build -o go-bigv bigv.io/client
 
 install: all
