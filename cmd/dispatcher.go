@@ -77,6 +77,9 @@ func (d *Dispatcher) Do(args []string) {
 	case "debug":
 		d.cmds.Debug(args[1:])
 		return
+	case "delete-vm":
+		d.cmds.DeleteVM(args[1:])
+		return
 	case "show-account":
 		d.cmds.ShowAccount(args[1:])
 		return

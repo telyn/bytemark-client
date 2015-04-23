@@ -24,6 +24,8 @@ func (cmds *CommandSet) Help(args []string) {
 		cmds.HelpForConfig()
 	case "debug":
 		cmds.HelpForDebug()
+	case "delete":
+		cmds.HelpForDelete()
 	case "exit":
 		cmds.HelpForExitCodes()
 	case "exit-codes":
