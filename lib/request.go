@@ -94,6 +94,7 @@ func (bigv *BigVClient) Request(auth bool, method string, location string, reque
 
 	baseErr := BigVError{
 		Method:       method,
+		URL:          req.URL,
 		StatusCode:   res.StatusCode,
 		RequestBody:  requestBody,
 		ResponseBody: "",
