@@ -18,6 +18,7 @@ type Commands interface {
 	Help([]string)
 	ShowAccount([]string)
 	ShowVM([]string)
+	UndeleteVM([]string)
 
 	HelpForConfig()
 	HelpForDebug()

@@ -12,7 +12,7 @@ const (
 	E_CANT_READ_CONFIG  = 3
 	E_CANT_WRITE_CONFIG = 4
 
-	E_UNKNOWN_ERROR = 59
+	E_UNKNOWN_ERROR = 49
 
 	E_CANT_CONNECT_AUTH = 50
 	E_CANT_CONNECT_BIGV = 150
@@ -27,10 +27,11 @@ const (
 	E_CREDENTIALS_WRONG   = 54
 
 	E_NOT_AUTHORIZED_BIGV = 155
-	E_NOT_FOUND_BIGV      = 156
 
-	E_UNKNOWN_AUTH = 59
-	E_UNKNOWN_BIGV = 159
+	E_NOT_FOUND_BIGV = 156
+
+	E_UNKNOWN_AUTH = 149
+	E_UNKNOWN_BIGV = 249
 )
 
 func (cmds *CommandSet) HelpForExitCodes() {
@@ -101,29 +102,34 @@ func exit(err error, message ...string) {
 	}
 	errorMessage := "Unknown error"
 	exitCode := E_UNKNOWN_ERROR
-	switch err.(type) {
-	case bigv.NotAuthorizedError:
-		errorMessage = err.Error()
-		exitCode = E_NOT_AUTHORIZED_BIGV
+	if err != nil {
+		switch err.(type) {
+		case bigv.NotAuthorizedError:
+			errorMessage = err.Error()
+			exitCode = E_NOT_AUTHORIZED_BIGV
 
-	case bigv.NotFoundError:
-		errorMessage = err.Error()
-		exitCode = E_NOT_FOUND_BIGV
+		case bigv.NotFoundError:
+			errorMessage = err.Error()
+			exitCode = E_NOT_FOUND_BIGV
 
-	case bigv.BigVError:
-		errorMessage = "Unknown error from BigV client library."
-		exitCode = E_UNKNOWN_ERROR
+		default:
+			e := err.Error()
+			if strings.Contains(e, "Badly-formed parameters") {
+				exitCode = E_CREDENTIALS_INVALID
+				errorMessage = "The supplied credentials contained invalid characters - please try again"
+			} else if strings.Contains(e, "Bad login credentials") {
+				exitCode = E_CREDENTIALS_WRONG
+				errorMessage = "A user account with those credentials could not be found. Check your details and try again"
 
-	default:
-		e := err.Error()
-		if strings.Contains(e, "Badly-formed parameters") {
-			exitCode = E_CREDENTIALS_INVALID
-			errorMessage = "The supplied credentials contained invalid characters - please try again"
-		} else if strings.Contains(e, "Bad login credentials") {
-			exitCode = E_CREDENTIALS_WRONG
-			errorMessage = "A user account with those credentials could not be found. Check your details and try again"
-
+			}
 		}
+
+		if _, ok := err.(bigv.BigVError); ok && exitCode == E_UNKNOWN_ERROR {
+			errorMessage = fmt.Sprintf("Unknown error from BigV client library.%s", err.Error())
+			exitCode = E_UNKNOWN_BIGV
+		}
+	} else {
+		exitCode = 0
 	}
 
 	if exitCode == E_UNKNOWN_ERROR {

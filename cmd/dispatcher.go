@@ -87,6 +87,9 @@ func (d *Dispatcher) Do(args []string) {
 	case "show-vm":
 		d.cmds.ShowVM(args[1:])
 		return
+	case "undelete-vm":
+		d.cmds.UndeleteVM(args[1:])
+		return
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", args[0])
 	d.cmds.Help(args)
