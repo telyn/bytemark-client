@@ -48,6 +48,9 @@ func TestDispatchDoHelp(t *testing.T) {
 
 	commands.When("Help", []string{"show"}).Times(1)
 	doDispatchTest(t, config, commands, "help", "show")
+
+	commands.When("Help", []string{"debug"}).Times(1)
+	doDispatchTest(t, config, commands, "help", "debug")
 }
 
 func TestDispatchDoConfig(t *testing.T) {
