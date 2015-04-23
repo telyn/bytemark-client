@@ -44,15 +44,11 @@ func (bigv *BigVClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 // Request makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
 func (bigv *BigVClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
-	req, res, err := bigv.Request(auth, method, location, requestBody)
+	_, res, err := bigv.Request(auth, method, location, requestBody)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
-
-	if bigv.debugLevel > 1 {
-		fmt.Printf("%s %s: %d\r\n", method, req.URL, res.StatusCode)
-	}
 
 	responseBody, err = ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -91,21 +87,31 @@ func (bigv *BigVClient) Request(auth bool, method string, location string, reque
 	if err != nil {
 		return req, res, err
 	}
+
+	if bigv.debugLevel > 1 {
+		fmt.Printf("%s %s: %d\r\n", method, req.URL, res.StatusCode)
+	}
+
+	baseErr := BigVError{
+		Method:       method,
+		StatusCode:   res.StatusCode,
+		RequestBody:  requestBody,
+		ResponseBody: "",
+	}
+
 	switch res.StatusCode {
+	case 400:
+		err = BadRequestError{baseErr}
+
 	case 403:
-		err = NotAuthorizedError{BigVError{
-			ThingType: "",
-			Thing:     "",
-			User:      "",
-			Action:    method,
-		}}
+		err = NotAuthorizedError{baseErr}
 	case 404:
-		err = NotFoundError{BigVError{
-			ThingType: "",
-			Thing:     "",
-			User:      "",
-			Action:    method,
-		}}
+		err = NotFoundError{baseErr}
+	default:
+		if 200 <= res.StatusCode && res.StatusCode <= 299 {
+			break
+		}
+		err = UnknownStatusCodeError{baseErr}
 	}
 	return req, res, err
 }

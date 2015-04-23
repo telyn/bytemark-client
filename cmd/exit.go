@@ -102,29 +102,34 @@ func exit(err error, message ...string) {
 	}
 	errorMessage := "Unknown error"
 	exitCode := E_UNKNOWN_ERROR
-	switch err.(type) {
-	case bigv.NotAuthorizedError:
-		errorMessage = err.Error()
-		exitCode = E_NOT_AUTHORIZED_BIGV
+	if err != nil {
+		switch err.(type) {
+		case bigv.NotAuthorizedError:
+			errorMessage = err.Error()
+			exitCode = E_NOT_AUTHORIZED_BIGV
 
-	case bigv.NotFoundError:
-		errorMessage = err.Error()
-		exitCode = E_NOT_FOUND_BIGV
+		case bigv.NotFoundError:
+			errorMessage = err.Error()
+			exitCode = E_NOT_FOUND_BIGV
 
-	case bigv.BigVError:
-		errorMessage = "Unknown error from BigV client library."
-		exitCode = E_UNKNOWN_ERROR
+		default:
+			e := err.Error()
+			if strings.Contains(e, "Badly-formed parameters") {
+				exitCode = E_CREDENTIALS_INVALID
+				errorMessage = "The supplied credentials contained invalid characters - please try again"
+			} else if strings.Contains(e, "Bad login credentials") {
+				exitCode = E_CREDENTIALS_WRONG
+				errorMessage = "A user account with those credentials could not be found. Check your details and try again"
 
-	default:
-		e := err.Error()
-		if strings.Contains(e, "Badly-formed parameters") {
-			exitCode = E_CREDENTIALS_INVALID
-			errorMessage = "The supplied credentials contained invalid characters - please try again"
-		} else if strings.Contains(e, "Bad login credentials") {
-			exitCode = E_CREDENTIALS_WRONG
-			errorMessage = "A user account with those credentials could not be found. Check your details and try again"
-
+			}
 		}
+
+		if _, ok := err.(bigv.BigVError); ok && exitCode == E_UNKNOWN_ERROR {
+			errorMessage = fmt.Sprintf("Unknown error from BigV client library.%s", err.Error())
+			exitCode = E_UNKNOWN_BIGV
+		}
+	} else {
+		exitCode = 0
 	}
 
 	if exitCode == E_UNKNOWN_ERROR {

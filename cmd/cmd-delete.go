@@ -90,7 +90,6 @@ func (cmds *CommandSet) UndeleteVM(args []string) {
 	if err != nil {
 		exit(err)
 	}
-
-	fmt.Println(FormatVirtualMachine(vm))
+	fmt.Printf("Successfully restored virtual machine %s\r\n", vm.Hostname)
 
 }
