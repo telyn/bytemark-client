@@ -47,13 +47,14 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 
 	if !force {
 		buf := bufio.NewReader(os.Stdin)
-		fstr := "Are you certain you wish to delete %s? (y/n)"
+		fstr := "Are you certain you wish to delete %s? (y/n) "
 		if purge {
-			fstr = "Are you certain you wish to PERMANENTLY delete %s? (y/n)"
+			fstr = "Are you certain you wish to PERMANENTLY delete %s? (y/n) "
 
 		}
 		fmt.Fprintf(os.Stderr, fstr, vm.Hostname)
 		chr, err := buf.ReadByte()
+		fmt.Println()
 		if err != nil {
 			exit(err)
 		} else if chr != 'y' {
@@ -68,7 +69,11 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 		exit(err)
 	}
 
-	fmt.Println(FormatVirtualMachine(vm))
+	if purge {
+		fmt.Printf("Virtual machine %s purged successfully.\r\n", name)
+	} else {
+		fmt.Printf("Virtual machine %s deleted successfully.\r\n", name)
+	}
 }
 
 func (cmds *CommandSet) UndeleteVM(args []string) {
