@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
 )
 
 func (commands *CommandSet) HelpForDebug() {
@@ -37,19 +36,14 @@ func (commands *CommandSet) Debug(args []string) {
 		commands.EnsureAuth()
 		body, err := commands.bigv.RequestAndRead(shouldAuth, args[0], args[1], "")
 		if err != nil {
-			fmt.Printf("error (type %T): %s", err.Error())
-			os.Exit(1)
+			exit(err)
 		}
 
 		buf := new(bytes.Buffer)
 		json.Indent(buf, body, "", "    ")
 		fmt.Printf("%s", buf)
 	case "config":
-		indented, err := json.MarshalIndent(commands.config.GetAll(), "", "    ")
-		if err != nil {
-			fmt.Printf("Your config is so weird it broke json.MarshalIndent")
-			panic(err)
-		}
+		indented, _ := json.MarshalIndent(commands.config.GetAll(), "", "    ")
 		fmt.Printf("%s", indented)
 	default:
 		commands.HelpForDebug()

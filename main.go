@@ -21,7 +21,7 @@ func main() {
 	go func() {
 		for _ = range ch {
 			fmt.Printf("\r\nCaught an interrupt - exiting.\r\n")
-			os.Exit(1)
+			os.Exit(-1)
 		}
 
 	}()

@@ -66,12 +66,10 @@ func (cmds *CommandSet) EnsureAuth() {
 						cmds.config.Set("pass", "", "INVALID")
 						cmds.config.Set("yubikey-otp", "", "INVALID")
 					} else {
-						fmt.Fprintf(os.Stderr, "Invalid credentials, giving up after three attempts.\r\n")
-						// TODO(telyn): define exit codes
-						os.Exit(1)
+						exit(err, "Invalid credentials, giving up after three attempts.")
 					}
 				} else {
-					panic(err)
+					exit(err)
 				}
 
 			}
@@ -94,7 +92,7 @@ func (cmds *CommandSet) PromptForCredentials() {
 		pass, err := speakeasy.Ask("Pass: ")
 
 		if err != nil {
-			panic(err)
+			exit(err, "Couldn't read password - are you sure you're using a terminal?")
 		}
 		cmds.config.Set("pass", strings.TrimSpace(pass), "INTERACTION")
 	}

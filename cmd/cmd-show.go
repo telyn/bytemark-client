@@ -26,7 +26,7 @@ func (cmds *CommandSet) ShowVM(args []string) {
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
-		panic(err)
+		exit(err)
 	}
 
 	fmt.Println(FormatVirtualMachine(vm))
@@ -39,7 +39,7 @@ func (cmds *CommandSet) ShowAccount(args []string) {
 	acc, err := cmds.bigv.GetAccount(name)
 
 	if err != nil {
-		panic(err)
+		exit(err)
 	}
 
 	fmt.Printf("Account %d: %s", acc.Id, acc.Name)

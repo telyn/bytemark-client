@@ -19,6 +19,10 @@ type NotAuthorizedError struct {
 	BigVError
 }
 
+func (e BigVError) Error() string {
+	return fmt.Sprintf("BigVError of type %T - Should have its own error message. Anyway, some details:\r\nThing: %s\r\nThingType: %s\r\nUser: %s\r\nAction: %s\r\n", e, e.Thing, e.ThingType, e.User, e.Action)
+}
+
 func (e NotFoundError) Error() string {
 	return fmt.Sprintf("Couldn't find %s %s as user %s", e.ThingType, e.Thing, e.User)
 }

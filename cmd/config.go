@@ -80,20 +80,17 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 
 	err := os.MkdirAll(config.Dir, 0700)
 	if err != nil {
-		// TODO(telyn): Better error handling here
 
-		panic(err)
+		exit(err)
 	}
 
 	stat, err := os.Stat(config.Dir)
 	if err != nil {
-		// TODO(telyn): Better error handling here
-		panic(err)
+		exit(err)
 	}
 
 	if !stat.IsDir() {
-		fmt.Printf("%s is not a directory", config.Dir)
-		panic("Cannot continue")
+		exit(nil, fmt.Sprintf("%s is not a directory", config.Dir))
 	}
 
 	if flags != nil {
@@ -125,7 +122,7 @@ func (config *Config) GetPath(name string) string {
 func (config *Config) GetUrl(path ...string) *url.URL {
 	url, err := url.Parse(config.Get("endpoint"))
 	if err != nil {
-		panic("Endpoint is not a valid URL")
+		exit(err, "Endpoint is not valid URL")
 	}
 	url.Parse("/" + strings.Join([]string(path), "/"))
 	return url
@@ -140,7 +137,7 @@ func (config *Config) LoadDefinitions() {
 	} else {
 		_, err := ioutil.ReadFile(config.GetPath("definitions"))
 		if err != nil {
-			panic("Couldn't load definitions")
+			exit(err, "Couldn't load definitions")
 		}
 	}
 
@@ -220,8 +217,8 @@ func (config *Config) read(name string) ConfigVar {
 		if os.IsNotExist(err) {
 			return config.GetDefault(name)
 		}
-		fmt.Printf("Couldn't read config for %s", name)
-		panic(err)
+
+		exit(err, fmt.Sprintf("Couldn't read config for %s", name))
 	}
 
 	return ConfigVar{name, string(contents), "FILE " + config.GetPath(name)}
@@ -237,8 +234,7 @@ func (config *Config) SetPersistent(name, value, source string) {
 	config.Set(name, value, source)
 	err := ioutil.WriteFile(config.GetPath(name), []byte(value), 0600)
 	if err != nil {
-		fmt.Println("Couldn't write to config directory " + config.Dir)
-		panic(err)
+		exit(err, fmt.Sprintf("Couldn't write to config directory "+config.Dir))
 	}
 }
 

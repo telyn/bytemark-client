@@ -22,7 +22,7 @@ func NewDispatcher(config ConfigManager) (d *Dispatcher) {
 	d = new(Dispatcher)
 	bigv, err := client.New(config.Get("endpoint"))
 	if err != nil {
-		panic("Couldn't create a BigVClient - is auth down?")
+		exit(err)
 	}
 
 	d.debugLevel = config.GetDebugLevel()
