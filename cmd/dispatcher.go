@@ -42,8 +42,6 @@ func NewDispatcherWithCommands(config ConfigManager, commands Commands) *Dispatc
 // EnsureAuth makes sure a valid token is stored in config.
 // This should be called by anything that needs auth.
 
-// TODO(telyn): Write a test for Do. Somehow.
-
 // Do takes the command line arguments and figures out what to do
 func (d *Dispatcher) Do(args []string) {
 	//	help := d.Flags.Lookup("help")
