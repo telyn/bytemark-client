@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	mock "github.com/maraino/go-mock"

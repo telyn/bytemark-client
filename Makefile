@@ -1,4 +1,4 @@
-ALL_PACKAGES := bigv.io/client/lib bigv.io/client/cmd bigv.io/client
+ALL_PACKAGES := bigv.io/client/lib bigv.io/client/cmd
 
 .PHONY: test update-dependencies
 .PHONY: BigV.app
@@ -19,8 +19,8 @@ clean:
 	rm -rf BigV.app
 	rm -f go-bigv
 
-go-bigv: main.go cmd/*.go lib/*.go
-	go build -o go-bigv bigv.io/client
+go-bigv: cmd/*.go lib/*.go
+	go build -o go-bigv bigv.io/client/cmd
 
 install: all
 	cp go-bigv /usr/bin/go-bigv
