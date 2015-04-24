@@ -24,6 +24,7 @@ type Client interface {
 	GetAccount(name string) (account *Account, err error)
 
 	// GROUPS
+	CreateGroup(name GroupName) error
 
 	// VIRTUAL MACHINES
 	DeleteVirtualMachine(name VirtualMachineName, purge bool) error
