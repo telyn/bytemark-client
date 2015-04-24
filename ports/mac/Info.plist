@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>applet</string>
+	<string>main</string>
 	<key>CFBundleIconFile</key>
 	<string>applet</string>
 	<key>CFBundleGetInfoString</key>
