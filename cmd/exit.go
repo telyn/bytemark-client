@@ -99,6 +99,8 @@ Exit code ranges:
 func exit(err error, message ...string) {
 	if len(message) > 0 {
 		fmt.Println(strings.Join(message, "\r\n"))
+	} else if err == nil {
+		os.Exit(0)
 	}
 	errorMessage := "Unknown error"
 	exitCode := E_UNKNOWN_ERROR
