@@ -1,0 +1,4 @@
+set folderPath to POSIX path of (path to me as text)
+do shell script "rm -f /tmp/BigV.app"
+do shell script "ln -s " & quoted form of folderPath & " /tmp/BigV.app"
+do shell script "open '" &folderPath & "Contents/Resources/BigV.terminal'"

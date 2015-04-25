@@ -1,8 +1,0 @@
-#!/bin/bash
-
-PATH=/Applications/BigV.app/Contents/Resources/bin:$PATH
-
-clear
-go-bigv help
-
-bash

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+PATH=`readlink /tmp/BigV.app`/Contents/Resources/bin:$PATH
+rm /tmp/BigV.app
+
+clear
+go-bigv help
+
+bash

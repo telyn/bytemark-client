@@ -13,7 +13,7 @@
 	cnR2e4aPl5qjtbi9AAAAAAAAAQEAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAL8=
 	</data>
 	<key>CommandString</key>
-	<string>/Applications/BigV.app/Contents/Resources/start</string>
+	<string>/tmp/BigV.app/Contents/Resources/start</string>
 	<key>CursorBlink</key>
 	<true/>
 	<key>CursorColor</key>
