@@ -21,7 +21,8 @@ BigV.app: go-bigv $(LAUNCHER_APP) ports/mac/*
 	# then put in our own Info.plist which has BigV branding and copyright and paths and stuff
 	cp ports/mac/Info.plist BigV.app/Contents
 	# copy in the terminal profile and start script
-	cp -r ports/mac/{BigV.terminal,start} BigV.app/Contents/Resources
+	cp -r ports/mac/BigV.terminal BigV.app/Contents/Resources
+	cp -r ports/mac/start BigV.app/Contents/Resources
 	# copy in go-bigv into its own folder (this allows us to say 
 	# "add BigV.app/Contents/Resources/bin to your PATH" and it'll only add go-bigv
 	# and not the launcher too.)
