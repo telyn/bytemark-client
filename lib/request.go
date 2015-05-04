@@ -6,8 +6,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 )
+
+// needs to be a string or at least a stringer so need to convert the array anyway
+// bit of a microoptimisation to remove it anyway tbf, we're talking about URL paths here, there are like 4 variables max
+
+func BuildUrl(format string, args ...string) string {
+	arr := make([]interface{}, len(args), len(args))
+	for i, str := range args {
+		arr[i] = url.QueryEscape(str)
+	}
+	return fmt.Sprintf(format, arr...)
+}
 
 // RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
 func (bigv *BigVClient) RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error {

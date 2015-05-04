@@ -2,11 +2,10 @@ package lib
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 func (bigv *BigVClient) CreateGroup(name GroupName) error {
-	path := fmt.Sprintf("/accounts/%s/groups", name.Account)
+	path := BuildUrl("/accounts/%s/groups", name.Account)
 
 	obj := map[string]string{
 		"name": name.Group,
