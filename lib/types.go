@@ -90,7 +90,7 @@ type VirtualMachineSpec struct {
 }
 
 type Group struct {
-	Name string `json:name"`
+	Name string `json:"name"`
 
 	// the following cannot be set
 	AccountId       int              `json:"account_id"`
