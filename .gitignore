@@ -1,4 +1,4 @@
-.*.swp
+.*.sw*
 main/main
 go-bigv
 go-bigv.exe
