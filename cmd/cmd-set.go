@@ -25,7 +25,7 @@ func (cmds *CommandSet) HelpForConfig() {
 	fmt.Println()
 }
 
-// Set provides the bigv set command, which sets variables in the user's config
+// Config provides the bigv config command, which sets variables in the user's config
 // It's slightly more user friendly than echo "value" > ~/.go-bigv/
 func (cmds *CommandSet) Config(args []string) {
 	if len(args) == 0 {

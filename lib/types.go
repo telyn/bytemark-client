@@ -58,7 +58,7 @@ type User struct {
 	AccountName string `json:"account_name"`
 }
 
-// TODO(telyn): new fields (last_imaged_with and
+// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
 type VirtualMachine struct {
 	Autoreboot            bool   `json:"autoreboot_on"`
 	CdromUrl              string `json:"cdrom_url"`

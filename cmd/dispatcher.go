@@ -11,7 +11,6 @@ import (
 // type der is used to create API requests and direct output to views,
 // except probably when those API requests don't require authorisation (e.g. /definitions, new user)
 type Dispatcher struct {
-	//Config *Config
 	Flags      *flag.FlagSet
 	cmds       Commands
 	debugLevel int
