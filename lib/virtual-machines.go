@@ -6,6 +6,9 @@ func (bigv *BigVClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 	path := BuildUrl("/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 
 	err = bigv.RequestAndUnmarshal(true, "GET", path, "", vm)
+	if err != nil {
+		vm = nil
+	}
 	return vm, err
 }
 

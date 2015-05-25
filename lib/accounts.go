@@ -1,11 +1,15 @@
 package lib
 
-// GetAccount takes an account name and returns a filled-out Account object
-func (bigv *BigVClient) GetAccount(name string) (account *Account, err error) {
-	account = new(Account)
+// GetAccount takes an account name or ID and returns a filled-out Account object
+func (bigv *BigVClient) GetAccount(name string) (*Account, error) {
+	account := new(Account)
+
 	path := BuildUrl("/accounts/%s", name)
 
-	err = bigv.RequestAndUnmarshal(true, "GET", path, "", account)
+	err := bigv.RequestAndUnmarshal(true, "GET", path, "", account)
+	if err != nil {
+		return nil, err
+	}
 
-	return account, err
+	return account, nil
 }
