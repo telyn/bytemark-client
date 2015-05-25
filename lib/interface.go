@@ -16,8 +16,6 @@ type Client interface {
 	AuthWithToken(string) error
 	AuthWithCredentials(auth3.Credentials) error
 
-	BuildUrl(format string, bits ...string) string
-
 	RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error
 	RequestAndRead(auth bool, method, path, requestBody string) (responseBody []byte, err error)
 	Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error)
