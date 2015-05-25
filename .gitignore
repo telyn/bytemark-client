@@ -3,3 +3,5 @@ main/main
 go-bigv
 go-bigv.exe
 BigV.app
+*.coverage
+*.coverage.html

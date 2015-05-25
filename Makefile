@@ -1,4 +1,5 @@
 ALL_PACKAGES := bigv.io/client/lib bigv.io/client/cmd
+ALL_FILES := cmd/*.go lib/*.go
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)
 OSAARCH:=i386
@@ -34,8 +35,11 @@ BigV.app: go-bigv $(LAUNCHER_APP) ports/mac/*
 clean:
 	rm -rf BigV.app rm $(LAUNCHER_APP)
 	rm -f go-bigv
+	rm -f cmd.coverage lib.coverage
+	rm -f cmd.coverage.html lib.coverage.html
 
-go-bigv: cmd/*.go lib/*.go
+
+go-bigv: $(ALL_FILES)
 	go build -o go-bigv bigv.io/client/cmd
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
@@ -49,7 +53,17 @@ endif
 install: all
 	cp go-bigv /usr/bin/go-bigv
 
-test:
+coverage: lib.coverage.html cmd.coverage.html
+	open lib.coverage.html
+	open cmd.coverage.html
+
+%.coverage.html: %.coverage
+	go tool cover -html=$< -o $@
+
+%.coverage: % %/*
+	go test -coverprofile=$@ bigv.io/client/$<
+
+test: 
 	go test $(ALL_PACKAGES)
 
 update-dependencies: 
