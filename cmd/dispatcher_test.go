@@ -78,6 +78,7 @@ func TestDispatchDoHelp(t *testing.T) {
 	config := &mockConfig{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
+	config.When("Get", "silent").Return("true")
 
 	commands.When("Help", []string{}).Times(1)
 

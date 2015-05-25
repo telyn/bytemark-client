@@ -10,6 +10,7 @@ func TestCommandConfig(t *testing.T) {
 
 	config.When("GetV", "user").Return(ConfigVar{"user", "old-test-user", "config"})
 	config.When("Get", "user").Return("old-test-user")
+	config.When("Get", "silent").Return("true")
 
 	config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
 

@@ -207,6 +207,8 @@ func (config *Config) GetDefault(name string) ConfigVar {
 			v.Value = val
 		}
 		return v
+	case "silent":
+		return ConfigVar{"silent", "false", "CODE"}
 	}
 	return ConfigVar{"", "", ""}
 }

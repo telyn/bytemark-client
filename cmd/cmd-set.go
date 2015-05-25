@@ -51,9 +51,9 @@ func (cmds *CommandSet) Config(args []string) {
 		// TODO(telyn): input validation ha ha ha
 		cmds.config.SetPersistent(variable, args[2], "CMD set")
 
-		if oldVar.Source == "config" {
+		if oldVar.Source == "config" && cmds.config.Get("silent") != "true" {
 			fmt.Printf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, args[1])
-		} else {
+		} else if cmds.config.Get("silent") != "true" {
 			fmt.Printf("%s has been set. \r\nNew value: %s\r\n", variable, args[1])
 		}
 

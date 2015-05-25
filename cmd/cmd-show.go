@@ -28,8 +28,9 @@ func (cmds *CommandSet) ShowVM(args []string) {
 	if err != nil {
 		exit(err)
 	}
-
-	fmt.Println(FormatVirtualMachine(vm))
+	if cmds.config.Get("silent") != "true" {
+		fmt.Println(FormatVirtualMachine(vm))
+	}
 
 }
 
