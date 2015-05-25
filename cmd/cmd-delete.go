@@ -34,7 +34,7 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 
 	flags.Parse(args)
 
-	name := ParseVirtualMachineName(flags.Args()[0])
+	name := cmds.bigv.ParseVirtualMachineName(flags.Args()[0])
 	cmds.EnsureAuth()
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
@@ -78,7 +78,7 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 
 func (cmds *CommandSet) UndeleteVM(args []string) {
 
-	name := ParseVirtualMachineName(args[0])
+	name := cmds.bigv.ParseVirtualMachineName(args[0])
 	cmds.EnsureAuth()
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)

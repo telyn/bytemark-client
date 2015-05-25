@@ -9,6 +9,10 @@ func (vm VirtualMachineName) String() string {
 	return fmt.Sprintf("%s.%s.%s", vm.VirtualMachine, vm.Group, vm.Account)
 }
 
+func (g GroupName) String() string {
+	return g.Group + "." + g.Account
+}
+
 func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
 	total = 0
 	for _, disc := range vm.Discs {

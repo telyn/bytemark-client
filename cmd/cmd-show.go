@@ -21,7 +21,7 @@ func (cmds *CommandSet) HelpForShow() {
 func (cmds *CommandSet) ShowVM(args []string) {
 	cmds.EnsureAuth()
 
-	name := ParseVirtualMachineName(args[0])
+	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
@@ -35,7 +35,7 @@ func (cmds *CommandSet) ShowVM(args []string) {
 }
 
 func (cmds *CommandSet) ShowAccount(args []string) {
-	name := ParseAccountName(args[0])
+	name := cmds.bigv.ParseAccountName(args[0])
 
 	acc, err := cmds.bigv.GetAccount(name)
 

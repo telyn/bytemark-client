@@ -38,6 +38,7 @@ func TestShowVMCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Get", "silent").Return("true")
 
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	vm := getFixtureVM()
 	c.When("GetVirtualMachine", bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}).Return(&vm, nil).Times(1)

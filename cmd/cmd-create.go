@@ -14,9 +14,9 @@ func (cmd *CommandSet) CreateGroup(args []string) {
 
 	name := bigv.GroupName{"", ""}
 	if len(args) == 0 {
-		name = ParseGroupName(Prompt("Group name: "))
-	} else if name = ParseGroupName(args[0]); name.Group == "" {
-		name = ParseGroupName(Prompt("Group name: "))
+		name = cmd.bigv.ParseGroupName(Prompt("Group name: "))
+	} else if name = cmd.bigv.ParseGroupName(args[0]); name.Group == "" {
+		name = cmd.bigv.ParseGroupName(Prompt("Group name: "))
 	}
 
 	if name.Account == "" {

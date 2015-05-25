@@ -176,3 +176,18 @@ func (c *mockBigVClient) UndeleteVirtualMachine(name bigv.VirtualMachineName) er
 	r := c.Called(name)
 	return r.Error(0)
 }
+
+func (c *mockBigVClient) ParseVirtualMachineName(name string) bigv.VirtualMachineName {
+	r := c.Called(name)
+	n, _ := r.Get(0).(bigv.VirtualMachineName)
+	return n
+}
+func (c *mockBigVClient) ParseGroupName(name string) bigv.GroupName {
+	r := c.Called(name)
+	n, _ := r.Get(0).(bigv.GroupName)
+	return n
+}
+func (c *mockBigVClient) ParseAccountName(name string) string {
+	r := c.Called(name)
+	return r.String(0)
+}
