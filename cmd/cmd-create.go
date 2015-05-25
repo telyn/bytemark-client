@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+//TODO(telyn): create-vm should have a --ansible=FILE flag that appends the VM's hostname to the given file, adds
+
 func (cmd *CommandSet) CreateGroup(args []string) {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
