@@ -59,7 +59,7 @@ func (commands *CommandSet) Debug(args []string) {
 			buf := bufio.NewReader(os.Stdin)
 			requestBody, err = buf.ReadString(byte(uint8(14)))
 			if err != nil {
-				panic("Couldn't read from stdin")
+				Exit(err)
 			}
 		}
 		body, err := commands.bigv.RequestAndRead(*shouldAuth, args[0], args[1], requestBody)
