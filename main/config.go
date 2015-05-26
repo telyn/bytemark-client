@@ -133,16 +133,6 @@ func (config *Config) GetPath(name string) string {
 	return filepath.Join(config.Dir, name)
 }
 
-// GetURL combines the given path parts with the endpoint URL.
-func (config *Config) GetURL(path ...string) *url.URL {
-	url, err := url.Parse(config.Get("endpoint"))
-	if err != nil {
-		exit(err, "Endpoint is not valid URL")
-	}
-	url.Parse("/" + strings.Join([]string(path), "/"))
-	return url
-}
-
 // LoadDefinitions reads the local copy of the definitions json file, or downloads it from the endpoint if it's too old or nonexistant.
 // Eventually this will be used to provide information on various things throughout the application
 func (config *Config) LoadDefinitions() {
