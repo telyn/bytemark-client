@@ -1,4 +1,4 @@
 /*
-Package lib provides a reference implementation of a BigV API library which you can use in your projects to integrate with BigV
+Package lib provides an API library to integrate your project with Bytemark's BigV self-service hosting.
 */
 package lib
