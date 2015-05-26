@@ -15,7 +15,6 @@ func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 // DeleteVirtualMachine deletes the named virtual machine.
 // returns nil on success or an error otherwise.
 func (bigv *bigvClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
-	// TODO(telyn): URL escaping
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if purge {
 		path += "?purge=true"
