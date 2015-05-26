@@ -3,8 +3,10 @@ package main
 import (
 	bigv "bigv.io/client/lib"
 	"bufio"
+	auth3 "bytemark.co.uk/auth3/client"
 	"fmt"
 	"github.com/bgentry/speakeasy"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -47,6 +49,11 @@ func NewCommandSet(config ConfigManager, client bigv.Client) *CommandSet {
 func (cmds *CommandSet) EnsureAuth() {
 	err := cmds.bigv.AuthWithToken(cmds.config.Get("token"))
 	if err != nil {
+		if aErr, ok := err.(auth3.Error); ok {
+			if _, ok := aErr.Err.(*url.Error); ok {
+				exit(aErr)
+			}
+		}
 		fmt.Fprintf(os.Stderr, "Failed to use token, trying credentials.\r\n\r\n")
 		attempts := 3
 

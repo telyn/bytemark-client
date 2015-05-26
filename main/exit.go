@@ -2,7 +2,10 @@ package main
 
 import (
 	bigv "bigv.io/client/lib"
+	auth3 "bytemark.co.uk/auth3/client"
 	"fmt"
+	"net"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -126,6 +129,26 @@ func exit(err error, message ...string) {
 	exitCode := E_UNKNOWN_ERROR
 	if err != nil {
 		switch err.(type) {
+		case auth3.Error:
+			// TODO(telyn): I feel like this entire chunk should be in bytemark.co.uk/auth3/client
+			authErr, _ := err.(auth3.Error)
+			switch authErr.Err.(type) {
+			case *url.Error:
+				urlErr, _ := authErr.Err.(*url.Error)
+				if urlErr.Error != nil {
+					if opError, ok := urlErr.Err.(*net.OpError); ok {
+						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", opError.Err)
+					} else {
+						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %T %v", urlErr.Err, urlErr.Err)
+					}
+				} else {
+					errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", urlErr)
+				}
+				exitCode = E_CANT_CONNECT_AUTH
+			default:
+				errorMessage = fmt.Sprintf("Couldn't create auth session - internal error of type %T: %v", authErr.Err, authErr.Err)
+				exitCode = E_UNKNOWN_AUTH
+			}
 		case bigv.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_AUTHORIZED_BIGV
@@ -155,7 +178,7 @@ func exit(err error, message ...string) {
 	}
 
 	if exitCode == E_UNKNOWN_ERROR {
-		fmt.Printf("Unknown error: %s. I'm going to panic now. Expect a lot of output.\r\n", err)
+		fmt.Printf("Unknown error of type %T: %s. I'm going to panic now. Expect a lot of output.\r\n", err, err)
 		panic("")
 	} else if len(message) == 0 {
 		fmt.Println(errorMessage)
