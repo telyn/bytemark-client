@@ -5,9 +5,11 @@ ifeq ($(GOARCH),386)
 OSAARCH:=i386
 endif
 LAUNCHER_APP:=ports/mac/launcher.app
+RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefile
 
 .PHONY: test update-dependencies
 .PHONY: BigV.app
+.PHONY: find-uk0 find-bugs-todos find-exits
 
 all: go-bigv
 
@@ -65,6 +67,17 @@ coverage: lib.coverage.html main.coverage.html
 
 test: 
 	go test $(ALL_PACKAGES)
+
+find-uk0: 
+	$(RGREP) --exclude=go-bigv "uk0" .
+
+find-bugs-todos:
+	$(RGREP) -P "// BUG(.*):" .
+	$(RGREP) -P "// TODO(.*):" .
+
+find-exits:
+	$(RGREP) --exclude=exit.go --exclude=main.go -P "panic\(|os.Exit" .
+
 
 update-dependencies: 
 	go get -ut $(ALL_PACKAGES)
