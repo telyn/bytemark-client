@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+// CreateGroup sends a request to the BigV server to create a group with the given name.
 func (bigv *BigVClient) CreateGroup(name GroupName) error {
 	path := BuildUrl("/accounts/%s/groups", name.Account)
 

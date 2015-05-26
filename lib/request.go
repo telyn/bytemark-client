@@ -10,9 +10,7 @@ import (
 	"strings"
 )
 
-// needs to be a string or at least a stringer so need to convert the array anyway
-// bit of a microoptimisation to remove it anyway tbf, we're talking about URL paths here, there are like 4 variables max
-
+// BuildUrl pieces together a URL from parts, escaping as necessary..
 func BuildUrl(format string, args ...string) string {
 	arr := make([]interface{}, len(args), len(args))
 	for i, str := range args {
@@ -53,7 +51,7 @@ func (bigv *BigVClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 
 }
 
-// Request makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
+// RequestAndRead makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
 func (bigv *BigVClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
 	_, res, err := bigv.Request(auth, method, location, requestBody)
@@ -74,7 +72,7 @@ func (bigv *BigVClient) RequestAndRead(auth bool, method, location, requestBody 
 	return responseBody, nil
 }
 
-// Make an HTTP request and then request it, returning the request object, response object and any errors
+// Request makes an HTTP request and then request it, returning the request object, response object and any errors
 // For use by Client.RequestAndRead, do not use externally except for testing
 func (bigv *BigVClient) Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
 	url := location

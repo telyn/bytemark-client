@@ -5,6 +5,7 @@ import (
 	"net/url"
 )
 
+// BigVError is the basic error type which all errors return by the client library are subclassed from.
 type BigVError struct {
 	Method       string
 	URL          *url.URL
@@ -13,17 +14,22 @@ type BigVError struct {
 	ResponseBody string
 }
 
+// NotFoundError is returned when an object was unable to be found - either because the caller doesn't have permission to see them or because they don't exist.
 type NotFoundError struct {
 	BigVError
 }
 
+// NotAuthorizedError is returned when an action was unable to be performed because the caller doesn't have permission.
 type NotAuthorizedError struct {
 	BigVError
 }
 
+// UnknownStatusCodeError is returned when an action caused BigV to return a strange status code that the client library wasn't expecting. Perhaps it's a protocol mismatch - try updating to the latest version of the library, otherwise file a bug report.
 type UnknownStatusCodeError struct {
 	BigVError
 }
+
+// BadRequestError is returned when a request was malformed. Report these as bugs.
 type BadRequestError struct {
 	BigVError
 }

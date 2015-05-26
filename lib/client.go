@@ -4,7 +4,9 @@ import (
 	auth3 "bytemark.co.uk/auth3/client"
 )
 
-// Client is the main type in the BigV client library.
+// TODO(telyn): don't export BigVClient
+
+// BigVClient is the main type in the BigV client library
 type BigVClient struct {
 	endpoint    string
 	auth        *auth3.Client
@@ -12,6 +14,7 @@ type BigVClient struct {
 	debugLevel  int
 }
 
+// New creates a new BigV client using the given BigV endpoint and the default Bytemark auth endpoint
 func New(endpoint string) (bigv *BigVClient, err error) {
 	bigv = new(BigVClient)
 	bigv.endpoint = endpoint
@@ -25,6 +28,7 @@ func New(endpoint string) (bigv *BigVClient, err error) {
 	return bigv, nil
 }
 
+// NewWithAuth creates a new BigV client using the given BigV endpoint and bytemark.co.uk/auth3/client Client
 func NewWithAuth(endpoint string, auth *auth3.Client) (bigv *BigVClient) {
 	bigv = new(BigVClient)
 	bigv.endpoint = endpoint
@@ -33,6 +37,7 @@ func NewWithAuth(endpoint string, auth *auth3.Client) (bigv *BigVClient) {
 	return bigv
 }
 
+// AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
 func (bigv *BigVClient) AuthWithCredentials(credentials auth3.Credentials) error {
 	session, err := bigv.auth.CreateSession(credentials)
 	if err == nil {
@@ -41,6 +46,7 @@ func (bigv *BigVClient) AuthWithCredentials(credentials auth3.Credentials) error
 	return err
 }
 
+// AuthWithToken attempts to read sessiondata from auth for the given token. Returns nil on success or an error otherwise.
 func (bigv *BigVClient) AuthWithToken(token string) error {
 
 	session, err := bigv.auth.ReadSession(token)
@@ -51,15 +57,18 @@ func (bigv *BigVClient) AuthWithToken(token string) error {
 
 }
 
+// GetEndpoint returns the BigV endpoint currently in use.
 func (bigv *BigVClient) GetEndpoint() string {
 	return bigv.endpoint
 }
 
+// SetDebugLevel sets the debug level / verbosity of the BigV client. 0 (default) is silent.
 func (bigv *BigVClient) SetDebugLevel(debugLevel int) {
 	bigv.debugLevel = debugLevel
 }
 
-// TODO(telyn): remove GetSessionToken - Dispatcher should get the AuthSession and pass it to NewWithSession
+// GetSessionToken returns the token for the current auth session - note that this may cause panics at this time.
 func (bigv *BigVClient) GetSessionToken() string {
+	// BUG(telyn): Does it cause panics
 	return bigv.authSession.Token
 }

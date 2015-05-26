@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// Client provides the interface which all BigV API clients should implement.
 type Client interface {
 	// Getters
 	GetEndpoint() string

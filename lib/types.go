@@ -1,15 +1,19 @@
 package lib
 
+// VirtualMachineName is the triplet-form of the name of a VirtualMachine, which should be enough to find the VM.
 type VirtualMachineName struct {
 	VirtualMachine string
 	Group          string
 	Account        string
 }
+
+// GroupName is the double-form of the name of a Group, which should be enough to find the group.
 type GroupName struct {
 	Group   string
 	Account string
 }
 
+// Disc is a representation of a VM's disc, which can be unmarshalled from JSON output by the BigV server.
 type Disc struct {
 	Label        string `json:"label"`
 	StorageGrade string `json:"storage_grade"`
@@ -20,11 +24,14 @@ type Disc struct {
 	StoragePool      string `json:"storage_pool"`
 }
 
+// ImageInstall represents what image was most recently installed on a VM along with its root password.
+// This might only be returned when creating a VM.
 type ImageInstall struct {
 	Distribution string `json:"distribution"`
 	RootPassword string `json:"root_password"`
 }
 
+// IP represents an IP for the purpose of setting RDNS with BigV
 type IP struct {
 	RDns string `json:"rdns"`
 
@@ -32,6 +39,7 @@ type IP struct {
 	Ip string `json:"ip"`
 }
 
+// NetworkInterface represents a BigV virtual NIC and what IPs it has routed.
 type NetworkInterface struct {
 	Label string `json:"label"`
 
@@ -46,6 +54,7 @@ type NetworkInterface struct {
 	VirtualMachineId int               `json:"virtual_machine_id"`
 }
 
+// User represents a BigV user.
 type User struct {
 	Username       string `json:"username"`
 	Email          string `json:"email"`
@@ -58,7 +67,7 @@ type User struct {
 	AccountName string `json:"account_name"`
 }
 
-// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
+// VirtualMachine represents a VirtualMachine, as passed around from the BigV virtual_machines endpoint
 type VirtualMachine struct {
 	Autoreboot            bool   `json:"autoreboot_on"`
 	CdromUrl              string `json:"cdrom_url"`
@@ -81,14 +90,18 @@ type VirtualMachine struct {
 	Hostname          string              `json:"hostname"`
 	Head              string              `json:"head"`
 	NetworkInterfaces []*NetworkInterface `json:"network_interfaces"`
+
+	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
 }
 
+// VirtualMachineSpec represents the specification for a VM that is passed to the create_vm endpoint
 type VirtualMachineSpec struct {
 	VirtualMachine VirtualMachine `json:"virtual_machine"`
 	Discs          []Disc         `json:"discs"`
 	Reimage        ImageInstall   `json:"reimage"`
 }
 
+// Group represents a group
 type Group struct {
 	Name string `json:"name"`
 
@@ -98,6 +111,7 @@ type Group struct {
 	VirtualMachines []VirtualMachine `json:"virtual_machines"`
 }
 
+// Account represents a BigV account
 type Account struct {
 	Name string `json:"name"`
 
