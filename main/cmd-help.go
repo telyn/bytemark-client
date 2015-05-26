@@ -7,10 +7,18 @@ import (
 
 // HelpForHelp shows overall usage information for the BigV client, including a list of available commands.
 func (cmds *CommandSet) HelpForHelp() {
-	// TODO(telyn): write real usage information
 	fmt.Println("bigv command-line client (the new, cool one)")
 	fmt.Println()
-	fmt.Println("There would be some usage output here if I had actually written any.")
+	fmt.Println("Usage")
+	fmt.Println()
+	fmt.Println("    go-bigv [flags] <command> [flags] [args]")
+	fmt.Println()
+	fmt.Println("Commands available")
+	fmt.Println()
+	fmt.Println("    help, config, create, debug, delete, list, show")
+	fmt.Println("    AND MAYBE MORE OR FEWER - THIS LIST IS NOT FINAL")
+	fmt.Println()
+	fmt.Println("See `go-bigv help <command>` for help specific to a command")
 	fmt.Println()
 }
 
