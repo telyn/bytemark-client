@@ -37,7 +37,7 @@ type ConfigManager interface {
 	GetAll() []ConfigVar
 	Set(string, string, string)
 	SetPersistent(string, string, string)
-	Unset(string)
+	Unset(string) error
 	GetDebugLevel() int
 
 	ImportFlags(*flag.FlagSet) []string
@@ -261,8 +261,7 @@ func (config *Config) SetPersistent(name, value, source string) {
 }
 
 // Unset removes the named key from both config's Memo and the user's config directory.
-func (config *Config) Unset(name string) {
+func (config *Config) Unset(name string) error {
 	delete(config.Memo, name)
-	// TODO(telyn): handle errors here or don't
-	os.Remove(config.GetPath(name))
+	return os.Remove(config.GetPath(name))
 }

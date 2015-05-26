@@ -40,9 +40,9 @@ func (c *mockConfig) SetPersistent(name, value, source string) {
 	return
 }
 
-func (c *mockConfig) Unset(name string) {
-	c.Called(name)
-	return
+func (c *mockConfig) Unset(name string) error {
+	r := c.Called(name)
+	return r.Error(0)
 }
 
 func (c *mockConfig) GetDebugLevel() int {
