@@ -1,7 +1,7 @@
 package lib
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-func (bigv *BigVClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error) {
+func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error) {
 	vm = new(VirtualMachine)
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 
@@ -14,7 +14,7 @@ func (bigv *BigVClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 
 // DeleteVirtualMachine deletes the named virtual machine.
 // returns nil on success or an error otherwise.
-func (bigv *BigVClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
+func (bigv *bigvClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
 	// TODO(telyn): URL escaping
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if purge {
@@ -27,7 +27,7 @@ func (bigv *BigVClient) DeleteVirtualMachine(name VirtualMachineName, purge bool
 
 // UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 // Return nil on success, an error otherwise.
-func (bigv *BigVClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
+func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
 	_, _, err = bigv.Request(true, "PUT", path, `{"deleted":false}`)

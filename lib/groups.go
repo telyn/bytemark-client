@@ -5,7 +5,7 @@ import (
 )
 
 // CreateGroup sends a request to the BigV server to create a group with the given name.
-func (bigv *BigVClient) CreateGroup(name GroupName) error {
+func (bigv *bigvClient) CreateGroup(name GroupName) error {
 	path := BuildURL("/accounts/%s/groups", name.Account)
 
 	obj := map[string]string{

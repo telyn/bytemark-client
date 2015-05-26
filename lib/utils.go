@@ -7,7 +7,7 @@ import (
 // by convention this function uses DEFAULT in all-caps to mean "the default group/account", as set in the config, rather than the "default" group in BigV itself.
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (bigv *BigVClient) ParseVirtualMachineName(name string) (vm VirtualMachineName) {
+func (bigv *bigvClient) ParseVirtualMachineName(name string) (vm VirtualMachineName) {
 	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	vm.Group = ""
@@ -44,7 +44,7 @@ Loop:
 // by convention this function uses DEFAULT in all-caps to mean "the default group/account", as set in the config, rather than the "default" group in BigV itself.
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
-func (bigv *BigVClient) ParseGroupName(name string) (group GroupName) {
+func (bigv *bigvClient) ParseGroupName(name string) (group GroupName) {
 	// 1 or 2 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	group.Group = ""
@@ -68,7 +68,7 @@ Loop:
 // by convention this function uses DEFAULT in all-caps to mean "the default account", as set in the config, rather than the "default" group in BigV itself.
 
 // ParseAccountName parses a group name given in .account[.extrabits] format.
-func (bigv *BigVClient) ParseAccountName(name string) (account string) {
+func (bigv *bigvClient) ParseAccountName(name string) (account string) {
 	// 1 piece with optional extra cruft for the fqdn
 
 	// there's a micro-optimisation to do here to not use Split,
