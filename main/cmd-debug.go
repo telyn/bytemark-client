@@ -11,13 +11,13 @@ import (
 
 // HelpForDebug outputs usage information for the debug command.
 func (commands *CommandSet) HelpForDebug() {
-	fmt.Println("bigv debug")
+	fmt.Println("go-bigv debug")
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("    bigv debug [--junk-token] [--auth] GET <path>")
-	fmt.Println("    bigv debug [--junk-token] [--auth] DELETE <path>")
-	fmt.Println("    bigv debug [--junk-token] [--auth] PUT <path>")
-	fmt.Println("    bigv debug [--junk-token] [--auth] POST <path>")
+	fmt.Println("    go-bigv debug [--junk-token] [--auth] GET <path>")
+	fmt.Println("    go-bigv debug [--junk-token] [--auth] DELETE <path>")
+	fmt.Println("    go-bigv debug [--junk-token] [--auth] PUT <path>")
+	fmt.Println("    go-bigv debug [--junk-token] [--auth] POST <path>")
 	fmt.Println()
 	fmt.Println("GET sends an HTTP GET request with an optional valid authorization header to the given path on the BigV endpoint and pretty-prints the received json.")
 	fmt.Println("The rest do similar, but PUT and POST")

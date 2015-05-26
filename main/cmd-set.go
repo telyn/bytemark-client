@@ -7,16 +7,16 @@ import (
 
 // HelpForConfig outputs usage information for the bigv config command.
 func (cmds *CommandSet) HelpForConfig() {
-	fmt.Println("bigv config")
+	fmt.Println("go-bigv config")
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("    bigv config")
+	fmt.Println("    go-bigv config")
 	fmt.Println("        Outputs the current values of all variables and what source they were derived from")
 	fmt.Println()
-	fmt.Println("    bigv config set <variable> <value>")
+	fmt.Println("    go-bigv config set <variable> <value>")
 	fmt.Println("        Sets a variable by writing to your bigv config (usually ~/.go-bigv)")
 	fmt.Println()
-	fmt.Println("    bigv config unset <variable>")
+	fmt.Println("    go-bigv config unset <variable>")
 	fmt.Println("        Unsets a variable by removing data from bigv config (usually ~/.go-bigv)")
 	fmt.Println()
 	fmt.Println("Available variables:")

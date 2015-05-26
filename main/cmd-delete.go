@@ -9,8 +9,7 @@ import (
 
 // HelpForDelete outputs usage information for the delete command
 func (cmds *CommandSet) HelpForDelete() {
-	// TODO(telyn): Replace instances of bigv with $0, however you get $0 in go?
-	fmt.Println("bigv delete")
+	fmt.Println("go-bigv delete")
 	fmt.Println()
 	fmt.Println("usage: bigv delete [-p | --purge] <name>")
 	fmt.Println("       bigv delete vm [-p | ---purge] <virtual machine>")

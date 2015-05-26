@@ -7,13 +7,12 @@ import (
 
 // HelpForShow outputs usage information for the show commands: show, show-vm, show-group, show-account.
 func (cmds *CommandSet) HelpForShow() {
-	// TODO(telyn): Replace instances of bigv with $0, however you get $0 in go?
-	fmt.Println("bigv show")
+	fmt.Println("go-bigv show")
 	fmt.Println()
-	fmt.Println("usage: bigv show [-j | --json] <name>")
-	fmt.Println("       bigv show vm [-j | --json] <virtual machine>")
-	fmt.Println("       bigv show group [-j | --json] [-v | --verbose] <group>")
-	fmt.Println("       bigv show account [-j | --json] [-v | --verbose] <account>")
+	fmt.Println("usage: go-bigv show [-j | --json] <name>")
+	fmt.Println("       go-bigv show vm [-j | --json] <virtual machine>")
+	fmt.Println("       go-bigv show group [-j | --json] [-v | --verbose] <group>")
+	fmt.Println("       go-bigv show account [-j | --json] [-v | --verbose] <account>")
 	fmt.Println()
 	fmt.Println("Displays information about the given virtual machine, group, or account.")
 	fmt.Println("If the --verbose flag is given to bigv show group or bigv show account, full details are given for each VM.")
