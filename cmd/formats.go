@@ -59,6 +59,9 @@ func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
 	output = append(output, padding+title)
 
 	output = append(output, fmt.Sprintf("Hostname: %s", vm.Hostname))
+	if (format&_FormatVMWithCDURL) != 0 && vm.CdromURL != "" {
+		output = append(output, fmt.Sprintf("CD-ROM: %s", vm.CdromURL))
+	}
 
 	output = append(output, "")
 	if (format & _FormatVMWithDiscs) != 0 {
