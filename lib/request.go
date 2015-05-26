@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-// BuildUrl pieces together a URL from parts, escaping as necessary..
-func BuildUrl(format string, args ...string) string {
+// BuildURL pieces together a URL from parts, escaping as necessary..
+func BuildURL(format string, args ...string) string {
 	arr := make([]interface{}, len(args), len(args))
 	for i, str := range args {
 		arr[i] = url.QueryEscape(str)

@@ -55,7 +55,7 @@ var (
     "vlan_num": 999
 }`
 
-	fixtureVm = `{"autoreboot_on": true,
+	fixtureVM = `{"autoreboot_on": true,
     "cdrom_url": null,
     "cores": 1,
     "deleted": false,
@@ -102,12 +102,12 @@ func TestDiscUnmarshal(t *testing.T) {
 		panic(err)
 	}
 
-	is.Equal(99994, disc.Id)
+	is.Equal(99994, disc.ID)
 	is.Equal("vda", disc.Label)
 	is.Equal(35840, disc.Size)
 	is.Equal("sata", disc.StorageGrade)
 	is.Equal("tail99-sata9", disc.StoragePool)
-	is.Equal(99999, disc.VirtualMachineId)
+	is.Equal(99999, disc.VirtualMachineID)
 }
 
 func TestNicUnmarshal(t *testing.T) {
@@ -120,15 +120,15 @@ func TestNicUnmarshal(t *testing.T) {
 		panic(err)
 	}
 
-	is.Equal(99996, nic.Id)
-	is.Equal(99999, nic.VirtualMachineId)
+	is.Equal(99996, nic.ID)
+	is.Equal(99999, nic.VirtualMachineID)
 	is.Equal("ff:ff:ff:ff:ff:fe", nic.Mac)
 	is.Equal(999, nic.VlanNum)
 
-	is.Equal(true, Contains(nic.Ips, "192.168.99.1"))
-	is.Equal(true, Contains(nic.Ips, "fe80::9999"))
-	is.OK(t, nic.ExtraIps["192.168.99.2"])
-	is.Equal("192.168.99.1", nic.ExtraIps["192.168.99.2"])
+	is.Equal(true, Contains(nic.IPs, "192.168.99.1"))
+	is.Equal(true, Contains(nic.IPs, "fe80::9999"))
+	is.OK(t, nic.ExtraIPs["192.168.99.2"])
+	is.Equal("192.168.99.1", nic.ExtraIPs["192.168.99.2"])
 
 }
 
@@ -136,7 +136,7 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 	is := is.New(t)
 
 	vm := new(VirtualMachine)
-	err := json.Unmarshal([]byte(fixtureVm), vm)
+	err := json.Unmarshal([]byte(fixtureVM), vm)
 
 	if err != nil {
 		fmt.Printf("%v\r\n", err)
@@ -144,15 +144,15 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 	}
 
 	is.Equal(true, vm.Autoreboot)
-	is.Equal("", vm.CdromUrl)
+	is.Equal("", vm.CdromURL)
 	is.Equal(1, vm.Cores)
 	is.Equal(false, vm.Deleted)
-	is.Equal(9999, vm.GroupId)
+	is.Equal(9999, vm.GroupID)
 	is.Equal("virtio2013", vm.HardwareProfile)
 	is.Equal(false, vm.HardwareProfileLocked)
 	is.Equal("head99", vm.Head)
 	is.Equal("example.notarealgroup.bytemark.uk0.bigv.io", vm.Hostname)
-	is.Equal(99999, vm.Id)
+	is.Equal(99999, vm.ID)
 	is.Equal("10.0.0.1", vm.ManagementAddress)
 	is.Equal(2048, vm.Memory)
 	is.Equal("example", vm.Name)
@@ -161,40 +161,40 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 
 	disc := vm.Discs[0]
 
-	is.Equal(99994, disc.Id)
+	is.Equal(99994, disc.ID)
 	is.Equal("vda", disc.Label)
 	is.Equal(35840, disc.Size)
 	is.Equal("sata", disc.StorageGrade)
 	is.Equal("tail99-sata9", disc.StoragePool)
-	is.Equal(99999, disc.VirtualMachineId)
+	is.Equal(99999, disc.VirtualMachineID)
 
 	disc = vm.Discs[1]
 
-	is.Equal(99995, disc.Id)
+	is.Equal(99995, disc.ID)
 	is.Equal("vdb", disc.Label)
 	is.Equal(666666, disc.Size)
 	is.Equal("archive", disc.StorageGrade)
 	is.Equal("tail98-sata9", disc.StoragePool)
-	is.Equal(99999, disc.VirtualMachineId)
+	is.Equal(99999, disc.VirtualMachineID)
 
 	nic := vm.NetworkInterfaces[0]
 
-	is.Equal(99996, nic.Id)
-	is.Equal(99999, nic.VirtualMachineId)
+	is.Equal(99996, nic.ID)
+	is.Equal(99999, nic.VirtualMachineID)
 	is.Equal("ff:ff:ff:ff:ff:fe", nic.Mac)
 	is.Equal(999, nic.VlanNum)
 
-	is.Equal(true, Contains(nic.Ips, "192.168.99.1"))
-	is.Equal(true, Contains(nic.Ips, "fe80::9999"))
-	is.OK(t, nic.ExtraIps["192.168.99.2"])
-	is.Equal("192.168.99.1", nic.ExtraIps["192.168.99.2"])
+	is.Equal(true, Contains(nic.IPs, "192.168.99.1"))
+	is.Equal(true, Contains(nic.IPs, "fe80::9999"))
+	is.OK(t, nic.ExtraIPs["192.168.99.2"])
+	is.Equal("192.168.99.1", nic.ExtraIPs["192.168.99.2"])
 }
 
 func TestTotalDiscSize(t *testing.T) {
 	is := is.New(t)
 
 	vm := new(VirtualMachine)
-	err := json.Unmarshal([]byte(fixtureVm), vm)
+	err := json.Unmarshal([]byte(fixtureVM), vm)
 	if err != nil {
 		panic(err)
 	}

@@ -46,6 +46,6 @@ func (cmds *CommandSet) ShowAccount(args []string) {
 		exit(err)
 	}
 
-	fmt.Printf("Account %d: %s", acc.Id, acc.Name)
+	fmt.Printf("Account %d: %s", acc.ID, acc.Name)
 
 }

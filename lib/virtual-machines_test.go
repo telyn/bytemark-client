@@ -13,10 +13,10 @@ func getFixtureVM() (vm VirtualMachine) {
 
 	return VirtualMachine{
 		Name:    "valid-vm",
-		GroupId: 1,
+		GroupID: 1,
 
 		Autoreboot:            true,
-		CdromUrl:              "",
+		CdromURL:              "",
 		Cores:                 1,
 		Memory:                1,
 		PowerOn:               true,
@@ -26,7 +26,7 @@ func getFixtureVM() (vm VirtualMachine) {
 		Discs: []*Disc{
 			&disc,
 		},
-		Id:                1,
+		ID:                1,
 		ManagementAddress: "127.0.0.1",
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
@@ -73,6 +73,6 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.Nil(err)
 
 	is.Equal("127.0.0.1", vm.ManagementAddress)
-	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].Ips[0])
+	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].IPs[0])
 
 }

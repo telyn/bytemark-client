@@ -9,7 +9,7 @@ import (
 func getFixtureVM() bigv.VirtualMachine {
 	return bigv.VirtualMachine{
 		Name:    "test-vm",
-		GroupId: 1,
+		GroupID: 1,
 	}
 }
 

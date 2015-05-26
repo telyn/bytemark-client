@@ -4,7 +4,7 @@ package lib
 func (bigv *BigVClient) GetAccount(name string) (*Account, error) {
 	account := new(Account)
 
-	path := BuildUrl("/accounts/%s", name)
+	path := BuildURL("/accounts/%s", name)
 
 	err := bigv.RequestAndUnmarshal(true, "GET", path, "", account)
 	if err != nil {

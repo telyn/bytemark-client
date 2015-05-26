@@ -5,8 +5,8 @@ func getFixtureDisc() Disc {
 		Label:            "",
 		StorageGrade:     "sata",
 		Size:             26400,
-		Id:               1,
-		VirtualMachineId: 1,
+		ID:               1,
+		VirtualMachineID: 1,
 		StoragePool:      "fakepool",
 	}
 }

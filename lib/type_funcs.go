@@ -28,12 +28,12 @@ func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
 // AllIpv4Addresses flattens all the IPs for a VM into a single []string
 func (vm *VirtualMachine) AllIpv4Addresses() (ips []string) {
 	for _, nic := range vm.NetworkInterfaces {
-		for _, ip := range nic.Ips {
+		for _, ip := range nic.IPs {
 			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() != nil {
 				ips = append(ips, ip)
 			}
 		}
-		for ip := range nic.ExtraIps {
+		for ip := range nic.ExtraIPs {
 			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() != nil {
 				ips = append(ips, ip)
 			}
@@ -45,12 +45,12 @@ func (vm *VirtualMachine) AllIpv4Addresses() (ips []string) {
 // AllIpv6Addresses flattens all the v6 IPs for a VM into a single []string
 func (vm *VirtualMachine) AllIpv6Addresses() (ips []string) {
 	for _, nic := range vm.NetworkInterfaces {
-		for _, ip := range nic.Ips {
+		for _, ip := range nic.IPs {
 			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() == nil {
 				ips = append(ips, ip)
 			}
 		}
-		for ip := range nic.ExtraIps {
+		for ip := range nic.ExtraIPs {
 			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() == nil {
 				ips = append(ips, ip)
 			}

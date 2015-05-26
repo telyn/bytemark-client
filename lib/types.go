@@ -19,8 +19,8 @@ type Disc struct {
 	StorageGrade string `json:"storage_grade"`
 	Size         int    `json:"size"`
 
-	Id               int    `json:"id"`
-	VirtualMachineId int    `json:"virtual_machine_id"`
+	ID               int    `json:"id"`
+	VirtualMachineID int    `json:"virtual_machine_id"`
 	StoragePool      string `json:"storage_pool"`
 }
 
@@ -36,7 +36,7 @@ type IP struct {
 	RDns string `json:"rdns"`
 
 	// this cannot be set.
-	Ip string `json:"ip"`
+	IP string `json:"ip"`
 }
 
 // NetworkInterface represents a BigV virtual NIC and what IPs it has routed.
@@ -47,11 +47,11 @@ type NetworkInterface struct {
 
 	// the following can't be set (or at least, so I'm assuming..)
 
-	Id               int               `json:"id"`
+	ID               int               `json:"id"`
 	VlanNum          int               `json:"vlan_num"`
-	Ips              []string          `json:"ips"`
-	ExtraIps         map[string]string `json:"extra_ips"`
-	VirtualMachineId int               `json:"virtual_machine_id"`
+	IPs              []string          `json:"ips"`
+	ExtraIPs         map[string]string `json:"extra_ips"`
+	VirtualMachineID int               `json:"virtual_machine_id"`
 }
 
 // User represents a BigV user.
@@ -70,21 +70,21 @@ type User struct {
 // VirtualMachine represents a VirtualMachine, as passed around from the BigV virtual_machines endpoint
 type VirtualMachine struct {
 	Autoreboot            bool   `json:"autoreboot_on"`
-	CdromUrl              string `json:"cdrom_url"`
+	CdromURL              string `json:"cdrom_url"`
 	Cores                 int    `json:"cores"`
 	Memory                int    `json:"memory"`
 	Name                  string `json:"name"`
 	PowerOn               bool   `json:"power_on"`
 	HardwareProfile       string `json:"hardware_profile"`
 	HardwareProfileLocked bool   `json:"hardware_profile_locked"`
-	GroupId               int    `json:"group_id"`
+	GroupID               int    `json:"group_id"`
 
 	// zone name can be set during creation but not changed
 	ZoneName string `json:"zone_name"`
 
 	// the following cannot be set
 	Discs             []*Disc             `json:"discs"`
-	Id                int                 `json:"id"`
+	ID                int                 `json:"id"`
 	ManagementAddress string              `json:"management_address"`
 	Deleted           bool                `json:"deleted"`
 	Hostname          string              `json:"hostname"`
@@ -106,8 +106,8 @@ type Group struct {
 	Name string `json:"name"`
 
 	// the following cannot be set
-	AccountId       int              `json:"account_id"`
-	Id              int              `json:"id"`
+	AccountID       int              `json:"account_id"`
+	ID              int              `json:"id"`
 	VirtualMachines []VirtualMachine `json:"virtual_machines"`
 }
 
@@ -116,7 +116,7 @@ type Account struct {
 	Name string `json:"name"`
 
 	// the following cannot be set
-	Id        int      `json:"id"`
+	ID        int      `json:"id"`
 	Suspended bool     `json:"suspended"`
 	Groups    []*Group `json:"groups"`
 }
