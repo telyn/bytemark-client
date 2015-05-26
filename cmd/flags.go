@@ -2,6 +2,7 @@ package main
 
 import "flag"
 
+// MakeCommonFlagSet creates a FlagSet which provides the flags shared between the main command and the sub-commands.
 func MakeCommonFlagSet() *flag.FlagSet {
 	flags := flag.NewFlagSet("go-bigv", flag.ExitOnError)
 

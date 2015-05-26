@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var CONFIG_VARIABLES = [...]string{
+var configVars = [...]string{
 	"endpoint",
 	"auth-endpoint",
 	"user",
@@ -30,6 +30,7 @@ type ConfigVar struct {
 	Source string
 }
 
+// ConfigManager is an interface defining a key->value store that also knows where the values were set from.
 type ConfigManager interface {
 	Get(string) string
 	GetV(string) ConfigVar
@@ -111,6 +112,7 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 	return config
 }
 
+// GetDebugLevel returns the current debug-level as an integer. This is used throughout the bigv.io/client library to determine verbosity of output.
 func (config *Config) GetDebugLevel() int {
 	return config.debugLevel
 }
@@ -119,7 +121,9 @@ func (config *Config) GetDebugLevel() int {
 func (config *Config) GetPath(name string) string {
 	return filepath.Join(config.Dir, name)
 }
-func (config *Config) GetUrl(path ...string) *url.URL {
+
+// GetURL combines the given path parts with the endpoint URL.
+func (config *Config) GetURL(path ...string) *url.URL {
 	url, err := url.Parse(config.Get("endpoint"))
 	if err != nil {
 		exit(err, "Endpoint is not valid URL")
@@ -128,6 +132,8 @@ func (config *Config) GetUrl(path ...string) *url.URL {
 	return url
 }
 
+// LoadDefinitions reads the local copy of the definitions json file, or downloads it from the endpoint if it's too old or nonexistant.
+// Eventually this will be used to provide information on various things throughout the application
 func (config *Config) LoadDefinitions() {
 	stat, err := os.Stat(config.GetPath("definitions"))
 
@@ -143,28 +149,31 @@ func (config *Config) LoadDefinitions() {
 
 }
 
+// Get returns the value of a ConfigVar. Used to simplify code when the source is unnecessary.
 func (config *Config) Get(name string) string {
 	return config.GetV(name).Value
 }
 
+// GetV returns the ConfigVar for the given key.
 func (config *Config) GetV(name string) ConfigVar {
 	// try to read the Memo
 	name = strings.ToLower(name)
 	if val, ok := config.Memo[name]; ok {
 		return val
-	} else {
-		return config.read(name)
 	}
+	return config.read(name)
 }
 
+// GetAll returns all of the available ConfigVars in the Config.
 func (config *Config) GetAll() []ConfigVar {
-	vars := make([]ConfigVar, len(CONFIG_VARIABLES))
-	for i, v := range CONFIG_VARIABLES {
+	vars := make([]ConfigVar, len(configVars))
+	for i, v := range configVars {
 		vars[i] = config.GetV(v)
 	}
 	return vars
 }
 
+// GetDefault returns the default ConfigVar for the given key.
 func (config *Config) GetDefault(name string) ConfigVar {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {

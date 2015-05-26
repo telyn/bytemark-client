@@ -5,8 +5,9 @@ import (
 	"strings"
 )
 
+// HelpForConfig outputs usage information for the bigv config command.
 func (cmds *CommandSet) HelpForConfig() {
-	fmt.Println("bigv config set")
+	fmt.Println("bigv config")
 	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("    bigv config")
@@ -25,7 +26,7 @@ func (cmds *CommandSet) HelpForConfig() {
 	fmt.Println()
 }
 
-// Config provides the bigv config command, which sets variables in the user's config
+// Config provides the bigv config command, which sets variables in the user's config. See HelpForConfig for usage information.
 // It's slightly more user friendly than echo "value" > ~/.go-bigv/
 func (cmds *CommandSet) Config(args []string) {
 	if len(args) == 0 {

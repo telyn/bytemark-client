@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// Commands represents the available commands in the BigV client. Each command should have its own function defined here, with a corresponding HelpFor* function too.
 type Commands interface {
 	EnsureAuth()
 
@@ -28,11 +29,13 @@ type Commands interface {
 	HelpForShow()
 }
 
+// CommandSet is the main implementation of the Commands interface
 type CommandSet struct {
 	bigv   bigv.Client
 	config ConfigManager
 }
 
+// NewCommandSet creates a CommandSet given a ConfigManager and bigv.io/client/lib Client.
 func NewCommandSet(config ConfigManager, client bigv.Client) *CommandSet {
 	commandSet := new(CommandSet)
 	commandSet.config = config
@@ -40,6 +43,7 @@ func NewCommandSet(config ConfigManager, client bigv.Client) *CommandSet {
 	return commandSet
 }
 
+// EnsureAuth authenticates with the BigV authentication server, prompting for credentials if necessary.
 func (cmds *CommandSet) EnsureAuth() {
 	err := cmds.bigv.AuthWithToken(cmds.config.Get("token"))
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+// HelpForDebug outputs usage information for the debug command.
 func (commands *CommandSet) HelpForDebug() {
 	fmt.Println("bigv debug")
 	fmt.Println()

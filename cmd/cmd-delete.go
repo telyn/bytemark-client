@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// HelpForDelete outputs usage information for the delete command
 func (cmds *CommandSet) HelpForDelete() {
 	// TODO(telyn): Replace instances of bigv with $0, however you get $0 in go?
 	fmt.Println("bigv delete")
@@ -25,6 +26,7 @@ func (cmds *CommandSet) HelpForDelete() {
 	fmt.Println()
 }
 
+// DeleteVM implements the delete-vm command, which is used to delete and purge BigV VMs. See HelpForDelete for usage information.
 func (cmds *CommandSet) DeleteVM(args []string) {
 
 	flags := flag.NewFlagSet("DeleteVM", flag.ExitOnError)
@@ -76,6 +78,7 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 	}
 }
 
+// UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.
 func (cmds *CommandSet) UndeleteVM(args []string) {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])

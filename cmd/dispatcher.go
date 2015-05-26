@@ -8,8 +8,7 @@ import (
 	"strings"
 )
 
-// type der is used to create API requests and direct output to views,
-// except probably when those API requests don't require authorisation (e.g. /definitions, new user)
+// Dispatcher is used to determine what functions to run for the command-line arguments provided
 type Dispatcher struct {
 	Flags      *flag.FlagSet
 	cmds       Commands
@@ -31,7 +30,7 @@ func NewDispatcher(config ConfigManager) (d *Dispatcher) {
 	return d
 }
 
-// NewderWithCommands is for writing tests with mock CommandSets
+// NewDispatcherWithCommands is for writing tests with mock CommandSets
 func NewDispatcherWithCommands(config ConfigManager, commands Commands) *Dispatcher {
 	d := NewDispatcher(config)
 	d.cmds = commands

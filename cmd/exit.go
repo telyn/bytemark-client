@@ -7,33 +7,53 @@ import (
 	"strings"
 )
 
+// ExitCode is a named type for the E_* constants which are used as exit codes.
+type ExitCode int
+
 const (
-	E_TRAPPED_INTERRUPT = -1
-	E_CANT_READ_CONFIG  = 3
+	// E_TRAPPED_INTERRUPT is the exit code returned when an unexpected interrupt like SIGUSR1 was trapped
+	E_TRAPPED_INTERRUPT ExitCode = -1
+	// E_CANT_READ_CONFIG is the exit code returned when we couldn't read a config variable from the disk for some reason
+	E_CANT_READ_CONFIG = 3
+	// E_CANT_WRITE_CONFIG is the exit code returned when we couldn't write a config variable to the disk for some reason
 	E_CANT_WRITE_CONFIG = 4
 
+	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
 	E_UNKNOWN_ERROR = 49
 
+	// E_CANT_CONNECT_AUTH is the exit code returned when we were unable to establish an HTTP connection to the auth endpoint.
 	E_CANT_CONNECT_AUTH = 50
+	// E_CANT_CONNECT_BIGV is the exit code returned when we were unable to establish an HTTP connection to the BigV endpoint.
 	E_CANT_CONNECT_BIGV = 150
 
+	// E_AUTH_REPORTED_ERROR is the exit code returned when the auth server reported an internal error.
 	E_AUTH_REPORTED_ERROR = 51
+	// E_BIGV_REPORTED_ERROR is the exit code returned when the BigV server reported an internal error.
 	E_BIGV_REPORTED_ERROR = 152
 
+	// E_CANT_PARSE_AUTH is the exit code returned when the auth server returned something we were unable to parse.
 	E_CANT_PARSE_AUTH = 52
+	// E_CANT_PARSE_BIGV is the exit code returned when the BigV server returned something we were unable to parse.
 	E_CANT_PARSE_BIGV = 152
 
+	// E_CREDENTIALS_INVALID is the exit code returned when the auth server says your credentials contain invalid characters.
 	E_CREDENTIALS_INVALID = 53
-	E_CREDENTIALS_WRONG   = 54
+	// E_CREDENTIALS_WRONG is the exit code returned when the auth server says your credentials don't match a user in its database.
+	E_CREDENTIALS_WRONG = 54
 
+	// E_NOT_AUTHORIZED_BIGV is the exit code returned when the BigV server says you haven't got permission to do that.
 	E_NOT_AUTHORIZED_BIGV = 155
 
+	// E_NOT_FOUND_BIGV is the exit code returned when the BigV server says you do not have permission to see the object you are trying to view, or that it does not exist.
 	E_NOT_FOUND_BIGV = 156
 
+	// E_UNKNOWN_AUTH is the exit code returned when we get an unexpected error from the auth server.
 	E_UNKNOWN_AUTH = 149
+	// E_UNKNOWN_BIGV is the exit code returned when we get an unexpected error from the BigV server.
 	E_UNKNOWN_BIGV = 249
 )
 
+// HelpForExitCodes prints readable information on what the various exit codes do.
 func (cmds *CommandSet) HelpForExitCodes() {
 	fmt.Println(`bigv exit code list:
 
