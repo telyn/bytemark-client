@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -21,6 +22,11 @@ func (cmds *CommandSet) HelpForShow() {
 
 // ShowVM implements the show-vm command, which is used to display information about BigV VMs. See HelpForShow for the usage information.
 func (cmds *CommandSet) ShowVM(args []string) {
+	flags := MakeCommonFlagSet()
+	jsonOut := flags.Bool("json", false, "")
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
 	cmds.EnsureAuth()
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
@@ -31,13 +37,22 @@ func (cmds *CommandSet) ShowVM(args []string) {
 		exit(err)
 	}
 	if cmds.config.Get("silent") != "true" {
-		fmt.Println(FormatVirtualMachine(vm))
+		if *jsonOut {
+			fmt.Println(json.MarshalIndent(vm, "", "    "))
+		} else {
+			fmt.Println(FormatVirtualMachine(vm))
+		}
 	}
 
 }
 
 // ShowAccount implements the show-account command, which is used to show the BigV account name, as well as the groups and VMs within it.
 func (cmds *CommandSet) ShowAccount(args []string) {
+	flags := MakeCommonFlagSet()
+	jsonOut := flags.Bool("json", false, "")
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
 	name := cmds.bigv.ParseAccountName(args[0])
 
 	acc, err := cmds.bigv.GetAccount(name)
@@ -46,6 +61,10 @@ func (cmds *CommandSet) ShowAccount(args []string) {
 		exit(err)
 	}
 
-	fmt.Printf("Account %d: %s", acc.ID, acc.Name)
+	if *jsonOut {
+		fmt.Println(json.MarshalIndent(acc, "", "    "))
+	} else {
+		fmt.Printf("Account %d: %s", acc.ID, acc.Name)
+	}
 
 }

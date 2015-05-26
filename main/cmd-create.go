@@ -11,7 +11,7 @@ import (
 func (cmd *CommandSet) CreateGroup(args []string) {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
-	args = flags.Args()
+	args = cmd.config.ImportFlags(flags)
 
 	name := bigv.GroupName{"", ""}
 	if len(args) == 0 {
@@ -21,13 +21,8 @@ func (cmd *CommandSet) CreateGroup(args []string) {
 	}
 
 	if name.Account == "" {
-		// TODO(telyn): think I need to de-boilerplate flag lookup too.
-		// oh yeah I was going to add Config.ReadFlags(FlagSet)
-		val := flags.Lookup("account").Value
-		if name.Account = val.String(); name.Account == "" {
-			if name.Account = cmd.config.Get("account"); name.Account == "" {
-				name.Account = Prompt("Account name: ")
-			}
+		if name.Account = cmd.config.Get("account"); name.Account == "" {
+			name.Account = Prompt("Account name: ")
 		}
 	}
 
