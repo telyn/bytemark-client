@@ -160,7 +160,6 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 
 	config := NewConfig(dir, nil)
 
-	// TODO(telyn): Update me when we move to api.bigv.io
 	is.Equal("https://uk0.bigv.io", config.Get("endpoint"))
 	is.Equal("https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
 

@@ -26,6 +26,8 @@ func (bigv *bigvClient) ParseVirtualMachineName(name string) (vm VirtualMachineN
 		bits = bits[0 : len(bits)-1]
 	}
 
+	// TODO(telyn): ParseVirtualMachine isn't smart enough yet
+
 	// a for loop seems an odd choice here maybe but it means
 	// I don't need to do lots of ifs to see if the next bit exists
 Loop:
