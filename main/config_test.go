@@ -243,7 +243,32 @@ func TestConfigDir(t *testing.T) {
  ============
 */
 
-// TODO(telyn): no i don't want to write flag tests today
+func testFlagsWithArgs(args []string) *Config {
+	CleanEnv()
+	dir := CleanDir()
+	flags := MakeCommonFlagSet()
+
+	flags.Parse(args)
+	return NewConfig(dir, flags)
+
+}
+
+func TestMainFlags(t *testing.T) {
+	is := is.New(t)
+
+	config := testFlagsWithArgs([]string{"--help", "--force"})
+
+	for _, v := range configVars {
+		// if this line ever fails then either configVars is out of date, GetDefault is out of date, or something weird has happened
+		is.Equal(config.GetDefault(v), config.GetV(v))
+	}
+
+	config = testFlagsWithArgs([]string{"--user=test-user", "-account=test-account", "--endpoint", "example.com"})
+	is.Equal(ConfigVar{"user", "test-user", "FLAG user"}, config.GetV("user"))
+	is.Equal(ConfigVar{"account", "test-account", "FLAG account"}, config.GetV("account"))
+	is.Equal(ConfigVar{"endpoint", "example.com", "FLAG endpoint"}, config.GetV("endpoint"))
+
+}
 
 /*
  ===========
