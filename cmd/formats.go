@@ -11,34 +11,34 @@ import (
 type VMFormatOptions uint8
 
 const (
-	// FormatVMWithAddrs causes IP addresses to be included in the output
-	FormatVMWithAddrs VMFormatOptions = 1 << iota
-	// FormatVMWithDiscs causes individual disc sizes & storage grades to be included in the output
-	FormatVMWithDiscs
-	// FormatVMWithCDURL causes the URL of the image being used as the CD to be included in the output, if applicable
-	FormatVMWithCDURL
+	// _FormatVMWithAddrs causes IP addresses to be included in the output
+	_FormatVMWithAddrs VMFormatOptions = 1 << iota
+	// _FormatVMWithDiscs causes individual disc sizes & storage grades to be included in the output
+	_FormatVMWithDiscs
+	// _FormatVMWithCDURL causes the URL of the image being used as the CD to be included in the output, if applicable
+	_FormatVMWithCDURL
 )
 
 // VMListFormatMode is the way that FormatVirtualMachineList will format the VMList
 type VMListFormatMode uint8
 
 const (
-	// FormatVMListName outputs only the names of the VMs
-	FormatVMListName VMListFormatMode = iota
-	// FormatVMListNameDotGroup outputs the VMs in name.group format
-	FormatVMListNameDotGroup
-	// FormatVMListFQDN outputs the full hostnames of the VMs.
-	FormatVMListFQDN
+	// _FormatVMListName outputs only the names of the VMs
+	_FormatVMListName VMListFormatMode = iota
+	// _FormatVMListNameDotGroup outputs the VMs in name.group format
+	_FormatVMListNameDotGroup
+	// _FormatVMListFQDN outputs the full hostnames of the VMs.
+	_FormatVMListFQDN
 )
 
 // FORMAT_DEFAULT_WIDTH is the default width to attempt to print to.
-const FormatDefaultWidth = 80
+const _FormatDefaultWidth = 80
 
 // FormatVirtualMachine pretty-prints a VM. The optional second argument is a bitmask of VMFormatOptions,
 // and the optional third is the width you'd like to display..oh.
 func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
-	width := FormatDefaultWidth
-	format := FormatVMWithAddrs | FormatVMWithDiscs
+	width := _FormatDefaultWidth
+	format := _FormatVMWithAddrs | _FormatVMWithDiscs
 
 	if len(options) >= 1 {
 		format = VMFormatOptions(options[0])
@@ -61,14 +61,14 @@ func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
 	output = append(output, fmt.Sprintf("Hostname: %s", vm.Hostname))
 
 	output = append(output, "")
-	if (format & FormatVMWithDiscs) != 0 {
+	if (format & _FormatVMWithDiscs) != 0 {
 		for _, disc := range vm.Discs {
 			output = append(output, fmt.Sprintf("Disc %s: %d GiB, %s grade", disc.Label, disc.Size/1024, disc.StorageGrade))
 		}
 		output = append(output, "")
 	}
 
-	if (format & FormatVMWithAddrs) != 0 {
+	if (format & _FormatVMWithAddrs) != 0 {
 		output = append(output, fmt.Sprintf("IPv4 Addresses: %s\r\n", strings.Join(vm.AllIpv4Addresses(), ",\r\n                ")))
 		output = append(output, fmt.Sprintf("IPv6 Addresses: %s\r\n", strings.Join(vm.AllIpv6Addresses(), ",\r\n                ")))
 	}
