@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -139,7 +140,24 @@ func (config *Config) LoadDefinitions() {
 
 	if err != nil || time.Since(stat.ModTime()) > 24*time.Hour {
 		// TODO(telyn): grab it off the internet
-		//		url := config.GetUrl("definitions.json")
+		c := &http.Client{}
+		req, err := http.NewRequest("GET", config.Get("endpoint")+"/definitions.json", nil)
+		if err != nil {
+			exit(err)
+		}
+		req.Header.Add("Accept", "application/json")
+		req.Header.Add("Content-Type", "application/json")
+		res, err := c.Do(req)
+		if err != nil {
+			exit(err)
+		}
+		if res.StatusCode == 200 {
+			responseBody, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				exit(err)
+			}
+			ioutil.WriteFile(config.GetPath("definitions"), responseBody, 0660)
+		}
 	} else {
 		_, err := ioutil.ReadFile(config.GetPath("definitions"))
 		if err != nil {

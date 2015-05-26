@@ -49,7 +49,7 @@ func (cmds *CommandSet) Config(args []string) {
 			fmt.Printf("%s: '%s' (%s)", oldVar.Name, oldVar.Value, oldVar.Source)
 		}
 
-		// TODO(telyn): input validation ha ha ha
+		// TODO(telyn): consider validating input for the set command
 		cmds.config.SetPersistent(variable, args[2], "CMD set")
 
 		if oldVar.Source == "config" && cmds.config.Get("silent") != "true" {
