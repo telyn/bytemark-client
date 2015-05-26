@@ -39,6 +39,8 @@ type ConfigManager interface {
 	SetPersistent(string, string, string)
 	Unset(string)
 	GetDebugLevel() int
+
+	ImportFlags(*flag.FlagSet) []string
 }
 
 // Params currently used:
@@ -94,22 +96,31 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 		exit(nil, fmt.Sprintf("%s is not a directory", config.Dir))
 	}
 
-	if flags != nil {
-		// dump all the flags into the memo
-		// should be reet...reet?
-		flags.Visit(func(f *flag.Flag) {
-			config.Memo[f.Name] = ConfigVar{
-				f.Name,
-				f.Value.String(),
-				"FLAG " + f.Name,
-			}
-		})
-	}
 	debugLevel, err := strconv.ParseInt(config.Get("debug-level"), 10, 0)
 	if err == nil {
 		config.debugLevel = int(debugLevel)
 	}
+
+	config.ImportFlags(flags)
 	return config
+}
+
+func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
+	if flags != nil {
+		if flags.Parsed() {
+			// dump all the flags into the memo
+			// should be reet...reet?
+			flags.Visit(func(f *flag.Flag) {
+				config.Memo[f.Name] = ConfigVar{
+					f.Name,
+					f.Value.String(),
+					"FLAG " + f.Name,
+				}
+			})
+			return flags.Args()
+		}
+	}
+	return nil
 }
 
 // GetDebugLevel returns the current debug-level as an integer. This is used throughout the bigv.io/client library to determine verbosity of output.

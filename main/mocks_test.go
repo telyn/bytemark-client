@@ -3,6 +3,7 @@ package main
 import (
 	bigv "bigv.io/client/lib"
 	auth3 "bytemark.co.uk/auth3/client"
+	"flag"
 	"fmt"
 	mock "github.com/maraino/go-mock"
 	"net/http"
@@ -47,6 +48,14 @@ func (c *mockConfig) Unset(name string) {
 func (c *mockConfig) GetDebugLevel() int {
 	ret := c.Called()
 	return ret.Int(0)
+}
+
+func (c *mockConfig) ImportFlags(*flag.FlagSet) []string {
+	ret := c.Called()
+	if arr, ok := ret.Get(0).([]string); ok {
+		return arr
+	}
+	return nil
 }
 
 // mock CommandSet
