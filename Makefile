@@ -1,5 +1,5 @@
-ALL_PACKAGES := bigv.io/client/lib bigv.io/client/cmd
-ALL_FILES := cmd/*.go lib/*.go
+ALL_PACKAGES := bigv.io/client/lib bigv.io/client/main
+ALL_FILES := main/*.go lib/*.go
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)
 OSAARCH:=i386
@@ -35,12 +35,12 @@ BigV.app: go-bigv $(LAUNCHER_APP) ports/mac/*
 clean:
 	rm -rf BigV.app rm $(LAUNCHER_APP)
 	rm -f go-bigv
-	rm -f cmd.coverage lib.coverage
-	rm -f cmd.coverage.html lib.coverage.html
+	rm -f main.coverage lib.coverage
+	rm -f main.coverage.html lib.coverage.html
 
 
 go-bigv: $(ALL_FILES)
-	go build -o go-bigv bigv.io/client/cmd
+	go build -o go-bigv bigv.io/client/main
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))
@@ -53,9 +53,9 @@ endif
 install: all
 	cp go-bigv /usr/bin/go-bigv
 
-coverage: lib.coverage.html cmd.coverage.html
+coverage: lib.coverage.html main.coverage.html
 	open lib.coverage.html
-	open cmd.coverage.html
+	open main.coverage.html
 
 %.coverage.html: %.coverage
 	go tool cover -html=$< -o $@
