@@ -4,8 +4,6 @@ import (
 	auth3 "bytemark.co.uk/auth3/client"
 )
 
-// TODO(telyn): don't export BigVClient
-
 // bigvClient is the main type in the BigV client library
 type bigvClient struct {
 	endpoint    string
@@ -16,17 +14,11 @@ type bigvClient struct {
 
 // New creates a new BigV client using the given BigV endpoint and the default Bytemark auth endpoint
 func New(endpoint string) (bigv *bigvClient, err error) {
-	bigv = new(bigvClient)
-	bigv.endpoint = endpoint
-	bigv.debugLevel = 0
-
-	// TODO(telyn): use NewWithAuth for DRYness
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
 	}
-	bigv.auth = auth
-	return bigv, nil
+	return NewWithAuth(endpoint, auth), nil
 }
 
 // NewWithAuth creates a new BigV client using the given BigV endpoint and bytemark.co.uk/auth3/client Client
