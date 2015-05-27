@@ -23,12 +23,13 @@ type Client struct {
 // {"password" => "foo", "yubikey" => "cccbar"}
 type Credentials map[string]string
 
-type CreateSessionError struct {
-	httpErr error
+type Error struct {
+	Message string
+	Err     error
 }
 
-func (e CreateSessionError) Error() string {
-	return fmt.Sprintf("Failed to create session: %v", e.httpErr)
+func (e Error) Error() string {
+	return fmt.Sprintf("%s: %v", e.Message, e.Err)
 }
 
 // Data in the session. We expect it to look like this.
@@ -96,16 +97,16 @@ func (c *Client) ReadSession(token string) (*SessionData, error) {
 	x.Path = x.Path + "/" + token
 	req, reqErr := http.NewRequest("GET", x.String(), nil)
 	if reqErr != nil {
-		return nil, reqErr
+		return nil, Error{"Request couldn't be created", reqErr}
 	}
 
 	req.Header.Add("Accept", "application/json")
 	body, bodyErr := c.doRequest(req)
 	if bodyErr != nil {
-		return nil, bodyErr
+		return nil, Error{"Request failed", bodyErr}
 	}
 	if len(body) == 0 {
-		return nil, errors.New("Empty body returned reading session")
+		return nil, Error{"Empty body returned reading session", nil}
 	}
 
 	out := &SessionData{Token: token} // not included in session data
@@ -127,7 +128,7 @@ func (c *Client) CreateSessionToken(credentials Credentials) (string, error) {
 
 	req, reqErr := http.NewRequest("POST", c.sessionEndpoint.String(), bytes.NewBuffer(data))
 	if reqErr != nil {
-		return "", reqErr
+		return "", Error{"Couldn't create request", reqErr}
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -135,7 +136,7 @@ func (c *Client) CreateSessionToken(credentials Credentials) (string, error) {
 
 	body, err := c.doRequest(req)
 	if err != nil || len(body) == 0 {
-		return "", CreateSessionError{err}
+		return "", Error{"Couldn't create session", err}
 	}
 
 	// FIXME: auth should really put the token in an Authorization: header.
@@ -153,7 +154,7 @@ func (c *Client) CreateSession(credentials Credentials) (*SessionData, error) {
 
 	sessionData, getErr := c.ReadSession(token)
 	if getErr != nil {
-		return nil, fmt.Errorf("Created session but couldn't read it: %s", getErr)
+		return nil, getErr
 	}
 
 	return sessionData, nil
