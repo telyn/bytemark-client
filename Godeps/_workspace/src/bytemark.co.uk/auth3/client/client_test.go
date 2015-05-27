@@ -32,6 +32,7 @@ var fSessions = map[string]*SessionData {
 		Token:    "good-session",
 		Username: "foo",
 		Factors: []string{"password", "google-auth"},
+		GroupMemberships: []string{"staff"},
 	},
 }
 
@@ -87,7 +88,12 @@ func FixturesHandler(s *TestSuite, c *C, w http.ResponseWriter, r *http.Request)
 			}
 			w.Header().Add("Content-Type", "application/json")
 			// We construct our own json here. The token is not included in the output.
-			w.Write([]byte(`{"username":"`+d.Username+`","factors":["`+strings.Join(d.Factors, `","`)+`"]}`))
+			w.Write([]byte(
+				`{"username":"`+d.Username+
+				`","factors":["`+strings.Join(d.Factors, `","`)+`"],`+
+				`"group_memberships":["`+strings.Join(d.GroupMemberships, `","`)+
+				`"]}`,
+			))
 			return
 		default:
 			w.WriteHeader(404)

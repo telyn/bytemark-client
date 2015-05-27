@@ -16,18 +16,29 @@ import (
 
 type Client struct {
 	sessionEndpoint *url.URL
-	HTTP http.Client
+	HTTP            http.Client
 }
 
 // n-factor auth. We expect factor => credential, i.e:
 // {"password" => "foo", "yubikey" => "cccbar"}
 type Credentials map[string]string
 
+type CreateSessionError struct {
+	httpErr error
+}
+
+func (e CreateSessionError) Error() string {
+	return fmt.Sprintf("Failed to create session: %v", e.httpErr)
+}
+
 // Data in the session. We expect it to look like this.
 type SessionData struct {
 	Token      string // not actually in the session, but communicate it here
 	Username   string
 	Factors  []string
+
+	// The groups this user is a member of
+	GroupMemberships []string `json:"group_memberships"`
 }
 
 func (c *Client) doRequest(req *http.Request) ([]byte, error) {
@@ -124,7 +135,7 @@ func (c *Client) CreateSessionToken(credentials Credentials) (string, error) {
 
 	body, err := c.doRequest(req)
 	if err != nil || len(body) == 0 {
-		return "", fmt.Errorf("Failed to create session: %v", err)
+		return "", CreateSessionError{err}
 	}
 
 	// FIXME: auth should really put the token in an Authorization: header.
