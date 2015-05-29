@@ -49,7 +49,7 @@ func NewCommandSet(config ConfigManager, client bigv.Client) *CommandSet {
 func (cmds *CommandSet) EnsureAuth() {
 	err := cmds.bigv.AuthWithToken(cmds.config.Get("token"))
 	if err != nil {
-		if aErr, ok := err.(auth3.Error); ok {
+		if aErr, ok := err.(*auth3.Error); ok {
 			if _, ok := aErr.Err.(*url.Error); ok {
 				exit(aErr)
 			}

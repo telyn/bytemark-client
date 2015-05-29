@@ -129,9 +129,9 @@ func exit(err error, message ...string) {
 	exitCode := E_UNKNOWN_ERROR
 	if err != nil {
 		switch err.(type) {
-		case auth3.Error:
+		case *auth3.Error:
 			// TODO(telyn): I feel like this entire chunk should be in bytemark.co.uk/auth3/client
-			authErr, _ := err.(auth3.Error)
+			authErr, _ := err.(*auth3.Error)
 			switch authErr.Err.(type) {
 			case *url.Error:
 				urlErr, _ := authErr.Err.(*url.Error)
