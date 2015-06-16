@@ -29,6 +29,7 @@ type Disc struct {
 type ImageInstall struct {
 	Distribution string `json:"distribution"`
 	RootPassword string `json:"root_password"`
+	PublicKeys   string `json:"ssh_public_key"`
 }
 
 // IP represents an IP for the purpose of setting RDNS with BigV
