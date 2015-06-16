@@ -18,11 +18,11 @@ func (e *DiscSpecError) Error() string {
 }
 
 // ParseDiscSpec takes a disc spec and returns a slice of Discs (from bigv.io/client/lib)
-func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
+func ParseDiscSpec(spec string, trace bool) ([]*bigv.Disc, error) {
 	// parser!
 	pos := 0
 
-	discs := make([]bigv.Disc, 0, 4)
+	discs := make([]*bigv.Disc, 0, 4)
 
 	const (
 		_either = 0
@@ -66,7 +66,7 @@ func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 				if err != nil {
 					panic(err)
 				}
-				discs = append(discs, bigv.Disc{
+				discs = append(discs, &bigv.Disc{
 					StorageGrade: curGrade,
 					Size:         int(size) * 1024,
 				})
@@ -93,7 +93,7 @@ func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 	if err != nil {
 		panic(err)
 	}
-	discs = append(discs, bigv.Disc{
+	discs = append(discs, &bigv.Disc{
 		StorageGrade: curGrade,
 		Size:         int(size) * 1024,
 	})
