@@ -10,6 +10,12 @@ import (
 	"strings"
 )
 
+type UserRequestedExit struct{}
+
+func (e *UserRequestedExit) Error() string {
+	return "User requested exit"
+}
+
 // ExitCode is a named type for the E_* constants which are used as exit codes.
 type ExitCode int
 
@@ -20,6 +26,8 @@ const (
 	E_CANT_READ_CONFIG = 3
 	// E_CANT_WRITE_CONFIG is the exit code returned when we couldn't write a config variable to the disk for some reason
 	E_CANT_WRITE_CONFIG = 4
+	// E_USER_EXIT is the exit code returned when the user's action caused the program to terminate (usually by saying no to a prompt)
+	E_USER_EXIT = 5
 
 	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
 	E_UNKNOWN_ERROR = 49
@@ -156,6 +164,9 @@ func exit(err error, message ...string) {
 		case bigv.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_FOUND_BIGV
+		case *UserRequestedExit:
+			errorMessage = ""
+			exitCode = E_USER_EXIT
 
 		default:
 			e := err.Error()
