@@ -31,7 +31,7 @@ func (cmds *CommandSet) HelpForConfig() {
 func (cmds *CommandSet) Config(args []string) {
 	if len(args) == 0 {
 		for _, v := range cmds.config.GetAll() {
-			fmt.Println("%s: '%s' (%s)", v.Name, v.Value, v.Source)
+			fmt.Printf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
 		}
 		return
 	} else if len(args) == 1 {
@@ -46,20 +46,24 @@ func (cmds *CommandSet) Config(args []string) {
 		oldVar := cmds.config.GetV(variable)
 
 		if len(args) == 2 {
-			fmt.Printf("%s: '%s' (%s)", oldVar.Name, oldVar.Value, oldVar.Source)
+			fmt.Printf("%s: '%s' (%s)\r\n", oldVar.Name, oldVar.Value, oldVar.Source)
+			exit(nil)
 		}
 
 		// TODO(telyn): consider validating input for the set command
 		cmds.config.SetPersistent(variable, args[2], "CMD set")
 
-		if oldVar.Source == "config" && cmds.config.Get("silent") != "true" {
+		if oldVar.Source == "config" && !cmds.config.GetBool("silent") {
 			fmt.Printf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, args[1])
-		} else if cmds.config.Get("silent") != "true" {
+		} else if !cmds.config.GetBool("silent") {
 			fmt.Printf("%s has been set. \r\nNew value: %s\r\n", variable, args[1])
 		}
 
 	case "unset":
 
+	default:
+		fmt.Printf("Unrecognised command %s\r\n", args[0])
+		cmds.HelpForConfig()
 	}
 
 }
