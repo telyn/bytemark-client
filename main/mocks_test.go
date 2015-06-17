@@ -87,6 +87,9 @@ func (cmds *mockCommands) Config(args []string) {
 func (cmds *mockCommands) CreateGroup(args []string) {
 	cmds.Called(args)
 }
+func (cmds *mockCommands) CreateVM(args []string) {
+	cmds.Called(args)
+}
 
 func (cmds *mockCommands) ShowAccount(args []string) {
 	cmds.Called(args)
@@ -107,6 +110,11 @@ func (cmds *mockCommands) EnsureAuth() {
 func (cmds *mockCommands) HelpForConfig() {
 	cmds.Called()
 }
+
+func (cmds *mockCommands) HelpForCreate() {
+	cmds.Called()
+}
+
 func (cmds *mockCommands) HelpForDebug() {
 	cmds.Called()
 }
@@ -180,6 +188,11 @@ func (c *mockBigVClient) CreateGroup(name bigv.GroupName) error {
 func (c *mockBigVClient) DeleteVirtualMachine(name bigv.VirtualMachineName, purge bool) error {
 	r := c.Called(name, purge)
 	return r.Error(0)
+}
+func (c *mockBigVClient) CreateVirtualMachine(group bigv.GroupName, vm bigv.VirtualMachineSpec) (*bigv.VirtualMachine, error) {
+	r := c.Called(group, vm)
+	rvm, _ := r.Get(0).(*bigv.VirtualMachine)
+	return rvm, r.Error(1)
 }
 func (c *mockBigVClient) GetVirtualMachine(name bigv.VirtualMachineName) (vm *bigv.VirtualMachine, err error) {
 	r := c.Called(name)

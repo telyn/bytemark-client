@@ -73,12 +73,16 @@ type Client interface {
 	// VIRTUAL MACHINES
 	//
 
+	// CreateVirtualMachine creates a virtual machine with a given specification in the given group.
+	// returns nil on success or an error otherwise.
+	CreateVirtualMachine(group GroupName, vm VirtualMachineSpec) (*VirtualMachine, error)
+
 	// DeleteVirtualMachine deletes the named virtual machine.
 	// returns nil on success or an error otherwise.
 	DeleteVirtualMachine(name VirtualMachineName, purge bool) error
 
 	// GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-	GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error)
+	GetVirtualMachine(name VirtualMachineName) (*VirtualMachine, error)
 
 	// UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 	// Return nil on success, an error otherwise.

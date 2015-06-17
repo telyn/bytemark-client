@@ -74,6 +74,9 @@ func (d *Dispatcher) Do(args []string) {
 	case "create-group":
 		d.cmds.CreateGroup(args[1:])
 		return
+	case "create-vm":
+		d.cmds.CreateVM(args[1:])
+		return
 	case "debug":
 		d.cmds.Debug(args[1:])
 		return

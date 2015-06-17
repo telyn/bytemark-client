@@ -17,6 +17,7 @@ type Commands interface {
 
 	Config([]string)
 	CreateGroup([]string)
+	CreateVM([]string)
 	DeleteVM([]string)
 	Debug([]string)
 	Help([]string)
@@ -25,6 +26,7 @@ type Commands interface {
 	UndeleteVM([]string)
 
 	HelpForConfig()
+	HelpForCreate()
 	HelpForDebug()
 	HelpForDelete()
 	HelpForHelp()

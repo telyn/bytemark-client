@@ -29,6 +29,9 @@ func TestDispatchDoCreate(t *testing.T) {
 	doDispatchTest(t, config, commands, "create-group", "test-group")
 
 	commands.Reset()
+
+	commands.When("CreateVM", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "create-vm")
 }
 
 func TestDispatchDoDebug(t *testing.T) {
