@@ -22,12 +22,14 @@ func main() {
 	flags := MakeCommonFlagSet()
 
 	flags.Parse(os.Args[1:])
+
 	configDir := ""
 	value := flags.Lookup("config-dir").Value
 	if value != nil {
 		configDir = value.String()
 	}
 	config := NewConfig(configDir, flag.CommandLine)
+	config.ImportFlags(flags)
 
 	dispatch := NewDispatcher(config)
 
