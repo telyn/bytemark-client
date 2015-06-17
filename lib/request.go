@@ -24,8 +24,10 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 
 	data, err := bigv.RequestAndRead(auth, method, path, requestBody)
 
-	if bigv.debugLevel >= 4 {
-		fmt.Printf("'%s'\r\n", data)
+	if bigv.debugLevel >= 3 {
+		buf := new(bytes.Buffer)
+		json.Indent(buf, data, "", "    ")
+		fmt.Printf("%s", buf)
 	}
 
 	if err != nil {
@@ -41,12 +43,6 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 		return err
 	}
 
-	if bigv.debugLevel >= 3 {
-		buf := new(bytes.Buffer)
-		json.Indent(buf, data, "", "    ")
-		fmt.Printf("%s", buf)
-	}
-
 	return nil
 
 }
@@ -56,20 +52,25 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
 	_, res, err := bigv.Request(auth, method, location, requestBody)
 	if err != nil {
-		return nil, err
+		switch err.(type) {
+		case BadRequestError:
+			break
+		default:
+			return nil, err
+		}
 	}
 	defer res.Body.Close()
 
-	responseBody, err = ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
+	responseBody, readErr := ioutil.ReadAll(res.Body)
+	if readErr != nil {
+		return nil, readErr
 	}
 
 	if bigv.debugLevel > 2 {
-		fmt.Printf(string(responseBody))
+		fmt.Println(string(responseBody))
 	}
 
-	return responseBody, nil
+	return responseBody, err
 }
 
 // Request makes an HTTP request and then request it, returning the request object, response object and any errors
