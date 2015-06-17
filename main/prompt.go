@@ -12,13 +12,16 @@ func PromptYesNo(prompt string) bool {
 	return Prompt(prompt+" (y/n) ") == "y"
 }
 
-// Prompt provides a string prompt, returns the entered string (including CR on Windows probably)
+// Prompt provides a string prompt, returns the entered string with no whitespace (hopefully)
 func Prompt(prompt string) string {
 	fmt.Print(prompt)
 	reader := bufio.NewReader(os.Stdin)
 	res, err := reader.ReadString('\n')
 
 	if err != nil {
+		if err.Error() == "EOF" {
+			return ""
+		}
 		exit(err)
 	}
 	return strings.TrimSpace(res)
