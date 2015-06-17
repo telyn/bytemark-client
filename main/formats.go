@@ -77,5 +77,46 @@ func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
 	}
 
 	return strings.Join(output, "\r\n")
+}
+
+func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachineSpec) string {
+	output := make([]string, 0, 10)
+	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
+	output = append(output, fmt.Sprintf("Group: '%s'", group.Group))
+	output = append(output, fmt.Sprintf("Account: '%s'", group.Account))
+	s := ""
+	if spec.VirtualMachine.Cores > 1 {
+		s = "s"
+	}
+	output = append(output, fmt.Sprintf("Specs: %d core%s and %dGB memory", spec.VirtualMachine.Cores, s, spec.VirtualMachine.Memory))
+
+	locked := ""
+	if spec.VirtualMachine.HardwareProfile != "" {
+		if spec.VirtualMachine.HardwareProfileLocked {
+			locked = " (locked)"
+		}
+		output = append(output, fmt.Sprintf("Hardware profile: %s%s", spec.VirtualMachine.HardwareProfile, locked))
+	}
+
+	if spec.Reimage.Distribution == "" {
+		output = append(output, "No image specified")
+	} else {
+		output = append(output, "Image: "+spec.Reimage.Distribution)
+	}
+
+	s = ""
+	if len(spec.Discs) > 1 {
+		s = "s"
+	}
+	output = append(output, fmt.Sprintf("%d disc%s: ", len(spec.Discs), s))
+	for i, disc := range spec.Discs {
+		desc := fmt.Sprintf("Disc %d", i)
+		if i == 0 {
+			desc = "Boot disc"
+		}
+
+		output = append(output, fmt.Sprintf("    %s %d GiB, %s grade", desc, disc.Size/1024, disc.StorageGrade))
+	}
+	return strings.Join(output, "\r\n")
 
 }
