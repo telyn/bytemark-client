@@ -25,8 +25,8 @@ func TestDispatchDoCreate(t *testing.T) {
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
-	commands.When("CreateGroup", []string{}).Times(1)
-	doDispatchTest(t, config, commands, "create-group")
+	commands.When("CreateGroup", []string{"test-group"}).Times(1)
+	doDispatchTest(t, config, commands, "create-group", "test-group")
 
 	commands.Reset()
 }

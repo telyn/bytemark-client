@@ -36,7 +36,7 @@ func TestShowVMCommand(t *testing.T) {
 	config := &mockConfig{}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Get", "silent").Return("true")
+	config.When("GetBool", "silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"})
