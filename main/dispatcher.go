@@ -54,7 +54,7 @@ func (d *Dispatcher) Do(args []string) {
 		return
 	}
 
-	// short-circuit commands that don't take arguments
+	// short-circuit commands that don't require arguments
 	switch strings.ToLower(args[0]) {
 	case "config":
 		d.cmds.Config(args[1:])
