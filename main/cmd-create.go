@@ -102,6 +102,18 @@ func (cmd *CommandSet) CreateVM(args []string) {
 		name.Group = *group
 	}
 
+	if name.Group == "" {
+		name.Group = "default"
+	}
+
+	if name.Account == "" {
+		name.Account = cmd.config.Get("account")
+	}
+
+	if name.Account == "" {
+		name.Account = Prompt("Account: ")
+	}
+
 	discs, err := ParseDiscSpec(*discSpecs, false)
 	if err != nil {
 		exit(err)
@@ -136,7 +148,7 @@ func (cmd *CommandSet) CreateVM(args []string) {
 
 	groupName := bigv.GroupName{
 		Group:   name.Group,
-		Account: cmd.config.Get("account"),
+		Account: name.Account,
 	}
 
 	if !cmd.config.GetBool("silent") {

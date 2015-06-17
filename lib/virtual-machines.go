@@ -37,12 +37,14 @@ func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err err
 
 //CreateVirtualMachine creates a virtual machine in the given group.
 func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachineSpec) (vm *VirtualMachine, err error) {
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/create_vm", group.Account, group.Group)
+	path := BuildURL("/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
+
 	// TODO(telyn): possibly better to build a map[string]string and marshal that
 	js, err := json.Marshal(spec)
 	if err != nil {
 		return nil, err
 	}
+
 	vm = new(VirtualMachine)
 	err = bigv.RequestAndUnmarshal(true, "POST", path, string(js), vm)
 	return vm, err
