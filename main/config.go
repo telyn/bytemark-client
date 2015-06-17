@@ -33,6 +33,7 @@ type ConfigVar struct {
 // ConfigManager is an interface defining a key->value store that also knows where the values were set from.
 type ConfigManager interface {
 	Get(string) string
+	GetBool(string) bool
 	GetV(string) ConfigVar
 	GetAll() []ConfigVar
 	Set(string, string, string)
@@ -236,8 +237,14 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		return v
 	case "silent":
 		return ConfigVar{"silent", "false", "CODE"}
+	case "force":
+		return ConfigVar{"force", "false", "CODE"}
 	}
 	return ConfigVar{"", "", ""}
+}
+
+func (config *Config) GetBool(name string) bool {
+	return !(config.Get(name) == "" || config.Get(name) == "false")
 }
 
 func (config *Config) read(name string) ConfigVar {

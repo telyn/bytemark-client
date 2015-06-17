@@ -20,6 +20,11 @@ func (c *mockConfig) Get(name string) string {
 	return ret.String(0)
 }
 
+func (c *mockConfig) GetBool(name string) bool {
+	ret := c.Called(name)
+	return ret.Bool(0)
+}
+
 func (c *mockConfig) GetV(name string) ConfigVar {
 	ret := c.Called(name)
 	return ret.Get(0).(ConfigVar)

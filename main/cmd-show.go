@@ -35,7 +35,7 @@ func (cmds *CommandSet) ShowVM(args []string) {
 	if err != nil {
 		exit(err)
 	}
-	if cmds.config.Get("silent") != "true" {
+	if !cmds.config.GetBool("silent") {
 		if *jsonOut {
 			fmt.Println(json.MarshalIndent(vm, "", "    "))
 		} else {
