@@ -62,9 +62,6 @@ func (d *Dispatcher) Do(args []string) {
 	case "help":
 		d.cmds.Help(args[1:])
 		return
-	case "create-group":
-		d.cmds.CreateGroup(args[1:])
-		return
 	}
 
 	// do this
@@ -74,6 +71,9 @@ func (d *Dispatcher) Do(args []string) {
 	}
 
 	switch strings.ToLower(args[0]) {
+	case "create-group":
+		d.cmds.CreateGroup(args[1:])
+		return
 	case "debug":
 		d.cmds.Debug(args[1:])
 		return
