@@ -2,7 +2,6 @@ package main
 
 import (
 	//	bigv "bigv.io/client/lib"
-	"flag"
 	"fmt"
 	"os"
 	"os/signal"
@@ -28,8 +27,7 @@ func main() {
 	if value != nil {
 		configDir = value.String()
 	}
-	config := NewConfig(configDir, flag.CommandLine)
-	config.ImportFlags(flags)
+	config := NewConfig(configDir, flags)
 
 	dispatch := NewDispatcher(config)
 

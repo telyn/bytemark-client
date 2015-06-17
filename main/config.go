@@ -97,12 +97,11 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 		exit(nil, fmt.Sprintf("%s is not a directory", config.Dir))
 	}
 
+	config.ImportFlags(flags)
 	debugLevel, err := strconv.ParseInt(config.Get("debug-level"), 10, 0)
 	if err == nil {
 		config.debugLevel = int(debugLevel)
 	}
-
-	config.ImportFlags(flags)
 	return config
 }
 
