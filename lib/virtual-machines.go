@@ -2,6 +2,10 @@ package lib
 
 import "encoding/json"
 
+var i2b = [...]string{
+	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+}
+
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
 func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error) {
 	vm = new(VirtualMachine)
@@ -60,11 +64,16 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 
 	discs := make([]map[string]interface{}, 0, 4)
 
-	for _, d := range spec.Discs {
-		disc := make(map[string]interface{})
-		if d.Label != "" {
-			disc["label"] = d.Label
+	for i, d := range spec.Discs {
+		if i > 7 {
+			return nil, TooManyDiscsOnTheDancefloorError{}
 		}
+		disc := make(map[string]interface{})
+		label := d.Label
+		if label == "" {
+			label = "vd" + i2b[i]
+		}
+		disc["label"] = d.Label
 		disc["size"] = d.Size
 		disc["storage_grade"] = d.StorageGrade
 

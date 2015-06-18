@@ -34,6 +34,11 @@ type BadRequestError struct {
 	BigVError
 }
 
+// TooManyDiscsOnTheDancefloorError is returned when the API call would result in more than 8 discs being attached to a VM.
+type TooManyDiscsOnTheDancefloorError struct {
+	BigVError
+}
+
 func (e BigVError) Error() string {
 	return fmt.Sprintf("HTTP %s %s returned %d\r\n", e.Method, e.URL.String(), e.StatusCode)
 }
