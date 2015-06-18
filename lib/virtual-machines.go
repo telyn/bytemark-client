@@ -39,8 +39,53 @@ func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err err
 func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachineSpec) (vm *VirtualMachine, err error) {
 	path := BuildURL("/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
 
-	// TODO(telyn): possibly better to build a map[string]string and marshal that
-	js, err := json.Marshal(spec)
+	req := make(map[string]interface{})
+	rvm := make(map[string]interface{})
+	rvm["autoreboot_on"] = spec.VirtualMachine.Autoreboot
+	if spec.VirtualMachine.CdromURL != "" {
+		rvm["cdrom_url"] = spec.VirtualMachine.CdromURL
+	}
+	rvm["cores"] = spec.VirtualMachine.Cores
+	rvm["memory"] = spec.VirtualMachine.Memory
+	rvm["name"] = spec.VirtualMachine.Name
+	if spec.VirtualMachine.HardwareProfile != "" {
+		rvm["hardware_profile"] = spec.VirtualMachine.HardwareProfile
+	}
+	rvm["hardware_profile_locked"] = spec.VirtualMachine.HardwareProfileLocked
+	if spec.VirtualMachine.ZoneName != "" {
+		rvm["zone_name"] = spec.VirtualMachine.ZoneName
+	}
+
+	req["virtual_machine"] = rvm
+
+	discs := make([]map[string]interface{}, 0, 4)
+
+	for _, d := range spec.Discs {
+		disc := make(map[string]interface{})
+		if d.Label != "" {
+			disc["label"] = d.Label
+		}
+		disc["size"] = d.Size
+		disc["storage_grade"] = d.StorageGrade
+
+		discs = append(discs, disc)
+	}
+
+	req["discs"] = discs
+
+	reimage := make(map[string]interface{})
+
+	if spec.Reimage.Distribution != "" {
+		reimage["distribution"] = spec.Reimage.Distribution
+	}
+	if spec.Reimage.RootPassword != "" {
+		reimage["root_password"] = spec.Reimage.RootPassword
+	}
+	reimage["ssh_public_key"] = spec.Reimage.PublicKeys
+
+	req["reimage"] = reimage
+
+	js, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
