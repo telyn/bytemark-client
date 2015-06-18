@@ -113,12 +113,6 @@ func (cmd *CommandSet) CreateVM(args []string) {
 	if name.Account == "" {
 		name.Account = Prompt("Account: ")
 	}
-	if *zone == "" {
-		*zone = "manchester"
-	}
-	if *hwprofile == "" {
-		*hwprofile = "virtio2013"
-	}
 
 	discs, err := ParseDiscSpec(*discSpecs, false)
 	if err != nil {
@@ -127,9 +121,6 @@ func (cmd *CommandSet) CreateVM(args []string) {
 	for _, d := range discs {
 		if d.StorageGrade == "" {
 			d.StorageGrade = "sata"
-		}
-		if d.Label == "" {
-			d.Label = "vda"
 		}
 	}
 
