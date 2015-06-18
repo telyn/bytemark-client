@@ -37,7 +37,8 @@ func (cmds *CommandSet) ShowVM(args []string) {
 	}
 	if !cmds.config.GetBool("silent") {
 		if *jsonOut {
-			fmt.Println(json.MarshalIndent(vm, "", "    "))
+			js, _ := json.MarshalIndent(vm, "", "    ")
+			fmt.Println(string(js))
 		} else {
 			fmt.Println(FormatVirtualMachine(vm))
 		}
@@ -61,7 +62,8 @@ func (cmds *CommandSet) ShowAccount(args []string) {
 	}
 
 	if *jsonOut {
-		fmt.Println(json.MarshalIndent(acc, "", "    "))
+		js, _ := json.MarshalIndent(acc, "", "    ")
+		fmt.Println(string(js))
 	} else {
 		fmt.Printf("Account %d: %s", acc.ID, acc.Name)
 	}
