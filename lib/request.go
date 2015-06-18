@@ -102,6 +102,9 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 	if bigv.debugLevel > 1 {
 		fmt.Printf("%s %s: %d\r\n", method, req.URL, res.StatusCode)
 	}
+	if bigv.debugLevel >= 3 {
+		fmt.Printf("request body: %s\r\n", requestBody)
+	}
 
 	baseErr := BigVError{
 		Method:       method,
