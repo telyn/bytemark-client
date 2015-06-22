@@ -19,3 +19,13 @@ func (bigv *bigvClient) CreateGroup(name GroupName) error {
 	_, _, err = bigv.Request(true, "POST", path, string(bytes))
 	return err
 }
+
+// GetGroup requests an overview of the group with the given name
+func (bigv *bigvClient) GetGroup(name GroupName) (*Group, error) {
+	group := new(Group)
+
+	path := BuildURL("/accounts/%s/groups/%s?view=overview", name.Account, name.Group)
+
+	err := bigv.RequestAndUnmarshal(true, "GET", path, "", group)
+	return group, err
+}

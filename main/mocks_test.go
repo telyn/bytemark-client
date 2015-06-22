@@ -95,6 +95,10 @@ func (cmds *mockCommands) ShowAccount(args []string) {
 	cmds.Called(args)
 }
 
+func (cmds *mockCommands) ShowGroup(args []string) {
+	cmds.Called(args)
+}
+
 func (cmds *mockCommands) ShowVM(args []string) {
 	cmds.Called(args)
 }
@@ -184,6 +188,11 @@ func (c *mockBigVClient) GetAccount(name string) (account *bigv.Account, err err
 func (c *mockBigVClient) CreateGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
+}
+func (c *mockBigVClient) GetGroup(name bigv.GroupName) (*bigv.Group, error) {
+	r := c.Called(name)
+	group, _ := r.Get(0).(*bigv.Group)
+	return group, r.Error(1)
 }
 func (c *mockBigVClient) DeleteVirtualMachine(name bigv.VirtualMachineName, purge bool) error {
 	r := c.Called(name, purge)

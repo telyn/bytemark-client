@@ -86,6 +86,9 @@ func (d *Dispatcher) Do(args []string) {
 	case "show-account":
 		d.cmds.ShowAccount(args[1:])
 		return
+	case "show-group":
+		d.cmds.ShowGroup(args[1:])
+		return
 	case "show-vm":
 		d.cmds.ShowVM(args[1:])
 		return

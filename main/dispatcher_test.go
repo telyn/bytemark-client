@@ -120,16 +120,26 @@ func TestDispatchDoConfig(t *testing.T) {
 	doDispatchTest(t, config, commands, "config", "set", "variablename", "value")
 }
 
-//
-//func TestDispatchDoShow(t *testing.T) {
-//	commands := &mockCommands{}
-//	config := &mockConfig{}
-//	config.When("Get", "endpoint").Return("endpoint.example.com")
-//	config.When("GetDebugLevel").Return(0)
-//
-//	doDispatchTest(t, config, commands)
-//}
-//
+func TestDispatchDoShow(t *testing.T) {
+	commands := &mockCommands{}
+	config := &mockConfig{}
+	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("GetDebugLevel").Return(0)
+	config.When("Get", "silent").Return(true)
+
+	commands.When("ShowVM", []string{"some-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "show-vm", "some-vm")
+
+	commands.Reset()
+	commands.When("ShowGroup", []string{"some-group"}).Times(1)
+	doDispatchTest(t, config, commands, "show-group", "some-group")
+
+	commands.Reset()
+	commands.When("ShowAccount", []string{"some-account"}).Times(1)
+	doDispatchTest(t, config, commands, "show-account", "some-account")
+
+}
+
 //func TestDispatchDoUnset(t *testing.T) {
 //	commands := &mockCommands{}
 //	config := &mockConfig{}

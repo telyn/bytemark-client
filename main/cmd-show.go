@@ -12,7 +12,7 @@ func (cmds *CommandSet) HelpForShow() {
 	fmt.Println()
 	fmt.Println("usage: go-bigv show [--json] <name>")
 	fmt.Println("       go-bigv show vm [--json] <virtual machine>")
-	fmt.Println("       go-bigv show group [--json] [--verbose] <group>")
+	fmt.Println("       go-bigv show group [--json] [--list-vms] [--verbose] <group>")
 	fmt.Println("       go-bigv show account [--json] [--list-groups] [--list-vms] [--verbose] <account>")
 	fmt.Println()
 	fmt.Println("Displays information about the given virtual machine, group, or account.")
@@ -42,6 +42,44 @@ func (cmds *CommandSet) ShowVM(args []string) {
 			fmt.Println(string(js))
 		} else {
 			fmt.Println(FormatVirtualMachine(vm))
+		}
+	}
+
+}
+
+// ShowGroup implements the show-group command, which is used to show the BigV group name and ID, as well as the VMs within it.
+func (cmds *CommandSet) ShowGroup(args []string) {
+	flags := MakeCommonFlagSet()
+	list := flags.Bool("list-vms", false, "")
+	verbose := flags.Bool("verbose", false, "")
+	jsonOut := flags.Bool("json", false, "")
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	name := cmds.bigv.ParseGroupName(args[0])
+
+	group, err := cmds.bigv.GetGroup(name)
+
+	if err != nil {
+		exit(err)
+	}
+
+	if !cmds.config.GetBool("silent") {
+
+		if *jsonOut {
+			js, _ := json.MarshalIndent(group, "", "    ")
+			fmt.Println(string(js))
+		} else {
+			fmt.Printf("Group %d: %s\r\n", group.ID, group.Name)
+			fmt.Println()
+			if *list {
+				for _, vm := range group.VirtualMachines {
+					fmt.Println(vm.Name)
+				}
+			} else if *verbose {
+				fmt.Println(strings.Join(FormatVirtualMachines(group.VirtualMachines), "\r\n"))
+
+			}
 		}
 	}
 

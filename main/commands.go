@@ -22,6 +22,7 @@ type Commands interface {
 	Debug([]string)
 	Help([]string)
 	ShowAccount([]string)
+	ShowGroup([]string)
 	ShowVM([]string)
 	UndeleteVM([]string)
 
