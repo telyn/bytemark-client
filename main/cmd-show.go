@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // HelpForShow outputs usage information for the show commands: show, show-vm, show-group, show-account.
@@ -12,7 +13,7 @@ func (cmds *CommandSet) HelpForShow() {
 	fmt.Println("usage: go-bigv show [--json] <name>")
 	fmt.Println("       go-bigv show vm [--json] <virtual machine>")
 	fmt.Println("       go-bigv show group [--json] [--verbose] <group>")
-	fmt.Println("       go-bigv show account [--json] [--verbose] <account>")
+	fmt.Println("       go-bigv show account [--json] [--list-groups] [--list-vms] [--verbose] <account>")
 	fmt.Println()
 	fmt.Println("Displays information about the given virtual machine, group, or account.")
 	fmt.Println("If the --verbose flag is given to bigv show group or bigv show account, full details are given for each VM.")
@@ -49,6 +50,9 @@ func (cmds *CommandSet) ShowVM(args []string) {
 // ShowAccount implements the show-account command, which is used to show the BigV account name, as well as the groups and VMs within it.
 func (cmds *CommandSet) ShowAccount(args []string) {
 	flags := MakeCommonFlagSet()
+	listgroups := flags.Bool("list-groups", false, "")
+	listvms := flags.Bool("list-vms", false, "")
+	verbose := flags.Bool("verbose", false, "")
 	jsonOut := flags.Bool("json", false, "")
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -66,6 +70,33 @@ func (cmds *CommandSet) ShowAccount(args []string) {
 		fmt.Println(string(js))
 	} else {
 		fmt.Printf("Account %d: %s", acc.ID, acc.Name)
+		fmt.Println()
+		switch {
+		case *verbose:
+			for _, g := range acc.Groups {
+				fmt.Printf("Group %s\r\n", g.Name)
+				fmt.Println(strings.Join(FormatVirtualMachines(g.VirtualMachines), "\r\n"))
+			}
+		case *listgroups:
+			fmt.Println("Groups:")
+			for _, g := range acc.Groups {
+				fmt.Println("%s", g.Name)
+			}
+		case *listvms:
+			fmt.Println("Virtual machines:")
+			for _, g := range acc.Groups {
+				for _, vm := range g.VirtualMachines {
+					fmt.Println("%s.%s\r\n", vm.Name, g.Name)
+				}
+			}
+		default:
+			vms := 0
+			for _, g := range acc.Groups {
+				vms += len(g.VirtualMachines)
+			}
+			fmt.Println("%d groups containing %d virtual machines\r\n", len(acc.Groups), vms)
+		}
+
 	}
 
 }

@@ -34,6 +34,16 @@ const (
 // FORMAT_DEFAULT_WIDTH is the default width to attempt to print to.
 const _FormatDefaultWidth = 80
 
+// FormatVirtualMachines loops through a bunch of VMs, formatting each one as it goes, and returns each formatted VM as a string.
+// The options are the same as FormatVirtualMachine
+func FormatVirtualMachines(vms []*client.VirtualMachine, options ...int) []string {
+	output := make([]string, len(vms), len(vms))
+	for i, vm := range vms {
+		output[i] = FormatVirtualMachine(vm, options...)
+	}
+	return output
+}
+
 // FormatVirtualMachine pretty-prints a VM. The optional second argument is a bitmask of VMFormatOptions,
 // and the optional third is the width you'd like to display..oh.
 func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
