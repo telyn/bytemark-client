@@ -85,6 +85,27 @@ type Client interface {
 	// GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
 	GetVirtualMachine(name VirtualMachineName) (*VirtualMachine, error)
 
+	// ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
+	// button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
+	// returns nil on success or an error otherwise.
+	ResetVirtualMachine(name VirtualMachineName) (err error)
+
+	// RestartVirtualMachine restarts the named virtual machine. This is
+	// returns nil on success or an error otherwise.
+	RestartVirtualMachine(name VirtualMachineName) (err error)
+
+	// StartVirtualMachine starts the named virtual machine.
+	// returns nil on success or an error otherwise.
+	StartVirtualMachine(name VirtualMachineName) (err error)
+
+	// StopVirtualMachine starts the named virtual machine.
+	// returns nil on success or an error otherwise.
+	StopVirtualMachine(name VirtualMachineName) (err error)
+
+	// ShutdownVirtualMachine sends an ACPI shutdown to the VM. This will cause a graceful shutdown of the machine
+	// returns nil on success or an error otherwise.
+	ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error)
+
 	// UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 	// Return nil on success, an error otherwise.
 	UndeleteVirtualMachine(name VirtualMachineName) error

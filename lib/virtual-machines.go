@@ -94,3 +94,63 @@ func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 	}
 	return vm, err
 }
+
+// ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
+// button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
+// returns nil on success or an error otherwise.
+func (bigv *bigvClient) ResetVirtualMachine(name VirtualMachineName) (err error) {
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "POST", path, `{"signal":"reset"}`)
+	return err
+}
+
+// RestartVirtualMachine restarts the named virtual machine. This is
+// returns nil on success or an error otherwise.
+func (bigv *bigvClient) RestartVirtualMachine(name VirtualMachineName) (err error) {
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": false}`)
+	return err
+}
+
+// StartVirtualMachine starts the named virtual machine.
+// returns nil on success or an error otherwise.
+func (bigv *bigvClient) StartVirtualMachine(name VirtualMachineName) (err error) {
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": true}`)
+	return err
+}
+
+// StopVirtualMachine starts the named virtual machine.
+// returns nil on success or an error otherwise.
+func (bigv *bigvClient) StopVirtualMachine(name VirtualMachineName) (err error) {
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":false, "power_on": false}`)
+	return err
+}
+
+// ShutdownVirtualMachine sends an ACPI shutdown to the VM. This will cause a graceful shutdown of the machine
+// returns nil on success or an error otherwise.
+func (bigv *bigvClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error) {
+	if stayoff {
+		path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+		_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":false}`)
+	}
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "PUT", path, `{"signal": "powerdown"}`)
+	return err
+}
+
+// UndeleteVirtualMachine changes the deleted flag on a VM back to false.
+// Return nil on success, an error otherwise.
+func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	_, _, err = bigv.Request(true, "PUT", path, `{"deleted":false}`)
+	return err
+}

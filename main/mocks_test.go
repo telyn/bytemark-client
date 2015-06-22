@@ -91,6 +91,22 @@ func (cmds *mockCommands) CreateVM(args []string) {
 	cmds.Called(args)
 }
 
+func (cmds *mockCommands) ResetVM(args []string) {
+	cmds.Called(args)
+}
+func (cmds *mockCommands) Restart(args []string) {
+	cmds.Called(args)
+}
+func (cmds *mockCommands) Shutdown(args []string) {
+	cmds.Called(args)
+}
+func (cmds *mockCommands) Stop(args []string) {
+	cmds.Called(args)
+}
+func (cmds *mockCommands) Start(args []string) {
+	cmds.Called(args)
+}
+
 func (cmds *mockCommands) ShowAccount(args []string) {
 	cmds.Called(args)
 }
@@ -127,6 +143,10 @@ func (cmds *mockCommands) HelpForDelete() {
 }
 
 func (cmds *mockCommands) HelpForHelp() {
+	cmds.Called()
+}
+
+func (cmds *mockCommands) HelpForPower() {
 	cmds.Called()
 }
 
@@ -210,6 +230,26 @@ func (c *mockBigVClient) GetVirtualMachine(name bigv.VirtualMachineName) (vm *bi
 }
 func (c *mockBigVClient) UndeleteVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
+	return r.Error(0)
+}
+func (c *mockBigVClient) ResetVirtualMachine(name bigv.VirtualMachineName) error {
+	r := c.Called(name)
+	return r.Error(0)
+}
+func (c *mockBigVClient) RestartVirtualMachine(name bigv.VirtualMachineName) error {
+	r := c.Called(name)
+	return r.Error(0)
+}
+func (c *mockBigVClient) StartVirtualMachine(name bigv.VirtualMachineName) error {
+	r := c.Called(name)
+	return r.Error(0)
+}
+func (c *mockBigVClient) StopVirtualMachine(name bigv.VirtualMachineName) error {
+	r := c.Called(name)
+	return r.Error(0)
+}
+func (c *mockBigVClient) ShutdownVirtualMachine(name bigv.VirtualMachineName, stayoff bool) error {
+	r := c.Called(name, stayoff)
 	return r.Error(0)
 }
 

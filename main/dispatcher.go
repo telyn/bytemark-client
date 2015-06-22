@@ -83,6 +83,12 @@ func (d *Dispatcher) Do(args []string) {
 	case "delete-vm":
 		d.cmds.DeleteVM(args[1:])
 		return
+	case "restart":
+		d.cmds.Restart(args[1:])
+		return
+	case "reset":
+		d.cmds.ResetVM(args[1:])
+		return
 	case "show-account":
 		d.cmds.ShowAccount(args[1:])
 		return
@@ -91,6 +97,15 @@ func (d *Dispatcher) Do(args []string) {
 		return
 	case "show-vm":
 		d.cmds.ShowVM(args[1:])
+		return
+	case "shutdown":
+		d.cmds.Shutdown(args[1:])
+		return
+	case "start":
+		d.cmds.Start(args[1:])
+		return
+	case "stop":
+		d.cmds.Stop(args[1:])
 		return
 	case "undelete-vm":
 		d.cmds.UndeleteVM(args[1:])

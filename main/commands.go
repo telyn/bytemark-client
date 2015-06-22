@@ -21,6 +21,11 @@ type Commands interface {
 	DeleteVM([]string)
 	Debug([]string)
 	Help([]string)
+	ResetVM([]string)
+	Restart([]string)
+	Start([]string)
+	Stop([]string)
+	Shutdown([]string)
 	ShowAccount([]string)
 	ShowGroup([]string)
 	ShowVM([]string)
@@ -31,6 +36,7 @@ type Commands interface {
 	HelpForDebug()
 	HelpForDelete()
 	HelpForHelp()
+	HelpForPower()
 	HelpForShow()
 }
 

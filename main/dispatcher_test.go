@@ -120,6 +120,53 @@ func TestDispatchDoConfig(t *testing.T) {
 	doDispatchTest(t, config, commands, "config", "set", "variablename", "value")
 }
 
+func TestDispatchDoPower(t *testing.T) {
+	commands := &mockCommands{}
+	config := &mockConfig{}
+	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("GetDebugLevel").Return(0)
+
+	commands.When("Help", []string{"shutdown"}).Times(1)
+	doDispatchTest(t, config, commands, "shutdown")
+
+	commands.Reset()
+	commands.When("Help", []string{"start"}).Times(1)
+	doDispatchTest(t, config, commands, "start")
+
+	commands.Reset()
+	commands.When("Help", []string{"stop"}).Times(1)
+	doDispatchTest(t, config, commands, "stop")
+
+	commands.Reset()
+	commands.When("Help", []string{"restart"}).Times(1)
+	doDispatchTest(t, config, commands, "TestRestartCommand")
+
+	commands.Reset()
+	commands.When("Help", []string{"reset"}).Times(1)
+	doDispatchTest(t, config, commands, "reset")
+
+	commands.Reset()
+	commands.When("Shutdown", []string{"test-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "shutdown", "test-vm")
+
+	commands.Reset()
+	commands.When("Start", []string{"test-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "start", "test-vm")
+
+	commands.Reset()
+	commands.When("Stop", []string{"test-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "stop", "test-vm")
+
+	commands.Reset()
+	commands.When("Restart", []string{"test-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "restart", "test-vm")
+
+	commands.Reset()
+	commands.When("Reset", []string{"test-vm"}).Times(1)
+	doDispatchTest(t, config, commands, "reset", "test-vm")
+
+}
+
 func TestDispatchDoShow(t *testing.T) {
 	commands := &mockCommands{}
 	config := &mockConfig{}

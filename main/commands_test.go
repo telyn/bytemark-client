@@ -125,6 +125,98 @@ func TestShowGroupCommand(t *testing.T) {
 	}
 }
 
+func TestResetCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetBool", "silent").Return(true)
+	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+
+	c.When("ResetVirtualMachine", vmn).Times(1)
+
+	cmds := NewCommandSet(config, c)
+	cmds.ResetVM([]string{"test-vm.test-group.test-account"})
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+func TestRestartCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetBool", "silent").Return(true)
+	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+
+	c.When("RestartVirtualMachine", vmn).Times(1)
+
+	cmds := NewCommandSet(config, c)
+	cmds.Restart([]string{"test-vm.test-group.test-account"})
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+func TestShutdownCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetBool", "silent").Return(true)
+	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+
+	cmds := NewCommandSet(config, c)
+	c.When("ShutdownVirtualMachine", vmn).Times(1)
+	cmds.Shutdown([]string{"test-vm.test-group.test-account"})
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+func TestStartCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetBool", "silent").Return(true)
+	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+
+	cmds := NewCommandSet(config, c)
+
+	c.When("StartVirtualMachine", vmn).Times(1)
+	cmds.Start([]string{"test-vm.test-group.test-account"})
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+func TestStopCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+
+	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetBool", "silent").Return(true)
+	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+
+	c.When("StopVirtualMachine", vmn).Times(1)
+
+	cmds := NewCommandSet(config, c)
+
+	cmds.Stop([]string{"test-vm.test-group.test-account"})
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 func TestShowVMCommand(t *testing.T) {
 	c := &mockBigVClient{}
 	config := &mockConfig{}
