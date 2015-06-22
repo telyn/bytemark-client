@@ -42,13 +42,13 @@ func NewDispatcherWithCommands(config ConfigManager, commands Commands) *Dispatc
 
 // Do takes the command line arguments and figures out what to do
 func (d *Dispatcher) Do(args []string) {
-	//	help := d.Flags.Lookup("help")
-	///	fmt.Printf("%+v", help)
+	help := d.Flags.Lookup("help")
+	fmt.Printf("%+v", help)
 	if d.debugLevel >= 1 {
 		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
 	}
 
-	if /*help == true || */ len(args) == 0 || strings.HasPrefix(args[0], "-") {
+	if help.Value.String() == "true" || len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		fmt.Printf("No command specified.\n\n")
 		d.cmds.Help(args)
 		return

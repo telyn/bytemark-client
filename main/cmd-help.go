@@ -33,6 +33,8 @@ func (cmds *CommandSet) Help(args []string) {
 	switch strings.ToLower(args[0]) {
 	case "config":
 		cmds.HelpForConfig()
+	case "create":
+		cmds.HelpForCreate()
 	case "debug":
 		cmds.HelpForDebug()
 	case "delete":
