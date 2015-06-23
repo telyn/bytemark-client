@@ -58,19 +58,23 @@ func (cmd *CommandSet) CreateGroup(args []string) ExitCode {
 		name = cmd.bigv.ParseGroupName(Prompt("Group name: "))
 	}
 
+	var err error
 	if name.Account == "" {
-		if name.Account = cmd.config.Get("account"); name.Account == "" {
+		if name.Account, err = cmd.config.Get("account"); name.Account == "" {
 			name.Account = Prompt("Account name: ")
 		}
 	}
 
-	cmd.EnsureAuth()
+	err = cmd.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
-	err := cmd.bigv.CreateGroup(name)
+	err = cmd.bigv.CreateGroup(name)
 	if err == nil {
 		fmt.Printf("Group %s was created under account %s\r\n", name.Group, name.Account)
 	}
-	return exit(err)
+	return processError(err)
 
 }
 
@@ -93,6 +97,8 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmd.config.ImportFlags(flags)
 
+	var err error
+
 	name := bigv.VirtualMachineName{"", "", ""}
 	if len(args) > 0 {
 		name = cmd.bigv.ParseVirtualMachineName(args[0])
@@ -107,7 +113,7 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 	}
 
 	if name.Account == "" {
-		name.Account = cmd.config.Get("account")
+		name.Account, err = cmd.config.Get("account")
 	}
 
 	if name.Account == "" {
@@ -116,7 +122,7 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 
 	discs, err := ParseDiscSpec(*discSpecs, false)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 	for _, d := range discs {
 		if d.StorageGrade == "" {
@@ -151,26 +157,26 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 		Account: name.Account,
 	}
 
-	if !cmd.config.GetBool("silent") {
+	if !cmd.config.Silent() {
 		fmt.Println("The following VM will be created:")
 		fmt.Println(FormatVirtualMachineSpec(&groupName, &spec))
 	}
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
-	if !cmd.config.GetBool("force") && !PromptYesNo("Are you certain you wish to continue?") {
+	if !cmd.config.Force() && !PromptYesNo("Are you certain you wish to continue?") {
 		fmt.Println("Exiting.")
-		exit(&UserRequestedExit{})
+		return processError(&UserRequestedExit{})
 	}
 
 	cmd.EnsureAuth()
 
 	vm, err := cmd.bigv.CreateVirtualMachine(groupName, spec)
 	if err != nil {
-		exit(err)
-	} else if !cmd.config.GetBool("silent") {
+		return processError(err)
+	} else if !cmd.config.Silent() {
 		fmt.Printf("Virtual machine %s created successfully\n", vm.Name)
 		fmt.Println(FormatVirtualMachine(vm))
 	}
-	return exit(nil)
+	return E_SUCCESS
 
 }

@@ -34,9 +34,9 @@ func (cmds *CommandSet) ShowVM(args []string) ExitCode {
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		if *jsonOut {
 			js, _ := json.MarshalIndent(vm, "", "    ")
 			fmt.Println(string(js))
@@ -44,7 +44,7 @@ func (cmds *CommandSet) ShowVM(args []string) ExitCode {
 			fmt.Println(FormatVirtualMachine(vm))
 		}
 	}
-	return 0
+	return E_SUCCESS
 
 }
 
@@ -64,10 +64,10 @@ func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
 	group, err := cmds.bigv.GetGroup(name)
 
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 
 		if *jsonOut {
 			js, _ := json.MarshalIndent(group, "", "    ")
@@ -104,7 +104,7 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 	acc, err := cmds.bigv.GetAccount(name)
 
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
 	if *jsonOut {

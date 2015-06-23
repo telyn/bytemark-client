@@ -13,7 +13,7 @@ import (
 
 // Commands represents the available commands in the BigV client. Each command should have its own function defined here, with a corresponding HelpFor* function too.
 type Commands interface {
-	EnsureAuth()
+	EnsureAuth() error
 
 	Config([]string) ExitCode
 	CreateGroup([]string) ExitCode
@@ -55,12 +55,14 @@ func NewCommandSet(config ConfigManager, client bigv.Client) *CommandSet {
 }
 
 // EnsureAuth authenticates with the BigV authentication server, prompting for credentials if necessary.
-func (cmds *CommandSet) EnsureAuth() {
-	err := cmds.bigv.AuthWithToken(cmds.config.Get("token"))
+func (cmds *CommandSet) EnsureAuth() error {
+	token, err := cmds.config.Get("token")
+
+	err = cmds.bigv.AuthWithToken(token)
 	if err != nil {
 		if aErr, ok := err.(*auth3.Error); ok {
 			if _, ok := aErr.Err.(*url.Error); ok {
-				exit(aErr)
+				return aErr
 			}
 		}
 		fmt.Fprintf(os.Stderr, "Failed to use token, trying credentials.\r\n\r\n")
@@ -71,11 +73,11 @@ func (cmds *CommandSet) EnsureAuth() {
 
 			cmds.PromptForCredentials()
 			credents := map[string]string{
-				"username": cmds.config.Get("user"),
-				"password": cmds.config.Get("pass"),
+				"username": cmds.config.GetIgnoreErr("user"),
+				"password": cmds.config.GetIgnoreErr("pass"),
 			}
-			if cmds.config.Get("yubikey") != "" {
-				credents["yubikey"] = cmds.config.Get("yubikey-otp")
+			if useKey, _ := cmds.config.GetBool("yubikey"); useKey {
+				credents["yubikey"] = cmds.config.GetIgnoreErr("yubikey-otp")
 			}
 
 			err = cmds.bigv.AuthWithCredentials(credents)
@@ -91,44 +93,46 @@ func (cmds *CommandSet) EnsureAuth() {
 						cmds.config.Set("pass", "", "INVALID")
 						cmds.config.Set("yubikey-otp", "", "INVALID")
 					} else {
-						exit(err, "Invalid credentials, giving up after three attempts.")
+						return err
 					}
 				} else {
-					exit(err)
+					return err
 				}
 
 			}
 		}
 	}
+	return nil
 
 }
 
 // PromptForCredentials ensures that user, pass and yubikey-otp are defined, by prompting the user for them.
 // needs a for loop to ensure that they don't stay empty.
-func (cmds *CommandSet) PromptForCredentials() {
+// returns nil on success or an error on failure
+func (cmds *CommandSet) PromptForCredentials() error {
 	buf := bufio.NewReader(os.Stdin)
-	for cmds.config.Get("user") == "" {
+	for cmds.config.GetIgnoreErr("user") == "" {
 		fmt.Fprintf(os.Stderr, "User: ")
 		user, _ := buf.ReadString('\n')
 		cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
 	}
 
-	for cmds.config.Get("pass") == "" {
+	for cmds.config.GetIgnoreErr("pass") == "" {
 		pass, err := speakeasy.Ask("Pass: ")
 
 		if err != nil {
-			exit(err, "Couldn't read password - are you sure you're using a terminal?")
+			return err
 		}
 		cmds.config.Set("pass", strings.TrimSpace(pass), "INTERACTION")
 	}
 
-	if cmds.config.Get("yubikey") != "" {
-		for cmds.config.Get("yubikey-otp") == "" {
+	if cmds.config.GetIgnoreErr("yubikey") != "" {
+		for cmds.config.GetIgnoreErr("yubikey-otp") == "" {
 			fmt.Fprintf(os.Stderr, "Press yubikey: ")
 			yubikey, _ := buf.ReadString('\n')
 			cmds.config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
 		}
 	}
 	fmt.Fprintf(os.Stderr, "\r\n")
-
+	return nil
 }

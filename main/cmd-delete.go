@@ -41,10 +41,11 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 	if vm.Deleted && !purge {
-		return exit(nil, "Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge", vm.Hostname)
+		fmt.Printf("Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge", vm.Hostname)
+		return E_SUCCESS
 	}
 
 	if !force {
@@ -59,9 +60,10 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 		chr, err := buf.ReadByte()
 		fmt.Println()
 		if err != nil {
-			return exit(err)
+			return processError(err)
 		} else if chr != 'y' {
-			return exit(nil, "Aborting.")
+
+			return processError(&UserRequestedExit{})
 
 		}
 	}
@@ -69,7 +71,7 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 	err = cmds.bigv.DeleteVirtualMachine(name, purge)
 
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
 	if purge {
@@ -88,17 +90,18 @@ func (cmds *CommandSet) UndeleteVM(args []string) ExitCode {
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
 	if !vm.Deleted {
-		return exit(nil, fmt.Sprintf("Virtual machine %s was already undeleted", vm.Hostname))
+		fmt.Printf("Virtual machine %s was already undeleted", vm.Hostname)
+		return E_SUCCESS
 	}
 
 	err = cmds.bigv.UndeleteVirtualMachine(name)
 
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 	fmt.Printf("Successfully restored virtual machine %s\r\n", vm.Hostname)
 

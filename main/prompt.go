@@ -20,9 +20,9 @@ func Prompt(prompt string) string {
 
 	if err != nil {
 		if err.Error() == "EOF" {
-			return ""
+			return res
 		}
-		exit(err)
+		return ""
 	}
 	return strings.TrimSpace(res)
 }

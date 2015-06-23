@@ -130,7 +130,7 @@ Exit code ranges:
 `)
 }
 
-func exit(err error, message ...string) ExitCode {
+func processError(err error, message ...string) ExitCode {
 	if len(message) > 0 {
 		fmt.Println(strings.Join(message, "\r\n"))
 	} else if err == nil {

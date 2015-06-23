@@ -45,15 +45,15 @@ func (cmds *CommandSet) Start(args []string) ExitCode {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to start %s...\r\n", name.VirtualMachine)
 	}
 	err := cmds.bigv.StartVirtualMachine(name)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " started successfully.")
 	}
 	return 0
@@ -69,16 +69,16 @@ func (cmds *CommandSet) Shutdown(args []string) ExitCode {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to shutdown %s...\r\n", name.VirtualMachine)
 	}
 
 	err := cmds.bigv.ShutdownVirtualMachine(name, !*restart)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " was shutdown successfully.")
 	}
 	return 0
@@ -92,15 +92,15 @@ func (cmds *CommandSet) Stop(args []string) ExitCode {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to stop %s...\r\n", name.VirtualMachine)
 	}
 	err := cmds.bigv.StopVirtualMachine(name)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " stopped successfully.")
 	}
 	return 0
@@ -115,15 +115,15 @@ func (cmds *CommandSet) Restart(args []string) ExitCode {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to restart %s...\r\n", name.VirtualMachine)
 	}
 	err := cmds.bigv.RestartVirtualMachine(name)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " restart successfully.")
 	}
 	return 0
@@ -138,15 +138,15 @@ func (cmds *CommandSet) ResetVM(args []string) ExitCode {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to reset %s...\r\n", name.VirtualMachine)
 	}
 	err := cmds.bigv.ResetVirtualMachine(name)
 	if err != nil {
-		return exit(err)
+		return processError(err)
 	}
 
-	if !cmds.config.GetBool("silent") {
+	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " reset successfully.")
 	}
 	return 0

@@ -32,14 +32,17 @@ type ConfigVar struct {
 
 // ConfigManager is an interface defining a key->value store that also knows where the values were set from.
 type ConfigManager interface {
-	Get(string) string
-	GetBool(string) bool
-	GetV(string) ConfigVar
-	GetAll() []ConfigVar
+	Get(string) (string, error)
+	GetIgnoreErr(string) string
+	GetBool(string) (bool, error)
+	GetV(string) (ConfigVar, error)
+	GetAll() ([]ConfigVar, error)
 	Set(string, string, string)
-	SetPersistent(string, string, string)
+	SetPersistent(string, string, string) error
 	Unset(string) error
 	GetDebugLevel() int
+	Force() bool
+	Silent() bool
 
 	ImportFlags(*flag.FlagSet) []string
 }
@@ -66,11 +69,47 @@ type Config struct {
 	Definitions map[string]string
 }
 
+type ConfigDirInvalidError struct {
+	Path string
+}
+
+func (e *ConfigDirInvalidError) Error() string {
+	return fmt.Sprintf("The config directory is '%s' but it doesn't seem to be a directory.", e.Path)
+}
+
+type CannotLoadDefinitionsError struct {
+	Err error
+}
+
+func (e *CannotLoadDefinitionsError) Error() string {
+	return fmt.Sprintf("Unable to load the definitions file from the BigV API.")
+}
+
+type ConfigReadError struct {
+	Name string
+	Path string
+	Err  error
+}
+
+func (e *ConfigReadError) Error() string {
+	return fmt.Sprintf("Unable to read config for %s from %s.", e.Name, e.Path)
+}
+
+type ConfigWriteError struct {
+	Name string
+	Path string
+	Err  error
+}
+
+func (e *ConfigWriteError) Error() string {
+	return fmt.Sprintf("Unable to write persistent config for %s (%s).", e.Name, e.Path)
+}
+
 // Do I really need to have the flags passed in here?
 // Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
-func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
+func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
 	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
@@ -82,27 +121,32 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config) {
 		config.Dir = configDir
 	}
 
-	err := os.MkdirAll(config.Dir, 0700)
+	err = os.MkdirAll(config.Dir, 0700)
 	if err != nil {
 
-		exit(err)
+		return nil, err
 	}
 
 	stat, err := os.Stat(config.Dir)
 	if err != nil {
-		exit(err)
+		return nil, err
 	}
 
 	if !stat.IsDir() {
-		exit(nil, fmt.Sprintf("%s is not a directory", config.Dir))
+		return nil, &ConfigDirInvalidError{config.Dir}
 	}
 
 	config.ImportFlags(flags)
-	debugLevel, err := strconv.ParseInt(config.Get("debug-level"), 10, 0)
-	if err == nil {
-		config.debugLevel = int(debugLevel)
+	strDL, err := config.Get("debug-level")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	} else {
+		debugLevel, err := strconv.ParseInt(strDL, 10, 0)
+		if err == nil {
+			config.debugLevel = int(debugLevel)
+		}
 	}
-	return config
+	return config, nil
 }
 
 func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
@@ -135,60 +179,75 @@ func (config *Config) GetPath(name string) string {
 
 // LoadDefinitions reads the local copy of the definitions json file, or downloads it from the endpoint if it's too old or nonexistant.
 // Eventually this will be used to provide information on various things throughout the application
-func (config *Config) LoadDefinitions() {
+func (config *Config) LoadDefinitions() error {
 	stat, err := os.Stat(config.GetPath("definitions"))
 
 	if err != nil || time.Since(stat.ModTime()) > 24*time.Hour {
 		// TODO(telyn): grab it off the internet
 		c := &http.Client{}
-		req, err := http.NewRequest("GET", config.Get("endpoint")+"/definitions.json", nil)
+		endpoint, err := config.Get("endpoint")
 		if err != nil {
-			exit(err)
+			return err
+		}
+		req, err := http.NewRequest("GET", endpoint+"/definitions.json", nil)
+		if err != nil {
+			return &CannotLoadDefinitionsError{err}
 		}
 		req.Header.Add("Accept", "application/json")
 		req.Header.Add("Content-Type", "application/json")
 		res, err := c.Do(req)
 		if err != nil {
-			exit(err)
+			return &CannotLoadDefinitionsError{err}
 		}
 		if res.StatusCode == 200 {
 			responseBody, err := ioutil.ReadAll(res.Body)
 			if err != nil {
-				exit(err)
+				return &CannotLoadDefinitionsError{err}
 			}
 			ioutil.WriteFile(config.GetPath("definitions"), responseBody, 0660)
 		}
 	} else {
 		_, err := ioutil.ReadFile(config.GetPath("definitions"))
 		if err != nil {
-			exit(err, "Couldn't load definitions")
+			return &CannotLoadDefinitionsError{err}
 		}
 	}
+	return nil
 
 }
 
 // Get returns the value of a ConfigVar. Used to simplify code when the source is unnecessary.
-func (config *Config) Get(name string) string {
-	return config.GetV(name).Value
+func (config *Config) Get(name string) (string, error) {
+	v, err := config.GetV(name)
+	return v.Value, err
+}
+
+// GetIgnoreErr returns the value of a ConfigVar or an empty string , if it was unable to read it for whatever reason.
+func (config *Config) GetIgnoreErr(name string) string {
+	s, _ := config.Get(name)
+	return s
 }
 
 // GetV returns the ConfigVar for the given key.
-func (config *Config) GetV(name string) ConfigVar {
+func (config *Config) GetV(name string) (ConfigVar, error) {
 	// try to read the Memo
 	name = strings.ToLower(name)
 	if val, ok := config.Memo[name]; ok {
-		return val
+		return val, nil
 	}
 	return config.read(name)
 }
 
 // GetAll returns all of the available ConfigVars in the Config.
-func (config *Config) GetAll() []ConfigVar {
-	vars := make([]ConfigVar, len(configVars))
+func (config *Config) GetAll() (vars []ConfigVar, err error) {
+	vars = make([]ConfigVar, len(configVars))
 	for i, v := range configVars {
-		vars[i] = config.GetV(v)
+		vars[i], err = config.GetV(v)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return vars
+	return vars, nil
 }
 
 // GetDefault returns the default ConfigVar for the given key.
@@ -242,21 +301,26 @@ func (config *Config) GetDefault(name string) ConfigVar {
 	return ConfigVar{"", "", ""}
 }
 
-func (config *Config) GetBool(name string) bool {
-	return !(config.Get(name) == "" || config.Get(name) == "false")
+func (config *Config) GetBool(name string) (bool, error) {
+	v, err := config.Get(name)
+	if err != nil {
+		return false, err
+	}
+	return !(v == "" || v == "false"), nil
 }
 
-func (config *Config) read(name string) ConfigVar {
-	contents, err := ioutil.ReadFile(config.GetPath(name))
+func (config *Config) read(name string) (ConfigVar, error) {
+	path := config.GetPath(name)
+	contents, err := ioutil.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return config.GetDefault(name)
+			return config.GetDefault(name), nil
 		}
 
-		exit(err, fmt.Sprintf("Couldn't read config for %s", name))
+		return config.GetDefault(name), &ConfigReadError{Name: name, Path: path, Err: err}
 	}
 
-	return ConfigVar{name, string(contents), "FILE " + config.GetPath(name)}
+	return ConfigVar{name, string(contents), "FILE " + path}, nil
 }
 
 // Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.
@@ -265,16 +329,27 @@ func (config *Config) Set(name, value, source string) {
 }
 
 // SetPersistent writes a file to the config directory for the given key-value pair.
-func (config *Config) SetPersistent(name, value, source string) {
+func (config *Config) SetPersistent(name, value, source string) error {
+	path := config.GetPath(name)
 	config.Set(name, value, source)
-	err := ioutil.WriteFile(config.GetPath(name), []byte(value), 0600)
+	err := ioutil.WriteFile(path, []byte(value), 0600)
 	if err != nil {
-		exit(err, fmt.Sprintf("Couldn't write to config directory "+config.Dir))
+		return &ConfigWriteError{Name: name, Path: path, Err: err}
 	}
+	return nil
 }
 
 // Unset removes the named key from both config's Memo and the user's config directory.
 func (config *Config) Unset(name string) error {
 	delete(config.Memo, name)
 	return os.Remove(config.GetPath(name))
+}
+
+func (config *Config) Force() bool {
+	force, _ := config.GetBool("force")
+	return force
+}
+func (config *Config) Silent() bool {
+	silent, _ := config.GetBool("silent")
+	return silent
 }

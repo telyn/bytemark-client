@@ -15,24 +15,33 @@ type mockConfig struct {
 	mock.Mock
 }
 
-func (c *mockConfig) Get(name string) string {
+func (c *mockConfig) Force() bool {
+	ret := c.Called()
+	return ret.Bool(0)
+}
+
+func (c *mockConfig) Get(name string) (string, error) {
+	ret := c.Called(name)
+	return ret.String(0), ret.Error(1)
+}
+func (c *mockConfig) GetIgnoreErr(name string) string {
 	ret := c.Called(name)
 	return ret.String(0)
 }
 
-func (c *mockConfig) GetBool(name string) bool {
+func (c *mockConfig) GetBool(name string) (bool, error) {
 	ret := c.Called(name)
-	return ret.Bool(0)
+	return ret.Bool(0), ret.Error(1)
 }
 
-func (c *mockConfig) GetV(name string) ConfigVar {
+func (c *mockConfig) GetV(name string) (ConfigVar, error) {
 	ret := c.Called(name)
-	return ret.Get(0).(ConfigVar)
+	return ret.Get(0).(ConfigVar), ret.Error(1)
 }
 
-func (c *mockConfig) GetAll() []ConfigVar {
+func (c *mockConfig) GetAll() ([]ConfigVar, error) {
 	ret := c.Called()
-	return ret.Get(0).([]ConfigVar)
+	return ret.Get(0).([]ConfigVar), ret.Error(1)
 }
 
 func (c *mockConfig) Set(name, value, source string) {
@@ -40,9 +49,13 @@ func (c *mockConfig) Set(name, value, source string) {
 	return
 }
 
-func (c *mockConfig) SetPersistent(name, value, source string) {
-	c.Called(name, value, source)
-	return
+func (c *mockConfig) SetPersistent(name, value, source string) error {
+	ret := c.Called(name, value, source)
+	return ret.Error(0)
+}
+func (c *mockConfig) Silent() bool {
+	ret := c.Called()
+	return ret.Bool(0)
 }
 
 func (c *mockConfig) Unset(name string) error {
@@ -138,8 +151,9 @@ func (cmds *mockCommands) UndeleteVM(args []string) ExitCode {
 	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) EnsureAuth() {
-	cmds.Called()
+func (cmds *mockCommands) EnsureAuth() error {
+	r := cmds.Called()
+	return r.Error(0)
 }
 
 func (cmds *mockCommands) HelpForConfig() {

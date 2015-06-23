@@ -27,11 +27,15 @@ func main() {
 	if value != nil {
 		configDir = value.String()
 	}
-	config := NewConfig(configDir, flags)
+
+	config, err := NewConfig(configDir, flags)
+	if err != nil {
+		os.Exit(int(processError(err)))
+	}
 
 	dispatch, err := NewDispatcher(config)
 	if err != nil {
-		os.Exit(int(exit(err)))
+		os.Exit(int(processError(err)))
 	}
 
 	os.Exit(int(dispatch.Do(flags.Args())))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -30,32 +31,53 @@ func (cmds *CommandSet) HelpForConfig() {
 // It's slightly more user friendly than echo "value" > ~/.go-bigv/
 func (cmds *CommandSet) Config(args []string) ExitCode {
 	if len(args) == 0 {
-		for _, v := range cmds.config.GetAll() {
+		vars, err := cmds.config.GetAll()
+		if err != nil {
+			return processError(err)
+		}
+		for _, v := range vars {
 			fmt.Printf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
 		}
-		return exit(nil)
+		return E_SUCCESS
 	} else if len(args) == 1 {
 		cmds.HelpForConfig()
-		return exit(nil)
+		return E_SUCCESS
 	}
 
 	switch strings.ToLower(args[0]) {
 	case "set":
 		variable := strings.ToLower(args[1])
 
-		oldVar := cmds.config.GetV(variable)
+		oldVar, err := cmds.config.GetV(variable)
+		if err != nil {
+			if e, ok := err.(*ConfigReadError); ok {
+				fmt.Fprintf(os.Stderr, "Couldn't read the old value of %s - %v\r\n", e.Name, e.Err)
+			} else {
+				fmt.Fprintf(os.Stderr, "Couldn't read the old value of %s - %v\r\n", variable, err)
+			}
+			return E_CANT_READ_CONFIG
+		}
 
 		if len(args) == 2 {
 			fmt.Printf("%s: '%s' (%s)\r\n", oldVar.Name, oldVar.Value, oldVar.Source)
-			return exit(nil)
+			return E_SUCCESS
 		}
 
 		// TODO(telyn): consider validating input for the set command
-		cmds.config.SetPersistent(variable, args[2], "CMD set")
+		// TODO(telyn): This should possibly return errors.
+		err = cmds.config.SetPersistent(variable, args[2], "CMD set")
+		if err != nil {
+			if e, ok := err.(*ConfigReadError); ok {
+				fmt.Fprintf(os.Stderr, "Couldn't set %s - %v\r\n", e.Name, e.Err)
+			} else {
+				fmt.Fprintf(os.Stderr, "Couldn't set %s - %v\r\n", variable, err)
+			}
+			return E_CANT_WRITE_CONFIG
+		}
 
-		if oldVar.Source == "config" && !cmds.config.GetBool("silent") {
+		if oldVar.Source == "config" && !cmds.config.Silent() {
 			fmt.Printf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, args[1])
-		} else if !cmds.config.GetBool("silent") {
+		} else if !cmds.config.Silent() {
 			fmt.Printf("%s has been set. \r\nNew value: %s\r\n", variable, args[1])
 		}
 
@@ -65,5 +87,5 @@ func (cmds *CommandSet) Config(args []string) ExitCode {
 		fmt.Printf("Unrecognised command %s\r\n", args[0])
 		cmds.HelpForConfig()
 	}
-	return exit(nil)
+	return E_SUCCESS
 }

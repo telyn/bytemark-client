@@ -59,22 +59,26 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 			buf := bufio.NewReader(os.Stdin)
 			requestBody, err = buf.ReadString(byte(uint8(14)))
 			if err != nil {
-				return exit(err)
+				return processError(err)
 			}
 		}
 		body, err := commands.bigv.RequestAndRead(*shouldAuth, args[0], args[1], requestBody)
 		if err != nil {
-			return exit(err)
+			return processError(err)
 		}
 
 		buf := new(bytes.Buffer)
 		json.Indent(buf, body, "", "    ")
 		fmt.Printf("%s", buf)
 	case "config":
-		indented, _ := json.MarshalIndent(commands.config.GetAll(), "", "    ")
+		vars, err := commands.config.GetAll()
+		if err != nil {
+			return processError(err)
+		}
+		indented, _ := json.MarshalIndent(vars, "", "    ")
 		fmt.Printf("%s", indented)
 	default:
 		commands.HelpForDebug()
 	}
-	return exit(nil)
+	return E_SUCCESS
 }

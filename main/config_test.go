@@ -118,7 +118,10 @@ func TestConfigDefaultConfigDir(t *testing.T) {
 
 	CleanEnv()
 
-	config := NewConfig("", nil)
+	config, err := NewConfig("", nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 	expected := filepath.Join(os.Getenv("HOME"), "/.go-bigv")
 	is.Equal(expected, config.Dir)
 }
@@ -131,7 +134,10 @@ func TestConfigEnvConfigDir(t *testing.T) {
 	expected := "/tmp"
 	os.Setenv("BIGV_CONFIG_DIR", expected)
 
-	config := NewConfig("", nil)
+	config, err := NewConfig("", nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 	is.Equal(expected, config.Dir)
 }
 
@@ -141,7 +147,10 @@ func TestConfigPassedConfigDir(t *testing.T) {
 	JunkEnv()
 
 	expected := "/home"
-	config := NewConfig(expected, nil)
+	config, err := NewConfig(expected, nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 	is.Equal(expected, config.Dir)
 }
 
@@ -158,13 +167,16 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 	CleanEnv()
 	dir := CleanDir()
 
-	config := NewConfig(dir, nil)
+	config, err := NewConfig(dir, nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 
-	is.Equal("https://uk0.bigv.io", config.Get("endpoint"))
-	is.Equal("https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
+	is.Equal("https://uk0.bigv.io", config.GetIgnoreErr("endpoint"))
+	is.Equal("https://auth.bytemark.co.uk", config.GetIgnoreErr("auth-endpoint"))
 
-	is.Equal("", config.Get("user"))
-	is.Equal("", config.Get("account"))
+	is.Equal("", config.GetIgnoreErr("user"))
+	is.Equal("", config.GetIgnoreErr("account"))
 
 	os.RemoveAll(dir)
 }
@@ -178,17 +190,22 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	expected := "test-username"
 	os.Setenv("BIGV_USER", expected)
 
-	config := NewConfig(dir, nil)
+	config, err := NewConfig(dir, nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 
-	is.Equal("https://uk0.bigv.io", config.Get("endpoint"))
-	is.Equal("https://auth.bytemark.co.uk", config.Get("auth-endpoint"))
+	is.Equal("https://uk0.bigv.io", config.GetIgnoreErr("endpoint"))
+	is.Equal("https://auth.bytemark.co.uk", config.GetIgnoreErr("auth-endpoint"))
 
-	v := config.GetV("user")
+	v, err := config.GetV("user")
+	is.Nil(err)
 	is.Equal("user", v.Name)
 	is.Equal(expected, v.Value)
 	is.Equal("ENV BIGV_USER", v.Source)
 
-	v = config.GetV("account")
+	v, err = config.GetV("account")
+	is.Nil(err)
 	is.Equal("account", v.Name)
 	is.Equal(expected, v.Value)
 	is.Equal("ENV BIGV_USER", v.Source)
@@ -202,13 +219,16 @@ func TestConfigDefaultsFixtureEnv(t *testing.T) {
 	fixture := FixtureEnv()
 	dir := CleanDir()
 
-	config := NewConfig(dir, nil)
+	config, err := NewConfig(dir, nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 
-	is.Equal(fixture["endpoint"], config.Get("endpoint"))
-	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
-	is.Equal(fixture["user"], config.Get("user"))
-	is.Equal(fixture["account"], config.Get("account"))
-	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.GetIgnoreErr("auth-endpoint"))
+	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
+	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
+	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 	os.RemoveAll(dir)
 }
 
@@ -225,13 +245,16 @@ func TestConfigDir(t *testing.T) {
 	JunkEnv()
 	dir, fixture := FixtureDir()
 
-	config := NewConfig(dir, nil)
+	config, err := NewConfig(dir, nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 
-	is.Equal(fixture["endpoint"], config.Get("endpoint"))
-	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
-	is.Equal(fixture["user"], config.Get("user"))
-	is.Equal(fixture["account"], config.Get("account"))
-	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.GetIgnoreErr("auth-endpoint"))
+	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
+	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
+	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 
 	os.RemoveAll(dir)
 }
@@ -242,7 +265,7 @@ func TestConfigDir(t *testing.T) {
  ============
 */
 
-func testFlagsWithArgs(args []string) *Config {
+func testFlagsWithArgs(args []string) (*Config, error) {
 	CleanEnv()
 	dir := CleanDir()
 	flags := MakeCommonFlagSet()
@@ -255,17 +278,30 @@ func testFlagsWithArgs(args []string) *Config {
 func TestMainFlags(t *testing.T) {
 	is := is.New(t)
 
-	config := testFlagsWithArgs([]string{"--help", "--force"})
+	config, err := testFlagsWithArgs([]string{"--help", "--force"})
+	is.Nil(err)
 
 	for _, v := range configVars {
 		// if this line ever fails then either configVars is out of date, GetDefault is out of date, or something weird has happened
-		is.Equal(config.GetDefault(v), config.GetV(v))
+
+		vv, err := config.GetV(v)
+		is.Nil(err)
+		is.Equal(config.GetDefault(v), vv)
 	}
 
-	config = testFlagsWithArgs([]string{"--user=test-user", "-account=test-account", "--endpoint", "example.com"})
-	is.Equal(ConfigVar{"user", "test-user", "FLAG user"}, config.GetV("user"))
-	is.Equal(ConfigVar{"account", "test-account", "FLAG account"}, config.GetV("account"))
-	is.Equal(ConfigVar{"endpoint", "example.com", "FLAG endpoint"}, config.GetV("endpoint"))
+	config, err = testFlagsWithArgs([]string{"--user=test-user", "-account=test-account", "--endpoint", "example.com"})
+
+	v, err := config.GetV("user")
+	is.Nil(err)
+	is.Equal(ConfigVar{"user", "test-user", "FLAG user"}, v)
+
+	v, err = config.GetV("account")
+	is.Nil(err)
+	is.Equal(ConfigVar{"account", "test-account", "FLAG account"}, v)
+
+	v, err = config.GetV("endpoint")
+	is.Nil(err)
+	is.Equal(ConfigVar{"endpoint", "example.com", "FLAG endpoint"}, v)
 
 }
 
@@ -280,22 +316,25 @@ func TestConfigSet(t *testing.T) {
 
 	CleanEnv()
 	dir, fixture := FixtureDir()
-	config := NewConfig(dir, nil)
+	config, err := NewConfig(dir, nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 
-	is.Equal(fixture["endpoint"], config.Get("endpoint"))
-	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
-	is.Equal(fixture["user"], config.Get("user"))
-	is.Equal(fixture["account"], config.Get("account"))
-	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.GetIgnoreErr("auth-endpoint"))
+	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
+	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
+	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 
 	config.Set("user", "test-user", "TEST")
 	fixture["user"] = "test-user"
 
-	is.Equal(fixture["endpoint"], config.Get("endpoint"))
-	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
-	is.Equal(fixture["user"], config.Get("user"))
-	is.Equal(fixture["account"], config.Get("account"))
-	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.GetIgnoreErr("auth-endpoint"))
+	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
+	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
+	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 	os.RemoveAll(dir)
 }
 
@@ -304,32 +343,36 @@ func TestConfigSetPersistent(t *testing.T) {
 
 	CleanEnv()
 	dir, fixture := FixtureDir()
-	config := NewConfig(dir, nil)
+	config, err := NewConfig(dir, nil)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 
-	is.Equal(fixture["endpoint"], config.Get("endpoint"))
-	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
-	is.Equal(fixture["user"], config.Get("user"))
-	is.Equal(fixture["account"], config.Get("account"))
-	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.GetIgnoreErr("auth-endpoint"))
+	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
+	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
+	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 
 	config.SetPersistent("user", "test-user", "TEST")
 	fixture["user"] = "test-user"
 
-	is.Equal(fixture["endpoint"], config.Get("endpoint"))
-	is.Equal(fixture["auth-endpoint"], config.Get("auth-endpoint"))
-	is.Equal(fixture["user"], config.Get("user"))
-	is.Equal(fixture["account"], config.Get("account"))
-	is.Equal(fixture["debug-level"], config.Get("debug-level"))
+	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config.GetIgnoreErr("auth-endpoint"))
+	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
+	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
+	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 
 	CleanEnv() // in case for some wacky reason I write to the environment
 	//create a new config (blanking the memo) to test the file in the directory has changed.
-	config2 := NewConfig(dir, nil)
+	config2, err := NewConfig(dir, nil)
+	is.Nil(err)
 
-	is.Equal(fixture["endpoint"], config2.Get("endpoint"))
-	is.Equal(fixture["auth-endpoint"], config2.Get("auth-endpoint"))
-	is.Equal(fixture["user"], config2.Get("user"))
-	is.Equal(fixture["account"], config2.Get("account"))
-	is.Equal(fixture["debug-level"], config2.Get("debug-level"))
+	is.Equal(fixture["endpoint"], config2.GetIgnoreErr("endpoint"))
+	is.Equal(fixture["auth-endpoint"], config2.GetIgnoreErr("auth-endpoint"))
+	is.Equal(fixture["user"], config2.GetIgnoreErr("user"))
+	is.Equal(fixture["account"], config2.GetIgnoreErr("account"))
+	is.Equal(fixture["debug-level"], config2.GetIgnoreErr("debug-level"))
 
 	os.RemoveAll(dir)
 }
