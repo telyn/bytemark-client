@@ -21,7 +21,7 @@ func (cmds *CommandSet) HelpForShow() {
 }
 
 // ShowVM implements the show-vm command, which is used to display information about BigV VMs. See HelpForShow for the usage information.
-func (cmds *CommandSet) ShowVM(args []string) {
+func (cmds *CommandSet) ShowVM(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	jsonOut := flags.Bool("json", false, "")
 	flags.Parse(args)
@@ -34,7 +34,7 @@ func (cmds *CommandSet) ShowVM(args []string) {
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 	if !cmds.config.GetBool("silent") {
 		if *jsonOut {
@@ -44,11 +44,12 @@ func (cmds *CommandSet) ShowVM(args []string) {
 			fmt.Println(FormatVirtualMachine(vm))
 		}
 	}
+	return 0
 
 }
 
 // ShowGroup implements the show-group command, which is used to show the BigV group name and ID, as well as the VMs within it.
-func (cmds *CommandSet) ShowGroup(args []string) {
+func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	list := flags.Bool("list-vms", false, "")
 	verbose := flags.Bool("verbose", false, "")
@@ -58,10 +59,12 @@ func (cmds *CommandSet) ShowGroup(args []string) {
 
 	name := cmds.bigv.ParseGroupName(args[0])
 
+	cmds.EnsureAuth()
+
 	group, err := cmds.bigv.GetGroup(name)
 
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if !cmds.config.GetBool("silent") {
@@ -82,11 +85,12 @@ func (cmds *CommandSet) ShowGroup(args []string) {
 			}
 		}
 	}
+	return 0
 
 }
 
 // ShowAccount implements the show-account command, which is used to show the BigV account name, as well as the groups and VMs within it.
-func (cmds *CommandSet) ShowAccount(args []string) {
+func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	listgroups := flags.Bool("list-groups", false, "")
 	listvms := flags.Bool("list-vms", false, "")
@@ -100,7 +104,7 @@ func (cmds *CommandSet) ShowAccount(args []string) {
 	acc, err := cmds.bigv.GetAccount(name)
 
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if *jsonOut {
@@ -136,5 +140,6 @@ func (cmds *CommandSet) ShowAccount(args []string) {
 		}
 
 	}
+	return 0
 
 }

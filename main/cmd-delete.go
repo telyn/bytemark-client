@@ -26,8 +26,9 @@ func (cmds *CommandSet) HelpForDelete() {
 }
 
 // DeleteVM implements the delete-vm command, which is used to delete and purge BigV VMs. See HelpForDelete for usage information.
-func (cmds *CommandSet) DeleteVM(args []string) {
+func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 
+	// TODO(telyn): rewrite flag code here.
 	flags := flag.NewFlagSet("DeleteVM", flag.ExitOnError)
 
 	var purge = *flags.Bool("purge", false, "Whether or not to purge the VM. If yes, will delete all your data.")
@@ -40,13 +41,14 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 	if vm.Deleted && !purge {
-		exit(nil, "Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge", vm.Hostname)
+		return exit(nil, "Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge", vm.Hostname)
 	}
 
 	if !force {
+		// TODO(telyn): use PromptYN
 		buf := bufio.NewReader(os.Stdin)
 		fstr := "Are you certain you wish to delete %s? (y/n) "
 		if purge {
@@ -57,9 +59,9 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 		chr, err := buf.ReadByte()
 		fmt.Println()
 		if err != nil {
-			exit(err)
+			return exit(err)
 		} else if chr != 'y' {
-			exit(nil, "Aborting.")
+			return exit(nil, "Aborting.")
 
 		}
 	}
@@ -67,7 +69,7 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 	err = cmds.bigv.DeleteVirtualMachine(name, purge)
 
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if purge {
@@ -75,28 +77,30 @@ func (cmds *CommandSet) DeleteVM(args []string) {
 	} else {
 		fmt.Printf("Virtual machine %s deleted successfully.\r\n", name)
 	}
+	return 0
 }
 
 // UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.
-func (cmds *CommandSet) UndeleteVM(args []string) {
+func (cmds *CommandSet) UndeleteVM(args []string) ExitCode {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 	cmds.EnsureAuth()
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if !vm.Deleted {
-		exit(nil, fmt.Sprintf("Virtual machine %s was already undeleted", vm.Hostname))
+		return exit(nil, fmt.Sprintf("Virtual machine %s was already undeleted", vm.Hostname))
 	}
 
 	err = cmds.bigv.UndeleteVirtualMachine(name)
 
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 	fmt.Printf("Successfully restored virtual machine %s\r\n", vm.Hostname)
 
+	return 0
 }

@@ -6,7 +6,10 @@ import (
 )
 
 func doDispatchTest(t *testing.T, config *mockConfig, commands *mockCommands, args ...string) {
-	d := NewDispatcherWithCommands(config, commands)
+	d, err := NewDispatcherWithCommands(config, commands)
+	if err != nil {
+		t.Fatalf("NewDispatcherWithCommands died: %v", err)
+	}
 
 	if args == nil {
 		args = []string{}
@@ -84,10 +87,8 @@ func TestDispatchDoHelp(t *testing.T) {
 	config.When("Get", "silent").Return("true")
 
 	commands.When("Help", []string{}).Times(1)
-
 	doDispatchTest(t, config, commands)
 
-	commands.Reset()
 	commands.When("Help", []string{}).Times(1)
 	doDispatchTest(t, config, commands, "help")
 
@@ -139,7 +140,7 @@ func TestDispatchDoPower(t *testing.T) {
 
 	commands.Reset()
 	commands.When("Help", []string{"restart"}).Times(1)
-	doDispatchTest(t, config, commands, "TestRestartCommand")
+	doDispatchTest(t, config, commands, "restart")
 
 	commands.Reset()
 	commands.When("Help", []string{"reset"}).Times(1)
@@ -162,7 +163,7 @@ func TestDispatchDoPower(t *testing.T) {
 	doDispatchTest(t, config, commands, "restart", "test-vm")
 
 	commands.Reset()
-	commands.When("Reset", []string{"test-vm"}).Times(1)
+	commands.When("ResetVM", []string{"test-vm"}).Times(1)
 	doDispatchTest(t, config, commands, "reset", "test-vm")
 
 }

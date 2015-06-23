@@ -45,7 +45,7 @@ func (cmd *CommandSet) HelpForCreate() {
 }
 
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
-func (cmd *CommandSet) CreateGroup(args []string) {
+func (cmd *CommandSet) CreateGroup(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmd.config.ImportFlags(flags)
@@ -70,12 +70,12 @@ func (cmd *CommandSet) CreateGroup(args []string) {
 	if err == nil {
 		fmt.Printf("Group %s was created under account %s\r\n", name.Group, name.Account)
 	}
-	exit(err)
+	return exit(err)
 
 }
 
 // CreateVM implements the create-vm command. See HelpForCreateVM for usage
-func (cmd *CommandSet) CreateVM(args []string) {
+func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	cores := flags.Int("cores", 1, "")
 	cdrom := flags.String("cdrom", "", "")
@@ -116,7 +116,7 @@ func (cmd *CommandSet) CreateVM(args []string) {
 
 	discs, err := ParseDiscSpec(*discSpecs, false)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 	for _, d := range discs {
 		if d.StorageGrade == "" {
@@ -171,6 +171,6 @@ func (cmd *CommandSet) CreateVM(args []string) {
 		fmt.Printf("Virtual machine %s created successfully\n", vm.Name)
 		fmt.Println(FormatVirtualMachine(vm))
 	}
-	exit(nil)
+	return exit(nil)
 
 }

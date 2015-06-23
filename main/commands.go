@@ -15,21 +15,21 @@ import (
 type Commands interface {
 	EnsureAuth()
 
-	Config([]string)
-	CreateGroup([]string)
-	CreateVM([]string)
-	DeleteVM([]string)
-	Debug([]string)
+	Config([]string) ExitCode
+	CreateGroup([]string) ExitCode
+	CreateVM([]string) ExitCode
+	DeleteVM([]string) ExitCode
+	Debug([]string) ExitCode
 	Help([]string)
-	ResetVM([]string)
-	Restart([]string)
-	Start([]string)
-	Stop([]string)
-	Shutdown([]string)
-	ShowAccount([]string)
-	ShowGroup([]string)
-	ShowVM([]string)
-	UndeleteVM([]string)
+	ResetVM([]string) ExitCode
+	Restart([]string) ExitCode
+	Start([]string) ExitCode
+	Stop([]string) ExitCode
+	Shutdown([]string) ExitCode
+	ShowAccount([]string) ExitCode
+	ShowGroup([]string) ExitCode
+	ShowVM([]string) ExitCode
+	UndeleteVM([]string) ExitCode
 
 	HelpForConfig()
 	HelpForCreate()

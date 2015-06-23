@@ -28,7 +28,7 @@ func (commands *CommandSet) HelpForDebug() {
 
 // Debug makes an HTTP <method> request to the URL specified in the arguments.
 // command syntax: debug <method> <url>
-func (commands *CommandSet) Debug(args []string) {
+func (commands *CommandSet) Debug(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	junkToken := flags.Bool("junk-token", false, "")
 	shouldAuth := flags.Bool("auth", false, "")
@@ -41,7 +41,7 @@ func (commands *CommandSet) Debug(args []string) {
 
 	if len(args) < 1 {
 		commands.HelpForDebug()
-		return
+		return 0
 	}
 
 	switch args[0] {
@@ -59,12 +59,12 @@ func (commands *CommandSet) Debug(args []string) {
 			buf := bufio.NewReader(os.Stdin)
 			requestBody, err = buf.ReadString(byte(uint8(14)))
 			if err != nil {
-				exit(err)
+				return exit(err)
 			}
 		}
 		body, err := commands.bigv.RequestAndRead(*shouldAuth, args[0], args[1], requestBody)
 		if err != nil {
-			exit(err)
+			return exit(err)
 		}
 
 		buf := new(bytes.Buffer)
@@ -76,4 +76,5 @@ func (commands *CommandSet) Debug(args []string) {
 	default:
 		commands.HelpForDebug()
 	}
+	return exit(nil)
 }

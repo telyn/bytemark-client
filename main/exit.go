@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -20,6 +19,10 @@ func (e *UserRequestedExit) Error() string {
 type ExitCode int
 
 const (
+	// E_USAGE_DISPLAYED is returned when some usage info / help page was displayed. Unsure whether it should == E_SUCCESS or not
+	E_USAGE_DISPLAYED = 0
+	// E_SUCCESS is used to say everything went well
+	E_SUCCESS = 0
 	// E_TRAPPED_INTERRUPT is the exit code returned when an unexpected interrupt like SIGUSR1 was trapped
 	E_TRAPPED_INTERRUPT ExitCode = -1
 	// E_CANT_READ_CONFIG is the exit code returned when we couldn't read a config variable from the disk for some reason
@@ -127,14 +130,14 @@ Exit code ranges:
 `)
 }
 
-func exit(err error, message ...string) {
+func exit(err error, message ...string) ExitCode {
 	if len(message) > 0 {
 		fmt.Println(strings.Join(message, "\r\n"))
 	} else if err == nil {
-		os.Exit(0)
+		return 0
 	}
 	errorMessage := "Unknown error"
-	exitCode := E_UNKNOWN_ERROR
+	exitCode := ExitCode(E_UNKNOWN_ERROR)
 	if err != nil {
 		switch err.(type) {
 		case *auth3.Error:
@@ -195,5 +198,5 @@ func exit(err error, message ...string) {
 		fmt.Println(errorMessage)
 
 	}
-	os.Exit(exitCode)
+	return exitCode
 }

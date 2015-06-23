@@ -29,8 +29,10 @@ func main() {
 	}
 	config := NewConfig(configDir, flags)
 
-	dispatch := NewDispatcher(config)
+	dispatch, err := NewDispatcher(config)
+	if err != nil {
+		os.Exit(int(exit(err)))
+	}
 
-	dispatch.Do(flags.Args())
-	os.Exit(0)
+	os.Exit(int(dispatch.Do(flags.Args())))
 }

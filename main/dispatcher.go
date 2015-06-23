@@ -16,101 +16,89 @@ type Dispatcher struct {
 }
 
 // NewDispatcher creates a new Dispatcher given a config.
-func NewDispatcher(config ConfigManager) (d *Dispatcher) {
+func NewDispatcher(config ConfigManager) (d *Dispatcher, err error) {
 	d = new(Dispatcher)
 	bigv, err := client.New(config.Get("endpoint"))
 	if err != nil {
-		exit(err)
+		return nil, err
 	}
 
 	d.debugLevel = config.GetDebugLevel()
 	bigv.SetDebugLevel(d.debugLevel)
 
 	d.cmds = NewCommandSet(config, bigv)
-	return d
+	return d, nil
 }
 
 // NewDispatcherWithCommands is for writing tests with mock CommandSets
-func NewDispatcherWithCommands(config ConfigManager, commands Commands) *Dispatcher {
-	d := NewDispatcher(config)
+func NewDispatcherWithCommands(config ConfigManager, commands Commands) (*Dispatcher, error) {
+	d, err := NewDispatcher(config)
+	if err != nil {
+		return nil, err
+	}
 	d.cmds = commands
-	return d
+	return d, nil
 }
 
 // EnsureAuth makes sure a valid token is stored in config.
 // This should be called by anything that needs auth.
 
 // Do takes the command line arguments and figures out what to do
-func (d *Dispatcher) Do(args []string) {
-	help := d.Flags.Lookup("help")
-	fmt.Printf("%+v", help)
+func (d *Dispatcher) Do(args []string) ExitCode {
 	if d.debugLevel >= 1 {
 		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
 	}
 
-	if help.Value.String() == "true" || len(args) == 0 || strings.HasPrefix(args[0], "-") {
+	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		fmt.Printf("No command specified.\n\n")
 		d.cmds.Help(args)
-		return
+		return E_SUCCESS
 	}
 
 	// short-circuit commands that don't require arguments
 	switch strings.ToLower(args[0]) {
 	case "config":
-		d.cmds.Config(args[1:])
-		return
+		return d.cmds.Config(args[1:])
+	case "create-group":
+		return d.cmds.CreateGroup(args[1:])
+	case "create-vm":
+		return d.cmds.CreateVM(args[1:])
 	case "help":
 		d.cmds.Help(args[1:])
-		return
+		return E_USAGE_DISPLAYED
 	}
 
 	// do this
 	if len(args) == 1 {
 		d.cmds.Help(args)
-		return
+		return E_USAGE_DISPLAYED
 	}
 
 	switch strings.ToLower(args[0]) {
-	case "create-group":
-		d.cmds.CreateGroup(args[1:])
-		return
-	case "create-vm":
-		d.cmds.CreateVM(args[1:])
-		return
 	case "debug":
-		d.cmds.Debug(args[1:])
-		return
+		return d.cmds.Debug(args[1:])
 	case "delete-vm":
-		d.cmds.DeleteVM(args[1:])
-		return
+		return d.cmds.DeleteVM(args[1:])
 	case "restart":
-		d.cmds.Restart(args[1:])
-		return
+		return d.cmds.Restart(args[1:])
 	case "reset":
-		d.cmds.ResetVM(args[1:])
-		return
+		return d.cmds.ResetVM(args[1:])
 	case "show-account":
-		d.cmds.ShowAccount(args[1:])
-		return
+		return d.cmds.ShowAccount(args[1:])
 	case "show-group":
-		d.cmds.ShowGroup(args[1:])
-		return
+		return d.cmds.ShowGroup(args[1:])
 	case "show-vm":
-		d.cmds.ShowVM(args[1:])
-		return
+		return d.cmds.ShowVM(args[1:])
 	case "shutdown":
-		d.cmds.Shutdown(args[1:])
-		return
+		return d.cmds.Shutdown(args[1:])
 	case "start":
-		d.cmds.Start(args[1:])
-		return
+		return d.cmds.Start(args[1:])
 	case "stop":
-		d.cmds.Stop(args[1:])
-		return
+		return d.cmds.Stop(args[1:])
 	case "undelete-vm":
-		d.cmds.UndeleteVM(args[1:])
-		return
+		return d.cmds.UndeleteVM(args[1:])
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", args[0])
 	d.cmds.Help(args)
+	return E_USAGE_DISPLAYED
 }

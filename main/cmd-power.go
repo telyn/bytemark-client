@@ -36,7 +36,7 @@ func (cmds *CommandSet) HelpForPower() {
 	fmt.Println()
 }
 
-func (cmds *CommandSet) Start(args []string) {
+func (cmds *CommandSet) Start(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -45,18 +45,21 @@ func (cmds *CommandSet) Start(args []string) {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	fmt.Printf("Attempting to start %s...\r\n", name.VirtualMachine)
+	if !cmds.config.GetBool("silent") {
+		fmt.Printf("Attempting to start %s...\r\n", name.VirtualMachine)
+	}
 	err := cmds.bigv.StartVirtualMachine(name)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if !cmds.config.GetBool("silent") {
 		fmt.Println(name.VirtualMachine, " started successfully.")
 	}
+	return 0
 }
 
-func (cmds *CommandSet) Shutdown(args []string) {
+func (cmds *CommandSet) Shutdown(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	restart := flags.Bool("restart", false, "")
 	flags.Parse(args)
@@ -66,17 +69,21 @@ func (cmds *CommandSet) Shutdown(args []string) {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	fmt.Printf("Attempting to shutdown %s...\r\n", name.VirtualMachine)
+	if !cmds.config.GetBool("silent") {
+		fmt.Printf("Attempting to shutdown %s...\r\n", name.VirtualMachine)
+	}
+
 	err := cmds.bigv.ShutdownVirtualMachine(name, !*restart)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if !cmds.config.GetBool("silent") {
 		fmt.Println(name.VirtualMachine, " was shutdown successfully.")
 	}
+	return 0
 }
-func (cmds *CommandSet) Stop(args []string) {
+func (cmds *CommandSet) Stop(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -85,18 +92,21 @@ func (cmds *CommandSet) Stop(args []string) {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	fmt.Printf("Attempting to stop %s...\r\n", name.VirtualMachine)
+	if !cmds.config.GetBool("silent") {
+		fmt.Printf("Attempting to stop %s...\r\n", name.VirtualMachine)
+	}
 	err := cmds.bigv.StopVirtualMachine(name)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if !cmds.config.GetBool("silent") {
 		fmt.Println(name.VirtualMachine, " stopped successfully.")
 	}
+	return 0
 }
 
-func (cmds *CommandSet) Restart(args []string) {
+func (cmds *CommandSet) Restart(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -105,18 +115,21 @@ func (cmds *CommandSet) Restart(args []string) {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	fmt.Printf("Attempting to restart %s...\r\n", name.VirtualMachine)
+	if !cmds.config.GetBool("silent") {
+		fmt.Printf("Attempting to restart %s...\r\n", name.VirtualMachine)
+	}
 	err := cmds.bigv.RestartVirtualMachine(name)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if !cmds.config.GetBool("silent") {
 		fmt.Println(name.VirtualMachine, " restart successfully.")
 	}
+	return 0
 }
 
-func (cmds *CommandSet) ResetVM(args []string) {
+func (cmds *CommandSet) ResetVM(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -125,14 +138,17 @@ func (cmds *CommandSet) ResetVM(args []string) {
 
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
-	fmt.Printf("Attempting to reset %s...\r\n", name.VirtualMachine)
+	if !cmds.config.GetBool("silent") {
+		fmt.Printf("Attempting to reset %s...\r\n", name.VirtualMachine)
+	}
 	err := cmds.bigv.ResetVirtualMachine(name)
 	if err != nil {
-		exit(err)
+		return exit(err)
 	}
 
 	if !cmds.config.GetBool("silent") {
 		fmt.Println(name.VirtualMachine, " reset successfully.")
 	}
+	return 0
 
 }

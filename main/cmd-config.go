@@ -28,15 +28,15 @@ func (cmds *CommandSet) HelpForConfig() {
 
 // Config provides the bigv config command, which sets variables in the user's config. See HelpForConfig for usage information.
 // It's slightly more user friendly than echo "value" > ~/.go-bigv/
-func (cmds *CommandSet) Config(args []string) {
+func (cmds *CommandSet) Config(args []string) ExitCode {
 	if len(args) == 0 {
 		for _, v := range cmds.config.GetAll() {
 			fmt.Printf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
 		}
-		return
+		return exit(nil)
 	} else if len(args) == 1 {
 		cmds.HelpForConfig()
-		return
+		return exit(nil)
 	}
 
 	switch strings.ToLower(args[0]) {
@@ -47,7 +47,7 @@ func (cmds *CommandSet) Config(args []string) {
 
 		if len(args) == 2 {
 			fmt.Printf("%s: '%s' (%s)\r\n", oldVar.Name, oldVar.Value, oldVar.Source)
-			exit(nil)
+			return exit(nil)
 		}
 
 		// TODO(telyn): consider validating input for the set command
@@ -60,10 +60,10 @@ func (cmds *CommandSet) Config(args []string) {
 		}
 
 	case "unset":
-
+		// TODO(telyn): write this...
 	default:
 		fmt.Printf("Unrecognised command %s\r\n", args[0])
 		cmds.HelpForConfig()
 	}
-
+	return exit(nil)
 }

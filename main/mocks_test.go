@@ -69,58 +69,73 @@ type mockCommands struct {
 	mock.Mock
 }
 
-func (cmds *mockCommands) Debug(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) Debug(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) DeleteVM(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) DeleteVM(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
 func (cmds *mockCommands) Help(args []string) {
 	cmds.Called(args)
 }
 
-func (cmds *mockCommands) Config(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) Config(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
-func (cmds *mockCommands) CreateGroup(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) CreateGroup(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
-func (cmds *mockCommands) CreateVM(args []string) {
-	cmds.Called(args)
-}
-
-func (cmds *mockCommands) ResetVM(args []string) {
-	cmds.Called(args)
-}
-func (cmds *mockCommands) Restart(args []string) {
-	cmds.Called(args)
-}
-func (cmds *mockCommands) Shutdown(args []string) {
-	cmds.Called(args)
-}
-func (cmds *mockCommands) Stop(args []string) {
-	cmds.Called(args)
-}
-func (cmds *mockCommands) Start(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) CreateVM(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) ShowAccount(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) ResetVM(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+func (cmds *mockCommands) Restart(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+
+}
+func (cmds *mockCommands) Shutdown(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+func (cmds *mockCommands) Stop(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+func (cmds *mockCommands) Start(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) ShowGroup(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) ShowAccount(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) ShowVM(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) ShowGroup(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) UndeleteVM(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) ShowVM(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+
+func (cmds *mockCommands) UndeleteVM(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
 func (cmds *mockCommands) EnsureAuth() {
