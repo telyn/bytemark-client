@@ -29,7 +29,7 @@ func TestCommandConfig(t *testing.T) {
 
 	config.When("GetV", "user").Return(ConfigVar{"user", "old-test-user", "config"})
 	config.When("Get", "user").Return("old-test-user")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 
 	config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
 
@@ -47,8 +47,8 @@ func TestCreateVMCommand(t *testing.T) {
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "force").Return(true)
-	config.When("GetBool", "silent").Return(true)
+	config.When("Force").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm"})
 
 	c.When("ParseVirtualMachineName", "test-vm").Return(bigv.VirtualMachineName{VirtualMachine: "test-vm"})
@@ -109,7 +109,7 @@ func TestShowGroupCommand(t *testing.T) {
 	config := &mockConfig{}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-group.test-account"})
 
 	c.When("ParseGroupName", "test-group.test-account").Return(bigv.GroupName{Group: "test-group", Account: "test-account"})
@@ -132,7 +132,7 @@ func TestResetCommand(t *testing.T) {
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -151,7 +151,7 @@ func TestRestartCommand(t *testing.T) {
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -170,7 +170,7 @@ func TestShutdownCommand(t *testing.T) {
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -188,7 +188,7 @@ func TestStartCommand(t *testing.T) {
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -208,7 +208,7 @@ func TestStopCommand(t *testing.T) {
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -228,7 +228,7 @@ func TestShowVMCommand(t *testing.T) {
 	config := &mockConfig{}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("GetBool", "silent").Return(true)
+	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"})
