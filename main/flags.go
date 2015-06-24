@@ -4,7 +4,7 @@ import "flag"
 
 // MakeCommonFlagSet creates a FlagSet which provides the flags shared between the main command and the sub-commands.
 func MakeCommonFlagSet() *flag.FlagSet {
-	flags := flag.NewFlagSet("go-bigv", flag.ExitOnError)
+	flags := flag.NewFlagSet("go-bigv", flag.ContinueOnError)
 
 	// because I'm creating my own help functions I'm not going to supply usage info. Neener neener.
 	flags.Bool("help", false, "")
