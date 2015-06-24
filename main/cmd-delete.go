@@ -25,14 +25,12 @@ func (cmds *CommandSet) HelpForDelete() {
 
 // DeleteVM implements the delete-vm command, which is used to delete and purge BigV VMs. See HelpForDelete for usage information.
 func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
+	flags := MakeCommonFlagSet()
 
-	// TODO(telyn): rewrite flag code here.
-	flags := flag.NewFlagSet("DeleteVM", flag.ExitOnError)
-
-	var purge = *flags.Bool("purge", false, "Whether or not to purge the VM. If yes, will delete all your data.")
-	var force = *flags.Bool("force", false, "Don't confirm deletion. Be careful when using with --purge!")
+	purge := *flags.Bool("purge", false, "Whether or not to purge the VM. If yes, will delete all your data.")
 
 	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
 
 	name := cmds.bigv.ParseVirtualMachineName(flags.Args()[0])
 	cmds.EnsureAuth()
@@ -46,21 +44,13 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 		return E_SUCCESS
 	}
 
-	if !force {
-		// TODO(telyn): use PromptYN
-		buf := bufio.NewReader(os.Stdin)
-		fstr := "Are you certain you wish to delete %s? (y/n) "
+	if !cmds.config.Force() {
+		fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
 		if purge {
-			fstr = "Are you certain you wish to PERMANENTLY delete %s? (y/n) "
+			fstr = fmt.Sprintf("Are you certain you wish to PERMANENTLY delete %s?", vm.Hostname)
 
 		}
-		fmt.Fprintf(os.Stderr, fstr, vm.Hostname)
-		chr, err := buf.ReadByte()
-		fmt.Println()
-		if err != nil {
-			return processError(err)
-		} else if chr != 'y' {
-
+		if !PromptYesNo(fstr) {
 			return processError(&UserRequestedExit{})
 
 		}
