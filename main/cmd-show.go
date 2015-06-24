@@ -85,7 +85,7 @@ func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
 			}
 		}
 	}
-	return 0
+	return E_SUCCESS
 
 }
 
@@ -140,6 +140,6 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 		}
 
 	}
-	return 0
+	return E_SUCCESS
 
 }

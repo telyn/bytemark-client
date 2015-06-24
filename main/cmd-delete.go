@@ -79,7 +79,7 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 	} else {
 		fmt.Printf("Virtual machine %s deleted successfully.\r\n", name)
 	}
-	return 0
+	return E_SUCCESS
 }
 
 // UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.
@@ -105,5 +105,5 @@ func (cmds *CommandSet) UndeleteVM(args []string) ExitCode {
 	}
 	fmt.Printf("Successfully restored virtual machine %s\r\n", vm.Hostname)
 
-	return 0
+	return E_SUCCESS
 }

@@ -56,7 +56,7 @@ func (cmds *CommandSet) Start(args []string) ExitCode {
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " started successfully.")
 	}
-	return 0
+	return E_SUCCESS
 }
 
 func (cmds *CommandSet) Shutdown(args []string) ExitCode {
@@ -81,7 +81,7 @@ func (cmds *CommandSet) Shutdown(args []string) ExitCode {
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " was shutdown successfully.")
 	}
-	return 0
+	return E_SUCCESS
 }
 func (cmds *CommandSet) Stop(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
@@ -103,7 +103,7 @@ func (cmds *CommandSet) Stop(args []string) ExitCode {
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " stopped successfully.")
 	}
-	return 0
+	return E_SUCCESS
 }
 
 func (cmds *CommandSet) Restart(args []string) ExitCode {
@@ -126,7 +126,7 @@ func (cmds *CommandSet) Restart(args []string) ExitCode {
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " restart successfully.")
 	}
-	return 0
+	return E_SUCCESS
 }
 
 func (cmds *CommandSet) ResetVM(args []string) ExitCode {
@@ -149,6 +149,6 @@ func (cmds *CommandSet) ResetVM(args []string) ExitCode {
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " reset successfully.")
 	}
-	return 0
+	return E_SUCCESS
 
 }
