@@ -64,7 +64,6 @@ func (cmds *CommandSet) Config(args []string) ExitCode {
 		}
 
 		// TODO(telyn): consider validating input for the set command
-		// TODO(telyn): This should possibly return errors.
 		err = cmds.config.SetPersistent(variable, args[2], "CMD set")
 		if err != nil {
 			if e, ok := err.(*ConfigReadError); ok {
