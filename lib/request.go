@@ -35,15 +35,7 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 	}
 
 	err = json.Unmarshal(data, output)
-	if err != nil {
-		// BUG(telyn): this is a bad error message and you should feel bad
-		fmt.Printf("Data returned was not the right type.\r\n")
-		fmt.Printf("%+v\r\n", output)
-
-		return err
-	}
-
-	return nil
+	return err
 
 }
 
