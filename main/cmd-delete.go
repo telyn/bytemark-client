@@ -1,25 +1,23 @@
 package main
 
 import (
-	"bufio"
-	"flag"
 	"fmt"
-	"os"
 )
 
 // HelpForDelete outputs usage information for the delete command
 func (cmds *CommandSet) HelpForDelete() {
 	fmt.Println("go-bigv delete")
 	fmt.Println()
-	fmt.Println("usage: bigv delete [-p | --purge] <name>")
-	fmt.Println("       bigv delete vm [-p | ---purge] <virtual machine>")
+	fmt.Println("usage: bigv delete [--force] [--purge] <name>")
+	fmt.Println("       bigv delete vm [--force] [---purge] <virtual machine>")
 	fmt.Println("       bigv delete group <group>")
 	fmt.Println("       bigv delete account <account>")
 	fmt.Println("       bigv delete user <auser>")
 	fmt.Println("       bigv undelete vm <virtual machine>")
 	fmt.Println()
-	fmt.Println("Deletes the given virtual machine, group, account or user.")
+	fmt.Println("Deletes the given virtual machine, group, account or user. Only empty groups and accounts can be deleted.")
 	fmt.Println("If the --purge flag is given and the target is a virtual machine, will permanently delete the VM. Billing will cease and you will be unable to recover the VM.")
+	fmt.Println("If the --force flag is given, you will not be prompted to confirm deletion.")
 	fmt.Println()
 	fmt.Println("The undelete vm command may be used to restore a deleted (but not purged) vm to its state prior to deletion.")
 	fmt.Println()
