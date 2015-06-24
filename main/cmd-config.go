@@ -82,7 +82,9 @@ func (cmds *CommandSet) Config(args []string) ExitCode {
 		}
 
 	case "unset":
-		// TODO(telyn): write this...
+		variable := strings.ToLower(args[0])
+		err := cmds.config.Unset(variable)
+		return processError(err)
 	default:
 		fmt.Printf("Unrecognised command %s\r\n", args[0])
 		cmds.HelpForConfig()
