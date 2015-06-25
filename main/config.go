@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -180,15 +181,22 @@ func (config *Config) GetPath(name string) string {
 // LoadDefinitions reads the local copy of the definitions json file, or downloads it from the endpoint if it's too old or nonexistant.
 // Eventually this will be used to provide information on various things throughout the application
 func (config *Config) LoadDefinitions() error {
-	stat, err := os.Stat(config.GetPath("definitions"))
+	endpoint, err := config.Get("endpoint")
+	if err != nil {
+		return err
+	}
+	defPath := config.GetPath("definitions-" + endpoint + ".json")
+	stat, err := os.Stat(defPath)
 
 	if err != nil || time.Since(stat.ModTime()) > 24*time.Hour {
-		// TODO(telyn): grab it off the internet
-		c := &http.Client{}
 		endpoint, err := config.Get("endpoint")
 		if err != nil {
 			return err
 		}
+		if !config.Silent() {
+			fmt.Fprintf(os.Stderr, "Downloading definitions for %s...\r\n", endpoint)
+		}
+		c := &http.Client{}
 		req, err := http.NewRequest("GET", endpoint+"/definitions.json", nil)
 		if err != nil {
 			return &CannotLoadDefinitionsError{err}
@@ -204,13 +212,21 @@ func (config *Config) LoadDefinitions() error {
 			if err != nil {
 				return &CannotLoadDefinitionsError{err}
 			}
-			ioutil.WriteFile(config.GetPath("definitions"), responseBody, 0660)
+			ioutil.WriteFile(defPath, responseBody, 0660)
+
+			err = json.Unmarshal(responseBody, config.Definitions)
+			fmt.Fprintln(os.Stderr)
+			return err
+		} else {
+			// TODO(telyn): Unexpected status code
 		}
 	} else {
-		_, err := ioutil.ReadFile(config.GetPath("definitions"))
+		defs, err := ioutil.ReadFile(defPath)
 		if err != nil {
 			return &CannotLoadDefinitionsError{err}
 		}
+		err = json.Unmarshal(defs, config.Definitions)
+		return err
 	}
 	return nil
 
