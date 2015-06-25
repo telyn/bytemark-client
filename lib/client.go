@@ -60,8 +60,10 @@ func (bigv *bigvClient) SetDebugLevel(debugLevel int) {
 	bigv.debugLevel = debugLevel
 }
 
-// GetSessionToken returns the token for the current auth session - note that this may cause panics at this time.
+// GetSessionToken returns the token for the current auth session
 func (bigv *bigvClient) GetSessionToken() string {
-	// BUG(telyn): Does it cause panics
+	if bigv.authSession == nil {
+		return ""
+	}
 	return bigv.authSession.Token
 }
