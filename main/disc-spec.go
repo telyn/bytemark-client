@@ -64,7 +64,8 @@ func ParseDiscSpec(spec string, trace bool) ([]*bigv.Disc, error) {
 			} else if c == ',' {
 				size, err := strconv.ParseInt(curSize, 10, 32)
 				if err != nil {
-					panic(err)
+					// this should logically be impossible - curSize should be a string solely containing characters from 0-9
+					return nil, &DiscSpecError{Position: pos - len(curSize)}
 				}
 				discs = append(discs, &bigv.Disc{
 					StorageGrade: curGrade,
@@ -91,7 +92,8 @@ func ParseDiscSpec(spec string, trace bool) ([]*bigv.Disc, error) {
 	}
 	size, err := strconv.ParseInt(curSize, 10, 32)
 	if err != nil {
-		panic(err)
+		// this should logically be impossible - curSize should be a string solely containing characters from 0-9
+		return nil, &DiscSpecError{Position: pos - len(curSize)}
 	}
 	discs = append(discs, &bigv.Disc{
 		StorageGrade: curGrade,
