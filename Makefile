@@ -72,7 +72,7 @@ find-uk0:
 	$(RGREP) --exclude=go-bigv "uk0" .
 
 find-bugs-todos:
-	$(RGREP) -P "// BUG(.*):" .
+	$(RGREP) -P "// BUG(.*):" . || echo ""
 	$(RGREP) -P "// TODO(.*):" .
 
 find-exits:
