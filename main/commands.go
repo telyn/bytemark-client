@@ -18,6 +18,7 @@ type Commands interface {
 	Config([]string) ExitCode
 	CreateGroup([]string) ExitCode
 	CreateVM([]string) ExitCode
+	DeleteGroup([]string) ExitCode
 	DeleteVM([]string) ExitCode
 	Debug([]string) ExitCode
 	Help([]string)

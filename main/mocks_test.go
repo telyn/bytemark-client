@@ -91,6 +91,10 @@ func (cmds *mockCommands) DeleteVM(args []string) ExitCode {
 	r := cmds.Called(args)
 	return ExitCode(r.Int(0))
 }
+func (cmds *mockCommands) DeleteGroup(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
 
 func (cmds *mockCommands) Help(args []string) {
 	cmds.Called(args)
@@ -242,6 +246,10 @@ func (c *mockBigVClient) GetGroup(name bigv.GroupName) (*bigv.Group, error) {
 	r := c.Called(name)
 	group, _ := r.Get(0).(*bigv.Group)
 	return group, r.Error(1)
+}
+func (c *mockBigVClient) DeleteGroup(name bigv.GroupName) error {
+	r := c.Called(name)
+	return r.Error(0)
 }
 func (c *mockBigVClient) DeleteVirtualMachine(name bigv.VirtualMachineName, purge bool) error {
 	r := c.Called(name, purge)

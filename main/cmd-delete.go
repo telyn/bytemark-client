@@ -1,7 +1,9 @@
 package main
 
 import (
+	bigv "bigv.io/client/lib"
 	"fmt"
+	"os"
 )
 
 // HelpForDelete outputs usage information for the delete command
@@ -47,7 +49,7 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 	if !cmds.config.Force() {
 		fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
 		if purge {
-			fstr = fmt.Sprintf("Are you certain you wish to PERMANENTLY delete %s?", vm.Hostname)
+			fstr = fmt.Sprintf("Are you certain you wish to permanently delete %s? You will not be able to un-delete it.", vm.Hostname)
 
 		}
 		if !PromptYesNo(fstr) {
@@ -68,6 +70,56 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 		fmt.Printf("Virtual machine %s deleted successfully.\r\n", name)
 	}
 	return E_SUCCESS
+}
+
+func (cmds *CommandSet) DeleteGroup(args []string) ExitCode {
+	flags := MakeCommonFlagSet()
+
+	recursive := flags.Bool("recursive", false, "")
+
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	name := cmds.bigv.ParseGroupName(flags.Args()[0])
+
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
+
+	group, err := cmds.bigv.GetGroup(name)
+	if err != nil {
+		return processError(err)
+	}
+
+	if len(group.VirtualMachines) > 0 {
+		if *recursive {
+
+			fmt.Fprintln(os.Stderr, "WARNING: The following VMs will be permanently deleted, without any way to recover or un-delete them:")
+			for _, vm := range group.VirtualMachines {
+				fmt.Fprintf(os.Stderr, "\t%s\r\n", vm.Name)
+			}
+			fmt.Fprint(os.Stderr, "\r\n\r\n")
+			if PromptYesNo("Are you sure you want to continue?") {
+				vmn := bigv.VirtualMachineName{Group: name.Group, Account: name.Account}
+				for _, vm := range group.VirtualMachines {
+					vmn.VirtualMachine = vm.Name
+					err := cmds.bigv.DeleteVirtualMachine(vmn, true)
+					if err != nil {
+						return processError(err)
+					} else {
+						fmt.Fprintf(os.Stderr, "Virtual machine %s purged successfully.\r\n", name)
+					}
+
+				}
+			}
+		} else {
+			fmt.Fprintf(os.Stderr, "Group %s contains virtual machines, will not be deleted without --recursive\r\n", name.Group)
+			return E_WONT_DELETE_NONEMPTY
+		}
+	}
+	return processError(cmds.bigv.DeleteGroup(name))
+
 }
 
 // UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.

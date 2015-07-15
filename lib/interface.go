@@ -68,6 +68,7 @@ type Client interface {
 
 	// CreateGroup sends a request to the BigV server to create a group with the given name.
 	CreateGroup(name GroupName) error
+	DeleteGroup(name GroupName) error
 	GetGroup(name GroupName) (*Group, error)
 
 	//

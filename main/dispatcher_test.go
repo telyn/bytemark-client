@@ -62,6 +62,10 @@ func TestDispatchDoDelete(t *testing.T) {
 	commands.When("DeleteVM", []string{"test.virtual.machine"}).Times(1)
 	doDispatchTest(t, config, commands, "delete-vm", "test.virtual.machine")
 	commands.Reset()
+
+	commands.When("DeleteGroup", []string{"test-group.account"}).Times(1)
+	doDispatchTest(t, config, commands, "delete-group", "test-group.account")
+	commands.Reset()
 }
 
 func TestDispatchDoUndelete(t *testing.T) {

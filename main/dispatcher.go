@@ -81,6 +81,8 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 	switch strings.ToLower(args[0]) {
 	case "debug":
 		return d.cmds.Debug(args[1:])
+	case "delete-group":
+		return d.cmds.DeleteGroup(args[1:])
 	case "delete-vm":
 		return d.cmds.DeleteVM(args[1:])
 	case "restart":

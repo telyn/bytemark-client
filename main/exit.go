@@ -31,6 +31,8 @@ const (
 	E_CANT_WRITE_CONFIG = 4
 	// E_USER_EXIT is the exit code returned when the user's action caused the program to terminate (usually by saying no to a prompt)
 	E_USER_EXIT = 5
+	// E_WONT_DELETE_NONEMPTY is the exit code returned when the user's requested that a group be deleted when it still had virtual machines in
+	E_WONT_DELETE_NONEMPTY = 6
 
 	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
 	E_UNKNOWN_ERROR = 49
