@@ -101,6 +101,8 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 
 	name := cmds.bigv.ParseAccountName(args[0])
 
+	cmds.EnsureAuth()
+
 	acc, err := cmds.bigv.GetAccount(name)
 
 	if err != nil {
