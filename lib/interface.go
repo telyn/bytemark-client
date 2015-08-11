@@ -13,8 +13,11 @@ type Client interface {
 	// GetEndpoint returns the BigV endpoint currently in use.
 	GetEndpoint() string
 
-	// GetSessionToken returns the token for the current auth session - note that this may cause panics at this time.
+	// GetSessionToken returns the token for the current auth session
 	GetSessionToken() string
+
+	// GetSessionUser returns the user's name for the current auth session.
+	GetSessionUser() string
 
 	//
 	// Setters

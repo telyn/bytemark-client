@@ -199,6 +199,10 @@ func (c *mockBigVClient) GetSessionToken() string {
 	r := c.Called()
 	return r.String(0)
 }
+func (c *mockBigVClient) GetSessionUser() string {
+	r := c.Called()
+	return r.String(0)
+}
 func (c *mockBigVClient) SetDebugLevel(level int) {
 	c.Called(level)
 }
