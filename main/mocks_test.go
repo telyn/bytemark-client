@@ -15,6 +15,10 @@ type mockConfig struct {
 	mock.Mock
 }
 
+func (c *mockConfig) EndpointName() string {
+	ret := c.Called()
+	return ret.String(0)
+}
 func (c *mockConfig) Force() bool {
 	ret := c.Called()
 	return ret.Bool(0)
@@ -80,6 +84,11 @@ func (c *mockConfig) ImportFlags(*flag.FlagSet) []string {
 
 type mockCommands struct {
 	mock.Mock
+}
+
+func (cmds *mockCommands) Console(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
 func (cmds *mockCommands) Debug(args []string) ExitCode {

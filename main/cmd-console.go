@@ -1,0 +1,148 @@
+package main
+
+import (
+	"bigv.io/client/lib"
+	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
+	"strings"
+	"syscall"
+)
+
+func (cmds *CommandSet) HelpForConsole() {
+	fmt.Println("go-bigv console commands")
+	fmt.Println()
+	fmt.Println("usage: go-bigv console [--serial | --vnc] [--connect | --panel] <vm name>")
+	fmt.Println("       go-bigv serial [--connect] <vm name>")
+	fmt.Println("       go-bigv vnc [--connect | --panel] <vm name>")
+	fmt.Println()
+	fmt.Println("Out-of-band access to a machine's serial or graphical (VNC) console.")
+	fmt.Println()
+	fmt.Println("serial: outputs connection information for the out-of-band")
+	fmt.Println("        serial console specified. If the --connect flag is")
+	fmt.Println("        given, will attempt to open a connection as well.")
+	fmt.Println()
+	fmt.Println("vnc: Outputs instructions for connecting to the VNC console.")
+	fmt.Println("     If --connect is given, will also attempt to connect to")
+	fmt.Println("     the VNC console, falling back to the BigV panel if no ssh")
+	fmt.Println("     or vnc clients can be found, or if --panel is specified.")
+	fmt.Println()
+	fmt.Println()
+	//TODO: stop kidding around
+	fmt.Println("haha just kidding, at the moment vnc always uses panel and")
+	fmt.Println("--connect does nothing for ssh")
+}
+
+func openCommand() string {
+	switch runtime.GOOS {
+	case "windows":
+		return "start"
+	case "darwin":
+		return "open"
+	default:
+		return "xdg-open"
+	}
+}
+
+func (cmds *CommandSet) panelURL(endpoint string) string {
+	if strings.EqualFold(endpoint, "uk0.bigv.io") {
+		return "panel-beta.bytemark.co.uk"
+	}
+	if strings.EqualFold(endpoint, "int.bigv.io") {
+		return "panel-int.vlan863.bytemark.uk0.bigv.io"
+	}
+	panel := cmds.config.GetIgnoreErr("panel-address")
+	if panel == "" {
+		panel = "your.panel.address"
+	}
+	return panel
+
+}
+
+func shortEndpoint(endpoint string) string {
+	return strings.Split(endpoint, ".")[0]
+}
+
+func getExitCode(cmd *exec.Cmd) (exitCode int, err error) {
+	err = cmd.Wait()
+	if exitErr, ok := err.(*exec.ExitError); ok {
+		if waitStatus, ok := exitErr.Sys().(*syscall.WaitStatus); ok {
+			return waitStatus.ExitStatus(), err
+
+		}
+	}
+	return 0, err
+}
+
+func showVNCHowTo(vm *lib.VirtualMachine) {
+	//TODO: writeme
+}
+
+func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
+	fmt.Println("Serial console connection information for ", vm.Hostname)
+	fmt.Println()
+	fmt.Printf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your bigv user's keys (see `bigv show keys`, `bigv add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
+	fmt.Println()
+	fmt.Println()
+	fmt.Printf("Then connect to %s@%s\r\n", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
+
+}
+
+func (cmds *CommandSet) Console(args []string) ExitCode {
+	flags := MakeCommonFlagSet()
+	connect := flags.Bool("connect", false, "")
+	//panel := flags.Bool("panel", false, "")
+	flags.Bool("serial", false, "") // because we default to serial, we don't care if it's set
+	vnc := flags.Bool("vnc", false, "")
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	cmds.EnsureAuth()
+
+	vm, err := cmds.bigv.GetVirtualMachine(name)
+	if err != nil {
+		return processError(err)
+	}
+	if *vnc {
+
+		if !*connect {
+			showVNCHowTo(vm)
+			return E_SUCCESS
+		}
+		ep := cmds.config.GetIgnoreErr("endpoint")
+		token := cmds.config.GetIgnoreErr("token")
+		url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", cmds.panelURL(ep), token, shortEndpoint(ep), vm.ManagementAddress)
+		command := openCommand()
+		_, err := exec.LookPath(command)
+		if err != nil {
+			command = "/usr/bin/x-www-browser"
+			_, err := exec.LookPath(command)
+			if err != nil {
+				return processError(err, "Couldn't find a browser on your system - please install xdg-open or symlink your preferred browser to /usr/bin/x-www-browser")
+			}
+		}
+		cmd := exec.Command(command, url)
+		err = cmd.Start()
+		if err != nil {
+			return processError(err, "Couldn't start a browser.")
+		}
+		_, err = getExitCode(cmd)
+		return processError(err)
+
+	} else { // default to serial
+		if !*connect {
+			cmds.showSSHHowTo(vm)
+			return E_SUCCESS
+		}
+		host := fmt.Sprintf("%s@%s", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
+		fmt.Fprintf(os.Stderr, "ssh %s\r\n", host)
+		err := syscall.Exec("ssh", []string{host}, os.Environ())
+		if err != nil {
+			return processError(err, "Couldn't connect to the management address. Please ensure you have an SSH client in your $PATH.")
+		}
+	}
+	return E_SUCCESS
+
+}

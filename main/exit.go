@@ -20,11 +20,11 @@ type ExitCode int
 
 const (
 	// E_USAGE_DISPLAYED is returned when some usage info / help page was displayed. Unsure whether it should == E_SUCCESS or not
-	E_USAGE_DISPLAYED = 0
+	E_USAGE_DISPLAYED ExitCode = 0
 	// E_SUCCESS is used to say everything went well
 	E_SUCCESS = 0
 	// E_TRAPPED_INTERRUPT is the exit code returned when an unexpected interrupt like SIGUSR1 was trapped
-	E_TRAPPED_INTERRUPT ExitCode = -1
+	E_TRAPPED_INTERRUPT = -1
 	// E_CANT_READ_CONFIG is the exit code returned when we couldn't read a config variable from the disk for some reason
 	E_CANT_READ_CONFIG = 3
 	// E_CANT_WRITE_CONFIG is the exit code returned when we couldn't write a config variable to the disk for some reason
@@ -33,6 +33,8 @@ const (
 	E_USER_EXIT = 5
 	// E_WONT_DELETE_NONEMPTY is the exit code returned when the user's requested that a group be deleted when it still had virtual machines in
 	E_WONT_DELETE_NONEMPTY = 6
+	// E_PEBKAC is the exit code returned when the user entered a malformed command, name, or flag.
+	E_PEBKAC = 7
 
 	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
 	E_UNKNOWN_ERROR = 49

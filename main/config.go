@@ -44,6 +44,7 @@ type ConfigManager interface {
 	GetDebugLevel() int
 	Force() bool
 	Silent() bool
+	EndpointName() string
 
 	ImportFlags(*flag.FlagSet) []string
 }
@@ -368,4 +369,18 @@ func (config *Config) Force() bool {
 func (config *Config) Silent() bool {
 	silent, _ := config.GetBool("silent")
 	return silent
+}
+
+func (config *Config) PanelURL() string {
+	ep := config.GetIgnoreErr("endpoint")
+	dotPos := strings.Index(ep, ".")
+	return ep[0:dotPos]
+
+}
+
+func (config *Config) EndpointName() string {
+	endpoint := config.GetIgnoreErr("endpoint")
+	endpoint = strings.TrimPrefix(endpoint, "https://")
+	endpoint = strings.TrimPrefix(endpoint, "http://") // it never hurts to be prepared
+	return endpoint
 }
