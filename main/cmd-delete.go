@@ -34,7 +34,7 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name := cmds.bigv.ParseVirtualMachineName(flags.Args()[0])
+	name := cmds.bigv.ParseVirtualMachineName(args[0])
 	cmds.EnsureAuth()
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
