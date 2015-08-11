@@ -20,6 +20,44 @@ func (cmds *CommandSet) HelpForShow() {
 	fmt.Println()
 }
 
+// Show implements the show command which is a stupendous badass of a command
+func (cmds *CommandSet) Show(args []string) ExitCode {
+	if len(args) == 0 {
+		cmds.HelpForShow()
+		return E_USAGE_DISPLAYED
+	}
+
+	switch strings.ToLower(args[0]) {
+	case "vm":
+		return cmds.ShowVM(args[1:])
+	case "account":
+		return cmds.ShowAccount(args[1:])
+	case "user":
+		fmt.Printf("Leave me alone! I'm grumpy.")
+		return 666
+		//return ShowUser(args[1:])
+	case "group":
+		return cmds.ShowGroup(args[1:])
+	case "key", "keys":
+		fmt.Printf("Leave me alone, I'm grumpy!")
+		return 666
+		//return cmds.ShowKeys(args[1:])
+	}
+
+	name := strings.TrimSuffix(args[0], cmds.config.EndpointName())
+	dots := strings.Count(name, ".")
+	switch dots {
+	case 2:
+		return cmds.ShowVM(args)
+	case 1:
+		return cmds.ShowGroup(args)
+	case 0:
+		return cmds.ShowAccount(args)
+		// TODO: should also try show-vm sprintf("%s.%s.%s", args[0], "default", config.get("user"))
+	}
+	return E_SUCCESS
+}
+
 // ShowVM implements the show-vm command, which is used to display information about BigV VMs. See HelpForShow for the usage information.
 func (cmds *CommandSet) ShowVM(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
