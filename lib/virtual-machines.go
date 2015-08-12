@@ -1,6 +1,9 @@
 package lib
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 var i2b = [...]string{
 	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
@@ -153,4 +156,34 @@ func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err err
 
 	_, _, err = bigv.Request(true, "PUT", path, `{"deleted":false}`)
 	return err
+}
+
+// SetVirtualMachineHardwareProfile specifies the hardware profile on a VM. Optionally locks or unlocks h. profile
+// Return nil on success, an error otherwise.
+func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachine, profile string, locked ...bool) (err error) {
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	hwprofile_lock := ""
+	if len(locked) > 0 {
+		hwprofile_lock = `, "hardware_profile_locked": false`
+		if locked[0] {
+			hwprofile_lock = `, "hardware_profile_locked": true`
+		}
+	}
+	what := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofile_lock)
+
+	_, _, err = bigv.Request(true, "PUT", path, what)
+	return err
+}
+
+// SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
+// Return nil on success, an error otherwise.
+func (bigv *bigvClient) SetVirtualMachineHardwareProfileLock(name VirtualMachine, locked bool) (err error) {
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	what := `{"hardware_profile_locked": false}`
+	if locked[0] {
+		what = `{"hardware_profile_locked": true}`
+	}
+
+	_, _, err = bigv.Request(true, "PUT", path, what)
 }

@@ -110,4 +110,12 @@ type Client interface {
 	// UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 	// Return nil on success, an error otherwise.
 	UndeleteVirtualMachine(name VirtualMachineName) error
+
+	// SetVirtualMachineHardwareProfile specifies the hardware profile on a VM. Optionally locks or unlocks h. profile
+	// Return nil on success, an error otherwise.
+	SetVirtualMachineHardwareProfile(name VirtualMachine, profile string, locked ...bool) (err error)
+
+	// SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
+	// Return nil on success, an error otherwise.
+	SetVirtualMachineHardwareProfileLock(name VirtualMachine, locked bool) (err error)
 }
