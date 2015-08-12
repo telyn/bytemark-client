@@ -160,7 +160,7 @@ func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err err
 
 // SetVirtualMachineHardwareProfile specifies the hardware profile on a VM. Optionally locks or unlocks h. profile
 // Return nil on success, an error otherwise.
-func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachine, profile string, locked ...bool) (err error) {
+func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachineName, profile string, locked ...bool) (err error) {
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	hwprofile_lock := ""
 	if len(locked) > 0 {
@@ -177,13 +177,14 @@ func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachine, pr
 
 // SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
 // Return nil on success, an error otherwise.
-func (bigv *bigvClient) SetVirtualMachineHardwareProfileLock(name VirtualMachine, locked bool) (err error) {
+func (bigv *bigvClient) SetVirtualMachineHardwareProfileLock(name VirtualMachineName, locked bool) (err error) {
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
 	what := `{"hardware_profile_locked": false}`
-	if locked[0] {
+	if locked {
 		what = `{"hardware_profile_locked": true}`
 	}
 
 	_, _, err = bigv.Request(true, "PUT", path, what)
+	return err
 }
