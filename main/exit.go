@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/url"
 	"strings"
+	"syscall"
 )
 
 type UserRequestedExit struct{}
@@ -174,7 +175,10 @@ func processError(err error, message ...string) ExitCode {
 		case *UserRequestedExit:
 			errorMessage = ""
 			exitCode = E_USER_EXIT
-
+		case syscall.Errno:
+			errno, _ := err.(*syscall.Errno)
+			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", errno)
+			exitCode = E_UNKNOWN_ERROR
 		default:
 			e := err.Error()
 			if strings.Contains(e, "Badly-formed parameters") {

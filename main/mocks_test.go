@@ -48,6 +48,11 @@ func (c *mockConfig) GetAll() ([]ConfigVar, error) {
 	return ret.Get(0).([]ConfigVar), ret.Error(1)
 }
 
+func (c *mockConfig) PanelURL() string {
+	ret := c.Called()
+	return ret.String(0)
+}
+
 func (c *mockConfig) Set(name, value, source string) {
 	c.Called(name, value, source)
 	return

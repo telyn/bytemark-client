@@ -45,6 +45,7 @@ type ConfigManager interface {
 	Force() bool
 	Silent() bool
 	EndpointName() string
+	PanelURL() string
 
 	ImportFlags(*flag.FlagSet) []string
 }
@@ -372,10 +373,19 @@ func (config *Config) Silent() bool {
 }
 
 func (config *Config) PanelURL() string {
-	ep := config.GetIgnoreErr("endpoint")
-	dotPos := strings.Index(ep, ".")
-	return ep[0:dotPos]
-
+	endpoint := config.EndpointName()
+	if strings.EqualFold(endpoint, "uk0.bigv.io") {
+		return "https://panel-beta.bytemark.co.uk"
+	}
+	if strings.EqualFold(endpoint, "int.bigv.io") {
+		// worrying leaky code?
+		return "https://panel-int.vlan863.bytemark.uk0.bigv.io"
+	}
+	panel := config.GetIgnoreErr("panel-address")
+	if panel == "" {
+		panel = "https://your.panel.address"
+	}
+	return panel
 }
 
 func (config *Config) EndpointName() string {

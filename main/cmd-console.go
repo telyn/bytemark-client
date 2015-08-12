@@ -45,21 +45,6 @@ func openCommand() string {
 	}
 }
 
-func (cmds *CommandSet) panelURL(endpoint string) string {
-	if strings.EqualFold(endpoint, "uk0.bigv.io") {
-		return "panel-beta.bytemark.co.uk"
-	}
-	if strings.EqualFold(endpoint, "int.bigv.io") {
-		return "panel-int.vlan863.bytemark.uk0.bigv.io"
-	}
-	panel := cmds.config.GetIgnoreErr("panel-address")
-	if panel == "" {
-		panel = "your.panel.address"
-	}
-	return panel
-
-}
-
 func shortEndpoint(endpoint string) string {
 	return strings.Split(endpoint, ".")[0]
 }
@@ -76,19 +61,25 @@ func getExitCode(cmd *exec.Cmd) (exitCode int, err error) {
 }
 
 func showVNCHowTo(vm *lib.VirtualMachine) {
-	//TODO: writeme
-}
-
-func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
-	fmt.Println("Serial console connection information for ", vm.Hostname)
+	fmt.Println("VNC connection information for", vm.Hostname)
 	fmt.Println()
 	fmt.Printf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your bigv user's keys (see `bigv show keys`, `bigv add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	fmt.Println()
+	fmt.Println("Then set up a tunnel using SSH: ssh -L <some number>:%s:5900 %s@%s\r\n")
+	fmt.Println()
+	fmt.Println("You can now connect to VNC on localhost, port <some number>")
+}
+
+func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
+	fmt.Println("Serial console connection information for", vm.Hostname)
+	fmt.Println()
+	fmt.Printf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your bigv user's keys (see `bigv show keys`, `bigv add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	fmt.Println()
 	fmt.Printf("Then connect to %s@%s\r\n", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
 
 }
 
+//TODO: this function is really horrible.
 func (cmds *CommandSet) Console(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	connect := flags.Bool("connect", false, "")
@@ -111,18 +102,20 @@ func (cmds *CommandSet) Console(args []string) ExitCode {
 			showVNCHowTo(vm)
 			return E_SUCCESS
 		}
-		ep := cmds.config.GetIgnoreErr("endpoint")
+		ep := cmds.config.EndpointName()
 		token := cmds.config.GetIgnoreErr("token")
-		url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", cmds.panelURL(ep), token, shortEndpoint(ep), vm.ManagementAddress)
+		url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", cmds.config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
+
 		command := openCommand()
-		_, err := exec.LookPath(command)
+		bin, err := exec.LookPath(command)
 		if err != nil {
 			command = "/usr/bin/x-www-browser"
-			_, err := exec.LookPath(command)
+			bin, err = exec.LookPath(command)
 			if err != nil {
 				return processError(err, "Couldn't find a browser on your system - please install xdg-open or symlink your preferred browser to /usr/bin/x-www-browser")
 			}
 		}
+		fmt.Fprintf(os.Stderr, "%s %s\r\n", bin, url)
 		cmd := exec.Command(command, url)
 		err = cmd.Start()
 		if err != nil {
@@ -138,9 +131,20 @@ func (cmds *CommandSet) Console(args []string) ExitCode {
 		}
 		host := fmt.Sprintf("%s@%s", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
 		fmt.Fprintf(os.Stderr, "ssh %s\r\n", host)
-		err := syscall.Exec("ssh", []string{host}, os.Environ())
+		bin, err := exec.LookPath("ssh")
 		if err != nil {
-			return processError(err, "Couldn't connect to the management address. Please ensure you have an SSH client in your $PATH.")
+			return processError(err, "Unable to find an ssh executable")
+		}
+		err = syscall.Exec(bin, []string{"ssh", host}, os.Environ())
+		if err != nil {
+			if errno, ok := err.(syscall.Errno); ok {
+				if errno != 0 {
+					return processError(err, "Attempting to exec ssh failed. Please file a bug report.")
+				}
+			} else {
+				return processError(err, "Couldn't connect to the management address. Please ensure you have an SSH client in your $PATH.")
+
+			}
 		}
 	}
 	return E_SUCCESS
