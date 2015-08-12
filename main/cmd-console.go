@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 	"syscall"
 )
@@ -30,19 +29,7 @@ func (cmds *CommandSet) HelpForConsole() {
 	fmt.Println()
 	fmt.Println()
 	//TODO: stop kidding around
-	fmt.Println("haha just kidding, at the moment vnc always uses panel and")
-	fmt.Println("--connect does nothing for ssh")
-}
-
-func openCommand() string {
-	switch runtime.GOOS {
-	case "windows":
-		return "start"
-	case "darwin":
-		return "open"
-	default:
-		return "xdg-open"
-	}
+	fmt.Println("haha just kidding, at the moment vnc always uses panel")
 }
 
 func shortEndpoint(endpoint string) string {
@@ -106,23 +93,7 @@ func (cmds *CommandSet) Console(args []string) ExitCode {
 		token := cmds.config.GetIgnoreErr("token")
 		url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", cmds.config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
 
-		command := openCommand()
-		bin, err := exec.LookPath(command)
-		if err != nil {
-			command = "/usr/bin/x-www-browser"
-			bin, err = exec.LookPath(command)
-			if err != nil {
-				return processError(err, "Couldn't find a browser on your system - please install xdg-open or symlink your preferred browser to /usr/bin/x-www-browser")
-			}
-		}
-		fmt.Fprintf(os.Stderr, "%s %s\r\n", bin, url)
-		cmd := exec.Command(command, url)
-		err = cmd.Start()
-		if err != nil {
-			return processError(err, "Couldn't start a browser.")
-		}
-		_, err = getExitCode(cmd)
-		return processError(err)
+		return processError(callBrowser(url))
 
 	} else { // default to serial
 		if !*connect {
