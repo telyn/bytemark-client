@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (cmds *CommandSet) HelpForPower() {
+func (cmds *CommandSet) HelpForPower() ExitCode {
 	fmt.Println("go-bigv power commands")
 	fmt.Println()
 	fmt.Println("usage: go-bigv start")
@@ -34,6 +34,7 @@ func (cmds *CommandSet) HelpForPower() {
 	fmt.Println("       pressed the reset button. Doesn't apply hardware")
 	fmt.Println("       changes.")
 	fmt.Println()
+	return E_USAGE_DISPLAYED
 }
 
 func (cmds *CommandSet) Start(args []string) ExitCode {

@@ -29,12 +29,12 @@ func TestDispatchDoCreate(t *testing.T) {
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("CreateGroup", []string{"test-group"}).Times(1)
-	doDispatchTest(t, config, commands, "create-group", "test-group")
+	doDispatchTest(t, config, commands, "create", "group", "test-group")
 
 	commands.Reset()
 
 	commands.When("CreateVM", []string{}).Times(1)
-	doDispatchTest(t, config, commands, "create-vm")
+	doDispatchTest(t, config, commands, "create", "vm")
 }
 
 func TestDispatchDoDebug(t *testing.T) {
@@ -55,16 +55,16 @@ func TestDispatchDoDelete(t *testing.T) {
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
-	commands.When("Help", []string{"delete-vm"}).Times(1)
-	doDispatchTest(t, config, commands, "delete-vm")
+	commands.When("DeleteVM", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "delete", "vm")
 	commands.Reset()
 
 	commands.When("DeleteVM", []string{"test.virtual.machine"}).Times(1)
-	doDispatchTest(t, config, commands, "delete-vm", "test.virtual.machine")
+	doDispatchTest(t, config, commands, "delete", "vm", "test.virtual.machine")
 	commands.Reset()
 
 	commands.When("DeleteGroup", []string{"test-group.account"}).Times(1)
-	doDispatchTest(t, config, commands, "delete-group", "test-group.account")
+	doDispatchTest(t, config, commands, "delete", "group", "test-group.account")
 	commands.Reset()
 }
 
@@ -74,12 +74,12 @@ func TestDispatchDoUndelete(t *testing.T) {
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
-	commands.When("Help", []string{"undelete-vm"}).Times(1)
-	doDispatchTest(t, config, commands, "undelete-vm")
+	commands.When("UndeleteVM", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "undelete", "vm")
 	commands.Reset()
 
 	commands.When("UndeleteVM", []string{"test.virtual.machine"}).Times(1)
-	doDispatchTest(t, config, commands, "undelete-vm", "test.virtual.machine")
+	doDispatchTest(t, config, commands, "undelete", "vm", "test.virtual.machine")
 	commands.Reset()
 }
 
@@ -131,23 +131,23 @@ func TestDispatchDoPower(t *testing.T) {
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
-	commands.When("Help", []string{"shutdown"}).Times(1)
+	commands.When("Shutdown", []string{}).Times(1)
 	doDispatchTest(t, config, commands, "shutdown")
 
 	commands.Reset()
-	commands.When("Help", []string{"start"}).Times(1)
+	commands.When("Start", []string{}).Times(1)
 	doDispatchTest(t, config, commands, "start")
 
 	commands.Reset()
-	commands.When("Help", []string{"stop"}).Times(1)
+	commands.When("Stop", []string{}).Times(1)
 	doDispatchTest(t, config, commands, "stop")
 
 	commands.Reset()
-	commands.When("Help", []string{"restart"}).Times(1)
+	commands.When("Restart", []string{}).Times(1)
 	doDispatchTest(t, config, commands, "restart")
 
 	commands.Reset()
-	commands.When("Help", []string{"reset"}).Times(1)
+	commands.When("ResetVM", []string{}).Times(1)
 	doDispatchTest(t, config, commands, "reset")
 
 	commands.Reset()
@@ -180,15 +180,15 @@ func TestDispatchDoShow(t *testing.T) {
 	config.When("Get", "silent").Return(true)
 
 	commands.When("ShowVM", []string{"some-vm"}).Times(1)
-	doDispatchTest(t, config, commands, "show-vm", "some-vm")
+	doDispatchTest(t, config, commands, "show", "vm", "some-vm")
 
 	commands.Reset()
 	commands.When("ShowGroup", []string{"some-group"}).Times(1)
-	doDispatchTest(t, config, commands, "show-group", "some-group")
+	doDispatchTest(t, config, commands, "show", "group", "some-group")
 
 	commands.Reset()
 	commands.When("ShowAccount", []string{"some-account"}).Times(1)
-	doDispatchTest(t, config, commands, "show-account", "some-account")
+	doDispatchTest(t, config, commands, "show", "account", "some-account")
 
 }
 

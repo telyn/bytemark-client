@@ -7,7 +7,7 @@ import (
 )
 
 // HelpForConfig outputs usage information for the bigv config command.
-func (cmds *CommandSet) HelpForConfig() {
+func (cmds *CommandSet) HelpForConfig() ExitCode {
 	fmt.Println("go-bigv config")
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -25,6 +25,7 @@ func (cmds *CommandSet) HelpForConfig() {
 	fmt.Println("    auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.")
 	fmt.Println("    debug-level - the default debug level. Set to 0 unless you like lots of output")
 	fmt.Println()
+	return E_USAGE_DISPLAYED
 }
 
 // Config provides the bigv config command, which sets variables in the user's config. See HelpForConfig for usage information.

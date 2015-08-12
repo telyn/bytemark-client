@@ -22,7 +22,7 @@ type Commands interface {
 	DeleteGroup([]string) ExitCode
 	DeleteVM([]string) ExitCode
 	Debug([]string) ExitCode
-	Help([]string)
+	Help([]string) ExitCode
 	ResetVM([]string) ExitCode
 	Restart([]string) ExitCode
 	Start([]string) ExitCode
@@ -33,13 +33,13 @@ type Commands interface {
 	ShowVM([]string) ExitCode
 	UndeleteVM([]string) ExitCode
 
-	HelpForConfig()
-	HelpForCreate()
-	HelpForDebug()
-	HelpForDelete()
-	HelpForHelp()
-	HelpForPower()
-	HelpForShow()
+	HelpForConfig() ExitCode
+	HelpForCreate() ExitCode
+	HelpForDebug() ExitCode
+	HelpForDelete() ExitCode
+	HelpForHelp() ExitCode
+	HelpForPower() ExitCode
+	HelpForShow() ExitCode
 }
 
 // CommandSet is the main implementation of the Commands interface

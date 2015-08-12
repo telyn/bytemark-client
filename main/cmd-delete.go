@@ -7,7 +7,7 @@ import (
 )
 
 // HelpForDelete outputs usage information for the delete command
-func (cmds *CommandSet) HelpForDelete() {
+func (cmds *CommandSet) HelpForDelete() ExitCode {
 	fmt.Println("go-bigv delete")
 	fmt.Println()
 	fmt.Println("usage: bigv delete [--force] [--purge] <name>")
@@ -23,6 +23,7 @@ func (cmds *CommandSet) HelpForDelete() {
 	fmt.Println()
 	fmt.Println("The undelete vm command may be used to restore a deleted (but not purged) vm to its state prior to deletion.")
 	fmt.Println()
+	return E_USAGE_DISPLAYED
 }
 
 // DeleteVM implements the delete-vm command, which is used to delete and purge BigV VMs. See HelpForDelete for usage information.

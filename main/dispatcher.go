@@ -12,12 +12,15 @@ import (
 type Dispatcher struct {
 	Flags      *flag.FlagSet
 	cmds       Commands
+	config     ConfigManager
 	debugLevel int
 }
 
 // NewDispatcher creates a new Dispatcher given a config.
 func NewDispatcher(config ConfigManager) (d *Dispatcher, err error) {
 	d = new(Dispatcher)
+
+	d.config = config
 	endpoint, err := config.Get("endpoint")
 	if err != nil {
 		return nil, err
@@ -44,10 +47,92 @@ func NewDispatcherWithCommands(config ConfigManager, commands Commands) (*Dispat
 	return d, nil
 }
 
-// EnsureAuth makes sure a valid token is stored in config.
-// This should be called by anything that needs auth.
+// CommandFunc is a type which takes an array of arguments and returns an ExitCode.
+type CommandFunc func([]string) ExitCode
 
-// Do takes the command line arguments and figures out what to do
+func (d *Dispatcher) DoCreate(args []string) ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForCreate()
+	}
+
+	switch strings.ToLower(args[0]) {
+	case "vm":
+		return d.cmds.CreateVM(args[1:])
+	case "group":
+		return d.cmds.CreateGroup(args[1:])
+		//    case "disc", "discs"
+		//    return d.cmds.CreateDiscs(args[1:]
+
+	}
+	fmt.Fprintf(os.Stderr, "Unrecognised command 'create %s'\r\n", args[0])
+	return E_PEBKAC
+}
+
+func (d *Dispatcher) DoDelete(args []string) ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForDelete()
+	}
+	switch strings.ToLower(args[0]) {
+	case "vm":
+		return d.cmds.DeleteVM(args[1:])
+	case "group":
+		return d.cmds.DeleteGroup(args[1:])
+	}
+	fmt.Fprintf(os.Stderr, "Unknown command 'delete %s'\r\n", args[0])
+	return d.cmds.HelpForDelete()
+
+}
+func (d *Dispatcher) DoShow(args []string) ExitCode {
+	// Show implements the show command which is a stupendous badass of a command
+	if len(args) == 0 {
+		d.cmds.HelpForShow()
+		return E_USAGE_DISPLAYED
+	}
+
+	switch strings.ToLower(args[0]) {
+	case "vm":
+		return d.cmds.ShowVM(args[1:])
+	case "account":
+		return d.cmds.ShowAccount(args[1:])
+	case "user":
+		fmt.Printf("Leave me alone! I'm grumpy.")
+		return 666
+		//return ShowUser(args[1:])
+	case "group":
+		return d.cmds.ShowGroup(args[1:])
+	case "key", "keys":
+		fmt.Printf("Leave me alone, I'm grumpy!")
+		return 666
+		//return d.cmds.ShowKeys(args[1:])
+	}
+
+	name := strings.TrimSuffix(args[0], d.config.EndpointName())
+	dots := strings.Count(name, ".")
+	switch dots {
+	case 2:
+		return d.cmds.ShowVM(args)
+	case 1:
+		return d.cmds.ShowGroup(args)
+	case 0:
+		return d.cmds.ShowAccount(args)
+		// TODO: should also try show-vm sprintf("%s.%s.%s", args[0], "default", config.get("user"))
+	}
+	return E_SUCCESS
+}
+
+func (d *Dispatcher) DoUndelete(args []string) ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForDelete()
+	}
+	switch strings.ToLower(args[0]) {
+	case "vm":
+		return d.cmds.UndeleteVM(args[1:])
+	}
+	fmt.Fprintf(os.Stderr, "Unrecognised command 'undelete %s'\r\n", args[0])
+	return d.cmds.HelpForDelete()
+}
+
+// Do takes the command line arguments and figures out what to do.
 func (d *Dispatcher) Do(args []string) ExitCode {
 	if d.debugLevel >= 1 {
 		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
@@ -59,58 +144,34 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 		return E_SUCCESS
 	}
 
-	// short-circuit commands that don't require arguments
-	switch strings.ToLower(args[0]) {
-	case "config":
-		return d.cmds.Config(args[1:])
-	case "create-group":
-		return d.cmds.CreateGroup(args[1:])
-	case "create-vm":
-		return d.cmds.CreateVM(args[1:])
-	case "help":
-		d.cmds.Help(args[1:])
-		return E_USAGE_DISPLAYED
+	commands := map[string]CommandFunc{
+		"create":   d.DoCreate,
+		"config":   d.cmds.Config,
+		"console":  d.cmds.Console,
+		"connect":  d.cmds.Console,
+		"debug":    d.cmds.Debug,
+		"delete":   d.DoDelete,
+		"help":     d.cmds.Help,
+		"restart":  d.cmds.Restart,
+		"reset":    d.cmds.ResetVM,
+		"serial":   d.cmds.Console,
+		"shutdown": d.cmds.Shutdown,
+		"stop":     d.cmds.Stop,
+		"start":    d.cmds.Start,
+		"show":     d.DoShow,
+		"undelete": d.DoUndelete,
+		"vnc":      d.cmds.Console,
 	}
 
-	// do this
-	if len(args) == 1 {
-		d.cmds.Help(args)
-		return E_USAGE_DISPLAYED
+	command := strings.ToLower(args[0])
+	fn := commands[command]
+
+	if fn != nil {
+		return fn(args[1:])
+	} else {
+		fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", command)
+		fmt.Println()
+		return d.cmds.Help(args)
 	}
 
-	switch strings.ToLower(args[0]) {
-	case "console":
-		return d.cmds.Console(args[1:])
-	case "debug":
-		return d.cmds.Debug(args[1:])
-	case "delete-group":
-		return d.cmds.DeleteGroup(args[1:])
-	case "delete-vm":
-		return d.cmds.DeleteVM(args[1:])
-	case "restart":
-		return d.cmds.Restart(args[1:])
-	case "reset":
-		return d.cmds.ResetVM(args[1:])
-	case "serial":
-		return d.cmds.Console(append([]string{"--serial"}, args[1:]...))
-	case "show-account":
-		return d.cmds.ShowAccount(args[1:])
-	case "show-group":
-		return d.cmds.ShowGroup(args[1:])
-	case "show-vm":
-		return d.cmds.ShowVM(args[1:])
-	case "shutdown":
-		return d.cmds.Shutdown(args[1:])
-	case "start":
-		return d.cmds.Start(args[1:])
-	case "stop":
-		return d.cmds.Stop(args[1:])
-	case "undelete-vm":
-		return d.cmds.UndeleteVM(args[1:])
-	case "vnc":
-		return d.cmds.Console(append([]string{"--vnc"}, args[1:]...))
-	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", args[0])
-	d.cmds.Help(args)
-	return E_USAGE_DISPLAYED
 }

@@ -6,7 +6,7 @@ import (
 )
 
 //HelpForCreateVM provides usage information for the create-vm command
-func (cmd *CommandSet) HelpForCreateVM() {
+func (cmd *CommandSet) HelpForCreateVM() ExitCode {
 	fmt.Println("go-bigv create vm")
 	fmt.Println()
 	fmt.Println("usage: go-bigv create vm [flags] <name>")
@@ -29,19 +29,21 @@ func (cmd *CommandSet) HelpForCreateVM() {
 	fmt.Println("    --zone <name> (default manchester)")
 	fmt.Println()
 	fmt.Println("If hwprofile-locked is set then the virtual machine's hardware won't be changed over time.")
+	return E_USAGE_DISPLAYED
 
 }
 
 //HelpForCreate provides usage information for the create command and its subcommands.
-func (cmd *CommandSet) HelpForCreate() {
+func (cmd *CommandSet) HelpForCreate() ExitCode {
 	fmt.Println("go-bigv create")
 	fmt.Println()
-	fmt.Println("usage: go-bigv create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine name>")
+	fmt.Println("usage: go-bigv create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine>")
 	fmt.Println("               create group [--account <name>] <name>")
-	fmt.Println("               create discs <disc specs>")
+	fmt.Println("               create disc[s] <disc specs> <virtual machine>")
 	fmt.Println("               create ip [--reason reason] <virtual machine>")
 	fmt.Println("               create vm (see go-bigv help create vm)")
 	fmt.Println("")
+	return E_USAGE_DISPLAYED
 }
 
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.

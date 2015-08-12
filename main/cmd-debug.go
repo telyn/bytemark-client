@@ -10,7 +10,7 @@ import (
 )
 
 // HelpForDebug outputs usage information for the debug command.
-func (commands *CommandSet) HelpForDebug() {
+func (commands *CommandSet) HelpForDebug() ExitCode {
 	fmt.Println("go-bigv debug")
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -24,6 +24,8 @@ func (commands *CommandSet) HelpForDebug() {
 	fmt.Println("The --junk-token flag sets the token to empty - useful if you want to ensure that credential-auth is working, or you want to do something as another user")
 	fmt.Println("The --auth token tells the client to gain valid auth and send the auth header on that request.")
 	fmt.Println()
+	return E_USAGE_DISPLAYED
+
 }
 
 // Debug makes an HTTP <method> request to the URL specified in the arguments.

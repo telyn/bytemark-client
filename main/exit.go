@@ -73,7 +73,7 @@ const (
 )
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
-func (cmds *CommandSet) HelpForExitCodes() {
+func (cmds *CommandSet) HelpForExitCodes() ExitCode {
 	fmt.Println(`bigv exit code list:
 
 Exit code ranges:
@@ -133,6 +133,7 @@ Exit code ranges:
     255
 	Trapped an interrupt signal, so exited.
 `)
+	return E_USAGE_DISPLAYED
 }
 
 func processError(err error, message ...string) ExitCode {

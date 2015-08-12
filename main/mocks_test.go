@@ -100,6 +100,10 @@ func (cmds *mockCommands) Debug(args []string) ExitCode {
 	r := cmds.Called(args)
 	return ExitCode(r.Int(0))
 }
+func (cmds *mockCommands) Delete(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
 
 func (cmds *mockCommands) DeleteVM(args []string) ExitCode {
 	r := cmds.Called(args)
@@ -110,11 +114,16 @@ func (cmds *mockCommands) DeleteGroup(args []string) ExitCode {
 	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) Help(args []string) {
-	cmds.Called(args)
+func (cmds *mockCommands) Help(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
 func (cmds *mockCommands) Config(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+func (cmds *mockCommands) Create(args []string) ExitCode {
 	r := cmds.Called(args)
 	return ExitCode(r.Int(0))
 }
@@ -149,6 +158,11 @@ func (cmds *mockCommands) Start(args []string) ExitCode {
 	return ExitCode(r.Int(0))
 }
 
+func (cmds *mockCommands) Show(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+
 func (cmds *mockCommands) ShowAccount(args []string) ExitCode {
 	r := cmds.Called(args)
 	return ExitCode(r.Int(0))
@@ -164,6 +178,11 @@ func (cmds *mockCommands) ShowVM(args []string) ExitCode {
 	return ExitCode(r.Int(0))
 }
 
+func (cmds *mockCommands) Undelete(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+
 func (cmds *mockCommands) UndeleteVM(args []string) ExitCode {
 	r := cmds.Called(args)
 	return ExitCode(r.Int(0))
@@ -174,31 +193,38 @@ func (cmds *mockCommands) EnsureAuth() error {
 	return r.Error(0)
 }
 
-func (cmds *mockCommands) HelpForConfig() {
-	cmds.Called()
+func (cmds *mockCommands) HelpForConfig() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) HelpForCreate() {
-	cmds.Called()
+func (cmds *mockCommands) HelpForCreate() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) HelpForDebug() {
-	cmds.Called()
+func (cmds *mockCommands) HelpForDebug() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
 }
-func (cmds *mockCommands) HelpForDelete() {
-	cmds.Called()
-}
-
-func (cmds *mockCommands) HelpForHelp() {
-	cmds.Called()
+func (cmds *mockCommands) HelpForDelete() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) HelpForPower() {
-	cmds.Called()
+func (cmds *mockCommands) HelpForHelp() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommands) HelpForShow() {
-	cmds.Called()
+func (cmds *mockCommands) HelpForPower() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
+}
+
+func (cmds *mockCommands) HelpForShow() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
 }
 
 type mockBigVClient struct {
