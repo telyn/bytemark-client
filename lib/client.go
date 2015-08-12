@@ -67,3 +67,10 @@ func (bigv *bigvClient) GetSessionToken() string {
 	}
 	return bigv.authSession.Token
 }
+
+func (bigv *bigvClient) GetSessionUser() string {
+	if bigv.authSession == nil {
+		return ""
+	}
+	return bigv.authSession.Username
+}

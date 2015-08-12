@@ -16,6 +16,7 @@ type Commands interface {
 	EnsureAuth() error
 
 	Config([]string) ExitCode
+	Console([]string) ExitCode
 	CreateGroup([]string) ExitCode
 	CreateVM([]string) ExitCode
 	DeleteGroup([]string) ExitCode

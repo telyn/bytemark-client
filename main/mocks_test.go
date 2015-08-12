@@ -15,6 +15,10 @@ type mockConfig struct {
 	mock.Mock
 }
 
+func (c *mockConfig) EndpointName() string {
+	ret := c.Called()
+	return ret.String(0)
+}
 func (c *mockConfig) Force() bool {
 	ret := c.Called()
 	return ret.Bool(0)
@@ -42,6 +46,11 @@ func (c *mockConfig) GetV(name string) (ConfigVar, error) {
 func (c *mockConfig) GetAll() ([]ConfigVar, error) {
 	ret := c.Called()
 	return ret.Get(0).([]ConfigVar), ret.Error(1)
+}
+
+func (c *mockConfig) PanelURL() string {
+	ret := c.Called()
+	return ret.String(0)
 }
 
 func (c *mockConfig) Set(name, value, source string) {
@@ -80,6 +89,11 @@ func (c *mockConfig) ImportFlags(*flag.FlagSet) []string {
 
 type mockCommands struct {
 	mock.Mock
+}
+
+func (cmds *mockCommands) Console(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
 }
 
 func (cmds *mockCommands) Debug(args []string) ExitCode {
@@ -196,6 +210,10 @@ func (c *mockBigVClient) GetEndpoint() string {
 	return r.String(0)
 }
 func (c *mockBigVClient) GetSessionToken() string {
+	r := c.Called()
+	return r.String(0)
+}
+func (c *mockBigVClient) GetSessionUser() string {
 	r := c.Called()
 	return r.String(0)
 }

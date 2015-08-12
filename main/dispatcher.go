@@ -79,6 +79,8 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 	}
 
 	switch strings.ToLower(args[0]) {
+	case "console":
+		return d.cmds.Console(args[1:])
 	case "debug":
 		return d.cmds.Debug(args[1:])
 	case "delete-group":
@@ -89,6 +91,8 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 		return d.cmds.Restart(args[1:])
 	case "reset":
 		return d.cmds.ResetVM(args[1:])
+	case "serial":
+		return d.cmds.Console(append([]string{"--serial"}, args[1:]...))
 	case "show-account":
 		return d.cmds.ShowAccount(args[1:])
 	case "show-group":
@@ -103,6 +107,8 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 		return d.cmds.Stop(args[1:])
 	case "undelete-vm":
 		return d.cmds.UndeleteVM(args[1:])
+	case "vnc":
+		return d.cmds.Console(append([]string{"--vnc"}, args[1:]...))
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", args[0])
 	d.cmds.Help(args)
