@@ -107,16 +107,29 @@ List of commands
 	    --root-password <password>
 	    --stopped (if set, machine won't be started)
 	    --zone <name> (default york)
-
+`bigv delete [--force] [--purge] <name>
+`bigv delete account <account>
+`bigv delete disc [--force] [---purge] <virtual machine> <disc label>
+`bigv delete group <group>
+`bigv delete user <user>
+`bigv delete vm [--force] [---purge] <virtual machine>
+`bigv debug [--junk-token] [--auth] <method> <path>` - Make an HTTP request to the given path on the current endpoint.
+`bigv debug config` - output the current config as json to debug Config's internal state
+`bigv help [command | topic]` - output the help for bigv or for the given command or topic
 `bigv list vms <group> - lists the vms in the given group, one per line
 `bigv list groups <account> - lists the groups in the given account, one per line
 `bigv list accounts - lists the accounts you can see, one per line
 `bigv lock hwprofile <virtual machine>`
+`bigv reset <virtual machine>` - Need to discuss whether this is useful
 `bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
 `bigv set hwprofile <virtual machine> <hardware profile>`
 `bigv show vm [--json] <virtual machine> - shows an overview of the given VM. Its discs, IPs, and such.
 `bigv show group [--json] <group> - shows an overview of the given group, a list of VMs in them w/ size information
 `bigv show account [--json] <account> - shows an overview of the given account, a list of groups and vms within them
 `bigv show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
+`bigv shutdown <virtual machine>`
+`bigv start <virtual machine>`
+`bigv stop <virtual machine>`
+`bigv undelete vm <virtual machine>
 `bigv unlock hwprofile <virtual machine>`
 `bigv vnc [--connect | --panel] <virtual machine>` - alias for `bigv console --vnc`
