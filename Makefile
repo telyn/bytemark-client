@@ -56,8 +56,13 @@ install: all
 	cp go-bigv /usr/bin/go-bigv
 
 coverage: lib.coverage.html main.coverage.html
+ifeq (Darwin, $(shell uname -s))
 	open lib.coverage.html
 	open main.coverage.html
+else
+	xdg-open lib.coverage.html
+	xdg-open main.coverage.html
+endif
 
 %.coverage.html: %.coverage
 	go tool cover -html=$< -o $@
