@@ -68,6 +68,10 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.Nil(vm)
 	is.NotNil(err)
 
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
+	is.Nil(vm)
+	is.NotNil(err)
+
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
 	is.NotNil(vm)
 	is.Nil(err)
