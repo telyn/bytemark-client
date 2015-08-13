@@ -6,3 +6,4 @@ BigV.app
 *.coverage
 *.coverage.html
 doc/*.html
+docs/

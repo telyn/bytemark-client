@@ -70,6 +70,11 @@ endif
 %.coverage: % %/*
 	go test -coverprofile=$@ bigv.io/client/$<
 
+docs: doc/*.md
+	for file in doc/*.md; do \
+	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
+	done
+
 test: 
 	go test $(ALL_PACKAGES)
 
