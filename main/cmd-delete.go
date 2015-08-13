@@ -14,7 +14,7 @@ func (cmds *CommandSet) HelpForDelete() ExitCode {
 	fmt.Println("       bigv delete vm [--force] [---purge] <virtual machine>")
 	fmt.Println("       bigv delete group <group>")
 	fmt.Println("       bigv delete account <account>")
-	fmt.Println("       bigv delete user <auser>")
+	fmt.Println("       bigv delete user <user>")
 	fmt.Println("       bigv undelete vm <virtual machine>")
 	fmt.Println()
 	fmt.Println("Deletes the given virtual machine, group, account or user. Only empty groups and accounts can be deleted.")

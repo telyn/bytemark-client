@@ -24,6 +24,7 @@ func (cmds *CommandSet) HelpForConfig() ExitCode {
 	fmt.Println("    endpoint - the BigV endpoint to connect to. https://uk0.bigv.io is the default")
 	fmt.Println("    auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.")
 	fmt.Println("    debug-level - the default debug level. Set to 0 unless you like lots of output")
+	fmt.Println("    token - the token used for authentication.") // You can get one using bigv auth.")
 	fmt.Println()
 	return E_USAGE_DISPLAYED
 }

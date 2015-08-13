@@ -12,9 +12,9 @@ import (
 func (cmds *CommandSet) HelpForConsole() {
 	fmt.Println("go-bigv console commands")
 	fmt.Println()
-	fmt.Println("usage: go-bigv console [--serial | --vnc] [--connect | --panel] <vm name>")
-	fmt.Println("       go-bigv serial [--connect] <vm name>")
-	fmt.Println("       go-bigv vnc [--connect | --panel] <vm name>")
+	fmt.Println("usage: go-bigv console [--serial | --vnc] [--connect | --panel] <virtual machine>")
+	fmt.Println("       go-bigv serial [--connect] <virtual machine>")
+	fmt.Println("       go-bigv vnc [--connect | --panel] <virtual machine>")
 	fmt.Println()
 	fmt.Println("Out-of-band access to a machine's serial or graphical (VNC) console.")
 	fmt.Println()

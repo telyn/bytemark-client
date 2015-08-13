@@ -5,3 +5,4 @@ go-bigv.exe
 BigV.app
 *.coverage
 *.coverage.html
+doc/*.html
