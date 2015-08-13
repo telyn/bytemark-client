@@ -54,6 +54,14 @@ A non-zero positive integer
 
 A valid DNS name containing no `` `.` `` characters.
 
+`resize spec`
+---------------
+
+    [+-]<size>
+
+Will set the size to `<size>`, or if `+` is specified, grow the thing by `<size>`.
+If `-` is specified, will shrink the thing by `<size>`. Or at least ask to.
+
 `size`
 ---------------
 
@@ -86,9 +94,8 @@ List of commands
 `bigv config set <variable> <value>`  persistently sets a variable
 `bigv config unset <variable>` - persistently unsets a variable
 `bigv console [--serial | --vnc] [--connect | --panel] <virtual machine>`
-`bigv create disc [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine>`
 `bigv create group [--account <account>] <name>`
-`bigv create disc[s] <virtual machine> <disc specs>`
+`bigv create dis<c|k>[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]` - if ambiguous, berate user
 `bigv create ip [--reason reason] <virtual machine>`
 `bigv create vm [flags] <name> [<cores> [<memory> [<disc specs>]]]` - creates a vm with the given name and the following flags
 
@@ -109,24 +116,30 @@ List of commands
 	    --zone <name> (default york)
 `bigv delete [--force] [--purge] <name>
 `bigv delete account <account>
-`bigv delete disc [--force] [---purge] <virtual machine> <disc label>
+`bigv delete dis<c|k> [--force] [---purge] <virtual machine> <disc label>`
 `bigv delete group <group>
+`bigv delete ip <ip>` - _actually no you can't delete an ip_
+`bigv delete nic <virtual machine> <nic id>`
 `bigv delete user <user>
-`bigv delete vm [--force] [---purge] <virtual machine>
+`bigv delete vm [--force] [---purge] <virtual machine>`
 `bigv debug [--junk-token] [--auth] <method> <path>` - Make an HTTP request to the given path on the current endpoint.
 `bigv debug config` - output the current config as json to debug Config's internal state
+`bigv grant <user> <privilege> <object>`
 `bigv help [command | topic]` - output the help for bigv or for the given command or topic
-`bigv list vms <group> - lists the vms in the given group, one per line
-`bigv list groups <account> - lists the groups in the given account, one per line
-`bigv list accounts - lists the accounts you can see, one per line
+`bigv list vms <group>` - lists the vms in the given group, one per line
+`bigv list groups <account>` - lists the groups in the given account, one per line
+`bigv list accounts` - lists the accounts you can see, one per line
 `bigv lock hwprofile <virtual machine>`
+`bigv request ip <virtual machine> [<nic id>]` - requests an IP on the given NIC, or the default NIC if not specified
 `bigv reset <virtual machine>` - Need to discuss whether this is useful
+`bigv resize dis<c|k> [--size <size>] <virtual machine> [<resize spec>]` - resize to `size`. if ambiguous, berate user.
+`bigv revoke <user> <privilege>`
 `bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
 `bigv set hwprofile <virtual machine> <hardware profile>`
-`bigv show vm [--json] <virtual machine> - shows an overview of the given VM. Its discs, IPs, and such.
-`bigv show group [--json] <group> - shows an overview of the given group, a list of VMs in them w/ size information
-`bigv show account [--json] <account> - shows an overview of the given account, a list of groups and vms within them
+`bigv show account [--json] <account>` - shows an overview of the given account, a list of groups and vms within them
+`bigv show group [--json] <group>` - shows an overview of the given group, a list of VMs in them w/ size information
 `bigv show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
+`bigv show vm [--json] [--nics] <virtual machine>` - shows an overview of the given VM. Its discs, IPs, and such.
 `bigv shutdown <virtual machine>`
 `bigv start <virtual machine>`
 `bigv stop <virtual machine>`
