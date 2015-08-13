@@ -8,10 +8,6 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "bytemark.co.uk/auth3/client",
-			"Rev": "4957f7d71735325ad52e282a1cef899b67a3e4b0"
-		},
-		{
 			"ImportPath": "github.com/bgentry/speakeasy",
 			"Rev": "5dfe43257d1f86b96484e760f2f0c4e2559089c7"
 		},
