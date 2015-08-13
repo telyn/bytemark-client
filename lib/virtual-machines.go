@@ -11,6 +11,10 @@ var i2b = [...]string{
 
 //CreateVirtualMachine creates a virtual machine in the given group.
 func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachineSpec) (vm *VirtualMachine, err error) {
+	err = bigv.validateGroupName(&group)
+	if err != nil {
+		return nil, err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
 
 	req := make(map[string]interface{})
@@ -77,6 +81,10 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 // DeleteVirtualMachine deletes the named virtual machine.
 // returns nil on success or an error otherwise.
 func (bigv *bigvClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if purge {
 		path += "?purge=true"
@@ -88,12 +96,16 @@ func (bigv *bigvClient) DeleteVirtualMachine(name VirtualMachineName, purge bool
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
 func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return nil, err
+	}
 	vm = new(VirtualMachine)
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 
 	err = bigv.RequestAndUnmarshal(true, "GET", path, "", vm)
 	if err != nil {
-		vm = nil
+		return nil, err
 	}
 	return vm, err
 }
@@ -102,6 +114,10 @@ func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 // button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
 // returns nil on success or an error otherwise.
 func (bigv *bigvClient) ResetVirtualMachine(name VirtualMachineName) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
 
 	_, _, err = bigv.Request(true, "POST", path, `{"signal":"reset"}`)
@@ -111,6 +127,10 @@ func (bigv *bigvClient) ResetVirtualMachine(name VirtualMachineName) (err error)
 // RestartVirtualMachine restarts the named virtual machine. This is
 // returns nil on success or an error otherwise.
 func (bigv *bigvClient) RestartVirtualMachine(name VirtualMachineName) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
 	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": false}`)
@@ -120,6 +140,10 @@ func (bigv *bigvClient) RestartVirtualMachine(name VirtualMachineName) (err erro
 // StartVirtualMachine starts the named virtual machine.
 // returns nil on success or an error otherwise.
 func (bigv *bigvClient) StartVirtualMachine(name VirtualMachineName) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
 	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": true}`)
@@ -129,6 +153,10 @@ func (bigv *bigvClient) StartVirtualMachine(name VirtualMachineName) (err error)
 // StopVirtualMachine starts the named virtual machine.
 // returns nil on success or an error otherwise.
 func (bigv *bigvClient) StopVirtualMachine(name VirtualMachineName) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
 	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":false, "power_on": false}`)
@@ -138,6 +166,10 @@ func (bigv *bigvClient) StopVirtualMachine(name VirtualMachineName) (err error) 
 // ShutdownVirtualMachine sends an ACPI shutdown to the VM. This will cause a graceful shutdown of the machine
 // returns nil on success or an error otherwise.
 func (bigv *bigvClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	if stayoff {
 		path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
@@ -152,6 +184,10 @@ func (bigv *bigvClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff 
 // UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 // Return nil on success, an error otherwise.
 func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
 	_, _, err = bigv.Request(true, "PUT", path, `{"deleted":false}`)
@@ -161,6 +197,10 @@ func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err err
 // SetVirtualMachineHardwareProfile specifies the hardware profile on a VM. Optionally locks or unlocks h. profile
 // Return nil on success, an error otherwise.
 func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachineName, profile string, locked ...bool) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	hwprofile_lock := ""
 	if len(locked) > 0 {
@@ -178,6 +218,10 @@ func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachineName
 // SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
 // Return nil on success, an error otherwise.
 func (bigv *bigvClient) SetVirtualMachineHardwareProfileLock(name VirtualMachineName, locked bool) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
 	what := `{"hardware_profile_locked": false}`

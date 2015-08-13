@@ -64,13 +64,20 @@ func TestGetVirtualMachine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	vm, err := client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
+	vm, err := client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
+	is.Nil(vm)
+	is.NotNil(err)
+	if _, ok := err.(BadNameError); !ok {
+		t.Fatalf("Expected BadNameError, got %T", err)
+	}
+
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
 	is.Nil(vm)
 	is.NotNil(err)
 
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
-	is.Nil(vm)
-	is.NotNil(err)
+	is.NotNil(vm)
+	is.Nil(err)
 
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
 	is.NotNil(vm)

@@ -53,10 +53,6 @@ func TestGetGroup(t *testing.T) {
 	is.NotNil(group)
 	is.Nil(err)
 
-	group, err = client.GetGroup(GroupName{Group: "default", Account: "account"})
-	is.NotNil(group)
-	is.Nil(err)
-
 	group, err = client.GetGroup(GroupName{Group: "", Account: ""})
 	is.NotNil(group)
 	is.Nil(err)

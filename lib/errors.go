@@ -14,6 +14,14 @@ type BigVError struct {
 	ResponseBody string
 }
 
+// BadNameError is returned when a VirtualMachineName / GroupName or AccountName is invalid.
+type BadNameError struct {
+	BigVError
+	Type         string
+	ProblemField string
+	ProblemValue string
+}
+
 // NotFoundError is returned when an object was unable to be found - either because the caller doesn't have permission to see them or because they don't exist.
 type NotFoundError struct {
 	BigVError
@@ -58,4 +66,8 @@ func (e NotFoundError) Error() string {
 func (e NotAuthorizedError) Error() string {
 	return fmt.Sprintf("403 Unauthorized\r\n%s", e.BigVError.Error())
 
+}
+
+func (e BadNameError) Error() string {
+	return fmt.Sprintf("Invalid name: '%s' is a bad %s for a %s", e.ProblemValue, e.ProblemField, e.Type)
 }
