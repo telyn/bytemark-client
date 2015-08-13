@@ -48,6 +48,7 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 
 	switch args[0] {
 	case "GET", "PUT", "POST", "DELETE":
+		// BUG(telyn): don't panic
 		if !strings.HasPrefix(args[1], "/") {
 			args[1] = "/" + args[1]
 		}
@@ -61,6 +62,7 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 			buf := bufio.NewReader(os.Stdin)
 			requestBody, err = buf.ReadString(byte(uint8(14)))
 			if err != nil {
+				// BUG(telyn): deal with EOFs properly
 				return processError(err)
 			}
 		}
