@@ -67,7 +67,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 				return aErr
 			}
 		}
-		fmt.Fprintf(os.Stderr, "Failed to use token, trying credentials.\r\n\r\n")
+		fmt.Fprintf(os.Stderr, "Please log in to BigV\r\n\r\n")
 		attempts := 3
 
 		for err != nil {
