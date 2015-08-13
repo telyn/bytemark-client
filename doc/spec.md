@@ -126,16 +126,22 @@ List of commands
 `bigv debug config` - output the current config as json to debug Config's internal state
 `bigv grant <user> <privilege> <object>`
 `bigv help [command | topic]` - output the help for bigv or for the given command or topic
-`bigv list vms <group>` - lists the vms in the given group, one per line
-`bigv list groups <account>` - lists the groups in the given account, one per line
-`bigv list accounts` - lists the accounts you can see, one per line
 `bigv lock hwprofile <virtual machine>`
+`bigv list accounts` - lists the accounts you can see, one per line
+`bigv list images` - lists the available operating system images that can be passed to create vm and reimage
+`bigv list (grades | storage-grades)` - lists the available storage grades, along with a description. One per line.
+`bigv list privileges` - lists the privileges that can possibly be granted
+`bigv list groups <account>` - lists the groups in the given account, one per line
+`bigv list vms <group>` - lists the vms in the given group, one per line
+`bigv reimage [--image <image>] <virtual machine> [<image>]`
 `bigv request ip <virtual machine> [<nic id>]` - requests an IP on the given NIC, or the default NIC if not specified
 `bigv reset <virtual machine>` - Need to discuss whether this is useful
 `bigv resize dis<c|k> [--size <size>] <virtual machine> [<resize spec>]` - resize to `size`. if ambiguous, berate user.
 `bigv revoke <user> <privilege>`
 `bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
 `bigv set hwprofile <virtual machine> <hardware profile>`
+`bigv set memory <virtual machine> <hardware profile>`
+`bigv set cores <virtual machine> <hardware profile>`
 `bigv show account [--json] <account>` - shows an overview of the given account, a list of groups and vms within them
 `bigv show group [--json] <group>` - shows an overview of the given group, a list of VMs in them w/ size information
 `bigv show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
@@ -143,6 +149,6 @@ List of commands
 `bigv shutdown <virtual machine>`
 `bigv start <virtual machine>`
 `bigv stop <virtual machine>`
-`bigv undelete vm <virtual machine>
+`bigv undelete vm <virtual machine>`
 `bigv unlock hwprofile <virtual machine>`
 `bigv vnc [--connect | --panel] <virtual machine>` - alias for `bigv console --vnc`
