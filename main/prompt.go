@@ -9,7 +9,7 @@ import (
 
 // PromptYesNo provides a y/n prompt. Returns true if the user enters y, false otherwise.
 func PromptYesNo(prompt string) bool {
-	return Prompt(prompt+" (y/n) ") == "y"
+	return Prompt(prompt+" (y/N) ") == "y"
 }
 
 // Prompt provides a string prompt, returns the entered string with no whitespace (hopefully)
@@ -25,4 +25,13 @@ func Prompt(prompt string) string {
 		return ""
 	}
 	return strings.TrimSpace(res)
+}
+
+func ShiftArgument(args []string, kindOfThing string) (string, bool) {
+	if len(args) > 0 {
+		return args[0], true
+	} else {
+		fmt.Fprintf(os.Stderr, "Not enough arguments. A %s was not specified.\r\n", kindOfThing)
+		return "", false
+	}
 }
