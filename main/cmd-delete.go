@@ -35,9 +35,14 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return E_PEBKAC
+	}
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank.\r\n")
+		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return E_PEBKAC
 	}
 	cmds.EnsureAuth()
@@ -85,7 +90,12 @@ func (cmds *CommandSet) DeleteGroup(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name := cmds.bigv.ParseGroupName(flags.Args()[0])
+	nameStr, ok := ShiftArgument(args, "group")
+	if !ok {
+		cmds.HelpForDelete()
+		return E_PEBKAC
+	}
+	name := cmds.bigv.ParseGroupName(nameStr)
 
 	err := cmds.EnsureAuth()
 	if err != nil {
@@ -130,7 +140,12 @@ func (cmds *CommandSet) DeleteGroup(args []string) ExitCode {
 // UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.
 func (cmds *CommandSet) UndeleteVM(args []string) ExitCode {
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return E_PEBKAC
+	}
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank\r\n")
 		return E_PEBKAC

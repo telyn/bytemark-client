@@ -29,14 +29,18 @@ func (cmds *CommandSet) ShowVM(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
-
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForShow()
+		return E_PEBKAC
+	}
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return E_PEBKAC
 	}
 
+	cmds.EnsureAuth()
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
@@ -63,7 +67,12 @@ func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name := cmds.bigv.ParseGroupName(args[0])
+	nameStr, ok := ShiftArgument(args, "group")
+	if !ok {
+		cmds.HelpForShow()
+		return E_PEBKAC
+	}
+	name := cmds.bigv.ParseGroupName(nameStr)
 
 	cmds.EnsureAuth()
 
@@ -105,7 +114,12 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name := cmds.bigv.ParseAccountName(args[0])
+	nameStr, ok := ShiftArgument(args, "account")
+	if !ok {
+		cmds.HelpForShow()
+		return E_PEBKAC
+	}
+	name := cmds.bigv.ParseAccountName(nameStr)
 
 	cmds.EnsureAuth()
 

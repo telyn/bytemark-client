@@ -76,7 +76,12 @@ func (cmds *CommandSet) Console(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForConsole()
+		return E_PEBKAC
+	}
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank\r\n")
 		return E_PEBKAC

@@ -47,32 +47,24 @@ func (cmd *CommandSet) HelpForCreate() ExitCode {
 }
 
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
-func (cmd *CommandSet) CreateGroup(args []string) ExitCode {
+func (cmds *CommandSet) CreateGroup(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
 	flags.Parse(args)
-	args = cmd.config.ImportFlags(flags)
+	args = cmds.config.ImportFlags(flags)
 
-	// extract this out to PromptForGroupName probably
-	name := bigv.GroupName{"", ""}
-	if len(args) == 0 {
-		name = cmd.bigv.ParseGroupName(Prompt("Group name: "))
-	} else if name = cmd.bigv.ParseGroupName(args[0]); name.Group == "" {
-		name = cmd.bigv.ParseGroupName(Prompt("Group name: "))
+	nameStr, ok := ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return E_PEBKAC
 	}
+	name := cmds.bigv.ParseGroupName(nameStr)
 
-	var err error
-	if name.Account == "" {
-		if name.Account, err = cmd.config.Get("account"); name.Account == "" {
-			name.Account = Prompt("Account name: ")
-		}
-	}
-
-	err = cmd.EnsureAuth()
+	err := cmds.EnsureAuth()
 	if err != nil {
 		return processError(err)
 	}
 
-	err = cmd.bigv.CreateGroup(name)
+	err = cmds.bigv.CreateGroup(name)
 	if err == nil {
 		fmt.Printf("Group %s was created under account %s\r\n", name.Group, name.Account)
 	}
@@ -100,10 +92,15 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 	args = cmd.config.ImportFlags(flags)
 
 	var err error
+	nameStr, ok := ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmd.HelpForCreateVM()
+		return E_PEBKAC
+	}
 
 	name := bigv.VirtualMachineName{"", "", ""}
 	if len(args) > 0 {
-		name, err = cmd.bigv.ParseVirtualMachineName(args[0])
+		name, err = cmd.bigv.ParseVirtualMachineName(nameStr)
 
 	}
 

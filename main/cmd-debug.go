@@ -42,8 +42,7 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 	}
 
 	if len(args) < 1 {
-		commands.HelpForDebug()
-		return E_SUCCESS
+		return commands.HelpForDebug()
 	}
 
 	switch args[0] {
