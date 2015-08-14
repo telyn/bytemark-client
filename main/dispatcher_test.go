@@ -83,6 +83,88 @@ func TestDispatchDoUndelete(t *testing.T) {
 	commands.Reset()
 }
 
+func TestDispatchDoLock(t *testing.T) {
+	commands := &mockCommands{}
+	config := &mockConfig{}
+	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("GetDebugLevel").Return(0)
+
+	commands.When("HelpForLocks").Times(1)
+	doDispatchTest(t, config, commands, "lock")
+	commands.Reset()
+
+	commands.When("HelpForLocks").Times(1)
+	doDispatchTest(t, config, commands, "lock", "non-existent")
+	commands.Reset()
+
+	commands.When("LockHWProfile", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "lock")
+	commands.Reset()
+
+	commands.When("HelpForLocks").Times(0)
+	commands.When("LockHWProfile", []string{"test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "lock", "test.virtual.machine")
+	commands.Reset()
+}
+
+func TestDispatchDoUnlock(t *testing.T) {
+	commands := &mockCommands{}
+	config := &mockConfig{}
+	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("GetDebugLevel").Return(0)
+
+	commands.When("HelpForLocks").Times(1)
+	doDispatchTest(t, config, commands, "unlock")
+	commands.Reset()
+
+	commands.When("HelpForLocks").Times(1)
+	doDispatchTest(t, config, commands, "unlock", "non-existent")
+	commands.Reset()
+
+	commands.When("HelpForLocks").Times(1)
+	doDispatchTest(t, config, commands, "unlock")
+	commands.Reset()
+
+	commands.When("HelpForLocks").Times(0)
+	commands.When("UnlockHWProfile", []string{"test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "unlock", "test.virtual.machine")
+	commands.Reset()
+}
+
+func TestDispatchDoSet(t *testing.T) {
+	commands := &mockCommands{}
+	config := &mockConfig{}
+	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("GetDebugLevel").Return(0)
+
+	commands.When("HelpForSet").Times(1)
+	doDispatchTest(t, config, commands, "set")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(1)
+	doDispatchTest(t, config, commands, "set", "hwprofile")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(1)
+	doDispatchTest(t, config, commands, "set", "hwprofile", "test.virtual.machine")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(0)
+	commands.When("SetHWProfile", []string{"--locked", "test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "set", "hwprofile", "--locked", "test.virtual.machine")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(0)
+	commands.When("SetHWProfile", []string{"--unlocked", "test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "set", "hwprofile", "--unlocked", "test.virtual.machine")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(0)
+	commands.When("SetHWProfile", []string{"test.virtual.machine", "virtio123"}).Times(1)
+	doDispatchTest(t, config, commands, "set", "hwprofile", "test.virtual.machine", "virtio123")
+	commands.Reset()
+}
+
 func TestDispatchDoHelp(t *testing.T) {
 	commands := &mockCommands{}
 	config := &mockConfig{}

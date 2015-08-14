@@ -6,6 +6,10 @@ import (
 	//"github.com/cheekybits/is"
 )
 
+///////////////////////
+// Support Functions //
+///////////////////////
+
 func getFixtureVM() bigv.VirtualMachine {
 	return bigv.VirtualMachine{
 		Name:    "test-vm",
@@ -23,6 +27,10 @@ func getFixtureGroup() bigv.Group {
 		VirtualMachines: vms,
 	}
 }
+
+////////////////
+// Test Cases //
+////////////////
 
 func TestCommandConfig(t *testing.T) {
 	config := &mockConfig{}
@@ -238,6 +246,132 @@ func TestShowVMCommand(t *testing.T) {
 
 	cmds := NewCommandSet(config, c)
 	cmds.ShowVM([]string{"test-vm.test-group.test-account"})
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestLockHWProfileCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+
+	vmname = bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "test-group",
+		Account:        "test-account"}
+	args := []string{"test-vm.test-group.test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return(args)
+
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(0)
+
+	cmds := NewCommandSet(config, c)
+	cmds.LockHWProfile(args)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestUnlockHWProfileCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+
+	vmname = bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "test-group",
+		Account:        "test-account"}
+	args := []string{"test-vm.test-group.test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return(args)
+
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(0)
+	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(1)
+
+	cmds := NewCommandSet(config, c)
+	cmds.UnlockHWProfile(args)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestSetHWProfileCommand(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+
+	vmname = bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "test-group",
+		Account:        "test-account"}
+	args := []string{"test-vm.test-group.test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return(args)
+
+	// test no arguments, nothing should happen
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(0)              // don't talk to BigV
+	c.When("SetVirtualMachineHardwareProfile", vmname).Return(nil).Times(0) // don't do anything
+
+	cmds := NewCommandSet(config, c)
+	cmds.SetHWProfile(args)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+
+	// test hardware profile only
+	c.Reset()
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123").Return(nil).Times(1)
+
+	args = []string{"test-vm.test-group.test-account", "virtio123"}
+
+	cmds := NewCommandSet(config, c)
+	cmds.SetHWProfile(args)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+
+	// test --lock flag
+	c.Reset()
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", true).Return(nil).Times(1)
+
+	args_flag := []string{"test-vm.test-group.test-account", "virtio123", "--lock"}
+
+	cmds := NewCommandSet(config, c)
+	cmds.SetHWProfile(args_flag)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+
+	// test --unlock flag
+	c.Reset()
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", false).Return(nil).Times(1)
+
+	args_flag = []string{"test-vm.test-group.test-account", "--unlock", "virtio123"}
+
+	cmds := NewCommandSet(config, c)
+	cmds.SetHWProfile(args_flag)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

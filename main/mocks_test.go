@@ -188,6 +188,21 @@ func (cmds *mockCommands) UndeleteVM(args []string) ExitCode {
 	return ExitCode(r.Int(0))
 }
 
+func (cmds *mockCommands) LockHWProfile(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+
+func (cmds *mockCommands) UnlockHWProfile(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+
+func (cmds *mockCommands) SetHWProfile(args []string) ExitCode {
+	r := cmds.Called(args)
+	return ExitCode(r.Int(0))
+}
+
 func (cmds *mockCommands) EnsureAuth() error {
 	r := cmds.Called()
 	return r.Error(0)
