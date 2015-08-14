@@ -45,11 +45,14 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) ExitCode {
 
 // SetHWProfile implements the set-hwprofile command
 func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
+	fmt.Println(args)
 	flags := MakeCommonFlagSet()
 	lock_hwp := flags.Bool("lock", false, "")
 	unlock_hwp := flags.Bool("unlock", false, "")
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
+	fmt.Println(*lock_hwp, *unlock_hwp)
+	fmt.Println(args)
 
 	// do nothing if --lock and --unlock are both specified
 	if *lock_hwp && *unlock_hwp {
@@ -59,8 +62,14 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	}
 
 	// identify vm
-	// BUG(Berin): insufficient size args list causes panic
 	var e error
+
+	// name and hardware profile required
+	if len(args) < 2 {
+		fmt.Println("must specify a VM name and a hardware profile")
+		cmds.HelpForSet()
+		return E_PEBKAC
+	}
 	name := cmds.bigv.ParseVirtualMachineName(args[0])
 
 	cmds.EnsureAuth()
