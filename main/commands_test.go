@@ -333,12 +333,17 @@ func TestSetHWProfileCommand(t *testing.T) {
 	}
 
 	// test hardware profile only
+	args = []string{"test-vm.test-group.test-account", "virtio123"}
+
+	config.Reset()
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return(args)
+
 	c.Reset()
 	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123").Return(nil).Times(1)
-
-	args = []string{"test-vm.test-group.test-account", "virtio123"}
+	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool(nil)).Return(nil).Times(1)
 
 	cmds = NewCommandSet(config, c)
 	cmds.SetHWProfile(args)
@@ -351,9 +356,9 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.Reset()
 	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", true).Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{true}).Return(nil).Times(1)
 
-	args_flag := []string{"test-vm.test-group.test-account", "virtio123", "--lock"}
+	args_flag := []string{"test-vm.test-group.test-account", "--lock=True", "virtio123"}
 
 	cmds = NewCommandSet(config, c)
 	cmds.SetHWProfile(args_flag)
@@ -366,7 +371,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.Reset()
 	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", false).Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{false}).Return(nil).Times(1)
 
 	args_flag = []string{"test-vm.test-group.test-account", "--unlock", "virtio123"}
 
