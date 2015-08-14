@@ -26,3 +26,12 @@ func Prompt(prompt string) string {
 	}
 	return strings.TrimSpace(res)
 }
+
+func ShiftArgument(args []string, kindOfThing string) (string, bool) {
+	if len(args) > 0 {
+		return args[0], true
+	} else {
+		fmt.Fprintf(os.Stderr, "Not enough arguments. A %s was not specified.\r\n", kindOfThing)
+		return "", false
+	}
+}
