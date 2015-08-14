@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -30,7 +31,11 @@ func (cmds *CommandSet) ShowVM(args []string) ExitCode {
 
 	cmds.EnsureAuth()
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
+		return E_PEBKAC
+	}
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 

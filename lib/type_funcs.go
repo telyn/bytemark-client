@@ -14,8 +14,38 @@ func (g GroupName) String() string {
 	return g.Group + "." + g.Account
 }
 
+func (bigv *bigvClient) validateVirtualMachineName(vm *VirtualMachineName) error {
+	if vm.Account == "" {
+		vm.Account = bigv.authSession.Username
+	}
+	if vm.Group == "" {
+		vm.Group = "default"
+	}
+	if vm.VirtualMachine == "" {
+		return BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+	}
+	return nil
+}
+
+func (bigv *bigvClient) validateGroupName(group *GroupName) error {
+	if group.Account == "" {
+		group.Account = bigv.authSession.Username
+	}
+	if group.Group == "" {
+		group.Group = "default"
+	}
+	return nil
+}
+
+func (bigv *bigvClient) validateAccountName(account *string) error {
+	if *account == "" {
+		*account = bigv.authSession.Username
+	}
+	return nil
+}
+
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (bigv *bigvClient) ParseVirtualMachineName(name string) (vm VirtualMachineName) {
+func (bigv *bigvClient) ParseVirtualMachineName(name string) (vm VirtualMachineName, err error) {
 	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	vm.Group = ""
@@ -38,9 +68,6 @@ Loop:
 			break
 		case 1:
 			// want to be able to do vm..account to get the default group
-			if bit == "" {
-				break
-			}
 			vm.Group = strings.TrimSpace(strings.ToLower(bit))
 			break
 		case 2:
@@ -48,7 +75,10 @@ Loop:
 			break Loop
 		}
 	}
-	return vm
+	if vm.VirtualMachine == "" {
+		return vm, BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+	}
+	return vm, nil
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.

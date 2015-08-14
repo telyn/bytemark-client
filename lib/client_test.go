@@ -28,7 +28,7 @@ func mkTestAuthServer() *httptest.Server {
 		fmt.Fprintln(w,
 			`{
     "token": "fffffffffffffff",
-    "username": "valid-user",
+    "username": "account",
     "factors": []
 }`)
 	}))

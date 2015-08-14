@@ -103,7 +103,8 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 
 	name := bigv.VirtualMachineName{"", "", ""}
 	if len(args) > 0 {
-		name = cmd.bigv.ParseVirtualMachineName(args[0])
+		name, err = cmd.bigv.ParseVirtualMachineName(args[0])
+
 	}
 
 	if *group != "" {

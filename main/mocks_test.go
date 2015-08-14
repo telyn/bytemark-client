@@ -342,10 +342,10 @@ func (c *mockBigVClient) ShutdownVirtualMachine(name bigv.VirtualMachineName, st
 	return r.Error(0)
 }
 
-func (c *mockBigVClient) ParseVirtualMachineName(name string) bigv.VirtualMachineName {
+func (c *mockBigVClient) ParseVirtualMachineName(name string) (bigv.VirtualMachineName, error) {
 	r := c.Called(name)
 	n, _ := r.Get(0).(bigv.VirtualMachineName)
-	return n
+	return n, r.Error(1)
 }
 func (c *mockBigVClient) ParseGroupName(name string) bigv.GroupName {
 	r := c.Called(name)

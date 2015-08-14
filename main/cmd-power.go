@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 func (cmds *CommandSet) HelpForPower() ExitCode {
@@ -44,12 +45,16 @@ func (cmds *CommandSet) Start(args []string) ExitCode {
 
 	cmds.EnsureAuth()
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
+		return E_PEBKAC
+	}
 
 	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to start %s...\r\n", name.VirtualMachine)
 	}
-	err := cmds.bigv.StartVirtualMachine(name)
+	err = cmds.bigv.StartVirtualMachine(name)
 	if err != nil {
 		return processError(err)
 	}
@@ -68,13 +73,17 @@ func (cmds *CommandSet) Shutdown(args []string) ExitCode {
 
 	cmds.EnsureAuth()
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
+		return E_PEBKAC
+	}
 
 	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to shutdown %s...\r\n", name.VirtualMachine)
 	}
 
-	err := cmds.bigv.ShutdownVirtualMachine(name, !*restart)
+	err = cmds.bigv.ShutdownVirtualMachine(name, !*restart)
 	if err != nil {
 		return processError(err)
 	}
@@ -91,12 +100,16 @@ func (cmds *CommandSet) Stop(args []string) ExitCode {
 
 	cmds.EnsureAuth()
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
+		return E_PEBKAC
+	}
 
 	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to stop %s...\r\n", name.VirtualMachine)
 	}
-	err := cmds.bigv.StopVirtualMachine(name)
+	err = cmds.bigv.StopVirtualMachine(name)
 	if err != nil {
 		return processError(err)
 	}
@@ -114,12 +127,16 @@ func (cmds *CommandSet) Restart(args []string) ExitCode {
 
 	cmds.EnsureAuth()
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
+		return E_PEBKAC
+	}
 
 	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to restart %s...\r\n", name.VirtualMachine)
 	}
-	err := cmds.bigv.RestartVirtualMachine(name)
+	err = cmds.bigv.RestartVirtualMachine(name)
 	if err != nil {
 		return processError(err)
 	}
@@ -137,12 +154,16 @@ func (cmds *CommandSet) ResetVM(args []string) ExitCode {
 
 	cmds.EnsureAuth()
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
+		return E_PEBKAC
+	}
 
 	if !cmds.config.Silent() {
 		fmt.Printf("Attempting to reset %s...\r\n", name.VirtualMachine)
 	}
-	err := cmds.bigv.ResetVirtualMachine(name)
+	err = cmds.bigv.ResetVirtualMachine(name)
 	if err != nil {
 		return processError(err)
 	}

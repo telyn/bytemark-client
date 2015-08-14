@@ -9,11 +9,11 @@ import (
 func TestGetAccounts(t *testing.T) {
 	is := is.New(t)
 	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/valid-account" {
+		if req.URL.Path == "/accounts/account" {
 			w.Write([]byte(`{
-    "name": "valid-account",
-    "id": 1
-}`))
+			    "name": "account",
+			    "id": 1
+			}`))
 		} else if req.URL.Path == "/accounts/invalid-account" {
 			http.NotFound(w, req)
 		} else {
@@ -36,8 +36,12 @@ func TestGetAccounts(t *testing.T) {
 	is.Nil(acc)
 	is.NotNil(err)
 
-	acc, err = client.GetAccount("valid-account")
+	acc, err = client.GetAccount("")
 	is.NotNil(acc)
-	is.Equal("valid-account", acc.Name)
+	is.Equal("account", acc.Name)
+
+	acc, err = client.GetAccount("account")
+	is.NotNil(acc)
+	is.Equal("account", acc.Name)
 
 }
