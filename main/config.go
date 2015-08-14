@@ -67,6 +67,7 @@ type ConfigManager interface {
 //
 type Config struct {
 	debugLevel  int
+	mainFlags   *flag.FlagSet
 	Dir         string
 	Memo        map[string]ConfigVar
 	Definitions map[string]string
@@ -116,6 +117,7 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
 	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
+	config.mainFlags = flags
 	if os.Getenv("BIGV_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
 	}
@@ -164,6 +166,16 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 					"FLAG " + f.Name,
 				}
 			})
+			if flags != config.mainFlags {
+
+				args := flags.Args()
+				for _, arg := range args {
+					if strings.HasPrefix(arg, "-") {
+						fmt.Fprintf(os.Stderr, "Flag-like argument '%s' specified after your arguments\r\nBe aware that only flags placed before your arguments are parsed.\r\nSee the help for the command you're calling for invocation examples.\r\n\r\n", arg)
+						break
+					}
+				}
+			}
 			return flags.Args()
 		}
 	}
