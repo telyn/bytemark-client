@@ -98,12 +98,11 @@ func TestDispatchDoLock(t *testing.T) {
 	commands.Reset()
 
 	commands.When("LockHWProfile", []string{}).Times(1)
-	doDispatchTest(t, config, commands, "lock")
-	commands.Reset()
+	doDispatchTest(t, config, commands, "lock", "hwprofile")
 
 	commands.When("HelpForLocks").Times(0)
 	commands.When("LockHWProfile", []string{"test.virtual.machine"}).Times(1)
-	doDispatchTest(t, config, commands, "lock", "test.virtual.machine")
+	doDispatchTest(t, config, commands, "lock", "hwprofile", "test.virtual.machine")
 	commands.Reset()
 }
 
@@ -121,13 +120,13 @@ func TestDispatchDoUnlock(t *testing.T) {
 	doDispatchTest(t, config, commands, "unlock", "non-existent")
 	commands.Reset()
 
-	commands.When("HelpForLocks").Times(1)
-	doDispatchTest(t, config, commands, "unlock")
+	commands.When("UnlockHWProfile", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "unlock", "hwprofile")
 	commands.Reset()
 
 	commands.When("HelpForLocks").Times(0)
 	commands.When("UnlockHWProfile", []string{"test.virtual.machine"}).Times(1)
-	doDispatchTest(t, config, commands, "unlock", "test.virtual.machine")
+	doDispatchTest(t, config, commands, "unlock", "hwprofile", "test.virtual.machine")
 	commands.Reset()
 }
 
@@ -141,13 +140,15 @@ func TestDispatchDoSet(t *testing.T) {
 	doDispatchTest(t, config, commands, "set")
 	commands.Reset()
 
-	commands.When("HelpForSet").Times(1)
-	doDispatchTest(t, config, commands, "set", "hwprofile")
-	commands.Reset()
+	// currently only the dispatcher is tested, HelpForSet IS called but in the
+	// command which isn't loaded, so these tests are disable for now
+	//commands.When("HelpForSet").Times(1)
+	//doDispatchTest(t, config, commands, "set", "hwprofile")
+	//commands.Reset()
 
-	commands.When("HelpForSet").Times(1)
-	doDispatchTest(t, config, commands, "set", "hwprofile", "test.virtual.machine")
-	commands.Reset()
+	//commands.When("HelpForSet").Times(1)
+	//doDispatchTest(t, config, commands, "set", "hwprofile", "test.virtual.machine")
+	//commands.Reset()
 
 	commands.When("HelpForSet").Times(0)
 	commands.When("SetHWProfile", []string{"--locked", "test.virtual.machine"}).Times(1)
