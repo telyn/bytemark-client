@@ -256,7 +256,7 @@ func TestLockHWProfileCommand(t *testing.T) {
 	c := &mockBigVClient{}
 	config := &mockConfig{}
 
-	vmname = bigv.VirtualMachineName{
+	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account"}
@@ -283,7 +283,7 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 	c := &mockBigVClient{}
 	config := &mockConfig{}
 
-	vmname = bigv.VirtualMachineName{
+	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account"}
@@ -310,7 +310,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c := &mockBigVClient{}
 	config := &mockConfig{}
 
-	vmname = bigv.VirtualMachineName{
+	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account"}
@@ -340,7 +340,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	args = []string{"test-vm.test-group.test-account", "virtio123"}
 
-	cmds := NewCommandSet(config, c)
+	cmds = NewCommandSet(config, c)
 	cmds.SetHWProfile(args)
 
 	if ok, err := c.Verify(); !ok {
@@ -355,7 +355,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	args_flag := []string{"test-vm.test-group.test-account", "virtio123", "--lock"}
 
-	cmds := NewCommandSet(config, c)
+	cmds = NewCommandSet(config, c)
 	cmds.SetHWProfile(args_flag)
 
 	if ok, err := c.Verify(); !ok {
@@ -370,7 +370,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	args_flag = []string{"test-vm.test-group.test-account", "--unlock", "virtio123"}
 
-	cmds := NewCommandSet(config, c)
+	cmds = NewCommandSet(config, c)
 	cmds.SetHWProfile(args_flag)
 
 	if ok, err := c.Verify(); !ok {

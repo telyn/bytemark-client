@@ -232,7 +232,17 @@ func (cmds *mockCommands) HelpForHelp() ExitCode {
 	return ExitCode(r.Int(0))
 }
 
+func (cmds *mockCommands) HelpForLocks() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
+}
+
 func (cmds *mockCommands) HelpForPower() ExitCode {
+	r := cmds.Called()
+	return ExitCode(r.Int(0))
+}
+
+func (cmds *mockCommands) HelpForSet() ExitCode {
 	r := cmds.Called()
 	return ExitCode(r.Int(0))
 }
