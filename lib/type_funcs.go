@@ -45,7 +45,7 @@ func (bigv *bigvClient) validateAccountName(account *string) error {
 }
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (bigv *bigvClient) ParseVirtualMachineName(name string) (vm VirtualMachineName) {
+func (bigv *bigvClient) ParseVirtualMachineName(name string) (vm VirtualMachineName, err error) {
 	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	vm.Group = ""
@@ -68,9 +68,6 @@ Loop:
 			break
 		case 1:
 			// want to be able to do vm..account to get the default group
-			if bit == "" {
-				break
-			}
 			vm.Group = strings.TrimSpace(strings.ToLower(bit))
 			break
 		case 2:
@@ -78,7 +75,10 @@ Loop:
 			break Loop
 		}
 	}
-	return vm
+	if vm.VirtualMachine == "" {
+		return vm, BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+	}
+	return vm, nil
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
