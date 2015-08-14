@@ -142,7 +142,7 @@ func (d *Dispatcher) DoLock(args []string) ExitCode {
 		return d.cmds.LockHWProfile(args[1:])
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command 'lock %s'\r\n", args[0])
-	return d.cmds.HelpForLock()
+	return d.cmds.HelpForLocks()
 }
 
 func (d *Dispatcher) DoUnlock(args []string) ExitCode {
@@ -155,7 +155,7 @@ func (d *Dispatcher) DoUnlock(args []string) ExitCode {
 		return d.cmds.UnlockHWProfile(args[1:])
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command 'unlock %s'\r\n", args[0])
-	return d.cmds.HelpForLock()
+	return d.cmds.HelpForLocks()
 }
 
 func (d *Dispatcher) DoSet(args []string) ExitCode {
@@ -195,7 +195,7 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 		"restart":  d.cmds.Restart,
 		"reset":    d.cmds.ResetVM,
 		"serial":   d.cmds.Console,
-		"set":      d.cmds.DoSet,
+		"set":      d.DoSet,
 		"shutdown": d.cmds.Shutdown,
 		"stop":     d.cmds.Stop,
 		"start":    d.cmds.Start,

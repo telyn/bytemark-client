@@ -41,7 +41,9 @@ type Commands interface {
 	HelpForDebug() ExitCode
 	HelpForDelete() ExitCode
 	HelpForHelp() ExitCode
+	HelpForLocks() ExitCode
 	HelpForPower() ExitCode
+	HelpForSet() ExitCode
 	HelpForShow() ExitCode
 }
 

@@ -1,17 +1,19 @@
 package main
 
 import (
-	bigv "bigv.io/client/lib"
+	//bigv "bigv.io/client/lib"
 	"fmt"
 )
 
 // HelpForLocking provides usage information for locking and unlocking hardware
 // profiles.
 func (cmds *CommandSet) HelpForLocks() ExitCode {
+	return E_SUCCESS
 }
 
 // HelpForSet provides usage information for the set command and its subcommands.
 func (cmds *CommandSet) HelpForSet() ExitCode {
+	return E_SUCCESS
 }
 
 // LockHWProfile implements the lock-hwprofile command
@@ -50,7 +52,7 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	args = cmds.config.ImportFlags(flags)
 
 	// do nothing if --lock and --unlock are both specified
-	if lock_hwp && unlock_hwp {
+	if *lock_hwp && *unlock_hwp {
 		fmt.Println("ambiguous command, both lock and unlock specified")
 		cmds.HelpForSet()
 		return E_PEBKAC
@@ -64,13 +66,13 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	cmds.EnsureAuth()
 
 	// if lock_hwp or unlock_hwp are specified, account this into the call
-	if lock_hwp {
-		e = SetVirtualMachineHardwareProfile(name, args[1], true)
-	} else if unlock_hwp {
-		e = SetVirtualMachineHardwareProfile(name, args[1], false)
+	if *lock_hwp {
+		e = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], true)
+	} else if *unlock_hwp {
+		e = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], false)
 		// otherwise omit lock
 	} else {
-		e = SetVirtualMachineHardwareProfile(name, args[1])
+		e = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1])
 	}
 
 	// return
