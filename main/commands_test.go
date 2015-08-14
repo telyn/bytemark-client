@@ -358,7 +358,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{true}).Return(nil).Times(1)
 
-	args_flag := []string{"test-vm.test-group.test-account", "--lock=True", "virtio123"}
+	args_flag := []string{"--lock", "test-vm.test-group.test-account", "virtio123"}
 
 	cmds = NewCommandSet(config, c)
 	cmds.SetHWProfile(args_flag)
@@ -373,7 +373,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{false}).Return(nil).Times(1)
 
-	args_flag = []string{"test-vm.test-group.test-account", "--unlock", "virtio123"}
+	args_flag = []string{"--unlock", "test-vm.test-group.test-account", "virtio123"}
 
 	cmds = NewCommandSet(config, c)
 	cmds.SetHWProfile(args_flag)
