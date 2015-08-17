@@ -171,7 +171,10 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 		return processError(&UserRequestedExit{})
 	}
 
-	cmd.EnsureAuth()
+	err = cmd.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	vm, err := cmd.bigv.CreateVirtualMachine(groupName, spec)
 	if err != nil {

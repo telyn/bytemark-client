@@ -43,12 +43,14 @@ func (cmds *CommandSet) Start(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
-
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return E_PEBKAC
+	}
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -71,12 +73,14 @@ func (cmds *CommandSet) Shutdown(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
-
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return E_PEBKAC
+	}
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -98,12 +102,15 @@ func (cmds *CommandSet) Stop(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
-
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return E_PEBKAC
+	}
+
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -125,12 +132,14 @@ func (cmds *CommandSet) Restart(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
-
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return E_PEBKAC
+	}
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -152,12 +161,15 @@ func (cmds *CommandSet) ResetVM(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
-
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return E_PEBKAC
+	}
+
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
 	}
 
 	if !cmds.config.Silent() {

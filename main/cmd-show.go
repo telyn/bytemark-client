@@ -29,7 +29,10 @@ func (cmds *CommandSet) ShowVM(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
@@ -65,7 +68,10 @@ func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
 
 	name := cmds.bigv.ParseGroupName(args[0])
 
-	cmds.EnsureAuth()
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	group, err := cmds.bigv.GetGroup(name)
 
@@ -107,7 +113,10 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 
 	name := cmds.bigv.ParseAccountName(args[0])
 
-	cmds.EnsureAuth()
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	acc, err := cmds.bigv.GetAccount(name)
 

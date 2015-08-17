@@ -53,7 +53,10 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 			args[1] = "/" + args[1]
 		}
 		if *shouldAuth {
-			commands.EnsureAuth()
+			err := commands.EnsureAuth()
+			if err != nil {
+				return processError(err)
+			}
 		}
 
 		requestBody := ""

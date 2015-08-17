@@ -40,7 +40,10 @@ func (cmds *CommandSet) DeleteVM(args []string) ExitCode {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank.\r\n")
 		return E_PEBKAC
 	}
-	cmds.EnsureAuth()
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
@@ -135,7 +138,10 @@ func (cmds *CommandSet) UndeleteVM(args []string) ExitCode {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank\r\n")
 		return E_PEBKAC
 	}
-	cmds.EnsureAuth()
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
