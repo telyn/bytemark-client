@@ -156,7 +156,7 @@ func processError(err error, message ...string) ExitCode {
 					if opError, ok := urlErr.Err.(*net.OpError); ok {
 						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", opError.Err)
 					} else {
-						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %T %v", urlErr.Err, urlErr.Err)
+						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %T %v\r\nPlease file a bug report quoting this message.", urlErr.Err, urlErr.Err)
 					}
 				} else {
 					errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", urlErr)
@@ -165,6 +165,17 @@ func processError(err error, message ...string) ExitCode {
 			default:
 				errorMessage = fmt.Sprintf("Couldn't create auth session - internal error of type %T: %v", authErr.Err, authErr.Err)
 				exitCode = E_UNKNOWN_AUTH
+			}
+		case *url.Error:
+			urlErr, _ := err.(*url.Error)
+			if urlErr.Error != nil {
+				if opError, ok := urlErr.Err.(*net.OpError); ok {
+					errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %v", opError.Err)
+				} else {
+					errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %T %v\r\nPlease file a bug report quoting this message.", urlErr.Err, urlErr.Err)
+				}
+			} else {
+				errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %v", urlErr)
 			}
 		case bigv.NotAuthorizedError:
 			errorMessage = err.Error()
