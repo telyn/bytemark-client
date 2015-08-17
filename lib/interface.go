@@ -121,4 +121,12 @@ type Client interface {
 	// SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
 	// Return nil on success, an error otherwise.
 	SetVirtualMachineHardwareProfileLock(name VirtualMachineName, locked bool) (err error)
+
+	// SetVirtualMachineMemory sets the RAM available to a virtual machine in megabytes
+	// Return nil on success, an error otherwise.
+	SetVirtualMachineMemory(name VirtualMachineName, memory int) (err error)
+
+	// SetVirtualMachineCores sets the number of CPUs available to a virtual machine
+	// Return nil on success, an error otherwise.
+	SetVirtualMachineCores(name VirtualMachineName, cores int) (err error)
 }

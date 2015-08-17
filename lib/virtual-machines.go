@@ -232,3 +232,33 @@ func (bigv *bigvClient) SetVirtualMachineHardwareProfileLock(name VirtualMachine
 	_, _, err = bigv.Request(true, "PUT", path, what)
 	return err
 }
+
+// SetVirtualMachineMemory sets the RAM available to a virtual machine in megabytes
+// Return nil on success, an error otherwise.
+func (bigv *bigvClient) SetVirtualMachineMemory(name VirtualMachineName, memory int) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	what := fmt.Sprintf(`{"memory": %d}`, memory)
+
+	_, _, err = bigv.Request(true, "PUT", path, what)
+	return err
+}
+
+// SetVirtualMachineCores sets the number of CPUs available to a virtual machine
+// Return nil on success, an error otherwise.
+func (bigv *bigvClient) SetVirtualMachineCores(name VirtualMachineName, cores int) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+
+	what := fmt.Sprintf(`{"cores": %d}`, cores)
+
+	_, _, err = bigv.Request(true, "PUT", path, what)
+	return err
+}

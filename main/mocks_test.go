@@ -346,12 +346,20 @@ func (c *mockBigVClient) RestartVirtualMachine(name bigv.VirtualMachineName) err
 	r := c.Called(name)
 	return r.Error(0)
 }
+func (c *mockBigVClient) SetVirtualMachineCores(name bigv.VirtualMachineName, cores int) error {
+	r := c.Called(name, cores)
+	return r.Error(0)
+}
 func (c *mockBigVClient) SetVirtualMachineHardwareProfile(name bigv.VirtualMachineName, hwprofile string, locked ...bool) error {
 	r := c.Called(name, hwprofile, locked)
 	return r.Error(0)
 }
 func (c *mockBigVClient) SetVirtualMachineHardwareProfileLock(name bigv.VirtualMachineName, locked bool) error {
 	r := c.Called(name, locked)
+	return r.Error(0)
+}
+func (c *mockBigVClient) SetVirtualMachineMemory(name bigv.VirtualMachineName, memory int) error {
+	r := c.Called(name, memory)
 	return r.Error(0)
 }
 func (c *mockBigVClient) StartVirtualMachine(name bigv.VirtualMachineName) error {
