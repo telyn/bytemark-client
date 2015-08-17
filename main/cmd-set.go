@@ -3,6 +3,7 @@ package main
 import (
 	//bigv "bigv.io/client/lib"
 	"fmt"
+	"os"
 )
 
 // HelpForLocking provides usage information for locking and unlocking hardware
@@ -22,9 +23,16 @@ func (cmds *CommandSet) LockHWProfile(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	cmds.EnsureAuth()
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
+		return E_PEBKAC
+	}
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	e := cmds.bigv.SetVirtualMachineHardwareProfileLock(name, true)
 	return processError(e)
@@ -36,8 +44,16 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
-	cmds.EnsureAuth()
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
+		return E_PEBKAC
+	}
+
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	e := cmds.bigv.SetVirtualMachineHardwareProfileLock(name, false)
 	return processError(e)
@@ -59,7 +75,7 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	}
 
 	// identify vm
-	var e error
+	var err error
 
 	// name and hardware profile required
 	if len(args) < 2 {
@@ -67,20 +83,27 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 		cmds.HelpForSet()
 		return E_PEBKAC
 	}
-	name := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
+		return E_PEBKAC
+	}
 
-	cmds.EnsureAuth()
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
 
 	// if lock_hwp or unlock_hwp are specified, account this into the call
 	if *lock_hwp {
-		e = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], true)
+		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], true)
 	} else if *unlock_hwp {
-		e = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], false)
+		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], false)
 		// otherwise omit lock
 	} else {
-		e = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1])
+		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1])
 	}
 
 	// return
-	return processError(e)
+	return processError(err)
 }
