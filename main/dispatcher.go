@@ -132,6 +132,45 @@ func (d *Dispatcher) DoUndelete(args []string) ExitCode {
 	return d.cmds.HelpForDelete()
 }
 
+func (d *Dispatcher) DoLock(args []string) ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForLocks()
+	}
+
+	switch strings.ToLower(args[0]) {
+	case "hwprofile":
+		return d.cmds.LockHWProfile(args[1:])
+	}
+	fmt.Fprintf(os.Stderr, "Unrecognised command 'lock %s'\r\n", args[0])
+	return d.cmds.HelpForLocks()
+}
+
+func (d *Dispatcher) DoUnlock(args []string) ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForLocks()
+	}
+
+	switch strings.ToLower(args[0]) {
+	case "hwprofile":
+		return d.cmds.UnlockHWProfile(args[1:])
+	}
+	fmt.Fprintf(os.Stderr, "Unrecognised command 'unlock %s'\r\n", args[0])
+	return d.cmds.HelpForLocks()
+}
+
+func (d *Dispatcher) DoSet(args []string) ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForSet()
+	}
+
+	switch strings.ToLower(args[0]) {
+	case "hwprofile":
+		return d.cmds.SetHWProfile(args[1:])
+	}
+	fmt.Fprintf(os.Stderr, "Unrecognised command 'set %s'\r\rn", args[0])
+	return d.cmds.HelpForSet()
+}
+
 // Do takes the command line arguments and figures out what to do.
 func (d *Dispatcher) Do(args []string) ExitCode {
 	if d.debugLevel >= 1 {
@@ -152,14 +191,17 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 		"debug":    d.cmds.Debug,
 		"delete":   d.DoDelete,
 		"help":     d.cmds.Help,
+		"lock":     d.DoLock,
 		"restart":  d.cmds.Restart,
 		"reset":    d.cmds.ResetVM,
 		"serial":   d.cmds.Console,
+		"set":      d.DoSet,
 		"shutdown": d.cmds.Shutdown,
 		"stop":     d.cmds.Stop,
 		"start":    d.cmds.Start,
 		"show":     d.DoShow,
 		"undelete": d.DoUndelete,
+		"unlock":   d.DoUnlock,
 		"vnc":      d.cmds.Console,
 	}
 

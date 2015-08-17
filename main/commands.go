@@ -23,8 +23,11 @@ type Commands interface {
 	DeleteVM([]string) ExitCode
 	Debug([]string) ExitCode
 	Help([]string) ExitCode
+	LockHWProfile([]string) ExitCode
+	UnlockHWProfile([]string) ExitCode
 	ResetVM([]string) ExitCode
 	Restart([]string) ExitCode
+	SetHWProfile([]string) ExitCode
 	Start([]string) ExitCode
 	Stop([]string) ExitCode
 	Shutdown([]string) ExitCode
@@ -38,7 +41,9 @@ type Commands interface {
 	HelpForDebug() ExitCode
 	HelpForDelete() ExitCode
 	HelpForHelp() ExitCode
+	HelpForLocks() ExitCode
 	HelpForPower() ExitCode
+	HelpForSet() ExitCode
 	HelpForShow() ExitCode
 }
 
