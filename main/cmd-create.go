@@ -21,7 +21,7 @@ func (cmd *CommandSet) HelpForCreateVM() ExitCode {
 	fmt.Println("    --hwprofile <profile>")
 	fmt.Println("    --hwprofile-locked")
 	fmt.Println("    --image <image name> (see go-bigv images)")
-	fmt.Println("    --memory <num> (default 1, unit GB)")
+	fmt.Println("    --memory <size> (default 1, units are GiB)")
 	fmt.Println("    --public-keys <keys> (newline seperated)")
 	fmt.Println("    --public-keys-file <file> (will be read & appended to --public-keys)")
 	fmt.Println("    --root-password <password>")
