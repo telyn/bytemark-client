@@ -65,7 +65,7 @@ func TestCreateVMCommand(t *testing.T) {
 			Name:                  "test-vm",
 			Autoreboot:            true,
 			Cores:                 1,
-			Memory:                1,
+			Memory:                1024,
 			CdromURL:              "https://example.com/example.iso",
 			HardwareProfile:       "test-profile",
 			HardwareProfileLocked: true,
@@ -78,19 +78,17 @@ func TestCreateVMCommand(t *testing.T) {
 	}
 
 	group := bigv.GroupName{
-		Group:   "test-group",
-		Account: "test-account",
+		Group:   "",
+		Account: "",
 	}
 
 	c.When("CreateVirtualMachine", group, vm).Return(vm.VirtualMachine, nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
 	cmds.CreateVM([]string{
-		"--account", "test-account",
 		"--cdrom", "https://example.com/example.iso",
 		"--cores", "1",
 		"--discs", "25",
-		"--group", "test-group",
 		"--hwprofile", "test-profile",
 		"--hwprofile-locked",
 		"--image", "test-image",
