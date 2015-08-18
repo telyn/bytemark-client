@@ -4,6 +4,8 @@ import (
 	//bigv "bigv.io/client/lib"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 // HelpForLocking provides usage information for locking and unlocking hardware
@@ -59,6 +61,41 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) ExitCode {
 	return processError(e)
 }
 
+// SetCores implements the set-cores command
+func (cmds *CommandSet) SetCores(args []string) ExitCode {
+	flags := MakeCommonFlagSet()
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	if len(args) != 2 {
+		fmt.Println("must specify a VM name and a number of CPUs")
+		cmds.HelpForSet()
+		return E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
+		return E_PEBKAC
+	}
+
+	// decide on the number of cores to set now
+	cores, err := strconv.Atoi(args[1])
+	if err != nil || cores < 1 {
+		fmt.Fprintf(os.Stderr, "Invalid number of cores \"%s\"\r\n", args[1])
+		return E_PEBKAC
+	}
+
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
+
+	// submit command to BigV
+	err = cmds.bigv.SetVirtualMachineCores(name, cores)
+	return processError(err)
+}
+
 // SetHWProfile implements the set-hwprofile command
 func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	flags := MakeCommonFlagSet()
@@ -74,11 +111,8 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 		return E_PEBKAC
 	}
 
-	// identify vm
-	var err error
-
 	// name and hardware profile required
-	if len(args) < 2 {
+	if len(args) != 2 {
 		fmt.Println("must specify a VM name and a hardware profile")
 		cmds.HelpForSet()
 		return E_PEBKAC
@@ -105,5 +139,44 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	}
 
 	// return
+	return processError(err)
+}
+
+// SetMemory implements the set-memory command
+func (cmds *CommandSet) SetMemory(args []string) ExitCode {
+	flags := MakeCommonFlagSet()
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	if len(args) != 2 {
+		fmt.Println("must specify a VM name and an amount of memory")
+		cmds.HelpForSet()
+		return E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
+		return E_PEBKAC
+	}
+
+	// decide on the number of cores to set now
+	m := 1 // decide if user means MB or GB
+	if strings.HasSuffix(strings.ToUpper(args[1]), "G") {
+		m = 1024
+	}
+
+	memory, err := strconv.Atoi(args[1])
+	if err != nil || memory < 1 {
+		fmt.Fprintf(os.Stderr, "Invalid amount of memory \"%s\"\r\n", args[1])
+		return E_PEBKAC
+	}
+
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return processError(err)
+	}
+
+	err = cmds.bigv.SetVirtualMachineMemory(name, memory*m)
 	return processError(err)
 }

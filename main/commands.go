@@ -27,7 +27,9 @@ type Commands interface {
 	UnlockHWProfile([]string) ExitCode
 	ResetVM([]string) ExitCode
 	Restart([]string) ExitCode
+	SetCores([]string) ExitCode
 	SetHWProfile([]string) ExitCode
+	SetMemory([]string) ExitCode
 	Start([]string) ExitCode
 	Stop([]string) ExitCode
 	Shutdown([]string) ExitCode

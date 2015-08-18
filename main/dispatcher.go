@@ -166,6 +166,10 @@ func (d *Dispatcher) DoSet(args []string) ExitCode {
 	switch strings.ToLower(args[0]) {
 	case "hwprofile":
 		return d.cmds.SetHWProfile(args[1:])
+	case "memory":
+		return d.cmds.SetMemory(args[1:])
+	case "cores":
+		return d.cmds.SetCores(args[1:])
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command 'set %s'\r\rn", args[0])
 	return d.cmds.HelpForSet()

@@ -164,6 +164,26 @@ func TestDispatchDoSet(t *testing.T) {
 	commands.When("SetHWProfile", []string{"test.virtual.machine", "virtio123"}).Times(1)
 	doDispatchTest(t, config, commands, "set", "hwprofile", "test.virtual.machine", "virtio123")
 	commands.Reset()
+
+	commands.When("HelpForSet").Times(0)
+	commands.When("SetCores", []string{"test.virtual.machine", "10"}).Times(1)
+	doDispatchTest(t, config, commands, "set", "cores", "test.virtual.machine", "10")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(0)
+	commands.When("SetCores", []string{"test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "set", "cores", "test.virtual.machine")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(0)
+	commands.When("SetMemory", []string{"test.virtual.machine", "16G"}).Times(1)
+	doDispatchTest(t, config, commands, "set", "memory", "test.virtual.machine", "16G")
+	commands.Reset()
+
+	commands.When("HelpForSet").Times(0)
+	commands.When("SetMemory", []string{"test.virtual.machine"}).Times(1)
+	doDispatchTest(t, config, commands, "set", "memory", "test.virtual.machine")
+	commands.Reset()
 }
 
 func TestDispatchDoHelp(t *testing.T) {
