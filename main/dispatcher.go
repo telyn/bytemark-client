@@ -11,7 +11,7 @@ import (
 // Dispatcher is used to determine what functions to run for the command-line arguments provided
 type Dispatcher struct {
 	Flags      *flag.FlagSet
-	cmds       Commands
+	cmds       commands.CommandManager
 	config     ConfigManager
 	debugLevel int
 }
