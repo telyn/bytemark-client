@@ -108,7 +108,7 @@ List of commands
 	    --hwprofile <profile>
 	    --hwprofile-locked (if specified, will lock the hwprofile)
 	    --image <image name> 
-	    --memory <num> (default 1, unit GB)
+	    --memory <size> (default 1, default unit GB)
 	    --public-keys <keys> (newline seperated)
 	    --public-keys-file <file> (will be read & appended to --public-keys)
 	    --root-password <password>
@@ -140,8 +140,8 @@ List of commands
 `bigv revoke <user> <privilege>`
 `bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
 `bigv set hwprofile <virtual machine> <hardware profile>`
-`bigv set memory <virtual machine> <hardware profile>`
-`bigv set cores <virtual machine> <hardware profile>`
+`bigv set memory <virtual machine> <size>`
+`bigv set cores <virtual machine> <num>`
 `bigv show account [--json] <account>` - shows an overview of the given account, a list of groups and vms within them
 `bigv show group [--json] <group>` - shows an overview of the given group, a list of VMs in them w/ size information
 `bigv show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
