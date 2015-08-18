@@ -73,7 +73,7 @@ const (
 )
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
-func (cmds *CommandSet) HelpForExitCodes() ExitCode {
+func HelpForExitCodes() ExitCode {
 	fmt.Println(`bigv exit code list:
 
 Exit code ranges:
