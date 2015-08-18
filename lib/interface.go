@@ -64,6 +64,8 @@ type Client interface {
 
 	// GetAccount takes an account name or ID and returns a filled-out Account object
 	GetAccount(name string) (account *Account, err error)
+	// GetAccount gets all the accounts the logged-in user can see.
+	GetAccounts() (accounts []*Account, err error)
 
 	//
 	// GROUPS

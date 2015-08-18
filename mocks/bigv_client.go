@@ -63,6 +63,12 @@ func (c *BigVClient) GetAccount(name string) (account *bigv.Account, err error) 
 	return acc, r.Error(1)
 }
 
+func (c *BigVClient) GetAccounts() (accounts []*bigv.Account, err error) {
+	r := c.Called()
+	acc, _ := r.Get(0).([]*bigv.Account)
+	return acc, r.Error(1)
+}
+
 func (c *BigVClient) CreateGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
