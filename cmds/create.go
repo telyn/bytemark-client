@@ -50,9 +50,10 @@ func (cmds *CommandSet) HelpForCreate() util.ExitCode {
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
 func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
+	flags.Parse()
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(args, "group")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
