@@ -1,4 +1,4 @@
-package main
+package cmds
 
 import (
 	cmd "bigv.io/client/cmd"
