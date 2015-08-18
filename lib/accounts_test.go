@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGetAccounts(t *testing.T) {
+func TestGetAccount(t *testing.T) {
 	is := is.New(t)
 	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account" {
@@ -43,5 +43,42 @@ func TestGetAccounts(t *testing.T) {
 	acc, err = client.GetAccount("account")
 	is.NotNil(acc)
 	is.Equal("account", acc.Name)
+
+}
+
+func TestGetAccounts(t *testing.T) {
+	is := is.New(t)
+	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts" {
+			w.Write([]byte(`[
+			{
+			    "name": "account",
+			    "id": 1
+			}, {
+			    "name": "Dr. Evil",
+			    "suspended": true,
+			    "id": 10
+			}
+			]`))
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+
+	}))
+	defer authServer.Close()
+	defer brain.Close()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	acc, err := client.GetAccounts()
+	is.Nil(err)
+	is.Equal(2, len(acc))
+	is.Equal("Dr. Evil", acc[1].Name)
 
 }
