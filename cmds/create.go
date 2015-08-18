@@ -50,25 +50,16 @@ func (cmds *CommandSet) HelpForCreate() util.ExitCode {
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
 func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
-	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	// extract this out to util.PromptForGroupName probably
-	name := bigv.GroupName{"", ""}
-	if len(args) == 0 {
-		name = cmds.bigv.ParseGroupName(util.Prompt("Group name: "))
-	} else if name = cmds.bigv.ParseGroupName(args[0]); name.Group == "" {
-		name = cmds.bigv.ParseGroupName(util.Prompt("Group name: "))
+	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
 	}
+	name := cmds.bigv.ParseGroupName(nameStr)
 
-	var err error
-	if name.Account == "" {
-		if name.Account, err = cmds.config.Get("account"); name.Account == "" {
-			name.Account = util.Prompt("Account name: ")
-		}
-	}
-
-	err = cmds.EnsureAuth()
+	err := cmds.EnsureAuth()
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -100,10 +91,15 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	args = cmds.config.ImportFlags(flags)
 
 	var err error
+	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForCreateVM()
+		return util.E_PEBKAC
+	}
 
 	name := bigv.VirtualMachineName{"", "", ""}
 	if len(args) > 0 {
-		name, err = cmds.bigv.ParseVirtualMachineName(args[0])
+		name, err = cmds.bigv.ParseVirtualMachineName(nameStr)
 
 	}
 	memory, err := util.ParseSize(*memorySpec)

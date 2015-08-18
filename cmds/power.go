@@ -44,7 +44,13 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return util.E_PEBKAC
@@ -74,7 +80,13 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return util.E_PEBKAC
@@ -103,7 +115,13 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return util.E_PEBKAC
@@ -133,7 +151,13 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return util.E_PEBKAC
@@ -162,7 +186,13 @@ func (cmds *CommandSet) ResetVM(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
 		return util.E_PEBKAC
