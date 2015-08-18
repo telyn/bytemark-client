@@ -1,7 +1,7 @@
 How to add a command
 ====================
 
-Lib
+lib
 ----
 
 * Add a function to call the API to a relevant file in `lib/`. The
@@ -12,42 +12,45 @@ Lib
 * Add the function you just made to the interface to
   `lib/interface.go`. Now `go test bigv.io/client/main` will break.
 
-* Add a mock version of the function to `main/mocks_test.go`'s
-  `mockBigVClient`. Now `go test bigv.io/client/main` will work.
+* Add a unit test for your API call to the relavent `_test.go` file
+  in `lib/`.
+
+* Add a mock version of the function to `mocks/bigv-client.go`
+  Now `go test bigv.io/client/main` will work.
   Commit if you like.
 
-Main
+cmds
 ----
 
-* Add a CamelCased version of the command to `main/commands.go`'s
-  `Commands` interface. Now `go test bigv.io/client/main` will break.
+* Add a CamelCased version of the command to `cmds/cmds.go`
+  `CommandManager` interface. Now `go test bigv.io/client/main` will break.
 
-* Add a mock version of the function to `main/mocks_test.go`'s
-  `mockCommands`. Now `go test bigv.io/client/main` will work.
+* Add a mock version of the function to `mocks/cmds.go`'s
+  `CommandManager`. Now `go test bigv.io/client/main` will work.
 
-* Implement the function in `main/cmd-<base>.go` where `<base>` is
-  the first word of the command. See cmd-create.go and CreateVM for a
-  kind of template, although CreateVM is complicated and messy.
+* Implement the function in `cmds/<base>.go` where `<base>` is
+  the first word of the command. See cmd-show.go and ShowVM for a
+  kind of template, although its output is more complicated than you likely need
 
-* Add usage info to `main/cmd-<base>.go`'s `HelpFor<Base>` function.
+* Add usage info to `cmds/<base>.go`'s `HelpFor<Base>` function.
   Split it out if you have a particularly complicated usage info. If
   you do, no need to add it to the `Commands` interface nor
-  `mockCommands`.
+  `Commands`.
+
+* Add a unit test for the command to `cmds/cmds_test.go`. You're
+  trying to ensure that your function turns its arguments into the
+  right parameters to the API-calling function you made at the
+  beginning.
+
+main
+----
 
 * Add a case statement and call to the function in `Do` in
   `main/dispatcher.go`
 
-Tests
------
-
 * Add a test for it to `main/dispatcher_test.go`. The test should
   ensure that your function gets called when the command is passed to
   Do.
-
-* Add a unit test for the command to `main/commands_test.go`. You're
-  trying to ensure that your function turns its arguments into the
-  right parameters to the API-calling function you made at the
-  beginning.
 
 Finishing up
 ------------

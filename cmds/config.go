@@ -1,13 +1,14 @@
-package main
+package cmds
 
 import (
+	"bigv.io/client/cmds/util"
 	"fmt"
 	"os"
 	"strings"
 )
 
 // HelpForConfig outputs usage information for the bigv config command.
-func (cmds *CommandSet) HelpForConfig() ExitCode {
+func (cmds *CommandSet) HelpForConfig() util.ExitCode {
 	fmt.Println("go-bigv config")
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -26,24 +27,24 @@ func (cmds *CommandSet) HelpForConfig() ExitCode {
 	fmt.Println("    debug-level - the default debug level. Set to 0 unless you like lots of output")
 	fmt.Println("    token - the token used for authentication.") // You can get one using bigv auth.")
 	fmt.Println()
-	return E_USAGE_DISPLAYED
+	return util.E_USAGE_DISPLAYED
 }
 
 // Config provides the bigv config command, which sets variables in the user's config. See HelpForConfig for usage information.
 // It's slightly more user friendly than echo "value" > ~/.go-bigv/
-func (cmds *CommandSet) Config(args []string) ExitCode {
+func (cmds *CommandSet) Config(args []string) util.ExitCode {
 	if len(args) == 0 {
 		vars, err := cmds.config.GetAll()
 		if err != nil {
-			return processError(err)
+			return util.ProcessError(err)
 		}
 		for _, v := range vars {
 			fmt.Printf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
 		}
-		return E_SUCCESS
+		return util.E_SUCCESS
 	} else if len(args) == 1 {
 		cmds.HelpForConfig()
-		return E_SUCCESS
+		return util.E_SUCCESS
 	}
 
 	switch strings.ToLower(args[0]) {
@@ -52,28 +53,28 @@ func (cmds *CommandSet) Config(args []string) ExitCode {
 
 		oldVar, err := cmds.config.GetV(variable)
 		if err != nil {
-			if e, ok := err.(*ConfigReadError); ok {
+			if e, ok := err.(*util.ConfigReadError); ok {
 				fmt.Fprintf(os.Stderr, "Couldn't read the old value of %s - %v\r\n", e.Name, e.Err)
 			} else {
 				fmt.Fprintf(os.Stderr, "Couldn't read the old value of %s - %v\r\n", variable, err)
 			}
-			return E_CANT_READ_CONFIG
+			return util.E_CANT_READ_CONFIG
 		}
 
 		if len(args) == 2 {
 			fmt.Printf("%s: '%s' (%s)\r\n", oldVar.Name, oldVar.Value, oldVar.Source)
-			return E_SUCCESS
+			return util.E_SUCCESS
 		}
 
 		// TODO(telyn): consider validating input for the set command
 		err = cmds.config.SetPersistent(variable, args[2], "CMD set")
 		if err != nil {
-			if e, ok := err.(*ConfigReadError); ok {
+			if e, ok := err.(*util.ConfigReadError); ok {
 				fmt.Fprintf(os.Stderr, "Couldn't set %s - %v\r\n", e.Name, e.Err)
 			} else {
 				fmt.Fprintf(os.Stderr, "Couldn't set %s - %v\r\n", variable, err)
 			}
-			return E_CANT_WRITE_CONFIG
+			return util.E_CANT_WRITE_CONFIG
 		}
 
 		if oldVar.Source == "config" && !cmds.config.Silent() {
@@ -85,10 +86,10 @@ func (cmds *CommandSet) Config(args []string) ExitCode {
 	case "unset":
 		variable := strings.ToLower(args[0])
 		err := cmds.config.Unset(variable)
-		return processError(err)
+		return util.ProcessError(err)
 	default:
 		fmt.Printf("Unrecognised command %s\r\n", args[0])
 		cmds.HelpForConfig()
 	}
-	return E_SUCCESS
+	return util.E_SUCCESS
 }

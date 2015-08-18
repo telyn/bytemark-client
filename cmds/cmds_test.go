@@ -1,7 +1,9 @@
-package main
+package cmds
 
 import (
+	util "bigv.io/client/cmds/util"
 	bigv "bigv.io/client/lib"
+	"bigv.io/client/mocks"
 	"testing"
 	//"github.com/cheekybits/is"
 )
@@ -33,9 +35,9 @@ func getFixtureGroup() bigv.Group {
 ////////////////
 
 func TestCommandConfig(t *testing.T) {
-	config := &mockConfig{}
+	config := &mocks.Config{}
 
-	config.When("GetV", "user").Return(ConfigVar{"user", "old-test-user", "config"})
+	config.When("GetV", "user").Return(util.ConfigVar{"user", "old-test-user", "config"})
 	config.When("Get", "user").Return("old-test-user")
 	config.When("Silent").Return(true)
 
@@ -50,8 +52,8 @@ func TestCommandConfig(t *testing.T) {
 }
 
 func TestCreateVMCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -111,8 +113,8 @@ func TestCreateVMCommand(t *testing.T) {
 }
 
 func TestShowGroupCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
@@ -133,8 +135,8 @@ func TestShowGroupCommand(t *testing.T) {
 }
 
 func TestResetCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
@@ -152,8 +154,8 @@ func TestResetCommand(t *testing.T) {
 	}
 }
 func TestRestartCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
@@ -171,8 +173,8 @@ func TestRestartCommand(t *testing.T) {
 	}
 }
 func TestShutdownCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
@@ -189,8 +191,8 @@ func TestShutdownCommand(t *testing.T) {
 	}
 }
 func TestStartCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
@@ -208,8 +210,8 @@ func TestStartCommand(t *testing.T) {
 	}
 }
 func TestStopCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
@@ -230,8 +232,8 @@ func TestStopCommand(t *testing.T) {
 }
 
 func TestShowVMCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
@@ -251,8 +253,8 @@ func TestShowVMCommand(t *testing.T) {
 }
 
 func TestSetCores(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
@@ -277,8 +279,8 @@ func TestSetCores(t *testing.T) {
 }
 
 func TestSetMemory(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
@@ -322,8 +324,8 @@ func TestSetMemory(t *testing.T) {
 }
 
 func TestLockHWProfileCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
@@ -349,8 +351,8 @@ func TestLockHWProfileCommand(t *testing.T) {
 }
 
 func TestUnlockHWProfileCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
@@ -376,8 +378,8 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 }
 
 func TestSetHWProfileCommand(t *testing.T) {
-	c := &mockBigVClient{}
-	config := &mockConfig{}
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
 
 	vmname := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",

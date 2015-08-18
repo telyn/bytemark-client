@@ -1,12 +1,13 @@
-package main
+package cmds
 
 import (
+	"bigv.io/client/cmds/util"
 	"fmt"
 	"strings"
 )
 
 // HelpForHelp shows overall usage information for the BigV client, including a list of available commands.
-func (cmds *CommandSet) HelpForHelp() ExitCode {
+func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	fmt.Println("bigv command-line client (the new, cool one)")
 	fmt.Println()
 	fmt.Println("Usage")
@@ -20,11 +21,11 @@ func (cmds *CommandSet) HelpForHelp() ExitCode {
 	fmt.Println()
 	fmt.Println("See `go-bigv help <command>` for help specific to a command")
 	fmt.Println()
-	return E_USAGE_DISPLAYED
+	return util.E_USAGE_DISPLAYED
 }
 
 // Help implements the help command, which gives usage information specific to each command. Usage: bigv help [command]
-func (cmds *CommandSet) Help(args []string) ExitCode {
+func (cmds *CommandSet) Help(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return cmds.HelpForHelp()
 	}
@@ -40,9 +41,9 @@ func (cmds *CommandSet) Help(args []string) ExitCode {
 	case "delete":
 		return cmds.HelpForDelete()
 	case "exit":
-		return cmds.HelpForExitCodes()
+		return util.HelpForExitCodes()
 	case "exit-codes":
-		return cmds.HelpForExitCodes()
+		return util.HelpForExitCodes()
 	case "show":
 		return cmds.HelpForShow()
 	}

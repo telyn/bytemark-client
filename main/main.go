@@ -1,7 +1,7 @@
 package main
 
 import (
-	//	bigv "bigv.io/client/lib"
+	util "bigv.io/client/cmds/util"
 	"fmt"
 	"os"
 	"os/signal"
@@ -13,12 +13,12 @@ func main() {
 	go func() {
 		for _ = range ch {
 			fmt.Printf("\r\nCaught an interrupt - exiting.\r\n")
-			os.Exit(int(E_TRAPPED_INTERRUPT))
+			os.Exit(int(util.E_TRAPPED_INTERRUPT))
 		}
 
 	}()
 
-	flags := MakeCommonFlagSet()
+	flags := util.MakeCommonFlagSet()
 
 	flags.Parse(os.Args[1:])
 
@@ -28,14 +28,14 @@ func main() {
 		configDir = value.String()
 	}
 
-	config, err := NewConfig(configDir, flags)
+	config, err := util.NewConfig(configDir, flags)
 	if err != nil {
-		os.Exit(int(processError(err)))
+		os.Exit(int(util.ProcessError(err)))
 	}
 
 	dispatch, err := NewDispatcher(config)
 	if err != nil {
-		os.Exit(int(processError(err)))
+		os.Exit(int(util.ProcessError(err)))
 	}
 
 	os.Exit(int(dispatch.Do(flags.Args())))

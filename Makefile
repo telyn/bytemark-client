@@ -1,4 +1,4 @@
-ALL_PACKAGES := bigv.io/client/lib bigv.io/client/main
+ALL_PACKAGES := bigv.io/client/lib bigv.io/client/cmds/util bigv.io/client/cmds bigv.io/client/main
 ALL_FILES := main/*.go lib/*.go
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)

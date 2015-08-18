@@ -1,7 +1,7 @@
-package main
+package cmds
 
 import (
-	//bigv "bigv.io/client/lib"
+	util "bigv.io/client/cmds/util"
 	"fmt"
 	"os"
 	"strconv"
@@ -9,95 +9,95 @@ import (
 
 // HelpForLocking provides usage information for locking and unlocking hardware
 // profiles.
-func (cmds *CommandSet) HelpForLocks() ExitCode {
-	return E_SUCCESS
+func (cmds *CommandSet) HelpForLocks() util.ExitCode {
+	return util.E_SUCCESS
 }
 
 // HelpForSet provides usage information for the set command and its subcommands.
-func (cmds *CommandSet) HelpForSet() ExitCode {
-	return E_SUCCESS
+func (cmds *CommandSet) HelpForSet() util.ExitCode {
+	return util.E_SUCCESS
 }
 
 // LockHWProfile implements the lock-hwprofile command
-func (cmds *CommandSet) LockHWProfile(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) LockHWProfile(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	e := cmds.bigv.SetVirtualMachineHardwareProfileLock(name, true)
-	return processError(e)
+	return util.ProcessError(e)
 }
 
 // UnlockHWProfile implements the unlock-hwprofile command
-func (cmds *CommandSet) UnlockHWProfile(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) UnlockHWProfile(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	e := cmds.bigv.SetVirtualMachineHardwareProfileLock(name, false)
-	return processError(e)
+	return util.ProcessError(e)
 }
 
 // SetCores implements the set-cores command
-func (cmds *CommandSet) SetCores(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) SetCores(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	if len(args) != 2 {
 		fmt.Println("must specify a VM name and a number of CPUs")
 		cmds.HelpForSet()
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	// decide on the number of cores to set now
 	cores, err := strconv.Atoi(args[1])
 	if err != nil || cores < 1 {
 		fmt.Fprintf(os.Stderr, "Invalid number of cores \"%s\"\r\n", args[1])
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	// submit command to BigV
 	err = cmds.bigv.SetVirtualMachineCores(name, cores)
-	return processError(err)
+	return util.ProcessError(err)
 }
 
 // SetHWProfile implements the set-hwprofile command
-func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) SetHWProfile(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	lock_hwp := flags.Bool("lock", false, "")
 	unlock_hwp := flags.Bool("unlock", false, "")
 	flags.Parse(args)
@@ -107,24 +107,24 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	if *lock_hwp && *unlock_hwp {
 		fmt.Println("ambiguous command, both lock and unlock specified")
 		cmds.HelpForSet()
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	// name and hardware profile required
 	if len(args) != 2 {
 		fmt.Println("must specify a VM name and a hardware profile")
 		cmds.HelpForSet()
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	// if lock_hwp or unlock_hwp are specified, account this into the call
@@ -138,38 +138,38 @@ func (cmds *CommandSet) SetHWProfile(args []string) ExitCode {
 	}
 
 	// return
-	return processError(err)
+	return util.ProcessError(err)
 }
 
 // SetMemory implements the set-memory command
-func (cmds *CommandSet) SetMemory(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) SetMemory(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	if len(args) != 2 {
 		fmt.Println("must specify a VM name and an amount of memory")
 		cmds.HelpForSet()
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to parse VM name\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
-	memory, err := ParseSize(args[1])
+	memory, err := util.ParseSize(args[1])
 	if err != nil || memory < 1 {
 		fmt.Fprintf(os.Stderr, "Invalid amount of memory \"%s\"\r\n", args[1])
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	err = cmds.bigv.SetVirtualMachineMemory(name, memory)
-	return processError(err)
+	return util.ProcessError(err)
 }

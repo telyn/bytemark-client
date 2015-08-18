@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	bigv "bigv.io/client/lib"
@@ -73,7 +73,7 @@ const (
 )
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
-func (cmds *CommandSet) HelpForExitCodes() ExitCode {
+func HelpForExitCodes() ExitCode {
 	fmt.Println(`bigv exit code list:
 
 Exit code ranges:
@@ -136,7 +136,7 @@ Exit code ranges:
 	return E_USAGE_DISPLAYED
 }
 
-func processError(err error, message ...string) ExitCode {
+func ProcessError(err error, message ...string) ExitCode {
 	if len(message) > 0 {
 		fmt.Println(strings.Join(message, "\r\n"))
 	} else if err == nil {

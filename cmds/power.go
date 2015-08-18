@@ -1,11 +1,12 @@
-package main
+package cmds
 
 import (
+	"bigv.io/client/cmds/util"
 	"fmt"
 	"os"
 )
 
-func (cmds *CommandSet) HelpForPower() ExitCode {
+func (cmds *CommandSet) HelpForPower() util.ExitCode {
 	fmt.Println("go-bigv power commands")
 	fmt.Println()
 	fmt.Println("usage: go-bigv start")
@@ -35,22 +36,22 @@ func (cmds *CommandSet) HelpForPower() ExitCode {
 	fmt.Println("       pressed the reset button. Doesn't apply hardware")
 	fmt.Println("       changes.")
 	fmt.Println()
-	return E_USAGE_DISPLAYED
+	return util.E_USAGE_DISPLAYED
 }
 
-func (cmds *CommandSet) Start(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) Start(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -58,17 +59,17 @@ func (cmds *CommandSet) Start(args []string) ExitCode {
 	}
 	err = cmds.bigv.StartVirtualMachine(name)
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " started successfully.")
 	}
-	return E_SUCCESS
+	return util.E_SUCCESS
 }
 
-func (cmds *CommandSet) Shutdown(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	restart := flags.Bool("restart", false, "")
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -76,11 +77,11 @@ func (cmds *CommandSet) Shutdown(args []string) ExitCode {
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -89,28 +90,28 @@ func (cmds *CommandSet) Shutdown(args []string) ExitCode {
 
 	err = cmds.bigv.ShutdownVirtualMachine(name, !*restart)
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " was shutdown successfully.")
 	}
-	return E_SUCCESS
+	return util.E_SUCCESS
 }
-func (cmds *CommandSet) Stop(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) Stop(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -118,28 +119,28 @@ func (cmds *CommandSet) Stop(args []string) ExitCode {
 	}
 	err = cmds.bigv.StopVirtualMachine(name)
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " stopped successfully.")
 	}
-	return E_SUCCESS
+	return util.E_SUCCESS
 }
 
-func (cmds *CommandSet) Restart(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) Restart(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -147,29 +148,29 @@ func (cmds *CommandSet) Restart(args []string) ExitCode {
 	}
 	err = cmds.bigv.RestartVirtualMachine(name)
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " restart successfully.")
 	}
-	return E_SUCCESS
+	return util.E_SUCCESS
 }
 
-func (cmds *CommandSet) ResetVM(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) ResetVM(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
-		return E_PEBKAC
+		return util.E_PEBKAC
 	}
 
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -177,12 +178,12 @@ func (cmds *CommandSet) ResetVM(args []string) ExitCode {
 	}
 	err = cmds.bigv.ResetVirtualMachine(name)
 	if err != nil {
-		return processError(err)
+		return util.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
 		fmt.Println(name.VirtualMachine, " reset successfully.")
 	}
-	return E_SUCCESS
+	return util.E_SUCCESS
 
 }

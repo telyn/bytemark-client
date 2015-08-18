@@ -1,6 +1,7 @@
-package main
+package cmds
 
 import (
+	util "bigv.io/client/cmds/util"
 	bigv "bigv.io/client/lib"
 	"bufio"
 	auth3 "bytemark.co.uk/auth3/client"
@@ -11,52 +12,54 @@ import (
 	"strings"
 )
 
+type CommandFunc func([]string) util.ExitCode
+
 // Commands represents the available commands in the BigV client. Each command should have its own function defined here, with a corresponding HelpFor* function too.
-type Commands interface {
+type CommandManager interface {
 	EnsureAuth() error
 
-	Config([]string) ExitCode
-	Console([]string) ExitCode
-	CreateGroup([]string) ExitCode
-	CreateVM([]string) ExitCode
-	DeleteGroup([]string) ExitCode
-	DeleteVM([]string) ExitCode
-	Debug([]string) ExitCode
-	Help([]string) ExitCode
-	LockHWProfile([]string) ExitCode
-	UnlockHWProfile([]string) ExitCode
-	ResetVM([]string) ExitCode
-	Restart([]string) ExitCode
-	SetCores([]string) ExitCode
-	SetHWProfile([]string) ExitCode
-	SetMemory([]string) ExitCode
-	Start([]string) ExitCode
-	Stop([]string) ExitCode
-	Shutdown([]string) ExitCode
-	ShowAccount([]string) ExitCode
-	ShowGroup([]string) ExitCode
-	ShowVM([]string) ExitCode
-	UndeleteVM([]string) ExitCode
+	Config([]string) util.ExitCode
+	Console([]string) util.ExitCode
+	CreateGroup([]string) util.ExitCode
+	CreateVM([]string) util.ExitCode
+	DeleteGroup([]string) util.ExitCode
+	DeleteVM([]string) util.ExitCode
+	Debug([]string) util.ExitCode
+	Help([]string) util.ExitCode
+	LockHWProfile([]string) util.ExitCode
+	UnlockHWProfile([]string) util.ExitCode
+	ResetVM([]string) util.ExitCode
+	Restart([]string) util.ExitCode
+	SetCores([]string) util.ExitCode
+	SetHWProfile([]string) util.ExitCode
+	SetMemory([]string) util.ExitCode
+	Start([]string) util.ExitCode
+	Stop([]string) util.ExitCode
+	Shutdown([]string) util.ExitCode
+	ShowAccount([]string) util.ExitCode
+	ShowGroup([]string) util.ExitCode
+	ShowVM([]string) util.ExitCode
+	UndeleteVM([]string) util.ExitCode
 
-	HelpForConfig() ExitCode
-	HelpForCreate() ExitCode
-	HelpForDebug() ExitCode
-	HelpForDelete() ExitCode
-	HelpForHelp() ExitCode
-	HelpForLocks() ExitCode
-	HelpForPower() ExitCode
-	HelpForSet() ExitCode
-	HelpForShow() ExitCode
+	HelpForConfig() util.ExitCode
+	HelpForCreate() util.ExitCode
+	HelpForDebug() util.ExitCode
+	HelpForDelete() util.ExitCode
+	HelpForHelp() util.ExitCode
+	HelpForLocks() util.ExitCode
+	HelpForPower() util.ExitCode
+	HelpForSet() util.ExitCode
+	HelpForShow() util.ExitCode
 }
 
 // CommandSet is the main implementation of the Commands interface
 type CommandSet struct {
 	bigv   bigv.Client
-	config ConfigManager
+	config util.ConfigManager
 }
 
 // NewCommandSet creates a CommandSet given a ConfigManager and bigv.io/client/lib Client.
-func NewCommandSet(config ConfigManager, client bigv.Client) *CommandSet {
+func NewCommandSet(config util.ConfigManager, client bigv.Client) *CommandSet {
 	commandSet := new(CommandSet)
 	commandSet.config = config
 	commandSet.bigv = client

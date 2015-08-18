@@ -1,6 +1,6 @@
 // +build !windows
 
-package main
+package util
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ func openCommand() string {
 	}
 }
 
-func callBrowser(url string) error {
+func CallBrowser(url string) error {
 	fmt.Fprintf(os.Stderr, "Running a browser to open %s...", url)
 	command := openCommand()
 	bin, err := exec.LookPath(command)
