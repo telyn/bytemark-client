@@ -1,12 +1,13 @@
 package main
 
 import (
+	"bigv.io/client/mocks"
 	"testing"
 	//"github.com/cheekybits/is"
 )
 
-func doDispatchTest(t *testing.T, config *mockConfig, commands *mockCommands, args ...string) {
-	d, err := NewDispatcherWithCommands(config, commands)
+func doDispatchTest(t *testing.T, config *mocks.Config, commands *mocks.Commands, args ...string) {
+	d, err := NewDispatcherWithCommandManager(config, commands)
 	if err != nil {
 		t.Fatalf("NewDispatcherWithCommands died: %v", err)
 	}
@@ -23,8 +24,8 @@ func doDispatchTest(t *testing.T, config *mockConfig, commands *mockCommands, ar
 }
 
 func TestDispatchDoCreate(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -38,8 +39,8 @@ func TestDispatchDoCreate(t *testing.T) {
 }
 
 func TestDispatchDoDebug(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -50,8 +51,8 @@ func TestDispatchDoDebug(t *testing.T) {
 }
 
 func TestDispatchDoDelete(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -69,8 +70,8 @@ func TestDispatchDoDelete(t *testing.T) {
 }
 
 func TestDispatchDoUndelete(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -84,8 +85,8 @@ func TestDispatchDoUndelete(t *testing.T) {
 }
 
 func TestDispatchDoLock(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -107,8 +108,8 @@ func TestDispatchDoLock(t *testing.T) {
 }
 
 func TestDispatchDoUnlock(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -131,8 +132,8 @@ func TestDispatchDoUnlock(t *testing.T) {
 }
 
 func TestDispatchDoSet(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -187,8 +188,8 @@ func TestDispatchDoSet(t *testing.T) {
 }
 
 func TestDispatchDoHelp(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 	config.When("Get", "silent").Return("true")
@@ -207,8 +208,8 @@ func TestDispatchDoHelp(t *testing.T) {
 }
 
 func TestDispatchDoConfig(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -229,8 +230,8 @@ func TestDispatchDoConfig(t *testing.T) {
 }
 
 func TestDispatchDoPower(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
@@ -276,8 +277,8 @@ func TestDispatchDoPower(t *testing.T) {
 }
 
 func TestDispatchDoShow(t *testing.T) {
-	commands := &mockCommands{}
-	config := &mockConfig{}
+	commands := &mocks.Commands{}
+	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 	config.When("Get", "silent").Return(true)
@@ -296,8 +297,8 @@ func TestDispatchDoShow(t *testing.T) {
 }
 
 //func TestDispatchDoUnset(t *testing.T) {
-//	commands := &mockCommands{}
-//	config := &mockConfig{}
+//	commands := &mocks.Commands{}
+//	config := &mocks.Config{}
 //	config.When("Get", "endpoint").Return("endpoint.example.com")
 //	config.When("GetDebugLevel").Return(0)
 //

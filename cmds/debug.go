@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"bigv.io/client/cmds/util"
 	"bufio"
 	"bytes"
 	"encoding/json"
@@ -10,7 +11,7 @@ import (
 )
 
 // HelpForDebug outputs usage information for the debug command.
-func (commands *CommandSet) HelpForDebug() ExitCode {
+func (commands *CommandSet) HelpForDebug() cmd.ExitCode {
 	fmt.Println("go-bigv debug")
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -24,14 +25,14 @@ func (commands *CommandSet) HelpForDebug() ExitCode {
 	fmt.Println("The --junk-token flag sets the token to empty - useful if you want to ensure that credential-auth is working, or you want to do something as another user")
 	fmt.Println("The --auth token tells the client to gain valid auth and send the auth header on that request.")
 	fmt.Println()
-	return E_USAGE_DISPLAYED
+	return cmd.E_USAGE_DISPLAYED
 
 }
 
 // Debug makes an HTTP <method> request to the URL specified in the arguments.
 // command syntax: debug <method> <url>
-func (commands *CommandSet) Debug(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (commands *CommandSet) Debug(args []string) cmd.ExitCode {
+	flags := cmd.MakeCommonFlagSet()
 	junkToken := flags.Bool("junk-token", false, "")
 	shouldAuth := flags.Bool("auth", false, "")
 	flags.Parse(args)
@@ -43,7 +44,7 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 
 	if len(args) < 1 {
 		commands.HelpForDebug()
-		return E_SUCCESS
+		return cmd.E_SUCCESS
 	}
 
 	switch args[0] {
@@ -55,7 +56,7 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 		if *shouldAuth {
 			err := commands.EnsureAuth()
 			if err != nil {
-				return processError(err)
+				return cmd.ProcessError(err)
 			}
 		}
 
@@ -66,12 +67,12 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 			requestBody, err = buf.ReadString(byte(uint8(14)))
 			if err != nil {
 				// BUG(telyn): deal with EOFs properly
-				return processError(err)
+				return cmd.ProcessError(err)
 			}
 		}
 		body, err := commands.bigv.RequestAndRead(*shouldAuth, args[0], args[1], requestBody)
 		if err != nil {
-			return processError(err)
+			return cmd.ProcessError(err)
 		}
 
 		buf := new(bytes.Buffer)
@@ -80,12 +81,12 @@ func (commands *CommandSet) Debug(args []string) ExitCode {
 	case "config":
 		vars, err := commands.config.GetAll()
 		if err != nil {
-			return processError(err)
+			return cmd.ProcessError(err)
 		}
 		indented, _ := json.MarshalIndent(vars, "", "    ")
 		fmt.Printf("%s", indented)
 	default:
 		commands.HelpForDebug()
 	}
-	return E_SUCCESS
+	return cmd.E_SUCCESS
 }

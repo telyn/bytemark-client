@@ -1,12 +1,13 @@
 package cmds
 
 import (
+	"bigv.io/client/cmds/util"
 	bigv "bigv.io/client/lib"
 	"fmt"
 )
 
 //HelpForCreateVM provides usage information for the create-vm command
-func (cmd *CommandSet) HelpForCreateVM() ExitCode {
+func (cmds *CommandSet) HelpForCreateVM() cmd.ExitCode {
 	fmt.Println("go-bigv create vm")
 	fmt.Println()
 	fmt.Println("usage: go-bigv create vm [flags] <name> [<cores> [<memory> [<disc specs>]]")
@@ -29,12 +30,12 @@ func (cmd *CommandSet) HelpForCreateVM() ExitCode {
 	fmt.Println("    --zone <name> (default manchester)")
 	fmt.Println()
 	fmt.Println("If hwprofile-locked is set then the virtual machine's hardware won't be changed over time.")
-	return E_USAGE_DISPLAYED
+	return cmd.E_USAGE_DISPLAYED
 
 }
 
 //HelpForCreate provides usage information for the create command and its subcommands.
-func (cmd *CommandSet) HelpForCreate() ExitCode {
+func (cmds *CommandSet) HelpForCreate() cmd.ExitCode {
 	fmt.Println("go-bigv create")
 	fmt.Println()
 	fmt.Println("usage: go-bigv create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine>")
@@ -43,46 +44,46 @@ func (cmd *CommandSet) HelpForCreate() ExitCode {
 	fmt.Println("               create ip [--reason reason] <virtual machine>")
 	fmt.Println("               create vm (see go-bigv help create vm)")
 	fmt.Println("")
-	return E_USAGE_DISPLAYED
+	return cmd.E_USAGE_DISPLAYED
 }
 
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
-func (cmd *CommandSet) CreateGroup(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) CreateGroup(args []string) cmd.ExitCode {
+	flags := cmd.MakeCommonFlagSet()
 	flags.Parse(args)
-	args = cmd.config.ImportFlags(flags)
+	args = cmds.config.ImportFlags(flags)
 
-	// extract this out to PromptForGroupName probably
+	// extract this out to cmd.PromptForGroupName probably
 	name := bigv.GroupName{"", ""}
 	if len(args) == 0 {
-		name = cmd.bigv.ParseGroupName(Prompt("Group name: "))
-	} else if name = cmd.bigv.ParseGroupName(args[0]); name.Group == "" {
-		name = cmd.bigv.ParseGroupName(Prompt("Group name: "))
+		name = cmds.bigv.ParseGroupName(cmd.Prompt("Group name: "))
+	} else if name = cmds.bigv.ParseGroupName(args[0]); name.Group == "" {
+		name = cmds.bigv.ParseGroupName(cmd.Prompt("Group name: "))
 	}
 
 	var err error
 	if name.Account == "" {
-		if name.Account, err = cmd.config.Get("account"); name.Account == "" {
-			name.Account = Prompt("Account name: ")
+		if name.Account, err = cmds.config.Get("account"); name.Account == "" {
+			name.Account = cmd.Prompt("Account name: ")
 		}
 	}
 
-	err = cmd.EnsureAuth()
+	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
-	err = cmd.bigv.CreateGroup(name)
+	err = cmds.bigv.CreateGroup(name)
 	if err == nil {
 		fmt.Printf("Group %s was created under account %s\r\n", name.Group, name.Account)
 	}
-	return processError(err)
+	return cmd.ProcessError(err)
 
 }
 
 // CreateVM implements the create-vm command. See HelpForCreateVM for usage
-func (cmd *CommandSet) CreateVM(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) CreateVM(args []string) cmd.ExitCode {
+	flags := cmd.MakeCommonFlagSet()
 	cores := flags.Int("cores", 1, "")
 	cdrom := flags.String("cdrom", "", "")
 	discSpecs := flags.String("discs", "25", "")
@@ -97,13 +98,13 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 	stopped := flags.Bool("stopped", false, "")
 	zone := flags.String("zone", "", "")
 	flags.Parse(args)
-	args = cmd.config.ImportFlags(flags)
+	args = cmds.config.ImportFlags(flags)
 
 	var err error
 
 	name := bigv.VirtualMachineName{"", "", ""}
 	if len(args) > 0 {
-		name, err = cmd.bigv.ParseVirtualMachineName(args[0])
+		name, err = cmds.bigv.ParseVirtualMachineName(args[0])
 
 	}
 
@@ -116,16 +117,16 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 	}
 
 	if name.Account == "" {
-		name.Account, err = cmd.config.Get("account")
+		name.Account, err = cmds.config.Get("account")
 	}
 
 	if name.Account == "" {
-		name.Account = Prompt("Account: ")
+		name.Account = cmd.Prompt("Account: ")
 	}
 
-	discs, err := ParseDiscSpec(*discSpecs, false)
+	discs, err := cmd.ParseDiscSpec(*discSpecs, false)
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 	for _, d := range discs {
 		if d.StorageGrade == "" {
@@ -160,29 +161,29 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 		Account: name.Account,
 	}
 
-	if !cmd.config.Silent() {
+	if !cmds.config.Silent() {
 		fmt.Println("The following VM will be created:")
-		fmt.Println(FormatVirtualMachineSpec(&groupName, &spec))
+		fmt.Println(cmd.FormatVirtualMachineSpec(&groupName, &spec))
 	}
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
-	if !cmd.config.Force() && !PromptYesNo("Are you certain you wish to continue?") {
+	if !cmds.config.Force() && !cmd.PromptYesNo("Are you certain you wish to continue?") {
 		fmt.Println("Exiting.")
-		return processError(&UserRequestedExit{})
+		return cmd.ProcessError(&cmd.UserRequestedExit{})
 	}
 
-	err = cmd.EnsureAuth()
+	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
-	vm, err := cmd.bigv.CreateVirtualMachine(groupName, spec)
+	vm, err := cmds.bigv.CreateVirtualMachine(groupName, spec)
 	if err != nil {
-		return processError(err)
-	} else if !cmd.config.Silent() {
+		return cmd.ProcessError(err)
+	} else if !cmds.config.Silent() {
 		fmt.Printf("Virtual machine %s created successfully\n", vm.Name)
-		fmt.Println(FormatVirtualMachine(vm))
+		fmt.Println(cmd.FormatVirtualMachine(vm))
 	}
-	return E_SUCCESS
+	return cmd.E_SUCCESS
 
 }

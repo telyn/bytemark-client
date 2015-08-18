@@ -1,80 +1,80 @@
 package mocks
 
 import (
-	"bigv.io/client/cmd"
+	util "bigv.io/client/cmds/util"
 	"flag"
 	mock "github.com/maraino/go-mock"
 )
 
 // mock Config
 
-type mockConfig struct {
+type Config struct {
 	mock.Mock
 }
 
-func (c *mockConfig) EndpointName() string {
+func (c *Config) EndpointName() string {
 	ret := c.Called()
 	return ret.String(0)
 }
-func (c *mockConfig) Force() bool {
+func (c *Config) Force() bool {
 	ret := c.Called()
 	return ret.Bool(0)
 }
 
-func (c *mockConfig) Get(name string) (string, error) {
+func (c *Config) Get(name string) (string, error) {
 	ret := c.Called(name)
 	return ret.String(0), ret.Error(1)
 }
-func (c *mockConfig) GetIgnoreErr(name string) string {
+func (c *Config) GetIgnoreErr(name string) string {
 	ret := c.Called(name)
 	return ret.String(0)
 }
 
-func (c *mockConfig) GetBool(name string) (bool, error) {
+func (c *Config) GetBool(name string) (bool, error) {
 	ret := c.Called(name)
 	return ret.Bool(0), ret.Error(1)
 }
 
-func (c *mockConfig) GetV(name string) (cmd.ConfigVar, error) {
+func (c *Config) GetV(name string) (util.ConfigVar, error) {
 	ret := c.Called(name)
-	return ret.Get(0).(cmd.ConfigVar), ret.Error(1)
+	return ret.Get(0).(util.ConfigVar), ret.Error(1)
 }
 
-func (c *mockConfig) GetAll() ([]cmd.ConfigVar, error) {
+func (c *Config) GetAll() ([]util.ConfigVar, error) {
 	ret := c.Called()
-	return ret.Get(0).([]cmd.ConfigVar), ret.Error(1)
+	return ret.Get(0).([]util.ConfigVar), ret.Error(1)
 }
 
-func (c *mockConfig) PanelURL() string {
+func (c *Config) PanelURL() string {
 	ret := c.Called()
 	return ret.String(0)
 }
 
-func (c *mockConfig) Set(name, value, source string) {
+func (c *Config) Set(name, value, source string) {
 	c.Called(name, value, source)
 	return
 }
 
-func (c *mockConfig) SetPersistent(name, value, source string) error {
+func (c *Config) SetPersistent(name, value, source string) error {
 	ret := c.Called(name, value, source)
 	return ret.Error(0)
 }
-func (c *mockConfig) Silent() bool {
+func (c *Config) Silent() bool {
 	ret := c.Called()
 	return ret.Bool(0)
 }
 
-func (c *mockConfig) Unset(name string) error {
+func (c *Config) Unset(name string) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
 
-func (c *mockConfig) GetDebugLevel() int {
+func (c *Config) GetDebugLevel() int {
 	ret := c.Called()
 	return ret.Int(0)
 }
 
-func (c *mockConfig) ImportFlags(*flag.FlagSet) []string {
+func (c *Config) ImportFlags(*flag.FlagSet) []string {
 	ret := c.Called()
 	if arr, ok := ret.Get(0).([]string); ok {
 		return arr

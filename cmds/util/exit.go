@@ -136,7 +136,7 @@ Exit code ranges:
 	return E_USAGE_DISPLAYED
 }
 
-func processError(err error, message ...string) ExitCode {
+func ProcessError(err error, message ...string) ExitCode {
 	if len(message) > 0 {
 		fmt.Println(strings.Join(message, "\r\n"))
 	} else if err == nil {

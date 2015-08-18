@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"bigv.io/client/cmds/util"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -8,7 +9,7 @@ import (
 )
 
 // HelpForShow outputs usage information for the show commands: show, show-vm, show-group, show-account.
-func (cmds *CommandSet) HelpForShow() ExitCode {
+func (cmds *CommandSet) HelpForShow() cmd.ExitCode {
 	fmt.Println("go-bigv show")
 	fmt.Println()
 	fmt.Println("usage: go-bigv show [--json] <name>")
@@ -19,47 +20,47 @@ func (cmds *CommandSet) HelpForShow() ExitCode {
 	fmt.Println("Displays information about the given virtual machine, group, or account.")
 	fmt.Println("If the --verbose flag is given to bigv show group or bigv show account, full details are given for each VM.")
 	fmt.Println()
-	return E_USAGE_DISPLAYED
+	return cmd.E_USAGE_DISPLAYED
 }
 
 // ShowVM implements the show-vm command, which is used to display information about BigV VMs. See HelpForShow for the usage information.
-func (cmds *CommandSet) ShowVM(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) ShowVM(args []string) cmd.ExitCode {
+	flags := cmd.MakeCommonFlagSet()
 	jsonOut := flags.Bool("json", false, "")
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	err := cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
-		return E_PEBKAC
+		return cmd.E_PEBKAC
 	}
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 	if !cmds.config.Silent() {
 		if *jsonOut {
 			js, _ := json.MarshalIndent(vm, "", "    ")
 			fmt.Println(string(js))
 		} else {
-			fmt.Println(FormatVirtualMachine(vm))
+			fmt.Println(cmd.FormatVirtualMachine(vm))
 		}
 	}
-	return E_SUCCESS
+	return cmd.E_SUCCESS
 
 }
 
 // ShowGroup implements the show-group command, which is used to show the BigV group name and ID, as well as the VMs within it.
-func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) ShowGroup(args []string) cmd.ExitCode {
+	flags := cmd.MakeCommonFlagSet()
 	list := flags.Bool("list-vms", false, "")
 	verbose := flags.Bool("verbose", false, "")
 	jsonOut := flags.Bool("json", false, "")
@@ -70,13 +71,13 @@ func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
 
 	err := cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
 	group, err := cmds.bigv.GetGroup(name)
 
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
 	if !cmds.config.Silent() {
@@ -92,18 +93,18 @@ func (cmds *CommandSet) ShowGroup(args []string) ExitCode {
 					fmt.Println(vm.Name)
 				}
 			} else if *verbose {
-				fmt.Println(strings.Join(FormatVirtualMachines(group.VirtualMachines), "\r\n"))
+				fmt.Println(strings.Join(cmd.FormatVirtualMachines(group.VirtualMachines), "\r\n"))
 
 			}
 		}
 	}
-	return E_SUCCESS
+	return cmd.E_SUCCESS
 
 }
 
 // ShowAccount implements the show-account command, which is used to show the BigV account name, as well as the groups and VMs within it.
-func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) ShowAccount(args []string) cmd.ExitCode {
+	flags := cmd.MakeCommonFlagSet()
 	listgroups := flags.Bool("list-groups", false, "")
 	listvms := flags.Bool("list-vms", false, "")
 	verbose := flags.Bool("verbose", false, "")
@@ -115,13 +116,13 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 
 	err := cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
 	acc, err := cmds.bigv.GetAccount(name)
 
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
 	if *jsonOut {
@@ -134,7 +135,7 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 		case *verbose:
 			for _, g := range acc.Groups {
 				fmt.Printf("Group %s\r\n", g.Name)
-				fmt.Println(strings.Join(FormatVirtualMachines(g.VirtualMachines), "\r\n"))
+				fmt.Println(strings.Join(cmd.FormatVirtualMachines(g.VirtualMachines), "\r\n"))
 			}
 		case *listgroups:
 			fmt.Println("Groups:")
@@ -157,6 +158,6 @@ func (cmds *CommandSet) ShowAccount(args []string) ExitCode {
 		}
 
 	}
-	return E_SUCCESS
+	return cmd.E_SUCCESS
 
 }

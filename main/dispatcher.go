@@ -1,6 +1,8 @@
 package main
 
 import (
+	commands "bigv.io/client/cmds"
+	util "bigv.io/client/cmds/util"
 	client "bigv.io/client/lib"
 	"flag"
 	"fmt"
@@ -12,12 +14,12 @@ import (
 type Dispatcher struct {
 	Flags      *flag.FlagSet
 	cmds       commands.CommandManager
-	config     ConfigManager
+	config     util.ConfigManager
 	debugLevel int
 }
 
 // NewDispatcher creates a new Dispatcher given a config.
-func NewDispatcher(config ConfigManager) (d *Dispatcher, err error) {
+func NewDispatcher(config util.ConfigManager) (d *Dispatcher, err error) {
 	d = new(Dispatcher)
 
 	d.config = config
@@ -33,12 +35,12 @@ func NewDispatcher(config ConfigManager) (d *Dispatcher, err error) {
 	d.debugLevel = config.GetDebugLevel()
 	bigv.SetDebugLevel(d.debugLevel)
 
-	d.cmds = NewCommandSet(config, bigv)
+	d.cmds = commands.NewCommandSet(config, bigv)
 	return d, nil
 }
 
-// NewDispatcherWithCommands is for writing tests with mock CommandSets
-func NewDispatcherWithCommands(config ConfigManager, commands Commands) (*Dispatcher, error) {
+// NewDispatcherWithCommandManager is for writing tests with mock CommandManagers
+func NewDispatcherWithCommandManager(config util.ConfigManager, commands commands.CommandManager) (*Dispatcher, error) {
 	d, err := NewDispatcher(config)
 	if err != nil {
 		return nil, err
@@ -47,10 +49,10 @@ func NewDispatcherWithCommands(config ConfigManager, commands Commands) (*Dispat
 	return d, nil
 }
 
-// CommandFunc is a type which takes an array of arguments and returns an ExitCode.
-type CommandFunc func([]string) ExitCode
+// CommandFunc is a type which takes an array of arguments and returns an util.ExitCode.
+type CommandFunc func([]string) util.ExitCode
 
-func (d *Dispatcher) DoCreate(args []string) ExitCode {
+func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForCreate()
 	}
@@ -65,10 +67,10 @@ func (d *Dispatcher) DoCreate(args []string) ExitCode {
 
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command 'create %s'\r\n", args[0])
-	return E_PEBKAC
+	return util.E_PEBKAC
 }
 
-func (d *Dispatcher) DoDelete(args []string) ExitCode {
+func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForDelete()
 	}
@@ -82,11 +84,11 @@ func (d *Dispatcher) DoDelete(args []string) ExitCode {
 	return d.cmds.HelpForDelete()
 
 }
-func (d *Dispatcher) DoShow(args []string) ExitCode {
+func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 	// Show implements the show command which is a stupendous badass of a command
 	if len(args) == 0 {
 		d.cmds.HelpForShow()
-		return E_USAGE_DISPLAYED
+		return util.E_USAGE_DISPLAYED
 	}
 
 	switch strings.ToLower(args[0]) {
@@ -117,10 +119,10 @@ func (d *Dispatcher) DoShow(args []string) ExitCode {
 		return d.cmds.ShowAccount(args)
 		// TODO: should also try show-vm sprintf("%s.%s.%s", args[0], "default", config.get("user"))
 	}
-	return E_SUCCESS
+	return util.E_SUCCESS
 }
 
-func (d *Dispatcher) DoUndelete(args []string) ExitCode {
+func (d *Dispatcher) DoUndelete(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForDelete()
 	}
@@ -132,7 +134,7 @@ func (d *Dispatcher) DoUndelete(args []string) ExitCode {
 	return d.cmds.HelpForDelete()
 }
 
-func (d *Dispatcher) DoLock(args []string) ExitCode {
+func (d *Dispatcher) DoLock(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForLocks()
 	}
@@ -145,7 +147,7 @@ func (d *Dispatcher) DoLock(args []string) ExitCode {
 	return d.cmds.HelpForLocks()
 }
 
-func (d *Dispatcher) DoUnlock(args []string) ExitCode {
+func (d *Dispatcher) DoUnlock(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForLocks()
 	}
@@ -158,7 +160,7 @@ func (d *Dispatcher) DoUnlock(args []string) ExitCode {
 	return d.cmds.HelpForLocks()
 }
 
-func (d *Dispatcher) DoSet(args []string) ExitCode {
+func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForSet()
 	}
@@ -176,7 +178,7 @@ func (d *Dispatcher) DoSet(args []string) ExitCode {
 }
 
 // Do takes the command line arguments and figures out what to do.
-func (d *Dispatcher) Do(args []string) ExitCode {
+func (d *Dispatcher) Do(args []string) util.ExitCode {
 	if d.debugLevel >= 1 {
 		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
 	}
@@ -184,7 +186,7 @@ func (d *Dispatcher) Do(args []string) ExitCode {
 	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		fmt.Printf("No command specified.\n\n")
 		d.cmds.Help(args)
-		return E_SUCCESS
+		return util.E_SUCCESS
 	}
 
 	commands := map[string]CommandFunc{

@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"bigv.io/client/cmds/util"
 	"bigv.io/client/lib"
 	"fmt"
 	"os"
@@ -67,8 +68,8 @@ func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
 }
 
 //TODO: this function is really horrible.
-func (cmds *CommandSet) Console(args []string) ExitCode {
-	flags := MakeCommonFlagSet()
+func (cmds *CommandSet) Console(args []string) cmd.ExitCode {
+	flags := cmd.MakeCommonFlagSet()
 	connect := flags.Bool("connect", false, "")
 	//panel := flags.Bool("panel", false, "")
 	flags.Bool("serial", false, "") // because we default to serial, we don't care if it's set
@@ -79,52 +80,52 @@ func (cmds *CommandSet) Console(args []string) ExitCode {
 	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank\r\n")
-		return E_PEBKAC
+		return cmd.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
-		return processError(err)
+		return cmd.ProcessError(err)
 	}
 	if *vnc {
 
 		if !*connect {
 			showVNCHowTo(vm)
-			return E_SUCCESS
+			return cmd.E_SUCCESS
 		}
 		ep := cmds.config.EndpointName()
 		token := cmds.config.GetIgnoreErr("token")
 		url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", cmds.config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
 
-		return processError(callBrowser(url))
+		return cmd.ProcessError(cmd.CallBrowser(url))
 
 	} else { // default to serial
 		if !*connect {
 			cmds.showSSHHowTo(vm)
-			return E_SUCCESS
+			return cmd.E_SUCCESS
 		}
 		host := fmt.Sprintf("%s@%s", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
 		fmt.Fprintf(os.Stderr, "ssh %s\r\n", host)
 		bin, err := exec.LookPath("ssh")
 		if err != nil {
-			return processError(err, "Unable to find an ssh executable")
+			return cmd.ProcessError(err, "Unable to find an ssh executable")
 		}
 		err = syscall.Exec(bin, []string{"ssh", host}, os.Environ())
 		if err != nil {
 			if errno, ok := err.(syscall.Errno); ok {
 				if errno != 0 {
-					return processError(err, "Attempting to exec ssh failed. Please file a bug report.")
+					return cmd.ProcessError(err, "Attempting to exec ssh failed. Please file a bug report.")
 				}
 			} else {
-				return processError(err, "Couldn't connect to the management address. Please ensure you have an SSH client in your $PATH.")
+				return cmd.ProcessError(err, "Couldn't connect to the management address. Please ensure you have an SSH client in your $PATH.")
 
 			}
 		}
 	}
-	return E_SUCCESS
+	return cmd.E_SUCCESS
 
 }

@@ -1,183 +1,183 @@
 package mocks
 
 import (
-	"bigv.io/client/cmd"
+	"bigv.io/client/cmds/util"
 	mock "github.com/maraino/go-mock"
 )
 
 // mock CommandSet
 
-type mockCommandManager struct {
+type Commands struct {
 	mock.Mock
 }
 
-func (cmds *mockCommandManager) Console(args []string) cmd.ExitCode {
+func (cmds *Commands) Console(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) Debug(args []string) cmd.ExitCode {
+func (cmds *Commands) Debug(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
-func (cmds *mockCommandManager) Delete(args []string) cmd.ExitCode {
-	r := cmds.Called(args)
-	return cmd.ExitCode(r.Int(0))
-}
-
-func (cmds *mockCommandManager) DeleteVM(args []string) cmd.ExitCode {
-	r := cmds.Called(args)
-	return cmd.ExitCode(r.Int(0))
-}
-func (cmds *mockCommandManager) DeleteGroup(args []string) cmd.ExitCode {
+func (cmds *Commands) Delete(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) Help(args []string) cmd.ExitCode {
+func (cmds *Commands) DeleteVM(args []string) cmd.ExitCode {
+	r := cmds.Called(args)
+	return cmd.ExitCode(r.Int(0))
+}
+func (cmds *Commands) DeleteGroup(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) Config(args []string) cmd.ExitCode {
-	r := cmds.Called(args)
-	return cmd.ExitCode(r.Int(0))
-}
-func (cmds *mockCommandManager) Create(args []string) cmd.ExitCode {
-	r := cmds.Called(args)
-	return cmd.ExitCode(r.Int(0))
-}
-func (cmds *mockCommandManager) CreateGroup(args []string) cmd.ExitCode {
-	r := cmds.Called(args)
-	return cmd.ExitCode(r.Int(0))
-}
-func (cmds *mockCommandManager) CreateVM(args []string) cmd.ExitCode {
+func (cmds *Commands) Help(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) ResetVM(args []string) cmd.ExitCode {
+func (cmds *Commands) Config(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
-func (cmds *mockCommandManager) Restart(args []string) cmd.ExitCode {
-	r := cmds.Called(args)
-	return cmd.ExitCode(r.Int(0))
-
-}
-func (cmds *mockCommandManager) Shutdown(args []string) cmd.ExitCode {
+func (cmds *Commands) Create(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
-func (cmds *mockCommandManager) Stop(args []string) cmd.ExitCode {
+func (cmds *Commands) CreateGroup(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
-func (cmds *mockCommandManager) Start(args []string) cmd.ExitCode {
+func (cmds *Commands) CreateVM(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) Show(args []string) cmd.ExitCode {
+func (cmds *Commands) ResetVM(args []string) cmd.ExitCode {
+	r := cmds.Called(args)
+	return cmd.ExitCode(r.Int(0))
+}
+func (cmds *Commands) Restart(args []string) cmd.ExitCode {
+	r := cmds.Called(args)
+	return cmd.ExitCode(r.Int(0))
+
+}
+func (cmds *Commands) Shutdown(args []string) cmd.ExitCode {
+	r := cmds.Called(args)
+	return cmd.ExitCode(r.Int(0))
+}
+func (cmds *Commands) Stop(args []string) cmd.ExitCode {
+	r := cmds.Called(args)
+	return cmd.ExitCode(r.Int(0))
+}
+func (cmds *Commands) Start(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) ShowAccount(args []string) cmd.ExitCode {
+func (cmds *Commands) Show(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) ShowGroup(args []string) cmd.ExitCode {
+func (cmds *Commands) ShowAccount(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) ShowVM(args []string) cmd.ExitCode {
+func (cmds *Commands) ShowGroup(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) Undelete(args []string) cmd.ExitCode {
+func (cmds *Commands) ShowVM(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) UndeleteVM(args []string) cmd.ExitCode {
+func (cmds *Commands) Undelete(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) LockHWProfile(args []string) cmd.ExitCode {
+func (cmds *Commands) UndeleteVM(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) UnlockHWProfile(args []string) cmd.ExitCode {
+func (cmds *Commands) LockHWProfile(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) SetCores(args []string) cmd.ExitCode {
+func (cmds *Commands) UnlockHWProfile(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) SetHWProfile(args []string) cmd.ExitCode {
+func (cmds *Commands) SetCores(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) SetMemory(args []string) cmd.ExitCode {
+func (cmds *Commands) SetHWProfile(args []string) cmd.ExitCode {
 	r := cmds.Called(args)
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) EnsureAuth() error {
+func (cmds *Commands) SetMemory(args []string) cmd.ExitCode {
+	r := cmds.Called(args)
+	return cmd.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) EnsureAuth() error {
 	r := cmds.Called()
 	return r.Error(0)
 }
 
-func (cmds *mockCommandManager) HelpForConfig() cmd.ExitCode {
+func (cmds *Commands) HelpForConfig() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) HelpForCreate() cmd.ExitCode {
+func (cmds *Commands) HelpForCreate() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) HelpForDebug() cmd.ExitCode {
+func (cmds *Commands) HelpForDebug() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
-func (cmds *mockCommandManager) HelpForDelete() cmd.ExitCode {
-	r := cmds.Called()
-	return cmd.ExitCode(r.Int(0))
-}
-
-func (cmds *mockCommandManager) HelpForHelp() cmd.ExitCode {
+func (cmds *Commands) HelpForDelete() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) HelpForLocks() cmd.ExitCode {
+func (cmds *Commands) HelpForHelp() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) HelpForPower() cmd.ExitCode {
+func (cmds *Commands) HelpForLocks() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) HelpForSet() cmd.ExitCode {
+func (cmds *Commands) HelpForPower() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
 
-func (cmds *mockCommandManager) HelpForShow() cmd.ExitCode {
+func (cmds *Commands) HelpForSet() cmd.ExitCode {
+	r := cmds.Called()
+	return cmd.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) HelpForShow() cmd.ExitCode {
 	r := cmds.Called()
 	return cmd.ExitCode(r.Int(0))
 }
