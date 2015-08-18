@@ -164,6 +164,7 @@ func (cmds *CommandSet) SetMemory(args []string) ExitCode {
 	m := 1 // decide if user means MB or GB
 	if strings.HasSuffix(strings.ToUpper(args[1]), "G") {
 		m = 1024
+		args[1] = strings.TrimSuffix(strings.ToUpper(args[1]), "G")
 	}
 
 	memory, err := strconv.Atoi(args[1])
