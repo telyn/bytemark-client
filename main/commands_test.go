@@ -252,6 +252,77 @@ func TestShowVMCommand(t *testing.T) {
 	}
 }
 
+func TestSetCores(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+
+	vmname := bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "test-group",
+		Account:        "test-account"}
+	args := []string{"test-vm.test-group.test-account", "4"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return(args)
+
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineCores", vmname, 4).Return(nil).Times(1)
+
+	cmds := NewCommandSet(config, c)
+	cmds.SetCores(args)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestSetMemory(t *testing.T) {
+	c := &mockBigVClient{}
+	config := &mockConfig{}
+
+	vmname := bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "test-group",
+		Account:        "test-account"}
+	args := []string{"test-vm.test-group.test-account", "4096"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return(args)
+
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineMemory", vmname, 4096).Return(nil).Times(1)
+
+	cmds := NewCommandSet(config, c)
+	cmds.SetMemory(args)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+
+	args = []string{"test-vm.test-group.test-account", "16G"}
+
+	config.Reset()
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return(args)
+
+	c.Reset()
+	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("SetVirtualMachineMemory", vmname, 16384).Return(nil).Times(1)
+
+	cmds = NewCommandSet(config, c)
+	cmds.SetMemory(args)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 func TestLockHWProfileCommand(t *testing.T) {
 	c := &mockBigVClient{}
 	config := &mockConfig{}
