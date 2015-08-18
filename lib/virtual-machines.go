@@ -47,7 +47,7 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 		if label == "" {
 			label = "vd" + i2b[i]
 		}
-		disc["label"] = d.Label
+		disc["label"] = label
 		disc["size"] = d.Size
 		disc["storage_grade"] = d.StorageGrade
 

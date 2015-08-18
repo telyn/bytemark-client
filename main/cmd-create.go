@@ -21,7 +21,7 @@ func (cmd *CommandSet) HelpForCreateVM() ExitCode {
 	fmt.Println("    --hwprofile <profile>")
 	fmt.Println("    --hwprofile-locked")
 	fmt.Println("    --image <image name> (see go-bigv images)")
-	fmt.Println("    --memory <num> (default 1, unit GB)")
+	fmt.Println("    --memory <size> (default 1, units are GiB)")
 	fmt.Println("    --public-keys <keys> (newline seperated)")
 	fmt.Println("    --public-keys-file <file> (will be read & appended to --public-keys)")
 	fmt.Println("    --root-password <password>")
@@ -86,11 +86,10 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 	cores := flags.Int("cores", 1, "")
 	cdrom := flags.String("cdrom", "", "")
 	discSpecs := flags.String("discs", "25", "")
-	group := flags.String("group", "", "")
 	hwprofile := flags.String("hwprofile", "", "")
 	hwprofilelock := flags.Bool("hwprofile-locked", false, "")
 	image := flags.String("image", "", "")
-	memory := flags.Int("memory", 1, "")
+	memorySpec := flags.String("memory", "1", "")
 	pubkeys := flags.String("public-keys", "", "")
 	// pubkeysfile := flags.String("public-keys-file", "", "") // TODO(telyn): --public-keys-file
 	rootPassword := flags.String("root-password", "", "")
@@ -106,21 +105,9 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 		name, err = cmd.bigv.ParseVirtualMachineName(args[0])
 
 	}
-
-	if *group != "" {
-		name.Group = *group
-	}
-
-	if name.Group == "" {
-		name.Group = "default"
-	}
-
-	if name.Account == "" {
-		name.Account, err = cmd.config.Get("account")
-	}
-
-	if name.Account == "" {
-		name.Account = Prompt("Account: ")
+	memory, err := ParseSize(*memorySpec)
+	if err != nil {
+		return processError(err)
 	}
 
 	discs, err := ParseDiscSpec(*discSpecs, false)
@@ -141,7 +128,7 @@ func (cmd *CommandSet) CreateVM(args []string) ExitCode {
 			Name:                  name.VirtualMachine,
 			Autoreboot:            autoreboot,
 			Cores:                 *cores,
-			Memory:                *memory,
+			Memory:                memory,
 			ZoneName:              *zone,
 			CdromURL:              *cdrom,
 			HardwareProfile:       *hwprofile,
