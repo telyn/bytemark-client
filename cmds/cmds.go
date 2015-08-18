@@ -14,8 +14,6 @@ import (
 
 type CommandFunc func([]string) util.ExitCode
 
-var AvailableCommands map[string]CommandFunc
-
 // Commands represents the available commands in the BigV client. Each command should have its own function defined here, with a corresponding HelpFor* function too.
 type CommandManager interface {
 	EnsureAuth() error
