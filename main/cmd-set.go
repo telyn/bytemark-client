@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
 
 // HelpForLocking provides usage information for locking and unlocking hardware
@@ -160,14 +159,7 @@ func (cmds *CommandSet) SetMemory(args []string) ExitCode {
 		return E_PEBKAC
 	}
 
-	// decide on the number of cores to set now
-	m := 1 // decide if user means MB or GB
-	if strings.HasSuffix(strings.ToUpper(args[1]), "G") {
-		m = 1024
-		args[1] = strings.TrimSuffix(strings.ToUpper(args[1]), "G")
-	}
-
-	memory, err := strconv.Atoi(args[1])
+	memory, err := ParseSize(args[1])
 	if err != nil || memory < 1 {
 		fmt.Fprintf(os.Stderr, "Invalid amount of memory \"%s\"\r\n", args[1])
 		return E_PEBKAC
@@ -178,6 +170,6 @@ func (cmds *CommandSet) SetMemory(args []string) ExitCode {
 		return processError(err)
 	}
 
-	err = cmds.bigv.SetVirtualMachineMemory(name, memory*m)
+	err = cmds.bigv.SetVirtualMachineMemory(name, memory)
 	return processError(err)
 }

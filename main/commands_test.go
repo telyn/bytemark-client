@@ -284,7 +284,7 @@ func TestSetMemory(t *testing.T) {
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account"}
-	args := []string{"test-vm.test-group.test-account", "4096"}
+	args := []string{"test-vm.test-group.test-account", "4"}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
@@ -301,7 +301,7 @@ func TestSetMemory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	args = []string{"test-vm.test-group.test-account", "16G"}
+	args = []string{"test-vm.test-group.test-account", "16384M"}
 
 	config.Reset()
 	config.When("Get", "token").Return("test-token")
