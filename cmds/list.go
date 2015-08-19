@@ -11,6 +11,7 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 	fmt.Println("usage: bigv list vms")
 	fmt.Println("       bigv list groups")
 	fmt.Println("       bigv list accounts")
+	fmt.Println("       bigv list discs")
 	return util.E_USAGE_DISPLAYED
 }
 

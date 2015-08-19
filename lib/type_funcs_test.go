@@ -43,6 +43,8 @@ func TestParseGroupName(t *testing.T) {
 
 	bigv, _ := New("endpoint.tld")
 
+	is.Equal("halloween-vms.spooky-steve", bigv.ParseGroupName("halloween-vms.spooky-steve").String())
+	is.Equal("a.b", bigv.ParseGroupName("a.b").String())
 	is.Equal("a.b", bigv.ParseGroupName("a.b.c").String())
 	is.Equal("a.b", bigv.ParseGroupName("a.b.c.").String())
 	is.Equal("a.b", bigv.ParseGroupName("a.b.c.endpoint.tld").String())

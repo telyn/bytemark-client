@@ -61,9 +61,10 @@ func TestListVMs(t *testing.T) {
 	config.When("ImportFlags").Return([]string{"halloween-vms.spooky-steve"})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("ParseGroupName", "halloween-vms.spooky-steve").Return(&bigv.GroupName{"halloween-vms", "spooky-steve"}).Times(1)
+	groupname := bigv.GroupName{Group: "halloween-vms", Account: "spooky-steve"}
+	c.When("ParseGroupName", "halloween-vms.spooky-steve").Return(groupname).Times(1)
 
-	c.When("GetGroup", &bigv.GroupName{"halloween-vms", "spooky-steve"}).Return(&bigv.Group{
+	c.When("GetGroup", groupname).Return(&bigv.Group{
 		VirtualMachines: []*bigv.VirtualMachine{
 			&bigv.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
 			&bigv.VirtualMachine{ID: 23, Name: "jack-skellington"},
