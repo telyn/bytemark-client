@@ -19,7 +19,6 @@ func openCommand() string {
 }
 
 func CallBrowser(url string) error {
-	fmt.Fprintf(os.Stderr, "Running a browser to open %s...", url)
 	command := openCommand()
 	bin, err := exec.LookPath(command)
 	if err != nil {
@@ -30,7 +29,8 @@ func CallBrowser(url string) error {
 			return err
 		}
 	}
-	fmt.Fprintf(os.Stderr, "%s %s\r\n", bin, url)
+
+	fmt.Fprintf(os.Stderr, "Running a browser to open %s...\r\n", url)
 
 	var attr os.ProcAttr
 	proc, err := os.StartProcess(bin, []string{bin, url}, &attr)
