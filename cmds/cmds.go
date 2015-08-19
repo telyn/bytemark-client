@@ -31,7 +31,6 @@ type CommandManager interface {
 	ListDiscs([]string) util.ExitCode
 	ListVMs([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
-	UnlockHWProfile([]string) util.ExitCode
 	ResetVM([]string) util.ExitCode
 	Restart([]string) util.ExitCode
 	SetCores([]string) util.ExitCode
@@ -43,6 +42,7 @@ type CommandManager interface {
 	ShowAccount([]string) util.ExitCode
 	ShowGroup([]string) util.ExitCode
 	ShowVM([]string) util.ExitCode
+	UnlockHWProfile([]string) util.ExitCode
 	UndeleteVM([]string) util.ExitCode
 
 	HelpForConfig() util.ExitCode
