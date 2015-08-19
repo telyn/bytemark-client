@@ -5,6 +5,7 @@ import (
 	bigv "bigv.io/client/lib"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 // HelpForDelete outputs usage information for the delete command
@@ -83,6 +84,55 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		fmt.Printf("Virtual machine %s deleted successfully.\r\n", name)
 	}
 	return util.E_SUCCESS
+}
+
+func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
+	//purge := flags.Bool("purge", false, "")
+
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine name")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+
+	disc, ok := util.ShiftArgument(&args, "disc id")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+
+	discID, err := strconv.ParseInt(disc, 10, 32)
+	if !ok {
+		fmt.Fprintf(os.Stderr, "Invalid disc specified")
+		return cmds.HelpForDelete()
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	if !(cmds.config.Force() || util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.")) {
+		fmt.Println("Cancelling.")
+		return util.E_USER_EXIT
+	}
+
+	err = cmds.bigv.DeleteDisc(name, int(discID))
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	return util.E_SUCCESS
+
 }
 
 func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {

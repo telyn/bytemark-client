@@ -51,3 +51,31 @@ func TestDeleteVM(t *testing.T) {
 	}
 
 }
+
+func TestDeleteDisc(t *testing.T) {
+	is := is.New(t)
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
+
+	config.When("Get", "account").Return("test-account")
+	config.When("Get", "token").Return("test-token")
+	config.When("Force").Return(true)
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+
+	name := bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "test-group",
+		Account:        "test-account",
+	}
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(name).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("DeleteDisc", name, 666).Return(nil).Times(1)
+
+	cmds := NewCommandSet(config, c)
+
+	is.Equal(util.E_SUCCESS, cmds.DeleteDisc([]string{"--force", "test-vm.test-group.test-account", "666"}))
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}

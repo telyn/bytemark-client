@@ -68,6 +68,12 @@ type Client interface {
 	GetAccounts() (accounts []*Account, err error)
 
 	//
+	// DISCS
+	//
+
+	DeleteDisc(vm VirtualMachineName, ID int) error
+
+	//
 	// GROUPS
 	//
 
