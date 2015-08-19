@@ -22,6 +22,7 @@ type CommandManager interface {
 	Console([]string) util.ExitCode
 	CreateGroup([]string) util.ExitCode
 	CreateVM([]string) util.ExitCode
+	DeleteDisc([]string) util.ExitCode
 	DeleteGroup([]string) util.ExitCode
 	DeleteVM([]string) util.ExitCode
 	Debug([]string) util.ExitCode
