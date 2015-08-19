@@ -33,7 +33,7 @@ func CallBrowser(url string) error {
 	fmt.Fprintf(os.Stderr, "%s %s\r\n", bin, url)
 
 	var attr os.ProcAttr
-	proc, err := os.StartProcess(command, []string{url}, &attr)
+	proc, err := os.StartProcess(bin, []string{bin, url}, &attr)
 	if err != nil {
 		return err
 	}
