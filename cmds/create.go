@@ -53,7 +53,7 @@ func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "group")
+	nameStr, ok := util.ShiftArgument(&args, "group")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -92,7 +92,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	args = cmds.config.ImportFlags(flags)
 
 	var err error
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForCreateVM()
 		return util.E_PEBKAC

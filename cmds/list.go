@@ -20,11 +20,12 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "group")
+	nameStr, ok := util.ShiftArgument(&args, "group")
 	if !ok {
 		cmds.HelpForList()
 		return util.E_PEBKAC
 	}
+
 	name := cmds.bigv.ParseGroupName(nameStr)
 
 	err := cmds.EnsureAuth()
@@ -52,7 +53,7 @@ func (cmds *CommandSet) ListGroups(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, ok := util.ShiftArgument(args, "account")
+	name, ok := util.ShiftArgument(&args, "account")
 	if !ok {
 		cmds.HelpForList()
 		return util.E_PEBKAC
@@ -106,7 +107,7 @@ func (cmds *CommandSet) ListDiscs(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForList()
 		return util.E_PEBKAC

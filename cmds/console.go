@@ -77,7 +77,7 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForConsole()
 		return util.E_PEBKAC

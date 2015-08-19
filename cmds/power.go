@@ -44,7 +44,7 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -80,7 +80,7 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -115,7 +115,7 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -151,7 +151,7 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -186,7 +186,7 @@ func (cmds *CommandSet) ResetVM(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC

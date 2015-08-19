@@ -35,7 +35,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -93,7 +93,7 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(args, "group")
+	nameStr, ok := util.ShiftArgument(&args, "group")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -143,7 +143,7 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 // UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.
 func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 
-	nameStr, ok := util.ShiftArgument(args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
