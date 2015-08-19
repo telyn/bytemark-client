@@ -134,6 +134,24 @@ func (d *Dispatcher) DoUndelete(args []string) util.ExitCode {
 	return d.cmds.HelpForDelete()
 }
 
+func (d *Dispatcher) DoList(args []string) util.ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForList()
+	}
+	switch strings.ToLower(args[0]) {
+	case "vms":
+		return d.cmds.ListVMs(args[1:])
+	case "discs":
+		return d.cmds.ListDiscs(args[1:])
+	case "groups":
+		return d.cmds.ListGroups(args[1:])
+	case "accounts":
+		return d.cmds.ListAccounts(args[1:])
+		//case "keys":
+	}
+	return d.cmds.HelpForList()
+}
+
 func (d *Dispatcher) DoLock(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForLocks()
@@ -197,6 +215,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"debug":    d.cmds.Debug,
 		"delete":   d.DoDelete,
 		"help":     d.cmds.Help,
+		"list":     d.DoList,
 		"lock":     d.DoLock,
 		"restart":  d.cmds.Restart,
 		"reset":    d.cmds.ResetVM,

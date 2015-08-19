@@ -56,6 +56,26 @@ func (cmds *Commands) CreateVM(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
+func (cmds *Commands) ListAccounts(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) ListDiscs(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) ListGroups(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) ListVMs(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) ResetVM(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
@@ -158,6 +178,11 @@ func (cmds *Commands) HelpForDelete() util.ExitCode {
 }
 
 func (cmds *Commands) HelpForHelp() util.ExitCode {
+	r := cmds.Called()
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) HelpForList() util.ExitCode {
 	r := cmds.Called()
 	return util.ExitCode(r.Int(0))
 }

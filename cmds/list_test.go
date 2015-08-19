@@ -27,6 +27,40 @@ func TestListAccounts(t *testing.T) {
 	}
 }
 
+func TestListDiscs(t *testing.T) {
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Silent").Return(true)
+	config.When("ImportFlags").Return([]string{"spooky-vm"})
+
+	name := bigv.VirtualMachineName{
+		VirtualMachine: "spooky-vm",
+		Group:          "halloween-vms",
+		Account:        "",
+	}
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("ParseVirtualMachineName", "spooky-vm").Return(name).Times(1)
+
+	vm := bigv.VirtualMachine{
+		ID:   4,
+		Name: "spooky-vm",
+		Discs: []*bigv.Disc{
+			&bigv.Disc{StorageGrade: "sata", Size: 25600},
+			&bigv.Disc{StorageGrade: "archive", Size: 666666},
+		},
+	}
+	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
+
+	cmds := NewCommandSet(config, c)
+	cmds.ListDiscs([]string{"spooky-vm"})
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 func TestListGroups(t *testing.T) {
 	c := &mocks.BigVClient{}
 	config := &mocks.Config{}

@@ -26,6 +26,10 @@ type CommandManager interface {
 	DeleteVM([]string) util.ExitCode
 	Debug([]string) util.ExitCode
 	Help([]string) util.ExitCode
+	ListAccounts([]string) util.ExitCode
+	ListGroups([]string) util.ExitCode
+	ListDiscs([]string) util.ExitCode
+	ListVMs([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
 	UnlockHWProfile([]string) util.ExitCode
 	ResetVM([]string) util.ExitCode
@@ -46,6 +50,7 @@ type CommandManager interface {
 	HelpForDebug() util.ExitCode
 	HelpForDelete() util.ExitCode
 	HelpForHelp() util.ExitCode
+	HelpForList() util.ExitCode
 	HelpForLocks() util.ExitCode
 	HelpForPower() util.ExitCode
 	HelpForSet() util.ExitCode
