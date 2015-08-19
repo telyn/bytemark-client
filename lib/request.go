@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -43,14 +44,6 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
 func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
 	_, res, err := bigv.Request(auth, method, location, requestBody)
-	if err != nil {
-		switch err.(type) {
-		case BadRequestError:
-			break
-		default:
-			return nil, err
-		}
-	}
 	defer res.Body.Close()
 
 	responseBody, readErr := ioutil.ReadAll(res.Body)
@@ -59,7 +52,7 @@ func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody 
 	}
 
 	if bigv.debugLevel > 2 {
-		fmt.Println(string(responseBody))
+		fmt.Fprintf(os.Stderr, "response body: '%s'\r\n", string(responseBody))
 	}
 
 	return responseBody, err
@@ -92,10 +85,10 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 	}
 
 	if bigv.debugLevel > 1 {
-		fmt.Printf("%s %s: %d\r\n", method, req.URL, res.StatusCode)
+		fmt.Fprintf(os.Stderr, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
 	}
 	if bigv.debugLevel >= 3 {
-		fmt.Printf("request body: %s\r\n", requestBody)
+		fmt.Fprintf(os.Stderr, "request body: '%s'\r\n", requestBody)
 	}
 
 	baseErr := BigVError{
