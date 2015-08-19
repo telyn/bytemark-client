@@ -5,10 +5,6 @@ import (
 	"fmt"
 )
 
-var i2b = [...]string{
-	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-}
-
 //CreateVirtualMachine creates a virtual machine in the given group.
 func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachineSpec) (vm *VirtualMachine, err error) {
 	err = bigv.validateGroupName(&group)
@@ -36,6 +32,8 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 
 	req["virtual_machine"] = rvm
 
+	labelDiscs(spec.Discs)
+
 	discs := make([]map[string]interface{}, 0, 4)
 
 	for i, d := range spec.Discs {
@@ -44,9 +42,6 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 		}
 		disc := make(map[string]interface{})
 		label := d.Label
-		if label == "" {
-			label = "vd" + i2b[i]
-		}
 		disc["label"] = label
 		disc["size"] = d.Size
 		disc["storage_grade"] = d.StorageGrade
