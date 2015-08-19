@@ -50,7 +50,7 @@ func (cmds *CommandSet) HelpForCreate() util.ExitCode {
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
 func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
-	flags.Parse()
+	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
 	nameStr, ok := util.ShiftArgument(args, "group")
