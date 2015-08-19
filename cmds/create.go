@@ -98,10 +98,9 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name := bigv.VirtualMachineName{"", "", ""}
-	if len(args) > 0 {
-		name, err = cmds.bigv.ParseVirtualMachineName(nameStr)
-
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	if err != nil {
+		return util.ProcessError(err)
 	}
 	memory, err := util.ParseSize(*memorySpec)
 	if err != nil {

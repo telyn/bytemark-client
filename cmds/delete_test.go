@@ -61,7 +61,7 @@ func TestDeleteDisc(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
-	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account", "666"})
 
 	name := bigv.VirtualMachineName{
 		VirtualMachine: "test-vm",
