@@ -79,6 +79,8 @@ func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 		return d.cmds.DeleteVM(args[1:])
 	case "group":
 		return d.cmds.DeleteGroup(args[1:])
+	case "disc":
+		return d.cmds.DeleteDisc(args[1:])
 	}
 	fmt.Fprintf(os.Stderr, "Unknown command 'delete %s'\r\n", args[0])
 	return d.cmds.HelpForDelete()

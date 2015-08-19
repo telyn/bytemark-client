@@ -78,6 +78,10 @@ func (c *BigVClient) GetGroup(name bigv.GroupName) (*bigv.Group, error) {
 	group, _ := r.Get(0).(*bigv.Group)
 	return group, r.Error(1)
 }
+func (c *BigVClient) DeleteDisc(name bigv.VirtualMachineName, disc int) error {
+	r := c.Called(name, disc)
+	return r.Error(0)
+}
 func (c *BigVClient) DeleteGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
