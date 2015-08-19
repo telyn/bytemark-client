@@ -30,8 +30,7 @@ func (cmds *CommandSet) HelpForDelete() util.ExitCode {
 // DeleteVM implements the delete-vm command, which is used to delete and purge BigV VMs. See HelpForDelete for usage information.
 func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
-
-	purge := *flags.Bool("purge", false, "Whether or not to purge the VM. If yes, will delete all your data.")
+	purge := flags.Bool("purge", false, "")
 
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -55,14 +54,14 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	if vm.Deleted && !purge {
+	if vm.Deleted && !*purge {
 		fmt.Printf("Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge", vm.Hostname)
 		return util.E_SUCCESS
 	}
 
 	if !cmds.config.Force() {
 		fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
-		if purge {
+		if *purge {
 			fstr = fmt.Sprintf("Are you certain you wish to permanently delete %s? You will not be able to un-delete it.", vm.Hostname)
 
 		}
@@ -72,13 +71,13 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		}
 	}
 
-	err = cmds.bigv.DeleteVirtualMachine(name, purge)
+	err = cmds.bigv.DeleteVirtualMachine(name, *purge)
 
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	if purge {
+	if *purge {
 		fmt.Printf("Virtual machine %s purged successfully.\r\n", name)
 	} else {
 		fmt.Printf("Virtual machine %s deleted successfully.\r\n", name)
