@@ -37,7 +37,7 @@ cmds
   you do, no need to add it to the `Commands` interface nor
   `Commands`.
 
-* Add a unit test for the command to `cmds/cmds_test.go`. You're
+* Add a unit test for the command to `cmds/<Base>_test.go`. You're
   trying to ensure that your function turns its arguments into the
   right parameters to the API-calling function you made at the
   beginning.
