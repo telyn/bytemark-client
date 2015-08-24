@@ -33,6 +33,10 @@ func (cmds *Commands) DeleteGroup(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
+func (cmds *Commands) DeleteDisc(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
 
 func (cmds *Commands) Help(args []string) util.ExitCode {
 	r := cmds.Called(args)
