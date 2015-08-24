@@ -20,6 +20,7 @@ var configVars = [...]string{
 	"account",
 	"token",
 	"debug-level",
+	"yubikey",
 }
 
 // ConfigVar is a struct which contains a name-value-source triplet

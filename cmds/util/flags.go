@@ -10,6 +10,7 @@ func MakeCommonFlagSet() *flag.FlagSet {
 	flags.Bool("help", false, "")
 	flags.Bool("force", false, "")
 	flags.Bool("silent", false, "")
+	flags.Bool("yubikey", false, "")
 	flags.Int("debug-level", 0, "")
 	flags.String("user", "", "")
 	flags.String("account", "", "")
