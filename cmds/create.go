@@ -4,6 +4,8 @@ import (
 	"bigv.io/client/cmds/util"
 	bigv "bigv.io/client/lib"
 	"fmt"
+	"os"
+	"strings"
 )
 
 //HelpForCreateVM provides usage information for the create-vm command
@@ -38,13 +40,65 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 func (cmds *CommandSet) HelpForCreate() util.ExitCode {
 	fmt.Println("go-bigv create")
 	fmt.Println()
-	fmt.Println("usage: go-bigv create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine>")
+	fmt.Println("usage: go-bigv create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [disc specs]")
 	fmt.Println("               create group [--account <name>] <name>")
 	fmt.Println("               create disc[s] <disc specs> <virtual machine>")
 	fmt.Println("               create ip [--reason reason] <virtual machine>")
 	fmt.Println("               create vm (see go-bigv help create vm)")
 	fmt.Println("")
+	fmt.Println("Disc specs are a comma seperated list of size:storage grade pairs. Sizes are in GB by default but can be specified in M")
+	fmt.Println("")
 	return util.E_USAGE_DISPLAYED
+}
+
+func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
+	sizeFlag := flags.String("size", "", "")
+	gradeFlag := flags.String("grade", "", "")
+	labelFlag := flags.String("label", "", "")
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	if !ok {
+		cmds.HelpForCreate()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	if err != nil {
+		return util.ProcessError(err)
+	}
+	var discs []*bigv.Disc
+	if *sizeFlag != "" || *gradeFlag != "" {
+		// if both flags and spec are specified, fail
+		if len(args) >= 1 {
+			fmt.Fprintf(os.Stderr, "Ambiguous command given - please only specify disc specs as arguments or flags, not both")
+			return util.E_PEBKAC
+
+		} else {
+			// only flags
+			size, err := util.ParseSize(*sizeFlag)
+			if err != nil {
+				return util.ProcessError(err)
+			}
+			discs = append(discs, &bigv.Disc{Size: size, StorageGrade: *gradeFlag, Label: *labelFlag})
+		}
+
+	} else {
+		// if neither of flags and spec are specified, fail
+		if len(args) <= 1 {
+			return cmds.HelpForCreate()
+		} else {
+			spec := strings.Join(args, " ")
+			discs, err = util.ParseDiscSpec(spec, false)
+		}
+
+	}
+
+	cmds.bigv.CreateDiscs(name, discs)
+
+	return util.E_SUCCESS
 }
 
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
@@ -55,7 +109,7 @@ func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "group")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForCreate()
 		return util.E_PEBKAC
 	}
 	name := cmds.bigv.ParseGroupName(nameStr)

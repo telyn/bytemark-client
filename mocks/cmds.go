@@ -47,7 +47,7 @@ func (cmds *Commands) Config(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
-func (cmds *Commands) Create(args []string) util.ExitCode {
+func (cmds *Commands) CreateDiscs(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
