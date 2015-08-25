@@ -44,6 +44,12 @@ n.b. account will default to the account with the same name as the user you log 
 
 they are usually of the form virtioYYYY or compatibilityYYYY where YYYY is a 4-digit year.
 
+host name
+---------
+
+A valid DNS name 
+TODO(telyn): find rfc reference
+
 `id`
 ---------------
 
@@ -139,9 +145,10 @@ List of commands
 `bigv resize dis<c|k> [--size <size>] <virtual machine> [<resize spec>]` - resize to `size`. if ambiguous, berate user.
 `bigv revoke <user> <privilege>`
 `bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
+`bigv set cores <virtual machine> <num>`
 `bigv set hwprofile <virtual machine> <hardware profile>`
 `bigv set memory <virtual machine> <size>`
-`bigv set cores <virtual machine> <num>`
+`bigv set rdns <ip> <host name>`
 `bigv show account [--json] <account>` - shows an overview of the given account, a list of groups and vms within them
 `bigv show group [--json] <group>` - shows an overview of the given group, a list of VMs in them w/ size information
 `bigv show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
