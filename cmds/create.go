@@ -73,7 +73,9 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 	if *sizeFlag != "" || *gradeFlag != "" {
 		// if both flags and spec are specified, fail
 		if len(args) >= 1 {
-			fmt.Fprintf(os.Stderr, "Ambiguous command given - please only specify disc specs as arguments or flags, not both")
+			if !cmds.config.Silent() {
+				fmt.Fprintf(os.Stderr, "Ambiguous command given - please only specify disc specs as arguments or flags, not both")
+			}
 			return util.E_PEBKAC
 
 		} else {
@@ -87,15 +89,19 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 
 	} else {
 		// if neither of flags and spec are specified, fail
-		if len(args) <= 1 {
+		if len(args) == 0 {
 			return cmds.HelpForCreate()
 		} else {
 			spec := strings.Join(args, " ")
+			fmt.Fprintf(os.Stderr, spec)
 			discs, err = util.ParseDiscSpec(spec, false)
+			if err != nil {
+				return util.ProcessError(err)
+			}
 		}
 
 	}
-
+	cmds.EnsureAuth()
 	cmds.bigv.CreateDiscs(name, discs)
 
 	return util.E_SUCCESS
