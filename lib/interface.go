@@ -71,7 +71,8 @@ type Client interface {
 	// DISCS
 	//
 
-	DeleteDisc(vm VirtualMachineName, ID int) error
+	CreateDisc(vm VirtualMachineName, disc Disc) error
+	DeleteDisc(vm VirtualMachineName, id int) error
 
 	//
 	// GROUPS

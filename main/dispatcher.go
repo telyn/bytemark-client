@@ -62,8 +62,8 @@ func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 		return d.cmds.CreateVM(args[1:])
 	case "group":
 		return d.cmds.CreateGroup(args[1:])
-		//    case "disc", "discs"
-		//    return d.cmds.CreateDiscs(args[1:]
+	case "disc", "discs", "disk", "disks":
+		return d.cmds.CreateDiscs(args[1:])
 
 	}
 	fmt.Fprintf(os.Stderr, "Unrecognised command 'create %s'\r\n", args[0])
@@ -79,7 +79,7 @@ func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 		return d.cmds.DeleteVM(args[1:])
 	case "group":
 		return d.cmds.DeleteGroup(args[1:])
-	case "disc":
+	case "disc", "disk":
 		return d.cmds.DeleteDisc(args[1:])
 	}
 	fmt.Fprintf(os.Stderr, "Unknown command 'delete %s'\r\n", args[0])

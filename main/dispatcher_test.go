@@ -36,6 +36,17 @@ func TestDispatchDoCreate(t *testing.T) {
 
 	commands.When("CreateVM", []string{}).Times(1)
 	doDispatchTest(t, config, commands, "create", "vm")
+
+	commands.When("CreateDiscs", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "create", "disc")
+
+	commands.When("CreateDiscs", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "create", "discs")
+
+	commands.When("CreateDiscs", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "create", "disk")
+	commands.When("CreateDiscs", []string{}).Times(1)
+	doDispatchTest(t, config, commands, "create", "disks")
 }
 
 func TestDispatchDoDebug(t *testing.T) {
