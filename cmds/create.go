@@ -69,7 +69,7 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	var discs []*bigv.Disc
+	var discs []bigv.Disc
 	if *sizeFlag != "" || *gradeFlag != "" {
 		// if both flags and spec are specified, fail
 		if len(args) >= 1 {
@@ -84,7 +84,7 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 			if err != nil {
 				return util.ProcessError(err)
 			}
-			discs = append(discs, &bigv.Disc{Size: size, StorageGrade: *gradeFlag, Label: *labelFlag})
+			discs = append(discs, bigv.Disc{Size: size, StorageGrade: *gradeFlag, Label: *labelFlag})
 		}
 
 	} else {
@@ -102,9 +102,19 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 
 	}
 	cmds.EnsureAuth()
-	cmds.bigv.CreateDiscs(name, discs)
 
-	return util.E_SUCCESS
+	fmt.Printf("Adding discs to %s:\r\n", name)
+	for _, d := range discs {
+		fmt.Printf("    %d %s...", d.Size/1024, d.StorageGrade)
+		err = cmds.bigv.CreateDisc(name, d)
+		if err != nil {
+			fmt.Printf("Failure! " + err.Error())
+		} else {
+			fmt.Printf("success!\r\n")
+		}
+	}
+	return util.ProcessError(err)
+
 }
 
 // CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
@@ -171,9 +181,9 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	for _, d := range discs {
+	for i, d := range discs {
 		if d.StorageGrade == "" {
-			d.StorageGrade = "sata"
+			discs[i].StorageGrade = "sata"
 		}
 	}
 

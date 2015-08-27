@@ -5,33 +5,36 @@ import (
 	"fmt"
 )
 
-func labelDiscs(discs []*Disc) {
-	for i, disc := range discs {
-		if disc.Label == "" {
-			disc.Label = fmt.Sprintf("%c", 'a'+i)
+func labelDiscs(discs []Disc, offset ...int) {
+	realOffset := 0
+	if len(offset) >= 1 {
+		realOffset = offset[0]
+	}
+	for i := range discs {
+		if discs[i].Label == "" {
+			discs[i].Label = fmt.Sprintf("vd%c", 'a'+realOffset+i)
 		}
 	}
 
 }
 
-func generateDiscLabel(discIdx int) string {
-	return fmt.Sprintf("vd%c", 'a'+discIdx)
-}
-
-func (bigv *bigvClient) CreateDiscs(vm VirtualMachineName, discs []*Disc) (err error) {
-	err = bigv.validateVirtualMachineName(&vm)
+func (bigv *bigvClient) CreateDisc(name VirtualMachineName, disc Disc) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
-	labelDiscs(discs)
+	vm, err := bigv.GetVirtualMachine(name)
+	// smell bad
+	discs := []Disc{disc}
+	labelDiscs(discs, len(vm.Discs))
 
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs", vm.Account, vm.Group, vm.VirtualMachine)
-	js, err := json.Marshal(discs)
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
+	js, err := json.Marshal(discs[0])
 	if err != nil {
 		return err
 	}
 
-	_, _, err = bigv.Request(true, "POST", path, string(js))
+	_, err = bigv.RequestAndRead(true, "POST", path, string(js))
 	return err
 
 }

@@ -69,8 +69,8 @@ func (c *BigVClient) GetAccounts() (accounts []*bigv.Account, err error) {
 	return acc, r.Error(1)
 }
 
-func (c *BigVClient) CreateDiscs(name bigv.VirtualMachineName, discs []*bigv.Disc) error {
-	r := c.Called(name, discs)
+func (c *BigVClient) CreateDisc(name bigv.VirtualMachineName, disc bigv.Disc) error {
+	r := c.Called(name, disc)
 	return r.Error(0)
 }
 func (c *BigVClient) CreateGroup(name bigv.GroupName) error {

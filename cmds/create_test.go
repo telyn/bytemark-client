@@ -22,7 +22,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 	disc := bigv.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
-	c.When("CreateDiscs", name, []*bigv.Disc{&disc}).Return(nil).Times(1)
+	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
 	cmds.CreateDiscs([]string{"test-vm", "archive:35"})
@@ -46,8 +46,8 @@ func TestCreateVMCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := bigv.VirtualMachineSpec{
-		Discs: []*bigv.Disc{
-			&bigv.Disc{
+		Discs: []bigv.Disc{
+			bigv.Disc{
 				Size:         25 * 1024,
 				StorageGrade: "sata",
 			},
