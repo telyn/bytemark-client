@@ -19,7 +19,10 @@ func CallBrowser(url string) error {
 	if err != nil {
 		return err
 	}
-	proc, err := os.StartProcess(path, []string{path, "/C", "start", strings.Replace(url, "&", "^&", -1)}, &attr)
+	// so on windows when you're using cmd you have to escape ampersands with the ^ character.
+	// ¯\(º_o)/¯
+	url = strings.Replace(url, "&", "^&", -1)
+	proc, err := os.StartProcess(path, []string{path, "/C", "start", url }, &attr)
 	if err != nil {
 
 		return err
