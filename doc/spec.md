@@ -159,3 +159,8 @@ List of commands
 `bigv undelete vm <virtual machine>`
 `bigv unlock hwprofile <virtual machine>`
 `bigv vnc [--connect | --panel] <virtual machine>` - alias for `bigv console --vnc`
+
+Details
+=======
+
+Configuration directory: "$HOME/.bigv-client" except on Windows; "%APPDATA%/BigV Client" instead
