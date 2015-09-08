@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"syscall"
 )
 
 func openCommand() string {
@@ -34,10 +35,18 @@ func CallBrowser(url string) error {
 
 	var attr os.ProcAttr
 	proc, err := os.StartProcess(bin, []string{bin, url}, &attr)
+	subprocErr := SubprocessFailedError{Args: []string{bin, url}}
 	if err != nil {
-		return err
+		subprocErr.Err = err
+		return &subprocErr
 	}
-	_, err = proc.Wait()
-	return err
+	state, err := proc.Wait()
+
+	subprocErr.Err = err
+	waitStatus, ok := state.Sys().(syscall.WaitStatus)
+	if ok {
+		subprocErr.ExitCode = waitStatus.ExitStatus()
+	}
+	return &subprocErr
 
 }

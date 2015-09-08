@@ -36,6 +36,8 @@ const (
 	E_WONT_DELETE_NONEMPTY = 6
 	// E_PEBKAC is the exit code returned when the user entered a malformed command, name, or flag.
 	E_PEBKAC = 7
+	// E_SUBPROCESS_FAILED is the exit code returned when the client attempted to run a subprocess (e.g. ssh, a browser or a vpn client) but couldn't
+	E_SUBPROCESS_FAILED = 8
 
 	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
 	E_UNKNOWN_ERROR = 49
@@ -102,6 +104,8 @@ Exit code ranges:
 	The user requested a non-empty group be deleted
     7
 	The program was called with malformed arguments
+    8
+	Attempting to execute a subprocess failed
 
  50 - 249 Exit codes:
 
@@ -182,6 +186,9 @@ func ProcessError(err error, message ...string) ExitCode {
 			} else {
 				errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %v", urlErr)
 			}
+		case *SubprocessFailedError:
+			errorMessage = err.Error()
+			exitCode = E_SUBPROCESS_FAILED
 		case bigv.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_AUTHORIZED_BIGV
