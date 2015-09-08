@@ -2,24 +2,22 @@ package cmds
 
 import (
 	"bigv.io/client/cmds/util"
+	"bigv.io/client/util/log"
 	"encoding/json"
-	"fmt"
-	"os"
-	"strings"
 )
 
 // HelpForShow outputs usage information for the show commands: show, show-vm, show-group, show-account.
 func (cmds *CommandSet) HelpForShow() util.ExitCode {
-	fmt.Println("go-bigv show")
-	fmt.Println()
-	fmt.Println("usage: go-bigv show [--json] <name>")
-	fmt.Println("       go-bigv show vm [--json] <virtual machine>")
-	fmt.Println("       go-bigv show group [--json] [--list-vms] [--verbose] <group>")
-	fmt.Println("       go-bigv show account [--json] [--list-groups] [--list-vms] [--verbose] <account>")
-	fmt.Println()
-	fmt.Println("Displays information about the given virtual machine, group, or account.")
-	fmt.Println("If the --verbose flag is given to bigv show group or bigv show account, full details are given for each VM.")
-	fmt.Println()
+	log.Log("go-bigv show")
+	log.Log()
+	log.Log("usage: go-bigv show [--json] <name>")
+	log.Log("       go-bigv show vm [--json] <virtual machine>")
+	log.Log("       go-bigv show group [--json] [--list-vms] [--verbose] <group>")
+	log.Log("       go-bigv show account [--json] [--list-groups] [--list-vms] [--verbose] <account>")
+	log.Log()
+	log.Log("Displays information about the given virtual machine, group, or account.")
+	log.Log("If the --verbose flag is given to bigv show group or bigv show account, full details are given for each VM.")
+	log.Log()
 	return util.E_USAGE_DISPLAYED
 }
 
@@ -37,7 +35,7 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 	}
 	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Virtual machine name cannnot be blank\r\n")
+		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC
 	}
 
@@ -50,9 +48,9 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 	if !cmds.config.Silent() {
 		if *jsonOut {
 			js, _ := json.MarshalIndent(vm, "", "    ")
-			fmt.Println(string(js))
+			log.Output(string(js))
 		} else {
-			fmt.Println(util.FormatVirtualMachine(vm))
+			log.Log(util.FormatVirtualMachine(vm))
 		}
 	}
 	return util.E_SUCCESS
@@ -90,16 +88,18 @@ func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 
 		if *jsonOut {
 			js, _ := json.MarshalIndent(group, "", "    ")
-			fmt.Println(string(js))
+			log.Output(string(js))
 		} else {
-			fmt.Printf("Group %d: %s\r\n", group.ID, group.Name)
-			fmt.Println()
+			log.Outputf("Group %d: %s\r\n\r\n", group.ID, group.Name)
+
 			if *list {
 				for _, vm := range group.VirtualMachines {
-					fmt.Println(vm.Name)
+					log.Output(vm.Name)
 				}
 			} else if *verbose {
-				fmt.Println(strings.Join(util.FormatVirtualMachines(group.VirtualMachines), "\r\n"))
+				for _, v := range util.FormatVirtualMachines(group.VirtualMachines) {
+					log.Output(v)
+				}
 
 			}
 		}
@@ -138,26 +138,27 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 
 	if *jsonOut {
 		js, _ := json.MarshalIndent(acc, "", "    ")
-		fmt.Println(string(js))
+		log.Output(string(js))
 	} else {
-		fmt.Printf("Account %d: %s", acc.ID, acc.Name)
-		fmt.Println()
+		log.Outputf("Account %d: %s\r\n", acc.ID, acc.Name)
 		switch {
 		case *verbose:
 			for _, g := range acc.Groups {
-				fmt.Printf("Group %s\r\n", g.Name)
-				fmt.Println(strings.Join(util.FormatVirtualMachines(g.VirtualMachines), "\r\n"))
+				log.Outputf("Group %s\r\n", g.Name)
+				for _, v := range util.FormatVirtualMachines(g.VirtualMachines) {
+					log.Output(v)
+				}
 			}
 		case *listgroups:
-			fmt.Println("Groups:")
+			log.Output("Groups:")
 			for _, g := range acc.Groups {
-				fmt.Println("%s", g.Name)
+				log.Outputf("%s", g.Name)
 			}
 		case *listvms:
-			fmt.Println("Virtual machines:")
+			log.Output("Virtual machines:")
 			for _, g := range acc.Groups {
 				for _, vm := range g.VirtualMachines {
-					fmt.Println("%s.%s\r\n", vm.Name, g.Name)
+					log.Outputf("%s.%s\r\n", vm.Name, g.Name)
 				}
 			}
 		default:
@@ -165,7 +166,7 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 			for _, g := range acc.Groups {
 				vms += len(g.VirtualMachines)
 			}
-			fmt.Println("%d groups containing %d virtual machines\r\n", len(acc.Groups), vms)
+			log.Outputf("%d groups containing %d virtual machines\r\n", len(acc.Groups), vms)
 		}
 
 	}

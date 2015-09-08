@@ -2,11 +2,10 @@ package main
 
 import (
 	commands "bigv.io/client/cmds"
-	util "bigv.io/client/cmds/util"
+	"bigv.io/client/cmds/util"
 	client "bigv.io/client/lib"
+	"bigv.io/client/util/log"
 	"flag"
-	"fmt"
-	"os"
 	"strings"
 )
 
@@ -66,7 +65,7 @@ func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 		return d.cmds.CreateDiscs(args[1:])
 
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'create %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'create %s'\r\n", args[0])
 	return util.E_PEBKAC
 }
 
@@ -82,7 +81,7 @@ func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 	case "disc", "disk":
 		return d.cmds.DeleteDisc(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unknown command 'delete %s'\r\n", args[0])
+	log.Errorf("Unknown command 'delete %s'\r\n", args[0])
 	return d.cmds.HelpForDelete()
 
 }
@@ -99,13 +98,13 @@ func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 	case "account":
 		return d.cmds.ShowAccount(args[1:])
 	case "user":
-		fmt.Printf("Leave me alone! I'm grumpy.")
+		log.Error("show user not implemented yet")
 		return 666
 		//return ShowUser(args[1:])
 	case "group":
 		return d.cmds.ShowGroup(args[1:])
 	case "key", "keys":
-		fmt.Printf("Leave me alone, I'm grumpy!")
+		log.Error("show keys not implemented yet")
 		return 666
 		//return d.cmds.ShowKeys(args[1:])
 	}
@@ -132,7 +131,7 @@ func (d *Dispatcher) DoUndelete(args []string) util.ExitCode {
 	case "vm":
 		return d.cmds.UndeleteVM(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'undelete %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'undelete %s'\r\n", args[0])
 	return d.cmds.HelpForDelete()
 }
 
@@ -163,7 +162,7 @@ func (d *Dispatcher) DoLock(args []string) util.ExitCode {
 	case "hwprofile":
 		return d.cmds.LockHWProfile(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'lock %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'lock %s'\r\n", args[0])
 	return d.cmds.HelpForLocks()
 }
 
@@ -176,7 +175,7 @@ func (d *Dispatcher) DoUnlock(args []string) util.ExitCode {
 	case "hwprofile":
 		return d.cmds.UnlockHWProfile(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'unlock %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'unlock %s'\r\n", args[0])
 	return d.cmds.HelpForLocks()
 }
 
@@ -193,18 +192,16 @@ func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 	case "cores":
 		return d.cmds.SetCores(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'set %s'\r\rn", args[0])
+	log.Errorf("Unrecognised command 'set %s'\r\n", args[0])
 	return d.cmds.HelpForSet()
 }
 
 // Do takes the command line arguments and figures out what to do.
 func (d *Dispatcher) Do(args []string) util.ExitCode {
-	if d.debugLevel >= 1 {
-		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
-	}
+	log.Debugf(1, "Args passed to Do: %#v\r\n", args)
 
 	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
-		fmt.Printf("No command specified.\n\n")
+		log.Errorf("No command specified.\r\n")
 		d.cmds.Help(args)
 		return util.E_SUCCESS
 	}
@@ -238,8 +235,8 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 	if fn != nil {
 		return fn(args[1:])
 	} else {
-		fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", command)
-		fmt.Println()
+		log.Errorf("Unrecognised command '%s'\r\n\r\n", command)
+
 		return d.cmds.Help(args)
 	}
 

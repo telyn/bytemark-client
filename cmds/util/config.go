@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bigv.io/client/util/log"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -121,7 +122,7 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 	home := os.Getenv("HOME")
 	if runtime.GOOS == "windows" {
 		home = os.Getenv("APPDATA")
-		
+
 	}
 	config.Dir = filepath.Join(home, "/.go-bigv")
 	config.mainFlags = flags
@@ -148,14 +149,20 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		return nil, &ConfigDirInvalidError{config.Dir}
 	}
 
+	log.LogFile, err = os.Create(config.GetPath("debug.log"))
+	if err != nil {
+		log.Errorf("Couldn't open %s for writing\r\n", config.GetPath("debug.log"))
+	}
+
 	config.ImportFlags(flags)
 	strDL, err := config.Get("debug-level")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Error(err)
 	} else {
 		debugLevel, err := strconv.ParseInt(strDL, 10, 0)
 		if err == nil {
 			config.debugLevel = int(debugLevel)
+			log.DebugLevel = int(debugLevel)
 		}
 	}
 	return config, nil
@@ -173,16 +180,26 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 					"FLAG " + f.Name,
 				}
 			})
+
 			if flags != config.mainFlags {
 
 				args := flags.Args()
 				for _, arg := range args {
 					if strings.HasPrefix(arg, "-") {
-						fmt.Fprintf(os.Stderr, "Flag-like argument '%s' specified after your arguments\r\nBe aware that only flags placed before your arguments are parsed.\r\nSee the help for the command you're calling for invocation examples.\r\n\r\n", arg)
+						log.Errorf("Flag-like argument '%s' specified after your arguments\r\nBe aware that only flags placed before your arguments are parsed.\r\nSee the help for the command you're calling for invocation examples.\r\n\r\n", arg)
 						break
 					}
 				}
 			}
+
+			log.Silent = config.Silent()
+			strDL := config.GetIgnoreErr("debug-level")
+			debugLevel, err := strconv.ParseInt(strDL, 10, 0)
+			if err == nil {
+				config.debugLevel = int(debugLevel)
+				log.DebugLevel = int(debugLevel)
+			}
+
 			return flags.Args()
 		}
 	}
@@ -214,9 +231,7 @@ func (config *Config) LoadDefinitions() error {
 		if err != nil {
 			return err
 		}
-		if !config.Silent() {
-			fmt.Fprintf(os.Stderr, "Downloading definitions for %s...\r\n", endpoint)
-		}
+		log.Logf("Downloading definitions for %s...\r\n", endpoint)
 		c := &http.Client{}
 		req, err := http.NewRequest("GET", endpoint+"/definitions.json", nil)
 		if err != nil {
@@ -236,7 +251,6 @@ func (config *Config) LoadDefinitions() error {
 			ioutil.WriteFile(defPath, responseBody, 0660)
 
 			err = json.Unmarshal(responseBody, config.Definitions)
-			fmt.Fprintln(os.Stderr)
 			return err
 		} else {
 			// TODO(telyn): Unexpected status code

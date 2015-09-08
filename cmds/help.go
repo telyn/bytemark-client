@@ -2,25 +2,25 @@ package cmds
 
 import (
 	"bigv.io/client/cmds/util"
-	"fmt"
+	"bigv.io/client/util/log"
 	"strings"
 )
 
 // HelpForHelp shows overall usage information for the BigV client, including a list of available commands.
 func (cmds *CommandSet) HelpForHelp() util.ExitCode {
-	fmt.Println("bigv command-line client (the new, cool one)")
-	fmt.Println()
-	fmt.Println("Usage")
-	fmt.Println()
-	fmt.Println("    go-bigv [flags] <command> [flags] [args]")
-	fmt.Println()
-	fmt.Println("Commands available")
-	fmt.Println()
-	fmt.Println("    help, config, create, debug, delete, list, show")
-	fmt.Println("    AND MAYBE MORE OR FEWER - THIS LIST IS NOT FINAL")
-	fmt.Println()
-	fmt.Println("See `go-bigv help <command>` for help specific to a command")
-	fmt.Println()
+	log.Log("bigv command-line client (the new, cool one)")
+	log.Log()
+	log.Log("Usage")
+	log.Log()
+	log.Log("    go-bigv [flags] <command> [flags] [args]")
+	log.Log()
+	log.Log("Commands available")
+	log.Log()
+	log.Log("    help, config, create, debug, delete, list, show")
+	log.Log("    AND MAYBE MORE OR FEWER - THIS LIST IS NOT FINAL")
+	log.Log()
+	log.Log("See `go-bigv help <command>` for help specific to a command")
+	log.Log()
 	return util.E_USAGE_DISPLAYED
 }
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	util "bigv.io/client/cmds/util"
-	"fmt"
+	"bigv.io/client/util/log"
 	"os"
 	"os/signal"
 )
@@ -12,7 +12,7 @@ func main() {
 	signal.Notify(ch, os.Interrupt)
 	go func() {
 		for _ = range ch {
-			fmt.Printf("\r\nCaught an interrupt - exiting.\r\n")
+			log.Error("\r\nCaught an interrupt - exiting.\r\n")
 			os.Exit(int(util.E_TRAPPED_INTERRUPT))
 		}
 
