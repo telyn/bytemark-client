@@ -96,7 +96,12 @@ Exit code ranges:
 
     4
 	Couldn't write a file to config directory
-
+    5
+	The user caused the program to exit (usually by saying "no" to Yes/no prompts)	
+    6
+	The user requested a non-empty group be deleted
+    7
+	The program was called with malformed arguments
 
  50 - 249 Exit codes:
 
