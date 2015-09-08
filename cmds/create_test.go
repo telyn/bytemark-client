@@ -32,6 +32,8 @@ func TestCreateDiskCommand(t *testing.T) {
 	}
 }
 
+// TODO(telyn): TestCreateGroupCommand
+
 func TestCreateVMCommand(t *testing.T) {
 	c := &mocks.BigVClient{}
 	config := &mocks.Config{}
@@ -73,7 +75,14 @@ func TestCreateVMCommand(t *testing.T) {
 		Account: "",
 	}
 
-	c.When("CreateVirtualMachine", group, vm).Return(vm.VirtualMachine, nil).Times(1)
+	vmname := bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "",
+		Account:        "",
+	}
+
+	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
 	cmds.CreateVM([]string{

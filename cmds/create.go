@@ -227,7 +227,11 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	vm, err := cmds.bigv.CreateVirtualMachine(groupName, spec)
+	_, err = cmds.bigv.CreateVirtualMachine(groupName, spec)
+	if err != nil {
+		return util.ProcessError(err)
+	}
+	vm, err := cmds.bigv.GetVirtualMachine(bigv.VirtualMachineName{name.VirtualMachine, name.Group, name.Account})
 	if err != nil {
 		return util.ProcessError(err)
 	}
