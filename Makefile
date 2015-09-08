@@ -76,7 +76,11 @@ docs: doc/*.md
 	done
 
 test: 
+ifdef $(VERBOSE)
+	go test -v $(ALL_PACKAGES)
+else 
 	go test $(ALL_PACKAGES)
+endif
 
 find-uk0: 
 	$(RGREP) --exclude=go-bigv "uk0" .
