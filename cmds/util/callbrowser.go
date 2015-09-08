@@ -3,7 +3,7 @@
 package util
 
 import (
-	"fmt"
+	"bigv.io/client/util/log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -30,10 +30,11 @@ func CallBrowser(url string) error {
 		}
 	}
 
-	fmt.Fprintf(os.Stderr, "Running a browser to open %s...\r\n", url)
+	log.Logf("Running a browser to open %s...\r\n", url)
 
 	var attr os.ProcAttr
 	proc, err := os.StartProcess(bin, []string{bin, url}, &attr)
+	log.Debugf(1, "Executing %s \"%s\"", bin, url)
 	if err != nil {
 		return err
 	}

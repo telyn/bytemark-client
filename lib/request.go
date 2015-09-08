@@ -1,13 +1,13 @@
 package lib
 
 import (
+	"bigv.io/client/util/log"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -28,7 +28,7 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 	if bigv.debugLevel >= 3 {
 		buf := new(bytes.Buffer)
 		json.Indent(buf, data, "", "    ")
-		fmt.Printf("%s", buf)
+		log.Debugf(3, "%s", buf)
 	}
 
 	if err != nil {
@@ -51,9 +51,7 @@ func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody 
 		return nil, readErr
 	}
 
-	if bigv.debugLevel > 2 {
-		fmt.Fprintf(os.Stderr, "response body: '%s'\r\n", string(responseBody))
-	}
+	log.Debugf(2, "response body: '%s'\r\n", string(responseBody))
 
 	return responseBody, err
 }
@@ -84,12 +82,8 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		return req, res, err
 	}
 
-	if bigv.debugLevel > 1 {
-		fmt.Fprintf(os.Stderr, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
-	}
-	if bigv.debugLevel >= 3 {
-		fmt.Fprintf(os.Stderr, "request body: '%s'\r\n", requestBody)
-	}
+	log.Debugf(1, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
+	log.Debugf(3, "request body: '%s'\r\n", requestBody)
 
 	baseErr := BigVError{
 		Method:       method,

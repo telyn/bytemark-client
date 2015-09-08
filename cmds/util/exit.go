@@ -2,10 +2,13 @@ package util
 
 import (
 	bigv "bigv.io/client/lib"
+	"bigv.io/client/util/log"
 	auth3 "bytemark.co.uk/auth3/client"
 	"fmt"
 	"net"
 	"net/url"
+	"os"
+	"runtime"
 	"strings"
 	"syscall"
 )
@@ -74,7 +77,7 @@ const (
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
 func HelpForExitCodes() ExitCode {
-	fmt.Println(`bigv exit code list:
+	log.Logf(`bigv exit code list:
 
 Exit code ranges:
     All these ranges are inclusive (i.e. 0-99 means numbers from 0 to 99, including 0 and 99.)
@@ -137,8 +140,12 @@ Exit code ranges:
 }
 
 func ProcessError(err error, message ...string) ExitCode {
+	trace := make([]byte, 0, 4096)
+	runtime.Stack(trace, false)
+
+	log.Debug(1, "ProcessError called. Dumping arguments and stacktrace", os.Args, trace)
 	if len(message) > 0 {
-		fmt.Println(strings.Join(message, "\r\n"))
+		log.Error(message)
 	} else if err == nil {
 		return E_SUCCESS
 	}
@@ -212,10 +219,9 @@ func ProcessError(err error, message ...string) ExitCode {
 	}
 
 	if exitCode == E_UNKNOWN_ERROR {
-		fmt.Printf("Unknown error of type %T: %s. I'm going to panic now. Expect a lot of output.\r\n", err, err)
-		panic("")
-	} else if len(message) == 0 {
-		fmt.Println(errorMessage)
+		log.Errorf("Unknown error of type %T: %s.\r\nPlease send a bug report containing %s to support@bytemark.co.uk.\r\n", err, err, log.LogFile.Name())
+	} else if len(message) == 0 { // the message (passed as argument) is shadowed by errorMessage (made in this function)
+		log.Log(errorMessage)
 
 	}
 	return exitCode

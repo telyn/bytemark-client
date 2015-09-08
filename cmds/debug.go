@@ -2,29 +2,29 @@ package cmds
 
 import (
 	"bigv.io/client/cmds/util"
+	"bigv.io/client/util/log"
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
 )
 
 // HelpForDebug outputs usage information for the debug command.
 func (commands *CommandSet) HelpForDebug() util.ExitCode {
-	fmt.Println("go-bigv debug")
-	fmt.Println()
-	fmt.Println("Usage:")
-	fmt.Println("    go-bigv debug [--junk-token] [--auth] GET <path>")
-	fmt.Println("    go-bigv debug [--junk-token] [--auth] DELETE <path>")
-	fmt.Println("    go-bigv debug [--junk-token] [--auth] PUT <path>")
-	fmt.Println("    go-bigv debug [--junk-token] [--auth] POST <path>")
-	fmt.Println()
-	fmt.Println("GET sends an HTTP GET request with an optional valid authorization header to the given path on the BigV endpoint and pretty-prints the received json.")
-	fmt.Println("The rest do similar, but PUT and POST")
-	fmt.Println("The --junk-token flag sets the token to empty - useful if you want to ensure that credential-auth is working, or you want to do something as another user")
-	fmt.Println("The --auth token tells the client to gain valid auth and send the auth header on that request.")
-	fmt.Println()
+	log.Log("go-bigv debug")
+	log.Log()
+	log.Log("Usage:")
+	log.Log("    go-bigv debug [--junk-token] [--auth] GET <path>")
+	log.Log("    go-bigv debug [--junk-token] [--auth] DELETE <path>")
+	log.Log("    go-bigv debug [--junk-token] [--auth] PUT <path>")
+	log.Log("    go-bigv debug [--junk-token] [--auth] POST <path>")
+	log.Log()
+	log.Log("GET sends an HTTP GET request with an optional valid authorization header to the given path on the BigV endpoint and pretty-prints the received json.")
+	log.Log("The rest do similar, but PUT and POST")
+	log.Log("The --junk-token flag sets the token to empty - useful if you want to ensure that credential-auth is working, or you want to do something as another user")
+	log.Log("The --auth token tells the client to gain valid auth and send the auth header on that request.")
+	log.Log()
 	return util.E_USAGE_DISPLAYED
 
 }
@@ -76,14 +76,14 @@ func (commands *CommandSet) Debug(args []string) util.ExitCode {
 
 		buf := new(bytes.Buffer)
 		json.Indent(buf, body, "", "    ")
-		fmt.Printf("%s", buf)
+		log.Log(buf.String())
 	case "config":
 		vars, err := commands.config.GetAll()
 		if err != nil {
 			return util.ProcessError(err)
 		}
 		indented, _ := json.MarshalIndent(vars, "", "    ")
-		fmt.Printf("%s", indented)
+		log.Log(string(indented))
 	default:
 		commands.HelpForDebug()
 	}

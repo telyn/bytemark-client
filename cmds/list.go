@@ -2,16 +2,16 @@ package cmds
 
 import (
 	"bigv.io/client/cmds/util"
-	"fmt"
+	"bigv.io/client/util/log"
 )
 
 func (cmds *CommandSet) HelpForList() util.ExitCode {
-	fmt.Println("bigv list")
-	fmt.Println("")
-	fmt.Println("usage: bigv list vms")
-	fmt.Println("       bigv list groups")
-	fmt.Println("       bigv list accounts")
-	fmt.Println("       bigv list discs")
+	log.Log("bigv list")
+	log.Log("")
+	log.Log("usage: bigv list vms")
+	log.Log("       bigv list groups")
+	log.Log("       bigv list accounts")
+	log.Log("       bigv list discs")
 	return util.E_USAGE_DISPLAYED
 }
 
@@ -40,10 +40,8 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	if !cmds.config.Silent() {
-		for _, vm := range group.VirtualMachines {
-			fmt.Println(vm.Hostname)
-		}
+	for _, vm := range group.VirtualMachines {
+		log.Log(vm.Hostname)
 	}
 	return util.E_SUCCESS
 }
@@ -70,10 +68,8 @@ func (cmds *CommandSet) ListGroups(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	if !cmds.config.Silent() {
-		for _, group := range account.Groups {
-			fmt.Println(group.Name)
-		}
+	for _, group := range account.Groups {
+		log.Log(group.Name)
 	}
 	return util.E_SUCCESS
 }
@@ -94,10 +90,8 @@ func (cmds *CommandSet) ListAccounts(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	if !cmds.config.Silent() {
-		for _, group := range accounts {
-			fmt.Println(group.Name)
-		}
+	for _, group := range accounts {
+		log.Log(group.Name)
 	}
 	return util.E_SUCCESS
 }
@@ -123,9 +117,7 @@ func (cmds *CommandSet) ListDiscs(args []string) util.ExitCode {
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	for _, disc := range vm.Discs {
-		if !cmds.config.Silent() {
-			fmt.Printf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
-		}
+		log.Logf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
 	}
 	return util.E_SUCCESS
 }

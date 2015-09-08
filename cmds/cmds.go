@@ -3,12 +3,10 @@ package cmds
 import (
 	util "bigv.io/client/cmds/util"
 	bigv "bigv.io/client/lib"
-	"bufio"
+	"bigv.io/client/util/log"
 	auth3 "bytemark.co.uk/auth3/client"
-	"fmt"
 	"github.com/bgentry/speakeasy"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -84,7 +82,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 				return aErr
 			}
 		}
-		fmt.Fprintf(os.Stderr, "Please log in to BigV\r\n\r\n")
+		log.Error("Please log in to BigV\r\n")
 		attempts := 3
 
 		for err != nil {
@@ -107,7 +105,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 			} else {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
 					if attempts > 0 {
-						fmt.Fprintf(os.Stderr, "Invalid credentials, please try again\r\n")
+						log.Errorf("Invalid credentials, please try again\r\n")
 						cmds.config.Set("user", "", "INVALID")
 						cmds.config.Set("pass", "", "INVALID")
 						cmds.config.Set("yubikey-otp", "", "INVALID")
@@ -129,10 +127,8 @@ func (cmds *CommandSet) EnsureAuth() error {
 // needs a for loop to ensure that they don't stay empty.
 // returns nil on success or an error on failure
 func (cmds *CommandSet) PromptForCredentials() error {
-	buf := bufio.NewReader(os.Stdin)
 	for cmds.config.GetIgnoreErr("user") == "" {
-		fmt.Fprintf(os.Stderr, "User: ")
-		user, _ := buf.ReadString('\n')
+		user := util.Prompt("User: ")
 		cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
 	}
 
@@ -147,11 +143,10 @@ func (cmds *CommandSet) PromptForCredentials() error {
 
 	if cmds.config.GetIgnoreErr("yubikey") != "" {
 		for cmds.config.GetIgnoreErr("yubikey-otp") == "" {
-			fmt.Fprintf(os.Stderr, "Press yubikey: ")
-			yubikey, _ := buf.ReadString('\n')
+			yubikey := util.Prompt("Press yubikey: ")
 			cmds.config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
 		}
 	}
-	fmt.Fprintf(os.Stderr, "\r\n")
+	log.Log("")
 	return nil
 }
