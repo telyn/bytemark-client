@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -117,7 +118,12 @@ func (e *ConfigWriteError) Error() string {
 func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
-	config.Dir = filepath.Join(os.Getenv("HOME"), "/.go-bigv")
+	home := os.Getenv("HOME")
+	if runtime.GOOS == "windows" {
+		home = os.Getenv("APPDATA")
+		
+	}
+	config.Dir = filepath.Join(home, "/.go-bigv")
 	config.mainFlags = flags
 	if os.Getenv("BIGV_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
