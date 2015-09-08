@@ -1,7 +1,7 @@
 package util
 
 import (
-	"fmt"
+	"bigv.io/client/util/log"
 	"os"
 	"os/exec"
 	"strings"
