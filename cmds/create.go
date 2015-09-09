@@ -100,6 +100,13 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 		}
 
 	}
+	for i := range discs {
+		d, err := discs[i].Validate()
+		if err != nil {
+			return util.ProcessError(err)
+		}
+		discs[i] = *d
+	}
 	cmds.EnsureAuth()
 
 	log.Logf("Adding discs to %s:\r\n", name)
@@ -180,10 +187,12 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	for i, d := range discs {
-		if d.StorageGrade == "" {
-			discs[i].StorageGrade = "sata"
+	for i := range discs {
+		d, err := discs[i].Validate()
+		if err != nil {
+			return util.ProcessError(err)
 		}
+		discs[i] = *d
 	}
 
 	// if stopped isn't set and either cdrom or image are set, start the vm

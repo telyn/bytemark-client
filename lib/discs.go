@@ -18,6 +18,15 @@ func labelDiscs(discs []Disc, offset ...int) {
 
 }
 
+func (disc *Disc) Validate() (*Disc, error) {
+	if disc.StorageGrade == "" {
+		newDisc := *disc
+		newDisc.StorageGrade = "sata"
+		return &newDisc, nil
+	}
+	return disc, nil
+}
+
 func (bigv *bigvClient) CreateDisc(name VirtualMachineName, disc Disc) (err error) {
 	err = bigv.validateVirtualMachineName(&name)
 	if err != nil {
