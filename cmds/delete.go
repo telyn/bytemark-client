@@ -79,9 +79,9 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	}
 
 	if *purge {
-		log.Logf("Virtual machine %s purged successfully.\r\n", name)
+		log.Logf("Virtual machine %s purged successfully.\r\n", vm.Hostname)
 	} else {
-		log.Logf("Virtual machine %s deleted successfully.\r\n", name)
+		log.Logf("Virtual machine %s deleted successfully.\r\n", vm.Hostname)
 	}
 	return util.E_SUCCESS
 }

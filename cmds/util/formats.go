@@ -3,6 +3,7 @@ package util
 import (
 	client "bigv.io/client/lib"
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -98,7 +99,13 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 	if spec.VirtualMachine.Cores > 1 {
 		s = "s"
 	}
-	output = append(output, fmt.Sprintf("Specs: %d core%s and %dGB memory", spec.VirtualMachine.Cores, s, spec.VirtualMachine.Memory))
+
+	mems := fmt.Sprintf("%d", spec.VirtualMachine.Memory/1024)
+	if 0 != math.Mod(float64(spec.VirtualMachine.Memory), 1024) {
+		mem := float64(spec.VirtualMachine.Memory) / 1024.0
+		mems = fmt.Sprintf("%.2f", mem)
+	}
+	output = append(output, fmt.Sprintf("Specs: %d core%s and %sGiB memory", spec.VirtualMachine.Cores, s, mems))
 
 	locked := ""
 	if spec.VirtualMachine.HardwareProfile != "" {

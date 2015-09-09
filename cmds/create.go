@@ -68,6 +68,7 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
+
 	var discs []bigv.Disc
 	if *sizeFlag != "" || *gradeFlag != "" {
 		// if both flags and spec are specified, fail
@@ -111,10 +112,10 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 
 	log.Logf("Adding discs to %s:\r\n", name)
 	for _, d := range discs {
-		log.Logf("    %d %s...", d.Size/1024, d.StorageGrade)
+		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
 		err = cmds.bigv.CreateDisc(name, d)
 		if err != nil {
-			log.Errorf("Failure! %v\r\n", err.Error())
+			log.Errorf("failure! %v\r\n", err.Error())
 		} else {
 			log.Log("success!")
 		}
@@ -240,11 +241,11 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	vm, err := cmds.bigv.GetVirtualMachine(bigv.VirtualMachineName{name.VirtualMachine, name.Group, name.Account})
+	vm, err := cmds.bigv.GetVirtualMachine(name)
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	log.Logf("Virtual machine %s created successfully\r\n", vm.Name)
+	log.Log("Virtual machine created successfully\r\n", "")
 	log.Log(util.FormatVirtualMachine(vm))
 	return util.E_SUCCESS
 

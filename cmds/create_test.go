@@ -19,6 +19,7 @@ func TestCreateDiskCommand(t *testing.T) {
 	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
 	c.When("ParseVirtualMachineName", "test-vm").Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("GetVirtualMachine", name).Return(&bigv.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
 
 	disc := bigv.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
