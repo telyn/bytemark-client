@@ -69,7 +69,7 @@ func (cmds *CommandSet) ListGroups(args []string) util.ExitCode {
 	}
 
 	for _, group := range account.Groups {
-		log.Log(group.Name)
+		log.Output(group.Name)
 	}
 	return util.E_SUCCESS
 }

@@ -152,7 +152,7 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 		case *listgroups:
 			log.Output("Groups:")
 			for _, g := range acc.Groups {
-				log.Outputf("%s", g.Name)
+				log.Output(g.Name)
 			}
 		case *listvms:
 			log.Output("Virtual machines:")
