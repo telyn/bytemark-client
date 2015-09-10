@@ -3,6 +3,7 @@ package lib
 import (
 	"bigv.io/client/util/log"
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -44,7 +45,14 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
 func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
 	_, res, err := bigv.Request(auth, method, location, requestBody)
-	defer res.Body.Close()
+	if err != nil {
+		return []byte{}, err
+	}
+	defer func() {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+	}()
 
 	responseBody, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
@@ -65,6 +73,13 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		url = bigv.endpoint + location
 	}
 	cli := &http.Client{}
+	if bigv.endpoint == "https://staging.bigv.io" {
+		cli.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+	}
 
 	req, err = http.NewRequest(method, url, bytes.NewBufferString(requestBody))
 	if err != nil {
