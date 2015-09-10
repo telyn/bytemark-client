@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"io"
 	"os"
 	"strings"
 )
@@ -48,7 +49,6 @@ func (commands *CommandSet) Debug(args []string) util.ExitCode {
 
 	switch args[0] {
 	case "GET", "PUT", "POST", "DELETE":
-		// BUG(telyn): don't panic
 		if !strings.HasPrefix(args[1], "/") {
 			args[1] = "/" + args[1]
 		}
@@ -64,8 +64,7 @@ func (commands *CommandSet) Debug(args []string) util.ExitCode {
 		if args[0] == "PUT" || args[0] == "POST" {
 			buf := bufio.NewReader(os.Stdin)
 			requestBody, err = buf.ReadString(byte(uint8(14)))
-			if err != nil {
-				// BUG(telyn): deal with EOFs properly
+			if err != nil && err != io.EOF {
 				return util.ProcessError(err)
 			}
 		}
