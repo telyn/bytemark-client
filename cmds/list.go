@@ -8,10 +8,10 @@ import (
 func (cmds *CommandSet) HelpForList() util.ExitCode {
 	log.Log("bigv list")
 	log.Log("")
-	log.Log("usage: bigv list vms")
-	log.Log("       bigv list groups")
+	log.Log("usage: bigv list vms <group>")
+	log.Log("       bigv list groups <account>")
 	log.Log("       bigv list accounts")
-	log.Log("       bigv list discs")
+	log.Log("       bigv list discs <virtual machine>")
 	return util.E_USAGE_DISPLAYED
 }
 
