@@ -71,6 +71,9 @@ const (
 	// E_NOT_FOUND_BIGV is the exit code returned when the BigV server says you do not have permission to see the object you are trying to view, or that it does not exist.
 	E_NOT_FOUND_BIGV = 156
 
+	// E_BAD_REQUEST_BIGV is the exit code returned when we send a bad request to BigV. (E.g. names being too short or having wrong characters in)
+	E_BAD_REQUEST_BIGV = 157
+
 	// E_UNKNOWN_AUTH is the exit code returned when we get an unexpected error from the auth server.
 	E_UNKNOWN_AUTH = 149
 	// E_UNKNOWN_BIGV is the exit code returned when we get an unexpected error from the BigV server.
@@ -199,7 +202,9 @@ func ProcessError(err error, message ...string) ExitCode {
 		case bigv.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_AUTHORIZED_BIGV
-
+		case bigv.BadRequestError:
+			errorMessage = err.Error()
+			exitCode = E_BAD_REQUEST_BIGV
 		case bigv.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_FOUND_BIGV

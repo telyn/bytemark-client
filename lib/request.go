@@ -95,7 +95,17 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 
 	switch res.StatusCode {
 	case 400:
-		err = BadRequestError{baseErr}
+		responseBody, readErr := ioutil.ReadAll(res.Body)
+		if readErr != nil {
+			return nil, nil, BadRequestError{BigVError: baseErr, Problems: make(map[string][]string)}
+		}
+		baseErr.ResponseBody = string(responseBody)
+		brErr := BadRequestError{BigVError: baseErr, Problems: make(map[string][]string)}
+		err = json.Unmarshal(responseBody, &brErr.Problems)
+		if err != nil {
+			log.Debug(1, err)
+		}
+		err = brErr
 
 	case 403:
 		err = NotAuthorizedError{baseErr}
