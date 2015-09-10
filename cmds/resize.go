@@ -3,6 +3,7 @@ package cmds
 import (
 	"bigv.io/client/cmds/util"
 	"bigv.io/client/util/log"
+	"strconv"
 )
 
 func (cmds *CommandSet) HelpForResize() util.ExitCode {
@@ -12,7 +13,7 @@ func (cmds *CommandSet) HelpForResize() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }
 
-func (cmds *CommandSet) ResizeDisk(args []string) util.ExitCode {
+func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -23,7 +24,10 @@ func (cmds *CommandSet) ResizeDisk(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name := cmds.bigv.ParseGroupName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	if err != nil {
+
+	}
 
 	discId, ok := util.ShiftArgument(&args, "disc id")
 	if !ok {
@@ -37,7 +41,7 @@ func (cmds *CommandSet) ResizeDisk(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	disc, err := strconv.parseInt(discId, 10, 32)
+	disc, err := strconv.ParseInt(discId, 10, 32)
 	if err != nil {
 		cmds.HelpForList()
 		return util.E_PEBKAC
@@ -48,12 +52,11 @@ func (cmds *CommandSet) ResizeDisk(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	err := cmds.EnsureAuth()
+	err = cmds.EnsureAuth()
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	cmds.bigv.ResizeDisc(name, disc, size)
-
-	return util.E_SUCCESS
+	err = cmds.bigv.ResizeDisc(name, int(disc), size)
+	return util.ProcessError(err)
 }

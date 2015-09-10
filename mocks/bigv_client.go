@@ -73,45 +73,72 @@ func (c *BigVClient) CreateDisc(name bigv.VirtualMachineName, disc bigv.Disc) er
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
+
 func (c *BigVClient) CreateGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+
 func (c *BigVClient) GetGroup(name bigv.GroupName) (*bigv.Group, error) {
 	r := c.Called(name)
 	group, _ := r.Get(0).(*bigv.Group)
 	return group, r.Error(1)
 }
+
 func (c *BigVClient) DeleteDisc(name bigv.VirtualMachineName, disc int) error {
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
+
 func (c *BigVClient) DeleteGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+
 func (c *BigVClient) DeleteVirtualMachine(name bigv.VirtualMachineName, purge bool) error {
 	r := c.Called(name, purge)
 	return r.Error(0)
 }
+
 func (c *BigVClient) CreateVirtualMachine(group bigv.GroupName, vm bigv.VirtualMachineSpec) (*bigv.VirtualMachine, error) {
 	r := c.Called(group, vm)
 	rvm, _ := r.Get(0).(*bigv.VirtualMachine)
 	return rvm, r.Error(1)
 }
+
 func (c *BigVClient) GetVirtualMachine(name bigv.VirtualMachineName) (vm *bigv.VirtualMachine, err error) {
 	r := c.Called(name)
 	vm, _ = r.Get(0).(*bigv.VirtualMachine)
 	return vm, r.Error(1)
 }
-func (c *BigVClient) UndeleteVirtualMachine(name bigv.VirtualMachineName) error {
+
+func (c *BigVClient) ParseVirtualMachineName(name string) (bigv.VirtualMachineName, error) {
 	r := c.Called(name)
-	return r.Error(0)
+	n, _ := r.Get(0).(bigv.VirtualMachineName)
+	return n, r.Error(1)
 }
+
+func (c *BigVClient) ParseGroupName(name string) bigv.GroupName {
+	r := c.Called(name)
+	n, _ := r.Get(0).(bigv.GroupName)
+	return n
+}
+
+func (c *BigVClient) ParseAccountName(name string) string {
+	r := c.Called(name)
+	return r.String(0)
+}
+
 func (c *BigVClient) ResetVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+
+func (c *BigVClient) ResizeDisc(name bigv.VirtualMachineName, id int, size int) error {
+	r := c.Called(name)
+	return r.Error(0)
+}
+
 func (c *BigVClient) RestartVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
@@ -145,17 +172,7 @@ func (c *BigVClient) ShutdownVirtualMachine(name bigv.VirtualMachineName, stayof
 	return r.Error(0)
 }
 
-func (c *BigVClient) ParseVirtualMachineName(name string) (bigv.VirtualMachineName, error) {
+func (c *BigVClient) UndeleteVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
-	n, _ := r.Get(0).(bigv.VirtualMachineName)
-	return n, r.Error(1)
-}
-func (c *BigVClient) ParseGroupName(name string) bigv.GroupName {
-	r := c.Called(name)
-	n, _ := r.Get(0).(bigv.GroupName)
-	return n
-}
-func (c *BigVClient) ParseAccountName(name string) string {
-	r := c.Called(name)
-	return r.String(0)
+	return r.Error(0)
 }
