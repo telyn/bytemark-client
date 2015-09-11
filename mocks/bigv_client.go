@@ -135,7 +135,7 @@ func (c *BigVClient) ResetVirtualMachine(name bigv.VirtualMachineName) error {
 }
 
 func (c *BigVClient) ResizeDisc(name bigv.VirtualMachineName, id int, size int) error {
-	r := c.Called(name)
+	r := c.Called(name, id, size)
 	return r.Error(0)
 }
 

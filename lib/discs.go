@@ -59,3 +59,16 @@ func (bigv *bigvClient) DeleteDisc(vm VirtualMachineName, discID int) (err error
 
 	return err
 }
+
+func (bigv *bigvClient) ResizeDisc(vm VirtualMachineName, discID int, sizeMB int) (err error) {
+	err = bigv.validateVirtualMachineName(&vm)
+	if err != nil {
+		return err
+	}
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, fmt.Sprintf("%d", discID))
+
+	disc := fmt.Sprintf(`{"size":%d}`, sizeMB)
+
+	_, _, err = bigv.Request(true, "PUT", path, disc)
+	return err
+}

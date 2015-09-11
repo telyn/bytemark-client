@@ -15,16 +15,18 @@ func TestResizeDisk(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 
-	config.When("ImportFlags").Return([]string{"test-vm", "archive:35"})
+	args := []string{"test-vm", "11", "35"}
+
+	config.When("ImportFlags").Return(args)
 	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
 	c.When("ParseVirtualMachineName", "test-vm").Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", name).Return(&bigv.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
 
-	c.When("ResizeDisc", name, 11, 22).Return(nil).Times(1)
+	c.When("ResizeDisc", name, 11, 35*1024).Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.CreateDiscs([]string{"test-vm", "archive:35"})
+	cmds.ResizeDisc(args)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

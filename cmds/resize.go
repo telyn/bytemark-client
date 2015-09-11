@@ -53,6 +53,7 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 	}
 
 	err = cmds.EnsureAuth()
+
 	if err != nil {
 		return util.ProcessError(err)
 	}
