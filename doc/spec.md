@@ -131,6 +131,7 @@ List of commands
 `bigv help [command | topic]` - output the help for bigv or for the given command or topic
 `bigv lock hwprofile <virtual machine>`
 `bigv list accounts` - lists the accounts you can see, one per line
+`bigv list discs <virtual machine>` - lists the discs in the given VM, with their size and ids
 `bigv list images` - lists the available operating system images that can be passed to create vm and reimage
 `bigv list (grades | storage-grades)` - lists the available storage grades, along with a description. One per line.
 `bigv list privileges` - lists the privileges that can possibly be granted
