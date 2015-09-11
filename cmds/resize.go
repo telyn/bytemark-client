@@ -59,5 +59,10 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 	}
 
 	err = cmds.bigv.ResizeDisc(name, int(disc), size)
-	return util.ProcessError(err)
+	if err != nil {
+		return util.ProcessError(err)
+	} else {
+
+		return util.E_SUCCESS
+	}
 }
