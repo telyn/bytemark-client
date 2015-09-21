@@ -96,6 +96,9 @@ n.b. storage grades can be found out by asking the api for /definitions.json
 List of commands
 ================
 
+`bigv config`  output all info about the current config
+`bigv config get <variable>`  output the value & source of the given variable
+`bigv config set <variable> <value>`  persistently sets a bigv-client variable
 `bigv console [--serial | --vnc] [--connect | --panel] <virtual machine>`
 `bigv create group [--account <account>] <name>`
 `bigv create dis<c|k>[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]` - if ambiguous, berate user
@@ -143,7 +146,6 @@ List of commands
 `bigv resize dis<c|k> [--size <size>] <virtual machine> [<resize spec>]` - resize to `size`. if ambiguous, berate user.
 `bigv revoke <user> <privilege>`
 `bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
-`bigv set client <variable> <value>`  persistently sets a bigv-client variable
 `bigv set cores <virtual machine> <num>`
 `bigv set hwprofile <virtual machine> <hardware profile>`
 `bigv set memory <virtual machine> <size>`
