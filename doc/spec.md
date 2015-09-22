@@ -121,9 +121,6 @@ List of commands
 `bigv delete account <account>
 `bigv delete dis<c|k> [--force] [---purge] <virtual machine> <disc label>`
 `bigv delete group <group>
-`bigv delete ip <ip>` - _actually no you can't delete an ip_
-`bigv delete nic <virtual machine> <nic id>`
-`bigv delete user <user>
 `bigv delete vm [--force] [---purge] <virtual machine>`
 `bigv debug [--junk-token] [--auth] <method> <path>` - Make an HTTP request to the given path on the current endpoint.
 `bigv debug config` - output the current config as json to debug Config's internal state
@@ -138,28 +135,25 @@ List of commands
 `bigv list groups <account>` - lists the groups in the given account, one per line
 `bigv list vms <group>` - lists the vms in the given group, one per line
 `bigv reimage [--image <image>] <virtual machine> [<image>]`
-`bigv request ip <virtual machine> [<nic id>]` - requests an IP on the given NIC, or the default NIC if not specified
 `bigv reset <virtual machine>` - Need to discuss whether this is useful
 `bigv resize dis<c|k> [--size <size>] <virtual machine> [<resize spec>]` - resize to `size`. if ambiguous, berate user.
 `bigv revoke <user> <privilege>`
-`bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
-`bigv set client <variable> <value>`  persistently sets a bigv-client variable
+`bigv config set <variable> <value>`  persistently sets a bigv-client variable
 `bigv set cores <virtual machine> <num>`
 `bigv set hwprofile <virtual machine> <hardware profile>`
 `bigv set memory <virtual machine> <size>`
 `bigv set rdns <ip> <host name>`
 `bigv show account [--json] <account>` - shows an overview of the given account, a list of groups and vms within them
-`bigv show client config[uration]|variables` - outputs the current config
+`bigv config` - outputs the current config
 `bigv show group [--json] <group>` - shows an overview of the given group, a list of VMs in them w/ size information
 `bigv show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
 `bigv show vm [--json] [--nics] <virtual machine>` - shows an overview of the given VM. Its discs, IPs, and such.
 `bigv shutdown <virtual machine>`
 `bigv start <virtual machine>`
 `bigv stop <virtual machine>`
-`bigv unset client <variable>` - persistently unsets a bigv-client variable
+`bigv config unset <variable>` - persistently unsets a bigv-client variable
 `bigv undelete vm <virtual machine>`
 `bigv unlock hwprofile <virtual machine>`
-`bigv vnc [--connect | --panel] <virtual machine>` - alias for `bigv console --vnc`
 
 Details
 =======
