@@ -32,6 +32,7 @@ type CommandManager interface {
 	ListVMs([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
 	ResetVM([]string) util.ExitCode
+	ResizeDisc([]string) util.ExitCode
 	Restart([]string) util.ExitCode
 	SetCores([]string) util.ExitCode
 	SetHWProfile([]string) util.ExitCode
@@ -53,6 +54,7 @@ type CommandManager interface {
 	HelpForList() util.ExitCode
 	HelpForLocks() util.ExitCode
 	HelpForPower() util.ExitCode
+	HelpForResize() util.ExitCode
 	HelpForSet() util.ExitCode
 	HelpForShow() util.ExitCode
 }

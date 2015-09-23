@@ -179,6 +179,19 @@ func (d *Dispatcher) DoUnlock(args []string) util.ExitCode {
 	return d.cmds.HelpForLocks()
 }
 
+func (d *Dispatcher) DoResize(args []string) util.ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForResize()
+
+	}
+	switch strings.ToLower(args[0]) {
+	case "disc":
+		return d.cmds.ResizeDisc(args[1:])
+	}
+
+	return d.cmds.HelpForResize()
+}
+
 func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForSet()
@@ -216,6 +229,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"help":     d.cmds.Help,
 		"list":     d.DoList,
 		"lock":     d.DoLock,
+		"resize":   d.DoResize,
 		"restart":  d.cmds.Restart,
 		"reset":    d.cmds.ResetVM,
 		"serial":   d.cmds.Console,

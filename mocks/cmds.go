@@ -84,6 +84,12 @@ func (cmds *Commands) ResetVM(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
+
+func (cmds *Commands) ResizeDisc(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) Restart(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
@@ -197,6 +203,11 @@ func (cmds *Commands) HelpForLocks() util.ExitCode {
 }
 
 func (cmds *Commands) HelpForPower() util.ExitCode {
+	r := cmds.Called()
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) HelpForResize() util.ExitCode {
 	r := cmds.Called()
 	return util.ExitCode(r.Int(0))
 }
