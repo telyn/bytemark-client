@@ -11,9 +11,9 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 .PHONY: BigV.app
 .PHONY: find-uk0 find-bugs-todos find-exits
 
-all: go-bigv
+all: bytemark
 
-BigV.app: go-bigv $(LAUNCHER_APP) ports/mac/*
+Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	mkdir -p BigV.app/Contents/Resources/bin
 	mkdir -p BigV.app/Contents/Resources/Scripts
 	mkdir -p BigV.app/Contents/MacOS
@@ -26,23 +26,23 @@ BigV.app: go-bigv $(LAUNCHER_APP) ports/mac/*
 	# copy in the terminal profile and start script
 	cp -r ports/mac/BigV.terminal BigV.app/Contents/Resources
 	cp -r ports/mac/start BigV.app/Contents/Resources
-	# copy in go-bigv into its own folder (this allows us to say 
-	# "add BigV.app/Contents/Resources/bin to your PATH" and it'll only add go-bigv
+	# copy in bytemark into its own folder (this allows us to say 
+	# "add BigV.app/Contents/Resources/bin to your PATH" and it'll only add bytemark
 	# and not the launcher too.)
-	cp go-bigv BigV.app/Contents/Resources/bin
+	cp bytemark BigV.app/Contents/Resources/bin
 	# make a symlink into MacOS. This step is totally unnecessary but it means all the binaries live in MacOS which is nice I guess?
-	rm -f BigV.app/Contents/MacOS/go-bigv
-	ln -s ../Resources/bin/go-bigv BigV.app/Contents/MacOS
+	rm -f BigV.app/Contents/MacOS/bytemark
+	ln -s ../Resources/bin/bytemark BigV.app/Contents/MacOS
 
 clean:
 	rm -rf BigV.app rm $(LAUNCHER_APP)
-	rm -f go-bigv
+	rm -f bytemark
 	rm -f main.coverage lib.coverage
 	rm -f main.coverage.html lib.coverage.html
 
 
-go-bigv: $(ALL_FILES)
-	go build -o go-bigv bigv.io/client/main
+bytemark: $(ALL_FILES)
+	go build -o bytemark bigv.io/client/main
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))
@@ -53,7 +53,7 @@ else
 endif
 
 install: all
-	cp go-bigv /usr/bin/go-bigv
+	cp bytemark /usr/bin/bytemark
 
 coverage: lib.coverage.html main.coverage.html
 ifeq (Darwin, $(shell uname -s))
@@ -83,7 +83,7 @@ else
 endif
 
 find-uk0: 
-	$(RGREP) --exclude=go-bigv "uk0" .
+	$(RGREP) --exclude=bytemark "uk0" .
 
 find-bugs-todos:
 	$(RGREP) -P "// BUG(.*):" . || echo ""
