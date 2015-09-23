@@ -3,6 +3,8 @@ main/main
 go-bigv
 go-bigv.exe
 BigV.app
+Bytemark.app
+bytemark
 *.coverage
 *.coverage.html
 doc/*.html
