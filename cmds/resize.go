@@ -3,7 +3,7 @@ package cmds
 import (
 	"bigv.io/client/cmds/util"
 	"bigv.io/client/util/log"
-	"strconv"
+	"strings"
 )
 
 func (cmds *CommandSet) HelpForResize() util.ExitCode {
@@ -18,9 +18,16 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
+	const (
+		SET = iota
+		INCREASE
+	)
+	mode := SET
+
 	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
 	if !ok {
-		cmds.HelpForList()
+		log.Error("No virtual machine specified")
+		cmds.HelpForResize()
 		return util.E_PEBKAC
 	}
 
@@ -31,20 +38,21 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 
 	discId, ok := util.ShiftArgument(&args, "disc id")
 	if !ok {
-		cmds.HelpForList()
+		log.Error("No disc specified")
+		cmds.HelpForResize()
 		return util.E_PEBKAC
 	}
 
 	sizeStr, ok := util.ShiftArgument(&args, "")
 	if !ok {
-		cmds.HelpForList()
+		log.Error("No size specified")
+		cmds.HelpForResize()
 		return util.E_PEBKAC
 	}
 
-	disc, err := strconv.ParseInt(discId, 10, 32)
-	if err != nil {
-		cmds.HelpForList()
-		return util.E_PEBKAC
+	if strings.HasPrefix(sizeStr, "+") {
+		sizeStr = sizeStr[1:]
+		mode = INCREASE
 	}
 
 	size, err := util.ParseSize(sizeStr)
@@ -58,11 +66,23 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	err = cmds.bigv.ResizeDisc(name, int(disc), size)
+	oldDisc, err := cmds.bigv.GetDisc(name, discId)
 	if err != nil {
 		return util.ProcessError(err)
-	} else {
+	}
 
+	if mode == INCREASE {
+		size = oldDisc.Size + size
+	}
+
+	log.Logf("Resizing %s from %dGiB to %dGiB...", oldDisc.Label, oldDisc.Size/1024, size/1024)
+
+	err = cmds.bigv.ResizeDisc(name, discId, size)
+	if err != nil {
+		log.Logf("Failed!\r\n")
+		return util.ProcessError(err)
+	} else {
+		log.Logf("Completed.\r\n")
 		return util.E_SUCCESS
 	}
 }

@@ -5,7 +5,6 @@ import (
 	bigv "bigv.io/client/lib"
 	"bigv.io/client/util/log"
 	"fmt"
-	"strconv"
 )
 
 // HelpForDelete outputs usage information for the delete command
@@ -107,12 +106,6 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	discID, err := strconv.ParseInt(disc, 10, 32)
-	if !ok {
-		log.Error("Invalid disc specified")
-		return cmds.HelpForDelete()
-	}
-
 	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
 		return util.ProcessError(err)
@@ -128,7 +121,7 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 		return util.E_USER_EXIT
 	}
 
-	err = cmds.bigv.DeleteDisc(name, int(discID))
+	err = cmds.bigv.DeleteDisc(name, disc)
 	if err != nil {
 		return util.ProcessError(err)
 	}

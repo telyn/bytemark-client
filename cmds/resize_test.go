@@ -16,14 +16,18 @@ func TestResizeDisk(t *testing.T) {
 	config.When("Silent").Return(true)
 
 	args := []string{"test-vm", "11", "35"}
+	disc := bigv.Disc{
+		Size:         25600,
+		StorageGrade: "sata",
+	}
 
 	config.When("ImportFlags").Return(args)
 	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
 	c.When("ParseVirtualMachineName", "test-vm").Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(&bigv.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
+	c.When("GetDisc", name, "11").Return(&disc).Times(1)
 
-	c.When("ResizeDisc", name, 11, 35*1024).Return(nil).Times(1)
+	c.When("ResizeDisc", name, "11", 35*1024).Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
 	cmds.ResizeDisc(args)

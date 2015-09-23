@@ -74,6 +74,12 @@ func (c *BigVClient) CreateDisc(name bigv.VirtualMachineName, disc bigv.Disc) er
 	return r.Error(0)
 }
 
+func (c *BigVClient) GetDisc(name bigv.VirtualMachineName, discId string) (disc *bigv.Disc, err error) {
+	r := c.Called(name, discId)
+	disc, _ = r.Get(0).(*bigv.Disc)
+	return disc, r.Error(1)
+}
+
 func (c *BigVClient) CreateGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
@@ -85,7 +91,7 @@ func (c *BigVClient) GetGroup(name bigv.GroupName) (*bigv.Group, error) {
 	return group, r.Error(1)
 }
 
-func (c *BigVClient) DeleteDisc(name bigv.VirtualMachineName, disc int) error {
+func (c *BigVClient) DeleteDisc(name bigv.VirtualMachineName, disc string) error {
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
@@ -134,7 +140,7 @@ func (c *BigVClient) ResetVirtualMachine(name bigv.VirtualMachineName) error {
 	return r.Error(0)
 }
 
-func (c *BigVClient) ResizeDisc(name bigv.VirtualMachineName, id int, size int) error {
+func (c *BigVClient) ResizeDisc(name bigv.VirtualMachineName, id string, size int) error {
 	r := c.Called(name, id, size)
 	return r.Error(0)
 }
