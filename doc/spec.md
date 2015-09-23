@@ -99,7 +99,7 @@ List of commands
 `bigv console [--serial | --vnc] [--connect | --panel] <virtual machine>`
 `bigv create group [--account <account>] <name>`
 `bigv create dis<c|k>[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]` - if ambiguous, berate user
-`bigv create ip [--reason reason] <virtual machine>`
+`bigv request ip <virtual machine> <reason>`
 `bigv create vm [flags] <name> [<cores> [<memory> [<disc specs>]]]` - creates a vm with the given name and the following flags
 
 	    --account <name>
