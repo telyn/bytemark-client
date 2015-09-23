@@ -8,23 +8,24 @@ import (
 
 // HelpForHelp shows overall usage information for the BigV client, including a list of available commands.
 func (cmds *CommandSet) HelpForHelp() util.ExitCode {
-	log.Log("bigv command-line client (the new, cool one)")
+	log.Log("Bytemark command-line client")
 	log.Log()
 	log.Log("Usage")
 	log.Log()
-	log.Log("    go-bigv [flags] <command> [flags] [args]")
+	log.Log("    bytemark [flags] <command> [flags] [args]")
 	log.Log()
 	log.Log("Commands available")
 	log.Log()
-	log.Log("    help, config, create, debug, delete, list, show")
+	log.Log("    help, config, create, debug, delete,")
+	log.Log("    list, resize, show, undelete")
 	log.Log("    AND MAYBE MORE OR FEWER - THIS LIST IS NOT FINAL")
 	log.Log()
-	log.Log("See `go-bigv help <command>` for help specific to a command")
+	log.Log("See `bytemark help <command>` for help specific to a command")
 	log.Log()
 	return util.E_USAGE_DISPLAYED
 }
 
-// Help implements the help command, which gives usage information specific to each command. Usage: bigv help [command]
+// Help implements the help command, which gives usage information specific to each command. Usage: bytemark help [command]
 func (cmds *CommandSet) Help(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return cmds.HelpForHelp()

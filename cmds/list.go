@@ -6,12 +6,12 @@ import (
 )
 
 func (cmds *CommandSet) HelpForList() util.ExitCode {
-	log.Log("bigv list")
+	log.Log("bytemark list")
 	log.Log("")
-	log.Log("usage: bigv list vms <group>")
-	log.Log("       bigv list groups <account>")
-	log.Log("       bigv list accounts")
-	log.Log("       bigv list discs <virtual machine>")
+	log.Log("usage: bytemark list vms <group>")
+	log.Log("       bytemark list groups <account>")
+	log.Log("       bytemark list accounts")
+	log.Log("       bytemark list discs <virtual machine>")
 	return util.E_USAGE_DISPLAYED
 }
 

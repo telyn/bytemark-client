@@ -9,9 +9,9 @@ import (
 
 //HelpForCreateVM provides usage information for the create-vm command
 func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
-	log.Log("go-bigv create vm")
+	log.Log("bytemark create vm")
 	log.Log()
-	log.Log("usage: go-bigv create vm [flags] <name> [<cores> [<memory> [<disc specs>]]")
+	log.Log("usage: bytemark create vm [flags] <name> [<cores> [<memory> [<disc specs>]]")
 	log.Log()
 	log.Log("flags available")
 	log.Log("    --account <name>")
@@ -22,7 +22,7 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 	log.Log("    --group <name>")
 	log.Log("    --hwprofile <profile>")
 	log.Log("    --hwprofile-locked")
-	log.Log("    --image <image name> (see go-bigv images)")
+	log.Log("    --image <image name> (see bytemark images)")
 	log.Log("    --memory <size> (default 1, units are GiB)")
 	log.Log("    --public-keys <keys> (newline seperated)")
 	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
@@ -37,13 +37,13 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 
 //HelpForCreate provides usage information for the create command and its subcommands.
 func (cmds *CommandSet) HelpForCreate() util.ExitCode {
-	log.Log("go-bigv create")
+	log.Log("bytemark create")
 	log.Log()
-	log.Log("usage: go-bigv create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [disc specs]")
+	log.Log("usage: bytemark create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [disc specs]")
 	log.Log("               create group [--account <name>] <name>")
 	log.Log("               create disc[s] <disc specs> <virtual machine>")
 	log.Log("               create ip [--reason reason] <virtual machine>")
-	log.Log("               create vm (see go-bigv help create vm)")
+	log.Log("               create vm (see bytemark help create vm)")
 	log.Log("")
 	log.Log("Disc specs are a comma seperated list of size:storage grade pairs. Sizes are in GB by default but can be specified in M")
 	log.Log("")

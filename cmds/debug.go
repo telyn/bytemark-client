@@ -13,13 +13,13 @@ import (
 
 // HelpForDebug outputs usage information for the debug command.
 func (commands *CommandSet) HelpForDebug() util.ExitCode {
-	log.Log("go-bigv debug")
+	log.Log("bytemark debug")
 	log.Log()
 	log.Log("Usage:")
-	log.Log("    go-bigv debug [--junk-token] [--auth] GET <path>")
-	log.Log("    go-bigv debug [--junk-token] [--auth] DELETE <path>")
-	log.Log("    go-bigv debug [--junk-token] [--auth] PUT <path>")
-	log.Log("    go-bigv debug [--junk-token] [--auth] POST <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] GET <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] DELETE <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] PUT <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] POST <path>")
 	log.Log()
 	log.Log("GET sends an HTTP GET request with an optional valid authorization header to the given path on the BigV endpoint and pretty-prints the received json.")
 	log.Log("The rest do similar, but PUT and POST")

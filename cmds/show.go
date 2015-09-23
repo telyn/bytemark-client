@@ -8,15 +8,15 @@ import (
 
 // HelpForShow outputs usage information for the show commands: show, show-vm, show-group, show-account.
 func (cmds *CommandSet) HelpForShow() util.ExitCode {
-	log.Log("go-bigv show")
+	log.Log("bytemark show")
 	log.Log()
-	log.Log("usage: go-bigv show [--json] <name>")
-	log.Log("       go-bigv show vm [--json] <virtual machine>")
-	log.Log("       go-bigv show group [--json] [--list-vms] [--verbose] <group>")
-	log.Log("       go-bigv show account [--json] [--list-groups] [--list-vms] [--verbose] <account>")
+	log.Log("usage: bytemark show [--json] <name>")
+	log.Log("       bytemark show vm [--json] <virtual machine>")
+	log.Log("       bytemark show group [--json] [--list-vms] [--verbose] <group>")
+	log.Log("       bytemark show account [--json] [--list-groups] [--list-vms] [--verbose] <account>")
 	log.Log()
 	log.Log("Displays information about the given virtual machine, group, or account.")
-	log.Log("If the --verbose flag is given to bigv show group or bigv show account, full details are given for each VM.")
+	log.Log("If the --verbose flag is given to bytemark show group or bytemark show account, full details are given for each VM.")
 	log.Log()
 	return util.E_USAGE_DISPLAYED
 }

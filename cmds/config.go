@@ -6,31 +6,31 @@ import (
 	"strings"
 )
 
-// HelpForConfig outputs usage information for the bigv config command.
+// HelpForConfig outputs usage information for the bytemark config command.
 func (cmds *CommandSet) HelpForConfig() util.ExitCode {
-	log.Log("go-bigv config")
+	log.Log("bytemark config")
 	log.Log()
 	log.Log("Usage:")
-	log.Log("    go-bigv config")
+	log.Log("    bytemark config")
 	log.Log("        Outputs the current values of all variables and what source they were derived from")
 	log.Log()
-	log.Log("    go-bigv config set <variable> <value>")
-	log.Log("        Sets a variable by writing to your bigv config (usually ~/.go-bigv)")
+	log.Log("    bytemark config set <variable> <value>")
+	log.Log("        Sets a variable by writing to your bytemark config (usually ~/.bytemark)")
 	log.Log()
-	log.Log("    go-bigv config unset <variable>")
-	log.Log("        Unsets a variable by removing data from bigv config (usually ~/.go-bigv)")
+	log.Log("    bytemark config unset <variable>")
+	log.Log("        Unsets a variable by removing data from bytemark config (usually ~/.bytemark)")
 	log.Log()
 	log.Log("Available variables:")
 	log.Log("    endpoint - the BigV endpoint to connect to. https://uk0.bigv.io is the default")
 	log.Log("    auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.")
 	log.Log("    debug-level - the default debug level. Set to 0 unless you like lots of output")
-	log.Log("    token - the token used for authentication.") // You can get one using bigv auth.")
+	log.Log("    token - the token used for authentication.") // You can get one using bytemark auth.")
 	log.Log()
 	return util.E_USAGE_DISPLAYED
 }
 
-// Config provides the bigv config command, which sets variables in the user's config. See HelpForConfig for usage information.
-// It's slightly more user friendly than echo "value" > ~/.go-bigv/
+// Config provides the bytemark config command, which sets variables in the user's config. See HelpForConfig for usage information.
+// It's slightly more user friendly than echo "value" > ~/.bytemark/
 func (cmds *CommandSet) Config(args []string) util.ExitCode {
 	if len(args) == 0 {
 		vars, err := cmds.config.GetAll()

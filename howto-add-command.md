@@ -58,7 +58,7 @@ Finishing up
 Now do testing. `go test bigv.io/client/lib` and
 `go test bigv.io/client/main`. If that works then YOU'RE NOT DONE YET
 
-Run `make` and then try out your new `go-bigv`. Make sure the API
+Run `make` and then try out your new `bytemark`. Make sure the API
 calls you're making actually work (--debug-level=5). Make sure errors
 mostly don't cause panics.
 
@@ -66,7 +66,7 @@ To be honest as long as the right API calls are being made then I
 (Telyn) will be able to sort out all the error handling later.
 
 I'm intending to do get Bytemarkers to try to fuzz-test it with wacky
-arguments and junky ~/.go-bigv folders and such and send me logs with
+arguments and junky ~/.bytemark folders and such and send me logs with
 --debug-level=5 so I can squash as many as possible.
 
 I suspect there will still be weird edge cases in the first release

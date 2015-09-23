@@ -122,7 +122,7 @@ func TestConfigDefaultConfigDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	expected := filepath.Join(os.Getenv("HOME"), "/.go-bigv")
+	expected := filepath.Join(os.Getenv("HOME"), "/.bytemark")
 	is.Equal(expected, config.Dir)
 }
 

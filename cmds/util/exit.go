@@ -82,7 +82,7 @@ const (
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
 func HelpForExitCodes() ExitCode {
-	log.Logf(`bigv exit code list:
+	log.Logf(`bytemark exit code list:
 
 Exit code ranges:
     All these ranges are inclusive (i.e. 0-99 means numbers from 0 to 99, including 0 and 99.)
@@ -122,7 +122,7 @@ Exit code ranges:
         Auth endpoint reported an internal error
     
      52 / 152
-        Unable to parse output from auth endpoint (probably implies a protocol mismatch - try updating go-bigv)
+        Unable to parse output from auth endpoint (probably implies a protocol mismatch - try updating bytemark)
 
      53
 	Your credentials were rejected for containing invalid characters or fields.
@@ -137,11 +137,11 @@ Exit code ranges:
         Something couldn't be found on BigV. This could be due to the following reasons:
             * It doesn't exist
 	    * Your user account doesn't have authorisation to see it
-	    * Protocol mismatch between the BigV endpoint and go-bigv.
+	    * Protocol mismatch between the BigV endpoint and bytemark.
 
     149 / 249
 
-        An unknown error fell out of the auth / bigv library.
+        An unknown error fell out of the auth / BigV library.
 
 250 - 255 Exit codes:
 

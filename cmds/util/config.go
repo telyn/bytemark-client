@@ -59,14 +59,14 @@ type ConfigManager interface {
 // endpoint - the default endpoint to use - if not present, https://uk0.bigv.io
 // auth-endpoint - the default auth API endpoint to use - if not present, https://auth.bytemark.co.uk
 
-// A Config determines the configuration of the bigv client.
+// A Config determines the configuration of the Bytemark client.
 // It's responsible for handling things like the credentials to use and what endpoints to talk to.
 //
 // Each configuration item is read from the following places, falling back to successive places:
 //
 // Per-command command-line flags, global command-line flags, environment variables, configuration directory, hard-coded defaults
 //
-//The location of the configuration directory is read from global command-line flags, or is otherwise ~/.go-bigv
+//The location of the configuration directory is read from global command-line flags, or is otherwise ~/.bytemark
 //
 type Config struct {
 	debugLevel  int
@@ -115,7 +115,7 @@ func (e *ConfigWriteError) Error() string {
 // Do I really need to have the flags passed in here?
 // Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
 
-// NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
+// NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
 func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
@@ -124,7 +124,7 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		home = os.Getenv("APPDATA")
 
 	}
-	config.Dir = filepath.Join(home, "/.go-bigv")
+	config.Dir = filepath.Join(home, "/.bytemark")
 	config.mainFlags = flags
 	if os.Getenv("BIGV_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
@@ -306,7 +306,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
-		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bigv config set user <youruser>"
+		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bytemark config set user <youruser>"
 		return ConfigVar{"user", os.Getenv("BIGV_USER"), "ENV BIGV_USER"}
 	case "endpoint":
 		v := ConfigVar{"endpoint", "https://uk0.bigv.io", "CODE"}

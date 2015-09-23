@@ -1,9 +1,9 @@
 #!/bin/bash
 
-PATH=`readlink /tmp/BigV.app`/Contents/Resources/bin:$PATH
-rm /tmp/BigV.app
+PATH=`readlink /tmp/Bytemark.app`/Contents/Resources/bin:$PATH
+rm /tmp/Bytemark.app
 
 clear
-go-bigv help
+bytemark help
 
 bash

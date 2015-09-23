@@ -9,14 +9,14 @@ import (
 
 // HelpForDelete outputs usage information for the delete command
 func (cmds *CommandSet) HelpForDelete() util.ExitCode {
-	log.Log("go-bigv delete")
+	log.Log("bytemark delete")
 	log.Log()
-	log.Log("usage: bigv delete [--force] [--purge] <name>")
-	log.Log("       bigv delete vm [--force] [---purge] <virtual machine>")
-	log.Log("       bigv delete group <group>")
-	log.Log("       bigv delete account <account>")
-	log.Log("       bigv delete user <user>")
-	log.Log("       bigv undelete vm <virtual machine>")
+	log.Log("usage: bytemark delete [--force] [--purge] <name>")
+	log.Log("       bytemark delete vm [--force] [---purge] <virtual machine>")
+	log.Log("       bytemark delete group <group>")
+	log.Log("       bytemark delete account <account>")
+	log.Log("       bytemark delete user <user>")
+	log.Log("       bytemark undelete vm <virtual machine>")
 	log.Log()
 	log.Log("Deletes the given virtual machine, group, account or user. Only empty groups and accounts can be deleted.")
 	log.Log("If the --purge flag is given and the target is a virtual machine, will permanently delete the VM. Billing will cease and you will be unable to recover the VM.")

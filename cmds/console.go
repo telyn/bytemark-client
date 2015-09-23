@@ -12,11 +12,11 @@ import (
 )
 
 func (cmds *CommandSet) HelpForConsole() {
-	log.Log("go-bigv console commands")
+	log.Log("bytemark console commands")
 	log.Log()
-	log.Log("usage: go-bigv console [--serial | --vnc] [--connect | --panel] <virtual machine>")
-	log.Log("       go-bigv serial [--connect] <virtual machine>")
-	log.Log("       go-bigv vnc [--connect | --panel] <virtual machine>")
+	log.Log("usage: bytemark console [--serial | --vnc] [--connect | --panel] <virtual machine>")
+	log.Log("       bytemark serial [--connect] <virtual machine>")
+	log.Log("       bytemark vnc [--connect | --panel] <virtual machine>")
 	log.Log()
 	log.Log("Out-of-band access to a machine's serial or graphical (VNC) console.")
 	log.Log()
@@ -52,7 +52,7 @@ func getExitCode(cmd *exec.Cmd) (exitCode int, err error) {
 func showVNCHowTo(vm *lib.VirtualMachine) {
 	log.Log("VNC connection information for", vm.Hostname)
 	log.Log()
-	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your bigv user's keys (see `bigv show keys`, `bigv add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
+	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
 	log.Logf("Then set up a tunnel using SSH: ssh -L <some number>:%s:5900 %s@%s\r\n")
 	log.Log()
@@ -62,7 +62,7 @@ func showVNCHowTo(vm *lib.VirtualMachine) {
 func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
 	log.Log("Serial console connection information for", vm.Hostname)
 	log.Log()
-	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your bigv user's keys (see `bigv show keys`, `bigv add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
+	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
 	log.Logf("Then connect to %s@%s\r\n", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
 

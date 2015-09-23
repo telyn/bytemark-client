@@ -7,9 +7,9 @@ import (
 )
 
 func (cmds *CommandSet) HelpForResize() util.ExitCode {
-	log.Log("bigv resize")
+	log.Log("bytemark resize")
 	log.Log("")
-	log.Log("usage: bigv resize disc <virtual machine> <disc> <size>")
+	log.Log("usage: bytemark resize disc <virtual machine> <disc> <size>")
 	return util.E_USAGE_DISPLAYED
 }
 
