@@ -3,7 +3,6 @@
 
 package client
 
-
 import (
 	"bytes"
 	"encoding/json"
@@ -28,14 +27,14 @@ type Error struct {
 	Err     error
 }
 
-func (e Error) Error() string {
+func (e *Error) Error() string {
 	return fmt.Sprintf("%s: %v", e.Message, e.Err)
 }
 
 // Data in the session. We expect it to look like this.
 type SessionData struct {
-	Token      string // not actually in the session, but communicate it here
-	Username   string
+	Token    string // not actually in the session, but communicate it here
+	Username string
 	Factors  []string
 
 	// The groups this user is a member of
@@ -60,7 +59,7 @@ func (c *Client) doRequest(req *http.Request) ([]byte, error) {
 	}
 
 	if rsp.StatusCode < 200 || rsp.StatusCode > 299 {
-		 if len(body) == 0 {
+		if len(body) == 0 {
 			return nil, errors.New(rsp.Status)
 		}
 		return nil, errors.New(string(body))
@@ -97,16 +96,16 @@ func (c *Client) ReadSession(token string) (*SessionData, error) {
 	x.Path = x.Path + "/" + token
 	req, reqErr := http.NewRequest("GET", x.String(), nil)
 	if reqErr != nil {
-		return nil, Error{"Request couldn't be created", reqErr}
+		return nil, &Error{"Request couldn't be created", reqErr}
 	}
 
 	req.Header.Add("Accept", "application/json")
 	body, bodyErr := c.doRequest(req)
 	if bodyErr != nil {
-		return nil, Error{"Request failed", bodyErr}
+		return nil, &Error{"Request failed", bodyErr}
 	}
 	if len(body) == 0 {
-		return nil, Error{"Empty body returned reading session", nil}
+		return nil, &Error{"Empty body returned reading session", nil}
 	}
 
 	out := &SessionData{Token: token} // not included in session data
@@ -114,7 +113,6 @@ func (c *Client) ReadSession(token string) (*SessionData, error) {
 	if jsonErr != nil {
 		return nil, jsonErr
 	}
-
 
 	return out, nil
 }
@@ -128,7 +126,7 @@ func (c *Client) CreateSessionToken(credentials Credentials) (string, error) {
 
 	req, reqErr := http.NewRequest("POST", c.sessionEndpoint.String(), bytes.NewBuffer(data))
 	if reqErr != nil {
-		return "", Error{"Couldn't create request", reqErr}
+		return "", &Error{"Couldn't create request", reqErr}
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -136,7 +134,7 @@ func (c *Client) CreateSessionToken(credentials Credentials) (string, error) {
 
 	body, err := c.doRequest(req)
 	if err != nil || len(body) == 0 {
-		return "", Error{"Couldn't create session", err}
+		return "", &Error{"Couldn't create session", err}
 	}
 
 	// FIXME: auth should really put the token in an Authorization: header.
@@ -164,4 +162,3 @@ func (c *Client) CreateSession(credentials Credentials) (*SessionData, error) {
 // TODO: func (c *Client) ReadUser() {}
 // TODO: func (c *Client) IsUsernameAvailable(username string) {}
 // TODO: func (c *Client) ResetUserPassword() {}
-

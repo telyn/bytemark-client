@@ -20,7 +20,6 @@ In the future we want to be able to `go get bytemark.co.uk/client` but that's no
 Install dependencies
 ====================
 
-	git clone ssh://git@dev.bytemark.co.uk///home/git/auth3.git $GOPATH/src/bytemark.co.uk/auth3/
 	go get github.com/tools/godep
 	cd $GOPATH/src/bytemark.co.uk/client
 	godep restore

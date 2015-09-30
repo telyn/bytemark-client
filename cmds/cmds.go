@@ -3,8 +3,8 @@ package cmds
 import (
 	util "bytemark.co.uk/client/cmds/util"
 	bigv "bytemark.co.uk/client/lib"
+	auth3 "bytemark.co.uk/client/lib/auth"
 	"bytemark.co.uk/client/util/log"
-	auth3 "bytemark.co.uk/auth3/client"
 	"github.com/bgentry/speakeasy"
 	"net/url"
 	"strings"

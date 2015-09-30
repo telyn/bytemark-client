@@ -2,7 +2,7 @@ package mocks
 
 import (
 	bigv "bytemark.co.uk/client/lib"
-	auth3 "bytemark.co.uk/auth3/client"
+	auth3 "bytemark.co.uk/client/lib/auth"
 	"fmt"
 	mock "github.com/maraino/go-mock"
 	"net/http"

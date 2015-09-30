@@ -1,7 +1,7 @@
 package client_test
 
 import (
-	. "bytemark.co.uk/auth3/client"
+	. "bytemark.co.uk/client/lib/auth"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -12,26 +12,25 @@ import (
 	"testing"
 )
 
-
-
 type TestSuite struct {
-	ts *httptest.Server
+	ts     *httptest.Server
 	client *Client
 }
-var _ = Suite(&TestSuite{})
-func Test(t *testing.T) { TestingT(t) }
 
+var _ = Suite(&TestSuite{})
+
+func Test(t *testing.T) { TestingT(t) }
 
 // FIXME: test concurrency=1 as a result of using globals here
 var fCreds = map[string]Credentials{
-	"good-user": Credentials{"username":"good-user","password":"foo"},
+	"good-user": Credentials{"username": "good-user", "password": "foo"},
 }
 
-var fSessions = map[string]*SessionData {
-	"good-session":&SessionData{
-		Token:    "good-session",
-		Username: "foo",
-		Factors: []string{"password", "google-auth"},
+var fSessions = map[string]*SessionData{
+	"good-session": &SessionData{
+		Token:            "good-session",
+		Username:         "foo",
+		Factors:          []string{"password", "google-auth"},
 		GroupMemberships: []string{"staff"},
 	},
 }
@@ -47,7 +46,7 @@ func FixturesHandler(s *TestSuite, c *C, w http.ResponseWriter, r *http.Request)
 				bodyCreds := make(Credentials)
 				data := make([]byte, 4096)
 				r, err := r.Body.Read(data)
-				if r == 0 || ( err != nil && err != io.EOF ) {
+				if r == 0 || (err != nil && err != io.EOF) {
 					w.WriteHeader(400)
 					w.Write([]byte("Error reading body: " + err.Error()))
 					return
@@ -89,10 +88,10 @@ func FixturesHandler(s *TestSuite, c *C, w http.ResponseWriter, r *http.Request)
 			w.Header().Add("Content-Type", "application/json")
 			// We construct our own json here. The token is not included in the output.
 			w.Write([]byte(
-				`{"username":"`+d.Username+
-				`","factors":["`+strings.Join(d.Factors, `","`)+`"],`+
-				`"group_memberships":["`+strings.Join(d.GroupMemberships, `","`)+
-				`"]}`,
+				`{"username":"` + d.Username +
+					`","factors":["` + strings.Join(d.Factors, `","`) + `"],` +
+					`"group_memberships":["` + strings.Join(d.GroupMemberships, `","`) +
+					`"]}`,
 			))
 			return
 		default:
@@ -104,7 +103,6 @@ func FixturesHandler(s *TestSuite, c *C, w http.ResponseWriter, r *http.Request)
 		return
 	}
 }
-
 
 // Invariant server, so start it once
 func (s *TestSuite) SetUpSuite(c *C) {
@@ -149,11 +147,10 @@ func (s *TestSuite) TestCreateSession(c *C) {
 }
 
 func (s *TestSuite) TestCreateSessionWithBadCredentials(c *C) {
-	session, err := s.client.CreateSession(Credentials{"username":"bad-user","password":"foo"})
+	session, err := s.client.CreateSession(Credentials{"username": "bad-user", "password": "foo"})
 	c.Assert(err, NotNil)
 	c.Assert(session, IsNil)
 }
-
 
 func (s *TestSuite) TestCreateSessionToken(c *C) {
 	token, err := s.client.CreateSessionToken(fCreds["good-user"])
@@ -162,7 +159,7 @@ func (s *TestSuite) TestCreateSessionToken(c *C) {
 }
 
 func (s *TestSuite) TestCreateSessionTokenWithBadCredentials(c *C) {
-	token, err := s.client.CreateSession(Credentials{"username":"bad-user","password":"foo"})
+	token, err := s.client.CreateSession(Credentials{"username": "bad-user", "password": "foo"})
 	c.Assert(err, NotNil)
 	c.Assert(token, IsNil)
 }

@@ -1,7 +1,7 @@
 package lib
 
 import (
-	auth3 "bytemark.co.uk/auth3/client"
+	auth3 "bytemark.co.uk/client/lib/auth"
 )
 
 // bigvClient is the main type in the BigV client library
