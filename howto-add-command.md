@@ -10,23 +10,23 @@ lib
   `virtual_machines`, `groups`, `accounts`. Replace `_` with `-`.
 
 * Add the function you just made to the interface to
-  `lib/interface.go`. Now `go test bigv.io/client/main` will break.
+  `lib/interface.go`. Now `go test bytemark.co.uk/client/main` will break.
 
 * Add a unit test for your API call to the relavent `_test.go` file
   in `lib/`.
 
 * Add a mock version of the function to `mocks/bigv-client.go`
-  Now `go test bigv.io/client/main` will work.
+  Now `go test bytemark.co.uk/client/main` will work.
   Commit if you like.
 
 cmds
 ----
 
 * Add a CamelCased version of the command to `cmds/cmds.go`
-  `CommandManager` interface. Now `go test bigv.io/client/main` will break.
+  `CommandManager` interface. Now `go test bytemark.co.uk/client/main` will break.
 
 * Add a mock version of the function to `mocks/cmds.go`'s
-  `CommandManager`. Now `go test bigv.io/client/main` will work.
+  `CommandManager`. Now `go test bytemark.co.uk/client/main` will work.
 
 * Implement the function in `cmds/<base>.go` where `<base>` is
   the first word of the command. See cmd-show.go and ShowVM for a
@@ -55,8 +55,8 @@ main
 Finishing up
 ------------
 
-Now do testing. `go test bigv.io/client/lib` and
-`go test bigv.io/client/main`. If that works then YOU'RE NOT DONE YET
+Now do testing. `go test bytemark.co.uk/client/lib` and
+`go test bytemark.co.uk/client/main`. If that works then YOU'RE NOT DONE YET
 
 Run `make` and then try out your new `bytemark`. Make sure the API
 calls you're making actually work (--debug-level=5). Make sure errors

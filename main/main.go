@@ -1,8 +1,8 @@
 package main
 
 import (
-	util "bigv.io/client/cmds/util"
-	"bigv.io/client/util/log"
+	util "bytemark.co.uk/client/cmds/util"
+	"bytemark.co.uk/client/util/log"
 	"os"
 	"os/signal"
 )

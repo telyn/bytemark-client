@@ -1,9 +1,9 @@
 package cmds
 
 import (
-	"bigv.io/client/cmds/util"
-	bigv "bigv.io/client/lib"
-	"bigv.io/client/util/log"
+	"bytemark.co.uk/client/cmds/util"
+	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"fmt"
 )
 

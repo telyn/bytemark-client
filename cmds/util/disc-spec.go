@@ -1,7 +1,7 @@
 package util
 
 import (
-	bigv "bigv.io/client/lib"
+	bigv "bytemark.co.uk/client/lib"
 	"fmt"
 	"unicode/utf8"
 )
@@ -16,7 +16,7 @@ func (e *DiscSpecError) Error() string {
 	return fmt.Sprintf("Disc spec error: Unexpected %c at character %d.", e.Character, e.Position)
 }
 
-// ParseDiscSpec takes a disc spec and returns a slice of Discs (from bigv.io/client/lib)
+// ParseDiscSpec takes a disc spec and returns a slice of Discs (from bytemark.co.uk/client/lib)
 func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 	// parser!
 	pos := 0

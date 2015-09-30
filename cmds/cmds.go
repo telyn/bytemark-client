@@ -1,9 +1,9 @@
 package cmds
 
 import (
-	util "bigv.io/client/cmds/util"
-	bigv "bigv.io/client/lib"
-	"bigv.io/client/util/log"
+	util "bytemark.co.uk/client/cmds/util"
+	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	auth3 "bytemark.co.uk/auth3/client"
 	"github.com/bgentry/speakeasy"
 	"net/url"
@@ -65,7 +65,7 @@ type CommandSet struct {
 	config util.ConfigManager
 }
 
-// NewCommandSet creates a CommandSet given a ConfigManager and bigv.io/client/lib Client.
+// NewCommandSet creates a CommandSet given a ConfigManager and bytemark.co.uk/client/lib Client.
 func NewCommandSet(config util.ConfigManager, client bigv.Client) *CommandSet {
 	commandSet := new(CommandSet)
 	commandSet.config = config

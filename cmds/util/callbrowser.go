@@ -3,7 +3,7 @@
 package util
 
 import (
-	"bigv.io/client/util/log"
+	"bytemark.co.uk/client/util/log"
 	"os"
 	"os/exec"
 	"runtime"

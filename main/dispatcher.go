@@ -1,10 +1,10 @@
 package main
 
 import (
-	commands "bigv.io/client/cmds"
-	"bigv.io/client/cmds/util"
-	client "bigv.io/client/lib"
-	"bigv.io/client/util/log"
+	commands "bytemark.co.uk/client/cmds"
+	"bytemark.co.uk/client/cmds/util"
+	client "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"flag"
 	"strings"
 )

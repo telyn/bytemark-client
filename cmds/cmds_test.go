@@ -1,7 +1,7 @@
 package cmds
 
 import (
-	bigv "bigv.io/client/lib"
+	bigv "bytemark.co.uk/client/lib"
 	//"github.com/cheekybits/is"
 )
 

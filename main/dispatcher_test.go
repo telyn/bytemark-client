@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bigv.io/client/mocks"
+	"bytemark.co.uk/client/mocks"
 	"testing"
 	//"github.com/cheekybits/is"
 )

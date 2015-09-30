@@ -1,10 +1,10 @@
 package cmds
 
 import (
-	util "bigv.io/client/cmds/util"
+	util "bytemark.co.uk/client/cmds/util"
 
-	bigv "bigv.io/client/lib"
-	"bigv.io/client/mocks"
+	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/mocks"
 	"github.com/cheekybits/is"
 	"testing"
 )

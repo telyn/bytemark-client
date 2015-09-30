@@ -1,7 +1,7 @@
 package util
 
 import (
-	"bigv.io/client/util/log"
+	"bytemark.co.uk/client/util/log"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -206,7 +206,7 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 	return nil
 }
 
-// GetDebugLevel returns the current debug-level as an integer. This is used throughout the bigv.io/client library to determine verbosity of output.
+// GetDebugLevel returns the current debug-level as an integer. This is used throughout the bytemark.co.uk/client library to determine verbosity of output.
 func (config *Config) GetDebugLevel() int {
 	return config.debugLevel
 }

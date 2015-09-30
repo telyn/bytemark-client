@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"bigv.io/client/cmds/util"
+	"bytemark.co.uk/client/cmds/util"
 	mock "github.com/maraino/go-mock"
 )
 

@@ -1,8 +1,8 @@
 package cmds
 
 import (
-	bigv "bigv.io/client/lib"
-	"bigv.io/client/mocks"
+	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/mocks"
 	"testing"
 )
 

@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"bigv.io/client/util/log"
+	"bytemark.co.uk/client/util/log"
 	"bytes"
 	"crypto/tls"
 	"encoding/json"

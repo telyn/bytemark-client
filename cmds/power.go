@@ -1,8 +1,8 @@
 package cmds
 
 import (
-	"bigv.io/client/cmds/util"
-	"bigv.io/client/util/log"
+	"bytemark.co.uk/client/cmds/util"
+	"bytemark.co.uk/client/util/log"
 )
 
 func (cmds *CommandSet) HelpForPower() util.ExitCode {

@@ -1,7 +1,7 @@
 package util
 
 import (
-	client "bigv.io/client/lib"
+	client "bytemark.co.uk/client/lib"
 	"fmt"
 	"math"
 	"strings"
