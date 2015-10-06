@@ -1,7 +1,7 @@
 // Client library for auth3. Thin wrapper around net/http that supports creating
 // a session and reading it back
 
-package client
+package auth
 
 import (
 	"bytes"

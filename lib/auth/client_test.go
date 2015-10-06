@@ -1,7 +1,6 @@
-package client_test
+package auth
 
 import (
-	. "bytemark.co.uk/client/lib/auth"
 	"encoding/json"
 	"io"
 	"net/http"

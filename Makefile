@@ -1,4 +1,4 @@
-ALL_PACKAGES := bigv.io/client/lib bigv.io/client/cmds/util bigv.io/client/cmds bigv.io/client/main
+ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/main
 ALL_FILES := main/*.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)
@@ -42,7 +42,7 @@ clean:
 
 
 bytemark: $(ALL_FILES)
-	go build -o bytemark bigv.io/client/main
+	go build -o bytemark bytemark.co.uk/client/main
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))
@@ -68,7 +68,7 @@ endif
 	go tool cover -html=$< -o $@
 
 %.coverage: % %/*
-	go test -coverprofile=$@ bigv.io/client/$<
+	go test -coverprofile=$@ bytemark.co.uk/client/$<
 
 docs: doc/*.md
 	for file in doc/*.md; do \
