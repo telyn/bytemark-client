@@ -213,6 +213,13 @@ func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 func (d *Dispatcher) Do(args []string) util.ExitCode {
 	log.Debugf(1, "Args passed to Do: %#v\r\n", args)
 
+	for _, arg := range args {
+		if arg == "/?" || arg == "/h" || arg == "--help" || arg == "-h" {
+			d.cmds.Help(args)
+			return util.E_USAGE_DISPLAYED
+		}
+	}
+
 	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		log.Errorf("No command specified.\r\n")
 		d.cmds.Help(args)
