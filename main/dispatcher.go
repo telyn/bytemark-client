@@ -142,7 +142,7 @@ func (d *Dispatcher) DoList(args []string) util.ExitCode {
 	switch strings.ToLower(args[0]) {
 	case "vms":
 		return d.cmds.ListVMs(args[1:])
-	case "discs":
+	case "discs", "disks":
 		return d.cmds.ListDiscs(args[1:])
 	case "groups":
 		return d.cmds.ListGroups(args[1:])
@@ -185,7 +185,7 @@ func (d *Dispatcher) DoResize(args []string) util.ExitCode {
 
 	}
 	switch strings.ToLower(args[0]) {
-	case "disc":
+	case "disc", "disk":
 		return d.cmds.ResizeDisc(args[1:])
 	}
 
