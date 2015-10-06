@@ -15,16 +15,28 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }
 
+func (cmds *CommandSet) listDefaultAccountVMs() util.ExitCode {
+	acc, err := cmds.bigv.GetAccount("")
+	if err != nil {
+		return util.ProcessError(err)
+	}
+	for _, group := range acc.Groups {
+		for _, vm := range group.VirtualMachines {
+			log.Log(vm.Hostname)
+		}
+	}
+	return util.ProcessError(nil)
+}
+
 func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "group")
-	if !ok {
-		//GetAccount
+	nameStr := ""
+	if len(args) >= 1 {
+		nameStr = args[0]
 	}
-
 	name := cmds.bigv.ParseGroupName(nameStr)
 
 	err := cmds.EnsureAuth()
@@ -32,15 +44,18 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	group, err := cmds.bigv.GetGroup(name)
+	if len(args) >= 1 {
+		group, err := cmds.bigv.GetGroup(name)
 
-	if err != nil {
-		// TODO: try it as an account
-		return util.ProcessError(err)
-	}
+		if err != nil {
+			return cmds.listDefaultAccountVMs()
+		}
 
-	for _, vm := range group.VirtualMachines {
-		log.Log(vm.Hostname)
+		for _, vm := range group.VirtualMachines {
+			log.Log(vm.Hostname)
+		}
+	} else {
+		return cmds.listDefaultAccountVMs()
 	}
 	return util.E_SUCCESS
 }
