@@ -8,8 +8,8 @@ import (
 func (cmds *CommandSet) HelpForList() util.ExitCode {
 	log.Log("bytemark list")
 	log.Log("")
-	log.Log("usage: bytemark list vms <group>")
-	log.Log("       bytemark list groups <account>")
+	log.Log("usage: bytemark list vms [group]")
+	log.Log("       bytemark list groups [account]")
 	log.Log("       bytemark list accounts")
 	log.Log("       bytemark list discs <virtual machine>")
 	return util.E_USAGE_DISPLAYED
@@ -22,8 +22,7 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "group")
 	if !ok {
-		cmds.HelpForList()
-		return util.E_PEBKAC
+		//GetAccount
 	}
 
 	name := cmds.bigv.ParseGroupName(nameStr)
@@ -51,11 +50,11 @@ func (cmds *CommandSet) ListGroups(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, ok := util.ShiftArgument(&args, "account")
-	if !ok {
-		cmds.HelpForList()
-		return util.E_PEBKAC
+	name := ""
+	if len(args) >= 1 {
+		name = args[0]
 	}
+	// no error here - GetAccount will pick a sane default.
 
 	err := cmds.EnsureAuth()
 	if err != nil {
