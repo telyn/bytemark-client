@@ -57,6 +57,12 @@ func (c *BigVClient) Request(auth bool, method string, location string, requestB
 	return req, res, r.Error(2)
 }
 
+func (c *BigVClient) ReadDefinitions() (*bigv.Definitions, error) {
+	r := c.Called()
+	defs, _ := r.Get(0).(*bigv.Definitions)
+	return defs, r.Error(1)
+}
+
 func (c *BigVClient) GetAccount(name string) (account *bigv.Account, err error) {
 	r := c.Called(name)
 	acc, _ := r.Get(0).(*bigv.Account)

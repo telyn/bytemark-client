@@ -2,17 +2,14 @@ package util
 
 import (
 	"bytemark.co.uk/client/util/log"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var configVars = [...]string{
@@ -214,57 +211,6 @@ func (config *Config) GetDebugLevel() int {
 // GetPath joins the given string onto the end of the Config.Dir path
 func (config *Config) GetPath(name string) string {
 	return filepath.Join(config.Dir, name)
-}
-
-// LoadDefinitions reads the local copy of the definitions json file, or downloads it from the endpoint if it's too old or nonexistant.
-// Eventually this will be used to provide information on various things throughout the application
-func (config *Config) LoadDefinitions() error {
-	endpoint, err := config.Get("endpoint")
-	if err != nil {
-		return err
-	}
-	defPath := config.GetPath("definitions-" + endpoint + ".json")
-	stat, err := os.Stat(defPath)
-
-	if err != nil || time.Since(stat.ModTime()) > 24*time.Hour {
-		endpoint, err := config.Get("endpoint")
-		if err != nil {
-			return err
-		}
-		log.Logf("Downloading definitions for %s...\r\n", endpoint)
-		c := &http.Client{}
-		req, err := http.NewRequest("GET", endpoint+"/definitions.json", nil)
-		if err != nil {
-			return &CannotLoadDefinitionsError{err}
-		}
-		req.Header.Add("Accept", "application/json")
-		req.Header.Add("Content-Type", "application/json")
-		res, err := c.Do(req)
-		if err != nil {
-			return &CannotLoadDefinitionsError{err}
-		}
-		if res.StatusCode == 200 {
-			responseBody, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-				return &CannotLoadDefinitionsError{err}
-			}
-			ioutil.WriteFile(defPath, responseBody, 0660)
-
-			err = json.Unmarshal(responseBody, config.Definitions)
-			return err
-		} else {
-			// TODO(telyn): Unexpected status code
-		}
-	} else {
-		defs, err := ioutil.ReadFile(defPath)
-		if err != nil {
-			return &CannotLoadDefinitionsError{err}
-		}
-		err = json.Unmarshal(defs, config.Definitions)
-		return err
-	}
-	return nil
-
 }
 
 // Get returns the value of a ConfigVar. Used to simplify code when the source is unnecessary.

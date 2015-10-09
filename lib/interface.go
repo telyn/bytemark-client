@@ -59,6 +59,11 @@ type Client interface {
 	ParseAccountName(string) string
 
 	//
+	// DEFINITIONS
+	//
+	ReadDefinitions() (*Definitions, error)
+
+	//
 	// ACCOUNTS
 	//
 

@@ -25,6 +25,8 @@ type CommandManager interface {
 	DeleteGroup([]string) util.ExitCode
 	DeleteVM([]string) util.ExitCode
 	Debug([]string) util.ExitCode
+	Distributions([]string) util.ExitCode
+	HardwareProfiles([]string) util.ExitCode
 	Help([]string) util.ExitCode
 	ListAccounts([]string) util.ExitCode
 	ListGroups([]string) util.ExitCode
@@ -43,8 +45,10 @@ type CommandManager interface {
 	ShowAccount([]string) util.ExitCode
 	ShowGroup([]string) util.ExitCode
 	ShowVM([]string) util.ExitCode
+	StorageGrades([]string) util.ExitCode
 	UnlockHWProfile([]string) util.ExitCode
 	UndeleteVM([]string) util.ExitCode
+	Zones([]string) util.ExitCode
 
 	HelpForConfig() util.ExitCode
 	HelpForCreate() util.ExitCode
