@@ -1,5 +1,5 @@
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/main
-ALL_FILES := main/*.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go
+ALL_FILES := main/*.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)
 OSAARCH:=i386
@@ -55,13 +55,15 @@ endif
 install: all
 	cp bytemark /usr/bin/bytemark
 
-coverage: lib.coverage.html main.coverage.html
+coverage: lib.coverage.html main.coverage.html cmds.coverage.html 
 ifeq (Darwin, $(shell uname -s))
 	open lib.coverage.html
 	open main.coverage.html
+	open cmds.coverage.html
 else
 	xdg-open lib.coverage.html
 	xdg-open main.coverage.html
+	xdg-open cmds.coverage.html
 endif
 
 %.coverage.html: %.coverage
