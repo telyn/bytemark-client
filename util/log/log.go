@@ -10,6 +10,9 @@ var LogFile *os.File
 var Silent bool
 
 func Error(stuff ...interface{}) {
+	if len(stuff) == 0 {
+		Error("")
+	}
 	for _, v := range stuff {
 		if !Silent {
 			fmt.Fprintln(os.Stderr, v)
@@ -31,6 +34,9 @@ func Errorf(format string, args ...interface{}) {
 }
 
 func Log(stuff ...interface{}) {
+	if len(stuff) == 0 {
+		Log("")
+	}
 	for _, v := range stuff {
 		if !Silent {
 			fmt.Fprintln(os.Stderr, v)
@@ -51,6 +57,10 @@ func Logf(format string, args ...interface{}) {
 }
 
 func Output(stuff ...interface{}) {
+
+	if len(stuff) == 0 {
+		Output("")
+	}
 	for _, v := range stuff {
 		if !Silent {
 			fmt.Println(v)
