@@ -60,6 +60,15 @@ func (cmds *Commands) CreateVM(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
+func (cmds *Commands) Distributions(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+func (cmds *Commands) HardwareProfiles(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) ListAccounts(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
@@ -128,6 +137,11 @@ func (cmds *Commands) ShowVM(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
+func (cmds *Commands) StorageGrades(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) Undelete(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
@@ -159,6 +173,11 @@ func (cmds *Commands) SetHWProfile(args []string) util.ExitCode {
 }
 
 func (cmds *Commands) SetMemory(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) Zones(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
