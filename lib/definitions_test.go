@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cheekybits/is"
+	"net/http"
+	"os"
 	"testing"
 )
 
@@ -38,6 +40,46 @@ func TestProcessDefinitions(t *testing.T) {
 		is.Equal(l, defs.ZoneNames[k])
 	}
 
+}
+
+func TestReadDefinitions(t *testing.T) {
+	is := is.New(t)
+
+	client, _, brain, err := mkTestClientAndServers(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/definitions" {
+				w.Write([]byte(fixtureDefinitionsJSON))
+			} else {
+				http.NotFound(w, r)
+			}
+		}))
+	defer brain.Close()
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		t.FailNow()
+	}
+
+	defs, err := client.ReadDefinitions()
+	is.Nil(err)
+
+	is.Equal(3, len(defs.StorageGrades))
+	is.Equal(2, len(defs.HardwareProfiles))
+	is.Equal(12, len(defs.Distributions))
+
+	is.NotNil(defs)
+	for k, l := range fixtureDefinitions.Distributions {
+		is.Equal(l, defs.Distributions[k])
+	}
+	for k, l := range fixtureDefinitions.StorageGrades {
+		is.Equal(l, defs.StorageGrades[k])
+	}
+	for k, l := range fixtureDefinitions.HardwareProfiles {
+		is.Equal(l, defs.HardwareProfiles[k])
+	}
+	for k, l := range fixtureDefinitions.ZoneNames {
+		is.Equal(l, defs.ZoneNames[k])
+	}
 }
 
 var fixtureDefinitions = &Definitions{

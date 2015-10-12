@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
@@ -14,6 +15,42 @@ func getFixtureDisc() Disc {
 		ID:               1,
 		VirtualMachineID: 1,
 		StoragePool:      "fakepool",
+	}
+}
+
+func getFixtureDiscSet() []Disc {
+	return []Disc{
+		getFixtureDisc(),
+		Disc{
+			ID:           2,
+			StorageGrade: "archive",
+			Label:        "arch",
+			Size:         1024000,
+		},
+		Disc{
+			ID:           3,
+			StorageGrade: "sata",
+			Size:         2048,
+		},
+	}
+}
+
+func TestLabelDisc(t *testing.T) {
+	is := is.New(t)
+	discs := getFixtureDiscSet()
+	labelDiscs(discs)
+	for _, d := range discs {
+		switch d.ID {
+		case 1:
+			is.Equal("vda", d.Label)
+		case 2:
+			is.Equal("arch", d.Label)
+		case 3:
+			is.Equal("vdc", d.Label)
+		default:
+			fmt.Printf("Unexpected disc ID %d\r\n", d.ID)
+			t.Fail()
+		}
 	}
 }
 
