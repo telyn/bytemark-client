@@ -82,7 +82,7 @@ func TestCreateDisc(t *testing.T) {
 	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs" && req.Method == "POST" {
 			// TODO: unmarshal the disc
-			// then test for sanity
+			// then test for sanity, equality to disk put in
 			w.Write([]byte("{}"))
 		} else if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm" {
 			// TODO: return a VM that has some discs

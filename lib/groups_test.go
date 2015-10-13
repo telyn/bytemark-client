@@ -19,6 +19,67 @@ func getFixtureGroup() Group {
 
 }
 
+func TestCreateGroup(t *testing.T) {
+	is := is.New(t)
+	groupHandler := func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts/account/groups" && req.Method == "POST" {
+			// TODO: unmarshal the groupname and check
+			str, err := json.Marshal(getFixtureGroup())
+			if err != nil {
+				t.Fatal(err)
+			}
+			w.Write(str)
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+
+	}
+	client, authServer, brain, err :=
+		mkTestClientAndServers(http.HandlerFunc(groupHandler))
+
+	defer authServer.Close()
+	defer brain.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	is.Nil(err)
+
+	err = client.CreateGroup(GroupName{Group: "invalid-group", Account: "account"})
+	is.Nil(err)
+}
+
+func TestDeleteGroup(t *testing.T) {
+	is := is.New(t)
+	groupHandler := func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts/account/groups/default" && req.Method == "DELETE" {
+			w.Write([]byte(""))
+		} else if req.URL.Path == "/accounts/account/groups/default" && req.Method == "GET" {
+			str, err := json.Marshal(getFixtureGroup())
+			if err != nil {
+				t.Fatal(err)
+			}
+			w.Write(str)
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+
+	}
+	client, authServer, brain, err :=
+		mkTestClientAndServers(http.HandlerFunc(groupHandler))
+
+	defer authServer.Close()
+	defer brain.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+
+	is.Nil(err)
+	err = client.DeleteGroup(GroupName{Group: "default", Account: "account"})
+	is.Nil(err)
+
+}
+
 func TestGetGroup(t *testing.T) {
 	is := is.New(t)
 	groupHandler := func(w http.ResponseWriter, req *http.Request) {
