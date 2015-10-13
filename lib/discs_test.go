@@ -29,7 +29,7 @@ func getFixtureDiscSet() []Disc {
 		},
 		Disc{
 			ID:           3,
-			StorageGrade: "sata",
+			StorageGrade: "",
 			Size:         2048,
 		},
 	}
@@ -52,6 +52,58 @@ func TestLabelDisc(t *testing.T) {
 			t.Fail()
 		}
 	}
+}
+
+func TestValidateDisc(t *testing.T) {
+	is := is.New(t)
+	discs := getFixtureDiscSet()
+	for _, d := range discs {
+		d2, err := d.Validate()
+		is.Nil(err)
+
+		is.Equal(d.ID, d2.ID)
+		is.Equal(d.Label, d2.Label)
+		is.Equal(d.Size, d2.Size)
+		is.Equal(d.StoragePool, d2.StoragePool)
+		is.Equal(d.VirtualMachineID, d2.VirtualMachineID)
+		switch d.ID {
+		case 1, 3:
+			is.Equal("sata", d2.StorageGrade)
+		case 2:
+			is.Equal("archive", d2.StorageGrade)
+		}
+	}
+}
+
+func TestCreateDisc(t *testing.T) {
+	is := is.New(t)
+	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs" && req.Method == "POST" {
+			// TODO: unmarshal the disc
+			// then test for sanity
+			w.Write([]byte("{}"))
+		} else if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm" {
+			// TODO: return a VM that has some discs
+			w.Write([]byte("{}"))
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+
+	}))
+	defer authServer.Close()
+	defer brain.Close()
+
+	is.Nil(err)
+	err = client.AuthWithCredentials(map[string]string{})
+	is.Nil(err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = client.CreateDisc(VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, getFixtureDisc())
+
+	is.Nil(err)
+
 }
 
 func TestDeleteDisc(t *testing.T) {
