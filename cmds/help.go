@@ -21,6 +21,7 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("    help [command | topic] - output the help for the client or for the given command or topic")
 	log.Log()
 
+	// ALL of this should be in a sweet datastructure
 	// config
 	log.Log("  Config commands:")
 	log.Log("    config  output all info about the current config")
@@ -34,15 +35,13 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("    console [--serial | --vnc] [--connect | --panel] <virtual machine>")
 	log.Log("    request ip <virtual machine> <reason>")
 	log.Log("    set rdns <ip> <host name>")
-	log.Log("    reset <virtual machine> - Need to discuss whether this is useful")
-	log.Log("    shutdown <virtual machine>")
+	log.Log("    shutdown [--force] <virtual machine> - if force given, immediately stop the VM.")
 	log.Log("    start <virtual machine>")
-	log.Log("    stop <virtual machine>")
 	log.Log()
 
 	// virtual machine
 	log.Log("  Virtual machine commands:")
-	log.Log("    create disc[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>] - if ambiguous, berate user")
+	log.Log("    create disc[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]")
 	log.Log("    create vm [flags] <name> [<cores> [<memory> [<disc specs>]]] - creates a vm. See `bytemark help create` for detail on the flags")
 	log.Log("    delete disc [--force] [---purge] <virtual machine> <disc label>")
 	log.Log("    delete vm [--force] [---purge] <virtual machine>")
@@ -74,14 +73,17 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 
 	// users
 	log.Log("  User management commands:")
+	log.Log("    add key <ssh key>")
 	log.Log("    grant <user> <privilege> <object>")
+	log.Log("    list keys <ssh key>")
+	log.Log("    remove key <ssh key>")
 	log.Log("    revoke <user> <privilege>")
 	log.Log("    show user <name> - shows details about the given user - their authorised keys and any privileges you have granted them")
 	log.Log()
 
 	log.Log("  Informative commands:")
 	log.Log("    list images - lists the available operating system images that can be passed to create vm and reimage")
-	log.Log("    list (grades | storage-grades) - lists the available storage grades, along with a description. One per line.")
+	log.Log("    list (grades | storage-grades) - lists the available storage grades, along with a description.")
 	log.Log("    list privileges - lists the privileges that can possibly be granted")
 
 	return util.E_USAGE_DISPLAYED
