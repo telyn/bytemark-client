@@ -67,6 +67,9 @@ else
 	xdg-open cmds.coverage.html
 endif
 
+main.coverage: *.go
+	go test -coverprofile=$@ bytemark.co.uk/client
+
 %.coverage.html: %.coverage
 	go tool cover -html=$< -o $@
 
