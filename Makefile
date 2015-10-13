@@ -33,6 +33,7 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	# make a symlink into MacOS. This step is totally unnecessary but it means all the binaries live in MacOS which is nice I guess?
 	rm -f BigV.app/Contents/MacOS/bytemark
 	ln -s ../Resources/bin/bytemark BigV.app/Contents/MacOS
+	# sign the code? anyone? shall we sign the code?
 
 clean:
 	rm -rf BigV.app rm $(LAUNCHER_APP)
