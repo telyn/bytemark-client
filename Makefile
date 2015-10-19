@@ -107,7 +107,7 @@ docs: doc/*.md
 	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
 	done
 
-test: 
+test: gensrc
 ifdef $(VERBOSE)
 	go test -v $(ALL_PACKAGES)
 else 
