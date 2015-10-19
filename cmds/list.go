@@ -11,6 +11,7 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 	log.Log("usage: bytemark list vms [group]")
 	log.Log("       bytemark list groups [account]")
 	log.Log("       bytemark list accounts")
+	log.Log("       bytemark list keys <user>")
 	log.Log("       bytemark list discs <virtual machine>")
 	return util.E_USAGE_DISPLAYED
 }
@@ -106,6 +107,33 @@ func (cmds *CommandSet) ListAccounts(args []string) util.ExitCode {
 
 	for _, group := range accounts {
 		log.Log(group.Name)
+	}
+	return util.E_SUCCESS
+}
+
+func (cmds *CommandSet) ListKeys(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	username, ok := util.ShiftArgument(&args, "username")
+	if !ok {
+		cmds.HelpForShow()
+		return util.E_PEBKAC
+	}
+
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	user, err := cmds.bigv.GetUser(username)
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	for _, k := range user.AuthorizedKeys {
+		log.Output(k)
 	}
 	return util.E_SUCCESS
 }

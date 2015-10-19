@@ -173,3 +173,31 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 	return util.E_SUCCESS
 
 }
+
+func (cmds *CommandSet) ShowUser(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	username, ok := util.ShiftArgument(&args, "username")
+	if !ok {
+		cmds.HelpForShow()
+		return util.E_PEBKAC
+	}
+
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	user, err := cmds.bigv.GetUser(username)
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	log.Outputf("User %s:\n\nAuthorized keys:\n", user.Username)
+	for _, k := range user.AuthorizedKeys {
+		log.Output(k)
+	}
+	return util.E_SUCCESS
+}

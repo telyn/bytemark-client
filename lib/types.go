@@ -1,5 +1,7 @@
 package lib
 
+import ()
+
 // VirtualMachineName is the triplet-form of the name of a VirtualMachine, which should be enough to find the VM.
 type VirtualMachineName struct {
 	VirtualMachine string
@@ -56,16 +58,25 @@ type NetworkInterface struct {
 }
 
 // User represents a BigV user.
-type User struct {
+type JSONUser struct {
 	Username       string `json:"username"`
 	Email          string `json:"email"`
 	AuthorizedKeys string `json:"authorized_keys"`
-	Password       string `json:"password"`
+
+	// passwords are handled by auth these days
+	//Password       string `json:"password"`
 
 	// "users can be created (using POST) without authentication. If the
 	// request has no authentication, it will also accept an account_name
 	// parameter and create an account at the same time."
-	AccountName string `json:"account_name"`
+	// this is almost certainly never going to be useful
+	//AccountName string `json:"account_name"`
+}
+
+type User struct {
+	Username       string
+	Email          string
+	AuthorizedKeys []string
 }
 
 // VirtualMachine represents a VirtualMachine, as passed around from the BigV virtual_machines endpoint

@@ -71,6 +71,16 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("    show group [--json] <group> - shows an overview of the given group, a list of VMs in them w/ size information")
 	log.Log()
 
+	// users
+	log.Log("  User management commands:")
+	log.Log("    add key <public key>")
+	//log.Log("    grant <user> <privilege> <object>")
+	log.Log("    list keys <public key>")
+	log.Log("    remove key <public key>")
+	//log.Log("    revoke <user> <privilege>")
+	log.Log("    show user <name> - shows details about the given user - their authorised keys and any privileges you have granted them")
+	log.Log()
+
 	log.Log("  Informative commands:")
 	log.Log("    list images - lists the available operating system images that can be passed to create vm and reimage")
 	log.Log("    list (grades | storage-grades) - lists the available storage grades, along with a description.")

@@ -16,6 +16,7 @@ type CommandFunc func([]string) util.ExitCode
 type CommandManager interface {
 	EnsureAuth() error
 
+	AddKey([]string) util.ExitCode
 	Config([]string) util.ExitCode
 	Console([]string) util.ExitCode
 	CreateDiscs([]string) util.ExitCode
@@ -23,6 +24,7 @@ type CommandManager interface {
 	CreateVM([]string) util.ExitCode
 	DeleteDisc([]string) util.ExitCode
 	DeleteGroup([]string) util.ExitCode
+	DeleteKey([]string) util.ExitCode
 	DeleteVM([]string) util.ExitCode
 	Debug([]string) util.ExitCode
 	Distributions([]string) util.ExitCode
@@ -30,6 +32,7 @@ type CommandManager interface {
 	Help([]string) util.ExitCode
 	ListAccounts([]string) util.ExitCode
 	ListGroups([]string) util.ExitCode
+	ListKeys([]string) util.ExitCode
 	ListDiscs([]string) util.ExitCode
 	ListVMs([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
@@ -44,12 +47,14 @@ type CommandManager interface {
 	Shutdown([]string) util.ExitCode
 	ShowAccount([]string) util.ExitCode
 	ShowGroup([]string) util.ExitCode
+	ShowUser([]string) util.ExitCode
 	ShowVM([]string) util.ExitCode
 	StorageGrades([]string) util.ExitCode
 	UnlockHWProfile([]string) util.ExitCode
 	UndeleteVM([]string) util.ExitCode
 	Zones([]string) util.ExitCode
 
+	HelpForAdd() util.ExitCode
 	HelpForConfig() util.ExitCode
 	HelpForCreate() util.ExitCode
 	HelpForDebug() util.ExitCode
