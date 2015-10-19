@@ -220,7 +220,8 @@ func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 
 // Do takes the command line arguments and figures out what to do.
 func (d *Dispatcher) Do(args []string) util.ExitCode {
-	log.Debugf(1, "bytemark %v\r\n", client.GetVersion())
+	log.Debugf(1, "bytemark %v\r\n\r\n", client.GetVersion())
+
 	log.Debugf(1, "Args passed to Do: %#v\r\n", args)
 
 	for _, arg := range args {
