@@ -57,7 +57,7 @@ gensrc:
 
 checkinstall: 
 	checkinstall -D --install=no -y --maintainer="telyn@bytemark.co.uk" \
-	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)~$(BRANCH).$(GIT_COMMIT)" \
+	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)" \
 	    --requires="" \
 	    --strip=no --stripso=no
 
