@@ -1,5 +1,13 @@
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client
 ALL_FILES := *.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
+
+MAJORVERSION := 0
+MINORVERSION := 1
+BUILD_DATE := `date +%Y-%m-%d\ %H:%M`
+BUILD_NUMBER ?= 0
+GIT_COMMIT ?= `git rev-parse HEAD`
+VERSIONFILE := lib/version.go
+
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)
 OSAARCH:=i386
@@ -10,6 +18,7 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 .PHONY: test update-dependencies
 .PHONY: Bytemark.app
 .PHONY: find-uk0 find-bugs-todos find-exits
+.PHONY: gensrc
 
 all: bytemark
 
@@ -35,6 +44,23 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
 	# sign the code? anyone? shall we sign the code?
 
+gensrc:
+	rm -f $(VERSIONFILE)
+	@echo "package lib" > $(VERSIONFILE)
+	@echo "const (" >> $(VERSIONFILE)
+	@echo "  majorversion = $(MAJORVERSION)" >> $(VERSIONFILE)
+	@echo "  minorversion = $(MINORVERSION)" >> $(VERSIONFILE)
+	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
+	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
+	@echo "  builddate = \"$(BUILD_DATE)\"" >> $(VERSIONFILE)
+	@echo ")" >> $(VERSIONFILE)
+
+checkinstall: 
+	checkinstall -D --install=no -y --maintainer="telyn@bytemark.co.uk" \
+	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)~$(BRANCH).$(GIT_COMMIT)" \
+	    --requires="" \
+	    --strip=no --stripso=no
+
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
 	rm -f bytemark
@@ -42,7 +68,7 @@ clean:
 	rm -f main.coverage.html lib.coverage.html
 
 
-bytemark: $(ALL_FILES)
+bytemark: $(ALL_FILES) gensrc
 	go build -o bytemark bytemark.co.uk/client
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt

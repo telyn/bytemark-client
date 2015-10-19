@@ -9,3 +9,4 @@ bytemark
 *.coverage.html
 doc/*.html
 docs/
+lib/version.go
