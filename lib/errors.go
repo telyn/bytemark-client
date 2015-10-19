@@ -49,6 +49,10 @@ type TooManyDiscsOnTheDancefloorError struct {
 	BigVError
 }
 
+type NilAuthError struct {
+	BigVError
+}
+
 func (e BigVError) Error() string {
 	return fmt.Sprintf("HTTP %s %s returned %d\r\n", e.Method, e.URL.String(), e.StatusCode)
 }
@@ -80,4 +84,8 @@ func (e NotAuthorizedError) Error() string {
 
 func (e BadNameError) Error() string {
 	return fmt.Sprintf("Invalid name: '%s' is a bad %s for a %s", e.ProblemValue, e.ProblemField, e.Type)
+}
+
+func (e NilAuthError) Error() string {
+	return fmt.Sprintf("Authorisation wasn't set up. It's Telyn's fault.")
 }

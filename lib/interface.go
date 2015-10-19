@@ -91,6 +91,14 @@ type Client interface {
 	GetGroup(name GroupName) (*Group, error)
 
 	//
+	// USERS
+	//
+
+	GetUser(name string) (*User, error)
+	AddUserAuthorizedKey(username, key string) error
+	DeleteUserAuthorizedKey(username, key string) error
+
+	//
 	// VIRTUAL MACHINES
 	//
 

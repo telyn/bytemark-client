@@ -89,6 +89,9 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	if auth {
+		if bigv.authSession == nil {
+			return nil, nil, &NilAuthError{}
+		}
 		req.Header.Add("Authorization", "Bearer "+bigv.authSession.Token)
 	}
 

@@ -5,20 +5,21 @@ import (
 	bigv "bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"fmt"
+	"strings"
 )
 
 // HelpForDelete outputs usage information for the delete command
 func (cmds *CommandSet) HelpForDelete() util.ExitCode {
 	log.Log("bytemark delete")
 	log.Log()
-	log.Log("usage: bytemark delete [--force] [--purge] <name>")
-	log.Log("       bytemark delete vm [--force] [---purge] <virtual machine>")
-	log.Log("       bytemark delete group <group>")
-	log.Log("       bytemark delete account <account>")
+	log.Log("usage: bytemark delete account <account>")
+	log.Log("       bytemark delete disc <vm> <label>")
+	log.Log("       bytemark delete group [--recursive] <group>")
 	log.Log("       bytemark delete user <user>")
+	log.Log("       bytemark delete vm [--force] [---purge] <virtual machine>")
 	log.Log("       bytemark undelete vm <virtual machine>")
 	log.Log()
-	log.Log("Deletes the given virtual machine, group, account or user. Only empty groups and accounts can be deleted.")
+	log.Log("Deletes the given virtual machine, disc, group, account or user. Only empty groups and accounts can be deleted.")
 	log.Log("If the --purge flag is given and the target is a virtual machine, will permanently delete the VM. Billing will cease and you will be unable to recover the VM.")
 	log.Log("If the --force flag is given, you will not be prompted to confirm deletion.")
 	log.Log()
@@ -183,6 +184,33 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 	}
 	return util.ProcessError(cmds.bigv.DeleteGroup(name))
 
+}
+
+// DeleteKey implements the delete key command, which is used to remove an authorized_key from a user.
+func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
+
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	nameStr, ok := util.ShiftArgument(&args, "user")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+	key := strings.TrimSpace(strings.Join(args, " "))
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	err = cmds.bigv.DeleteUserAuthorizedKey(nameStr, key)
+	if err == nil {
+		log.Log("Key deleted successfully")
+		return util.E_SUCCESS
+	} else {
+		return util.ProcessError(err)
+	}
 }
 
 // UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.

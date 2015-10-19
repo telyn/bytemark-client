@@ -51,6 +51,17 @@ func NewDispatcherWithCommandManager(config util.ConfigManager, commands command
 // CommandFunc is a type which takes an array of arguments and returns an util.ExitCode.
 type CommandFunc func([]string) util.ExitCode
 
+func (d *Dispatcher) DoAdd(args []string) util.ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForAdd()
+	}
+	switch strings.ToLower(args[0]) {
+	case "key":
+		return d.cmds.AddKey(args[1:])
+	}
+	return d.cmds.HelpForAdd()
+}
+
 func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForCreate()
@@ -63,6 +74,8 @@ func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 		return d.cmds.CreateGroup(args[1:])
 	case "disc", "discs", "disk", "disks":
 		return d.cmds.CreateDiscs(args[1:])
+	case "key":
+		return d.cmds.AddKey(args[1:])
 
 	}
 	log.Errorf("Unrecognised command 'create %s'\r\n", args[0])
@@ -80,6 +93,8 @@ func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 		return d.cmds.DeleteGroup(args[1:])
 	case "disc", "disk":
 		return d.cmds.DeleteDisc(args[1:])
+	case "key":
+		return d.cmds.DeleteKey(args[1:])
 	}
 	log.Errorf("Unknown command 'delete %s'\r\n", args[0])
 	return d.cmds.HelpForDelete()
@@ -98,15 +113,9 @@ func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 	case "account":
 		return d.cmds.ShowAccount(args[1:])
 	case "user":
-		log.Error("show user not implemented yet")
-		return 666
-		//return ShowUser(args[1:])
+		return d.cmds.ShowUser(args[1:])
 	case "group":
 		return d.cmds.ShowGroup(args[1:])
-	case "key", "keys":
-		log.Error("show keys not implemented yet")
-		return 666
-		//return d.cmds.ShowKeys(args[1:])
 	}
 
 	name := strings.TrimSuffix(args[0], d.config.EndpointName())
@@ -118,7 +127,6 @@ func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 		return d.cmds.ShowGroup(args)
 	case 0:
 		return d.cmds.ShowAccount(args)
-		// TODO: should also try show-vm sprintf("%s.%s.%s", args[0], "default", config.get("user"))
 	}
 	return util.E_SUCCESS
 }
@@ -148,7 +156,8 @@ func (d *Dispatcher) DoList(args []string) util.ExitCode {
 		return d.cmds.ListGroups(args[1:])
 	case "accounts":
 		return d.cmds.ListAccounts(args[1:])
-		//case "keys":
+	case "key", "keys":
+		return d.cmds.ListKeys(args[1:])
 	}
 	return d.cmds.HelpForList()
 }
@@ -227,6 +236,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 	}
 
 	commands := map[string]CommandFunc{
+		"add":           d.DoAdd,
 		"create":        d.DoCreate,
 		"config":        d.cmds.Config,
 		"console":       d.cmds.Console,

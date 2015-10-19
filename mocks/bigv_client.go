@@ -63,6 +63,22 @@ func (c *BigVClient) ReadDefinitions() (*bigv.Definitions, error) {
 	return defs, r.Error(1)
 }
 
+func (c *BigVClient) AddUserAuthorizedKey(name, key string) error {
+	r := c.Called(name, key)
+	return r.Error(0)
+}
+
+func (c *BigVClient) DeleteUserAuthorizedKey(name, key string) error {
+	r := c.Called(name, key)
+	return r.Error(0)
+}
+
+func (c *BigVClient) GetUser(name string) (*bigv.User, error) {
+	r := c.Called(name)
+	u, _ := r.Get(0).(*bigv.User)
+	return u, r.Error(1)
+}
+
 func (c *BigVClient) GetAccount(name string) (account *bigv.Account, err error) {
 	r := c.Called(name)
 	acc, _ := r.Get(0).(*bigv.Account)

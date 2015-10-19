@@ -74,10 +74,10 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	// users
 	log.Log("  User management commands:")
 	log.Log("    add key <ssh key>")
-	log.Log("    grant <user> <privilege> <object>")
+	//log.Log("    grant <user> <privilege> <object>")
 	log.Log("    list keys <ssh key>")
 	log.Log("    remove key <ssh key>")
-	log.Log("    revoke <user> <privilege>")
+	//log.Log("    revoke <user> <privilege>")
 	log.Log("    show user <name> - shows details about the given user - their authorised keys and any privileges you have granted them")
 	log.Log()
 
