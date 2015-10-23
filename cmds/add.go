@@ -16,7 +16,7 @@ func (cmds *CommandSet) HelpForAdd() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }
 
-// AddKey implements the delete key command, which is used to remove an authorized_key from a user.
+// AddKey implements the add key command, which is used to remove an authorized_key from a user.
 func (cmds *CommandSet) AddKey(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 
@@ -25,7 +25,7 @@ func (cmds *CommandSet) AddKey(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "user")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForAdd()
 		return util.E_PEBKAC
 	}
 	key := strings.TrimSpace(strings.Join(args, " "))
