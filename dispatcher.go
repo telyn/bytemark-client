@@ -100,36 +100,6 @@ func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 	return d.cmds.HelpForDelete()
 
 }
-func (d *Dispatcher) DoShow(args []string) util.ExitCode {
-	// Show implements the show command which is a stupendous badass of a command
-	if len(args) == 0 {
-		d.cmds.HelpForShow()
-		return util.E_USAGE_DISPLAYED
-	}
-
-	switch strings.ToLower(args[0]) {
-	case "vm":
-		return d.cmds.ShowVM(args[1:])
-	case "account":
-		return d.cmds.ShowAccount(args[1:])
-	case "user":
-		return d.cmds.ShowUser(args[1:])
-	case "group":
-		return d.cmds.ShowGroup(args[1:])
-	}
-
-	name := strings.TrimSuffix(args[0], d.config.EndpointName())
-	dots := strings.Count(name, ".")
-	switch dots {
-	case 2:
-		return d.cmds.ShowVM(args)
-	case 1:
-		return d.cmds.ShowGroup(args)
-	case 0:
-		return d.cmds.ShowAccount(args)
-	}
-	return util.E_SUCCESS
-}
 
 func (d *Dispatcher) DoUndelete(args []string) util.ExitCode {
 	if len(args) == 0 {
@@ -220,6 +190,37 @@ func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 	}
 	log.Errorf("Unrecognised command 'set %s'\r\n", args[0])
 	return d.cmds.HelpForSet()
+}
+
+func (d *Dispatcher) DoShow(args []string) util.ExitCode {
+	// Show implements the show command which is a stupendous badass of a command
+	if len(args) == 0 {
+		d.cmds.HelpForShow()
+		return util.E_USAGE_DISPLAYED
+	}
+
+	switch strings.ToLower(args[0]) {
+	case "vm":
+		return d.cmds.ShowVM(args[1:])
+	case "account":
+		return d.cmds.ShowAccount(args[1:])
+	case "user":
+		return d.cmds.ShowUser(args[1:])
+	case "group":
+		return d.cmds.ShowGroup(args[1:])
+	}
+
+	name := strings.TrimSuffix(args[0], d.config.EndpointName())
+	dots := strings.Count(name, ".")
+	switch dots {
+	case 2:
+		return d.cmds.ShowVM(args)
+	case 1:
+		return d.cmds.ShowGroup(args)
+	case 0:
+		return d.cmds.ShowAccount(args)
+	}
+	return util.E_SUCCESS
 }
 
 func (d *Dispatcher) DoVersion(args []string) util.ExitCode {
