@@ -82,9 +82,9 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log()
 
 	log.Log("  Informative commands:")
-	log.Log("    list images - lists the available operating system images that can be passed to create vm and reimage")
-	log.Log("    list (grades | storage-grades) - lists the available storage grades, along with a description.")
-	log.Log("    list privileges - lists the privileges that can possibly be granted")
+	log.Log("    images - lists the available operating system images that can be passed to create vm and reimage")
+	log.Log("    storage grades - lists the available storage grades, along with a description.")
+	log.Log("    privileges - lists the privileges that can possibly be granted")
 
 	return util.E_USAGE_DISPLAYED
 }
