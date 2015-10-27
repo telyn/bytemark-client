@@ -201,6 +201,10 @@ func (d *Dispatcher) DoResize(args []string) util.ExitCode {
 	return d.cmds.HelpForResize()
 }
 
+func (d *Dispatcher) DoSerial(args []string) util.ExitCode {
+	return d.cmds.Console(append([]string{"--serial"}, args...))
+}
+
 func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForSet()
@@ -221,6 +225,10 @@ func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 func (d *Dispatcher) DoVersion(args []string) util.ExitCode {
 	log.Logf("bytemark %v\r\n", client.GetVersion())
 	return util.E_SUCCESS
+}
+
+func (d *Dispatcher) DoVNC(args []string) util.ExitCode {
+	return d.cmds.Console(append([]string{"--vnc"}, args...))
 }
 
 // Do takes the command line arguments and figures out what to do.
@@ -259,7 +267,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"resize":        d.DoResize,
 		"restart":       d.cmds.Restart,
 		"reset":         d.cmds.ResetVM,
-		"serial":        d.cmds.Console,
+		"serial":        d.DoSerial,
 		"set":           d.DoSet,
 		"shutdown":      d.cmds.Shutdown,
 		"stop":          d.cmds.Stop,
@@ -269,7 +277,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"undelete":      d.DoUndelete,
 		"unlock":        d.DoUnlock,
 		"version":       d.DoVersion,
-		"vnc":           d.cmds.Console,
+		"vnc":           d.DoVNC,
 		"zones":         d.cmds.Zones,
 	}
 
