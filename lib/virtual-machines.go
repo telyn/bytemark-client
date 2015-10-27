@@ -172,7 +172,7 @@ func (bigv *bigvClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff 
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
 
-	_, _, err = bigv.Request(true, "PUT", path, `{"signal": "powerdown"}`)
+	_, _, err = bigv.Request(true, "POST", path, `{"signal": "powerdown"}`)
 	return err
 }
 
