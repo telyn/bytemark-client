@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"bigv.io/client/cmds/util"
+	"bytemark.co.uk/client/cmds/util"
 	mock "github.com/maraino/go-mock"
 )
 
@@ -9,6 +9,11 @@ import (
 
 type Commands struct {
 	mock.Mock
+}
+
+func (cmds *Commands) AddKey(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
 }
 
 func (cmds *Commands) Console(args []string) util.ExitCode {
@@ -21,6 +26,10 @@ func (cmds *Commands) Debug(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 func (cmds *Commands) Delete(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+func (cmds *Commands) DeleteKey(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -60,12 +69,25 @@ func (cmds *Commands) CreateVM(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
+func (cmds *Commands) Distributions(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+func (cmds *Commands) HardwareProfiles(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) ListAccounts(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
 
 func (cmds *Commands) ListDiscs(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+func (cmds *Commands) ListKeys(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -84,6 +106,12 @@ func (cmds *Commands) ResetVM(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
+
+func (cmds *Commands) ResizeDisc(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) Restart(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
@@ -102,11 +130,6 @@ func (cmds *Commands) Start(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
-func (cmds *Commands) Show(args []string) util.ExitCode {
-	r := cmds.Called(args)
-	return util.ExitCode(r.Int(0))
-}
-
 func (cmds *Commands) ShowAccount(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
@@ -118,6 +141,16 @@ func (cmds *Commands) ShowGroup(args []string) util.ExitCode {
 }
 
 func (cmds *Commands) ShowVM(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) ShowUser(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) StorageGrades(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -157,9 +190,18 @@ func (cmds *Commands) SetMemory(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
+func (cmds *Commands) Zones(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) EnsureAuth() error {
 	r := cmds.Called()
 	return r.Error(0)
+}
+func (cmds *Commands) HelpForAdd() util.ExitCode {
+	r := cmds.Called()
+	return util.ExitCode(r.Int(0))
 }
 
 func (cmds *Commands) HelpForConfig() util.ExitCode {
@@ -197,6 +239,11 @@ func (cmds *Commands) HelpForLocks() util.ExitCode {
 }
 
 func (cmds *Commands) HelpForPower() util.ExitCode {
+	r := cmds.Called()
+	return util.ExitCode(r.Int(0))
+}
+
+func (cmds *Commands) HelpForResize() util.ExitCode {
 	r := cmds.Called()
 	return util.ExitCode(r.Int(0))
 }

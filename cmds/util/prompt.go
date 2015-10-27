@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytemark.co.uk/client/util/log"
 	"bufio"
 	"fmt"
 	"os"
@@ -14,7 +15,7 @@ func PromptYesNo(prompt string) bool {
 
 // Prompt provides a string prompt, returns the entered string with no whitespace (hopefully)
 func Prompt(prompt string) string {
-	fmt.Print(prompt)
+	fmt.Fprint(os.Stderr, prompt)
 	reader := bufio.NewReader(os.Stdin)
 	res, err := reader.ReadString('\n')
 
@@ -24,6 +25,7 @@ func Prompt(prompt string) string {
 		}
 		return ""
 	}
+	log.Debugf(999, "%s %s", prompt, res)
 	return strings.TrimSpace(res)
 }
 
@@ -33,7 +35,7 @@ func ShiftArgument(args *[]string, kindOfThing string) (string, bool) {
 		*args = (*args)[1:]
 		return value, true
 	} else {
-		fmt.Fprintf(os.Stderr, "Not enough arguments. A %s was not specified.\r\n", kindOfThing)
+		log.Errorf("Not enough arguments. A %s was not specified.\r\n", kindOfThing)
 		return "", false
 	}
 }

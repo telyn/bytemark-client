@@ -1,17 +1,15 @@
 package util
 
 import (
-	"encoding/json"
+	"bytemark.co.uk/client/util/log"
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var configVars = [...]string{
@@ -58,14 +56,14 @@ type ConfigManager interface {
 // endpoint - the default endpoint to use - if not present, https://uk0.bigv.io
 // auth-endpoint - the default auth API endpoint to use - if not present, https://auth.bytemark.co.uk
 
-// A Config determines the configuration of the bigv client.
+// A Config determines the configuration of the Bytemark client.
 // It's responsible for handling things like the credentials to use and what endpoints to talk to.
 //
 // Each configuration item is read from the following places, falling back to successive places:
 //
 // Per-command command-line flags, global command-line flags, environment variables, configuration directory, hard-coded defaults
 //
-//The location of the configuration directory is read from global command-line flags, or is otherwise ~/.go-bigv
+//The location of the configuration directory is read from global command-line flags, or is otherwise ~/.bytemark
 //
 type Config struct {
 	debugLevel  int
@@ -114,16 +112,16 @@ func (e *ConfigWriteError) Error() string {
 // Do I really need to have the flags passed in here?
 // Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
 
-// NewConfig sets up a new config struct. Pass in an empty string to default to ~/.go-bigv
+// NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
 func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
 	home := os.Getenv("HOME")
 	if runtime.GOOS == "windows" {
 		home = os.Getenv("APPDATA")
-		
+
 	}
-	config.Dir = filepath.Join(home, "/.go-bigv")
+	config.Dir = filepath.Join(home, "/.bytemark")
 	config.mainFlags = flags
 	if os.Getenv("BIGV_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
@@ -148,14 +146,20 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		return nil, &ConfigDirInvalidError{config.Dir}
 	}
 
+	log.LogFile, err = os.Create(config.GetPath("debug.log"))
+	if err != nil {
+		log.Errorf("Couldn't open %s for writing\r\n", config.GetPath("debug.log"))
+	}
+
 	config.ImportFlags(flags)
 	strDL, err := config.Get("debug-level")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Error(err)
 	} else {
 		debugLevel, err := strconv.ParseInt(strDL, 10, 0)
 		if err == nil {
 			config.debugLevel = int(debugLevel)
+			log.DebugLevel = int(debugLevel)
 		}
 	}
 	return config, nil
@@ -173,23 +177,33 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 					"FLAG " + f.Name,
 				}
 			})
+
 			if flags != config.mainFlags {
 
 				args := flags.Args()
 				for _, arg := range args {
 					if strings.HasPrefix(arg, "-") {
-						fmt.Fprintf(os.Stderr, "Flag-like argument '%s' specified after your arguments\r\nBe aware that only flags placed before your arguments are parsed.\r\nSee the help for the command you're calling for invocation examples.\r\n\r\n", arg)
+						log.Errorf("Flag-like argument '%s' specified after your arguments\r\nBe aware that only flags placed before your arguments are parsed.\r\nSee the help for the command you're calling for invocation examples.\r\n\r\n", arg)
 						break
 					}
 				}
 			}
+
+			log.Silent = config.Silent()
+			strDL := config.GetIgnoreErr("debug-level")
+			debugLevel, err := strconv.ParseInt(strDL, 10, 0)
+			if err == nil {
+				config.debugLevel = int(debugLevel)
+				log.DebugLevel = int(debugLevel)
+			}
+
 			return flags.Args()
 		}
 	}
 	return nil
 }
 
-// GetDebugLevel returns the current debug-level as an integer. This is used throughout the bigv.io/client library to determine verbosity of output.
+// GetDebugLevel returns the current debug-level as an integer. This is used throughout the bytemark.co.uk/client library to determine verbosity of output.
 func (config *Config) GetDebugLevel() int {
 	return config.debugLevel
 }
@@ -197,60 +211,6 @@ func (config *Config) GetDebugLevel() int {
 // GetPath joins the given string onto the end of the Config.Dir path
 func (config *Config) GetPath(name string) string {
 	return filepath.Join(config.Dir, name)
-}
-
-// LoadDefinitions reads the local copy of the definitions json file, or downloads it from the endpoint if it's too old or nonexistant.
-// Eventually this will be used to provide information on various things throughout the application
-func (config *Config) LoadDefinitions() error {
-	endpoint, err := config.Get("endpoint")
-	if err != nil {
-		return err
-	}
-	defPath := config.GetPath("definitions-" + endpoint + ".json")
-	stat, err := os.Stat(defPath)
-
-	if err != nil || time.Since(stat.ModTime()) > 24*time.Hour {
-		endpoint, err := config.Get("endpoint")
-		if err != nil {
-			return err
-		}
-		if !config.Silent() {
-			fmt.Fprintf(os.Stderr, "Downloading definitions for %s...\r\n", endpoint)
-		}
-		c := &http.Client{}
-		req, err := http.NewRequest("GET", endpoint+"/definitions.json", nil)
-		if err != nil {
-			return &CannotLoadDefinitionsError{err}
-		}
-		req.Header.Add("Accept", "application/json")
-		req.Header.Add("Content-Type", "application/json")
-		res, err := c.Do(req)
-		if err != nil {
-			return &CannotLoadDefinitionsError{err}
-		}
-		if res.StatusCode == 200 {
-			responseBody, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-				return &CannotLoadDefinitionsError{err}
-			}
-			ioutil.WriteFile(defPath, responseBody, 0660)
-
-			err = json.Unmarshal(responseBody, config.Definitions)
-			fmt.Fprintln(os.Stderr)
-			return err
-		} else {
-			// TODO(telyn): Unexpected status code
-		}
-	} else {
-		defs, err := ioutil.ReadFile(defPath)
-		if err != nil {
-			return &CannotLoadDefinitionsError{err}
-		}
-		err = json.Unmarshal(defs, config.Definitions)
-		return err
-	}
-	return nil
-
 }
 
 // Get returns the value of a ConfigVar. Used to simplify code when the source is unnecessary.
@@ -292,7 +252,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
-		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bigv config set user <youruser>"
+		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bytemark config set user <youruser>"
 		return ConfigVar{"user", os.Getenv("BIGV_USER"), "ENV BIGV_USER"}
 	case "endpoint":
 		v := ConfigVar{"endpoint", "https://uk0.bigv.io", "CODE"}

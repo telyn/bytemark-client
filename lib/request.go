@@ -1,13 +1,14 @@
 package lib
 
 import (
+	"bytemark.co.uk/client/util/log"
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -28,7 +29,7 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 	if bigv.debugLevel >= 3 {
 		buf := new(bytes.Buffer)
 		json.Indent(buf, data, "", "    ")
-		fmt.Printf("%s", buf)
+		log.Debugf(3, "%s", buf)
 	}
 
 	if err != nil {
@@ -44,16 +45,21 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
 func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
 	_, res, err := bigv.Request(auth, method, location, requestBody)
-	defer res.Body.Close()
+	if err != nil {
+		return []byte{}, err
+	}
+	defer func() {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+	}()
 
 	responseBody, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
 		return nil, readErr
 	}
 
-	if bigv.debugLevel > 2 {
-		fmt.Fprintf(os.Stderr, "response body: '%s'\r\n", string(responseBody))
-	}
+	log.Debugf(2, "response body: '%s'\r\n", string(responseBody))
 
 	return responseBody, err
 }
@@ -67,6 +73,13 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		url = bigv.endpoint + location
 	}
 	cli := &http.Client{}
+	if bigv.endpoint == "https://staging.bigv.io" {
+		cli.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+	}
 
 	req, err = http.NewRequest(method, url, bytes.NewBufferString(requestBody))
 	if err != nil {
@@ -76,6 +89,9 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	if auth {
+		if bigv.authSession == nil {
+			return nil, nil, &NilAuthError{}
+		}
 		req.Header.Add("Authorization", "Bearer "+bigv.authSession.Token)
 	}
 
@@ -84,12 +100,8 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		return req, res, err
 	}
 
-	if bigv.debugLevel > 1 {
-		fmt.Fprintf(os.Stderr, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
-	}
-	if bigv.debugLevel >= 3 {
-		fmt.Fprintf(os.Stderr, "request body: '%s'\r\n", requestBody)
-	}
+	log.Debugf(1, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
+	log.Debugf(3, "request body: '%s'\r\n", requestBody)
 
 	baseErr := BigVError{
 		Method:       method,
@@ -101,7 +113,17 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 
 	switch res.StatusCode {
 	case 400:
-		err = BadRequestError{baseErr}
+		responseBody, readErr := ioutil.ReadAll(res.Body)
+		if readErr != nil {
+			return nil, nil, BadRequestError{BigVError: baseErr, Problems: make(map[string][]string)}
+		}
+		baseErr.ResponseBody = string(responseBody)
+		brErr := BadRequestError{BigVError: baseErr, Problems: make(map[string][]string)}
+		err = json.Unmarshal(responseBody, &brErr.Problems)
+		if err != nil {
+			log.Debug(1, err)
+		}
+		err = brErr
 
 	case 403:
 		err = NotAuthorizedError{baseErr}

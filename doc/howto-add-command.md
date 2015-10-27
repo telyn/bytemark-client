@@ -10,23 +10,23 @@ lib
   `virtual_machines`, `groups`, `accounts`. Replace `_` with `-`.
 
 * Add the function you just made to the interface to
-  `lib/interface.go`. Now `go test bigv.io/client/main` will break.
+  `lib/interface.go`. Now `go test bytemark.co.uk/client/main` will break.
 
 * Add a unit test for your API call to the relavent `_test.go` file
   in `lib/`.
 
 * Add a mock version of the function to `mocks/bigv-client.go`
-  Now `go test bigv.io/client/main` will work.
+  Now `go test bytemark.co.uk/client/main` will work.
   Commit if you like.
 
 cmds
 ----
 
 * Add a CamelCased version of the command to `cmds/cmds.go`
-  `CommandManager` interface. Now `go test bigv.io/client/main` will break.
+  `CommandManager` interface. Now `go test bytemark.co.uk/client/main` will break.
 
 * Add a mock version of the function to `mocks/cmds.go`'s
-  `CommandManager`. Now `go test bigv.io/client/main` will work.
+  `CommandManager`. Now `go test bytemark.co.uk/client/main` will work.
 
 * Implement the function in `cmds/<base>.go` where `<base>` is
   the first word of the command. See cmd-show.go and ShowVM for a
@@ -55,10 +55,10 @@ main
 Finishing up
 ------------
 
-Now do testing. `go test bigv.io/client/lib` and
-`go test bigv.io/client/main`. If that works then YOU'RE NOT DONE YET
+Now do testing. `go test bytemark.co.uk/client/lib` and
+`go test bytemark.co.uk/client/main`. If that works then YOU'RE NOT DONE YET
 
-Run `make` and then try out your new `go-bigv`. Make sure the API
+Run `make` and then try out your new `bytemark`. Make sure the API
 calls you're making actually work (--debug-level=5). Make sure errors
 mostly don't cause panics.
 
@@ -66,7 +66,7 @@ To be honest as long as the right API calls are being made then I
 (Telyn) will be able to sort out all the error handling later.
 
 I'm intending to do get Bytemarkers to try to fuzz-test it with wacky
-arguments and junky ~/.go-bigv folders and such and send me logs with
+arguments and junky ~/.bytemark folders and such and send me logs with
 --debug-level=5 so I can squash as many as possible.
 
 I suspect there will still be weird edge cases in the first release

@@ -1,11 +1,14 @@
 package util
 
 import (
-	bigv "bigv.io/client/lib"
-	auth3 "bytemark.co.uk/auth3/client"
+	bigv "bytemark.co.uk/client/lib"
+	auth3 "bytemark.co.uk/client/lib/auth"
+	"bytemark.co.uk/client/util/log"
 	"fmt"
 	"net"
 	"net/url"
+	"os"
+	"runtime"
 	"strings"
 	"syscall"
 )
@@ -36,6 +39,8 @@ const (
 	E_WONT_DELETE_NONEMPTY = 6
 	// E_PEBKAC is the exit code returned when the user entered a malformed command, name, or flag.
 	E_PEBKAC = 7
+	// E_SUBPROCESS_FAILED is the exit code returned when the client attempted to run a subprocess (e.g. ssh, a browser or a vpn client) but couldn't
+	E_SUBPROCESS_FAILED = 8
 
 	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
 	E_UNKNOWN_ERROR = 49
@@ -66,6 +71,9 @@ const (
 	// E_NOT_FOUND_BIGV is the exit code returned when the BigV server says you do not have permission to see the object you are trying to view, or that it does not exist.
 	E_NOT_FOUND_BIGV = 156
 
+	// E_BAD_REQUEST_BIGV is the exit code returned when we send a bad request to BigV. (E.g. names being too short or having wrong characters in)
+	E_BAD_REQUEST_BIGV = 157
+
 	// E_UNKNOWN_AUTH is the exit code returned when we get an unexpected error from the auth server.
 	E_UNKNOWN_AUTH = 149
 	// E_UNKNOWN_BIGV is the exit code returned when we get an unexpected error from the BigV server.
@@ -74,7 +82,7 @@ const (
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
 func HelpForExitCodes() ExitCode {
-	fmt.Println(`bigv exit code list:
+	log.Logf(`bytemark exit code list:
 
 Exit code ranges:
     All these ranges are inclusive (i.e. 0-99 means numbers from 0 to 99, including 0 and 99.)
@@ -96,7 +104,14 @@ Exit code ranges:
 
     4
 	Couldn't write a file to config directory
-
+    5
+	The user caused the program to exit (usually by saying "no" to Yes/no prompts)	
+    6
+	The user requested a non-empty group be deleted
+    7
+	The program was called with malformed arguments
+    8
+	Attempting to execute a subprocess failed
 
  50 - 249 Exit codes:
 
@@ -107,7 +122,7 @@ Exit code ranges:
         Auth endpoint reported an internal error
     
      52 / 152
-        Unable to parse output from auth endpoint (probably implies a protocol mismatch - try updating go-bigv)
+        Unable to parse output from auth endpoint (probably implies a protocol mismatch - try updating bytemark)
 
      53
 	Your credentials were rejected for containing invalid characters or fields.
@@ -122,11 +137,11 @@ Exit code ranges:
         Something couldn't be found on BigV. This could be due to the following reasons:
             * It doesn't exist
 	    * Your user account doesn't have authorisation to see it
-	    * Protocol mismatch between the BigV endpoint and go-bigv.
+	    * Protocol mismatch between the BigV endpoint and bytemark.
 
     149 / 249
 
-        An unknown error fell out of the auth / bigv library.
+        An unknown error fell out of the auth / BigV library.
 
 250 - 255 Exit codes:
 
@@ -137,8 +152,12 @@ Exit code ranges:
 }
 
 func ProcessError(err error, message ...string) ExitCode {
+	trace := make([]byte, 4096, 4096)
+	runtime.Stack(trace, false)
+
+	log.Debug(1, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
 	if len(message) > 0 {
-		fmt.Println(strings.Join(message, "\r\n"))
+		log.Error(message)
 	} else if err == nil {
 		return E_SUCCESS
 	}
@@ -177,10 +196,15 @@ func ProcessError(err error, message ...string) ExitCode {
 			} else {
 				errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %v", urlErr)
 			}
+		case *SubprocessFailedError:
+			errorMessage = err.Error()
+			exitCode = E_SUBPROCESS_FAILED
 		case bigv.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_AUTHORIZED_BIGV
-
+		case bigv.BadRequestError:
+			errorMessage = err.Error()
+			exitCode = E_BAD_REQUEST_BIGV
 		case bigv.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_FOUND_BIGV
@@ -212,10 +236,9 @@ func ProcessError(err error, message ...string) ExitCode {
 	}
 
 	if exitCode == E_UNKNOWN_ERROR {
-		fmt.Printf("Unknown error of type %T: %s. I'm going to panic now. Expect a lot of output.\r\n", err, err)
-		panic("")
-	} else if len(message) == 0 {
-		fmt.Println(errorMessage)
+		log.Errorf("Unknown error of type %T: %s.\r\nPlease send a bug report containing %s to support@bytemark.co.uk.\r\n", err, err, log.LogFile.Name())
+	} else if len(message) == 0 { // the message (passed as argument) is shadowed by errorMessage (made in this function)
+		log.Log(errorMessage)
 
 	}
 	return exitCode

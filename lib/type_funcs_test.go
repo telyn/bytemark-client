@@ -15,7 +15,7 @@ func TestParseVirtualMachineName(t *testing.T) {
 
 	vm, err = bigv.ParseVirtualMachineName("a..c")
 	is.Nil(err)
-	is.Equal("a..c", vm.String())
+	is.Equal("a.default.c", vm.String())
 	vm, err = bigv.ParseVirtualMachineName("a.b.c.")
 	is.Equal("a.b.c", vm.String())
 	is.Nil(err)

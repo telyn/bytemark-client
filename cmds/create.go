@@ -1,53 +1,52 @@
 package cmds
 
 import (
-	"bigv.io/client/cmds/util"
-	bigv "bigv.io/client/lib"
-	"fmt"
-	"os"
+	"bytemark.co.uk/client/cmds/util"
+	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"strings"
 )
 
 //HelpForCreateVM provides usage information for the create-vm command
 func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
-	fmt.Println("go-bigv create vm")
-	fmt.Println()
-	fmt.Println("usage: go-bigv create vm [flags] <name> [<cores> [<memory> [<disc specs>]]")
-	fmt.Println()
-	fmt.Println("flags available")
-	fmt.Println("    --account <name>")
-	fmt.Println("    --cores <num> (default 1)")
-	fmt.Println("    --cdrom <url>")
-	fmt.Println("    --discs <disc specs> (default 25)")
-	fmt.Println("    --force")
-	fmt.Println("    --group <name>")
-	fmt.Println("    --hwprofile <profile>")
-	fmt.Println("    --hwprofile-locked")
-	fmt.Println("    --image <image name> (see go-bigv images)")
-	fmt.Println("    --memory <size> (default 1, units are GiB)")
-	fmt.Println("    --public-keys <keys> (newline seperated)")
-	fmt.Println("    --public-keys-file <file> (will be read & appended to --public-keys)")
-	fmt.Println("    --root-password <password>")
-	fmt.Println("    --stopped (if set, machine won't boot)")
-	fmt.Println("    --zone <name> (default manchester)")
-	fmt.Println()
-	fmt.Println("If hwprofile-locked is set then the virtual machine's hardware won't be changed over time.")
+	log.Log("bytemark create vm")
+	log.Log()
+	log.Log("usage: bytemark create vm [flags] <name> [<cores> [<memory> [<disc specs>]]")
+	log.Log()
+	log.Log("flags available")
+	log.Log("    --account <name>")
+	log.Log("    --cores <num> (default 1)")
+	log.Log("    --cdrom <url>")
+	log.Log("    --discs <disc specs> (default 25)")
+	log.Log("    --force")
+	log.Log("    --group <name>")
+	log.Log("    --hwprofile <profile>")
+	log.Log("    --hwprofile-locked")
+	log.Log("    --image <image name> (see bytemark images)")
+	log.Log("    --memory <size> (default 1, units are GiB)")
+	log.Log("    --public-keys <keys> (newline seperated)")
+	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
+	log.Log("    --root-password <password> (if not set, will be randomly generated)")
+	log.Log("    --stopped (if set, machine won't boot)")
+	log.Log("    --zone <name> (default manchester)")
+	log.Log()
+	log.Log("If hwprofile-locked is set then the virtual machine's hardware won't be changed over time.")
 	return util.E_USAGE_DISPLAYED
 
 }
 
 //HelpForCreate provides usage information for the create command and its subcommands.
 func (cmds *CommandSet) HelpForCreate() util.ExitCode {
-	fmt.Println("go-bigv create")
-	fmt.Println()
-	fmt.Println("usage: go-bigv create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [disc specs]")
-	fmt.Println("               create group [--account <name>] <name>")
-	fmt.Println("               create disc[s] <disc specs> <virtual machine>")
-	fmt.Println("               create ip [--reason reason] <virtual machine>")
-	fmt.Println("               create vm (see go-bigv help create vm)")
-	fmt.Println("")
-	fmt.Println("Disc specs are a comma seperated list of size:storage grade pairs. Sizes are in GB by default but can be specified in M")
-	fmt.Println("")
+	log.Log("bytemark create")
+	log.Log()
+	log.Log("usage: bytemark create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [disc specs]")
+	log.Log("               create group [--account <name>] <name>")
+	log.Log("               create disc[s] <disc specs> <virtual machine>")
+	log.Log("               create ip [--reason reason] <virtual machine>")
+	log.Log("               create vm (see bytemark help create vm)")
+	log.Log("")
+	log.Log("Disc specs are a comma seperated list of size:storage grade pairs. Sizes are in GB by default but can be specified in M")
+	log.Log("")
 	return util.E_USAGE_DISPLAYED
 }
 
@@ -69,12 +68,13 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
+
 	var discs []bigv.Disc
 	if *sizeFlag != "" || *gradeFlag != "" {
 		// if both flags and spec are specified, fail
 		if len(args) >= 1 {
 			if !cmds.config.Silent() {
-				fmt.Fprintf(os.Stderr, "Ambiguous command given - please only specify disc specs as arguments or flags, not both")
+				log.Error("Ambiguous command given - please only specify disc specs as arguments or flags, not both")
 			}
 			return util.E_PEBKAC
 
@@ -93,7 +93,7 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 			return cmds.HelpForCreate()
 		} else {
 			spec := strings.Join(args, " ")
-			fmt.Fprintf(os.Stderr, spec)
+
 			discs, err = util.ParseDiscSpec(spec, false)
 			if err != nil {
 				return util.ProcessError(err)
@@ -101,16 +101,23 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 		}
 
 	}
+	for i := range discs {
+		d, err := discs[i].Validate()
+		if err != nil {
+			return util.ProcessError(err)
+		}
+		discs[i] = *d
+	}
 	cmds.EnsureAuth()
 
-	fmt.Printf("Adding discs to %s:\r\n", name)
+	log.Logf("Adding discs to %s:\r\n", name)
 	for _, d := range discs {
-		fmt.Printf("    %d %s...", d.Size/1024, d.StorageGrade)
+		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
 		err = cmds.bigv.CreateDisc(name, d)
 		if err != nil {
-			fmt.Printf("Failure! " + err.Error())
+			log.Errorf("failure! %v\r\n", err.Error())
 		} else {
-			fmt.Printf("success!\r\n")
+			log.Log("success!")
 		}
 	}
 	return util.ProcessError(err)
@@ -137,7 +144,7 @@ func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 
 	err = cmds.bigv.CreateGroup(name)
 	if err == nil {
-		fmt.Printf("Group %s was created under account %s\r\n", name.Group, name.Account)
+		log.Logf("Group %s was created under account %s\r\n", name.Group, name.Account)
 	}
 	return util.ProcessError(err)
 
@@ -181,10 +188,17 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	for i, d := range discs {
-		if d.StorageGrade == "" {
-			discs[i].StorageGrade = "sata"
+	for i := range discs {
+		d, err := discs[i].Validate()
+		if err != nil {
+			return util.ProcessError(err)
 		}
+		discs[i] = *d
+	}
+
+	rootpass := *rootPassword
+	if *rootPassword == "" {
+		rootpass = util.GeneratePassword()
 	}
 
 	// if stopped isn't set and either cdrom or image are set, start the vm
@@ -205,7 +219,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		Reimage: &bigv.ImageInstall{
 			Distribution: *image,
 			PublicKeys:   *pubkeys,
-			RootPassword: *rootPassword,
+			RootPassword: rootpass,
 		},
 	}
 
@@ -214,14 +228,12 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		Account: name.Account,
 	}
 
-	if !cmds.config.Silent() {
-		fmt.Println("The following VM will be created:")
-		fmt.Println(util.FormatVirtualMachineSpec(&groupName, &spec))
-	}
+	log.Log("The following VM will be created:")
+	log.Log(util.FormatVirtualMachineSpec(&groupName, &spec))
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
 	if !cmds.config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
-		fmt.Println("Exiting.")
+		log.Error("Exiting.")
 		return util.ProcessError(&util.UserRequestedExit{})
 	}
 
@@ -230,13 +242,17 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	vm, err := cmds.bigv.CreateVirtualMachine(groupName, spec)
+	_, err = cmds.bigv.CreateVirtualMachine(groupName, spec)
 	if err != nil {
 		return util.ProcessError(err)
-	} else if !cmds.config.Silent() {
-		fmt.Printf("Virtual machine %s created successfully\n", vm.Name)
-		fmt.Println(util.FormatVirtualMachine(vm))
 	}
+	vm, err := cmds.bigv.GetVirtualMachine(name)
+	if err != nil {
+		return util.ProcessError(err)
+	}
+	log.Output("Virtual machine created successfully", "")
+	log.Output(util.FormatVirtualMachine(vm))
+	log.Outputf("Root password: %s\r\n", rootpass)
 	return util.E_SUCCESS
 
 }

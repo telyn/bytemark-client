@@ -8,7 +8,7 @@ func (bigv *bigvClient) GetAccount(name string) (*Account, error) {
 	}
 	account := new(Account)
 
-	path := BuildURL("/accounts/%s", name)
+	path := BuildURL("/accounts/%s?view=overview", name)
 
 	err = bigv.RequestAndUnmarshal(true, "GET", path, "", account)
 	if err != nil {

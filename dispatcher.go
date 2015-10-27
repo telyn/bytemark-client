@@ -1,12 +1,11 @@
 package main
 
 import (
-	commands "bigv.io/client/cmds"
-	util "bigv.io/client/cmds/util"
-	client "bigv.io/client/lib"
+	commands "bytemark.co.uk/client/cmds"
+	"bytemark.co.uk/client/cmds/util"
+	client "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"flag"
-	"fmt"
-	"os"
 	"strings"
 )
 
@@ -52,6 +51,17 @@ func NewDispatcherWithCommandManager(config util.ConfigManager, commands command
 // CommandFunc is a type which takes an array of arguments and returns an util.ExitCode.
 type CommandFunc func([]string) util.ExitCode
 
+func (d *Dispatcher) DoAdd(args []string) util.ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForAdd()
+	}
+	switch strings.ToLower(args[0]) {
+	case "key":
+		return d.cmds.AddKey(args[1:])
+	}
+	return d.cmds.HelpForAdd()
+}
+
 func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForCreate()
@@ -64,9 +74,11 @@ func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 		return d.cmds.CreateGroup(args[1:])
 	case "disc", "discs", "disk", "disks":
 		return d.cmds.CreateDiscs(args[1:])
+	case "key":
+		return d.cmds.AddKey(args[1:])
 
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'create %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'create %s'\r\n", args[0])
 	return util.E_PEBKAC
 }
 
@@ -81,8 +93,10 @@ func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 		return d.cmds.DeleteGroup(args[1:])
 	case "disc", "disk":
 		return d.cmds.DeleteDisc(args[1:])
+	case "key":
+		return d.cmds.DeleteKey(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unknown command 'delete %s'\r\n", args[0])
+	log.Errorf("Unknown command 'delete %s'\r\n", args[0])
 	return d.cmds.HelpForDelete()
 
 }
@@ -99,15 +113,9 @@ func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 	case "account":
 		return d.cmds.ShowAccount(args[1:])
 	case "user":
-		fmt.Printf("Leave me alone! I'm grumpy.")
-		return 666
-		//return ShowUser(args[1:])
+		return d.cmds.ShowUser(args[1:])
 	case "group":
 		return d.cmds.ShowGroup(args[1:])
-	case "key", "keys":
-		fmt.Printf("Leave me alone, I'm grumpy!")
-		return 666
-		//return d.cmds.ShowKeys(args[1:])
 	}
 
 	name := strings.TrimSuffix(args[0], d.config.EndpointName())
@@ -119,7 +127,6 @@ func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 		return d.cmds.ShowGroup(args)
 	case 0:
 		return d.cmds.ShowAccount(args)
-		// TODO: should also try show-vm sprintf("%s.%s.%s", args[0], "default", config.get("user"))
 	}
 	return util.E_SUCCESS
 }
@@ -132,7 +139,7 @@ func (d *Dispatcher) DoUndelete(args []string) util.ExitCode {
 	case "vm":
 		return d.cmds.UndeleteVM(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'undelete %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'undelete %s'\r\n", args[0])
 	return d.cmds.HelpForDelete()
 }
 
@@ -143,13 +150,14 @@ func (d *Dispatcher) DoList(args []string) util.ExitCode {
 	switch strings.ToLower(args[0]) {
 	case "vms":
 		return d.cmds.ListVMs(args[1:])
-	case "discs":
+	case "discs", "disks":
 		return d.cmds.ListDiscs(args[1:])
 	case "groups":
 		return d.cmds.ListGroups(args[1:])
 	case "accounts":
 		return d.cmds.ListAccounts(args[1:])
-		//case "keys":
+	case "key", "keys":
+		return d.cmds.ListKeys(args[1:])
 	}
 	return d.cmds.HelpForList()
 }
@@ -163,7 +171,7 @@ func (d *Dispatcher) DoLock(args []string) util.ExitCode {
 	case "hwprofile":
 		return d.cmds.LockHWProfile(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'lock %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'lock %s'\r\n", args[0])
 	return d.cmds.HelpForLocks()
 }
 
@@ -176,8 +184,21 @@ func (d *Dispatcher) DoUnlock(args []string) util.ExitCode {
 	case "hwprofile":
 		return d.cmds.UnlockHWProfile(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'unlock %s'\r\n", args[0])
+	log.Errorf("Unrecognised command 'unlock %s'\r\n", args[0])
 	return d.cmds.HelpForLocks()
+}
+
+func (d *Dispatcher) DoResize(args []string) util.ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForResize()
+
+	}
+	switch strings.ToLower(args[0]) {
+	case "disc", "disk":
+		return d.cmds.ResizeDisc(args[1:])
+	}
+
+	return d.cmds.HelpForResize()
 }
 
 func (d *Dispatcher) DoSet(args []string) util.ExitCode {
@@ -193,43 +214,63 @@ func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 	case "cores":
 		return d.cmds.SetCores(args[1:])
 	}
-	fmt.Fprintf(os.Stderr, "Unrecognised command 'set %s'\r\rn", args[0])
+	log.Errorf("Unrecognised command 'set %s'\r\n", args[0])
 	return d.cmds.HelpForSet()
+}
+
+func (d *Dispatcher) DoVersion(args []string) util.ExitCode {
+	log.Logf("bytemark %v\r\n", client.GetVersion())
+	return util.E_SUCCESS
 }
 
 // Do takes the command line arguments and figures out what to do.
 func (d *Dispatcher) Do(args []string) util.ExitCode {
-	if d.debugLevel >= 1 {
-		fmt.Fprintf(os.Stderr, "Args passed to Do: %#v\n", args)
+	log.Debugf(1, "bytemark %v\r\n\r\n", client.GetVersion())
+
+	log.Debugf(1, "Args passed to Do: %#v\r\n", args)
+
+	for _, arg := range args {
+		if arg == "/?" || arg == "/h" || arg == "--help" || arg == "-h" {
+			d.cmds.Help(args)
+			return util.E_USAGE_DISPLAYED
+		}
 	}
 
 	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
-		fmt.Printf("No command specified.\n\n")
+		log.Errorf("No command specified.\r\n")
 		d.cmds.Help(args)
 		return util.E_SUCCESS
 	}
 
 	commands := map[string]CommandFunc{
-		"create":   d.DoCreate,
-		"config":   d.cmds.Config,
-		"console":  d.cmds.Console,
-		"connect":  d.cmds.Console,
-		"debug":    d.cmds.Debug,
-		"delete":   d.DoDelete,
-		"help":     d.cmds.Help,
-		"list":     d.DoList,
-		"lock":     d.DoLock,
-		"restart":  d.cmds.Restart,
-		"reset":    d.cmds.ResetVM,
-		"serial":   d.cmds.Console,
-		"set":      d.DoSet,
-		"shutdown": d.cmds.Shutdown,
-		"stop":     d.cmds.Stop,
-		"start":    d.cmds.Start,
-		"show":     d.DoShow,
-		"undelete": d.DoUndelete,
-		"unlock":   d.DoUnlock,
-		"vnc":      d.cmds.Console,
+		"add":           d.DoAdd,
+		"create":        d.DoCreate,
+		"config":        d.cmds.Config,
+		"console":       d.cmds.Console,
+		"connect":       d.cmds.Console,
+		"debug":         d.cmds.Debug,
+		"delete":        d.DoDelete,
+		"distributions": d.cmds.Distributions,
+		"help":          d.cmds.Help,
+		"hwprofiles":    d.cmds.HardwareProfiles,
+		"images":        d.cmds.Distributions,
+		"list":          d.DoList,
+		"lock":          d.DoLock,
+		"resize":        d.DoResize,
+		"restart":       d.cmds.Restart,
+		"reset":         d.cmds.ResetVM,
+		"serial":        d.cmds.Console,
+		"set":           d.DoSet,
+		"shutdown":      d.cmds.Shutdown,
+		"stop":          d.cmds.Stop,
+		"storage":       d.cmds.StorageGrades,
+		"start":         d.cmds.Start,
+		"show":          d.DoShow,
+		"undelete":      d.DoUndelete,
+		"unlock":        d.DoUnlock,
+		"version":       d.DoVersion,
+		"vnc":           d.cmds.Console,
+		"zones":         d.cmds.Zones,
 	}
 
 	command := strings.ToLower(args[0])
@@ -238,8 +279,8 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 	if fn != nil {
 		return fn(args[1:])
 	} else {
-		fmt.Fprintf(os.Stderr, "Unrecognised command '%s'\r\n", command)
-		fmt.Println()
+		log.Errorf("Unrecognised command '%s'\r\n\r\n", command)
+
 		return d.cmds.Help(args)
 	}
 
