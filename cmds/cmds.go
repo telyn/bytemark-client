@@ -1,14 +1,12 @@
 package cmds
 
 import (
-	util "bigv.io/client/cmds/util"
-	bigv "bigv.io/client/lib"
-	"bufio"
-	auth3 "bytemark.co.uk/auth3/client"
-	"fmt"
+	util "bytemark.co.uk/client/cmds/util"
+	bigv "bytemark.co.uk/client/lib"
+	auth3 "bytemark.co.uk/client/lib/auth"
+	"bytemark.co.uk/client/util/log"
 	"github.com/bgentry/speakeasy"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -18,6 +16,7 @@ type CommandFunc func([]string) util.ExitCode
 type CommandManager interface {
 	EnsureAuth() error
 
+	AddKey([]string) util.ExitCode
 	Config([]string) util.ExitCode
 	Console([]string) util.ExitCode
 	CreateDiscs([]string) util.ExitCode
@@ -25,15 +24,20 @@ type CommandManager interface {
 	CreateVM([]string) util.ExitCode
 	DeleteDisc([]string) util.ExitCode
 	DeleteGroup([]string) util.ExitCode
+	DeleteKey([]string) util.ExitCode
 	DeleteVM([]string) util.ExitCode
 	Debug([]string) util.ExitCode
+	Distributions([]string) util.ExitCode
+	HardwareProfiles([]string) util.ExitCode
 	Help([]string) util.ExitCode
 	ListAccounts([]string) util.ExitCode
 	ListGroups([]string) util.ExitCode
+	ListKeys([]string) util.ExitCode
 	ListDiscs([]string) util.ExitCode
 	ListVMs([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
 	ResetVM([]string) util.ExitCode
+	ResizeDisc([]string) util.ExitCode
 	Restart([]string) util.ExitCode
 	SetCores([]string) util.ExitCode
 	SetHWProfile([]string) util.ExitCode
@@ -43,10 +47,14 @@ type CommandManager interface {
 	Shutdown([]string) util.ExitCode
 	ShowAccount([]string) util.ExitCode
 	ShowGroup([]string) util.ExitCode
+	ShowUser([]string) util.ExitCode
 	ShowVM([]string) util.ExitCode
+	StorageGrades([]string) util.ExitCode
 	UnlockHWProfile([]string) util.ExitCode
 	UndeleteVM([]string) util.ExitCode
+	Zones([]string) util.ExitCode
 
+	HelpForAdd() util.ExitCode
 	HelpForConfig() util.ExitCode
 	HelpForCreate() util.ExitCode
 	HelpForDebug() util.ExitCode
@@ -55,6 +63,7 @@ type CommandManager interface {
 	HelpForList() util.ExitCode
 	HelpForLocks() util.ExitCode
 	HelpForPower() util.ExitCode
+	HelpForResize() util.ExitCode
 	HelpForSet() util.ExitCode
 	HelpForShow() util.ExitCode
 }
@@ -65,7 +74,7 @@ type CommandSet struct {
 	config util.ConfigManager
 }
 
-// NewCommandSet creates a CommandSet given a ConfigManager and bigv.io/client/lib Client.
+// NewCommandSet creates a CommandSet given a ConfigManager and bytemark.co.uk/client/lib Client.
 func NewCommandSet(config util.ConfigManager, client bigv.Client) *CommandSet {
 	commandSet := new(CommandSet)
 	commandSet.config = config
@@ -84,7 +93,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 				return aErr
 			}
 		}
-		fmt.Fprintf(os.Stderr, "Please log in to BigV\r\n\r\n")
+		log.Error("Please log in to BigV\r\n")
 		attempts := 3
 
 		for err != nil {
@@ -107,7 +116,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 			} else {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
 					if attempts > 0 {
-						fmt.Fprintf(os.Stderr, "Invalid credentials, please try again\r\n")
+						log.Errorf("Invalid credentials, please try again\r\n")
 						cmds.config.Set("user", "", "INVALID")
 						cmds.config.Set("pass", "", "INVALID")
 						cmds.config.Set("yubikey-otp", "", "INVALID")
@@ -129,10 +138,8 @@ func (cmds *CommandSet) EnsureAuth() error {
 // needs a for loop to ensure that they don't stay empty.
 // returns nil on success or an error on failure
 func (cmds *CommandSet) PromptForCredentials() error {
-	buf := bufio.NewReader(os.Stdin)
 	for cmds.config.GetIgnoreErr("user") == "" {
-		fmt.Fprintf(os.Stderr, "User: ")
-		user, _ := buf.ReadString('\n')
+		user := util.Prompt("User: ")
 		cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
 	}
 
@@ -147,11 +154,10 @@ func (cmds *CommandSet) PromptForCredentials() error {
 
 	if cmds.config.GetIgnoreErr("yubikey") != "" {
 		for cmds.config.GetIgnoreErr("yubikey-otp") == "" {
-			fmt.Fprintf(os.Stderr, "Press yubikey: ")
-			yubikey, _ := buf.ReadString('\n')
+			yubikey := util.Prompt("Press yubikey: ")
 			cmds.config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
 		}
 	}
-	fmt.Fprintf(os.Stderr, "\r\n")
+	log.Log("")
 	return nil
 }

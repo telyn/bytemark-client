@@ -1,7 +1,7 @@
 package util
 
 import (
-	"fmt"
+	"bytemark.co.uk/client/util/log"
 	"os"
 	"os/exec"
 	"strings"
@@ -9,7 +9,7 @@ import (
 )
 
 func CallBrowser(url string) error {
-	fmt.Fprintf(os.Stderr, "Running a browser to open %s...\r\n", url)
+	log.Logf("Running a browser to open %s...\r\n", url)
 
 	var attr os.ProcAttr
 	attr.Sys = &syscall.SysProcAttr{HideWindow: true}
@@ -22,6 +22,8 @@ func CallBrowser(url string) error {
 	// so on windows when you're using cmd you have to escape ampersands with the ^ character.
 	// ¯\(º_o)/¯
 	url = strings.Replace(url, "&", "^&", -1)
+
+	log.Debugf(1, "Executing %s /C start \"%s\"", path, url)
 	proc, err := os.StartProcess(path, []string{path, "/C", "start", url}, &attr)
 	if err != nil {
 

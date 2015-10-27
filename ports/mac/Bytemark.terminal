@@ -13,7 +13,7 @@
 	cnR2e4aPl5qjtbi9AAAAAAAAAQEAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAL8=
 	</data>
 	<key>CommandString</key>
-	<string>/tmp/BigV.app/Contents/Resources/start</string>
+	<string>/tmp/Bytemark.app/Contents/Resources/start</string>
 	<key>CursorBlink</key>
 	<true/>
 	<key>CursorColor</key>
@@ -72,7 +72,7 @@
 	<key>columnCount</key>
 	<integer>120</integer>
 	<key>name</key>
-	<string>BigV</string>
+	<string>Bytemark</string>
 	<key>noWarnProcesses</key>
 	<array>
 		<dict>

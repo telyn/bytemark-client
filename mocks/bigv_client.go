@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	bigv "bigv.io/client/lib"
-	auth3 "bytemark.co.uk/auth3/client"
+	bigv "bytemark.co.uk/client/lib"
+	auth3 "bytemark.co.uk/client/lib/auth"
 	"fmt"
 	mock "github.com/maraino/go-mock"
 	"net/http"
@@ -57,6 +57,28 @@ func (c *BigVClient) Request(auth bool, method string, location string, requestB
 	return req, res, r.Error(2)
 }
 
+func (c *BigVClient) ReadDefinitions() (*bigv.Definitions, error) {
+	r := c.Called()
+	defs, _ := r.Get(0).(*bigv.Definitions)
+	return defs, r.Error(1)
+}
+
+func (c *BigVClient) AddUserAuthorizedKey(name, key string) error {
+	r := c.Called(name, key)
+	return r.Error(0)
+}
+
+func (c *BigVClient) DeleteUserAuthorizedKey(name, key string) error {
+	r := c.Called(name, key)
+	return r.Error(0)
+}
+
+func (c *BigVClient) GetUser(name string) (*bigv.User, error) {
+	r := c.Called(name)
+	u, _ := r.Get(0).(*bigv.User)
+	return u, r.Error(1)
+}
+
 func (c *BigVClient) GetAccount(name string) (account *bigv.Account, err error) {
 	r := c.Called(name)
 	acc, _ := r.Get(0).(*bigv.Account)
@@ -73,45 +95,78 @@ func (c *BigVClient) CreateDisc(name bigv.VirtualMachineName, disc bigv.Disc) er
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
+
+func (c *BigVClient) GetDisc(name bigv.VirtualMachineName, discId string) (disc *bigv.Disc, err error) {
+	r := c.Called(name, discId)
+	disc, _ = r.Get(0).(*bigv.Disc)
+	return disc, r.Error(1)
+}
+
 func (c *BigVClient) CreateGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+
 func (c *BigVClient) GetGroup(name bigv.GroupName) (*bigv.Group, error) {
 	r := c.Called(name)
 	group, _ := r.Get(0).(*bigv.Group)
 	return group, r.Error(1)
 }
-func (c *BigVClient) DeleteDisc(name bigv.VirtualMachineName, disc int) error {
+
+func (c *BigVClient) DeleteDisc(name bigv.VirtualMachineName, disc string) error {
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
+
 func (c *BigVClient) DeleteGroup(name bigv.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+
 func (c *BigVClient) DeleteVirtualMachine(name bigv.VirtualMachineName, purge bool) error {
 	r := c.Called(name, purge)
 	return r.Error(0)
 }
+
 func (c *BigVClient) CreateVirtualMachine(group bigv.GroupName, vm bigv.VirtualMachineSpec) (*bigv.VirtualMachine, error) {
 	r := c.Called(group, vm)
 	rvm, _ := r.Get(0).(*bigv.VirtualMachine)
 	return rvm, r.Error(1)
 }
+
 func (c *BigVClient) GetVirtualMachine(name bigv.VirtualMachineName) (vm *bigv.VirtualMachine, err error) {
 	r := c.Called(name)
 	vm, _ = r.Get(0).(*bigv.VirtualMachine)
 	return vm, r.Error(1)
 }
-func (c *BigVClient) UndeleteVirtualMachine(name bigv.VirtualMachineName) error {
+
+func (c *BigVClient) ParseVirtualMachineName(name string) (bigv.VirtualMachineName, error) {
 	r := c.Called(name)
-	return r.Error(0)
+	n, _ := r.Get(0).(bigv.VirtualMachineName)
+	return n, r.Error(1)
 }
+
+func (c *BigVClient) ParseGroupName(name string) bigv.GroupName {
+	r := c.Called(name)
+	n, _ := r.Get(0).(bigv.GroupName)
+	return n
+}
+
+func (c *BigVClient) ParseAccountName(name string) string {
+	r := c.Called(name)
+	return r.String(0)
+}
+
 func (c *BigVClient) ResetVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+
+func (c *BigVClient) ResizeDisc(name bigv.VirtualMachineName, id string, size int) error {
+	r := c.Called(name, id, size)
+	return r.Error(0)
+}
+
 func (c *BigVClient) RestartVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
@@ -145,17 +200,7 @@ func (c *BigVClient) ShutdownVirtualMachine(name bigv.VirtualMachineName, stayof
 	return r.Error(0)
 }
 
-func (c *BigVClient) ParseVirtualMachineName(name string) (bigv.VirtualMachineName, error) {
+func (c *BigVClient) UndeleteVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
-	n, _ := r.Get(0).(bigv.VirtualMachineName)
-	return n, r.Error(1)
-}
-func (c *BigVClient) ParseGroupName(name string) bigv.GroupName {
-	r := c.Called(name)
-	n, _ := r.Get(0).(bigv.GroupName)
-	return n
-}
-func (c *BigVClient) ParseAccountName(name string) string {
-	r := c.Called(name)
-	return r.String(0)
+	return r.Error(0)
 }

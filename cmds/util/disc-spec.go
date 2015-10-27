@@ -1,9 +1,8 @@
 package util
 
 import (
-	bigv "bigv.io/client/lib"
+	bigv "bytemark.co.uk/client/lib"
 	"fmt"
-	"strconv"
 	"unicode/utf8"
 )
 
@@ -17,7 +16,7 @@ func (e *DiscSpecError) Error() string {
 	return fmt.Sprintf("Disc spec error: Unexpected %c at character %d.", e.Character, e.Position)
 }
 
-// ParseDiscSpec takes a disc spec and returns a slice of Discs (from bigv.io/client/lib)
+// ParseDiscSpec takes a disc spec and returns a slice of Discs (from bytemark.co.uk/client/lib)
 func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 	// parser!
 	pos := 0
@@ -58,18 +57,15 @@ func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 				return nil, &DiscSpecError{pos, c}
 			}
 		case _size:
-			if c >= '0' && c <= '9' {
-				curSize += spec[pos : pos+w]
-				pos += w
-			} else if c == ',' {
-				size, err := strconv.ParseInt(curSize, 10, 32)
+			if c == ',' {
+				size, err := ParseSize(curSize)
 				if err != nil {
+					return discs, err
 					// this should logically be impossible - curSize should be a string solely containing characters from 0-9
-					return nil, &DiscSpecError{Position: pos - len(curSize)}
 				}
 				discs = append(discs, bigv.Disc{
 					StorageGrade: curGrade,
-					Size:         int(size) * 1024,
+					Size:         int(size),
 				})
 
 				curGrade = ""
@@ -78,7 +74,8 @@ func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 				expecting = _either
 				pos += w
 			} else {
-				return nil, &DiscSpecError{pos, c}
+				curSize += spec[pos : pos+w]
+				pos += w
 			}
 		default: // _expecting
 			if c >= 'a' && c <= 'z' {
@@ -90,13 +87,13 @@ func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 			}
 		}
 	}
-	size, err := strconv.ParseInt(curSize, 10, 32)
+	size, err := ParseSize(curSize)
 	if err != nil {
 		return nil, &DiscSpecError{Position: pos - len(curSize)}
 	}
 	discs = append(discs, bigv.Disc{
 		StorageGrade: curGrade,
-		Size:         int(size) * 1024,
+		Size:         int(size),
 	})
 	return discs, nil
 }

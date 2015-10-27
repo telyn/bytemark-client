@@ -1,7 +1,7 @@
 package util
 
 import (
-	bigv "bigv.io/client/lib"
+	bigv "bytemark.co.uk/client/lib"
 	"testing"
 )
 

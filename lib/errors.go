@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // BigVError is the basic error type which all errors return by the client library are subclassed from.
@@ -40,10 +41,15 @@ type UnknownStatusCodeError struct {
 // BadRequestError is returned when a request was malformed. Report these as bugs.
 type BadRequestError struct {
 	BigVError
+	Problems map[string][]string
 }
 
 // TooManyDiscsOnTheDancefloorError is returned when the API call would result in more than 8 discs being attached to a VM.
 type TooManyDiscsOnTheDancefloorError struct {
+	BigVError
+}
+
+type NilAuthError struct {
 	BigVError
 }
 
@@ -56,7 +62,15 @@ func (e UnknownStatusCodeError) Error() string {
 }
 
 func (e BadRequestError) Error() string {
-	return fmt.Sprintf("Bad HTTP request\r\n%s", e.BigVError.Error())
+	if len(e.Problems) == 0 {
+		return fmt.Sprintf("The API told us our request was bad\r\n%s", e.ResponseBody)
+	}
+	out := make([]string, len(e.Problems))
+	out = append(out, "Our request had some problems:")
+	for k, probs := range e.Problems {
+		out = append(out, fmt.Sprintf("%s:\r\n    %s", k, strings.Join(probs, "\r\n    ")))
+	}
+	return strings.Join(out, "\r\n")
 }
 
 func (e NotFoundError) Error() string {
@@ -70,4 +84,8 @@ func (e NotAuthorizedError) Error() string {
 
 func (e BadNameError) Error() string {
 	return fmt.Sprintf("Invalid name: '%s' is a bad %s for a %s", e.ProblemValue, e.ProblemField, e.Type)
+}
+
+func (e NilAuthError) Error() string {
+	return fmt.Sprintf("Authorisation wasn't set up. It's Telyn's fault.")
 }

@@ -1,30 +1,30 @@
 package cmds
 
 import (
-	"bigv.io/client/cmds/util"
-	bigv "bigv.io/client/lib"
+	"bytemark.co.uk/client/cmds/util"
+	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"fmt"
-	"os"
-	"strconv"
+	"strings"
 )
 
 // HelpForDelete outputs usage information for the delete command
 func (cmds *CommandSet) HelpForDelete() util.ExitCode {
-	fmt.Println("go-bigv delete")
-	fmt.Println()
-	fmt.Println("usage: bigv delete [--force] [--purge] <name>")
-	fmt.Println("       bigv delete vm [--force] [---purge] <virtual machine>")
-	fmt.Println("       bigv delete group <group>")
-	fmt.Println("       bigv delete account <account>")
-	fmt.Println("       bigv delete user <user>")
-	fmt.Println("       bigv undelete vm <virtual machine>")
-	fmt.Println()
-	fmt.Println("Deletes the given virtual machine, group, account or user. Only empty groups and accounts can be deleted.")
-	fmt.Println("If the --purge flag is given and the target is a virtual machine, will permanently delete the VM. Billing will cease and you will be unable to recover the VM.")
-	fmt.Println("If the --force flag is given, you will not be prompted to confirm deletion.")
-	fmt.Println()
-	fmt.Println("The undelete vm command may be used to restore a deleted (but not purged) vm to its state prior to deletion.")
-	fmt.Println()
+	log.Log("bytemark delete")
+	log.Log()
+	log.Log("usage: bytemark delete account <account>")
+	log.Log("       bytemark delete disc <vm> <label>")
+	log.Log("       bytemark delete group [--recursive] <group>")
+	log.Log("       bytemark delete user <user>")
+	log.Log("       bytemark delete vm [--force] [---purge] <virtual machine>")
+	log.Log("       bytemark undelete vm <virtual machine>")
+	log.Log()
+	log.Log("Deletes the given virtual machine, disc, group, account or user. Only empty groups and accounts can be deleted.")
+	log.Log("If the --purge flag is given and the target is a virtual machine, will permanently delete the VM. Billing will cease and you will be unable to recover the VM.")
+	log.Log("If the --force flag is given, you will not be prompted to confirm deletion.")
+	log.Log()
+	log.Log("The undelete vm command may be used to restore a deleted (but not purged) vm to its state prior to deletion.")
+	log.Log()
 	return util.E_USAGE_DISPLAYED
 }
 
@@ -43,7 +43,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	}
 	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank.\r\n")
+		log.Error("Virtual machine name cannot be blank.")
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
@@ -56,7 +56,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 	if vm.Deleted && !*purge {
-		fmt.Printf("Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge", vm.Hostname)
+		log.Errorf("Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge\r\n", vm.Hostname)
 		return util.E_SUCCESS
 	}
 
@@ -79,9 +79,9 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	}
 
 	if *purge {
-		fmt.Printf("Virtual machine %s purged successfully.\r\n", name)
+		log.Logf("Virtual machine %s purged successfully.\r\n", vm.Hostname)
 	} else {
-		fmt.Printf("Virtual machine %s deleted successfully.\r\n", name)
+		log.Logf("Virtual machine %s deleted successfully.\r\n", vm.Hostname)
 	}
 	return util.E_SUCCESS
 }
@@ -93,24 +93,18 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	fmt.Printf("%#v", args)
+	log.Debugf(2, "%#v", args)
 	nameStr, ok := util.ShiftArgument(&args, "virtual machine name")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	fmt.Printf("%#v", args)
+	log.Debugf(2, "%#v", args)
 
 	disc, ok := util.ShiftArgument(&args, "disc id")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
-	}
-
-	discID, err := strconv.ParseInt(disc, 10, 32)
-	if !ok {
-		fmt.Fprintf(os.Stderr, "Invalid disc specified")
-		return cmds.HelpForDelete()
 	}
 
 	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
@@ -124,11 +118,11 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 	}
 
 	if !(cmds.config.Force() || util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.")) {
-		fmt.Println("Cancelling.")
+		log.Log("Cancelling.")
 		return util.E_USER_EXIT
 	}
 
-	err = cmds.bigv.DeleteDisc(name, int(discID))
+	err = cmds.bigv.DeleteDisc(name, disc)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -165,11 +159,11 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 	if len(group.VirtualMachines) > 0 {
 		if *recursive {
 
-			fmt.Fprintln(os.Stderr, "WARNING: The following VMs will be permanently deleted, without any way to recover or un-delete them:")
+			log.Log("WARNING: The following VMs will be permanently deleted, without any way to recover or un-delete them:")
 			for _, vm := range group.VirtualMachines {
-				fmt.Fprintf(os.Stderr, "\t%s\r\n", vm.Name)
+				log.Logf("\t%s\r\n", vm.Name)
 			}
-			fmt.Fprint(os.Stderr, "\r\n\r\n")
+			log.Log("", "")
 			if util.PromptYesNo("Are you sure you want to continue?") {
 				vmn := bigv.VirtualMachineName{Group: name.Group, Account: name.Account}
 				for _, vm := range group.VirtualMachines {
@@ -178,18 +172,45 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 					if err != nil {
 						return util.ProcessError(err)
 					} else {
-						fmt.Fprintf(os.Stderr, "Virtual machine %s purged successfully.\r\n", name)
+						log.Logf("Virtual machine %s purged successfully.\r\n", name)
 					}
 
 				}
 			}
 		} else {
-			fmt.Fprintf(os.Stderr, "Group %s contains virtual machines, will not be deleted without --recursive\r\n", name.Group)
+			log.Errorf("Group %s contains virtual machines, will not be deleted without --recursive\r\n", name.Group)
 			return util.E_WONT_DELETE_NONEMPTY
 		}
 	}
 	return util.ProcessError(cmds.bigv.DeleteGroup(name))
 
+}
+
+// DeleteKey implements the delete key command, which is used to remove an authorized_key from a user.
+func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
+	flags := util.MakeCommonFlagSet()
+
+	flags.Parse(args)
+	args = cmds.config.ImportFlags(flags)
+
+	nameStr, ok := util.ShiftArgument(&args, "user")
+	if !ok {
+		cmds.HelpForDelete()
+		return util.E_PEBKAC
+	}
+	key := strings.TrimSpace(strings.Join(args, " "))
+	err := cmds.EnsureAuth()
+	if err != nil {
+		return util.ProcessError(err)
+	}
+
+	err = cmds.bigv.DeleteUserAuthorizedKey(nameStr, key)
+	if err == nil {
+		log.Log("Key deleted successfully")
+		return util.E_SUCCESS
+	} else {
+		return util.ProcessError(err)
+	}
 }
 
 // UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.
@@ -202,7 +223,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 	}
 	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Virtual machine name cannot be blank\r\n")
+		log.Error("Virtual machine name cannot be blank")
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
@@ -216,7 +237,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 	}
 
 	if !vm.Deleted {
-		fmt.Printf("Virtual machine %s was already undeleted", vm.Hostname)
+		log.Errorf("Virtual machine %s was already undeleted\r\n", vm.Hostname)
 		return util.E_SUCCESS
 	}
 
@@ -225,7 +246,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	fmt.Printf("Successfully restored virtual machine %s\r\n", vm.Hostname)
+	log.Logf("Successfully restored virtual machine %s\r\n", vm.Hostname)
 
 	return util.E_SUCCESS
 }

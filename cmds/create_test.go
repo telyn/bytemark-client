@@ -1,8 +1,8 @@
 package cmds
 
 import (
-	bigv "bigv.io/client/lib"
-	"bigv.io/client/mocks"
+	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/mocks"
 	"testing"
 	//"github.com/cheekybits/is"
 )
@@ -19,6 +19,7 @@ func TestCreateDiskCommand(t *testing.T) {
 	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
 	c.When("ParseVirtualMachineName", "test-vm").Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("GetVirtualMachine", name).Return(&bigv.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
 
 	disc := bigv.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
@@ -31,6 +32,8 @@ func TestCreateDiskCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// TODO(telyn): TestCreateGroupCommand
 
 func TestCreateVMCommand(t *testing.T) {
 	c := &mocks.BigVClient{}
@@ -73,7 +76,14 @@ func TestCreateVMCommand(t *testing.T) {
 		Account: "",
 	}
 
-	c.When("CreateVirtualMachine", group, vm).Return(vm.VirtualMachine, nil).Times(1)
+	vmname := bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "",
+		Account:        "",
+	}
+
+	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
 	cmds.CreateVM([]string{

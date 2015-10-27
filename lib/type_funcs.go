@@ -7,10 +7,22 @@ import (
 )
 
 func (vm VirtualMachineName) String() string {
+	if vm.Group == "" {
+		vm.Group = "default"
+	}
+	if vm.Account == "" {
+		return fmt.Sprintf("%s.%s", vm.VirtualMachine, vm.Group)
+	}
 	return fmt.Sprintf("%s.%s.%s", vm.VirtualMachine, vm.Group, vm.Account)
 }
 
 func (g GroupName) String() string {
+	if g.Group == "" {
+		g.Group = "default"
+	}
+	if g.Account == "" {
+		return g.Group
+	}
 	return g.Group + "." + g.Account
 }
 

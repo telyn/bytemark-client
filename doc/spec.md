@@ -96,71 +96,67 @@ n.b. storage grades can be found out by asking the api for /definitions.json
 List of commands
 ================
 
-`bigv console [--serial | --vnc] [--connect | --panel] <virtual machine>`
-`bigv create group [--account <account>] <name>`
-`bigv create dis<c|k>[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]` - if ambiguous, berate user
-`bigv create ip [--reason reason] <virtual machine>`
-`bigv create vm [flags] <name> [<cores> [<memory> [<disc specs>]]]` - creates a vm with the given name and the following flags
+`bytemark config`  output all info about the current config
+`bytemark config get <variable>`  output the value & source of the given variable
+`bytemark config set <variable> <value>`  persistently sets a bigv-client variable
+`bytemark console [--serial | --vnc] [--connect | --panel] <virtual machine>`
+`bytemark create group [--account <account>] <name>`
+`bytemark create dis<c|k>[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]` - if ambiguous, berate user
+`bytemark create vm [flags] <name> [<cores> [<memory> [<disc specs>]]]` - creates a vm with the given name and the following flags
 
-	    --account <name>
-	    --cores <num> (default 1)
-	    --cdrom <url>
-	    --discs <disc specs> (default 25)
-	    --force
-	    --group <name>
-	    --hwprofile <profile>
-	    --hwprofile-locked (if specified, will lock the hwprofile)
-	    --image <image name> 
-	    --memory <size> (default 1, default unit GB)
-	    --public-keys <keys> (newline seperated)
-	    --public-keys-file <file> (will be read & appended to --public-keys)
-	    --root-password <password>
-	    --stopped (if set, machine won't be started)
-	    --zone <name> (default york)
-`bigv delete [--force] [--purge] <name>
-`bigv delete account <account>
-`bigv delete dis<c|k> [--force] [---purge] <virtual machine> <disc label>`
-`bigv delete group <group>
-`bigv delete ip <ip>` - _actually no you can't delete an ip_
-`bigv delete nic <virtual machine> <nic id>`
-`bigv delete user <user>
-`bigv delete vm [--force] [---purge] <virtual machine>`
-`bigv debug [--junk-token] [--auth] <method> <path>` - Make an HTTP request to the given path on the current endpoint.
-`bigv debug config` - output the current config as json to debug Config's internal state
-`bigv grant <user> <privilege> <object>`
-`bigv help [command | topic]` - output the help for bigv or for the given command or topic
-`bigv lock hwprofile <virtual machine>`
-`bigv list accounts` - lists the accounts you can see, one per line
-`bigv list images` - lists the available operating system images that can be passed to create vm and reimage
-`bigv list (grades | storage-grades)` - lists the available storage grades, along with a description. One per line.
-`bigv list privileges` - lists the privileges that can possibly be granted
-`bigv list groups <account>` - lists the groups in the given account, one per line
-`bigv list vms <group>` - lists the vms in the given group, one per line
-`bigv reimage [--image <image>] <virtual machine> [<image>]`
-`bigv request ip <virtual machine> [<nic id>]` - requests an IP on the given NIC, or the default NIC if not specified
-`bigv reset <virtual machine>` - Need to discuss whether this is useful
-`bigv resize dis<c|k> [--size <size>] <virtual machine> [<resize spec>]` - resize to `size`. if ambiguous, berate user.
-`bigv revoke <user> <privilege>`
-`bigv serial [--connect] <virtual machine>` - alias to `bigv console --serial`
-`bigv set client <variable> <value>`  persistently sets a bigv-client variable
-`bigv set cores <virtual machine> <num>`
-`bigv set hwprofile <virtual machine> <hardware profile>`
-`bigv set memory <virtual machine> <size>`
-`bigv set rdns <ip> <host name>`
-`bigv show account [--json] <account>` - shows an overview of the given account, a list of groups and vms within them
-`bigv show client config[uration]|variables` - outputs the current config
-`bigv show group [--json] <group>` - shows an overview of the given group, a list of VMs in them w/ size information
-`bigv show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
-`bigv show vm [--json] [--nics] <virtual machine>` - shows an overview of the given VM. Its discs, IPs, and such.
-`bigv shutdown <virtual machine>`
-`bigv start <virtual machine>`
-`bigv stop <virtual machine>`
-`bigv unset client <variable>` - persistently unsets a bigv-client variable
-`bigv undelete vm <virtual machine>`
-`bigv unlock hwprofile <virtual machine>`
-`bigv vnc [--connect | --panel] <virtual machine>` - alias for `bigv console --vnc`
+        --account <name>
+        --cores <num> (default 1)
+        --cdrom <url>
+        --discs <disc specs> (default 25)
+        --force
+        --group <name>
+        --hwprofile <profile>
+        --hwprofile-locked (if specified, will lock the hwprofile)
+        --image <image name> 
+        --memory <size> (default 1, default unit GB)
+        --public-keys <keys> (newline seperated)
+        --public-keys-file <file> (will be read & appended to --public-keys)
+        --root-password <password>
+        --stopped (if set, machine won't be started)
+        --zone <name> (default york)
+`bytemark delete account <account>
+`bytemark delete dis<c|k> [--force] [---purge] <virtual machine> <disc label>`
+`bytemark delete group <group>
+`bytemark delete vm [--force] [---purge] <virtual machine>`
+`bytemark debug [--junk-token] [--auth] <method> <path>` - Make an HTTP request to the given path on the current endpoint.
+`bytemark debug config` - output the current config as json to debug Config's internal state
+`bytemark grant <user> <privilege> <object>`
+`bytemark help [command | topic]` - output the help for the client or for the given command or topic
+`bytemark lock hwprofile <virtual machine>`
+`bytemark list accounts` - lists the accounts you can see, one per line
+`bytemark list discs <virtual machine>` - lists the discs in the given VM, with their size and ids
+`bytemark list images` - lists the available operating system images that can be passed to create vm and reimage
+`bytemark list (grades | storage-grades)` - lists the available storage grades, along with a description. One per line.
+`bytemark list privileges` - lists the privileges that can possibly be granted
+`bytemark list groups <account>` - lists the groups in the given account, one per line
+`bytemark list vms <group>` - lists the vms in the given group, one per line
+`bytemark reimage [--image <image>] <virtual machine> [<image>]`
+`bytemark request ip <virtual machine> <reason>`
+`bytemark reset <virtual machine>` - Need to discuss whether this is useful
+`bytemark resize dis<c|k> [--size <size>] <virtual machine> [<resize spec>]` - resize to `size`. if ambiguous, berate user.
+`bytemark revoke <user> <privilege>`
+`bytemark set cores <virtual machine> <num>`
+`bytemark set hwprofile <virtual machine> <hardware profile>`
+`bytemark set memory <virtual machine> <size>`
+`bytemark set rdns <ip> <host name>`
+`bytemark show account [--json] <account>` - shows an overview of the given account, a list of groups and vms within them
+`bytemark config` - outputs the current config
+`bytemark show group [--json] <group>` - shows an overview of the given group, a list of VMs in them w/ size information
+`bytemark show user <name>` - shows details about the given user - their authorised keys and any privileges you have granted them
+`bytemark show vm [--json] [--nics] <virtual machine>` - shows an overview of the given VM. Its discs, IPs, and such.
+`bytemark shutdown <virtual machine>`
+`bytemark start <virtual machine>`
+`bytemark stop <virtual machine>`
+`bytemark config unset <variable>` - persistently unsets a bigv-client variable
+`bytemark undelete vm <virtual machine>`
+`bytemark unlock hwprofile <virtual machine>`
 
 Details
 =======
 
-Configuration directory: "$HOME/.bigv-client" except on Windows; "%APPDATA%/BigV Client" instead
+Configuration directory: "$HOME/.bytemark" except on Windows; "%APPDATA%/Bytemark" instead

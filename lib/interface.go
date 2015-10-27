@@ -1,7 +1,7 @@
 package lib
 
 import (
-	auth3 "bytemark.co.uk/auth3/client"
+	auth3 "bytemark.co.uk/client/lib/auth"
 	"net/http"
 )
 
@@ -59,6 +59,11 @@ type Client interface {
 	ParseAccountName(string) string
 
 	//
+	// DEFINITIONS
+	//
+	ReadDefinitions() (*Definitions, error)
+
+	//
 	// ACCOUNTS
 	//
 
@@ -72,7 +77,9 @@ type Client interface {
 	//
 
 	CreateDisc(vm VirtualMachineName, disc Disc) error
-	DeleteDisc(vm VirtualMachineName, id int) error
+	DeleteDisc(vm VirtualMachineName, idOrLabel string) error
+	GetDisc(vm VirtualMachineName, idOrLabel string) (*Disc, error)
+	ResizeDisc(vm VirtualMachineName, idOrLabel string, size int) error
 
 	//
 	// GROUPS
@@ -82,6 +89,14 @@ type Client interface {
 	CreateGroup(name GroupName) error
 	DeleteGroup(name GroupName) error
 	GetGroup(name GroupName) (*Group, error)
+
+	//
+	// USERS
+	//
+
+	GetUser(name string) (*User, error)
+	AddUserAuthorizedKey(username, key string) error
+	DeleteUserAuthorizedKey(username, key string) error
 
 	//
 	// VIRTUAL MACHINES
