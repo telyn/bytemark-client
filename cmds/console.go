@@ -26,12 +26,11 @@ func (cmds *CommandSet) HelpForConsole() {
 	log.Log()
 	log.Log("vnc: Outputs instructions for connecting to the VNC console.")
 	log.Log("     If --connect is given, will also attempt to connect to")
-	log.Log("     the VNC console, falling back to the BigV panel if no ssh")
-	log.Log("     or vnc clients can be found, or if --panel is specified.")
+	log.Log("     the VNC console using the Bytemark panel.")
+	// falling back to the BigV panel if no ssh")
+	//log.Log("     or vnc clients can be found, or if --panel is specified.")
 	log.Log()
 	log.Log()
-	//TODO: stop kidding around
-	log.Log("haha just kidding, at the moment vnc always uses panel")
 }
 
 func shortEndpoint(endpoint string) string {
@@ -49,14 +48,15 @@ func getExitCode(cmd *exec.Cmd) (exitCode int, err error) {
 	return 0, err
 }
 
-func showVNCHowTo(vm *lib.VirtualMachine) {
+func (cmds *CommandSet) showVNCHowTo(vm *lib.VirtualMachine) {
 	log.Log("VNC connection information for", vm.Hostname)
 	log.Log()
 	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
-	log.Logf("Then set up a tunnel using SSH: ssh -L <some number>:%s:5900 %s@%s\r\n")
+	log.Logf("Then set up a tunnel using SSH: ssh -L 9999:%s:5900 %s@%s\r\n", vm.ManagementAddress, cmds.bigv.GetSessionUser(), vm.ManagementAddress)
 	log.Log()
-	log.Log("You can now connect to VNC on localhost, port <some number>")
+	log.Log("You will then be able to connect to vnc://localhost:9999/")
+	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
 }
 
 func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
@@ -100,7 +100,7 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 	if *vnc {
 
 		if !*connect {
-			showVNCHowTo(vm)
+			cmds.showVNCHowTo(vm)
 			return util.E_SUCCESS
 		}
 		ep := cmds.config.EndpointName()
