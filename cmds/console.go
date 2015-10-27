@@ -106,8 +106,8 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 		ep := cmds.config.EndpointName()
 		token := cmds.config.GetIgnoreErr("token")
 		url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", cmds.config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
-
-		return util.ProcessError(util.CallBrowser(url))
+		err = util.CallBrowser(url)
+		return util.ProcessError(err)
 
 	} else { // default to serial
 		if !*connect {

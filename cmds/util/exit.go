@@ -197,6 +197,10 @@ func ProcessError(err error, message ...string) ExitCode {
 				errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %v", urlErr)
 			}
 		case *SubprocessFailedError:
+			spErr, _ := err.(*SubprocessFailedError)
+			if spErr.Err == nil {
+				return E_SUCCESS
+			}
 			errorMessage = err.Error()
 			exitCode = E_SUBPROCESS_FAILED
 		case bigv.NotAuthorizedError:
