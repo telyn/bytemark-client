@@ -120,6 +120,7 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 	} else {
 		output = append(output, "Image: "+spec.Reimage.Distribution)
 	}
+	output = append(output, "Root/Administrator password: "+spec.Reimage.RootPassword)
 
 	s = ""
 	if len(spec.Discs) > 1 {

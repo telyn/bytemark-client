@@ -26,7 +26,7 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 	log.Log("    --memory <size> (default 1, units are GiB)")
 	log.Log("    --public-keys <keys> (newline seperated)")
 	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
-	log.Log("    --root-password <password>")
+	log.Log("    --root-password <password> (if not set, will be randomly generated)")
 	log.Log("    --stopped (if set, machine won't boot)")
 	log.Log("    --zone <name> (default manchester)")
 	log.Log()
@@ -196,6 +196,11 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		discs[i] = *d
 	}
 
+	rootpass := *rootPassword
+	if *rootPassword == "" {
+		rootpass = util.GeneratePassword()
+	}
+
 	// if stopped isn't set and either cdrom or image are set, start the vm
 	autoreboot := !*stopped && ((*image != "") || (*cdrom != ""))
 
@@ -214,7 +219,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		Reimage: &bigv.ImageInstall{
 			Distribution: *image,
 			PublicKeys:   *pubkeys,
-			RootPassword: *rootPassword,
+			RootPassword: rootpass,
 		},
 	}
 
@@ -245,8 +250,9 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	log.Log("Virtual machine created successfully\r\n", "")
-	log.Log(util.FormatVirtualMachine(vm))
+	log.Output("Virtual machine created successfully", "")
+	log.Output(util.FormatVirtualMachine(vm))
+	log.Outputf("Root password: %s\r\n", rootpass)
 	return util.E_SUCCESS
 
 }
