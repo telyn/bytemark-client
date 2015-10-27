@@ -5,6 +5,7 @@ MAJORVERSION := 0
 MINORVERSION := 1
 BUILD_DATE := `date +%Y-%m-%d\ %H:%M`
 BUILD_NUMBER ?= 0
+GIT_BRANCH ?= `git rev-parse --abbrev-ref HEAD`
 GIT_COMMIT ?= `git rev-parse HEAD`
 VERSIONFILE := lib/version.go
 
@@ -21,6 +22,9 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 .PHONY: gensrc
 
 all: bytemark
+
+bytemark: $(ALL_FILES) gensrc
+	go build -o bytemark bytemark.co.uk/client
 
 Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	mkdir -p Bytemark.app/Contents/Resources/bin
@@ -52,14 +56,9 @@ gensrc:
 	@echo "  minorversion = $(MINORVERSION)" >> $(VERSIONFILE)
 	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
 	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
+	@echo "  gitbranch = \"$(GIT_BRANCH)\"" >> $(VERSIONFILE)
 	@echo "  builddate = \"$(BUILD_DATE)\"" >> $(VERSIONFILE)
 	@echo ")" >> $(VERSIONFILE)
-
-checkinstall: 
-	checkinstall -D --install=no -y --maintainer="telyn@bytemark.co.uk" \
-	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)" \
-	    --requires="" \
-	    --strip=no --stripso=no
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
@@ -67,9 +66,11 @@ clean:
 	rm -f main.coverage lib.coverage
 	rm -f main.coverage.html lib.coverage.html
 
-
-bytemark: $(ALL_FILES) gensrc
-	go build -o bytemark bytemark.co.uk/client
+checkinstall: 
+	checkinstall -D --install=no -y --maintainer="telyn@bytemark.co.uk" \
+	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)" \
+	    --requires="" \
+	    --strip=no --stripso=no
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))

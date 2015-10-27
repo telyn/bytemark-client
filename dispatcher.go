@@ -218,6 +218,11 @@ func (d *Dispatcher) DoSet(args []string) util.ExitCode {
 	return d.cmds.HelpForSet()
 }
 
+func (d *Dispatcher) DoVersion(args []string) util.ExitCode {
+	log.Logf("bytemark %v\r\n", client.GetVersion())
+	return util.E_SUCCESS
+}
+
 // Do takes the command line arguments and figures out what to do.
 func (d *Dispatcher) Do(args []string) util.ExitCode {
 	log.Debugf(1, "bytemark %v\r\n\r\n", client.GetVersion())
@@ -263,6 +268,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"show":          d.DoShow,
 		"undelete":      d.DoUndelete,
 		"unlock":        d.DoUnlock,
+		"version":       d.DoVersion,
 		"vnc":           d.cmds.Console,
 		"zones":         d.cmds.Zones,
 	}
