@@ -1,8 +1,8 @@
 package util
 
 import (
+	auth3 "bytemark.co.uk/auth3/client"
 	bigv "bytemark.co.uk/client/lib"
-	auth3 "bytemark.co.uk/client/lib/auth"
 	"bytemark.co.uk/client/util/log"
 	"fmt"
 	"net"

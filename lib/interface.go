@@ -1,7 +1,7 @@
 package lib
 
 import (
-	auth3 "bytemark.co.uk/client/lib/auth"
+	auth3 "bytemark.co.uk/auth3/client"
 	"net/http"
 )
 
