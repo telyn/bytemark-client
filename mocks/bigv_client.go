@@ -1,8 +1,8 @@
 package mocks
 
 import (
+	auth3 "bytemark.co.uk/auth3/client"
 	bigv "bytemark.co.uk/client/lib"
-	auth3 "bytemark.co.uk/client/lib/auth"
 	"fmt"
 	mock "github.com/maraino/go-mock"
 	"net/http"
