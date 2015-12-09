@@ -79,7 +79,7 @@ func (e BadRequestError) Error() string {
 
 func (e InternalServerError) Error() string {
 	out := []string{"The API server returned an error"}
-	if e.RequestBody != nil {
+	if e.RequestBody != "" {
 		out = append(out, fmt.Sprintf("It had this to say: %s", e.RequestBody))
 	}
 	return strings.Join(out, "\r\n")

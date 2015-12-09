@@ -122,7 +122,7 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		err = json.Unmarshal(responseBody, &brErr.Problems)
 		if err != nil {
 			log.Debug(1, err)
-			brErr.Problems["The problem"] = responseBody
+			brErr.Problems["The problem"] = []string{baseErr.ResponseBody}
 		}
 		err = brErr
 
