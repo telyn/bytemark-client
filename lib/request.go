@@ -122,6 +122,7 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		err = json.Unmarshal(responseBody, &brErr.Problems)
 		if err != nil {
 			log.Debug(1, err)
+			brErr.Problems["The problem"] = responseBody
 		}
 		err = brErr
 
@@ -129,6 +130,8 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		err = NotAuthorizedError{baseErr}
 	case 404:
 		err = NotFoundError{baseErr}
+	case 500:
+		err = InternalServerError{baseErr}
 	default:
 		if 200 <= res.StatusCode && res.StatusCode <= 299 {
 			break

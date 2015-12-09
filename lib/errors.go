@@ -44,6 +44,10 @@ type BadRequestError struct {
 	Problems map[string][]string
 }
 
+type InternalServerError struct {
+	BigVError
+}
+
 // TooManyDiscsOnTheDancefloorError is returned when the API call would result in more than 8 discs being attached to a VM.
 type TooManyDiscsOnTheDancefloorError struct {
 	BigVError
@@ -69,6 +73,14 @@ func (e BadRequestError) Error() string {
 	out = append(out, "Our request had some problems:")
 	for k, probs := range e.Problems {
 		out = append(out, fmt.Sprintf("%s:\r\n    %s", k, strings.Join(probs, "\r\n    ")))
+	}
+	return strings.Join(out, "\r\n")
+}
+
+func (e InternalServerError) Error() string {
+	out := []string{"The API server returned an error"}
+	if e.RequestBody != nil {
+		out = append(out, fmt.Sprintf("It had this to say: %s", e.RequestBody))
 	}
 	return strings.Join(out, "\r\n")
 }

@@ -209,6 +209,9 @@ func ProcessError(err error, message ...string) ExitCode {
 		case bigv.BadRequestError:
 			errorMessage = err.Error()
 			exitCode = E_BAD_REQUEST_BIGV
+		case bigv.InternalServerError:
+			errorMessage = err.Error()
+			exitCode = E_BIGV_REPORTED_ERROR
 		case bigv.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_FOUND_BIGV
