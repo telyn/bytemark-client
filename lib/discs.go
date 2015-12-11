@@ -33,7 +33,9 @@ func (bigv *bigvClient) CreateDisc(name VirtualMachineName, disc Disc) (err erro
 		return err
 	}
 	vm, err := bigv.GetVirtualMachine(name)
-	// smell bad
+	if err != nil {
+		return err
+	}
 	discs := []Disc{disc}
 	labelDiscs(discs, len(vm.Discs))
 
