@@ -48,11 +48,6 @@ type InternalServerError struct {
 	BigVError
 }
 
-// TooManyDiscsOnTheDancefloorError is returned when the API call would result in more than 8 discs being attached to a VM.
-type TooManyDiscsOnTheDancefloorError struct {
-	BigVError
-}
-
 type NilAuthError struct {
 	BigVError
 }

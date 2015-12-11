@@ -36,10 +36,7 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 
 	discs := make([]map[string]interface{}, 0, 4)
 
-	for i, d := range spec.Discs {
-		if i > 7 {
-			return nil, TooManyDiscsOnTheDancefloorError{}
-		}
+	for _, d := range spec.Discs {
 		disc := make(map[string]interface{})
 		label := d.Label
 		disc["label"] = label
