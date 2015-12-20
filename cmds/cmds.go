@@ -5,6 +5,7 @@ import (
 	util "bytemark.co.uk/client/cmds/util"
 	bigv "bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
+	"fmt"
 	"github.com/bgentry/speakeasy"
 	"net/url"
 	"strings"
@@ -138,9 +139,21 @@ func (cmds *CommandSet) EnsureAuth() error {
 // needs a for loop to ensure that they don't stay empty.
 // returns nil on success or an error on failure
 func (cmds *CommandSet) PromptForCredentials() error {
-	for cmds.config.GetIgnoreErr("user") == "" {
-		user := util.Prompt("User: ")
-		cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
+	userVar, _ := cmds.config.GetV("user")
+	log.Debugf(2, "%#v\n", userVar)
+	for userVar.Value == "" || userVar.Source != "INTERACTION" {
+		if userVar.Value != "" {
+			user := util.Prompt(fmt.Sprintf("User [%s]: ", userVar.Value))
+			if strings.TrimSpace(user) == "" {
+				cmds.config.Set("user", userVar.Value, "INTERACTION")
+			} else {
+				cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
+			}
+		} else {
+			user := util.Prompt("User: ")
+			cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
+		}
+		userVar, _ = cmds.config.GetV("user")
 	}
 
 	for cmds.config.GetIgnoreErr("pass") == "" {

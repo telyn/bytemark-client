@@ -272,7 +272,9 @@ func (config *Config) GetDefault(name string) ConfigVar {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
-		// TODO(telyn): we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bytemark config set user <youruser>"
+		if os.Getenv("BIGV_USER") == "" {
+			return ConfigVar{"user", os.Getenv("USER"), "ENV USER"}
+		}
 		return ConfigVar{"user", os.Getenv("BIGV_USER"), "ENV BIGV_USER"}
 	case "endpoint":
 		v := ConfigVar{"endpoint", "https://uk0.bigv.io", "CODE"}
