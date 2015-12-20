@@ -39,7 +39,10 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	cmds.EnsureAuth()
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return util.ProcessError(err)
+	}
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
