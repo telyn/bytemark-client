@@ -118,7 +118,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
 					if attempts > 0 {
 						log.Errorf("Invalid credentials, please try again\r\n")
-						cmds.config.Set("user", "", "INVALID")
+						cmds.config.Set("user", cmds.config.GetIgnoreErr("user"), "PRIOR INTERACTION")
 						cmds.config.Set("pass", "", "INVALID")
 						cmds.config.Set("yubikey-otp", "", "INVALID")
 					} else {
@@ -130,6 +130,17 @@ func (cmds *CommandSet) EnsureAuth() error {
 
 			}
 		}
+	}
+	if cmds.config.GetIgnoreErr("yubikey") != "" {
+		factors := cmds.bigv.GetSessionFactors()
+		for _, f := range factors {
+			if f == "yubikey" {
+				return nil
+			}
+		}
+		// if still executing, we didn't have yubikey factor
+		cmds.config.Set("token", "", "FLAG yubikey")
+		return cmds.EnsureAuth()
 	}
 	return nil
 

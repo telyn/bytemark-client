@@ -13,6 +13,8 @@ type Client interface {
 	// GetEndpoint returns the BigV endpoint currently in use.
 	GetEndpoint() string
 
+	// GetSessionFactors returns the factors provided when the current auth session was set up
+	GetSessionFactors() []string
 	// GetSessionToken returns the token for the current auth session
 	GetSessionToken() string
 
