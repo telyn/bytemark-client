@@ -41,7 +41,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannot be blank.")
 		return util.E_PEBKAC
@@ -107,7 +107,7 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -144,7 +144,7 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseGroupName(nameStr)
+	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
@@ -221,7 +221,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannot be blank")
 		return util.E_PEBKAC

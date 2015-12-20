@@ -83,7 +83,7 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 		cmds.HelpForConsole()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Logf("Virtual machine name cannot be blank\r\n")
 		return util.E_PEBKAC

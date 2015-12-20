@@ -94,7 +94,11 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 	output := make([]string, 0, 10)
 	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
 	output = append(output, fmt.Sprintf("Group: '%s'", group.Group))
-	output = append(output, fmt.Sprintf("Account: '%s'", group.Account))
+	if group.Account == "" {
+		output = append(output, "Account: not specified - will default to the account with the same name as the user you log in as")
+	} else {
+		output = append(output, fmt.Sprintf("Account: '%s'", group.Account))
+	}
 	s := ""
 	if spec.VirtualMachine.Cores > 1 {
 		s = "s"
@@ -116,7 +120,11 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 	}
 
 	if spec.Reimage.Distribution == "" {
-		output = append(output, "No image specified")
+		if spec.VirtualMachine.CdromURL == "" {
+			output = append(output, "No image or CD URL specified")
+		} else {
+			output = append(output, fmt.Sprintf("CD URL: %s", spec.VirtualMachine.CdromURL))
+		}
 	} else {
 		output = append(output, "Image: "+spec.Reimage.Distribution)
 	}

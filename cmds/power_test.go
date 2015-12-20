@@ -14,7 +14,9 @@ func TestResetCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("ResetVirtualMachine", vmn).Times(1)
@@ -33,7 +35,9 @@ func TestRestartCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("RestartVirtualMachine", vmn).Times(1)
@@ -52,7 +56,9 @@ func TestShutdownCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
@@ -70,7 +76,9 @@ func TestStartCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
@@ -90,7 +98,9 @@ func TestStopCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(vmn)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("StopVirtualMachine", vmn).Times(1)

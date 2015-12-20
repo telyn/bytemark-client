@@ -14,10 +14,11 @@ func TestCreateDiskCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{"", "", ""})
 
 	config.When("ImportFlags").Return([]string{"test-vm", "archive:35"})
 	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
-	c.When("ParseVirtualMachineName", "test-vm").Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", name).Return(&bigv.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
 
@@ -44,8 +45,9 @@ func TestCreateVMCommand(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm"})
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-vm").Return(bigv.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(bigv.VirtualMachineName{VirtualMachine: "test-vm"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := bigv.VirtualMachineSpec{

@@ -38,7 +38,7 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 	if len(args) >= 1 {
 		nameStr = args[0]
 	}
-	name := cmds.bigv.ParseGroupName(nameStr)
+	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
@@ -154,7 +154,7 @@ func (cmds *CommandSet) ListDiscs(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 

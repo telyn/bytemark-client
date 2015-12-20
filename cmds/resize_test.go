@@ -22,8 +22,10 @@ func TestResizeDisk(t *testing.T) {
 	}
 
 	config.When("ImportFlags").Return(args)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+
 	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
-	c.When("ParseVirtualMachineName", "test-vm").Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetDisc", name, "11").Return(&disc).Times(1)
 

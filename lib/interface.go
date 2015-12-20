@@ -54,9 +54,9 @@ type Client interface {
 	// Parsers
 	//
 
-	ParseVirtualMachineName(string) (VirtualMachineName, error)
-	ParseGroupName(string) GroupName
-	ParseAccountName(string) string
+	ParseVirtualMachineName(string, ...VirtualMachineName) (VirtualMachineName, error)
+	ParseGroupName(string, ...GroupName) GroupName
+	ParseAccountName(string, ...string) string
 
 	//
 	// DEFINITIONS
