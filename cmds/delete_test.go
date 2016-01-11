@@ -18,6 +18,7 @@ func TestDeleteVM(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm"})
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -62,6 +63,7 @@ func TestDeleteDisc(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account", "666"})
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 

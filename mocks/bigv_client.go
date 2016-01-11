@@ -24,6 +24,11 @@ func (c *BigVClient) GetSessionUser() string {
 	r := c.Called()
 	return r.String(0)
 }
+func (c *BigVClient) GetSessionFactors() []string {
+	r := c.Called()
+	ar := r.Get(0)
+	return ar.([]string)
+}
 func (c *BigVClient) SetDebugLevel(level int) {
 	c.Called(level)
 }

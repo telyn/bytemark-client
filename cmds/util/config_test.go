@@ -175,8 +175,8 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 	is.Equal("https://uk0.bigv.io", config.GetIgnoreErr("endpoint"))
 	is.Equal("https://auth.bytemark.co.uk", config.GetIgnoreErr("auth-endpoint"))
 
-	is.Equal("", config.GetIgnoreErr("user"))
-	is.Equal("", config.GetIgnoreErr("account"))
+	is.Equal(os.Getenv("USER"), config.GetIgnoreErr("user"))
+	is.Equal(os.Getenv("USER"), config.GetIgnoreErr("account"))
 
 	os.RemoveAll(dir)
 }

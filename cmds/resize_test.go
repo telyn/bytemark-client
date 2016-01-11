@@ -14,6 +14,7 @@ func TestResizeDisk(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 
 	args := []string{"test-vm", "11", "35"}
 	disc := bigv.Disc{

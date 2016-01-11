@@ -13,6 +13,7 @@ func TestShowGroupCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-group.test-account"})
 	config.When("GetGroup").Return(bigv.GroupName{})
 
@@ -37,6 +38,7 @@ func TestShowVMCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
 	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"})

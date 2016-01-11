@@ -13,6 +13,7 @@ func TestResetCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -34,6 +35,7 @@ func TestRestartCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -55,6 +57,7 @@ func TestShutdownCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -75,6 +78,7 @@ func TestStartCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -97,6 +101,7 @@ func TestStopCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 

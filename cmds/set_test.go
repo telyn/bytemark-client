@@ -19,6 +19,7 @@ func TestSetCores(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -46,6 +47,7 @@ func TestSetMemory(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -66,6 +68,7 @@ func TestSetMemory(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return(args)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
 	c.Reset()
@@ -93,6 +96,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
@@ -114,6 +118,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	config.Reset()
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
 	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
