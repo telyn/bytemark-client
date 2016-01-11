@@ -5,6 +5,13 @@ A mocking framework for [Go](http://golang.org/).
 
 Read online reference at http://godoc.org/github.com/maraino/go-mock
 
+Status
+------
+
+[![Build Status](https://travis-ci.org/maraino/go-mock.svg)](https://travis-ci.org/maraino/go-mock)
+[![Coverage Status](https://coveralls.io/repos/maraino/go-mock/badge.svg?branch=master&service=github)](https://coveralls.io/github/maraino/go-mock?branch=master)
+[![GoDoc](https://godoc.org/github.com/maraino/go-mock?status.svg)](http://godoc.org/github.com/maraino/go-mock)
+
 Usage
 -----
 

@@ -24,7 +24,7 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 all: bytemark
 
 bytemark: $(ALL_FILES) gensrc
-	go build -o bytemark bytemark.co.uk/client
+	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client
 
 Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	mkdir -p Bytemark.app/Contents/Resources/bin
@@ -110,9 +110,9 @@ docs: doc/*.md
 
 test: gensrc
 ifdef $(VERBOSE)
-	go test -v $(ALL_PACKAGES)
+	GO15VENDOREXPERIMENT=1 go test -v $(ALL_PACKAGES)
 else 
-	go test $(ALL_PACKAGES)
+	GO15VENDOREXPERIMENT=1 go test $(ALL_PACKAGES)
 endif
 
 find-uk0: 
@@ -124,8 +124,3 @@ find-bugs-todos:
 
 find-exits:
 	$(RGREP) --exclude=exit.go --exclude=main.go -P "panic\(|os.Exit" .
-
-
-update-dependencies: 
-	go get -ut $(ALL_PACKAGES)
-	godep update $(ALL_PACKAGES)
