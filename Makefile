@@ -62,7 +62,7 @@ gensrc:
 	@echo "  minorversion = $(MINORVERSION)" >> $(VERSIONFILE)
 	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
 	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
-	@GIT_BRANCH=HEAD; for i in master $$(git for-each-ref --format "%(refname)" refs/heads/release\*) develop $$(git for-each-ref --format "%(refname)" refs/heads); do \
+	GIT_BRANCH=HEAD; for i in master $$(git for-each-ref --format "%(refname)" refs/heads/release\*) develop $$(git for-each-ref --format "%(refname)" refs/heads); do \
 	    [ "`git rev-parse $$i`" == "`git rev-parse HEAD`" ] && GIT_BRANCH=`git rev-parse --abbrev-ref $$i`; \
 	done; \
 	echo "  gitbranch = \"$$GIT_BRANCH\"" >> $(VERSIONFILE);
