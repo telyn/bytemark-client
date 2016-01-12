@@ -1,3 +1,5 @@
+SHELL:=/bin/bash
+
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client
 ALL_FILES := *.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
 
@@ -61,7 +63,7 @@ gensrc:
 	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
 	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
 	@GIT_BRANCH=HEAD; for i in master $$(git for-each-ref --format "%(refname)" refs/heads/release\*) develop $$(git for-each-ref --format "%(refname)" refs/heads); do \
-	    [ `git rev-parse $$i` == `git rev-parse HEAD` ] && GIT_BRANCH=`git rev-parse --abbrev-ref $$i`; \
+	    [ "`git rev-parse $$i`" == "`git rev-parse HEAD`" ] && GIT_BRANCH=`git rev-parse --abbrev-ref $$i`; \
 	done; \
 	echo "  gitbranch = \"$$GIT_BRANCH\"" >> $(VERSIONFILE);
 	@echo "  builddate = \"$(BUILD_DATE)\"" >> $(VERSIONFILE)
