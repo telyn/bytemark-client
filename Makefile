@@ -26,6 +26,9 @@ all: bytemark
 bytemark: $(ALL_FILES) gensrc
 	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client
 
+Bytemark.app.zip: Bytemark.app
+	zip -r $@ $<
+
 Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	mkdir -p Bytemark.app/Contents/Resources/bin
 	mkdir -p Bytemark.app/Contents/Resources/Scripts
