@@ -50,15 +50,20 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 
 gensrc:
 	rm -f $(VERSIONFILE)
+	@echo "Writing $(VERSIONFILE)"
 	@echo "package lib" > $(VERSIONFILE)
 	@echo "const (" >> $(VERSIONFILE)
 	@echo "  majorversion = $(MAJORVERSION)" >> $(VERSIONFILE)
 	@echo "  minorversion = $(MINORVERSION)" >> $(VERSIONFILE)
 	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
 	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
-	@echo "  gitbranch = \"$(GIT_BRANCH)\"" >> $(VERSIONFILE)
+	@GIT_BRANCH=HEAD; for i in master $$(git for-each-ref --format "%(refname)" refs/heads/release\*) develop $$(git for-each-ref --format "%(refname)" refs/heads); do \
+	    [ `git rev-parse $$i` == `git rev-parse HEAD` ] && GIT_BRANCH=`git rev-parse --abbrev-ref $$i`; \
+	done; \
+	echo "  gitbranch = \"$$GIT_BRANCH\"" >> $(VERSIONFILE);
 	@echo "  builddate = \"$(BUILD_DATE)\"" >> $(VERSIONFILE)
 	@echo ")" >> $(VERSIONFILE)
+	@cat $(VERSIONFILE)
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
