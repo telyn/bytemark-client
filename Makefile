@@ -63,7 +63,7 @@ gensrc:
 	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
 	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
 	set -x; GIT_BRANCH=HEAD; for i in refs/heads/master $$(git for-each-ref --format "%(refname)" refs/heads/release\*) refs/heads/develop $$(git for-each-ref --format "%(refname)" refs/heads); do \
-	    [ "`git rev-parse $$i`" == "`git rev-parse HEAD`" ] && GIT_BRANCH=`git rev-parse --abbrev-ref $$i` && break; \
+	    [ "`git rev-parse $$i`" == "`git rev-parse HEAD`" ] && export GIT_BRANCH=`git rev-parse --abbrev-ref $$i` && break; \
 	done; \
 	echo "  gitbranch = \"$$GIT_BRANCH\"" >> $(VERSIONFILE);
 	@echo "  builddate = \"$(BUILD_DATE)\"" >> $(VERSIONFILE)
