@@ -5,11 +5,7 @@ ALL_FILES := *.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
 
 MAJORVERSION := 0
 MINORVERSION := 1
-BUILD_DATE := `date +%Y-%m-%d\ %H:%M`
 BUILD_NUMBER ?= 0
-GIT_BRANCH ?= `git rev-parse --abbrev-ref HEAD`
-GIT_COMMIT ?= `git rev-parse HEAD`
-VERSIONFILE := lib/version.go
 
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)
@@ -53,23 +49,6 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
 	# sign the code? anyone? shall we sign the code?
 
-gensrc:
-	rm -f $(VERSIONFILE)
-	@echo "Writing $(VERSIONFILE)"
-	@echo "package lib" > $(VERSIONFILE)
-	@echo "const (" >> $(VERSIONFILE)
-	@echo "  majorversion = $(MAJORVERSION)" >> $(VERSIONFILE)
-	@echo "  minorversion = $(MINORVERSION)" >> $(VERSIONFILE)
-	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
-	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
-	set -x; GIT_BRANCH=HEAD; for i in refs/heads/master $$(git for-each-ref --format "%(refname)" refs/heads/release\*) refs/heads/develop $$(git for-each-ref --format "%(refname)" refs/heads); do \
-	    [ "`git rev-parse $$i`" == "`git rev-parse HEAD`" ] && export GIT_BRANCH=`git rev-parse --abbrev-ref $$i` && break; \
-	done; \
-	echo "  gitbranch = \"$$GIT_BRANCH\"" >> $(VERSIONFILE);
-	@echo "  builddate = \"$(BUILD_DATE)\"" >> $(VERSIONFILE)
-	@echo ")" >> $(VERSIONFILE)
-	@cat $(VERSIONFILE)
-
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
 	rm -f bytemark
@@ -81,6 +60,10 @@ checkinstall:
 	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)" \
 	    --requires="" \
 	    --strip=no --stripso=no
+
+gensrc:
+	BUILD_NUMBER=$(BUILD_NUMBER) MAJORVERSION=$(MAJORVERSION) \
+	MINORVERSION=$(MINORVERSION) go generate ./...
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))
