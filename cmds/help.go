@@ -73,12 +73,12 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 
 	// users
 	log.Log("  User management commands:")
-	log.Log("    add key <public key>")
+	log.Log("    add key [--key-user=<user>] <public key> - add an SSH public key to the given user, or you by default")
 	//log.Log("    grant <user> <privilege> <object>")
-	log.Log("    list keys <public key>")
-	log.Log("    remove key <public key>")
+	log.Log("    list keys [--key-user=<user>] - list the SSH keys authorised for management by the given user. Defaults to showing you your keys")
+	log.Log("    remove key [--key-user=<user>] <public key identifier> - remove the given key from the given user, defaulting to you.")
 	//log.Log("    revoke <user> <privilege>")
-	log.Log("    show user <name> - shows details about the given user - their authorised keys and any privileges you have granted them")
+	log.Log("    show user <name> - shows details about the given user, including their authorised keys") //and any privileges you have granted them.")
 	log.Log()
 
 	log.Log("  Informative commands:")
