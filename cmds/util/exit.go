@@ -238,7 +238,7 @@ func ProcessError(err error, message ...string) ExitCode {
 		}
 
 		if _, ok := err.(bigv.BigVError); ok && exitCode == E_UNKNOWN_ERROR {
-			errorMessage = fmt.Sprintf("Unknown error from BigV client library.%s", err.Error())
+			errorMessage = fmt.Sprintf("Unknown error from BigV client library. %s", err.Error())
 			exitCode = E_UNKNOWN_BIGV
 		}
 	} else {
