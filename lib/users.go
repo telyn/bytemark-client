@@ -49,7 +49,7 @@ func (bigv *bigvClient) AddUserAuthorizedKey(username string, key string) error 
 
 }
 
-// DeleteUserAuthorizedKey
+// DeleteUserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part
 func (bigv *bigvClient) DeleteUserAuthorizedKey(username string, key string) error {
 	user, err := bigv.GetUser(username)
 	if err != nil {
@@ -57,11 +57,23 @@ func (bigv *bigvClient) DeleteUserAuthorizedKey(username string, key string) err
 	}
 	key = strings.TrimSpace(key)
 	newKeys := make([]string, 0)
+	potentiallyAmbiguous := false
 	for _, k := range user.AuthorizedKeys {
-		if strings.TrimSpace(k) == strings.TrimSpace(key) {
+		if strings.TrimSpace(k) == key {
 			continue
+		} else {
+			parts := strings.SplitN(k, " ", 3)
+			if len(parts) == 3 && strings.TrimSpace(parts[2]) == key {
+				potentiallyAmbiguous = true
+				continue
+			}
 		}
 		newKeys = append(newKeys, k)
+	}
+	// if there's a difference of more than one then the key was ambiguous
+	if len(newKeys) < len(user.AuthorizedKeys)-1 && potentiallyAmbiguous {
+		err := AmbiguousKeyError{}
+		return err
 	}
 
 	user.AuthorizedKeys = newKeys

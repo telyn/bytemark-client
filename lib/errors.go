@@ -52,6 +52,10 @@ type NilAuthError struct {
 	BigVError
 }
 
+type AmbiguousKeyError struct {
+	BigVError
+}
+
 func (e BigVError) Error() string {
 	return fmt.Sprintf("HTTP %s %s returned %d\r\n", e.Method, e.URL.String(), e.StatusCode)
 }
@@ -95,4 +99,8 @@ func (e BadNameError) Error() string {
 
 func (e NilAuthError) Error() string {
 	return fmt.Sprintf("Authorisation wasn't set up. It's Telyn's fault.")
+}
+
+func (e AmbiguousKeyError) Error() string {
+	return fmt.Sprint("The specified key was ambiguous - please specify the full key")
 }
