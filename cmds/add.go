@@ -10,9 +10,9 @@ import (
 func (cmds *CommandSet) HelpForAdd() util.ExitCode {
 	log.Log("bytemark add")
 	log.Log()
-	log.Log("usage: bytemark add key [--public-key-file=<filename>] <user> [<public key>]")
+	log.Log("usage: bytemark add key [--public-key-file=<filename>] [--user=<user>] [<public key>]")
 	log.Log()
-	log.Log("Add the given public key to the specified user. This will allow them")
+	log.Log("Add the given public key to the given user (or the default user). This will allow them")
 	log.Log("to use that key to access management IPs they have access to using that key.")
 	log.Log("Specify --public-key-file=- to read the public key from stdin")
 	log.Log("--public-key-file will be ignored if a public key is specified in the arguments")
@@ -28,11 +28,8 @@ func (cmds *CommandSet) AddKey(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "user")
-	if !ok {
-		cmds.HelpForAdd()
-		return util.E_PEBKAC
-	}
+	user := cmds.config.GetIgnoreErr("user")
+
 	key := strings.TrimSpace(strings.Join(args, " "))
 	if key == "" {
 		if *keyFile == "" {
@@ -52,7 +49,7 @@ func (cmds *CommandSet) AddKey(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	err = cmds.bigv.AddUserAuthorizedKey(nameStr, key)
+	err = cmds.bigv.AddUserAuthorizedKey(user, key)
 	if err == nil {
 		log.Log("Key added successfully")
 		return util.E_SUCCESS

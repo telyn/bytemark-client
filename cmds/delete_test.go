@@ -103,6 +103,7 @@ func TestDeleteKey(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "user").Return("test-user")
 	c.When("AuthWithToken", "test-token").Return(nil)
 	c.When("GetUser", usr.Username).Return(&usr)
 
@@ -110,7 +111,7 @@ func TestDeleteKey(t *testing.T) {
 
 	cmds := NewCommandSet(config, c)
 
-	args := []string{"test-user", "ssh-rsa", "AAAAFakeKey", "test-key-one"}
+	args := []string{"ssh-rsa", "AAAAFakeKey", "test-key-one"}
 	config.When("ImportFlags").Return(args)
 	exitCode := cmds.DeleteKey(args)
 
@@ -124,12 +125,13 @@ func TestDeleteKey(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil)
 	c.When("GetUser", usr.Username).Return(&usr)
 	c.When("DeleteUserAuthorizedKey", "test-user", "test-key-two").Return(bigv.AmbiguousKeyError{}).Times(1)
 
-	args = []string{"test-user", "test-key-two"}
+	args = []string{"test-key-two"}
 	config.When("ImportFlags").Return(args)
 	exitCode = cmds.DeleteKey(args)
 

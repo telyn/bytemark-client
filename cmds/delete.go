@@ -16,7 +16,7 @@ func (cmds *CommandSet) HelpForDelete() util.ExitCode {
 	log.Log("       bytemark delete disc <vm> <label>")
 	log.Log("       bytemark delete group [--recursive] <group>")
 	//log.Log("       bytemark delete user <user>")
-	log.Log("       bytemark delete key <user> <public key identifier>")
+	log.Log("       bytemark delete key [--user=<user>] <public key identifier>")
 	log.Log("       bytemark delete vm [--force] [---purge] <virtual machine>")
 	log.Log("       bytemark undelete vm <virtual machine>")
 	log.Log()
@@ -194,11 +194,7 @@ func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	user, ok := util.ShiftArgument(&args, "user")
-	if !ok {
-		cmds.HelpForDelete()
-		return util.E_PEBKAC
-	}
+	user := cmds.config.GetIgnoreErr("user")
 
 	key := strings.Join(args, " ")
 	if key == "" {

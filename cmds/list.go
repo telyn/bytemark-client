@@ -11,7 +11,7 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 	log.Log("usage: bytemark list vms [group]")
 	log.Log("       bytemark list groups [account]")
 	log.Log("       bytemark list accounts")
-	log.Log("       bytemark list keys <user>")
+	log.Log("       bytemark list keys [user]")
 	log.Log("       bytemark list discs <virtual machine>")
 	return util.E_USAGE_DISPLAYED
 }
@@ -116,10 +116,15 @@ func (cmds *CommandSet) ListKeys(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	username, ok := util.ShiftArgument(&args, "username")
-	if !ok {
-		cmds.HelpForShow()
-		return util.E_PEBKAC
+	username := cmds.config.GetIgnoreErr("user")
+	if len(args) == 1 {
+
+		usr, ok := util.ShiftArgument(&args, "username")
+		if !ok {
+			cmds.HelpForShow()
+			return util.E_PEBKAC
+		}
+		username = usr
 	}
 
 	err := cmds.EnsureAuth()
