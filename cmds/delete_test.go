@@ -83,3 +83,59 @@ func TestDeleteDisc(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestDeleteKey(t *testing.T) {
+	is := is.New(t)
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
+
+	usr := bigv.User{
+		Username: "test-user",
+		Email:    "test-user@example.com",
+		AuthorizedKeys: []string{
+			"ssh-rsa AAAAFakeKey test-key-one",
+			"ssh-rsa AAAAFakeKeyTwo test-key-two",
+			"ssh-rsa AAAAFakeKeyThree test-key-two",
+		},
+	}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Force").Return(true)
+	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil)
+	c.When("GetUser", usr.Username).Return(&usr)
+
+	c.When("DeleteUserAuthorizedKey", "test-user", "ssh-rsa AAAAFakeKey test-key-one").Return(nil).Times(1)
+
+	cmds := NewCommandSet(config, c)
+
+	args := []string{"test-user", "ssh-rsa", "AAAAFakeKey", "test-key-one"}
+	config.When("ImportFlags").Return(args)
+	exitCode := cmds.DeleteKey(args)
+
+	is.Equal(util.E_SUCCESS, exitCode)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+	c.Reset()
+	config.Reset()
+	config.When("Get", "token").Return("test-token")
+	config.When("Force").Return(true)
+	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
+
+	c.When("AuthWithToken", "test-token").Return(nil)
+	c.When("GetUser", usr.Username).Return(&usr)
+	c.When("DeleteUserAuthorizedKey", "test-user", "test-key-two").Return(bigv.AmbiguousKeyError{}).Times(1)
+
+	args = []string{"test-user", "test-key-two"}
+	config.When("ImportFlags").Return(args)
+	exitCode = cmds.DeleteKey(args)
+
+	is.Equal(util.E_PEBKAC, exitCode)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+	c.Reset()
+}

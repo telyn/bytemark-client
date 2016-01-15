@@ -57,7 +57,6 @@ type NetworkInterface struct {
 	VirtualMachineID int               `json:"virtual_machine_id"`
 }
 
-// User represents a BigV user.
 type JSONUser struct {
 	Username       string `json:"username"`
 	Email          string `json:"email"`
@@ -73,6 +72,7 @@ type JSONUser struct {
 	//AccountName string `json:"account_name"`
 }
 
+// User represents a Bytemark user.
 type User struct {
 	Username       string
 	Email          string

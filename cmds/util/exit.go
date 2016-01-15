@@ -222,6 +222,9 @@ func ProcessError(err error, message ...string) ExitCode {
 			errno, _ := err.(*syscall.Errno)
 			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", errno)
 			exitCode = E_UNKNOWN_ERROR
+		case bigv.AmbiguousKeyError:
+			exitCode = E_PEBKAC
+			errorMessage = err.Error()
 		default:
 			e := err.Error()
 			if strings.Contains(e, "Badly-formed parameters") {

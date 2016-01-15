@@ -200,10 +200,12 @@ func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	key, ok := util.ShiftArgument(&args, "public key identifier")
-	if !ok {
+	key := strings.Join(args, " ")
+	if key == "" {
+		log.Log("You must specify a key to delete.\r\n")
 		cmds.HelpForDelete()
-		return util.E_PEBKAC
+		return util.E_SUCCESS
+
 	}
 
 	err := cmds.EnsureAuth()
