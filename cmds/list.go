@@ -2,13 +2,15 @@ package cmds
 
 import (
 	"bytemark.co.uk/client/cmds/util"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
+	"strings"
 )
 
 func (cmds *CommandSet) HelpForList() util.ExitCode {
 	log.Log("bytemark list")
 	log.Log("")
-	log.Log("usage: bytemark list vms [group]")
+	log.Log("usage: bytemark list vms [group | account]")
 	log.Log("       bytemark list groups [account]")
 	log.Log("       bytemark list accounts")
 	log.Log("       bytemark list keys [user]")
@@ -47,9 +49,28 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 
 	if len(args) >= 1 {
 		group, err := cmds.bigv.GetGroup(name)
+		log.Debugf(5, "Error! %T: %v\r\n", err, err)
 
 		if err != nil {
-			return cmds.listDefaultAccountVMs()
+			if _, ok := err.(lib.NotFoundError); ok {
+
+				if !strings.Contains(nameStr, ".") {
+					account, err := cmds.bigv.GetAccount(nameStr)
+					if err != nil {
+						return util.ProcessError(err)
+					}
+
+					for _, g := range account.Groups {
+						for _, vm := range g.VirtualMachines {
+							log.Output(vm.Hostname)
+
+						}
+					}
+					return util.E_SUCCESS
+				}
+
+			}
+			return util.ProcessError(err)
 		}
 
 		for _, vm := range group.VirtualMachines {
