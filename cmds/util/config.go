@@ -349,7 +349,7 @@ func (config *Config) read(name string) (ConfigVar, error) {
 		return config.GetDefault(name), &ConfigReadError{Name: name, Path: path, Err: err}
 	}
 
-	return ConfigVar{name, string(contents), "FILE " + path}, nil
+	return ConfigVar{name, strings.TrimSpace(string(contents)), "FILE " + path}, nil
 }
 
 // Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.

@@ -17,7 +17,7 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 }
 
 func (cmds *CommandSet) listDefaultAccountVMs() util.ExitCode {
-	acc, err := cmds.bigv.GetAccount("")
+	acc, err := cmds.bigv.GetAccount(cmds.config.GetIgnoreErr("account"))
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -66,11 +66,10 @@ func (cmds *CommandSet) ListGroups(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name := ""
+	name := cmds.config.GetIgnoreErr("account")
 	if len(args) >= 1 {
 		name = args[0]
 	}
-	// no error here - GetAccount will pick a sane default.
 
 	err := cmds.EnsureAuth()
 	if err != nil {

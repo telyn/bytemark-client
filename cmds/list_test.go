@@ -71,6 +71,7 @@ func TestListGroups(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
 	config.When("ImportFlags").Return([]string{"spooky-steve"})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
