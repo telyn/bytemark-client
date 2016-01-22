@@ -23,7 +23,7 @@ func (cmds *CommandSet) listDefaultAccountVMs() util.ExitCode {
 	}
 	for _, group := range acc.Groups {
 		for _, vm := range group.VirtualMachines {
-			log.Log(vm.Hostname)
+			log.Output(vm.Hostname)
 		}
 	}
 	return util.ProcessError(nil)
@@ -53,7 +53,7 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 		}
 
 		for _, vm := range group.VirtualMachines {
-			log.Log(vm.Hostname)
+			log.Output(vm.Hostname)
 		}
 	} else {
 		return cmds.listDefaultAccountVMs()
@@ -105,7 +105,7 @@ func (cmds *CommandSet) ListAccounts(args []string) util.ExitCode {
 	}
 
 	for _, group := range accounts {
-		log.Log(group.Name)
+		log.Output(group.Name)
 	}
 	return util.E_SUCCESS
 }
@@ -163,7 +163,7 @@ func (cmds *CommandSet) ListDiscs(args []string) util.ExitCode {
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	for _, disc := range vm.Discs {
-		log.Logf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
+		log.Outputf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
 	}
 	return util.E_SUCCESS
 }
