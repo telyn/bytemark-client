@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/bgentry/speakeasy"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -168,7 +169,7 @@ func (cmds *CommandSet) PromptForCredentials() error {
 	}
 
 	for cmds.config.GetIgnoreErr("pass") == "" {
-		pass, err := speakeasy.Ask("Pass: ")
+		pass, err := speakeasy.FAsk(os.Stderr, "Pass: ")
 
 		if err != nil {
 			return err
