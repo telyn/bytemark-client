@@ -300,7 +300,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 			return ConfigVar{
 				"account",
 				val,
-				"ENV BIGV_AUTH_ENDPOINT",
+				"ENV BIGV_ACCOUNT",
 			}
 		}
 		def := config.GetDefault("user")
