@@ -152,14 +152,16 @@ Exit code ranges:
 }
 
 func ProcessError(err error, message ...string) ExitCode {
+	if err == nil {
+		return E_SUCCESS
+	}
+
 	trace := make([]byte, 4096, 4096)
 	runtime.Stack(trace, false)
 
 	log.Debug(1, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
 	if len(message) > 0 {
 		log.Error(message)
-	} else if err == nil {
-		return E_SUCCESS
 	}
 	errorMessage := "Unknown error"
 	exitCode := ExitCode(E_UNKNOWN_ERROR)
