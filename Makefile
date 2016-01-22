@@ -4,7 +4,7 @@ ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytema
 ALL_FILES := *.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
 
 MAJORVERSION := 0
-MINORVERSION := 1
+MINORVERSION := 2
 BUILD_NUMBER ?= 0
 
 OSAARCH:=x86_64
