@@ -1,10 +1,9 @@
 .*.sw*
 main/main
-go-bigv
-go-bigv.exe
 BigV.app
 Bytemark.app
 bytemark
+bytemark.exe
 *.coverage
 *.coverage.html
 doc/*.html
