@@ -42,6 +42,12 @@ type IP struct {
 	IP string `json:"ip"`
 }
 
+// IPSpec represents one v4 and one v6 address to assign to a bigv during creation.
+type IPSpec struct {
+	IPv4 string `json:"ipv4"`
+	IPv6 string `json:"ipv6"`
+}
+
 // NetworkInterface represents a BigV virtual NIC and what IPs it has routed.
 type NetworkInterface struct {
 	Label string `json:"label"`
@@ -111,6 +117,7 @@ type VirtualMachineSpec struct {
 	VirtualMachine *VirtualMachine `json:"virtual_machine"`
 	Discs          []Disc          `json:"discs"`
 	Reimage        *ImageInstall   `json:"reimage"`
+	IPs            *IPSpec         `json:"ips"`
 }
 
 // Group represents a group

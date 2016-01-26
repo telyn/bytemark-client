@@ -48,17 +48,30 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 
 	req["discs"] = discs
 
-	reimage := make(map[string]interface{})
+	if spec.Reimage != nil {
+		reimage := make(map[string]interface{})
 
-	if spec.Reimage.Distribution != "" {
-		reimage["distribution"] = spec.Reimage.Distribution
-	}
-	if spec.Reimage.RootPassword != "" {
-		reimage["root_password"] = spec.Reimage.RootPassword
-	}
-	reimage["ssh_public_key"] = spec.Reimage.PublicKeys
+		if spec.Reimage.Distribution != "" {
+			reimage["distribution"] = spec.Reimage.Distribution
+		}
+		if spec.Reimage.RootPassword != "" {
+			reimage["root_password"] = spec.Reimage.RootPassword
+		}
+		reimage["ssh_public_key"] = spec.Reimage.PublicKeys
 
-	req["reimage"] = reimage
+		req["reimage"] = reimage
+	}
+
+	if spec.IPs != nil {
+		ips := make(map[string]interface{})
+		if spec.IPs.IPv4 != "" {
+			ips["ipv4"] = spec.IPs.IPv4
+		}
+		if spec.IPs.IPv6 != "" {
+			ips["ipv6"] = spec.IPs.IPv6
+		}
+		rvm["ips"] = ips
+	}
 
 	js, err := json.Marshal(req)
 	if err != nil {

@@ -17,13 +17,16 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 	log.Log("    --account <name>")
 	log.Log("    --cores <num> (default 1)")
 	log.Log("    --cdrom <url>")
-	log.Log("    --discs <disc specs> (default 25)")
-	log.Log("    --force")
+	log.Log("    --discs <disc specs> - defaults to a single 25GiB sata-grade discs")
+	log.Log("    --force - disables the confirmation prompt")
 	log.Log("    --group <name>")
 	log.Log("    --hwprofile <profile>")
 	log.Log("    --hwprofile-locked")
-	log.Log("    --image <image name> (see bytemark images)")
+	log.Log("    --image <image name> - specify what to image the server with. Default is 'symbiosis'")
+	log.Log("    --ip <ip address> (v4 or v6) - up to one of each type may be specified")
 	log.Log("    --memory <size> (default 1, units are GiB)")
+	log.Log("    --no-image - specifies that the created server should not be imaged.")
+	log.Log("    --no-discs - specifies that the created server should not have any discs.")
 	log.Log("    --public-keys <keys> (newline seperated)")
 	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
 	log.Log("    --root-password <password> (if not set, will be randomly generated)")
@@ -92,11 +95,14 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 		if len(args) == 0 {
 			return cmds.HelpForCreate()
 		} else {
-			spec := strings.Join(args, " ")
+			specs := strings.Split(strings.Join(args, " "), ",")
+			for _, spec := range specs {
 
-			discs, err = util.ParseDiscSpec(spec, false)
-			if err != nil {
-				return util.ProcessError(err)
+				disc, err := util.ParseDiscSpec(spec)
+				if err != nil {
+					return util.ProcessError(err)
+				}
+				discs = append(discs, *disc)
 			}
 		}
 
@@ -155,11 +161,16 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	cores := flags.Int("cores", 1, "")
 	cdrom := flags.String("cdrom", "", "")
-	discSpecs := flags.String("discs", "25", "")
+	var discs util.DiscSpecFlag
+	flags.Var(&discs, "disc", "")
 	hwprofile := flags.String("hwprofile", "", "")
 	hwprofilelock := flags.Bool("hwprofile-locked", false, "")
 	image := flags.String("image", "", "")
+	var ips util.IPFlag
+	flags.Var(&ips, "ip", "")
 	memorySpec := flags.String("memory", "1", "")
+	noDiscs := flags.Bool("no-discs", false, "")
+	noImage := flags.Bool("no-image", false, "")
 	pubkeys := flags.String("public-keys", "", "")
 	// pubkeysfile := flags.String("public-keys-file", "", "") // TODO(telyn): --public-keys-file
 	rootPassword := flags.String("root-password", "", "")
@@ -184,10 +195,18 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	discs, err := util.ParseDiscSpec(*discSpecs, false)
-	if err != nil {
-		return util.ProcessError(err)
+	if *noDiscs {
+		*noImage = true
 	}
+
+	if *image == "" && !*noImage {
+		*image = "symbiosis"
+	}
+
+	if len(discs) == 0 && !*noDiscs {
+		discs = append(discs, bigv.Disc{Size: 25600})
+	}
+
 	for i := range discs {
 		d, err := discs[i].Validate()
 		if err != nil {
@@ -196,9 +215,48 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		discs[i] = *d
 	}
 
+	if len(ips) > 2 {
+		log.Debugf(1, "%d IP addresses were specified", len(ips))
+		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
+		return util.E_PEBKAC
+	}
+	var ipspec *bigv.IPSpec
+	if len(ips) > 0 {
+		ipspec = &bigv.IPSpec{}
+
+		for _, ip := range ips {
+			if ip.To4() != nil {
+				if ipspec.IPv4 != "" {
+					log.Debugf(1, "Multiple IPv4 addresses were specified\n")
+					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
+					return util.E_PEBKAC
+				}
+				ipspec.IPv4 = ip.To4().String()
+			} else {
+				if ipspec.IPv6 != "" {
+					log.Debugf(1, "Multiple IPv6 addresses were specified\n")
+					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
+					return util.E_PEBKAC
+
+				}
+				ipspec.IPv6 = ip.String()
+			}
+		}
+	}
+
 	rootpass := *rootPassword
-	if *rootPassword == "" {
+	if *rootPassword == "" && !*noImage {
 		rootpass = util.GeneratePassword()
+	}
+
+	imageInstall := &bigv.ImageInstall{
+		Distribution: *image,
+		PublicKeys:   *pubkeys,
+		RootPassword: rootpass,
+	}
+
+	if *noImage {
+		imageInstall = nil
 	}
 
 	// if stopped isn't set and either cdrom or image are set, start the vm
@@ -215,12 +273,9 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 			HardwareProfile:       *hwprofile,
 			HardwareProfileLocked: *hwprofilelock,
 		},
-		Discs: discs,
-		Reimage: &bigv.ImageInstall{
-			Distribution: *image,
-			PublicKeys:   *pubkeys,
-			RootPassword: rootpass,
-		},
+		Discs:   discs,
+		IPs:     ipspec,
+		Reimage: imageInstall,
 	}
 
 	groupName := bigv.GroupName{

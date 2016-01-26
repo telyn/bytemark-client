@@ -119,29 +119,44 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 		output = append(output, fmt.Sprintf("Hardware profile: %s%s", spec.VirtualMachine.HardwareProfile, locked))
 	}
 
-	if spec.Reimage.Distribution == "" {
-		if spec.VirtualMachine.CdromURL == "" {
-			output = append(output, "No image or CD URL specified")
-		} else {
-			output = append(output, fmt.Sprintf("CD URL: %s", spec.VirtualMachine.CdromURL))
+	if spec.IPs != nil {
+		if spec.IPs.IPv4 != "" {
+			output = append(output, fmt.Sprintf("IPv4 address: %s", spec.IPs.IPv4))
 		}
-	} else {
-		output = append(output, "Image: "+spec.Reimage.Distribution)
+		if spec.IPs.IPv6 != "" {
+			output = append(output, fmt.Sprintf("IPv6 address: %s", spec.IPs.IPv6))
+		}
 	}
-	output = append(output, "Root/Administrator password: "+spec.Reimage.RootPassword)
+
+	if spec.Reimage != nil {
+		if spec.Reimage.Distribution == "" {
+			if spec.VirtualMachine.CdromURL == "" {
+				output = append(output, "No image or CD URL specified")
+			} else {
+				output = append(output, fmt.Sprintf("CD URL: %s", spec.VirtualMachine.CdromURL))
+			}
+		} else {
+			output = append(output, "Image: "+spec.Reimage.Distribution)
+		}
+		output = append(output, "Root/Administrator password: "+spec.Reimage.RootPassword)
+	}
 
 	s = ""
 	if len(spec.Discs) > 1 {
 		s = "s"
 	}
-	output = append(output, fmt.Sprintf("%d disc%s: ", len(spec.Discs), s))
-	for i, disc := range spec.Discs {
-		desc := fmt.Sprintf("Disc %d", i)
-		if i == 0 {
-			desc = "Boot disc"
-		}
+	if len(spec.Discs) > 0 {
+		output = append(output, fmt.Sprintf("%d disc%s: ", len(spec.Discs), s))
+		for i, disc := range spec.Discs {
+			desc := fmt.Sprintf("Disc %d", i)
+			if i == 0 {
+				desc = "Boot disc"
+			}
 
-		output = append(output, fmt.Sprintf("    %s %d GiB, %s grade", desc, disc.Size/1024, disc.StorageGrade))
+			output = append(output, fmt.Sprintf("    %s %d GiB, %s grade", desc, disc.Size/1024, disc.StorageGrade))
+		}
+	} else {
+		output = append(output, "No discs specified")
 	}
 	return strings.Join(output, "\r\n")
 
