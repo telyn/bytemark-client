@@ -100,14 +100,18 @@ func (cmds *CommandSet) Help(args []string) util.ExitCode {
 	case "config":
 		return cmds.HelpForConfig()
 	case "create":
+		if len(args) > 1 {
+			switch args[1] {
+			case "vm", "cloud":
+				return cmds.HelpForCreateVM()
+			}
+		}
 		return cmds.HelpForCreate()
 	case "debug":
 		return cmds.HelpForDebug()
 	case "delete":
 		return cmds.HelpForDelete()
 	case "exit":
-		return util.HelpForExitCodes()
-	case "exit-codes":
 		return util.HelpForExitCodes()
 	case "show":
 		return cmds.HelpForShow()
