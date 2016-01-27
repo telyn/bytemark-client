@@ -8,16 +8,20 @@ import (
 
 // HelpForHelp shows overall usage information for the BigV client, including a list of available commands.
 func (cmds *CommandSet) HelpForHelp() util.ExitCode {
-	log.Log("Bytemark command-line client")
+	log.Log("usage: bytemark [flags] <command> [flags] [args]")
 	log.Log()
-	log.Log("Usage")
+	log.Log("See `bytemark help <command | topic>` for help specific to a command or topic")
 	log.Log()
-	log.Log("    bytemark [flags] <command> [flags] [args]")
-	log.Log()
-	log.Log("See `bytemark help <command>` for help specific to a command")
+	log.Log("Help topics available: first-use, scripting, exit codes")
 	log.Log()
 	log.Log("Commands available")
-	log.Log()
+	log.Log("   Config commands: config, config get, config set, config unset")
+	log.Log("   Common commands: create, delete, list, show, undelete")
+	log.Log("   Server commands: console, lock hwprofile, reimage, request ip, set, shutdown, start")
+	log.Log("   Cloud disk commands: resize")
+	log.Log("   User commands: add key, remove key")
+
+	/*log.Log()
 	log.Log("    help [command | topic] - output the help for the client or for the given command or topic")
 	log.Log()
 
@@ -85,6 +89,7 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("    images - lists the available operating system images that can be passed to create vm and reimage")
 	log.Log("    storage grades - lists the available storage grades, along with a description.")
 	log.Log("    privileges - lists the privileges that can possibly be granted")
+	*/
 
 	return util.E_USAGE_DISPLAYED
 }
