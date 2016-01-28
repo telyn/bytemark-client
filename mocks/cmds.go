@@ -213,6 +213,10 @@ func (cmds *Commands) HelpForConfig() util.ExitCode {
 	r := cmds.Called()
 	return util.ExitCode(r.Int(0))
 }
+func (cmds *Commands) HelpForConsole() util.ExitCode {
+	r := cmds.Called()
+	return util.ExitCode(r.Int(0))
+}
 
 func (cmds *Commands) HelpForCreate() util.ExitCode {
 	r := cmds.Called()

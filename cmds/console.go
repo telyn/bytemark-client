@@ -11,7 +11,7 @@ import (
 	"syscall"
 )
 
-func (cmds *CommandSet) HelpForConsole() {
+func (cmds *CommandSet) HelpForConsole() util.ExitCode {
 	log.Log("bytemark console commands")
 	log.Log()
 	log.Log("usage: bytemark console [--serial | --vnc] [--connect | --panel] <virtual machine>")
@@ -31,6 +31,7 @@ func (cmds *CommandSet) HelpForConsole() {
 	//log.Log("     or vnc clients can be found, or if --panel is specified.")
 	log.Log()
 	log.Log()
+	return util.E_USAGE_DISPLAYED
 }
 
 func shortEndpoint(endpoint string) string {

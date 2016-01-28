@@ -59,6 +59,7 @@ type CommandManager interface {
 
 	HelpForAdd() util.ExitCode
 	HelpForConfig() util.ExitCode
+	HelpForConsole() util.ExitCode
 	HelpForCreate() util.ExitCode
 	HelpForDebug() util.ExitCode
 	HelpForDelete() util.ExitCode
