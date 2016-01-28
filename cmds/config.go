@@ -77,9 +77,9 @@ func (cmds *CommandSet) Config(args []string) util.ExitCode {
 		}
 
 		if oldVar.Source == "config" {
-			log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, args[1])
+			log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, args[2])
 		} else {
-			log.Logf("%s has been set. \r\nNew value: %s\r\n", variable, args[1])
+			log.Logf("%s has been set. \r\nNew value: %s\r\n", variable, args[2])
 		}
 
 	case "unset":
