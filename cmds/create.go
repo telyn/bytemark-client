@@ -18,6 +18,7 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 	log.Log("    --cores <num> (default 1)")
 	log.Log("    --cdrom <url>")
 	log.Log("    --discs <disc specs> - defaults to a single 25GiB sata-grade discs")
+	log.Log("    --firstboot-script-file <file name> - a script that will be run on first boot")
 	log.Log("    --force - disables the confirmation prompt")
 	log.Log("    --group <name>")
 	log.Log("    --hwprofile <profile>")
@@ -159,21 +160,18 @@ func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 // CreateVM implements the create-vm command. See HelpForCreateVM for usage
 func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
+	addImageInstallFlags(flags)
 	cores := flags.Int("cores", 1, "")
 	cdrom := flags.String("cdrom", "", "")
 	var discs util.DiscSpecFlag
 	flags.Var(&discs, "disc", "")
 	hwprofile := flags.String("hwprofile", "", "")
 	hwprofilelock := flags.Bool("hwprofile-locked", false, "")
-	image := flags.String("image", "", "")
 	var ips util.IPFlag
 	flags.Var(&ips, "ip", "")
 	memorySpec := flags.String("memory", "1", "")
 	noDiscs := flags.Bool("no-discs", false, "")
 	noImage := flags.Bool("no-image", false, "")
-	pubkeys := flags.String("public-keys", "", "")
-	// pubkeysfile := flags.String("public-keys-file", "", "") // TODO(telyn): --public-keys-file
-	rootPassword := flags.String("root-password", "", "")
 	stopped := flags.Bool("stopped", false, "")
 	zone := flags.String("zone", "", "")
 	flags.Parse(args)
@@ -199,10 +197,6 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		*noImage = true
 	}
 
-	if *image == "" && !*noImage {
-		*image = "symbiosis"
-	}
-
 	if len(discs) == 0 && !*noDiscs {
 		discs = append(discs, bigv.Disc{Size: 25600})
 	}
@@ -220,6 +214,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
 		return util.E_PEBKAC
 	}
+
 	var ipspec *bigv.IPSpec
 	if len(ips) > 0 {
 		ipspec = &bigv.IPSpec{}
@@ -244,15 +239,9 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		}
 	}
 
-	rootpass := *rootPassword
-	if *rootPassword == "" && !*noImage {
-		rootpass = util.GeneratePassword()
-	}
-
-	imageInstall := &bigv.ImageInstall{
-		Distribution: *image,
-		PublicKeys:   *pubkeys,
-		RootPassword: rootpass,
+	imageInstall, _, err := prepareImageInstall(flags)
+	if err != nil {
+		return util.ProcessError(err)
 	}
 
 	if *noImage {
@@ -260,7 +249,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	}
 
 	// if stopped isn't set and either cdrom or image are set, start the vm
-	autoreboot := !*stopped && ((*image != "") || (*cdrom != ""))
+	autoreboot := !*stopped && ((imageInstall != nil) || (*cdrom != ""))
 
 	spec := bigv.VirtualMachineSpec{
 		VirtualMachine: &bigv.VirtualMachine{
@@ -305,9 +294,14 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	log.Output("Virtual machine created successfully", "")
-	log.Output(util.FormatVirtualMachine(vm))
-	log.Outputf("Root password: %s\r\n", rootpass)
+	log.Log("Virtual machine created successfully", "")
+	log.Log(util.FormatVirtualMachine(vm))
+	if imageInstall != nil {
+		log.Logf("Root password:") // logf so we don't get a tailing \r\n
+		log.Outputf("%s\r\n", imageInstall.RootPassword)
+	} else {
+		log.Log("Machine was not imaged")
+	}
 	return util.E_SUCCESS
 
 }

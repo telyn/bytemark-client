@@ -162,6 +162,11 @@ func (c *BigVClient) ParseAccountName(name string, defaults ...string) string {
 	return r.String(0)
 }
 
+func (c *BigVClient) ReimageVirtualMachine(name bigv.VirtualMachineName, image *bigv.ImageInstall) error {
+	r := c.Called(name, image)
+	return r.Error(0)
+}
+
 func (c *BigVClient) ResetVirtualMachine(name bigv.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)

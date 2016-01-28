@@ -265,6 +265,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"images":        d.cmds.Distributions,
 		"list":          d.DoList,
 		"lock":          d.DoLock,
+		"reimage":       d.cmds.Reimage,
 		"resize":        d.DoResize,
 		"restart":       d.cmds.Restart,
 		"reset":         d.cmds.ResetVM,

@@ -115,6 +115,23 @@ func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 	return vm, err
 }
 
+// ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
+// Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
+func (bigv *bigvClient) ReimageVirtualMachine(name VirtualMachineName, image *ImageInstall) (err error) {
+	err = bigv.validateVirtualMachineName(&name)
+	if err != nil {
+		return err
+	}
+	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/reimage", name.Account, name.Group, name.VirtualMachine)
+
+	js, err := json.Marshal(image)
+	if err != nil {
+		return err
+	}
+	_, _, err = bigv.Request(true, "POST", path, string(js))
+	return err
+}
+
 // ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
 // button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
 // returns nil on success or an error otherwise.

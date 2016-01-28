@@ -102,6 +102,11 @@ func (cmds *Commands) ListVMs(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
+func (cmds *Commands) Reimage(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) ResetVM(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))

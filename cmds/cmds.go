@@ -38,6 +38,7 @@ type CommandManager interface {
 	ListDiscs([]string) util.ExitCode
 	ListVMs([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
+	Reimage([]string) util.ExitCode
 	ResetVM([]string) util.ExitCode
 	ResizeDisc([]string) util.ExitCode
 	Restart([]string) util.ExitCode

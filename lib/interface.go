@@ -115,6 +115,10 @@ type Client interface {
 	// GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
 	GetVirtualMachine(name VirtualMachineName) (*VirtualMachine, error)
 
+	// ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
+	// Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
+	ReimageVirtualMachine(name VirtualMachineName, image *ImageInstall) (err error)
+
 	// ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
 	// button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
 	// returns nil on success or an error otherwise.
