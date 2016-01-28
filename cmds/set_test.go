@@ -3,11 +3,12 @@ package cmds
 import (
 	bigv "bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/mocks"
+	"github.com/cheekybits/is"
 	"testing"
-	//"github.com/cheekybits/is"
 )
 
 func TestSetCores(t *testing.T) {
+	is := is.New(t)
 	c := &mocks.BigVClient{}
 	config := &mocks.Config{}
 
@@ -28,7 +29,7 @@ func TestSetCores(t *testing.T) {
 	c.When("SetVirtualMachineCores", vmname, 4).Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.SetCores(args)
+	is.Equal(0, cmds.SetCores(args))
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
