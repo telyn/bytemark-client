@@ -266,3 +266,7 @@ func (cmds *Commands) HelpForShow() util.ExitCode {
 	r := cmds.Called()
 	return util.ExitCode(r.Int(0))
 }
+func (cmds *Commands) HelpForTopic(t string) util.ExitCode {
+	r := cmds.Called(t)
+	return util.ExitCode(r.Int(0))
+}

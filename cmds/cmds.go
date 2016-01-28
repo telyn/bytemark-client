@@ -70,6 +70,7 @@ type CommandManager interface {
 	HelpForResize() util.ExitCode
 	HelpForSet() util.ExitCode
 	HelpForShow() util.ExitCode
+	HelpForTopic(string) util.ExitCode
 }
 
 // CommandSet is the main implementation of the Commands interface
