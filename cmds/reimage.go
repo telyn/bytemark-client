@@ -9,8 +9,16 @@ import (
 )
 
 func (cmds *CommandSet) HelpForReimage() util.ExitCode {
-	log.Log("usage: bytemark reimage [--firstboot-script-file <filename>] [--image <image>] [--public-keys <public keys>] [--public-keys-file <filename>] [--root-password <password>] <server>")
+	log.Log("usage: bytemark reimage (--image <image>) [flags] <server>")
 	log.Log("")
+	log.Log("flags available")
+	log.Log("    --firstboot-script-file <file name> - a script that will be run on first boot")
+	log.Log("    --force - disables the confirmation prompt")
+	log.Log("    --image <image name> - specify what to image the server with. Default is 'symbiosis'. See `bytemark images` for a list of available images")
+	log.Log("    --public-keys <keys> (newline seperated)")
+	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
+	log.Log("    --root-password <password> (if not set, will be randomly generated)")
+	log.Log()
 	log.Log("Image the given server with the specified image, prompting for confirmation.")
 	log.Log("If the --image flag is not specified, will prompt with a list.")
 	log.Log("Specify --force to prevent prompting.")

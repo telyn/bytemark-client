@@ -113,6 +113,19 @@ func (d *Dispatcher) DoUndelete(args []string) util.ExitCode {
 	return d.cmds.HelpForDelete()
 }
 
+func (d *Dispatcher) DoVent(args []string) util.ExitCode {
+	if len(args) == 0 {
+		return d.cmds.HelpForHelp()
+
+	}
+	switch strings.ToLower(args[0]) {
+	case "frustration", "anger":
+		log.Log("(╯°□°）╯︵ ┻━┻)")
+		return util.E_SUCCESS
+	}
+	return d.cmds.HelpForHelp()
+}
+
 func (d *Dispatcher) DoList(args []string) util.ExitCode {
 	if len(args) == 0 {
 		return d.cmds.HelpForList()
@@ -256,7 +269,6 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"create":        d.DoCreate,
 		"config":        d.cmds.Config,
 		"console":       d.cmds.Console,
-		"connect":       d.cmds.Console,
 		"debug":         d.cmds.Debug,
 		"delete":        d.DoDelete,
 		"distributions": d.cmds.Distributions,
@@ -269,18 +281,17 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"resize":        d.DoResize,
 		"restart":       d.cmds.Restart,
 		"reset":         d.cmds.ResetVM,
-		"serial":        d.DoSerial,
 		"set":           d.DoSet,
 		"shutdown":      d.cmds.Shutdown,
-		"stop":          d.cmds.Stop,
-		"storage":       d.cmds.StorageGrades,
-		"start":         d.cmds.Start,
-		"show":          d.DoShow,
-		"undelete":      d.DoUndelete,
-		"unlock":        d.DoUnlock,
-		"version":       d.DoVersion,
-		"vnc":           d.DoVNC,
-		"zones":         d.cmds.Zones,
+		//"stop":         d.cmds.Stop,
+		"storage":  d.cmds.StorageGrades,
+		"start":    d.cmds.Start,
+		"show":     d.DoShow,
+		"undelete": d.DoUndelete,
+		"unlock":   d.DoUnlock,
+		"vent":     d.DoVent,
+		"version":  d.DoVersion,
+		"zones":    d.cmds.Zones,
 	}
 
 	command := strings.ToLower(args[0])

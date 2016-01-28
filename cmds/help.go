@@ -20,6 +20,7 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("   Server commands: console, lock hwprofile, reimage, request ip, set, shutdown, start")
 	log.Log("   Cloud disk commands: resize")
 	log.Log("   User commands: add key, remove key")
+	log.Log("   Information commands: hwprofiles, images, storage grades, version, zones")
 
 	/*log.Log()
 	log.Log("    help [command | topic] - output the help for the client or for the given command or topic")
@@ -104,22 +105,45 @@ func (cmds *CommandSet) Help(args []string) util.ExitCode {
 	switch strings.ToLower(args[0]) {
 	case "config":
 		return cmds.HelpForConfig()
+	case "console":
+		return cmds.HelpForConsole()
 	case "create":
 		if len(args) > 1 {
 			switch args[1] {
-			case "vm", "cloud":
+			case "vm", "server":
 				return cmds.HelpForCreateVM()
 			}
 		}
 		return cmds.HelpForCreate()
 	case "debug":
 		return cmds.HelpForDebug()
-	case "delete":
+	case "delete", "undelete":
 		return cmds.HelpForDelete()
 	case "exit":
 		return util.HelpForExitCodes()
+	case "hwprofiles":
+		return cmds.HardwareProfiles([]string{})
+	case "images", "distributions":
+		return cmds.Distributions([]string{})
+	case "list":
+		return cmds.HelpForList()
+	case "lock", "unlock":
+		return cmds.HelpForLocks()
+	case "reimage":
+		return cmds.HelpForReimage()
+	case "restart", "reset", "shutdown", "stop", "power":
+		return cmds.HelpForPower()
+	case "resize":
+		return cmds.HelpForResize()
+	case "set":
+		return cmds.HelpForSet()
 	case "show":
 		return cmds.HelpForShow()
+	case "storage":
+		return cmds.StorageGrades([]string{})
+	case "zones":
+		return cmds.Zones([]string{})
+
 	}
 	return cmds.HelpForHelp()
 
