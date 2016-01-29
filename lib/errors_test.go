@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"github.com/cheekybits/is"
 	"testing"
 )
 
@@ -31,7 +32,7 @@ func TestBadRequestError(t *testing.T) {
 	}
 
 	for i, d := range tests {
-		err := NewBadRequestError(d.input)
-
+		err := newBadRequestError([]byte(input))
+		is.Equal(d.output, err.FormatProblems())
 	}
 }

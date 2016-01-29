@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -60,6 +61,13 @@ func (e UnknownStatusCodeError) Error() string {
 	return fmt.Sprintf("An unexpected status code happened (report this as a bug!)\r\n%s", e.BigVError.Error())
 }
 
+func newBadRequestError(ctx BigVError, response []byte) BadRequestError {
+	problems := make(map[string][]string)
+	err := json.Unmarshal(response, problems)
+	return BadRequestError{
+		context,
+		problems}
+}
 func (e BadRequestError) Error() string {
 	if len(e.Problems) == 0 {
 		return fmt.Sprintf("The API told us our request was bad\r\n%s", e.ResponseBody)
