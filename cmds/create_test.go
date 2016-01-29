@@ -166,3 +166,55 @@ func TestCreateVMNoImagesNoDiscs(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCreateVM(t *testing.T) {
+	c := &mocks.BigVClient{}
+	config := &mocks.Config{}
+
+	config.When("Get", "account").Return("test-account")
+	config.When("Get", "token").Return("test-token")
+	config.When("Force").Return(true)
+	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("ImportFlags").Return([]string{"test-vm", "3", "6565m", "archive:34"})
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{"", "", ""})
+
+	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(bigv.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	vm := bigv.VirtualMachineSpec{
+		VirtualMachine: &bigv.VirtualMachine{
+			Name:   "test-vm",
+			Cores:  3,
+			Memory: 6565,
+		},
+		Discs: []bigv.Disc{{
+			Size:         34 * 1024,
+			StorageGrade: "archive",
+		},
+		},
+	}
+
+	group := bigv.GroupName{
+		Group:   "",
+		Account: "",
+	}
+
+	vmname := bigv.VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "",
+		Account:        "",
+	}
+
+	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
+
+	cmds := NewCommandSet(config, c)
+	cmds.CreateVM([]string{
+		"--no-image",
+		"test-vm", "3", "6565m", "archive:34",
+	})
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
