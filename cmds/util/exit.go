@@ -152,14 +152,16 @@ Exit code ranges:
 }
 
 func ProcessError(err error, message ...string) ExitCode {
+	if err == nil {
+		return E_SUCCESS
+	}
+
 	trace := make([]byte, 4096, 4096)
 	runtime.Stack(trace, false)
 
 	log.Debug(1, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
 	if len(message) > 0 {
 		log.Error(message)
-	} else if err == nil {
-		return E_SUCCESS
 	}
 	errorMessage := "Unknown error"
 	exitCode := ExitCode(E_UNKNOWN_ERROR)
@@ -222,6 +224,9 @@ func ProcessError(err error, message ...string) ExitCode {
 			errno, _ := err.(*syscall.Errno)
 			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", errno)
 			exitCode = E_UNKNOWN_ERROR
+		case bigv.AmbiguousKeyError:
+			exitCode = E_PEBKAC
+			errorMessage = err.Error()
 		default:
 			e := err.Error()
 			if strings.Contains(e, "Badly-formed parameters") {
@@ -235,7 +240,7 @@ func ProcessError(err error, message ...string) ExitCode {
 		}
 
 		if _, ok := err.(bigv.BigVError); ok && exitCode == E_UNKNOWN_ERROR {
-			errorMessage = fmt.Sprintf("Unknown error from BigV client library.%s", err.Error())
+			errorMessage = fmt.Sprintf("Unknown error from BigV client library. %s", err.Error())
 			exitCode = E_UNKNOWN_BIGV
 		}
 	} else {

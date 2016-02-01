@@ -3,7 +3,7 @@ package util
 import (
 	bigv "bytemark.co.uk/client/lib"
 	"fmt"
-	"unicode/utf8"
+	"strings"
 )
 
 // DiscSpecError represents an error during parse.
@@ -16,8 +16,29 @@ func (e *DiscSpecError) Error() string {
 	return fmt.Sprintf("Disc spec error: Unexpected %c at character %d.", e.Character, e.Position)
 }
 
+func ParseDiscSpec(spec string) (*bigv.Disc, error) {
+	bits := strings.Split(spec, ":")
+	size, err := ParseSize(bits[len(bits)-1])
+	if err != nil {
+		return nil, err
+	}
+	switch {
+	case len(bits) >= 4:
+		return nil, &DiscSpecError{}
+	case len(bits) == 3:
+		return &bigv.Disc{Label: bits[0], StorageGrade: bits[1], Size: size}, nil
+	case len(bits) == 2:
+		return &bigv.Disc{StorageGrade: bits[0], Size: size}, nil
+	case len(bits) == 1:
+		return &bigv.Disc{Size: size}, nil
+	case len(bits) == 0:
+		return nil, &DiscSpecError{}
+	}
+	return nil, nil
+}
+
 // ParseDiscSpec takes a disc spec and returns a slice of Discs (from bytemark.co.uk/client/lib)
-func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
+/*func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 	// parser!
 	// this really needs to be rewritten with a lexer.
 	pos := 0
@@ -130,3 +151,4 @@ func ParseDiscSpec(spec string, trace bool) ([]bigv.Disc, error) {
 	})
 	return discs, nil
 }
+*/

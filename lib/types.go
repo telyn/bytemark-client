@@ -29,9 +29,10 @@ type Disc struct {
 // ImageInstall represents what image was most recently installed on a VM along with its root password.
 // This might only be returned when creating a VM.
 type ImageInstall struct {
-	Distribution string `json:"distribution"`
-	RootPassword string `json:"root_password"`
-	PublicKeys   string `json:"ssh_public_key"`
+	Distribution    string `json:"distribution"`
+	FirstbootScript string `json:"firstboot_script"`
+	RootPassword    string `json:"root_password"`
+	PublicKeys      string `json:"ssh_public_key"`
 }
 
 // IP represents an IP for the purpose of setting RDNS with BigV
@@ -40,6 +41,12 @@ type IP struct {
 
 	// this cannot be set.
 	IP string `json:"ip"`
+}
+
+// IPSpec represents one v4 and one v6 address to assign to a bigv during creation.
+type IPSpec struct {
+	IPv4 string `json:"ipv4"`
+	IPv6 string `json:"ipv6"`
 }
 
 // NetworkInterface represents a BigV virtual NIC and what IPs it has routed.
@@ -57,7 +64,6 @@ type NetworkInterface struct {
 	VirtualMachineID int               `json:"virtual_machine_id"`
 }
 
-// User represents a BigV user.
 type JSONUser struct {
 	Username       string `json:"username"`
 	Email          string `json:"email"`
@@ -73,6 +79,7 @@ type JSONUser struct {
 	//AccountName string `json:"account_name"`
 }
 
+// User represents a Bytemark user.
 type User struct {
 	Username       string
 	Email          string
@@ -111,6 +118,7 @@ type VirtualMachineSpec struct {
 	VirtualMachine *VirtualMachine `json:"virtual_machine"`
 	Discs          []Disc          `json:"discs"`
 	Reimage        *ImageInstall   `json:"reimage"`
+	IPs            *IPSpec         `json:"ips"`
 }
 
 // Group represents a group

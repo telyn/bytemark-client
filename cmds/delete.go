@@ -15,11 +15,12 @@ func (cmds *CommandSet) HelpForDelete() util.ExitCode {
 	log.Log("usage: bytemark delete account <account>")
 	log.Log("       bytemark delete disc <vm> <label>")
 	log.Log("       bytemark delete group [--recursive] <group>")
-	log.Log("       bytemark delete user <user>")
+	//log.Log("       bytemark delete user <user>")
+	log.Log("       bytemark delete key [--user=<user>] <public key identifier>")
 	log.Log("       bytemark delete vm [--force] [---purge] <virtual machine>")
 	log.Log("       bytemark undelete vm <virtual machine>")
 	log.Log()
-	log.Log("Deletes the given virtual machine, disc, group, account or user. Only empty groups and accounts can be deleted.")
+	log.Log("Deletes the given virtual machine, disc, group, account or key. Only empty groups and accounts can be deleted.")
 	log.Log("If the --purge flag is given and the target is a virtual machine, will permanently delete the VM. Billing will cease and you will be unable to recover the VM.")
 	log.Log("If the --force flag is given, you will not be prompted to confirm deletion.")
 	log.Log()
@@ -41,7 +42,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannot be blank.")
 		return util.E_PEBKAC
@@ -107,7 +108,7 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -144,7 +145,7 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseGroupName(nameStr)
+	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
@@ -193,20 +194,24 @@ func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "user")
-	if !ok {
+	user := cmds.config.GetIgnoreErr("user")
+
+	key := strings.Join(args, " ")
+	if key == "" {
+		log.Log("You must specify a key to delete.\r\n")
 		cmds.HelpForDelete()
-		return util.E_PEBKAC
+		return util.E_SUCCESS
+
 	}
-	key := strings.TrimSpace(strings.Join(args, " "))
+
 	err := cmds.EnsureAuth()
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	err = cmds.bigv.DeleteUserAuthorizedKey(nameStr, key)
+	err = cmds.bigv.DeleteUserAuthorizedKey(user, key)
 	if err == nil {
-		log.Log("Key deleted successfully")
+		log.Log("Key deleted successfullly")
 		return util.E_SUCCESS
 	} else {
 		return util.ProcessError(err)
@@ -221,7 +226,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannot be blank")
 		return util.E_PEBKAC

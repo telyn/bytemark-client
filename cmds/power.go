@@ -49,7 +49,7 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC
@@ -83,7 +83,7 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC
@@ -114,7 +114,7 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC
@@ -146,7 +146,7 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC
@@ -177,7 +177,7 @@ func (cmds *CommandSet) ResetVM(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC

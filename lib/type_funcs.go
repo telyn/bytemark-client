@@ -57,34 +57,41 @@ func (bigv *bigvClient) validateAccountName(account *string) error {
 }
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (bigv *bigvClient) ParseVirtualMachineName(name string) (vm VirtualMachineName, err error) {
+func (bigv *bigvClient) ParseVirtualMachineName(name string, defaults ...VirtualMachineName) (vm VirtualMachineName, err error) {
 	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
-	vm.Group = ""
-	vm.Account = ""
-	vm.VirtualMachine = ""
+	if len(defaults) == 0 {
+		vm.Group = ""
+		vm.Account = ""
+		vm.VirtualMachine = ""
+	} else {
+		vm.Group = defaults[0].Group
+		vm.Account = defaults[0].Account
+		vm.VirtualMachine = defaults[0].VirtualMachine
+	}
 
 	if len(bits) > 3 && bits[len(bits)-1] == "" {
 		bits = bits[0 : len(bits)-1]
 	}
 
-	// TODO(telyn): ParseVirtualMachine isn't smart enough yet
-
 	// a for loop seems an odd choice here maybe but it means
 	// I don't need to do lots of ifs to see if the next bit exists
 Loop:
 	for i, bit := range bits {
-		switch i {
-		case 0:
-			vm.VirtualMachine = strings.TrimSpace(strings.ToLower(bit))
-			break
-		case 1:
-			// want to be able to do vm..account to get the default group
-			vm.Group = strings.TrimSpace(strings.ToLower(bit))
-			break
-		case 2:
-			vm.Account = strings.TrimSpace(strings.ToLower(bit))
-			break Loop
+		bit = strings.TrimSpace(strings.ToLower(bit))
+		if bit != "" {
+			switch i {
+			case 0:
+				vm.VirtualMachine = bit
+				break
+			case 1:
+				// want to be able to do vm..account to get the default group
+				vm.Group = bit
+				break
+			case 2:
+				vm.Account = bit
+				break Loop
+			}
 		}
 	}
 	if vm.VirtualMachine == "" {
@@ -94,21 +101,29 @@ Loop:
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
-func (bigv *bigvClient) ParseGroupName(name string) (group GroupName) {
+func (bigv *bigvClient) ParseGroupName(name string, defaults ...GroupName) (group GroupName) {
 	// 1 or 2 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
-	group.Group = ""
-	group.Account = ""
+	if len(defaults) == 0 {
+		group.Group = ""
+		group.Account = ""
+	} else {
+		group.Group = defaults[0].Group
+		group.Account = defaults[0].Account
+	}
 
 Loop:
 	for i, bit := range bits {
-		switch i {
-		case 0:
-			group.Group = strings.TrimSpace(strings.ToLower(bit))
-			break
-		case 1:
-			group.Account = strings.TrimSpace(strings.ToLower(bit))
-			break Loop
+		bit = strings.TrimSpace(strings.ToLower(bit))
+		if bit != "" {
+			switch i {
+			case 0:
+				group.Group = bit
+				break
+			case 1:
+				group.Account = bit
+				break Loop
+			}
 		}
 	}
 	return group
@@ -116,15 +131,21 @@ Loop:
 }
 
 // ParseAccountName parses a group name given in .account[.extrabits] format.
-func (bigv *bigvClient) ParseAccountName(name string) (account string) {
+func (bigv *bigvClient) ParseAccountName(name string, defaults ...string) (account string) {
 	// 1 piece with optional extra cruft for the fqdn
+
+	if len(defaults) == 0 {
+		account = ""
+	} else {
+		account = defaults[0]
+	}
 
 	// there's a micro-optimisation to do here to not use Split,
 	// but really, who can be bothered to?
-	account = ""
-
 	bits := strings.Split(name, ".")
-	account = bits[0]
+	if bits[0] != "" {
+		account = bits[0]
+	}
 
 	return account
 

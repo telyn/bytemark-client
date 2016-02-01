@@ -1,5 +1,7 @@
 package lib
 
+//go:generate ../gen/version.go.sh
+
 import (
 	"fmt"
 	"strings"

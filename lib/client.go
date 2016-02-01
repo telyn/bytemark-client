@@ -2,6 +2,8 @@ package lib
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"
+	"bytemark.co.uk/client/util/log"
+	"errors"
 )
 
 // bigvClient is the main type in the BigV client library
@@ -41,11 +43,15 @@ func (bigv *bigvClient) AuthWithCredentials(credentials auth3.Credentials) error
 
 // AuthWithToken attempts to read sessiondata from auth for the given token. Returns nil on success or an error otherwise.
 func (bigv *bigvClient) AuthWithToken(token string) error {
+	if token == "" {
+		return errors.New("No token provided")
+	}
 
 	session, err := bigv.auth.ReadSession(token)
 	if err == nil {
 		bigv.authSession = session
 	}
+	log.Debug(5, session)
 	return err
 
 }
@@ -58,6 +64,14 @@ func (bigv *bigvClient) GetEndpoint() string {
 // SetDebugLevel sets the debug level / verbosity of the BigV client. 0 (default) is silent.
 func (bigv *bigvClient) SetDebugLevel(debugLevel int) {
 	bigv.debugLevel = debugLevel
+}
+
+// GetSessionFactors returns the factors provided when the current auth session was set up
+func (bigv *bigvClient) GetSessionFactors() []string {
+	if bigv.authSession == nil {
+		return []string{}
+	}
+	return bigv.authSession.Factors
 }
 
 // GetSessionToken returns the token for the current auth session

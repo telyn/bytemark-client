@@ -102,6 +102,11 @@ func (cmds *Commands) ListVMs(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
+func (cmds *Commands) Reimage(args []string) util.ExitCode {
+	r := cmds.Called(args)
+	return util.ExitCode(r.Int(0))
+}
+
 func (cmds *Commands) ResetVM(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
@@ -208,6 +213,10 @@ func (cmds *Commands) HelpForConfig() util.ExitCode {
 	r := cmds.Called()
 	return util.ExitCode(r.Int(0))
 }
+func (cmds *Commands) HelpForConsole() util.ExitCode {
+	r := cmds.Called()
+	return util.ExitCode(r.Int(0))
+}
 
 func (cmds *Commands) HelpForCreate() util.ExitCode {
 	r := cmds.Called()
@@ -255,5 +264,9 @@ func (cmds *Commands) HelpForSet() util.ExitCode {
 
 func (cmds *Commands) HelpForShow() util.ExitCode {
 	r := cmds.Called()
+	return util.ExitCode(r.Int(0))
+}
+func (cmds *Commands) HelpForTopic(t string) util.ExitCode {
+	r := cmds.Called(t)
 	return util.ExitCode(r.Int(0))
 }

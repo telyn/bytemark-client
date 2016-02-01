@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"flag"
 	"fmt"
@@ -17,6 +18,7 @@ var configVars = [...]string{
 	"auth-endpoint",
 	"user",
 	"account",
+	"group",
 	"token",
 	"debug-level",
 	"yubikey",
@@ -37,6 +39,8 @@ type ConfigManager interface {
 	GetIgnoreErr(string) string
 	GetBool(string) (bool, error)
 	GetV(string) (ConfigVar, error)
+	GetVirtualMachine() lib.VirtualMachineName
+	GetGroup() lib.GroupName
 	GetAll() ([]ConfigVar, error)
 	Set(string, string, string)
 	SetPersistent(string, string, string) error
@@ -55,6 +59,8 @@ type ConfigManager interface {
 // username - the default username to use - if not present, $USER
 // endpoint - the default endpoint to use - if not present, https://uk0.bigv.io
 // auth-endpoint - the default auth API endpoint to use - if not present, https://auth.bytemark.co.uk
+// account - account to use if not specified elsewhere§
+// group - group to use if not specified
 
 // A Config determines the configuration of the Bytemark client.
 // It's responsible for handling things like the credentials to use and what endpoints to talk to.
@@ -235,6 +241,20 @@ func (config *Config) GetV(name string) (ConfigVar, error) {
 	return config.read(name)
 }
 
+func (config *Config) GetVirtualMachine() (vm lib.VirtualMachineName) {
+	vm.Account = config.GetIgnoreErr("account")
+	vm.Group = config.GetIgnoreErr("group")
+	vm.VirtualMachine = ""
+	//TODO(telyn): make it possible to set a default VM?
+	return vm
+}
+
+func (config *Config) GetGroup() (group lib.GroupName) {
+	group.Account = config.GetIgnoreErr("account")
+	group.Group = config.GetIgnoreErr("group")
+	return group
+}
+
 // GetAll returns all of the available ConfigVars in the Config.
 func (config *Config) GetAll() (vars []ConfigVar, err error) {
 	vars = make([]ConfigVar, len(configVars))
@@ -252,7 +272,9 @@ func (config *Config) GetDefault(name string) ConfigVar {
 	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
-		// we don't actually want to default to USER - that will happen during Dispatcher's PromptForCredentials so it can be all "Hey you should bytemark config set user <youruser>"
+		if os.Getenv("BIGV_USER") == "" {
+			return ConfigVar{"user", os.Getenv("USER"), "ENV USER"}
+		}
 		return ConfigVar{"user", os.Getenv("BIGV_USER"), "ENV BIGV_USER"}
 	case "endpoint":
 		v := ConfigVar{"endpoint", "https://uk0.bigv.io", "CODE"}
@@ -278,12 +300,22 @@ func (config *Config) GetDefault(name string) ConfigVar {
 			return ConfigVar{
 				"account",
 				val,
-				"ENV BIGV_AUTH_ENDPOINT",
+				"ENV BIGV_ACCOUNT",
 			}
 		}
 		def := config.GetDefault("user")
 		def.Name = "account"
 		return def
+	case "group":
+		val := os.Getenv("BIGV_GROUP")
+		if val != "" {
+			return ConfigVar{
+				"group",
+				val,
+				"ENV BIGV_GROUP",
+			}
+		}
+		return ConfigVar{"group", "default", "CODE"}
 	case "debug-level":
 		v := ConfigVar{"debug-level", "0", "CODE"}
 		if val := os.Getenv("BIGV_DEBUG_LEVEL"); val != "" {
@@ -317,7 +349,7 @@ func (config *Config) read(name string) (ConfigVar, error) {
 		return config.GetDefault(name), &ConfigReadError{Name: name, Path: path, Err: err}
 	}
 
-	return ConfigVar{name, string(contents), "FILE " + path}, nil
+	return ConfigVar{name, strings.TrimSpace(string(contents)), "FILE " + path}, nil
 }
 
 // Set stores the given key-value pair in config's Memo. This storage does not persist once the program terminates.

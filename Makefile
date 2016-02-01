@@ -1,13 +1,11 @@
+SHELL:=/bin/bash
+
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client
 ALL_FILES := *.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
 
 MAJORVERSION := 0
-MINORVERSION := 1
-BUILD_DATE := `date +%Y-%m-%d\ %H:%M`
+MINORVERSION := 3
 BUILD_NUMBER ?= 0
-GIT_BRANCH ?= `git rev-parse --abbrev-ref HEAD`
-GIT_COMMIT ?= `git rev-parse HEAD`
-VERSIONFILE := lib/version.go
 
 OSAARCH:=x86_64
 ifeq ($(GOARCH),386)
@@ -24,7 +22,10 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 all: bytemark
 
 bytemark: $(ALL_FILES) gensrc
-	go build -o bytemark bytemark.co.uk/client
+	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client
+
+Bytemark.app.zip: Bytemark.app
+	zip -r $@ $<
 
 Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	mkdir -p Bytemark.app/Contents/Resources/bin
@@ -48,18 +49,6 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
 	# sign the code? anyone? shall we sign the code?
 
-gensrc:
-	rm -f $(VERSIONFILE)
-	@echo "package lib" > $(VERSIONFILE)
-	@echo "const (" >> $(VERSIONFILE)
-	@echo "  majorversion = $(MAJORVERSION)" >> $(VERSIONFILE)
-	@echo "  minorversion = $(MINORVERSION)" >> $(VERSIONFILE)
-	@echo "  buildnumber = $(BUILD_NUMBER)" >> $(VERSIONFILE)
-	@echo "  gitcommit = \"$(GIT_COMMIT)\"" >> $(VERSIONFILE)
-	@echo "  gitbranch = \"$(GIT_BRANCH)\"" >> $(VERSIONFILE)
-	@echo "  builddate = \"$(BUILD_DATE)\"" >> $(VERSIONFILE)
-	@echo ")" >> $(VERSIONFILE)
-
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
 	rm -f bytemark
@@ -71,6 +60,10 @@ checkinstall:
 	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)" \
 	    --requires="" \
 	    --strip=no --stripso=no
+
+gensrc:
+	BUILD_NUMBER=$(BUILD_NUMBER) MAJORVERSION=$(MAJORVERSION) \
+	MINORVERSION=$(MINORVERSION) go generate ./...
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))
@@ -110,13 +103,16 @@ docs: doc/*.md
 
 test: gensrc
 ifdef $(VERBOSE)
-	go test -v $(ALL_PACKAGES)
+	GO15VENDOREXPERIMENT=1 go test -v $(ALL_PACKAGES)
 else 
-	go test $(ALL_PACKAGES)
+	GO15VENDOREXPERIMENT=1 go test $(ALL_PACKAGES)
 endif
 
 find-uk0: 
 	$(RGREP) --exclude=bytemark "uk0" .
+
+find-bigv:
+	$(RGREP) --exclude=bytemark -i bigv . | grep -v "bigv.io"
 
 find-bugs-todos:
 	$(RGREP) -P "// BUG(.*):" . || echo ""
@@ -124,8 +120,3 @@ find-bugs-todos:
 
 find-exits:
 	$(RGREP) --exclude=exit.go --exclude=main.go -P "panic\(|os.Exit" .
-
-
-update-dependencies: 
-	go get -ut $(ALL_PACKAGES)
-	godep update $(ALL_PACKAGES)

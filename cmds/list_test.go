@@ -13,6 +13,7 @@ func TestListAccounts(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-group.test-account"})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -33,7 +34,9 @@ func TestListDiscs(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"spooky-vm"})
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
 	name := bigv.VirtualMachineName{
 		VirtualMachine: "spooky-vm",
@@ -41,7 +44,7 @@ func TestListDiscs(t *testing.T) {
 		Account:        "",
 	}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("ParseVirtualMachineName", "spooky-vm").Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "spooky-vm", []bigv.VirtualMachineName{{}}).Return(name).Times(1)
 
 	vm := bigv.VirtualMachine{
 		ID:   4,
@@ -67,6 +70,8 @@ func TestListGroups(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
 	config.When("ImportFlags").Return([]string{"spooky-steve"})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -92,11 +97,13 @@ func TestListVMs(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"halloween-vms.spooky-steve"})
+	config.When("GetGroup").Return(bigv.GroupName{})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	groupname := bigv.GroupName{Group: "halloween-vms", Account: "spooky-steve"}
-	c.When("ParseGroupName", "halloween-vms.spooky-steve").Return(groupname).Times(1)
+	c.When("ParseGroupName", "halloween-vms.spooky-steve", []bigv.GroupName{{}}).Return(groupname).Times(1)
 
 	c.When("GetGroup", groupname).Return(&bigv.Group{
 		VirtualMachines: []*bigv.VirtualMachine{

@@ -114,6 +114,7 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 	switch res.StatusCode {
 	case 400:
 		responseBody, readErr := ioutil.ReadAll(res.Body)
+		log.Debugf(3, "response body: '%s'\r\n", responseBody)
 		if readErr != nil {
 			return nil, nil, BadRequestError{BigVError: baseErr, Problems: make(map[string][]string)}
 		}

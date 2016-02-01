@@ -3,11 +3,12 @@ package cmds
 import (
 	bigv "bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/mocks"
+	"github.com/cheekybits/is"
 	"testing"
-	//"github.com/cheekybits/is"
 )
 
 func TestSetCores(t *testing.T) {
+	is := is.New(t)
 	c := &mocks.BigVClient{}
 	config := &mocks.Config{}
 
@@ -19,14 +20,16 @@ func TestSetCores(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", args[0], []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineCores", vmname, 4).Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.SetCores(args)
+	is.Equal(0, cmds.SetCores(args))
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -45,9 +48,11 @@ func TestSetMemory(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", args[0], []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineMemory", vmname, 4096).Return(nil).Times(1)
 
@@ -64,9 +69,11 @@ func TestSetMemory(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return(args)
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
 	c.Reset()
-	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", args[0], []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineMemory", vmname, 16384).Return(nil).Times(1)
 
@@ -90,10 +97,12 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
 	// test no arguments, nothing should happen
-	c.When("ParseVirtualMachineName", args[0]).Return(vmname)
+	c.When("ParseVirtualMachineName", args[0], []bigv.VirtualMachineName{{}}).Return(vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(0)              // don't talk to BigV
 	c.When("SetVirtualMachineHardwareProfile", vmname).Return(nil).Times(0) // don't do anything
 
@@ -110,10 +119,12 @@ func TestSetHWProfileCommand(t *testing.T) {
 	config.Reset()
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return(args)
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
 	c.Reset()
-	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", args[0], []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool(nil)).Return(nil).Times(1)
 
@@ -126,7 +137,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	// test --lock flag
 	c.Reset()
-	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", args[0], []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{true}).Return(nil).Times(1)
 
@@ -141,7 +152,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	// test --unlock flag
 	c.Reset()
-	c.When("ParseVirtualMachineName", args[0]).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", args[0], []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{false}).Return(nil).Times(1)
 

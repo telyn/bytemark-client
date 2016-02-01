@@ -13,9 +13,11 @@ func TestShowGroupCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-group.test-account"})
+	config.When("GetGroup").Return(bigv.GroupName{})
 
-	c.When("ParseGroupName", "test-group.test-account").Return(bigv.GroupName{Group: "test-group", Account: "test-account"})
+	c.When("ParseGroupName", "test-group.test-account", []bigv.GroupName{{}}).Return(bigv.GroupName{Group: "test-group", Account: "test-account"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	group := getFixtureGroup()
@@ -36,8 +38,10 @@ func TestShowVMCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account").Return(bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"})
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	vm := getFixtureVM()
 	c.When("GetVirtualMachine", bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}).Return(&vm, nil).Times(1)

@@ -33,13 +33,16 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 		cmds.HelpForShow()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr)
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC
 	}
 
-	cmds.EnsureAuth()
+	err = cmds.EnsureAuth()
+	if err != nil {
+		return util.ProcessError(err)
+	}
 	vm, err := cmds.bigv.GetVirtualMachine(name)
 
 	if err != nil {
@@ -71,7 +74,7 @@ func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 		cmds.HelpForShow()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseGroupName(nameStr)
+	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
@@ -123,7 +126,7 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 		cmds.HelpForShow()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseAccountName(nameStr)
+	name := cmds.bigv.ParseAccountName(nameStr, cmds.config.GetIgnoreErr("account"))
 
 	err := cmds.EnsureAuth()
 	if err != nil {

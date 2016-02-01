@@ -23,7 +23,13 @@ func (cmds *CommandSet) LockHWProfile(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	if !ok {
+		cmds.HelpForSet()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Failed to parse VM name")
 		return util.E_PEBKAC
@@ -44,7 +50,13 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	if !ok {
+		cmds.HelpForSet()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Failed to parse VM name")
 		return util.E_PEBKAC
@@ -65,22 +77,28 @@ func (cmds *CommandSet) SetCores(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	if len(args) != 2 {
-		log.Log("must specify a VM name and a number of CPUs")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	coresStr, ok := util.ShiftArgument(&args, "number of CPU cores")
+	if !ok {
+		cmds.HelpForSet()
+		return util.E_PEBKAC
+	}
+
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Errorf("Failed to parse VM name\r\n")
 		return util.E_PEBKAC
 	}
 
 	// decide on the number of cores to set now
-	cores, err := strconv.Atoi(args[1])
+	cores, err := strconv.Atoi(coresStr)
 	if err != nil || cores < 1 {
-		log.Errorf("Invalid number of cores \"%s\"\r\n", args[1])
+		log.Errorf("Invalid number of cores \"%s\"\r\n", coresStr)
 		return util.E_PEBKAC
 	}
 
@@ -109,13 +127,19 @@ func (cmds *CommandSet) SetHWProfile(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	// name and hardware profile required
-	if len(args) != 2 {
-		log.Log("Must specify a VM name and a hardware profile")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+
+	profileStr, ok := util.ShiftArgument(&args, "hardware profile")
+	if !ok {
+		cmds.HelpForSet()
+		return util.E_PEBKAC
+	}
+
 	if err != nil {
 		log.Error("Failed to parse VM name")
 		return util.E_PEBKAC
@@ -128,12 +152,12 @@ func (cmds *CommandSet) SetHWProfile(args []string) util.ExitCode {
 
 	// if lock_hwp or unlock_hwp are specified, account this into the call
 	if *lock_hwp {
-		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], true)
+		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, profileStr, true)
 	} else if *unlock_hwp {
-		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1], false)
+		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, profileStr, false)
 		// otherwise omit lock
 	} else {
-		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, args[1])
+		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, profileStr)
 	}
 
 	// return
@@ -146,21 +170,27 @@ func (cmds *CommandSet) SetMemory(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	if len(args) != 2 {
-		log.Log("Must specify a VM name and an amount of memory")
+	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(args[0])
+	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Failed to parse VM name")
 		return util.E_PEBKAC
 	}
 
-	memory, err := util.ParseSize(args[1])
+	memoryStr, ok := util.ShiftArgument(&args, "memory size")
+	if !ok {
+		cmds.HelpForSet()
+		return util.E_PEBKAC
+	}
+
+	memory, err := util.ParseSize(memoryStr)
 	if err != nil || memory < 1 {
-		log.Errorf("Invalid amount of memory \"%s\"\r\n", args[1])
+		log.Errorf("Invalid amount of memory \"%s\"\r\n", memoryStr)
 		return util.E_PEBKAC
 	}
 

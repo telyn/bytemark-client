@@ -24,6 +24,11 @@ func (c *BigVClient) GetSessionUser() string {
 	r := c.Called()
 	return r.String(0)
 }
+func (c *BigVClient) GetSessionFactors() []string {
+	r := c.Called()
+	ar := r.Get(0)
+	return ar.([]string)
+}
 func (c *BigVClient) SetDebugLevel(level int) {
 	c.Called(level)
 }
@@ -140,21 +145,26 @@ func (c *BigVClient) GetVirtualMachine(name bigv.VirtualMachineName) (vm *bigv.V
 	return vm, r.Error(1)
 }
 
-func (c *BigVClient) ParseVirtualMachineName(name string) (bigv.VirtualMachineName, error) {
-	r := c.Called(name)
+func (c *BigVClient) ParseVirtualMachineName(name string, defaults ...bigv.VirtualMachineName) (bigv.VirtualMachineName, error) {
+	r := c.Called(name, defaults)
 	n, _ := r.Get(0).(bigv.VirtualMachineName)
 	return n, r.Error(1)
 }
 
-func (c *BigVClient) ParseGroupName(name string) bigv.GroupName {
-	r := c.Called(name)
+func (c *BigVClient) ParseGroupName(name string, defaults ...bigv.GroupName) bigv.GroupName {
+	r := c.Called(name, defaults)
 	n, _ := r.Get(0).(bigv.GroupName)
 	return n
 }
 
-func (c *BigVClient) ParseAccountName(name string) string {
-	r := c.Called(name)
+func (c *BigVClient) ParseAccountName(name string, defaults ...string) string {
+	r := c.Called(name, defaults)
 	return r.String(0)
+}
+
+func (c *BigVClient) ReimageVirtualMachine(name bigv.VirtualMachineName, image *bigv.ImageInstall) error {
+	r := c.Called(name, image)
+	return r.Error(0)
 }
 
 func (c *BigVClient) ResetVirtualMachine(name bigv.VirtualMachineName) error {

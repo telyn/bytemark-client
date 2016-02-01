@@ -5,8 +5,10 @@ import (
 	util "bytemark.co.uk/client/cmds/util"
 	bigv "bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
+	"fmt"
 	"github.com/bgentry/speakeasy"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -36,6 +38,7 @@ type CommandManager interface {
 	ListDiscs([]string) util.ExitCode
 	ListVMs([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
+	Reimage([]string) util.ExitCode
 	ResetVM([]string) util.ExitCode
 	ResizeDisc([]string) util.ExitCode
 	Restart([]string) util.ExitCode
@@ -56,6 +59,7 @@ type CommandManager interface {
 
 	HelpForAdd() util.ExitCode
 	HelpForConfig() util.ExitCode
+	HelpForConsole() util.ExitCode
 	HelpForCreate() util.ExitCode
 	HelpForDebug() util.ExitCode
 	HelpForDelete() util.ExitCode
@@ -66,6 +70,7 @@ type CommandManager interface {
 	HelpForResize() util.ExitCode
 	HelpForSet() util.ExitCode
 	HelpForShow() util.ExitCode
+	HelpForTopic(string) util.ExitCode
 }
 
 // CommandSet is the main implementation of the Commands interface
@@ -117,7 +122,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
 					if attempts > 0 {
 						log.Errorf("Invalid credentials, please try again\r\n")
-						cmds.config.Set("user", "", "INVALID")
+						cmds.config.Set("user", cmds.config.GetIgnoreErr("user"), "PRIOR INTERACTION")
 						cmds.config.Set("pass", "", "INVALID")
 						cmds.config.Set("yubikey-otp", "", "INVALID")
 					} else {
@@ -130,6 +135,17 @@ func (cmds *CommandSet) EnsureAuth() error {
 			}
 		}
 	}
+	if cmds.config.GetIgnoreErr("yubikey") != "" {
+		factors := cmds.bigv.GetSessionFactors()
+		for _, f := range factors {
+			if f == "yubikey" {
+				return nil
+			}
+		}
+		// if still executing, we didn't have yubikey factor
+		cmds.config.Set("token", "", "FLAG yubikey")
+		return cmds.EnsureAuth()
+	}
 	return nil
 
 }
@@ -138,13 +154,25 @@ func (cmds *CommandSet) EnsureAuth() error {
 // needs a for loop to ensure that they don't stay empty.
 // returns nil on success or an error on failure
 func (cmds *CommandSet) PromptForCredentials() error {
-	for cmds.config.GetIgnoreErr("user") == "" {
-		user := util.Prompt("User: ")
-		cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
+	userVar, _ := cmds.config.GetV("user")
+	log.Debugf(2, "%#v\n", userVar)
+	for userVar.Value == "" || userVar.Source != "INTERACTION" {
+		if userVar.Value != "" {
+			user := util.Prompt(fmt.Sprintf("User [%s]: ", userVar.Value))
+			if strings.TrimSpace(user) == "" {
+				cmds.config.Set("user", userVar.Value, "INTERACTION")
+			} else {
+				cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
+			}
+		} else {
+			user := util.Prompt("User: ")
+			cmds.config.Set("user", strings.TrimSpace(user), "INTERACTION")
+		}
+		userVar, _ = cmds.config.GetV("user")
 	}
 
 	for cmds.config.GetIgnoreErr("pass") == "" {
-		pass, err := speakeasy.Ask("Pass: ")
+		pass, err := speakeasy.FAsk(os.Stderr, "Pass: ")
 
 		if err != nil {
 			return err
