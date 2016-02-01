@@ -29,7 +29,7 @@ func (cmds *CommandSet) LockHWProfile(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Failed to parse VM name")
 		return util.E_PEBKAC
@@ -40,7 +40,7 @@ func (cmds *CommandSet) LockHWProfile(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	e := cmds.bigv.SetVirtualMachineHardwareProfileLock(name, true)
+	e := cmds.client.SetVirtualMachineHardwareProfileLock(name, true)
 	return util.ProcessError(e)
 }
 
@@ -56,7 +56,7 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Failed to parse VM name")
 		return util.E_PEBKAC
@@ -67,7 +67,7 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	e := cmds.bigv.SetVirtualMachineHardwareProfileLock(name, false)
+	e := cmds.client.SetVirtualMachineHardwareProfileLock(name, false)
 	return util.ProcessError(e)
 }
 
@@ -89,7 +89,7 @@ func (cmds *CommandSet) SetCores(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Errorf("Failed to parse VM name\r\n")
 		return util.E_PEBKAC
@@ -107,8 +107,8 @@ func (cmds *CommandSet) SetCores(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	// submit command to BigV
-	err = cmds.bigv.SetVirtualMachineCores(name, cores)
+	// submit command to API
+	err = cmds.client.SetVirtualMachineCores(name, cores)
 	return util.ProcessError(err)
 }
 
@@ -132,7 +132,7 @@ func (cmds *CommandSet) SetHWProfile(args []string) util.ExitCode {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 
 	profileStr, ok := util.ShiftArgument(&args, "hardware profile")
 	if !ok {
@@ -152,12 +152,12 @@ func (cmds *CommandSet) SetHWProfile(args []string) util.ExitCode {
 
 	// if lock_hwp or unlock_hwp are specified, account this into the call
 	if *lock_hwp {
-		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, profileStr, true)
+		err = cmds.client.SetVirtualMachineHardwareProfile(name, profileStr, true)
 	} else if *unlock_hwp {
-		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, profileStr, false)
+		err = cmds.client.SetVirtualMachineHardwareProfile(name, profileStr, false)
 		// otherwise omit lock
 	} else {
-		err = cmds.bigv.SetVirtualMachineHardwareProfile(name, profileStr)
+		err = cmds.client.SetVirtualMachineHardwareProfile(name, profileStr)
 	}
 
 	// return
@@ -176,7 +176,7 @@ func (cmds *CommandSet) SetMemory(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Failed to parse VM name")
 		return util.E_PEBKAC
@@ -199,6 +199,6 @@ func (cmds *CommandSet) SetMemory(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	err = cmds.bigv.SetVirtualMachineMemory(name, memory)
+	err = cmds.client.SetVirtualMachineMemory(name, memory)
 	return util.ProcessError(err)
 }

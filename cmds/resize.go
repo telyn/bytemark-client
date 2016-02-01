@@ -31,7 +31,7 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 
 	}
@@ -66,7 +66,7 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	oldDisc, err := cmds.bigv.GetDisc(name, discId)
+	oldDisc, err := cmds.client.GetDisc(name, discId)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -77,7 +77,7 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 
 	log.Logf("Resizing %s from %dGiB to %dGiB...", oldDisc.Label, oldDisc.Size/1024, size/1024)
 
-	err = cmds.bigv.ResizeDisc(name, discId, size)
+	err = cmds.client.ResizeDisc(name, discId, size)
 	if err != nil {
 		log.Logf("Failed!\r\n")
 		return util.ProcessError(err)

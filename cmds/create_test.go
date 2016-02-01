@@ -1,29 +1,29 @@
 package cmds
 
 import (
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/mocks"
 	"testing"
 	//"github.com/cheekybits/is"
 )
 
 func TestCreateDiskCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
 	config.When("ImportFlags").Return([]string{"test-vm", "archive:35"})
-	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
-	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(name).Times(1)
+	name := lib.VirtualMachineName{VirtualMachine: "test-vm"}
+	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(&bigv.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
+	c.When("GetVirtualMachine", name).Return(&lib.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
 
-	disc := bigv.Disc{Size: 35 * 1024, StorageGrade: "archive"}
+	disc := lib.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
 	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
@@ -38,7 +38,7 @@ func TestCreateDiskCommand(t *testing.T) {
 // TODO(telyn): TestCreateGroupCommand
 
 func TestCreateVMCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
 	config.When("Get", "account").Return("test-account")
@@ -47,23 +47,23 @@ func TestCreateVMCommand(t *testing.T) {
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(bigv.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-vm"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	vm := bigv.VirtualMachineSpec{
-		Discs: []bigv.Disc{
-			bigv.Disc{
+	vm := lib.VirtualMachineSpec{
+		Discs: []lib.Disc{
+			lib.Disc{
 				Size:         25 * 1024,
 				StorageGrade: "sata",
 			},
-			bigv.Disc{
+			lib.Disc{
 				Size:         50 * 1024,
 				StorageGrade: "archive",
 			},
 		},
-		VirtualMachine: &bigv.VirtualMachine{
+		VirtualMachine: &lib.VirtualMachine{
 			Name:                  "test-vm",
 			Autoreboot:            true,
 			Cores:                 1,
@@ -73,22 +73,22 @@ func TestCreateVMCommand(t *testing.T) {
 			HardwareProfileLocked: true,
 			ZoneName:              "test-zone",
 		},
-		Reimage: &bigv.ImageInstall{
+		Reimage: &lib.ImageInstall{
 			Distribution: "test-image",
 			RootPassword: "test-password",
 		},
-		IPs: &bigv.IPSpec{
+		IPs: &lib.IPSpec{
 			IPv4: "192.168.1.123",
 			IPv6: "fe80::123",
 		},
 	}
 
-	group := bigv.GroupName{
+	group := lib.GroupName{
 		Group:   "",
 		Account: "",
 	}
 
-	vmname := bigv.VirtualMachineName{
+	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "",
 		Account:        "",
@@ -119,7 +119,7 @@ func TestCreateVMCommand(t *testing.T) {
 }
 
 func TestCreateVMNoImagesNoDiscs(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
 	config.When("Get", "account").Return("test-account")
@@ -128,25 +128,25 @@ func TestCreateVMNoImagesNoDiscs(t *testing.T) {
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(bigv.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-vm"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	vm := bigv.VirtualMachineSpec{
-		VirtualMachine: &bigv.VirtualMachine{
+	vm := lib.VirtualMachineSpec{
+		VirtualMachine: &lib.VirtualMachine{
 			Name:   "test-vm",
 			Cores:  1,
 			Memory: 1024,
 		},
 	}
 
-	group := bigv.GroupName{
+	group := lib.GroupName{
 		Group:   "",
 		Account: "",
 	}
 
-	vmname := bigv.VirtualMachineName{
+	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "",
 		Account:        "",
@@ -168,7 +168,7 @@ func TestCreateVMNoImagesNoDiscs(t *testing.T) {
 }
 
 func TestCreateVM(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
 	config.When("Get", "account").Return("test-account")
@@ -177,30 +177,30 @@ func TestCreateVM(t *testing.T) {
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm", "3", "6565m", "archive:34"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(bigv.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-vm"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	vm := bigv.VirtualMachineSpec{
-		VirtualMachine: &bigv.VirtualMachine{
+	vm := lib.VirtualMachineSpec{
+		VirtualMachine: &lib.VirtualMachine{
 			Name:   "test-vm",
 			Cores:  3,
 			Memory: 6565,
 		},
-		Discs: []bigv.Disc{{
+		Discs: []lib.Disc{{
 			Size:         34 * 1024,
 			StorageGrade: "archive",
 		},
 		},
 	}
 
-	group := bigv.GroupName{
+	group := lib.GroupName{
 		Group:   "",
 		Account: "",
 	}
 
-	vmname := bigv.VirtualMachineName{
+	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "",
 		Account:        "",

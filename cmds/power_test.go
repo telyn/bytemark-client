@@ -1,23 +1,23 @@
 package cmds
 
 import (
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/mocks"
 	"testing"
 )
 
 func TestResetCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
-	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+	vmn := lib.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("ResetVirtualMachine", vmn).Times(1)
@@ -29,17 +29,17 @@ func TestResetCommand(t *testing.T) {
 	}
 }
 func TestRestartCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
-	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+	vmn := lib.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("RestartVirtualMachine", vmn).Times(1)
@@ -51,17 +51,17 @@ func TestRestartCommand(t *testing.T) {
 	}
 }
 func TestShutdownCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
-	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+	vmn := lib.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
@@ -72,17 +72,17 @@ func TestShutdownCommand(t *testing.T) {
 	}
 }
 func TestStartCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
-	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+	vmn := lib.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
@@ -94,18 +94,18 @@ func TestStartCommand(t *testing.T) {
 	}
 }
 func TestStopCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
-	vmn := bigv.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
+	vmn := lib.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("StopVirtualMachine", vmn).Times(1)

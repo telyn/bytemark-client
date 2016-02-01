@@ -1,9 +1,9 @@
 package cmds
 
 import (
+	"bufio"
 	"bytemark.co.uk/client/cmds/util"
 	"bytemark.co.uk/client/util/log"
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"io"
@@ -21,7 +21,7 @@ func (commands *CommandSet) HelpForDebug() util.ExitCode {
 	log.Log("    bytemark debug [--junk-token] [--auth] PUT <path>")
 	log.Log("    bytemark debug [--junk-token] [--auth] POST <path>")
 	log.Log()
-	log.Log("GET sends an HTTP GET request with an optional valid authorization header to the given path on the BigV endpoint and pretty-prints the received json.")
+	log.Log("GET sends an HTTP GET request with an optional valid authorization header to the given path on the API endpoint and pretty-prints the received json.")
 	log.Log("The rest do similar, but PUT and POST")
 	log.Log("The --junk-token flag sets the token to empty - useful if you want to ensure that credential-auth is working, or you want to do something as another user")
 	log.Log("The --auth token tells the client to gain valid auth and send the auth header on that request.")
@@ -68,7 +68,7 @@ func (commands *CommandSet) Debug(args []string) util.ExitCode {
 				return util.ProcessError(err)
 			}
 		}
-		body, err := commands.bigv.RequestAndRead(*shouldAuth, args[0], args[1], requestBody)
+		body, err := commands.client.RequestAndRead(*shouldAuth, args[0], args[1], requestBody)
 		if err != nil {
 			return util.ProcessError(err)
 		}

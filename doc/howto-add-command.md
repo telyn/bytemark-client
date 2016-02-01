@@ -15,7 +15,7 @@ lib
 * Add a unit test for your API call to the relavent `_test.go` file
   in `lib/`.
 
-* Add a mock version of the function to `mocks/bigv-client.go`
+* Add a mock version of the function to `mocks/bytemark-client.go`
   Now `go test bytemark.co.uk/client/main` will work.
   Commit if you like.
 
@@ -72,4 +72,4 @@ arguments and junky ~/.bytemark folders and such and send me logs with
 I suspect there will still be weird edge cases in the first release
 and maybe for all time, but the basic idea is that `exit` in
 `main/exit.go` should be smart enough 90% of the time, and all weird
-errors just need wrapping in a `GoBigvWeirdError` or something.
+errors just need wrapping in a `BytemarkWeirdError` or something.

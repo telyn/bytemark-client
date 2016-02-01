@@ -60,9 +60,9 @@ func (defs JSONDefinitions) Process() *Definitions {
 	return &out
 }
 
-func (bigv *bigvClient) ReadDefinitions() (*Definitions, error) {
+func (c *bytemarkClient) ReadDefinitions() (*Definitions, error) {
 	var defs JSONDefinitions
-	err := bigv.RequestAndUnmarshal(false, "GET", "/definitions", "", &defs)
+	err := c.RequestAndUnmarshal(false, "GET", "/definitions", "", &defs)
 	if err != nil {
 		return nil, err
 	}

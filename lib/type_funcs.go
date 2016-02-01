@@ -26,9 +26,9 @@ func (g GroupName) String() string {
 	return g.Group + "." + g.Account
 }
 
-func (bigv *bigvClient) validateVirtualMachineName(vm *VirtualMachineName) error {
+func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) error {
 	if vm.Account == "" {
-		vm.Account = bigv.authSession.Username
+		vm.Account = c.authSession.Username
 	}
 	if vm.Group == "" {
 		vm.Group = "default"
@@ -39,9 +39,9 @@ func (bigv *bigvClient) validateVirtualMachineName(vm *VirtualMachineName) error
 	return nil
 }
 
-func (bigv *bigvClient) validateGroupName(group *GroupName) error {
+func (c *bytemarkClient) validateGroupName(group *GroupName) error {
 	if group.Account == "" {
-		group.Account = bigv.authSession.Username
+		group.Account = c.authSession.Username
 	}
 	if group.Group == "" {
 		group.Group = "default"
@@ -49,15 +49,15 @@ func (bigv *bigvClient) validateGroupName(group *GroupName) error {
 	return nil
 }
 
-func (bigv *bigvClient) validateAccountName(account *string) error {
+func (c *bytemarkClient) validateAccountName(account *string) error {
 	if *account == "" {
-		*account = bigv.authSession.Username
+		*account = c.authSession.Username
 	}
 	return nil
 }
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (bigv *bigvClient) ParseVirtualMachineName(name string, defaults ...VirtualMachineName) (vm VirtualMachineName, err error) {
+func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...VirtualMachineName) (vm VirtualMachineName, err error) {
 	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	if len(defaults) == 0 {
@@ -101,7 +101,7 @@ Loop:
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
-func (bigv *bigvClient) ParseGroupName(name string, defaults ...GroupName) (group GroupName) {
+func (c *bytemarkClient) ParseGroupName(name string, defaults ...GroupName) (group GroupName) {
 	// 1 or 2 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	if len(defaults) == 0 {
@@ -131,7 +131,7 @@ Loop:
 }
 
 // ParseAccountName parses a group name given in .account[.extrabits] format.
-func (bigv *bigvClient) ParseAccountName(name string, defaults ...string) (account string) {
+func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (account string) {
 	// 1 piece with optional extra cruft for the fqdn
 
 	if len(defaults) == 0 {

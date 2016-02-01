@@ -16,21 +16,21 @@ import (
 
 func CleanEnv() {
 	// apparently os.Unsetenv doesn't exist in the version of go I'm using
-	os.Setenv("BIGV_CONFIG_DIR", "")
-	os.Setenv("BIGV_USER", "")
-	os.Setenv("BIGV_ACCOUNT", "")
-	os.Setenv("BIGV_ENDPOINT", "")
-	os.Setenv("BIGV_AUTH_ENDPOINT", "")
-	os.Setenv("BIGV_DEBUG_LEVEL", "")
+	os.Setenv("BM_CONFIG_DIR", "")
+	os.Setenv("BM_USER", "")
+	os.Setenv("BM_ACCOUNT", "")
+	os.Setenv("BM_ENDPOINT", "")
+	os.Setenv("BM_AUTH_ENDPOINT", "")
+	os.Setenv("BM_DEBUG_LEVEL", "")
 }
 
 func JunkEnv() {
-	os.Setenv("BIGV_CONFIG_DIR", "junk-env-config-dir")
-	os.Setenv("BIGV_USER", "junk-env-user")
-	os.Setenv("BIGV_ACCOUNT", "junk-env-account")
-	os.Setenv("BIGV_ENDPOINT", "junk-env-endpoint")
-	os.Setenv("BIGV_AUTH_ENDPOINT", "junk-env-auth-endpoint")
-	os.Setenv("BIGV_DEBUG_LEVEL", "junk-env-debug-level")
+	os.Setenv("BM_CONFIG_DIR", "junk-env-config-dir")
+	os.Setenv("BM_USER", "junk-env-user")
+	os.Setenv("BM_ACCOUNT", "junk-env-account")
+	os.Setenv("BM_ENDPOINT", "junk-env-endpoint")
+	os.Setenv("BM_AUTH_ENDPOINT", "junk-env-auth-endpoint")
+	os.Setenv("BM_DEBUG_LEVEL", "junk-env-debug-level")
 }
 
 func FixtureEnv() (fixture map[string]string) {
@@ -42,12 +42,12 @@ func FixtureEnv() (fixture map[string]string) {
 		"auth-endpoint": "https://fixture.env.auth.localhost.local",
 		"debug-level":   "fixture-env-debug-level",
 	}
-	os.Setenv("BIGV_CONFIG_DIR", fixture["config-dir"])
-	os.Setenv("BIGV_USER", fixture["user"])
-	os.Setenv("BIGV_ACCOUNT", fixture["account"])
-	os.Setenv("BIGV_ENDPOINT", fixture["endpoint"])
-	os.Setenv("BIGV_AUTH_ENDPOINT", fixture["auth-endpoint"])
-	os.Setenv("BIGV_DEBUG_LEVEL", fixture["debug-level"])
+	os.Setenv("BM_CONFIG_DIR", fixture["config-dir"])
+	os.Setenv("BM_USER", fixture["user"])
+	os.Setenv("BM_ACCOUNT", fixture["account"])
+	os.Setenv("BM_ENDPOINT", fixture["endpoint"])
+	os.Setenv("BM_AUTH_ENDPOINT", fixture["auth-endpoint"])
+	os.Setenv("BM_DEBUG_LEVEL", fixture["debug-level"])
 	return fixture
 }
 
@@ -58,7 +58,7 @@ func FixtureEnv() (fixture map[string]string) {
 */
 
 func CleanDir() (name string) {
-	dir, err := ioutil.TempDir("", "bigv-client-test")
+	dir, err := ioutil.TempDir("", "bytemark-client-test")
 	if err != nil {
 		panic("Couldn't create test dir.")
 	}
@@ -76,7 +76,7 @@ func JunkDir() (name string) {
 		"debug-level":   "junk-dir-debug-level",
 	}
 
-	dir, err := ioutil.TempDir("", "bigv-client-test")
+	dir, err := ioutil.TempDir("", "bytemark-client-test")
 	if err != nil {
 		panic("Couldn't create test dir.")
 	}
@@ -96,7 +96,7 @@ func FixtureDir() (dir string, fixture map[string]string) {
 		"debug-level":   "fixture-dir-debug-level",
 	}
 
-	dir, err := ioutil.TempDir("", "bigv-client-test")
+	dir, err := ioutil.TempDir("", "bytemark-client-test")
 	if err != nil {
 		panic("Couldn't create test dir.")
 	}
@@ -132,7 +132,7 @@ func TestConfigEnvConfigDir(t *testing.T) {
 	CleanEnv()
 
 	expected := "/tmp"
-	os.Setenv("BIGV_CONFIG_DIR", expected)
+	os.Setenv("BM_CONFIG_DIR", expected)
 
 	config, err := NewConfig("", nil)
 	if err != nil {
@@ -188,7 +188,7 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	dir := CleanDir()
 
 	expected := "test-username"
-	os.Setenv("BIGV_USER", expected)
+	os.Setenv("BM_USER", expected)
 
 	config, err := NewConfig(dir, nil)
 	if err != nil {
@@ -202,13 +202,13 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	is.Nil(err)
 	is.Equal("user", v.Name)
 	is.Equal(expected, v.Value)
-	is.Equal("ENV BIGV_USER", v.Source)
+	is.Equal("ENV BM_USER", v.Source)
 
 	v, err = config.GetV("account")
 	is.Nil(err)
 	is.Equal("account", v.Name)
 	is.Equal(expected, v.Value)
-	is.Equal("ENV BIGV_USER", v.Source)
+	is.Equal("ENV BM_USER", v.Source)
 
 	os.RemoveAll(dir)
 }

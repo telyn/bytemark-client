@@ -27,8 +27,6 @@ func (cmds *CommandSet) HelpForConsole() util.ExitCode {
 	log.Log("vnc: Outputs instructions for connecting to the VNC console.")
 	log.Log("     If --connect is given, will also attempt to connect to")
 	log.Log("     the VNC console using the Bytemark panel.")
-	// falling back to the BigV panel if no ssh")
-	//log.Log("     or vnc clients can be found, or if --panel is specified.")
 	log.Log()
 	log.Log()
 	return util.E_USAGE_DISPLAYED
@@ -54,7 +52,7 @@ func (cmds *CommandSet) showVNCHowTo(vm *lib.VirtualMachine) {
 	log.Log()
 	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
-	log.Logf("Then set up a tunnel using SSH: ssh -L 9999:%s:5900 %s@%s\r\n", vm.ManagementAddress, cmds.bigv.GetSessionUser(), vm.ManagementAddress)
+	log.Logf("Then set up a tunnel using SSH: ssh -L 9999:%s:5900 %s@%s\r\n", vm.ManagementAddress, cmds.client.GetSessionUser(), vm.ManagementAddress)
 	log.Log()
 	log.Log("You will then be able to connect to vnc://localhost:9999/")
 	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
@@ -65,7 +63,7 @@ func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
 	log.Log()
 	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
-	log.Logf("Then connect to %s@%s\r\n", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
+	log.Logf("Then connect to %s@%s\r\n", cmds.client.GetSessionUser(), vm.ManagementAddress)
 
 }
 
@@ -84,7 +82,7 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 		cmds.HelpForConsole()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Logf("Virtual machine name cannot be blank\r\n")
 		return util.E_PEBKAC
@@ -94,7 +92,7 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	vm, err := cmds.bigv.GetVirtualMachine(name)
+	vm, err := cmds.client.GetVirtualMachine(name)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -115,7 +113,7 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 			cmds.showSSHHowTo(vm)
 			return util.E_SUCCESS
 		}
-		host := fmt.Sprintf("%s@%s", cmds.bigv.GetSessionUser(), vm.ManagementAddress)
+		host := fmt.Sprintf("%s@%s", cmds.client.GetSessionUser(), vm.ManagementAddress)
 		log.Logf("ssh %s\r\n", host)
 		bin, err := exec.LookPath("ssh")
 		if err != nil {

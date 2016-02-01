@@ -2,7 +2,7 @@ package util
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"fmt"
 	"net"
@@ -47,37 +47,37 @@ const (
 
 	// E_CANT_CONNECT_AUTH is the exit code returned when we were unable to establish an HTTP connection to the auth endpoint.
 	E_CANT_CONNECT_AUTH = 50
-	// E_CANT_CONNECT_BIGV is the exit code returned when we were unable to establish an HTTP connection to the BigV endpoint.
-	E_CANT_CONNECT_BIGV = 150
+	// E_CANT_CONNECT_API is the exit code returned when we were unable to establish an HTTP connection to the API endpoint.
+	E_CANT_CONNECT_API = 150
 
 	// E_AUTH_REPORTED_ERROR is the exit code returned when the auth server reported an internal error.
 	E_AUTH_REPORTED_ERROR = 51
-	// E_BIGV_REPORTED_ERROR is the exit code returned when the BigV server reported an internal error.
-	E_BIGV_REPORTED_ERROR = 152
+	// E_API_REPORTED_ERROR is the exit code returned when the API server reported an internal error.
+	E_API_REPORTED_ERROR = 152
 
 	// E_CANT_PARSE_AUTH is the exit code returned when the auth server returned something we were unable to parse.
 	E_CANT_PARSE_AUTH = 52
-	// E_CANT_PARSE_BIGV is the exit code returned when the BigV server returned something we were unable to parse.
-	E_CANT_PARSE_BIGV = 152
+	// E_CANT_PARSE_API is the exit code returned when the API server returned something we were unable to parse.
+	E_CANT_PARSE_API = 152
 
 	// E_CREDENTIALS_INVALID is the exit code returned when the auth server says your credentials contain invalid characters.
 	E_CREDENTIALS_INVALID = 53
 	// E_CREDENTIALS_WRONG is the exit code returned when the auth server says your credentials don't match a user in its database.
 	E_CREDENTIALS_WRONG = 54
 
-	// E_NOT_AUTHORIZED_BIGV is the exit code returned when the BigV server says you haven't got permission to do that.
-	E_NOT_AUTHORIZED_BIGV = 155
+	// E_NOT_AUTHORIZED_API is the exit code returned when the API server says you haven't got permission to do that.
+	E_NOT_AUTHORIZED_API = 155
 
-	// E_NOT_FOUND_BIGV is the exit code returned when the BigV server says you do not have permission to see the object you are trying to view, or that it does not exist.
-	E_NOT_FOUND_BIGV = 156
+	// E_NOT_FOUND_API is the exit code returned when the API server says you do not have permission to see the object you are trying to view, or that it does not exist.
+	E_NOT_FOUND_API = 156
 
-	// E_BAD_REQUEST_BIGV is the exit code returned when we send a bad request to BigV. (E.g. names being too short or having wrong characters in)
-	E_BAD_REQUEST_BIGV = 157
+	// E_BAD_REQUEST_API is the exit code returned when we send a bad request to API. (E.g. names being too short or having wrong characters in)
+	E_BAD_REQUEST_API = 157
 
 	// E_UNKNOWN_AUTH is the exit code returned when we get an unexpected error from the auth server.
-	E_UNKNOWN_AUTH = 149
-	// E_UNKNOWN_BIGV is the exit code returned when we get an unexpected error from the BigV server.
-	E_UNKNOWN_BIGV = 249
+	E_UNKNOWN_AUTH_ERROR = 149
+	// E_UNKNOWN_API_ERROR is the exit code returned when we get an unexpected error from the Bytemark API.
+	E_UNKNOWN_API_ERROR = 249
 )
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
@@ -89,7 +89,7 @@ Exit code ranges:
 
       0- 49: local problems
      50-149: problem talking to auth.
-    150-249: problem talking to BigV.
+    150-249: problem talking to Bytemark.
     250-255: interrupts & signals
 
     Exit codes between 50 and 249 with the same tens and units have the same meaning but for a different endpoint
@@ -116,7 +116,7 @@ Exit code ranges:
  50 - 249 Exit codes:
 
      50 / 150
-        Unable to establish a connection to auth/BigV endpoint
+        Unable to establish a connection to auth/API endpoint
     
      51 / 151
         Auth endpoint reported an internal error
@@ -134,14 +134,14 @@ Exit code ranges:
 	Your user account doesn't have authorisation to perform that action
 
     156
-        Something couldn't be found on BigV. This could be due to the following reasons:
+        Something couldn't be found by the API server. This could be due to the following reasons:
             * It doesn't exist
 	    * Your user account doesn't have authorisation to see it
-	    * Protocol mismatch between the BigV endpoint and bytemark.
+	    * Protocol mismatch between the Bytemark endpoint and our client (i.e. client out of date).
 
     149 / 249
 
-        An unknown error fell out of the auth / BigV library.
+        An unknown error fell out of the auth / API library.
 
 250 - 255 Exit codes:
 
@@ -185,18 +185,18 @@ func ProcessError(err error, message ...string) ExitCode {
 				exitCode = E_CANT_CONNECT_AUTH
 			default:
 				errorMessage = fmt.Sprintf("Couldn't create auth session - internal error of type %T: %v", authErr.Err, authErr.Err)
-				exitCode = E_UNKNOWN_AUTH
+				exitCode = E_UNKNOWN_AUTH_ERROR
 			}
 		case *url.Error:
 			urlErr, _ := err.(*url.Error)
 			if urlErr.Error != nil {
 				if opError, ok := urlErr.Err.(*net.OpError); ok {
-					errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %v", opError.Err)
+					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", opError.Err)
 				} else {
-					errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %T %v\r\nPlease file a bug report quoting this message.", urlErr.Err, urlErr.Err)
+					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %T %v\r\nPlease file a bug report quoting this message.", urlErr.Err, urlErr.Err)
 				}
 			} else {
-				errorMessage = fmt.Sprintf("Couldn't connect to the BigV api server: %v", urlErr)
+				errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", urlErr)
 			}
 		case *SubprocessFailedError:
 			spErr, _ := err.(*SubprocessFailedError)
@@ -205,18 +205,18 @@ func ProcessError(err error, message ...string) ExitCode {
 			}
 			errorMessage = err.Error()
 			exitCode = E_SUBPROCESS_FAILED
-		case bigv.NotAuthorizedError:
+		case lib.NotAuthorizedError:
 			errorMessage = err.Error()
-			exitCode = E_NOT_AUTHORIZED_BIGV
-		case bigv.BadRequestError:
+			exitCode = E_NOT_AUTHORIZED_API
+		case lib.BadRequestError:
 			errorMessage = err.Error()
-			exitCode = E_BAD_REQUEST_BIGV
-		case bigv.InternalServerError:
+			exitCode = E_BAD_REQUEST_API
+		case lib.InternalServerError:
 			errorMessage = err.Error()
-			exitCode = E_BIGV_REPORTED_ERROR
-		case bigv.NotFoundError:
+			exitCode = E_API_REPORTED_ERROR
+		case lib.NotFoundError:
 			errorMessage = err.Error()
-			exitCode = E_NOT_FOUND_BIGV
+			exitCode = E_NOT_FOUND_API
 		case *UserRequestedExit:
 			errorMessage = ""
 			exitCode = E_USER_EXIT
@@ -224,7 +224,7 @@ func ProcessError(err error, message ...string) ExitCode {
 			errno, _ := err.(*syscall.Errno)
 			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", errno)
 			exitCode = E_UNKNOWN_ERROR
-		case bigv.AmbiguousKeyError:
+		case lib.AmbiguousKeyError:
 			exitCode = E_PEBKAC
 			errorMessage = err.Error()
 		default:
@@ -239,9 +239,9 @@ func ProcessError(err error, message ...string) ExitCode {
 			}
 		}
 
-		if _, ok := err.(bigv.BigVError); ok && exitCode == E_UNKNOWN_ERROR {
-			errorMessage = fmt.Sprintf("Unknown error from BigV client library. %s", err.Error())
-			exitCode = E_UNKNOWN_BIGV
+		if _, ok := err.(lib.APIError); ok && exitCode == E_UNKNOWN_ERROR {
+			errorMessage = fmt.Sprintf("Unknown error from API client library. %s", err.Error())
+			exitCode = E_UNKNOWN_API_ERROR
 		}
 	} else {
 		exitCode = 0

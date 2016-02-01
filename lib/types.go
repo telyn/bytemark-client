@@ -15,7 +15,7 @@ type GroupName struct {
 	Account string
 }
 
-// Disc is a representation of a VM's disc, which can be unmarshalled from JSON output by the BigV server.
+// Disc is a representation of a VM's disc.
 type Disc struct {
 	Label        string `json:"label"`
 	StorageGrade string `json:"storage_grade"`
@@ -35,7 +35,7 @@ type ImageInstall struct {
 	PublicKeys      string `json:"ssh_public_key"`
 }
 
-// IP represents an IP for the purpose of setting RDNS with BigV
+// IP represents an IP for the purpose of setting RDNS
 type IP struct {
 	RDns string `json:"rdns"`
 
@@ -43,13 +43,13 @@ type IP struct {
 	IP string `json:"ip"`
 }
 
-// IPSpec represents one v4 and one v6 address to assign to a bigv during creation.
+// IPSpec represents one v4 and one v6 address to assign to a server during creation.
 type IPSpec struct {
 	IPv4 string `json:"ipv4"`
 	IPv6 string `json:"ipv6"`
 }
 
-// NetworkInterface represents a BigV virtual NIC and what IPs it has routed.
+// NetworkInterface represents a virtual NIC and what IPs it has routed.
 type NetworkInterface struct {
 	Label string `json:"label"`
 
@@ -86,7 +86,7 @@ type User struct {
 	AuthorizedKeys []string
 }
 
-// VirtualMachine represents a VirtualMachine, as passed around from the BigV virtual_machines endpoint
+// VirtualMachine represents a VirtualMachine, as passed around from the virtual_machines endpoint
 type VirtualMachine struct {
 	Autoreboot            bool   `json:"autoreboot_on"`
 	CdromURL              string `json:"cdrom_url"`
@@ -131,7 +131,7 @@ type Group struct {
 	VirtualMachines []*VirtualMachine `json:"virtual_machines"`
 }
 
-// Account represents a BigV account
+// Account represents an account that's used by the brains. I think billing accounts will probably need their own type.
 type Account struct {
 	Name string `json:"name"`
 

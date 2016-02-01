@@ -1,7 +1,7 @@
 package cmds
 
 import (
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	//"github.com/cheekybits/is"
 )
 
@@ -9,19 +9,19 @@ import (
 // Support Functions //
 ///////////////////////
 
-func getFixtureVM() bigv.VirtualMachine {
-	return bigv.VirtualMachine{
+func getFixtureVM() lib.VirtualMachine {
+	return lib.VirtualMachine{
 		Name:    "test-vm",
 		GroupID: 1,
 	}
 }
 
-func getFixtureGroup() bigv.Group {
-	vms := make([]*bigv.VirtualMachine, 1, 1)
+func getFixtureGroup() lib.Group {
+	vms := make([]*lib.VirtualMachine, 1, 1)
 	vm := getFixtureVM()
 	vms[0] = &vm
 
-	return bigv.Group{
+	return lib.Group{
 		Name:            "test-group",
 		VirtualMachines: vms,
 	}

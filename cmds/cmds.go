@@ -3,7 +3,7 @@ package cmds
 import (
 	auth3 "bytemark.co.uk/auth3/client"
 	util "bytemark.co.uk/client/cmds/util"
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"fmt"
 	"github.com/bgentry/speakeasy"
@@ -14,7 +14,7 @@ import (
 
 type CommandFunc func([]string) util.ExitCode
 
-// Commands represents the available commands in the BigV client. Each command should have its own function defined here, with a corresponding HelpFor* function too.
+// Commands represents the available commands in the Bytemark client. Each command should have its own function defined here, with a corresponding HelpFor* function too.
 type CommandManager interface {
 	EnsureAuth() error
 
@@ -75,30 +75,30 @@ type CommandManager interface {
 
 // CommandSet is the main implementation of the Commands interface
 type CommandSet struct {
-	bigv   bigv.Client
+	client lib.Client
 	config util.ConfigManager
 }
 
 // NewCommandSet creates a CommandSet given a ConfigManager and bytemark.co.uk/client/lib Client.
-func NewCommandSet(config util.ConfigManager, client bigv.Client) *CommandSet {
+func NewCommandSet(config util.ConfigManager, client lib.Client) *CommandSet {
 	commandSet := new(CommandSet)
 	commandSet.config = config
-	commandSet.bigv = client
+	commandSet.client = client
 	return commandSet
 }
 
-// EnsureAuth authenticates with the BigV authentication server, prompting for credentials if necessary.
+// EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.
 func (cmds *CommandSet) EnsureAuth() error {
 	token, err := cmds.config.Get("token")
 
-	err = cmds.bigv.AuthWithToken(token)
+	err = cmds.client.AuthWithToken(token)
 	if err != nil {
 		if aErr, ok := err.(*auth3.Error); ok {
 			if _, ok := aErr.Err.(*url.Error); ok {
 				return aErr
 			}
 		}
-		log.Error("Please log in to BigV\r\n")
+		log.Error("Please log in to Bytemark\r\n")
 		attempts := 3
 
 		for err != nil {
@@ -113,10 +113,10 @@ func (cmds *CommandSet) EnsureAuth() error {
 				credents["yubikey"] = cmds.config.GetIgnoreErr("yubikey-otp")
 			}
 
-			err = cmds.bigv.AuthWithCredentials(credents)
+			err = cmds.client.AuthWithCredentials(credents)
 			if err == nil {
 				// sucess!
-				cmds.config.SetPersistent("token", cmds.bigv.GetSessionToken(), "AUTH")
+				cmds.config.SetPersistent("token", cmds.client.GetSessionToken(), "AUTH")
 				break
 			} else {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
@@ -136,7 +136,7 @@ func (cmds *CommandSet) EnsureAuth() error {
 		}
 	}
 	if cmds.config.GetIgnoreErr("yubikey") != "" {
-		factors := cmds.bigv.GetSessionFactors()
+		factors := cmds.client.GetSessionFactors()
 		for _, f := range factors {
 			if f == "yubikey" {
 				return nil

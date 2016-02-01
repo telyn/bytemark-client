@@ -22,11 +22,11 @@ func BuildURL(format string, args ...string) string {
 }
 
 // RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
-func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error {
+func (c *bytemarkClient) RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error {
 
-	data, err := bigv.RequestAndRead(auth, method, path, requestBody)
+	data, err := c.RequestAndRead(auth, method, path, requestBody)
 
-	if bigv.debugLevel >= 3 {
+	if c.debugLevel >= 3 {
 		buf := new(bytes.Buffer)
 		json.Indent(buf, data, "", "    ")
 		log.Debugf(3, "%s", buf)
@@ -43,8 +43,8 @@ func (bigv *bigvClient) RequestAndUnmarshal(auth bool, method, path, requestBody
 
 // RequestAndRead makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
 // This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
-func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
-	_, res, err := bigv.Request(auth, method, location, requestBody)
+func (c *bytemarkClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
+	_, res, err := c.Request(auth, method, location, requestBody)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -66,14 +66,14 @@ func (bigv *bigvClient) RequestAndRead(auth bool, method, location, requestBody 
 
 // Request makes an HTTP request and then request it, returning the request object, response object and any errors
 // For use by Client.RequestAndRead, do not use externally except for testing
-func (bigv *bigvClient) Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
+func (c *bytemarkClient) Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
 	url := location
 
 	if strings.HasPrefix(location, "/") {
-		url = bigv.endpoint + location
+		url = c.endpoint + location
 	}
 	cli := &http.Client{}
-	if bigv.endpoint == "https://staging.bigv.io" {
+	if c.endpoint == "https://staging.bigv.io" {
 		cli.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
@@ -89,10 +89,10 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	if auth {
-		if bigv.authSession == nil {
+		if c.authSession == nil {
 			return nil, nil, &NilAuthError{}
 		}
-		req.Header.Add("Authorization", "Bearer "+bigv.authSession.Token)
+		req.Header.Add("Authorization", "Bearer "+c.authSession.Token)
 	}
 
 	res, err = cli.Do(req)
@@ -103,7 +103,7 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 	log.Debugf(1, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
 	log.Debugf(3, "request body: '%s'\r\n", requestBody)
 
-	baseErr := BigVError{
+	baseErr := APIError{
 		Method:       method,
 		URL:          req.URL,
 		StatusCode:   res.StatusCode,
@@ -116,10 +116,10 @@ func (bigv *bigvClient) Request(auth bool, method string, location string, reque
 		responseBody, readErr := ioutil.ReadAll(res.Body)
 		log.Debugf(3, "response body: '%s'\r\n", responseBody)
 		if readErr != nil {
-			return nil, nil, BadRequestError{BigVError: baseErr, Problems: make(map[string][]string)}
+			return nil, nil, BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
 		}
 		baseErr.ResponseBody = string(responseBody)
-		brErr := BadRequestError{BigVError: baseErr, Problems: make(map[string][]string)}
+		brErr := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
 		err = json.Unmarshal(responseBody, &brErr.Problems)
 		if err != nil {
 			log.Debug(1, err)

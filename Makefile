@@ -111,9 +111,6 @@ endif
 find-uk0: 
 	$(RGREP) --exclude=bytemark "uk0" .
 
-find-bigv:
-	$(RGREP) --exclude=bytemark -i bigv . | grep -v "bigv.io"
-
 find-bugs-todos:
 	$(RGREP) -P "// BUG(.*):" . || echo ""
 	$(RGREP) -P "// TODO(.*):" .

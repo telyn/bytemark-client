@@ -27,12 +27,12 @@ func (disc *Disc) Validate() (*Disc, error) {
 	return disc, nil
 }
 
-func (bigv *bigvClient) CreateDisc(name VirtualMachineName, disc Disc) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc Disc) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
-	vm, err := bigv.GetVirtualMachine(name)
+	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return err
 	}
@@ -45,25 +45,25 @@ func (bigv *bigvClient) CreateDisc(name VirtualMachineName, disc Disc) (err erro
 		return err
 	}
 
-	_, err = bigv.RequestAndRead(true, "POST", path, string(js))
+	_, err = c.RequestAndRead(true, "POST", path, string(js))
 	return err
 
 }
 
-func (bigv *bigvClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string) (err error) {
-	err = bigv.validateVirtualMachineName(&vm)
+func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string) (err error) {
+	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return err
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 
-	_, _, err = bigv.Request(true, "DELETE", path, "")
+	_, _, err = c.Request(true, "DELETE", path, "")
 
 	return err
 }
 
-func (bigv *bigvClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
-	err = bigv.validateVirtualMachineName(&vm)
+func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
+	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return err
 	}
@@ -71,12 +71,12 @@ func (bigv *bigvClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, 
 
 	disc := fmt.Sprintf(`{"size":%d}`, sizeMB)
 
-	_, _, err = bigv.Request(true, "PUT", path, disc)
+	_, _, err = c.Request(true, "PUT", path, disc)
 	return err
 }
 
-func (bigv *bigvClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
-	err = bigv.validateVirtualMachineName(&vm)
+func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
+	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +84,6 @@ func (bigv *bigvClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (di
 
 	disc = new(Disc)
 
-	err = bigv.RequestAndUnmarshal(true, "GET", path, "", disc)
+	err = c.RequestAndUnmarshal(true, "GET", path, "", disc)
 	return disc, err
 }

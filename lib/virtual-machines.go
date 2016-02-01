@@ -6,8 +6,8 @@ import (
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
-func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachineSpec) (vm *VirtualMachine, err error) {
-	err = bigv.validateGroupName(&group)
+func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec VirtualMachineSpec) (vm *VirtualMachine, err error) {
+	err = c.validateGroupName(&group)
 	if err != nil {
 		return nil, err
 	}
@@ -79,14 +79,14 @@ func (bigv *bigvClient) CreateVirtualMachine(group GroupName, spec VirtualMachin
 	}
 
 	vm = new(VirtualMachine)
-	err = bigv.RequestAndUnmarshal(true, "POST", path, string(js), vm)
+	err = c.RequestAndUnmarshal(true, "POST", path, string(js), vm)
 	return vm, err
 }
 
 // DeleteVirtualMachine deletes the named virtual machine.
 // returns nil on success or an error otherwise.
-func (bigv *bigvClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -95,20 +95,20 @@ func (bigv *bigvClient) DeleteVirtualMachine(name VirtualMachineName, purge bool
 		path += "?purge=true"
 	}
 
-	_, _, err = bigv.Request(true, "DELETE", path, "")
+	_, _, err = c.Request(true, "DELETE", path, "")
 	return err
 }
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return nil, err
 	}
 	vm = new(VirtualMachine)
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 
-	err = bigv.RequestAndUnmarshal(true, "GET", path, "", vm)
+	err = c.RequestAndUnmarshal(true, "GET", path, "", vm)
 	if err != nil {
 		return nil, err
 	}
@@ -117,8 +117,8 @@ func (bigv *bigvClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualM
 
 // ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 // Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
-func (bigv *bigvClient) ReimageVirtualMachine(name VirtualMachineName, image *ImageInstall) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) ReimageVirtualMachine(name VirtualMachineName, image *ImageInstall) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -128,98 +128,98 @@ func (bigv *bigvClient) ReimageVirtualMachine(name VirtualMachineName, image *Im
 	if err != nil {
 		return err
 	}
-	_, _, err = bigv.Request(true, "POST", path, string(js))
+	_, _, err = c.Request(true, "POST", path, string(js))
 	return err
 }
 
 // ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
 // button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
 // returns nil on success or an error otherwise.
-func (bigv *bigvClient) ResetVirtualMachine(name VirtualMachineName) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) ResetVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
 
-	_, _, err = bigv.Request(true, "POST", path, `{"signal":"reset"}`)
+	_, _, err = c.Request(true, "POST", path, `{"signal":"reset"}`)
 	return err
 }
 
 // RestartVirtualMachine restarts the named virtual machine. This is
 // returns nil on success or an error otherwise.
-func (bigv *bigvClient) RestartVirtualMachine(name VirtualMachineName) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) RestartVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
-	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": false}`)
+	_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": false}`)
 	return err
 }
 
 // StartVirtualMachine starts the named virtual machine.
 // returns nil on success or an error otherwise.
-func (bigv *bigvClient) StartVirtualMachine(name VirtualMachineName) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) StartVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
-	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": true}`)
+	_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": true}`)
 	return err
 }
 
 // StopVirtualMachine starts the named virtual machine.
 // returns nil on success or an error otherwise.
-func (bigv *bigvClient) StopVirtualMachine(name VirtualMachineName) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) StopVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
-	_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":false, "power_on": false}`)
+	_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":false, "power_on": false}`)
 	return err
 }
 
 // ShutdownVirtualMachine sends an ACPI shutdown to the VM. This will cause a graceful shutdown of the machine
 // returns nil on success or an error otherwise.
-func (bigv *bigvClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
 	if stayoff {
 		path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
-		_, _, err = bigv.Request(true, "PUT", path, `{"autoreboot_on":false}`)
+		_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":false}`)
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
 
-	_, _, err = bigv.Request(true, "POST", path, `{"signal": "powerdown"}`)
+	_, _, err = c.Request(true, "POST", path, `{"signal": "powerdown"}`)
 	return err
 }
 
 // UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 // Return nil on success, an error otherwise.
-func (bigv *bigvClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 
-	_, _, err = bigv.Request(true, "PUT", path, `{"deleted":false}`)
+	_, _, err = c.Request(true, "PUT", path, `{"deleted":false}`)
 	return err
 }
 
 // SetVirtualMachineHardwareProfile specifies the hardware profile on a VM. Optionally locks or unlocks h. profile
 // Return nil on success, an error otherwise.
-func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachineName, profile string, locked ...bool) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name VirtualMachineName, profile string, locked ...bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -233,14 +233,14 @@ func (bigv *bigvClient) SetVirtualMachineHardwareProfile(name VirtualMachineName
 	}
 	what := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofile_lock)
 
-	_, _, err = bigv.Request(true, "PUT", path, what)
+	_, _, err = c.Request(true, "PUT", path, what)
 	return err
 }
 
 // SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
 // Return nil on success, an error otherwise.
-func (bigv *bigvClient) SetVirtualMachineHardwareProfileLock(name VirtualMachineName, locked bool) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) SetVirtualMachineHardwareProfileLock(name VirtualMachineName, locked bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -251,14 +251,14 @@ func (bigv *bigvClient) SetVirtualMachineHardwareProfileLock(name VirtualMachine
 		what = `{"hardware_profile_locked": true}`
 	}
 
-	_, _, err = bigv.Request(true, "PUT", path, what)
+	_, _, err = c.Request(true, "PUT", path, what)
 	return err
 }
 
 // SetVirtualMachineMemory sets the RAM available to a virtual machine in megabytes
 // Return nil on success, an error otherwise.
-func (bigv *bigvClient) SetVirtualMachineMemory(name VirtualMachineName, memory int) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) SetVirtualMachineMemory(name VirtualMachineName, memory int) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -266,14 +266,14 @@ func (bigv *bigvClient) SetVirtualMachineMemory(name VirtualMachineName, memory 
 
 	what := fmt.Sprintf(`{"memory": %d}`, memory)
 
-	_, _, err = bigv.Request(true, "PUT", path, what)
+	_, _, err = c.Request(true, "PUT", path, what)
 	return err
 }
 
 // SetVirtualMachineCores sets the number of CPUs available to a virtual machine
 // Return nil on success, an error otherwise.
-func (bigv *bigvClient) SetVirtualMachineCores(name VirtualMachineName, cores int) (err error) {
-	err = bigv.validateVirtualMachineName(&name)
+func (c *bytemarkClient) SetVirtualMachineCores(name VirtualMachineName, cores int) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -281,6 +281,6 @@ func (bigv *bigvClient) SetVirtualMachineCores(name VirtualMachineName, cores in
 
 	what := fmt.Sprintf(`{"cores": %d}`, cores)
 
-	_, _, err = bigv.Request(true, "PUT", path, what)
+	_, _, err = c.Request(true, "PUT", path, what)
 	return err
 }

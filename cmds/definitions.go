@@ -11,7 +11,7 @@ func (cmds *CommandSet) readDefinitions(args []string) (*lib.Definitions, error)
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	defs, err := cmds.bigv.ReadDefinitions()
+	defs, err := cmds.client.ReadDefinitions()
 	return defs, err
 
 }

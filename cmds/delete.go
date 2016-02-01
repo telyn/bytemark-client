@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"bytemark.co.uk/client/cmds/util"
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"fmt"
 	"strings"
@@ -29,7 +29,7 @@ func (cmds *CommandSet) HelpForDelete() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }
 
-// DeleteVM implements the delete-vm command, which is used to delete and purge BigV VMs. See HelpForDelete for usage information.
+// DeleteVM implements the delete-vm command, which is used to delete and purge Bytemark VMs. See HelpForDelete for usage information.
 func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	purge := flags.Bool("purge", false, "")
@@ -42,7 +42,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannot be blank.")
 		return util.E_PEBKAC
@@ -52,7 +52,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	vm, err := cmds.bigv.GetVirtualMachine(name)
+	vm, err := cmds.client.GetVirtualMachine(name)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -73,7 +73,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		}
 	}
 
-	err = cmds.bigv.DeleteVirtualMachine(name, *purge)
+	err = cmds.client.DeleteVirtualMachine(name, *purge)
 
 	if err != nil {
 		return util.ProcessError(err)
@@ -108,7 +108,7 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -123,7 +123,7 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 		return util.E_USER_EXIT
 	}
 
-	err = cmds.bigv.DeleteDisc(name, disc)
+	err = cmds.client.DeleteDisc(name, disc)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -145,14 +145,14 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
+	name := cmds.client.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	group, err := cmds.bigv.GetGroup(name)
+	group, err := cmds.client.GetGroup(name)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -166,10 +166,10 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 			}
 			log.Log("", "")
 			if util.PromptYesNo("Are you sure you want to continue?") {
-				vmn := bigv.VirtualMachineName{Group: name.Group, Account: name.Account}
+				vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 				for _, vm := range group.VirtualMachines {
 					vmn.VirtualMachine = vm.Name
-					err := cmds.bigv.DeleteVirtualMachine(vmn, true)
+					err := cmds.client.DeleteVirtualMachine(vmn, true)
 					if err != nil {
 						return util.ProcessError(err)
 					} else {
@@ -183,7 +183,7 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 			return util.E_WONT_DELETE_NONEMPTY
 		}
 	}
-	return util.ProcessError(cmds.bigv.DeleteGroup(name))
+	return util.ProcessError(cmds.client.DeleteGroup(name))
 
 }
 
@@ -209,7 +209,7 @@ func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	err = cmds.bigv.DeleteUserAuthorizedKey(user, key)
+	err = cmds.client.DeleteUserAuthorizedKey(user, key)
 	if err == nil {
 		log.Log("Key deleted successfullly")
 		return util.E_SUCCESS
@@ -218,7 +218,7 @@ func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
 	}
 }
 
-// UndeleteVM implements the undelete-vm command, which is used to remove the deleted flag from BigV VMs, allowing them to be reactivated.
+// UndeleteVM implements the undelete vm command, which is used to remove the deleted flag from Bytemark VMs, allowing them to be reactivated.
 func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
@@ -226,7 +226,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannot be blank")
 		return util.E_PEBKAC
@@ -236,7 +236,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	vm, err := cmds.bigv.GetVirtualMachine(name)
+	vm, err := cmds.client.GetVirtualMachine(name)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -246,7 +246,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 		return util.E_SUCCESS
 	}
 
-	err = cmds.bigv.UndeleteVirtualMachine(name)
+	err = cmds.client.UndeleteVirtualMachine(name)
 
 	if err != nil {
 		return util.ProcessError(err)

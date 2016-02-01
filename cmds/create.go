@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"bytemark.co.uk/client/cmds/util"
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"strconv"
 	"strings"
@@ -74,12 +74,12 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	var discs []bigv.Disc
+	var discs []lib.Disc
 	if *sizeFlag != "" || *gradeFlag != "" {
 		// if both flags and spec are specified, fail
 		if len(args) >= 1 {
@@ -94,7 +94,7 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 			if err != nil {
 				return util.ProcessError(err)
 			}
-			discs = append(discs, bigv.Disc{Size: size, StorageGrade: *gradeFlag, Label: *labelFlag})
+			discs = append(discs, lib.Disc{Size: size, StorageGrade: *gradeFlag, Label: *labelFlag})
 		}
 
 	} else {
@@ -126,7 +126,7 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 	log.Logf("Adding discs to %s:\r\n", name)
 	for _, d := range discs {
 		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
-		err = cmds.bigv.CreateDisc(name, d)
+		err = cmds.client.CreateDisc(name, d)
 		if err != nil {
 			log.Errorf("failure! %v\r\n", err.Error())
 		} else {
@@ -148,14 +148,14 @@ func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 		cmds.HelpForCreate()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
+	name := cmds.client.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	err = cmds.bigv.CreateGroup(name)
+	err = cmds.client.CreateGroup(name)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", name.Group, name.Account)
 	}
@@ -190,7 +190,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -236,7 +236,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	}
 
 	if len(discs) == 0 && !*noDiscs {
-		discs = append(discs, bigv.Disc{Size: 25600})
+		discs = append(discs, lib.Disc{Size: 25600})
 	}
 
 	for i := range discs {
@@ -253,9 +253,9 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	var ipspec *bigv.IPSpec
+	var ipspec *lib.IPSpec
 	if len(ips) > 0 {
-		ipspec = &bigv.IPSpec{}
+		ipspec = &lib.IPSpec{}
 
 		for _, ip := range ips {
 			if ip.To4() != nil {
@@ -289,8 +289,8 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	// if stopped isn't set and either cdrom or image are set, start the vm
 	autoreboot := !*stopped && ((imageInstall != nil) || (*cdrom != ""))
 
-	spec := bigv.VirtualMachineSpec{
-		VirtualMachine: &bigv.VirtualMachine{
+	spec := lib.VirtualMachineSpec{
+		VirtualMachine: &lib.VirtualMachine{
 			Name:                  name.VirtualMachine,
 			Autoreboot:            autoreboot,
 			Cores:                 *cores,
@@ -305,7 +305,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		Reimage: imageInstall,
 	}
 
-	groupName := bigv.GroupName{
+	groupName := lib.GroupName{
 		Group:   name.Group,
 		Account: name.Account,
 	}
@@ -324,11 +324,11 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	_, err = cmds.bigv.CreateVirtualMachine(groupName, spec)
+	_, err = cmds.client.CreateVirtualMachine(groupName, spec)
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	vm, err := cmds.bigv.GetVirtualMachine(name)
+	vm, err := cmds.client.GetVirtualMachine(name)
 	if err != nil {
 		return util.ProcessError(err)
 	}

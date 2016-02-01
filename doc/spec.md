@@ -98,7 +98,7 @@ List of commands
 
 `bytemark config`  output all info about the current config
 `bytemark config get <variable>`  output the value & source of the given variable
-`bytemark config set <variable> <value>`  persistently sets a bigv-client variable
+`bytemark config set <variable> <value>`  persistently sets a bytemark-client variable
 `bytemark console [--serial | --vnc] [--connect | --panel] <virtual machine>`
 `bytemark create group [--account <account>] <name>`
 `bytemark create dis<c|k>[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]` - if ambiguous, berate user
@@ -152,7 +152,7 @@ List of commands
 `bytemark shutdown <virtual machine>`
 `bytemark start <virtual machine>`
 `bytemark stop <virtual machine>`
-`bytemark config unset <variable>` - persistently unsets a bigv-client variable
+`bytemark config unset <variable>` - persistently unsets a bytemark-client variable
 `bytemark undelete vm <virtual machine>`
 `bytemark unlock hwprofile <virtual machine>`
 

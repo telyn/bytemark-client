@@ -19,7 +19,7 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 }
 
 func (cmds *CommandSet) listDefaultAccountVMs() util.ExitCode {
-	acc, err := cmds.bigv.GetAccount(cmds.config.GetIgnoreErr("account"))
+	acc, err := cmds.client.GetAccount(cmds.config.GetIgnoreErr("account"))
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -40,7 +40,7 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 	if len(args) >= 1 {
 		nameStr = args[0]
 	}
-	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
+	name := cmds.client.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
@@ -48,14 +48,14 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 	}
 
 	if len(args) >= 1 {
-		group, err := cmds.bigv.GetGroup(name)
+		group, err := cmds.client.GetGroup(name)
 		log.Debugf(5, "Error! %T: %v\r\n", err, err)
 
 		if err != nil {
 			if _, ok := err.(lib.NotFoundError); ok {
 
 				if !strings.Contains(nameStr, ".") {
-					account, err := cmds.bigv.GetAccount(nameStr)
+					account, err := cmds.client.GetAccount(nameStr)
 					if err != nil {
 						return util.ProcessError(err)
 					}
@@ -97,7 +97,7 @@ func (cmds *CommandSet) ListGroups(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	account, err := cmds.bigv.GetAccount(name)
+	account, err := cmds.client.GetAccount(name)
 
 	if err != nil {
 		return util.ProcessError(err)
@@ -119,7 +119,7 @@ func (cmds *CommandSet) ListAccounts(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	accounts, err := cmds.bigv.GetAccounts()
+	accounts, err := cmds.client.GetAccounts()
 
 	if err != nil {
 		return util.ProcessError(err)
@@ -152,7 +152,7 @@ func (cmds *CommandSet) ListKeys(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	user, err := cmds.bigv.GetUser(username)
+	user, err := cmds.client.GetUser(username)
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -179,9 +179,9 @@ func (cmds *CommandSet) ListDiscs(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 
-	vm, err := cmds.bigv.GetVirtualMachine(name)
+	vm, err := cmds.client.GetVirtualMachine(name)
 
 	for _, disc := range vm.Discs {
 		log.Outputf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)

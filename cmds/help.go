@@ -49,7 +49,7 @@ To list all my VMs that have a disc bigger than the default 25GiB:
 	return util.E_USAGE_DISPLAYED
 }
 
-// HelpForHelp shows overall usage information for the BigV client, including a list of available commands.
+// HelpForHelp shows overall usage information for the Bytemark client, including a list of available commands.
 func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("usage: bytemark [flags] <command> [flags] [args]")
 	log.Log()
@@ -74,8 +74,8 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("  Config commands:")
 	log.Log("    config  output all info about the current config")
 	log.Log("    config get <variable>  output the value & source of the given variable")
-	log.Log("    config set <variable> <value>  persistently sets a bigv-client variable")
-	log.Log("    config unset <variable> - persistently unsets a bigv-client variable")
+	log.Log("    config set <variable> <value>  persistently sets a bytemark client variable")
+	log.Log("    config unset <variable> - persistently unsets a bytemark client variable")
 	log.Log()
 
 	// machines generally

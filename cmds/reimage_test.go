@@ -9,7 +9,7 @@ import (
 
 func TestReimage(t *testing.T) {
 	is := is.New(t)
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
 	vmname := lib.VirtualMachineName{

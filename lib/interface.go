@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
-// Client provides the interface which all BigV API clients should implement.
+// Client provides the interface which all API clients should implement.
 type Client interface {
 	// Getters
 	//
 
-	// GetEndpoint returns the BigV endpoint currently in use.
+	// GetEndpoint returns the API endpoint currently in use.
 	GetEndpoint() string
 
 	// GetSessionFactors returns the factors provided when the current auth session was set up
@@ -25,7 +25,7 @@ type Client interface {
 	// Setters
 	//
 
-	// SetDebugLevel sets the debug level / verbosity of the BigV client. 0 (default) is silent.
+	// SetDebugLevel sets the debug level / verbosity of the API client. 0 (default) is silent.
 	SetDebugLevel(int)
 
 	//
@@ -87,7 +87,7 @@ type Client interface {
 	// GROUPS
 	//
 
-	// CreateGroup sends a request to the BigV server to create a group with the given name.
+	// CreateGroup sends a request to the API server to create a group with the given name.
 	CreateGroup(name GroupName) error
 	DeleteGroup(name GroupName) error
 	GetGroup(name GroupName) (*Group, error)

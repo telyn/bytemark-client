@@ -1,7 +1,7 @@
-BigV client (bigv-client): Important licensing information
+Bytemark client (bytemark-client): Important licensing information
 -----------------------------------------------------------
 
-Copyright (c) 2015, Bytemark Hosting
+Copyright (c) 2015–2016, Bytemark Limited
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

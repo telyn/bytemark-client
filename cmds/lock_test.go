@@ -1,17 +1,17 @@
 package cmds
 
 import (
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/mocks"
 	"testing"
 	//"github.com/cheekybits/is"
 )
 
 func TestLockHWProfileCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
-	vmname := bigv.VirtualMachineName{
+	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account"}
@@ -20,9 +20,9 @@ func TestLockHWProfileCommand(t *testing.T) {
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(0)
@@ -36,10 +36,10 @@ func TestLockHWProfileCommand(t *testing.T) {
 }
 
 func TestUnlockHWProfileCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
-	vmname := bigv.VirtualMachineName{
+	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account"}
@@ -48,9 +48,9 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []bigv.VirtualMachineName{{}}).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(0)
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(1)

@@ -26,15 +26,15 @@ func NewDispatcher(config util.ConfigManager) (d *Dispatcher, err error) {
 	if err != nil {
 		return nil, err
 	}
-	bigv, err := client.New(endpoint)
+	client, err := client.New(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
 	d.debugLevel = config.GetDebugLevel()
-	bigv.SetDebugLevel(d.debugLevel)
+	client.SetDebugLevel(d.debugLevel)
 
-	d.cmds = commands.NewCommandSet(config, bigv)
+	d.cmds = commands.NewCommandSet(config, client)
 	return d, nil
 }
 

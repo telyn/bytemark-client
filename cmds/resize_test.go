@@ -1,14 +1,14 @@
 package cmds
 
 import (
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/mocks"
 	"testing"
 	//"github.com/cheekybits/is"
 )
 
 func TestResizeDisk(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -17,16 +17,16 @@ func TestResizeDisk(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 
 	args := []string{"test-vm", "11", "35"}
-	disc := bigv.Disc{
+	disc := lib.Disc{
 		Size:         25600,
 		StorageGrade: "sata",
 	}
 
 	config.When("ImportFlags").Return(args)
-	config.When("GetVirtualMachine").Return(bigv.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	name := bigv.VirtualMachineName{VirtualMachine: "test-vm"}
-	c.When("ParseVirtualMachineName", "test-vm", []bigv.VirtualMachineName{{}}).Return(name).Times(1)
+	name := lib.VirtualMachineName{VirtualMachine: "test-vm"}
+	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetDisc", name, "11").Return(&disc).Times(1)
 

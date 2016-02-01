@@ -49,7 +49,7 @@ func (cmds *CommandSet) AddKey(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	err = cmds.bigv.AddUserAuthorizedKey(user, key)
+	err = cmds.client.AddUserAuthorizedKey(user, key)
 	if err == nil {
 		log.Log("Key added successfully")
 		return util.E_SUCCESS

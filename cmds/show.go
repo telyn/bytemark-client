@@ -21,7 +21,7 @@ func (cmds *CommandSet) HelpForShow() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }
 
-// ShowVM implements the show-vm command, which is used to display information about BigV VMs. See HelpForShow for the usage information.
+// ShowVM implements the show-vm command, which is used to display information about Bytemark VMs. See HelpForShow for the usage information.
 func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	jsonOut := flags.Bool("json", false, "")
@@ -33,7 +33,7 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 		cmds.HelpForShow()
 		return util.E_PEBKAC
 	}
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		log.Error("Virtual machine name cannnot be blank")
 		return util.E_PEBKAC
@@ -43,7 +43,7 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	vm, err := cmds.bigv.GetVirtualMachine(name)
+	vm, err := cmds.client.GetVirtualMachine(name)
 
 	if err != nil {
 		return util.ProcessError(err)
@@ -60,7 +60,7 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 
 }
 
-// ShowGroup implements the show-group command, which is used to show the BigV group name and ID, as well as the VMs within it.
+// ShowGroup implements the show-group command, which is used to show the group name and ID, as well as the VMs within it.
 func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	list := flags.Bool("list-vms", false, "")
@@ -74,14 +74,14 @@ func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 		cmds.HelpForShow()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseGroupName(nameStr, cmds.config.GetGroup())
+	name := cmds.client.ParseGroupName(nameStr, cmds.config.GetGroup())
 
 	err := cmds.EnsureAuth()
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	group, err := cmds.bigv.GetGroup(name)
+	group, err := cmds.client.GetGroup(name)
 
 	if err != nil {
 		return util.ProcessError(err)
@@ -111,7 +111,7 @@ func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 
 }
 
-// ShowAccount implements the show-account command, which is used to show the BigV account name, as well as the groups and VMs within it.
+// ShowAccount implements the show-account command, which is used to show the client account name, as well as the groups and VMs within it.
 func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	listgroups := flags.Bool("list-groups", false, "")
@@ -126,14 +126,14 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 		cmds.HelpForShow()
 		return util.E_PEBKAC
 	}
-	name := cmds.bigv.ParseAccountName(nameStr, cmds.config.GetIgnoreErr("account"))
+	name := cmds.client.ParseAccountName(nameStr, cmds.config.GetIgnoreErr("account"))
 
 	err := cmds.EnsureAuth()
 	if err != nil {
 		return util.ProcessError(err)
 	}
 
-	acc, err := cmds.bigv.GetAccount(name)
+	acc, err := cmds.client.GetAccount(name)
 
 	if err != nil {
 		return util.ProcessError(err)
@@ -193,7 +193,7 @@ func (cmds *CommandSet) ShowUser(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	user, err := cmds.bigv.GetUser(username)
+	user, err := cmds.client.GetUser(username)
 	if err != nil {
 		return util.ProcessError(err)
 	}

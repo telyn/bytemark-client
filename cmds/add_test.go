@@ -6,7 +6,7 @@ import (
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	c := &mocks.BigVClient{}
+	c := &mocks.Client{}
 	config := &mocks.Config{}
 
 	args := []string{"ssh-rsa", "aaaaawhartevervAsde", "fake key"}

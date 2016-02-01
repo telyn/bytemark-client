@@ -92,7 +92,7 @@ type CannotLoadDefinitionsError struct {
 }
 
 func (e *CannotLoadDefinitionsError) Error() string {
-	return fmt.Sprintf("Unable to load the definitions file from the BigV API.")
+	return fmt.Sprintf("Unable to load the definitions file from the Bytemark API.")
 }
 
 type ConfigReadError struct {
@@ -129,8 +129,8 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 	}
 	config.Dir = filepath.Join(home, "/.bytemark")
 	config.mainFlags = flags
-	if os.Getenv("BIGV_CONFIG_DIR") != "" {
-		config.Dir = os.Getenv("BIGV_CONFIG_DIR")
+	if os.Getenv("BM_CONFIG_DIR") != "" {
+		config.Dir = os.Getenv("BM_CONFIG_DIR")
 	}
 
 	if configDir != "" {
@@ -269,56 +269,56 @@ func (config *Config) GetAll() (vars []ConfigVar, err error) {
 
 // GetDefault returns the default ConfigVar for the given key.
 func (config *Config) GetDefault(name string) ConfigVar {
-	// ideally most of these should just be	os.Getenv("BIGV_"+name.Upcase().Replace("-","_"))
+	// ideally most of these should just be	os.Getenv("BM_"+name.Upcase().Replace("-","_"))
 	switch name {
 	case "user":
-		if os.Getenv("BIGV_USER") == "" {
+		if os.Getenv("BM_USER") == "" {
 			return ConfigVar{"user", os.Getenv("USER"), "ENV USER"}
 		}
-		return ConfigVar{"user", os.Getenv("BIGV_USER"), "ENV BIGV_USER"}
+		return ConfigVar{"user", os.Getenv("BM_USER"), "ENV BM_USER"}
 	case "endpoint":
 		v := ConfigVar{"endpoint", "https://uk0.bigv.io", "CODE"}
 
-		val := os.Getenv("BIGV_ENDPOINT")
+		val := os.Getenv("BM_ENDPOINT")
 		if val != "" {
 			v.Value = val
-			v.Source = "ENV BIGV_ENDPOINT"
+			v.Source = "ENV BM_ENDPOINT"
 		}
 		return v
 	case "auth-endpoint":
 		v := ConfigVar{"auth-endpoint", "https://auth.bytemark.co.uk", "CODE"}
 
-		val := os.Getenv("BIGV_AUTH_ENDPOINT")
+		val := os.Getenv("BM_AUTH_ENDPOINT")
 		if val != "" {
 			v.Value = val
-			v.Source = "ENV BIGV_AUTH_ENDPOINT"
+			v.Source = "ENV BM_AUTH_ENDPOINT"
 		}
 		return v
 	case "account":
-		val := os.Getenv("BIGV_ACCOUNT")
+		val := os.Getenv("BM_ACCOUNT")
 		if val != "" {
 			return ConfigVar{
 				"account",
 				val,
-				"ENV BIGV_ACCOUNT",
+				"ENV BM_ACCOUNT",
 			}
 		}
 		def := config.GetDefault("user")
 		def.Name = "account"
 		return def
 	case "group":
-		val := os.Getenv("BIGV_GROUP")
+		val := os.Getenv("BM_GROUP")
 		if val != "" {
 			return ConfigVar{
 				"group",
 				val,
-				"ENV BIGV_GROUP",
+				"ENV BM_GROUP",
 			}
 		}
 		return ConfigVar{"group", "default", "CODE"}
 	case "debug-level":
 		v := ConfigVar{"debug-level", "0", "CODE"}
-		if val := os.Getenv("BIGV_DEBUG_LEVEL"); val != "" {
+		if val := os.Getenv("BM_DEBUG_LEVEL"); val != "" {
 			v.Value = val
 		}
 		return v

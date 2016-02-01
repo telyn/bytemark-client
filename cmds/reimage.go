@@ -100,7 +100,7 @@ func (cmds *CommandSet) Reimage(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	name, err := cmds.bigv.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
+	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		return util.ProcessError(err)
 	}
@@ -117,6 +117,6 @@ func (cmds *CommandSet) Reimage(args []string) util.ExitCode {
 
 	cmds.EnsureAuth()
 
-	err = cmds.bigv.ReimageVirtualMachine(name, imageInstall)
+	err = cmds.client.ReimageVirtualMachine(name, imageInstall)
 	return util.ProcessError(err)
 }

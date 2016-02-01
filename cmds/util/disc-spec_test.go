@@ -1,23 +1,23 @@
 package util
 
 import (
-	bigv "bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/lib"
 	"testing"
 )
 
 func TestParseDiscSpec(t *testing.T) {
 	type test struct {
 		Spec string
-		Disc bigv.Disc
+		Disc lib.Disc
 	}
 	tests := []test{
-		test{"25", bigv.Disc{StorageGrade: "", Size: 25 * 1024}},
-		test{"archive:200", bigv.Disc{StorageGrade: "archive", Size: 200 * 1024}},
-		test{"archive:200M", bigv.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200Mib", bigv.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200mib", bigv.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200mb", bigv.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200MB", bigv.Disc{StorageGrade: "archive", Size: 200}},
+		test{"25", lib.Disc{StorageGrade: "", Size: 25 * 1024}},
+		test{"archive:200", lib.Disc{StorageGrade: "archive", Size: 200 * 1024}},
+		test{"archive:200M", lib.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200Mib", lib.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200mib", lib.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200mb", lib.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200MB", lib.Disc{StorageGrade: "archive", Size: 200}},
 	}
 
 	for n, x := range tests {

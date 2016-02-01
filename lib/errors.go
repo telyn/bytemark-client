@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// BigVError is the basic error type which all errors return by the client library are subclassed from.
-type BigVError struct {
+// APIError is the basic error type which all errors return by the client library are subclassed from.
+type APIError struct {
 	Method       string
 	URL          *url.URL
 	StatusCode   int
@@ -17,7 +17,7 @@ type BigVError struct {
 
 // BadNameError is returned when a VirtualMachineName / GroupName or AccountName is invalid.
 type BadNameError struct {
-	BigVError
+	APIError
 	Type         string
 	ProblemField string
 	ProblemValue string
@@ -25,43 +25,43 @@ type BadNameError struct {
 
 // NotFoundError is returned when an object was unable to be found - either because the caller doesn't have permission to see them or because they don't exist.
 type NotFoundError struct {
-	BigVError
+	APIError
 }
 
 // NotAuthorizedError is returned when an action was unable to be performed because the caller doesn't have permission.
 type NotAuthorizedError struct {
-	BigVError
+	APIError
 }
 
-// UnknownStatusCodeError is returned when an action caused BigV to return a strange status code that the client library wasn't expecting. Perhaps it's a protocol mismatch - try updating to the latest version of the library, otherwise file a bug report.
+// UnknownStatusCodeError is returned when an action caused API to return a strange status code that the client library wasn't expecting. Perhaps it's a protocol mismatch - try updating to the latest version of the library, otherwise file a bug report.
 type UnknownStatusCodeError struct {
-	BigVError
+	APIError
 }
 
 // BadRequestError is returned when a request was malformed. Report these as bugs.
 type BadRequestError struct {
-	BigVError
+	APIError
 	Problems map[string][]string
 }
 
 type InternalServerError struct {
-	BigVError
+	APIError
 }
 
 type NilAuthError struct {
-	BigVError
+	APIError
 }
 
 type AmbiguousKeyError struct {
-	BigVError
+	APIError
 }
 
-func (e BigVError) Error() string {
+func (e APIError) Error() string {
 	return fmt.Sprintf("HTTP %s %s returned %d\r\n", e.Method, e.URL.String(), e.StatusCode)
 }
 
 func (e UnknownStatusCodeError) Error() string {
-	return fmt.Sprintf("An unexpected status code happened (report this as a bug!)\r\n%s", e.BigVError.Error())
+	return fmt.Sprintf("An unexpected status code happened (report this as a bug!)\r\n%s", e.APIError.Error())
 }
 
 func (e BadRequestError) Error() string {
@@ -85,11 +85,11 @@ func (e InternalServerError) Error() string {
 }
 
 func (e NotFoundError) Error() string {
-	return fmt.Sprintf("404 Not found\r\n%s", e.BigVError.Error())
+	return fmt.Sprintf("404 Not found\r\n%s", e.APIError.Error())
 }
 
 func (e NotAuthorizedError) Error() string {
-	return fmt.Sprintf("403 Unauthorized\r\n%s", e.BigVError.Error())
+	return fmt.Sprintf("403 Unauthorized\r\n%s", e.APIError.Error())
 
 }
 

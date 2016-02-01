@@ -19,19 +19,19 @@ func (user *User) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (bigv *bigvClient) GetUser(name string) (*User, error) {
+func (c *bytemarkClient) GetUser(name string) (*User, error) {
 	url := BuildURL("/users/%s", name)
 
 	var user JSONUser
 	var realUser User
-	err := bigv.RequestAndUnmarshal(true, "GET", url, "", &user)
+	err := c.RequestAndUnmarshal(true, "GET", url, "", &user)
 	user.Process(&realUser)
 	return &realUser, err
 }
 
 // AddUserAuthorizedKey
-func (bigv *bigvClient) AddUserAuthorizedKey(username string, key string) error {
-	user, err := bigv.GetUser(username)
+func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error {
+	user, err := c.GetUser(username)
 	if err != nil {
 		return err
 	}
@@ -44,14 +44,14 @@ func (bigv *bigvClient) AddUserAuthorizedKey(username string, key string) error 
 	}
 
 	url := BuildURL("/users/%s", username)
-	_, err = bigv.RequestAndRead(true, "PUT", url, string(userjs))
+	_, err = c.RequestAndRead(true, "PUT", url, string(userjs))
 	return err
 
 }
 
 // DeleteUserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part
-func (bigv *bigvClient) DeleteUserAuthorizedKey(username string, key string) error {
-	user, err := bigv.GetUser(username)
+func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) error {
+	user, err := c.GetUser(username)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (bigv *bigvClient) DeleteUserAuthorizedKey(username string, key string) err
 	}
 
 	url := BuildURL("/users/%s", username)
-	_, err = bigv.RequestAndRead(true, "PUT", url, string(userjs))
+	_, err = c.RequestAndRead(true, "PUT", url, string(userjs))
 	return err
 
 }
