@@ -6,36 +6,36 @@ import (
 	"encoding/json"
 )
 
-// HelpForShow outputs usage information for the show commands: show, show-vm, show-group, show-account.
+// HelpForShow outputs usage information for the show commands: show, show server, show group, show account.
 func (cmds *CommandSet) HelpForShow() util.ExitCode {
 	log.Log("bytemark show")
 	log.Log()
 	log.Log("usage: bytemark show [--json] <name>")
-	log.Log("       bytemark show vm [--json] <virtual machine>")
-	log.Log("       bytemark show group [--json] [--list-vms] [--verbose] <group>")
-	log.Log("       bytemark show account [--json] [--list-groups] [--list-vms] [--verbose] <account>")
+	log.Log("       bytemark show [--json] <server>")
+	log.Log("       bytemark show group [--json] [--verbose] <group>")
+	log.Log("       bytemark show account [--json] [--verbose] <account>")
 	log.Log()
-	log.Log("Displays information about the given virtual machine, group, or account.")
-	log.Log("If the --verbose flag is given to bytemark show group or bytemark show account, full details are given for each VM.")
+	log.Log("Displays information about the given server, group, or account.")
+	log.Log("If the --verbose flag is given to bytemark show group or bytemark show account, full details are given for each server.")
 	log.Log()
 	return util.E_USAGE_DISPLAYED
 }
 
-// ShowVM implements the show-vm command, which is used to display information about Bytemark VMs. See HelpForShow for the usage information.
-func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
+// ShowServer implements the show server command, which is used to display information about Bytemark servers. See HelpForShow for the usage information.
+func (cmds *CommandSet) ShowServer(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	jsonOut := flags.Bool("json", false, "")
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForShow()
 		return util.E_PEBKAC
 	}
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannnot be blank")
+		log.Error("server name cannnot be blank")
 		return util.E_PEBKAC
 	}
 
@@ -60,7 +60,7 @@ func (cmds *CommandSet) ShowVM(args []string) util.ExitCode {
 
 }
 
-// ShowGroup implements the show-group command, which is used to show the group name and ID, as well as the VMs within it.
+// ShowGroup implements the show-group command, which is used to show the group name and ID, as well as the servers within it.
 func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	list := flags.Bool("list-vms", false, "")
@@ -111,7 +111,7 @@ func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 
 }
 
-// ShowAccount implements the show-account command, which is used to show the client account name, as well as the groups and VMs within it.
+// ShowAccount implements the show-account command, which is used to show the client account name, as well as the groups and servers within it.
 func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	listgroups := flags.Bool("list-groups", false, "")
@@ -158,7 +158,7 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 				log.Output(g.Name)
 			}
 		case *listvms:
-			log.Output("Virtual machines:")
+			log.Output("servers:")
 			for _, g := range acc.Groups {
 				for _, vm := range g.VirtualMachines {
 					log.Outputf("%s.%s\r\n", vm.Name, g.Name)
@@ -169,7 +169,7 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 			for _, g := range acc.Groups {
 				vms += len(g.VirtualMachines)
 			}
-			log.Outputf("%d groups containing %d virtual machines\r\n", len(acc.Groups), vms)
+			log.Outputf("%d groups containing %d servers\r\n", len(acc.Groups), vms)
 		}
 
 	}

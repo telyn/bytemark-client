@@ -10,15 +10,15 @@ import (
 func (cmds *CommandSet) HelpForList() util.ExitCode {
 	log.Log("bytemark list")
 	log.Log("")
-	log.Log("usage: bytemark list vms [group | account]")
+	log.Log("usage: bytemark list servers [group | account]")
 	log.Log("       bytemark list groups [account]")
 	log.Log("       bytemark list accounts")
 	log.Log("       bytemark list keys [user]")
-	log.Log("       bytemark list discs <virtual machine>")
+	log.Log("       bytemark list discs <server>")
 	return util.E_USAGE_DISPLAYED
 }
 
-func (cmds *CommandSet) listDefaultAccountVMs() util.ExitCode {
+func (cmds *CommandSet) listDefaultAccountServers() util.ExitCode {
 	acc, err := cmds.client.GetAccount(cmds.config.GetIgnoreErr("account"))
 	if err != nil {
 		return util.ProcessError(err)
@@ -31,7 +31,7 @@ func (cmds *CommandSet) listDefaultAccountVMs() util.ExitCode {
 	return util.ProcessError(nil)
 }
 
-func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
+func (cmds *CommandSet) ListServers(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
@@ -77,7 +77,7 @@ func (cmds *CommandSet) ListVMs(args []string) util.ExitCode {
 			log.Output(vm.Hostname)
 		}
 	} else {
-		return cmds.listDefaultAccountVMs()
+		return cmds.listDefaultAccountServers()
 	}
 	return util.E_SUCCESS
 }
@@ -168,7 +168,7 @@ func (cmds *CommandSet) ListDiscs(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForList()
 		return util.E_PEBKAC

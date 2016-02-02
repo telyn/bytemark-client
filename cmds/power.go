@@ -15,7 +15,7 @@ func (cmds *CommandSet) HelpForPower() util.ExitCode {
 	log.Log("       bytemark reset")
 	log.Log()
 	log.Log()
-	log.Log("start: Starts a stopped VM.")
+	log.Log("start: Starts a stopped server.")
 	log.Log()
 	log.Log("shutdown: Sends the ACPI shutdown signal, as if you had")
 	log.Log("          pressed the power/standby button. Allows the")
@@ -23,15 +23,15 @@ func (cmds *CommandSet) HelpForPower() util.ExitCode {
 	log.Log("          Hardware changes will be applied after the")
 	log.Log("          machine has been started again.")
 	log.Log()
-	log.Log("stop: Stops a running VM, as if you had just pulled the")
+	log.Log("stop: Stops a running server, as if you had just pulled the")
 	log.Log("      cord out. Hardware changes will be applied when the")
 	log.Log("      machine has been started again.")
 	log.Log()
-	log.Log("restart: Stops and then starts a running VM, as if you had")
+	log.Log("restart: Stops and then starts a running server, as if you had")
 	log.Log("         pulled the cord out, then plugged it in and")
 	log.Log("         powered the machine on again.")
 	log.Log()
-	log.Log("reset: Instantly restarts a running VM, as if you had")
+	log.Log("reset: Instantly restarts a running server, as if you had")
 	log.Log("       pressed the reset button. Doesn't apply hardware")
 	log.Log("       changes.")
 	log.Log()
@@ -43,7 +43,7 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -51,7 +51,7 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannnot be blank")
+		log.Error("server name cannnot be blank")
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
@@ -77,7 +77,7 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -85,7 +85,7 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannnot be blank")
+		log.Error("server name cannnot be blank")
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
@@ -108,7 +108,7 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -116,7 +116,7 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannnot be blank")
+		log.Error("server name cannnot be blank")
 		return util.E_PEBKAC
 	}
 
@@ -140,7 +140,7 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -148,7 +148,7 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannnot be blank")
+		log.Error("server name cannnot be blank")
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
@@ -166,12 +166,12 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 	return util.E_SUCCESS
 }
 
-func (cmds *CommandSet) ResetVM(args []string) util.ExitCode {
+func (cmds *CommandSet) ResetServer(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -179,7 +179,7 @@ func (cmds *CommandSet) ResetVM(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannnot be blank")
+		log.Error("server name cannnot be blank")
 		return util.E_PEBKAC
 	}
 

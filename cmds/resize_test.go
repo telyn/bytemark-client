@@ -16,7 +16,7 @@ func TestResizeDisk(t *testing.T) {
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 
-	args := []string{"test-vm", "11", "35"}
+	args := []string{"test-server", "11", "35"}
 	disc := lib.Disc{
 		Size:         25600,
 		StorageGrade: "sata",
@@ -25,8 +25,8 @@ func TestResizeDisk(t *testing.T) {
 	config.When("ImportFlags").Return(args)
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	name := lib.VirtualMachineName{VirtualMachine: "test-vm"}
-	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
+	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetDisc", name, "11").Return(&disc).Times(1)
 

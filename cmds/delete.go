@@ -13,38 +13,39 @@ func (cmds *CommandSet) HelpForDelete() util.ExitCode {
 	log.Log("bytemark delete")
 	log.Log()
 	log.Log("usage: bytemark delete account <account>")
-	log.Log("       bytemark delete disc <vm> <label>")
+	log.Log("       bytemark delete disc <server> <label>")
 	log.Log("       bytemark delete group [--recursive] <group>")
 	//log.Log("       bytemark delete user <user>")
 	log.Log("       bytemark delete key [--user=<user>] <public key identifier>")
-	log.Log("       bytemark delete vm [--force] [---purge] <virtual machine>")
-	log.Log("       bytemark undelete vm <virtual machine>")
+	log.Log("       bytemark delete server [--force] [---purge] <server>")
+	log.Log("       bytemark undelete server <server>")
 	log.Log()
-	log.Log("Deletes the given virtual machine, disc, group, account or key. Only empty groups and accounts can be deleted.")
-	log.Log("If the --purge flag is given and the target is a virtual machine, will permanently delete the VM. Billing will cease and you will be unable to recover the VM.")
+	log.Log("Deletes the given server, disc, group, account or key. Only empty groups and accounts can be deleted.")
+	log.Log("If the --purge flag is given and the target is a cloud server, will permanently delete the server. Billing will cease and you will be unable to recover the server or its data.")
 	log.Log("If the --force flag is given, you will not be prompted to confirm deletion.")
 	log.Log()
-	log.Log("The undelete vm command may be used to restore a deleted (but not purged) vm to its state prior to deletion.")
+	log.Log("The undelete server command may be used to restore a deleted (but not purged) server to its state prior to deletion.")
 	log.Log()
 	return util.E_USAGE_DISPLAYED
 }
 
-// DeleteVM implements the delete-vm command, which is used to delete and purge Bytemark VMs. See HelpForDelete for usage information.
-func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
+// DeleteServer implements the delete server command, which is used to delete and purge Bytemark servers. See HelpForDelete for usage information.
+func (cmds *CommandSet) DeleteServer(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	purge := flags.Bool("purge", false, "")
 
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannot be blank.")
+		log.Error("Server name cannot be blank.")
+		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
@@ -57,7 +58,7 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 	if vm.Deleted && !*purge {
-		log.Errorf("Virtual machine %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge\r\n", vm.Hostname)
+		log.Errorf("Server %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge\r\n", vm.Hostname)
 		return util.E_SUCCESS
 	}
 
@@ -80,9 +81,9 @@ func (cmds *CommandSet) DeleteVM(args []string) util.ExitCode {
 	}
 
 	if *purge {
-		log.Logf("Virtual machine %s purged successfully.\r\n", vm.Hostname)
+		log.Logf("Server %s purged successfully.\r\n", vm.Hostname)
 	} else {
-		log.Logf("Virtual machine %s deleted successfully.\r\n", vm.Hostname)
+		log.Logf("Server %s deleted successfully.\r\n", vm.Hostname)
 	}
 	return util.E_SUCCESS
 }
@@ -95,7 +96,7 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 	args = cmds.config.ImportFlags(flags)
 
 	log.Debugf(2, "%#v", args)
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine name")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
@@ -160,7 +161,7 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 	if len(group.VirtualMachines) > 0 {
 		if *recursive {
 
-			log.Log("WARNING: The following VMs will be permanently deleted, without any way to recover or un-delete them:")
+			log.Log("WARNING: The following servers will be permanently deleted, without any way to recover or un-delete them:")
 			for _, vm := range group.VirtualMachines {
 				log.Logf("\t%s\r\n", vm.Name)
 			}
@@ -173,13 +174,13 @@ func (cmds *CommandSet) DeleteGroup(args []string) util.ExitCode {
 					if err != nil {
 						return util.ProcessError(err)
 					} else {
-						log.Logf("Virtual machine %s purged successfully.\r\n", name)
+						log.Logf("Server %s purged successfully.\r\n", name)
 					}
 
 				}
 			}
 		} else {
-			log.Errorf("Group %s contains virtual machines, will not be deleted without --recursive\r\n", name.Group)
+			log.Errorf("Group %s contains servers, will not be deleted without --recursive\r\n", name.Group)
 			return util.E_WONT_DELETE_NONEMPTY
 		}
 	}
@@ -218,17 +219,17 @@ func (cmds *CommandSet) DeleteKey(args []string) util.ExitCode {
 	}
 }
 
-// UndeleteVM implements the undelete vm command, which is used to remove the deleted flag from Bytemark VMs, allowing them to be reactivated.
-func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
+// UndeleteServer implements the undelete server command, which is used to remove the deleted flag from Bytemark servers, allowing them to be reactivated.
+func (cmds *CommandSet) UndeleteServer(args []string) util.ExitCode {
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "cloud server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Virtual machine name cannot be blank")
+		log.Error("Server name cannot be blank")
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()
@@ -242,7 +243,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 	}
 
 	if !vm.Deleted {
-		log.Errorf("Virtual machine %s was already undeleted\r\n", vm.Hostname)
+		log.Errorf("%s was already undeleted\r\n", vm.Hostname)
 		return util.E_SUCCESS
 	}
 
@@ -251,7 +252,7 @@ func (cmds *CommandSet) UndeleteVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	log.Logf("Successfully restored virtual machine %s\r\n", vm.Hostname)
+	log.Logf("Successfully restored %s\r\n", vm.Hostname)
 
 	return util.E_SUCCESS
 }

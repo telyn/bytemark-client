@@ -23,11 +23,11 @@ type CommandManager interface {
 	Console([]string) util.ExitCode
 	CreateDiscs([]string) util.ExitCode
 	CreateGroup([]string) util.ExitCode
-	CreateVM([]string) util.ExitCode
+	CreateServer([]string) util.ExitCode
 	DeleteDisc([]string) util.ExitCode
 	DeleteGroup([]string) util.ExitCode
 	DeleteKey([]string) util.ExitCode
-	DeleteVM([]string) util.ExitCode
+	DeleteServer([]string) util.ExitCode
 	Debug([]string) util.ExitCode
 	Distributions([]string) util.ExitCode
 	HardwareProfiles([]string) util.ExitCode
@@ -36,10 +36,10 @@ type CommandManager interface {
 	ListGroups([]string) util.ExitCode
 	ListKeys([]string) util.ExitCode
 	ListDiscs([]string) util.ExitCode
-	ListVMs([]string) util.ExitCode
+	ListServers([]string) util.ExitCode
 	LockHWProfile([]string) util.ExitCode
 	Reimage([]string) util.ExitCode
-	ResetVM([]string) util.ExitCode
+	ResetServer([]string) util.ExitCode
 	ResizeDisc([]string) util.ExitCode
 	Restart([]string) util.ExitCode
 	SetCores([]string) util.ExitCode
@@ -51,10 +51,10 @@ type CommandManager interface {
 	ShowAccount([]string) util.ExitCode
 	ShowGroup([]string) util.ExitCode
 	ShowUser([]string) util.ExitCode
-	ShowVM([]string) util.ExitCode
+	ShowServer([]string) util.ExitCode
 	StorageGrades([]string) util.ExitCode
 	UnlockHWProfile([]string) util.ExitCode
-	UndeleteVM([]string) util.ExitCode
+	UndeleteServer([]string) util.ExitCode
 	Zones([]string) util.ExitCode
 
 	HelpForAdd() util.ExitCode

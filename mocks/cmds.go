@@ -34,7 +34,7 @@ func (cmds *Commands) DeleteKey(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
-func (cmds *Commands) DeleteVM(args []string) util.ExitCode {
+func (cmds *Commands) DeleteServer(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -64,7 +64,7 @@ func (cmds *Commands) CreateGroup(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
-func (cmds *Commands) CreateVM(args []string) util.ExitCode {
+func (cmds *Commands) CreateServer(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -97,7 +97,7 @@ func (cmds *Commands) ListGroups(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
-func (cmds *Commands) ListVMs(args []string) util.ExitCode {
+func (cmds *Commands) ListServers(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -107,7 +107,7 @@ func (cmds *Commands) Reimage(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
-func (cmds *Commands) ResetVM(args []string) util.ExitCode {
+func (cmds *Commands) ResetServer(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -145,7 +145,7 @@ func (cmds *Commands) ShowGroup(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
-func (cmds *Commands) ShowVM(args []string) util.ExitCode {
+func (cmds *Commands) ShowServer(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }
@@ -165,7 +165,7 @@ func (cmds *Commands) Undelete(args []string) util.ExitCode {
 	return util.ExitCode(r.Int(0))
 }
 
-func (cmds *Commands) UndeleteVM(args []string) util.ExitCode {
+func (cmds *Commands) UndeleteServer(args []string) util.ExitCode {
 	r := cmds.Called(args)
 	return util.ExitCode(r.Int(0))
 }

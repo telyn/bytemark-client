@@ -21,7 +21,7 @@ with a yubikey, run the following commands (windows users, note that you'll need
 At this point you can set up an alias to use your 'bob' configuration. Say you use bash/zsh, add the following to your bashrc/zshrc:
     alias bytemark-bob='bytemark --config-dir="$HOME/.bob"'
 
-Now you can run 'bytemark-bob list vms' to list all the vms in bob's default account and 'bytemark list vms' to do the same for alice.
+Now you can run 'bytemark-bob list servers' to list all the servers in bob's default account and 'bytemark list servers' to do the same for alice.
 
 Sorted.
 `,
@@ -36,12 +36,12 @@ Some particularly relavent notes:
 Here are just a couple of tricks I've been able to come up with.
 
 To output the uptime for all your machines in the "critical" group:
-  for i in $(bytemark list vms critical); do echo "${i%%.*}:"; ssh $i uptime; done
+  for i in $(bytemark list servers critical); do echo "${i%%.*}:"; ssh $i uptime; done
 
-To add 10GB of space to each archive grade disk in your "storage" vm:
+To add 10GB of space to each archive grade disk in your "storage" server:
   for disc in $(bytemark list discs storage | grep "archive grade"); do bytemark resize disc --size +10G $machine $(awk '{print $2}'); done
 
-To list all my VMs that have a disc bigger than the default 25GiB:
+To list all my servers that have a disc bigger than the default 25GiB:
     bytemark show account --json telyn | jq '[.groups[].virtual_machines[] | select(.discs[] | .size > 25600) | .hostname ]' | uniq
 `,
 	}
@@ -80,30 +80,30 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 
 	// machines generally
 	log.Log("  Common server commands:")
-	log.Log("    console [--serial | --vnc] [--connect | --panel] <virtual machine>")
-	log.Log("    request ip <virtual machine> <reason>")
+	log.Log("    console [--serial | --vnc] [--connect | --panel] <server>")
+	log.Log("    request ip <server> <reason>")
 	log.Log("    set rdns <ip> <host name>")
-	log.Log("    shutdown [--force] <virtual machine> - if force given, immediately stop the VM.")
-	log.Log("    start <virtual machine>")
+	log.Log("    shutdown [--force] <server> - if force given, immediately stop the server.")
+	log.Log("    start <server>")
 	log.Log()
 
-	// virtual machine
-	log.Log("  Virtual machine commands:")
-	log.Log("    create disc[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [<disc specs>]")
-	log.Log("    create vm [flags] <name> [<cores> [<memory> [<disc specs>]]] - creates a vm. See `bytemark help create` for detail on the flags")
-	log.Log("    delete disc [--force] [---purge] <virtual machine> <disc label>")
-	log.Log("    delete vm [--force] [---purge] <virtual machine>")
-	log.Log("    list discs <virtual machine> - lists the discs in the given VM, with their size and labels")
-	log.Log("    list vms <group> - lists the vms in the given group, one per line")
-	log.Log("    lock hwprofile <virtual machine>")
-	log.Log("    reimage [--image <image>] <virtual machine> [<image>]")
-	log.Log("    resize disc [--size <size>] <virtual machine> [<resize spec>] - resize to size. if ambiguous, berate user.")
-	log.Log("    set cores <virtual machine> <num>")
-	log.Log("    set hwprofile <virtual machine> <hardware profile>")
-	log.Log("    set memory <virtual machine> <size>")
-	log.Log("    show vm [--json] [--nics] <virtual machine> - shows an overview of the given VM. Its discs, IPs, and such.")
-	log.Log("    undelete vm <virtual machine> - Bring an unpurged machine back from deletion")
-	log.Log("    unlock hwprofile <virtual machine>")
+	// server
+	log.Log("  server commands:")
+	log.Log("    create disc[s] [--account <account>] [--group <group>] [--size <size>] [--grade <storage grade>] <server> [<disc specs>]")
+	log.Log("    create server [flags] <name> [<cores> [<memory> [<disc specs>]]] - creates a server. See `bytemark help create` for detail on the flags")
+	log.Log("    delete disc [--force] [---purge] <server> <disc label>")
+	log.Log("    delete server [--force] [---purge] <server>")
+	log.Log("    list discs <server> - lists the discs in the given server, with their size and labels")
+	log.Log("    list servers <group> - lists the server in the given group, one per line")
+	log.Log("    lock hwprofile <server>")
+	log.Log("    reimage [--image <image>] <server> [<image>]")
+	log.Log("    resize disc [--size <size>] <server> [<resize spec>] - resize to size. if ambiguous, berate user.")
+	log.Log("    set cores <server> <num>")
+	log.Log("    set hwprofile <server> <hardware profile>")
+	log.Log("    set memory <server> <size>")
+	log.Log("    show server [--json] [--nics] <server> - shows an overview of the given server. Its discs, IPs, and such.")
+	log.Log("    undelete server <server> - Bring an unpurged machine back from deletion")
+	log.Log("    unlock hwprofile <server>")
 	log.Log()
 
 	//log.Log("  Dedicated host commands:")
@@ -115,8 +115,8 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log("    delete group <group>")
 	log.Log("    list accounts - lists the accounts you can see, one per line")
 	log.Log("    list groups <account> - lists the groups in the given account, one per line")
-	log.Log("    show account [--json] <account> - shows an overview of the given account, a list of groups and vms within them")
-	log.Log("    show group [--json] <group> - shows an overview of the given group, a list of VMs in them w/ size information")
+	log.Log("    show account [--json] <account> - shows an overview of the given account, a list of groups and server within them")
+	log.Log("    show group [--json] <group> - shows an overview of the given group, a list of server in them w/ size information")
 	log.Log()
 
 	// users
@@ -130,7 +130,7 @@ func (cmds *CommandSet) HelpForHelp() util.ExitCode {
 	log.Log()
 
 	log.Log("  Informative commands:")
-	log.Log("    images - lists the available operating system images that can be passed to create vm and reimage")
+	log.Log("    images - lists the available operating system images that can be passed to create server and reimage")
 	log.Log("    storage grades - lists the available storage grades, along with a description.")
 	log.Log("    privileges - lists the privileges that can possibly be granted")
 	*/
@@ -154,7 +154,7 @@ func (cmds *CommandSet) Help(args []string) util.ExitCode {
 		if len(args) > 1 {
 			switch args[1] {
 			case "vm", "server":
-				return cmds.HelpForCreateVM()
+				return cmds.HelpForCreateServer()
 			}
 		}
 		return cmds.HelpForCreate()

@@ -17,18 +17,18 @@ func TestCreateDiskCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	config.When("ImportFlags").Return([]string{"test-vm", "archive:35"})
-	name := lib.VirtualMachineName{VirtualMachine: "test-vm"}
-	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	config.When("ImportFlags").Return([]string{"test-server", "archive:35"})
+	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
+	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(&lib.VirtualMachine{Hostname: "test-vm.default.test-user.endpoint"})
+	c.When("GetVirtualMachine", name).Return(&lib.VirtualMachine{Hostname: "test-server.default.test-user.endpoint"})
 
 	disc := lib.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
 	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.CreateDiscs([]string{"test-vm", "archive:35"})
+	cmds.CreateDiscs([]string{"test-server", "archive:35"})
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -37,7 +37,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 // TODO(telyn): TestCreateGroupCommand
 
-func TestCreateVMCommand(t *testing.T) {
+func TestCreateServerCommand(t *testing.T) {
 	c := &mocks.Client{}
 	config := &mocks.Config{}
 
@@ -46,10 +46,10 @@ func TestCreateVMCommand(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-vm"})
+	config.When("ImportFlags").Return([]string{"test-server"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := lib.VirtualMachineSpec{
@@ -64,7 +64,7 @@ func TestCreateVMCommand(t *testing.T) {
 			},
 		},
 		VirtualMachine: &lib.VirtualMachine{
-			Name:                  "test-vm",
+			Name:                  "test-server",
 			Autoreboot:            true,
 			Cores:                 1,
 			Memory:                1024,
@@ -89,7 +89,7 @@ func TestCreateVMCommand(t *testing.T) {
 	}
 
 	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-vm",
+		VirtualMachine: "test-server",
 		Group:          "",
 		Account:        "",
 	}
@@ -98,7 +98,7 @@ func TestCreateVMCommand(t *testing.T) {
 	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.CreateVM([]string{
+	cmds.CreateServer([]string{
 		"--cdrom", "https://example.com/example.iso",
 		"--cores", "1",
 		"--disc", "25",
@@ -111,14 +111,14 @@ func TestCreateVMCommand(t *testing.T) {
 		"--memory", "1",
 		"--root-password", "test-password",
 		"--zone", "test-zone",
-		"test-vm",
+		"test-server",
 	})
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
 }
 
-func TestCreateVMNoImagesNoDiscs(t *testing.T) {
+func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 	c := &mocks.Client{}
 	config := &mocks.Config{}
 
@@ -127,15 +127,15 @@ func TestCreateVMNoImagesNoDiscs(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-vm"})
+	config.When("ImportFlags").Return([]string{"test-server"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := lib.VirtualMachineSpec{
 		VirtualMachine: &lib.VirtualMachine{
-			Name:   "test-vm",
+			Name:   "test-server",
 			Cores:  1,
 			Memory: 1024,
 		},
@@ -147,7 +147,7 @@ func TestCreateVMNoImagesNoDiscs(t *testing.T) {
 	}
 
 	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-vm",
+		VirtualMachine: "test-server",
 		Group:          "",
 		Account:        "",
 	}
@@ -156,18 +156,18 @@ func TestCreateVMNoImagesNoDiscs(t *testing.T) {
 	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.CreateVM([]string{
+	cmds.CreateServer([]string{
 		"--cores", "1",
 		"--no-discs",
 		"--memory", "1",
-		"test-vm",
+		"test-server",
 	})
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
 }
 
-func TestCreateVM(t *testing.T) {
+func TestCreateServer(t *testing.T) {
 	c := &mocks.Client{}
 	config := &mocks.Config{}
 
@@ -176,15 +176,15 @@ func TestCreateVM(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-vm", "3", "6565m", "archive:34"})
+	config.When("ImportFlags").Return([]string{"test-server", "3", "6565m", "archive:34"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-vm"})
+	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := lib.VirtualMachineSpec{
 		VirtualMachine: &lib.VirtualMachine{
-			Name:   "test-vm",
+			Name:   "test-server",
 			Cores:  3,
 			Memory: 6565,
 		},
@@ -201,7 +201,7 @@ func TestCreateVM(t *testing.T) {
 	}
 
 	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-vm",
+		VirtualMachine: "test-server",
 		Group:          "",
 		Account:        "",
 	}
@@ -210,9 +210,9 @@ func TestCreateVM(t *testing.T) {
 	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.CreateVM([]string{
+	cmds.CreateServer([]string{
 		"--no-image",
-		"test-vm", "3", "6565m", "archive:34",
+		"test-server", "3", "6565m", "archive:34",
 	})
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

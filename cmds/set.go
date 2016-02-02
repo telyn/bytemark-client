@@ -23,7 +23,7 @@ func (cmds *CommandSet) LockHWProfile(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
@@ -31,7 +31,7 @@ func (cmds *CommandSet) LockHWProfile(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Failed to parse VM name")
+		log.Error("Failed to parse server name")
 		return util.E_PEBKAC
 	}
 
@@ -50,7 +50,7 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
@@ -58,7 +58,7 @@ func (cmds *CommandSet) UnlockHWProfile(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Failed to parse VM name")
+		log.Error("Failed to parse server name")
 		return util.E_PEBKAC
 	}
 
@@ -77,7 +77,7 @@ func (cmds *CommandSet) SetCores(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
@@ -91,7 +91,7 @@ func (cmds *CommandSet) SetCores(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Errorf("Failed to parse VM name\r\n")
+		log.Errorf("Failed to parse server name\r\n")
 		return util.E_PEBKAC
 	}
 
@@ -127,7 +127,7 @@ func (cmds *CommandSet) SetHWProfile(args []string) util.ExitCode {
 		return util.E_PEBKAC
 	}
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
@@ -141,7 +141,7 @@ func (cmds *CommandSet) SetHWProfile(args []string) util.ExitCode {
 	}
 
 	if err != nil {
-		log.Error("Failed to parse VM name")
+		log.Error("Failed to parse server name")
 		return util.E_PEBKAC
 	}
 
@@ -170,7 +170,7 @@ func (cmds *CommandSet) SetMemory(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForSet()
 		return util.E_PEBKAC
@@ -178,7 +178,7 @@ func (cmds *CommandSet) SetMemory(args []string) util.ExitCode {
 
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Error("Failed to parse VM name")
+		log.Error("Failed to parse server name")
 		return util.E_PEBKAC
 	}
 

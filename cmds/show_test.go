@@ -31,23 +31,23 @@ func TestShowGroupCommand(t *testing.T) {
 	}
 }
 
-func TestShowVMCommand(t *testing.T) {
+func TestShowServerCommand(t *testing.T) {
 	c := &mocks.Client{}
 	config := &mocks.Config{}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)
-	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account"})
+	config.When("ImportFlags").Return([]string{"test-server.test-group.test-account"})
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"})
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	vm := getFixtureVM()
-	c.When("GetVirtualMachine", lib.VirtualMachineName{VirtualMachine: "test-vm", Group: "test-group", Account: "test-account"}).Return(&vm, nil).Times(1)
+	c.When("GetVirtualMachine", lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}).Return(&vm, nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.ShowVM([]string{"test-vm.test-group.test-account"})
+	cmds.ShowServer([]string{"test-server.test-group.test-account"})
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

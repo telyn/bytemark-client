@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestDeleteVM(t *testing.T) {
+func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
 	c := &mocks.Client{}
 	config := &mocks.Config{}
@@ -19,35 +19,35 @@ func TestDeleteVM(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-vm"})
+	config.When("ImportFlags").Return([]string{"test-server"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
 	name := lib.VirtualMachineName{
-		VirtualMachine: "test-vm",
+		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account",
 	}
 
 	vm := getFixtureVM()
 
-	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", name, false).Return(nil).Times(1)
 	cmds := NewCommandSet(config, c)
 
-	is.Equal(util.E_SUCCESS, cmds.DeleteVM([]string{"test-vm"}))
+	is.Equal(util.E_SUCCESS, cmds.DeleteServer([]string{"test-server"}))
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
 	c.Reset()
 
-	c.When("ParseVirtualMachineName", "test-vm", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", name, true).Return(nil).Times(1)
 
-	is.Equal(util.E_SUCCESS, cmds.DeleteVM([]string{"--purge", "test-vm"}))
+	is.Equal(util.E_SUCCESS, cmds.DeleteServer([]string{"--purge", "test-server"}))
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -64,21 +64,21 @@ func TestDeleteDisc(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-vm.test-group.test-account", "666"})
+	config.When("ImportFlags").Return([]string{"test-server.test-group.test-account", "666"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
 	name := lib.VirtualMachineName{
-		VirtualMachine: "test-vm",
+		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account",
 	}
-	c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteDisc", name, "666").Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
 
-	is.Equal(util.E_SUCCESS, cmds.DeleteDisc([]string{"--force", "test-vm.test-group.test-account", "666"}))
+	is.Equal(util.E_SUCCESS, cmds.DeleteDisc([]string{"--force", "test-server.test-group.test-account", "666"}))
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

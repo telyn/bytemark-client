@@ -9,7 +9,7 @@ import (
 func (cmds *CommandSet) HelpForResize() util.ExitCode {
 	log.Log("bytemark resize")
 	log.Log("")
-	log.Log("usage: bytemark resize disc <virtual machine> <disc> <size>")
+	log.Log("usage: bytemark resize disc <server> <disc> <size>")
 	return util.E_USAGE_DISPLAYED
 }
 
@@ -24,9 +24,9 @@ func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
 	)
 	mode := SET
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		log.Error("No virtual machine specified")
+		log.Error("No server specified")
 		cmds.HelpForResize()
 		return util.E_PEBKAC
 	}

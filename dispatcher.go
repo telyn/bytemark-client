@@ -68,8 +68,8 @@ func (d *Dispatcher) DoCreate(args []string) util.ExitCode {
 	}
 
 	switch strings.ToLower(args[0]) {
-	case "vm":
-		return d.cmds.CreateVM(args[1:])
+	case "vm", "server":
+		return d.cmds.CreateServer(args[1:])
 	case "group":
 		return d.cmds.CreateGroup(args[1:])
 	case "disc", "discs", "disk", "disks":
@@ -87,8 +87,8 @@ func (d *Dispatcher) DoDelete(args []string) util.ExitCode {
 		return d.cmds.HelpForDelete()
 	}
 	switch strings.ToLower(args[0]) {
-	case "vm":
-		return d.cmds.DeleteVM(args[1:])
+	case "vm", "server":
+		return d.cmds.DeleteServer(args[1:])
 	case "group":
 		return d.cmds.DeleteGroup(args[1:])
 	case "disc", "disk":
@@ -106,8 +106,8 @@ func (d *Dispatcher) DoUndelete(args []string) util.ExitCode {
 		return d.cmds.HelpForDelete()
 	}
 	switch strings.ToLower(args[0]) {
-	case "vm":
-		return d.cmds.UndeleteVM(args[1:])
+	case "vm", "server":
+		return d.cmds.UndeleteServer(args[1:])
 	}
 	log.Errorf("Unrecognised command 'undelete %s'\r\n", args[0])
 	return d.cmds.HelpForDelete()
@@ -131,8 +131,8 @@ func (d *Dispatcher) DoList(args []string) util.ExitCode {
 		return d.cmds.HelpForList()
 	}
 	switch strings.ToLower(args[0]) {
-	case "vms":
-		return d.cmds.ListVMs(args[1:])
+	case "vms", "servers":
+		return d.cmds.ListServers(args[1:])
 	case "discs", "disks":
 		return d.cmds.ListDiscs(args[1:])
 	case "groups":
@@ -213,8 +213,8 @@ func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 	}
 
 	switch strings.ToLower(args[0]) {
-	case "vm":
-		return d.cmds.ShowVM(args[1:])
+	case "vm", "server":
+		return d.cmds.ShowServer(args[1:])
 	case "account":
 		return d.cmds.ShowAccount(args[1:])
 	case "user":
@@ -227,7 +227,7 @@ func (d *Dispatcher) DoShow(args []string) util.ExitCode {
 	dots := strings.Count(name, ".")
 	switch dots {
 	case 2:
-		return d.cmds.ShowVM(args)
+		return d.cmds.ShowServer(args)
 	case 1:
 		return d.cmds.ShowGroup(args)
 	case 0:
@@ -280,7 +280,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"reimage":       d.cmds.Reimage,
 		"resize":        d.DoResize,
 		"restart":       d.cmds.Restart,
-		"reset":         d.cmds.ResetVM,
+		"reset":         d.cmds.ResetServer,
 		"set":           d.DoSet,
 		"shutdown":      d.cmds.Shutdown,
 		//"stop":         d.cmds.Stop,

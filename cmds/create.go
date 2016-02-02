@@ -8,11 +8,9 @@ import (
 	"strings"
 )
 
-//HelpForCreateVM provides usage information for the create-vm command
-func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
-	log.Log("bytemark create vm")
-	log.Log()
-	log.Log("usage: bytemark create vm [flags] <name> [<cores> [<memory> [<disc specs>]...]")
+//HelpForCreateServer provides usage information for the create server command
+func (cmds *CommandSet) HelpForCreateServer() util.ExitCode {
+	log.Log("usage: bytemark create server [flags] <name> [<cores> [<memory> [<disc specs>]...]")
 	log.Log()
 	log.Log("flags available")
 	log.Log("    --account <name>")
@@ -31,16 +29,19 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 	log.Log("    --no-discs - specifies that the created server should not have any discs.")
 	log.Log("    --public-keys <keys> (newline seperated)")
 	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
-	log.Log("    --root-password <password> (if not set, will be randomly generated)")
-	log.Log("    --stopped (if set, machine won't boot)")
+	log.Log("    --root-password <password> - if not set, will be randomly generated")
+	log.Log("    --stopped - if set, machine won't boot")
+	//log.Log("    --type ( cloud | dual | pro | max ) - specifies the type of server to create")
 	log.Log("    --zone <name> (default manchester)")
+	log.Log()
+	log.Log("Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.")
 	log.Log()
 	log.Log("A disc spec looks like the following: label:grade:size")
 	log.Log("The label and grade fields are optional. If grade is empty, defaults to sata.")
 	log.Log("If there are two fields, they are assumed to be grade and size.")
 	log.Log("Multiple --disc flags can be used to create multiple discs")
 	log.Log()
-	log.Log("If hwprofile-locked is set then the virtual machine's hardware won't be changed over time.")
+	log.Log("If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.")
 	return util.E_USAGE_DISPLAYED
 
 }
@@ -49,11 +50,11 @@ func (cmds *CommandSet) HelpForCreateVM() util.ExitCode {
 func (cmds *CommandSet) HelpForCreate() util.ExitCode {
 	log.Log("bytemark create")
 	log.Log()
-	log.Log("usage: bytemark create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <virtual machine> [disc specs]")
+	log.Log("usage: bytemark create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <cloud server> [disc specs]")
 	log.Log("               create group [--account <name>] <name>")
-	log.Log("               create disc[s] <disc specs> <virtual machine>")
-	log.Log("               create ip [--reason reason] <virtual machine>")
-	log.Log("               create vm (see bytemark help create vm)")
+	log.Log("               create disc[s] <disc specs> <cloud server>")
+	log.Log("               create ip [--reason reason] <cloud server>")
+	log.Log("               create server (see bytemark help create server)")
 	log.Log("")
 	log.Log("Disc specs are a comma seperated list of size:storage grade pairs. Sizes are in GB by default but can be specified in M")
 	log.Log("")
@@ -68,7 +69,7 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "cloud server")
 	if !ok {
 		cmds.HelpForCreate()
 		return util.E_PEBKAC
@@ -163,8 +164,8 @@ func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
 
 }
 
-// CreateVM implements the create-vm command. See HelpForCreateVM for usage
-func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
+// CreateServer implements the create server command. See HelpForCreateServer for usage
+func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	addImageInstallFlags(flags)
 	cores := flags.Int("cores", 1, "")
@@ -184,9 +185,9 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	args = cmds.config.ImportFlags(flags)
 
 	var err error
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "cloud server")
 	if !ok {
-		cmds.HelpForCreateVM()
+		cmds.HelpForCreateServer()
 		return util.E_PEBKAC
 	}
 
@@ -200,7 +201,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 			cores64, err := strconv.ParseInt(arg, 10, 32)
 			if err != nil {
 				log.Error("Cores argument given was not an int.")
-				cmds.HelpForCreateVM()
+				cmds.HelpForCreateServer()
 				return util.E_PEBKAC
 			} else {
 				*cores = int(cores64)
@@ -210,7 +211,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		default:
 			if len(discs) != 0 {
 				log.Error("--disc flag used along with the discs spec argument - please use only one")
-				cmds.HelpForCreateVM()
+				cmds.HelpForCreateServer()
 				return util.E_PEBKAC
 			}
 			for i, spec := range strings.Split(arg, ",") {
@@ -286,7 +287,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		imageInstall = nil
 	}
 
-	// if stopped isn't set and either cdrom or image are set, start the vm
+	// if stopped isn't set and either cdrom or image are set, start the server
 	autoreboot := !*stopped && ((imageInstall != nil) || (*cdrom != ""))
 
 	spec := lib.VirtualMachineSpec{
@@ -310,7 +311,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 		Account: name.Account,
 	}
 
-	log.Log("The following VM will be created:")
+	log.Log("The following server will be created:")
 	log.Log(util.FormatVirtualMachineSpec(&groupName, &spec))
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
@@ -332,7 +333,7 @@ func (cmds *CommandSet) CreateVM(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	log.Log("Virtual machine created successfully", "")
+	log.Log("cloud server created successfully", "")
 	log.Log(util.FormatVirtualMachine(vm))
 	if imageInstall != nil {
 		log.Logf("Root password:") // logf so we don't get a tailing \r\n

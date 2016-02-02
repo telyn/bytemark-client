@@ -29,7 +29,7 @@ cmds
   `CommandManager`. Now `go test bytemark.co.uk/client/main` will work.
 
 * Implement the function in `cmds/<base>.go` where `<base>` is
-  the first word of the command. See cmd-show.go and ShowVM for a
+  the first word of the command. See cmd-show.go and ShowServer for a
   kind of template, although its output is more complicated than you likely need
 
 * Add usage info to `cmds/<base>.go`'s `HelpFor<Base>` function.

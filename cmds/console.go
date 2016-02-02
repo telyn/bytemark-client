@@ -14,9 +14,9 @@ import (
 func (cmds *CommandSet) HelpForConsole() util.ExitCode {
 	log.Log("bytemark console commands")
 	log.Log()
-	log.Log("usage: bytemark console [--serial | --vnc] [--connect | --panel] <virtual machine>")
-	log.Log("       bytemark serial [--connect] <virtual machine>")
-	log.Log("       bytemark vnc [--connect | --panel] <virtual machine>")
+	log.Log("usage: bytemark console [--serial | --vnc] [--connect | --panel] <server>")
+	log.Log("       bytemark serial [--connect] <server>")
+	log.Log("       bytemark vnc [--connect | --panel] <cloud server>")
 	log.Log()
 	log.Log("Out-of-band access to a machine's serial or graphical (VNC) console.")
 	log.Log()
@@ -77,14 +77,14 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "virtual machine")
+	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForConsole()
 		return util.E_PEBKAC
 	}
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
-		log.Logf("Virtual machine name cannot be blank\r\n")
+		log.Logf("server name cannot be blank\r\n")
 		return util.E_PEBKAC
 	}
 	err = cmds.EnsureAuth()

@@ -13,7 +13,7 @@ func TestReimage(t *testing.T) {
 	config := &mocks.Config{}
 
 	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-vm",
+		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account"}
 
@@ -23,7 +23,7 @@ func TestReimage(t *testing.T) {
 		RootPassword:    "gNFgYYIgayyDOjkV",
 		PublicKeys:      "",
 	}
-	args := []string{"--image", image.Distribution, "--root-password", image.RootPassword, "test-vm.test-group.test-account"}
+	args := []string{"--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Silent").Return(true)

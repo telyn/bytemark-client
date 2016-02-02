@@ -91,7 +91,7 @@ func TestListGroups(t *testing.T) {
 	}
 }
 
-func TestListVMs(t *testing.T) {
+func TestListServers(t *testing.T) {
 	c := &mocks.Client{}
 	config := &mocks.Config{}
 
@@ -113,7 +113,7 @@ func TestListVMs(t *testing.T) {
 	}).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.ListVMs([]string{"halloween-vms.spooky-steve"})
+	cmds.ListServers([]string{"halloween-vms.spooky-steve"})
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

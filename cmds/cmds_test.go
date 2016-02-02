@@ -11,7 +11,7 @@ import (
 
 func getFixtureVM() lib.VirtualMachine {
 	return lib.VirtualMachine{
-		Name:    "test-vm",
+		Name:    "test-server",
 		GroupID: 1,
 	}
 }
