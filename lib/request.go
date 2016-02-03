@@ -122,7 +122,7 @@ func (r *Request) Run(body []byte, responseObject interface{}) (statusCode int, 
 		err := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
 		jsonErr = json.Unmarshal(responseBody, &err.Problems)
 		if jsonErr != nil {
-			log.Debug(log.DBG_OUTLINE, jsonErr)
+			log.Debug(log.DBG_OUTLINE, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
 			err.Problems["The problem"] = []string{baseErr.ResponseBody}
 		}
 	case 403:

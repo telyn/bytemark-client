@@ -2,7 +2,6 @@ package lib
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"
-	"bytemark.co.uk/client/util/log"
 	"errors"
 )
 
