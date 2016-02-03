@@ -155,7 +155,6 @@ func (cmds *CommandSet) EnsureAuth() error {
 // returns nil on success or an error on failure
 func (cmds *CommandSet) PromptForCredentials() error {
 	userVar, _ := cmds.config.GetV("user")
-	log.Debugf(2, "%#v\n", userVar)
 	for userVar.Value == "" || userVar.Source != "INTERACTION" {
 		if userVar.Value != "" {
 			user := util.Prompt(fmt.Sprintf("User [%s]: ", userVar.Value))

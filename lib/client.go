@@ -51,7 +51,6 @@ func (c *bytemarkClient) AuthWithToken(token string) error {
 	if err == nil {
 		c.authSession = session
 	}
-	log.Debug(5, session)
 	return err
 
 }

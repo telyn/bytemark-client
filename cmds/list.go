@@ -49,7 +49,6 @@ func (cmds *CommandSet) ListServers(args []string) util.ExitCode {
 
 	if len(args) >= 1 {
 		group, err := cmds.client.GetGroup(name)
-		log.Debugf(5, "Error! %T: %v\r\n", err, err)
 
 		if err != nil {
 			if _, ok := err.(lib.NotFoundError); ok {

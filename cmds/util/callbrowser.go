@@ -35,7 +35,7 @@ func CallBrowser(url string) error {
 
 	var attr os.ProcAttr
 
-	log.Debugf(1, "Executing %s \"%s\"", bin, url)
+	log.Debugf(log.DBG_OUTLINE, "Executing %s \"%s\"", bin, url)
 
 	proc, err := os.StartProcess(bin, []string{bin, url}, &attr)
 	subprocErr := SubprocessFailedError{Args: []string{bin, url}}

@@ -5,6 +5,18 @@ import (
 	"os"
 )
 
+const (
+	// shows client version & arguments passed in, HTTP URLs & status codes, subprocess calls.
+	DBG_OUTLINE = iota
+	// shows args going in to library functions
+	DBG_ARGS
+	// not used right now
+	DBG_RESERVED
+	// raw request/response bodies.
+	DBG_HTTP_DATA
+	DBG_MISC
+)
+
 var DebugLevel int
 var LogFile *os.File
 var Silent bool
