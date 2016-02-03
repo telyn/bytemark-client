@@ -57,7 +57,7 @@ func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string)
 	}
 	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 
-	_, _, err = c.Request(true, "DELETE", path, "")
+	_, _, err = c.Request(EP_BRAIN, true, "DELETE", path, "")
 
 	return err
 }
@@ -71,7 +71,7 @@ func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string,
 
 	disc := fmt.Sprintf(`{"size":%d}`, sizeMB)
 
-	_, _, err = c.Request(true, "PUT", path, disc)
+	_, _, err = c.Request(EP_BRAIN, true, "PUT", path, disc)
 	return err
 }
 
@@ -84,6 +84,6 @@ func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (d
 
 	disc = new(Disc)
 
-	err = c.RequestAndUnmarshal(true, "GET", path, "", disc)
+	err = c.RequestAndUnmarshal(EP_BRAIN, true, "GET", path, "", disc)
 	return disc, err
 }
