@@ -63,7 +63,6 @@ func (cmds *CommandSet) ShowServer(args []string) util.ExitCode {
 // ShowGroup implements the show-group command, which is used to show the group name and ID, as well as the servers within it.
 func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
-	list := flags.Bool("list-vms", false, "")
 	verbose := flags.Bool("verbose", false, "")
 	jsonOut := flags.Bool("json", false, "")
 	flags.Parse(args)
@@ -93,13 +92,14 @@ func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 			js, _ := json.MarshalIndent(group, "", "    ")
 			log.Output(string(js))
 		} else {
-			log.Outputf("Group %d: %s\r\n\r\n", group.ID, group.Name)
+			s := ""
+			if len(group.VirtualMachines) != 1 {
+				s = "s"
+			}
+			log.Outputf("%s - Group containing %d cloud server%s\r\n", group.Name, len(group.VirtualMachines), s)
 
-			if *list {
-				for _, vm := range group.VirtualMachines {
-					log.Output(vm.Name)
-				}
-			} else if *verbose {
+			if *verbose || len(group.VirtualMachines) <= 3 {
+				log.Output()
 				for _, v := range util.FormatVirtualMachines(group.VirtualMachines) {
 					log.Output(v)
 				}
@@ -114,8 +114,6 @@ func (cmds *CommandSet) ShowGroup(args []string) util.ExitCode {
 // ShowAccount implements the show-account command, which is used to show the client account name, as well as the groups and servers within it.
 func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
-	listgroups := flags.Bool("list-groups", false, "")
-	listvms := flags.Bool("list-vms", false, "")
 	verbose := flags.Bool("verbose", false, "")
 	jsonOut := flags.Bool("json", false, "")
 	flags.Parse(args)
@@ -143,7 +141,21 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 		js, _ := json.MarshalIndent(acc, "", "    ")
 		log.Output(string(js))
 	} else {
-		log.Outputf("Account %d: %s\r\n", acc.ID, acc.Name)
+		gs := ""
+		if len(acc.Groups) != 1 {
+			gs = "s"
+		}
+		ss := ""
+		servers := 0
+		for _, g := range acc.Groups {
+			servers += len(g.VirtualMachines)
+		}
+		if servers != 1 {
+			ss = "s"
+		}
+
+		log.Outputf("%s - Account containing %d server%s across %d group%s\r\n", acc.Name, servers, ss, len(acc.Groups), gs)
+		log.Outputf("Groups in this account: %s\r\n")
 		switch {
 		case *verbose:
 			for _, g := range acc.Groups {
@@ -152,24 +164,6 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 					log.Output(v)
 				}
 			}
-		case *listgroups:
-			log.Output("Groups:")
-			for _, g := range acc.Groups {
-				log.Output(g.Name)
-			}
-		case *listvms:
-			log.Output("servers:")
-			for _, g := range acc.Groups {
-				for _, vm := range g.VirtualMachines {
-					log.Outputf("%s.%s\r\n", vm.Name, g.Name)
-				}
-			}
-		default:
-			vms := 0
-			for _, g := range acc.Groups {
-				vms += len(g.VirtualMachines)
-			}
-			log.Outputf("%d groups containing %d servers\r\n", len(acc.Groups), vms)
 		}
 
 	}
