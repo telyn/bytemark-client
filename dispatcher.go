@@ -247,9 +247,9 @@ func (d *Dispatcher) DoVNC(args []string) util.ExitCode {
 
 // Do takes the command line arguments and figures out what to do.
 func (d *Dispatcher) Do(args []string) util.ExitCode {
-	log.Debugf(1, "bytemark %v\r\n\r\n", client.GetVersion())
+	log.Debugf(log.DBG_OUTLINE, "bytemark %v\r\n\r\n", client.GetVersion())
 
-	log.Debugf(1, "Args passed to Do: %#v\r\n", args)
+	log.Debugf(log.DBG_OUTLINE, "Args passed to Do: %#v\r\n", args)
 
 	for _, arg := range args {
 		if arg == "/?" || arg == "/h" || arg == "--help" || arg == "-h" {

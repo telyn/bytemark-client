@@ -249,7 +249,6 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 	}
 
 	if len(ips) > 2 {
-		log.Debugf(1, "%d IP addresses were specified", len(ips))
 		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
 		return util.E_PEBKAC
 	}
@@ -261,14 +260,12 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 		for _, ip := range ips {
 			if ip.To4() != nil {
 				if ipspec.IPv4 != "" {
-					log.Debugf(1, "Multiple IPv4 addresses were specified\n")
 					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
 					return util.E_PEBKAC
 				}
 				ipspec.IPv4 = ip.To4().String()
 			} else {
 				if ipspec.IPv6 != "" {
-					log.Debugf(1, "Multiple IPv6 addresses were specified\n")
 					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
 					return util.E_PEBKAC
 

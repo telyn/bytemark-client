@@ -159,7 +159,7 @@ func ProcessError(err error, message ...string) ExitCode {
 	trace := make([]byte, 4096, 4096)
 	runtime.Stack(trace, false)
 
-	log.Debug(1, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
+	log.Debug(log.DBG_OUTLINE, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
 	if len(message) > 0 {
 		log.Error(message)
 	}

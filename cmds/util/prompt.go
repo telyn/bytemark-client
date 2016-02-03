@@ -1,8 +1,8 @@
 package util
 
 import (
-	"bytemark.co.uk/client/util/log"
 	"bufio"
+	"bytemark.co.uk/client/util/log"
 	"fmt"
 	"os"
 	"strings"
@@ -25,7 +25,6 @@ func Prompt(prompt string) string {
 		}
 		return ""
 	}
-	log.Debugf(999, "%s %s", prompt, res)
 	return strings.TrimSpace(res)
 }
 

@@ -23,7 +23,7 @@ func CallBrowser(url string) error {
 	// ¯\(º_o)/¯
 	url = strings.Replace(url, "&", "^&", -1)
 
-	log.Debugf(1, "Executing %s /C start \"%s\"", path, url)
+	log.Debugf(log.DBG_OUTLINE, "Executing %s /C start \"%s\"", path, url)
 	proc, err := os.StartProcess(path, []string{path, "/C", "start", url}, &attr)
 	if err != nil {
 

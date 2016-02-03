@@ -26,10 +26,10 @@ func (c *bytemarkClient) RequestAndUnmarshal(auth bool, method, path, requestBod
 
 	data, err := c.RequestAndRead(auth, method, path, requestBody)
 
-	if c.debugLevel >= 3 {
+	if c.debugLevel >= log.DBG_HTTPDATA {
 		buf := new(bytes.Buffer)
 		json.Indent(buf, data, "", "    ")
-		log.Debugf(3, "%s", buf)
+		log.Debugf(log.DBG_HTTPDATA, "%s", buf)
 	}
 
 	if err != nil {
@@ -100,8 +100,8 @@ func (c *bytemarkClient) Request(auth bool, method string, location string, requ
 		return req, res, err
 	}
 
-	log.Debugf(1, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
-	log.Debugf(3, "request body: '%s'\r\n", requestBody)
+	log.Debugf(log.DBG_OUTLINE, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
+	log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", requestBody)
 
 	baseErr := APIError{
 		Method:       method,
@@ -114,7 +114,7 @@ func (c *bytemarkClient) Request(auth bool, method string, location string, requ
 	switch res.StatusCode {
 	case 400:
 		responseBody, readErr := ioutil.ReadAll(res.Body)
-		log.Debugf(3, "response body: '%s'\r\n", responseBody)
+		log.Debugf(log.DBG_HTTPDATA, "response body: '%s'\r\n", responseBody)
 		if readErr != nil {
 			return nil, nil, BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
 		}
@@ -122,7 +122,7 @@ func (c *bytemarkClient) Request(auth bool, method string, location string, requ
 		brErr := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
 		err = json.Unmarshal(responseBody, &brErr.Problems)
 		if err != nil {
-			log.Debug(1, err)
+			log.Debug(log.DBG_OUTLINE, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
 			brErr.Problems["The problem"] = []string{baseErr.ResponseBody}
 		}
 		err = brErr

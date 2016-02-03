@@ -95,13 +95,11 @@ func (cmds *CommandSet) DeleteDisc(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
-	log.Debugf(2, "%#v", args)
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForDelete()
 		return util.E_PEBKAC
 	}
-	log.Debugf(2, "%#v", args)
 
 	disc, ok := util.ShiftArgument(&args, "disc id")
 	if !ok {

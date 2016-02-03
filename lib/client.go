@@ -2,7 +2,6 @@ package lib
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"
-	"bytemark.co.uk/client/util/log"
 	"errors"
 )
 
@@ -51,7 +50,6 @@ func (c *bytemarkClient) AuthWithToken(token string) error {
 	if err == nil {
 		c.authSession = session
 	}
-	log.Debug(5, session)
 	return err
 
 }
