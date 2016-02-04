@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
@@ -30,36 +31,44 @@ func (disc *Disc) Validate() (*Disc, error) {
 func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc Disc) (err error) {
 	err = c.validateVirtualMachineName(&name)
 	if err != nil {
-		return err
+		return
 	}
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
-		return err
+		return
 	}
 	discs := []Disc{disc}
 	labelDiscs(discs, len(vm.Discs))
 
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
-	js, err := json.Marshal(discs[0])
+	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
-		return err
+		return
 	}
 
-	_, err = c.RequestAndRead(true, "POST", path, string(js))
-	return err
+	js, err := json.Marshal(discs[0])
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	return
 
 }
 
 func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string) (err error) {
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
-		return err
+		return
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("DELETE", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 
-	_, _, err = c.Request(EP_BRAIN, true, "DELETE", path, "")
+	if err != nil {
+		return
+	}
 
-	return err
+	_, _, err = r.Run(nil, nil)
+
+	return
 }
 
 func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
@@ -67,23 +76,29 @@ func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string,
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	if err != nil {
+		return
+	}
 
+	// TODO(telyn): marshal json instead of sprintf
 	disc := fmt.Sprintf(`{"size":%d}`, sizeMB)
 
-	_, _, err = c.Request(EP_BRAIN, true, "PUT", path, disc)
+	_, _, err = r.Run(bytes.NewBufferString(disc), nil)
 	return err
 }
 
 func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
-		return nil, err
+		return
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 
-	disc = new(Disc)
+	if err != nil {
+		return
+	}
 
-	err = c.RequestAndUnmarshal(EP_BRAIN, true, "GET", path, "", disc)
-	return disc, err
+	_, _, err = r.Run(nil, disc)
+	return
 }

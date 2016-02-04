@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
 )
@@ -19,14 +20,16 @@ func (user *User) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (c *bytemarkClient) GetUser(name string) (*User, error) {
-	url := BuildURL("/users/%s", name)
+func (c *bytemarkClient) GetUser(name string) (user *User, err error) {
+	r, err := c.BuildRequest("GET", EP_BRAIN, "/users/%s", name)
+	if err != nil {
+		return
+	}
 
-	var user JSONUser
-	var realUser User
-	err := c.RequestAndUnmarshal(true, "GET", url, "", &user)
-	user.Process(&realUser)
-	return &realUser, err
+	var jsUser JSONUser
+	_, _, err = r.Run(nil, &user)
+	jsUser.Process(user)
+	return
 }
 
 // AddUserAuthorizedKey
@@ -43,13 +46,16 @@ func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error
 		return err
 	}
 
-	url := BuildURL("/users/%s", username)
-	_, err = c.RequestAndRead(true, "PUT", url, string(userjs))
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/users/%s", username)
+	if err != nil {
+		return err
+	}
+	_, _, err = r.Run(bytes.NewBuffer(userjs), nil)
 	return err
 
 }
 
-// DeleteUserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part
+// DeleteUserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part (as long as it's unique)
 func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) error {
 	user, err := c.GetUser(username)
 	if err != nil {
@@ -82,8 +88,8 @@ func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) er
 		return err
 	}
 
-	url := BuildURL("/users/%s", username)
-	_, err = c.RequestAndRead(true, "PUT", url, string(userjs))
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/users/%s", username)
+	_, _, err = r.Run(bytes.NewBuffer(userjs), nil)
 	return err
 
 }

@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
@@ -11,7 +12,10 @@ func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec VirtualMachi
 	if err != nil {
 		return nil, err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
+	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
+	if err != nil {
+		return nil, err
+	}
 
 	req := make(map[string]interface{})
 	rvm := make(map[string]interface{})
@@ -79,7 +83,7 @@ func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec VirtualMachi
 	}
 
 	vm = new(VirtualMachine)
-	err = c.RequestAndUnmarshal(true, "POST", path, string(js), vm)
+	_, _, err = r.Run(bytes.NewBuffer(js), vm)
 	return vm, err
 }
 
@@ -90,12 +94,16 @@ func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge boo
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	purgePart := ""
 	if purge {
-		path += "?purge=true"
+		purgePart = "?purge=true"
+	}
+	r, err := c.BuildRequest("DELETE", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s%s", name.Account, name.Group, name.VirtualMachine, purgePart)
+	if err != nil {
+		return err
 	}
 
-	_, _, err = c.Request(true, "DELETE", path, "")
+	_, _, err = r.Run(nil, nil)
 	return err
 }
 
@@ -106,9 +114,12 @@ func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm *Virtual
 		return nil, err
 	}
 	vm = new(VirtualMachine)
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return nil, err
+	}
 
-	err = c.RequestAndUnmarshal(true, "GET", path, "", vm)
+	_, _, err = r.Run(nil, vm)
 	if err != nil {
 		return nil, err
 	}
@@ -122,13 +133,16 @@ func (c *bytemarkClient) ReimageVirtualMachine(name VirtualMachineName, image *I
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/reimage", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/reimage", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
 	js, err := json.Marshal(image)
 	if err != nil {
 		return err
 	}
-	_, _, err = c.Request(true, "POST", path, string(js))
+	_, _, err = r.Run(bytes.NewBuffer(js), nil)
 	return err
 }
 
@@ -140,9 +154,12 @@ func (c *bytemarkClient) ResetVirtualMachine(name VirtualMachineName) (err error
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
-	_, _, err = c.Request(true, "POST", path, `{"signal":"reset"}`)
+	_, _, err = r.Run(bytes.NewBufferString(`{"signal":"reset"}`), nil)
 	return err
 }
 
@@ -153,9 +170,12 @@ func (c *bytemarkClient) RestartVirtualMachine(name VirtualMachineName) (err err
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
-	_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": false}`)
+	_, _, err = r.Run(bytes.NewBufferString(`{"autoreboot_on":true, "power_on": false}`), nil)
 	return err
 }
 
@@ -166,9 +186,12 @@ func (c *bytemarkClient) StartVirtualMachine(name VirtualMachineName) (err error
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
-	_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":true, "power_on": true}`)
+	_, _, err = r.Run(bytes.NewBufferString(`{"autoreboot_on":true, "power_on": true}`), nil)
 	return err
 }
 
@@ -179,9 +202,12 @@ func (c *bytemarkClient) StopVirtualMachine(name VirtualMachineName) (err error)
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
-	_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":false, "power_on": false}`)
+	_, _, err = r.Run(bytes.NewBufferString(`{"autoreboot_on":false, "power_on": false}`), nil)
 	return err
 }
 
@@ -190,16 +216,24 @@ func (c *bytemarkClient) StopVirtualMachine(name VirtualMachineName) (err error)
 func (c *bytemarkClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error) {
 	err = c.validateVirtualMachineName(&name)
 	if err != nil {
-		return err
+		return
 	}
+	var r *Request
 	if stayoff {
-		path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+		r, err = c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+		if err != nil {
+			return
+		}
 
-		_, _, err = c.Request(true, "PUT", path, `{"autoreboot_on":false}`)
+		_, _, err = r.Run(bytes.NewBufferString(`{"autoreboot_on":false}`), nil)
+		return
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	r, err = c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return
+	}
 
-	_, _, err = c.Request(true, "POST", path, `{"signal": "powerdown"}`)
+	_, _, err = r.Run(bytes.NewBufferString(`{"signal": "powerdown"}`), nil)
 	return err
 }
 
@@ -210,9 +244,12 @@ func (c *bytemarkClient) UndeleteVirtualMachine(name VirtualMachineName) (err er
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
-	_, _, err = c.Request(true, "PUT", path, `{"deleted":false}`)
+	_, _, err = r.Run(bytes.NewBufferString(`{"deleted":false}`), nil)
 	return err
 }
 
@@ -223,7 +260,10 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name VirtualMachineNam
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 	hwprofile_lock := ""
 	if len(locked) > 0 {
 		hwprofile_lock = `, "hardware_profile_locked": false`
@@ -231,9 +271,9 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name VirtualMachineNam
 			hwprofile_lock = `, "hardware_profile_locked": true`
 		}
 	}
-	what := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofile_lock)
+	profileJSON := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofile_lock)
 
-	_, _, err = c.Request(true, "PUT", path, what)
+	_, _, err = r.Run(bytes.NewBufferString(profileJSON), nil)
 	return err
 }
 
@@ -244,14 +284,17 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfileLock(name VirtualMachin
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
-
-	what := `{"hardware_profile_locked": false}`
-	if locked {
-		what = `{"hardware_profile_locked": true}`
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
 	}
 
-	_, _, err = c.Request(true, "PUT", path, what)
+	lockJSON := `{"hardware_profile_locked": false}`
+	if locked {
+		lockJSON = `{"hardware_profile_locked": true}`
+	}
+
+	_, _, err = r.Run(bytes.NewBufferString(lockJSON), nil)
 	return err
 }
 
@@ -262,11 +305,14 @@ func (c *bytemarkClient) SetVirtualMachineMemory(name VirtualMachineName, memory
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
-	what := fmt.Sprintf(`{"memory": %d}`, memory)
+	memoryJSON := fmt.Sprintf(`{"memory": %d}`, memory)
 
-	_, _, err = c.Request(true, "PUT", path, what)
+	_, _, err = r.Run(bytes.NewBufferString(memoryJSON), nil)
 	return err
 }
 
@@ -277,10 +323,13 @@ func (c *bytemarkClient) SetVirtualMachineCores(name VirtualMachineName, cores i
 	if err != nil {
 		return err
 	}
-	path := BuildURL("/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
 
-	what := fmt.Sprintf(`{"cores": %d}`, cores)
+	coresJSON := fmt.Sprintf(`{"cores": %d}`, cores)
 
-	_, _, err = c.Request(true, "PUT", path, what)
+	_, _, err = r.Run(bytes.NewBufferString(coresJSON), nil)
 	return err
 }

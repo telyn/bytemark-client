@@ -8,7 +8,7 @@ import (
 func TestParseVirtualMachineName(t *testing.T) {
 	is := is.New(t)
 
-	client, _ := New("endpoint.tld")
+	client, _ := New("endpoint.tld", "billing.endpoint.tld")
 	vm, err := client.ParseVirtualMachineName("a.b.c")
 	is.Nil(err)
 	is.Equal("a.b.c", vm.String())
@@ -41,7 +41,7 @@ func TestParseVirtualMachineName(t *testing.T) {
 func TestParseGroupName(t *testing.T) {
 	is := is.New(t)
 
-	client, _ := New("endpoint.tld")
+	client, _ := New("endpoint.tld", "billing.endpoint.tld")
 
 	is.Equal("halloween-vms.spooky-steve", client.ParseGroupName("halloween-vms.spooky-steve").String())
 	is.Equal("a.b", client.ParseGroupName("a.b").String())
@@ -56,7 +56,7 @@ func TestParseGroupName(t *testing.T) {
 func TestParseAccountName(t *testing.T) {
 	is := is.New(t)
 
-	client, _ := New("endpoint.tld")
+	client, _ := New("endpoint.tld", "billing.endpoint.tld")
 
 	is.Equal("a", client.ParseAccountName("a.b.c"))
 	is.Equal("a", client.ParseAccountName("a.b.c."))

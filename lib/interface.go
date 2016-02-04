@@ -2,7 +2,7 @@ package lib
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"
-	"net/http"
+	"net/url"
 )
 
 // Client provides the interface which all API clients should implement.
@@ -41,16 +41,11 @@ type Client interface {
 	// Requests
 	//
 
-	// RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
-	RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error
-
-	// RequestAndRead makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
-	// Use RequestAndUnmarshal unless you know that the given URL doesn't return JSON - this method may be unexported in future releases.
-	RequestAndRead(auth bool, method, path, requestBody string) (responseBody []byte, err error)
-
-	// Request makes an HTTP request and then request it, returning the request object, response object and any errors
-	// For use by Client.RequestAndRead, do not use externally except for testing
-	Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error)
+	AllowInsecureRequests()
+	BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
+	BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
+	NewRequestNoAuth(method string, url *url.URL) *Request
+	NewRequest(method string, url *url.URL) *Request
 
 	//
 	// Parsers

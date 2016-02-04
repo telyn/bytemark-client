@@ -103,3 +103,7 @@ func (c *bytemarkClient) GetSessionUser() string {
 	}
 	return c.authSession.Username
 }
+
+func (c *bytemarkClient) AllowInsecureRequests() {
+	c.allowInsecure = true
+}

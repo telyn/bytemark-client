@@ -15,7 +15,7 @@ func mkTestClientAndServers(handler http.Handler) (c *bytemarkClient, authServer
 	brain = mkTestBrain(handler)
 
 	auth, err := auth3.New(authServer.URL)
-	return NewWithAuth(brain.URL, auth), authServer, brain, err
+	return NewWithAuth(brain.URL, brain.URL, auth), authServer, brain, err
 }
 
 // mkTestBrain creates an httptest.Server for the given http.Handler. It's basically an alias for httptest.NewServer. Why did I write it?

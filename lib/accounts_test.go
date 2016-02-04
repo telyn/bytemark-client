@@ -31,6 +31,7 @@ func TestGetAccount(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	client.AllowInsecureRequests()
 
 	acc, err := client.GetAccount("invalid-account")
 	is.Nil(acc)

@@ -60,13 +60,18 @@ func (defs JSONDefinitions) Process() *Definitions {
 	return &out
 }
 
-func (c *bytemarkClient) ReadDefinitions() (*Definitions, error) {
+func (c *bytemarkClient) ReadDefinitions() (definitions *Definitions, err error) {
 	var defs JSONDefinitions
-	err := c.RequestAndUnmarshal(false, "GET", "/definitions", "", &defs)
+	r, err := c.BuildRequestNoAuth("GET", EP_BRAIN, "/definitions")
+
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	return defs.Process(), nil
+	_, _, err = r.Run(nil, &defs)
+
+	definitions = defs.Process()
+
+	return
 
 }
