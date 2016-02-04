@@ -45,7 +45,7 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -79,7 +79,7 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -110,7 +110,7 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -142,7 +142,7 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -173,7 +173,7 @@ func (cmds *CommandSet) ResetServer(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
