@@ -89,6 +89,7 @@ func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string,
 }
 
 func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
+	disc = new(Disc)
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return

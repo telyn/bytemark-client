@@ -55,6 +55,7 @@ func TestGetVirtualMachine(t *testing.T) {
 	}))
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +73,6 @@ func TestGetVirtualMachine(t *testing.T) {
 	}
 
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
-	is.Nil(vm)
 	is.NotNil(err)
 
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})

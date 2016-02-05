@@ -111,19 +111,19 @@ func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge boo
 func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm *VirtualMachine, err error) {
 	err = c.validateVirtualMachineName(&name)
 	if err != nil {
-		return nil, err
+		return
 	}
 	vm = new(VirtualMachine)
 	r, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	_, _, err = r.Run(nil, vm)
 	if err != nil {
-		return nil, err
+		return
 	}
-	return vm, err
+	return
 }
 
 // ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.

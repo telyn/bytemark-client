@@ -183,9 +183,11 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		err = InternalServerError{baseErr}
 	default:
 		if 200 <= res.StatusCode && res.StatusCode <= 299 {
-			jsonErr := json.Unmarshal(response, responseObject)
-			if jsonErr != nil {
-				return statusCode, response, jsonErr
+			if responseObject != nil {
+				jsonErr := json.Unmarshal(response, responseObject)
+				if jsonErr != nil {
+					return statusCode, response, jsonErr
+				}
 			}
 			break
 		}

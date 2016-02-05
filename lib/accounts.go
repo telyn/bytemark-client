@@ -26,7 +26,7 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 		return
 	}
 
-	_, _, err = req.Run(nil, accounts)
+	_, _, err = req.Run(nil, &accounts)
 	if err != nil {
 		return
 	}
