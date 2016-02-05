@@ -27,6 +27,7 @@ func TestDispatchDoCreate(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("CreateGroup", []string{"test-group"}).Times(1)
@@ -53,6 +54,7 @@ func TestDispatchDoDebug(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("Debug", []string{"GET", "/test"}).Times(1)
@@ -65,6 +67,7 @@ func TestDispatchDoDelete(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("DeleteServer", []string{}).Times(1)
@@ -84,6 +87,7 @@ func TestDispatchDoUndelete(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("UndeleteServer", []string{}).Times(1)
@@ -99,6 +103,7 @@ func TestDispatchDoLock(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("HelpForLocks").Times(1)
@@ -122,6 +127,7 @@ func TestDispatchDoUnlock(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("HelpForLocks").Times(1)
@@ -146,6 +152,7 @@ func TestDispatchDoSet(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("HelpForSet").Times(1)
@@ -202,6 +209,7 @@ func TestDispatchDoHelp(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 	config.When("Get", "silent").Return("true")
 
@@ -222,6 +230,7 @@ func TestDispatchDoConfig(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("Config", []string{}).Times(1)
@@ -244,6 +253,7 @@ func TestDispatchDoPower(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 
 	commands.When("Shutdown", []string{}).Times(1)
@@ -291,6 +301,7 @@ func TestDispatchDoShow(t *testing.T) {
 	commands := &mocks.Commands{}
 	config := &mocks.Config{}
 	config.When("Get", "endpoint").Return("endpoint.example.com")
+	config.When("Get", "billing-endpoint").Return("endpoint.example.com")
 	config.When("GetDebugLevel").Return(0)
 	config.When("Get", "silent").Return(true)
 

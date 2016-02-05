@@ -34,15 +34,14 @@ func TestGetAccount(t *testing.T) {
 	client.AllowInsecureRequests()
 
 	acc, err := client.GetAccount("invalid-account")
-	is.Nil(acc)
 	is.NotNil(err)
 
 	acc, err = client.GetAccount("")
-	is.NotNil(acc)
+	is.Nil(err)
 	is.Equal("account", acc.Name)
 
 	acc, err = client.GetAccount("account")
-	is.NotNil(acc)
+	is.Nil(err)
 	is.Equal("account", acc.Name)
 
 }
@@ -76,6 +75,7 @@ func TestGetAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	client.AllowInsecureRequests()
 
 	acc, err := client.GetAccounts()
 	is.Nil(err)

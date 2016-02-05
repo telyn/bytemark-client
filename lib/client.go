@@ -17,6 +17,7 @@ const (
 type bytemarkClient struct {
 	brainEndpoint   string
 	billingEndpoint string
+	allowInsecure   bool
 	auth            *auth3.Client
 	authSession     *auth3.SessionData
 	debugLevel      int

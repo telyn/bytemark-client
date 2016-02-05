@@ -28,13 +28,20 @@ func (e InsecureConnectionError) Error() string {
 }
 
 type Request struct {
-	authenticate    bool
-	client          Client
-	url             *url.URL
-	method          string
-	body            []byte
-	insecureAllowed bool
-	hasRun          bool
+	authenticate  bool
+	client        Client
+	url           *url.URL
+	method        string
+	body          []byte
+	allowInsecure bool
+	hasRun        bool
+}
+
+func (r *Request) GetURL() url.URL {
+	if r.url == nil {
+		return url.URL{}
+	}
+	return *r.url
 }
 
 func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
@@ -57,27 +64,30 @@ func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path str
 
 func (c *bytemarkClient) NewRequestNoAuth(method string, url *url.URL) *Request {
 	return &Request{
-		client: c,
-		url:    url,
-		method: method,
+		client:        c,
+		url:           url,
+		method:        method,
+		allowInsecure: c.allowInsecure,
 	}
 }
 
 func (c *bytemarkClient) NewRequest(method string, url *url.URL) *Request {
 	return &Request{
-		authenticate: true,
-		client:       c,
-		url:          url,
-		method:       method,
+		authenticate:  true,
+		client:        c,
+		url:           url,
+		method:        method,
+		allowInsecure: c.allowInsecure,
 	}
 
 }
 
 func (r *Request) AllowInsecure() {
-	r.insecureAllowed = true
+	r.allowInsecure = true
 }
 
 func (r *Request) mkHTTPClient() (c *http.Client) {
+	c = new(http.Client)
 	if r.url.Host == "staging.bigv.io" {
 		c.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -112,7 +122,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	}
 	r.hasRun = true
 
-	if !r.insecureAllowed && r.url.Scheme == "http" {
+	if !r.allowInsecure && r.url.Scheme == "http" {
 		err = InsecureConnectionError{r}
 		return
 	}

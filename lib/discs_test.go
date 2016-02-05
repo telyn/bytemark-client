@@ -94,6 +94,7 @@ func TestCreateDisc(t *testing.T) {
 	}))
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 
 	is.Nil(err)
 	err = client.AuthWithCredentials(map[string]string{})
@@ -125,6 +126,7 @@ func TestDeleteDisc(t *testing.T) {
 	}))
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 
 	if err != nil {
 		t.Fatal(err)
@@ -158,6 +160,7 @@ func TestResizeDisc(t *testing.T) {
 	}))
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 
 	if err != nil {
 		t.Fatal(err)
@@ -189,6 +192,7 @@ func TestShowDisc(t *testing.T) {
 	}))
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 
 	if err != nil {
 		t.Fatal(err)
@@ -199,12 +203,16 @@ func TestShowDisc(t *testing.T) {
 	}
 
 	disc, err := client.GetDisc(VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666")
+	if err != nil {
+		t.Fatal(err)
+	}
+	is.Nil(err)
 	fx := getFixtureDisc()
+
 	is.Equal(fx.ID, disc.ID)
 	is.Equal(fx.Label, disc.Label)
 	is.Equal(fx.Size, disc.Size)
 	is.Equal(fx.StorageGrade, disc.StorageGrade)
 	is.Equal(fx.StoragePool, disc.StoragePool)
 
-	is.Nil(err)
 }
