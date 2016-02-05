@@ -15,6 +15,7 @@ import (
 
 var configVars = [...]string{
 	"endpoint",
+	"billing-endpoint",
 	"auth-endpoint",
 	"user",
 	"account",
@@ -293,6 +294,14 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		if val != "" {
 			v.Value = val
 			v.Source = "ENV BM_ENDPOINT"
+		}
+		return v
+	case "billing-endpoint":
+		// TODO(telyn): !!! REAL BMBILLING ENDPOINT !!!
+		v := ConfigVar{"billing-endpoint", "", "CODE"}
+		if val := os.Getenv("BM_BILLING_ENDPOINT"); val != "" {
+			v.Value = val
+			v.Source = "ENV BM_BILLING_ENDPOINT"
 		}
 		return v
 	case "auth-endpoint":

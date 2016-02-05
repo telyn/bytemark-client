@@ -5,27 +5,38 @@ import (
 	"errors"
 )
 
+type Endpoint int
+
+const (
+	EP_AUTH Endpoint = iota
+	EP_BRAIN
+	EP_BILLING
+)
+
 // bytemarkClient is the main type in the Bytemark API client library
 type bytemarkClient struct {
-	endpoint    string
-	auth        *auth3.Client
-	authSession *auth3.SessionData
-	debugLevel  int
+	brainEndpoint   string
+	billingEndpoint string
+	allowInsecure   bool
+	auth            *auth3.Client
+	authSession     *auth3.SessionData
+	debugLevel      int
 }
 
 // New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
-func New(endpoint string) (c *bytemarkClient, err error) {
+func New(brainEndpoint, billingEndpoint string) (c *bytemarkClient, err error) {
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
 	}
-	return NewWithAuth(endpoint, auth), nil
+	return NewWithAuth(brainEndpoint, billingEndpoint, auth), nil
 }
 
 // NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and bytemark.co.uk/auth3/client Client
-func NewWithAuth(endpoint string, auth *auth3.Client) (c *bytemarkClient) {
+func NewWithAuth(brainEndpoint, billingEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
 	c = new(bytemarkClient)
-	c.endpoint = endpoint
+	c.brainEndpoint = brainEndpoint
+	c.billingEndpoint = billingEndpoint
 	c.debugLevel = 0
 	c.auth = auth
 	return c
@@ -56,7 +67,14 @@ func (c *bytemarkClient) AuthWithToken(token string) error {
 
 // GetEndpoint returns the Bytemark API endpoint currently in use.
 func (c *bytemarkClient) GetEndpoint() string {
-	return c.endpoint
+	return c.brainEndpoint
+}
+
+// GetBillingEndpoint returns the Bytemark Billing API endpoint in use.
+// This function is deprecated and will be removed in a point release.
+// DO NOT DEPEND ON IT
+func (c *bytemarkClient) GetBillingEndpoint() string {
+	return c.billingEndpoint
 }
 
 // SetDebugLevel sets the debug level / verbosity of the Bytemark API client. 0 (default) is silent.
@@ -85,4 +103,8 @@ func (c *bytemarkClient) GetSessionUser() string {
 		return ""
 	}
 	return c.authSession.Username
+}
+
+func (c *bytemarkClient) AllowInsecureRequests() {
+	c.allowInsecure = true
 }

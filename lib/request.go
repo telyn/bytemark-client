@@ -2,131 +2,179 @@ package lib
 
 import (
 	"bytemark.co.uk/client/util/log"
-	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 )
 
-// BuildURL pieces together a URL from parts, escaping as necessary..
-func BuildURL(format string, args ...string) string {
-	arr := make([]interface{}, len(args), len(args))
-	for i, str := range args {
-		arr[i] = url.QueryEscape(str)
-	}
-	return fmt.Sprintf(format, arr...)
+type RequestAlreadyRunError struct {
+	Request *Request
+}
+type InsecureConnectionError struct {
+	Request *Request
 }
 
-// RequestAndUnmarshal performs a request (with no body) and unmarshals the result into output - which should be a pointer to something cool
-func (c *bytemarkClient) RequestAndUnmarshal(auth bool, method, path, requestBody string, output interface{}) error {
+func (e RequestAlreadyRunError) Error() string {
+	return "A Request was Run twice"
+}
 
-	data, err := c.RequestAndRead(auth, method, path, requestBody)
+func (e InsecureConnectionError) Error() string {
+	return "A Request to an insecure endpoint was attempted when AllowInsecure had not been called."
+}
 
-	if c.debugLevel >= log.DBG_HTTPDATA {
-		buf := new(bytes.Buffer)
-		json.Indent(buf, data, "", "    ")
-		log.Debugf(log.DBG_HTTPDATA, "%s", buf)
+type Request struct {
+	authenticate  bool
+	client        Client
+	url           *url.URL
+	method        string
+	body          []byte
+	allowInsecure bool
+	hasRun        bool
+}
+
+func (r *Request) GetURL() url.URL {
+	if r.url == nil {
+		return url.URL{}
 	}
+	return *r.url
+}
 
+func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
+	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
-		return err
+		return
 	}
-
-	err = json.Unmarshal(data, output)
-	return err
-
+	r = c.NewRequestNoAuth(method, url)
+	return
 }
 
-// RequestAndRead makes a request to the URL specified, giving the token stored in the auth.Client, returning the entirety of the response body.
-// This is intended as the low-level work-horse of the libary, but may be deprecated in favour of MakeRequest in order to use a streaming JSON parser.
-func (c *bytemarkClient) RequestAndRead(auth bool, method, location, requestBody string) (responseBody []byte, err error) {
-	_, res, err := c.Request(auth, method, location, requestBody)
+func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
+	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
-		return []byte{}, err
+		return
 	}
-	defer func() {
-		if res.Body != nil {
-			res.Body.Close()
-		}
-	}()
-
-	responseBody, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		return nil, readErr
-	}
-
-	log.Debugf(2, "response body: '%s'\r\n", string(responseBody))
-
-	return responseBody, err
+	r = c.NewRequest(method, url)
+	return
 }
 
-// Request makes an HTTP request and then request it, returning the request object, response object and any errors
-// For use by Client.RequestAndRead, do not use externally except for testing
-func (c *bytemarkClient) Request(auth bool, method string, location string, requestBody string) (req *http.Request, res *http.Response, err error) {
-	url := location
-
-	if strings.HasPrefix(location, "/") {
-		url = c.endpoint + location
+func (c *bytemarkClient) NewRequestNoAuth(method string, url *url.URL) *Request {
+	return &Request{
+		client:        c,
+		url:           url,
+		method:        method,
+		allowInsecure: c.allowInsecure,
 	}
-	cli := &http.Client{}
-	if c.endpoint == "https://staging.bigv.io" {
-		cli.Transport = &http.Transport{
+}
+
+func (c *bytemarkClient) NewRequest(method string, url *url.URL) *Request {
+	return &Request{
+		authenticate:  true,
+		client:        c,
+		url:           url,
+		method:        method,
+		allowInsecure: c.allowInsecure,
+	}
+
+}
+
+func (r *Request) AllowInsecure() {
+	r.allowInsecure = true
+}
+
+func (r *Request) mkHTTPClient() (c *http.Client) {
+	c = new(http.Client)
+	if r.url.Host == "staging.bigv.io" {
+		c.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
 		}
 	}
+	return c
+}
 
-	req, err = http.NewRequest(method, url, bytes.NewBufferString(requestBody))
+func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
+	req, err = http.NewRequest(r.method, r.url.String(), body)
 	if err != nil {
-		return req, nil, err
+		return nil, err
 	}
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
-	if auth {
-		if c.authSession == nil {
-			return nil, nil, &NilAuthError{}
+	if r.authenticate {
+		if r.client.GetSessionToken() == "" {
+			return nil, &NilAuthError{}
 		}
-		req.Header.Add("Authorization", "Bearer "+c.authSession.Token)
+		req.Header.Add("Authorization", "Bearer "+r.client.GetSessionToken())
+	}
+	return
+}
+
+func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode int, response []byte, err error) {
+	if r.hasRun {
+		err = RequestAlreadyRunError{r}
+		return
+	}
+	r.hasRun = true
+
+	if !r.allowInsecure && r.url.Scheme == "http" {
+		err = InsecureConnectionError{r}
+		return
 	}
 
-	res, err = cli.Do(req)
+	cli := r.mkHTTPClient()
+
+	req, err := r.mkHTTPRequest(body)
 	if err != nil {
-		return req, res, err
+		return
 	}
 
-	log.Debugf(log.DBG_OUTLINE, "%s %s: %d\r\n", method, req.URL, res.StatusCode)
-	log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", requestBody)
+	res, err := cli.Do(req)
+	if err != nil {
+		return
+	}
+
+	statusCode = res.StatusCode
+
+	log.Debugf(log.DBG_OUTLINE, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
 
 	baseErr := APIError{
-		Method:       method,
-		URL:          req.URL,
-		StatusCode:   res.StatusCode,
-		RequestBody:  requestBody,
-		ResponseBody: "",
+		Method:     r.method,
+		URL:        req.URL,
+		StatusCode: res.StatusCode,
 	}
+
+	if sBody, ok := body.(io.ReadSeeker); ok {
+		sBody.Seek(0, 0)
+		if err == nil {
+			rb, _ := ioutil.ReadAll(sBody)
+			baseErr.RequestBody = string(rb)
+			if err == nil {
+				log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", baseErr.RequestBody)
+			}
+		}
+	}
+
+	response, err = ioutil.ReadAll(res.Body)
+	log.Debugf(log.DBG_HTTPDATA, "response body: '%s'\r\n", response)
+	if err != nil {
+		return
+	}
+	baseErr.ResponseBody = string(response)
 
 	switch res.StatusCode {
 	case 400:
-		responseBody, readErr := ioutil.ReadAll(res.Body)
-		log.Debugf(log.DBG_HTTPDATA, "response body: '%s'\r\n", responseBody)
-		if readErr != nil {
-			return nil, nil, BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
-		}
-		baseErr.ResponseBody = string(responseBody)
-		brErr := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
-		err = json.Unmarshal(responseBody, &brErr.Problems)
-		if err != nil {
+		err := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
+		jsonErr := json.Unmarshal(response, &err.Problems)
+		if jsonErr != nil {
 			log.Debug(log.DBG_OUTLINE, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
-			brErr.Problems["The problem"] = []string{baseErr.ResponseBody}
+			err.Problems["The problem"] = []string{baseErr.ResponseBody}
 		}
-		err = brErr
-
 	case 403:
 		err = NotAuthorizedError{baseErr}
 	case 404:
@@ -135,9 +183,36 @@ func (c *bytemarkClient) Request(auth bool, method string, location string, requ
 		err = InternalServerError{baseErr}
 	default:
 		if 200 <= res.StatusCode && res.StatusCode <= 299 {
+			if responseObject != nil {
+				jsonErr := json.Unmarshal(response, responseObject)
+				if jsonErr != nil {
+					return statusCode, response, jsonErr
+				}
+			}
 			break
 		}
 		err = UnknownStatusCodeError{baseErr}
 	}
-	return req, res, err
+	return
+}
+
+// BuildURL pieces together a URL from parts, escaping as necessary..
+func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...string) (*url.URL, error) {
+	arr := make([]interface{}, len(args), len(args))
+	for i, str := range args {
+		arr[i] = url.QueryEscape(str)
+	}
+	endpointUrl := ""
+	switch endpoint {
+	case EP_BRAIN:
+		endpointUrl = c.brainEndpoint
+	case EP_BILLING:
+		endpointUrl = c.billingEndpoint
+	default:
+		return nil, UnsupportedEndpointError(endpoint)
+	}
+	if !strings.HasPrefix(format, "/") {
+		return nil, UnsupportedEndpointError(-1)
+	}
+	return url.Parse(endpointUrl + fmt.Sprintf(format, arr...))
 }

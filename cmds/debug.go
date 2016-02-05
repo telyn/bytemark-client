@@ -3,6 +3,7 @@ package cmds
 import (
 	"bufio"
 	"bytemark.co.uk/client/cmds/util"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"bytes"
 	"encoding/json"
@@ -16,15 +17,16 @@ func (commands *CommandSet) HelpForDebug() util.ExitCode {
 	log.Log("bytemark debug")
 	log.Log()
 	log.Log("Usage:")
-	log.Log("    bytemark debug [--junk-token] [--auth] GET <path>")
-	log.Log("    bytemark debug [--junk-token] [--auth] DELETE <path>")
-	log.Log("    bytemark debug [--junk-token] [--auth] PUT <path>")
-	log.Log("    bytemark debug [--junk-token] [--auth] POST <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] [--use-billing] GET <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] [--use-billing] DELETE <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] [--use-billing] PUT <path>")
+	log.Log("    bytemark debug [--junk-token] [--auth] [--use-billing] POST <path>")
 	log.Log()
 	log.Log("GET sends an HTTP GET request with an optional valid authorization header to the given path on the API endpoint and pretty-prints the received json.")
 	log.Log("The rest do similar, but PUT and POST")
 	log.Log("The --junk-token flag sets the token to empty - useful if you want to ensure that credential-auth is working, or you want to do something as another user")
-	log.Log("The --auth token tells the client to gain valid auth and send the auth header on that request.")
+	log.Log("The --auth flag tells the client to gain valid auth and send the auth header on that request.")
+	log.Log("The --use-billig flag tells the client to send the request to the billing endpoint instead of the brain")
 	log.Log()
 	return util.E_USAGE_DISPLAYED
 
@@ -36,8 +38,14 @@ func (commands *CommandSet) Debug(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	junkToken := flags.Bool("junk-token", false, "")
 	shouldAuth := flags.Bool("auth", false, "")
+	billing := flags.Bool("use-billing", false, "")
 	flags.Parse(args)
 	args = commands.config.ImportFlags(flags)
+
+	endpoint := lib.EP_BRAIN
+	if *billing {
+		endpoint = lib.EP_BILLING
+	}
 
 	if *junkToken {
 		commands.config.Set("token", "", "FLAG junk-token")
@@ -49,8 +57,14 @@ func (commands *CommandSet) Debug(args []string) util.ExitCode {
 
 	switch args[0] {
 	case "GET", "PUT", "POST", "DELETE":
-		if !strings.HasPrefix(args[1], "/") {
-			args[1] = "/" + args[1]
+		method := args[0]
+		if len(args) < 2 {
+			commands.HelpForDebug()
+			return util.E_PEBKAC
+		}
+		url := args[1]
+		if !strings.HasPrefix(url, "/") {
+			url = "/" + url
 		}
 		if *shouldAuth {
 			err := commands.EnsureAuth()
@@ -59,19 +73,26 @@ func (commands *CommandSet) Debug(args []string) util.ExitCode {
 			}
 		}
 
-		requestBody := ""
 		err := error(nil)
-		if args[0] == "PUT" || args[0] == "POST" {
-			buf := bufio.NewReader(os.Stdin)
-			requestBody, err = buf.ReadString(byte(uint8(14)))
-			if err != nil && err != io.EOF {
-				return util.ProcessError(err)
-			}
+		reader := io.Reader(nil)
+		if method == "PUT" || method == "POST" {
+			reader = bufio.NewReader(os.Stdin)
+			// read until an eof
 		}
-		body, err := commands.client.RequestAndRead(*shouldAuth, args[0], args[1], requestBody)
+		req, err := commands.client.BuildRequest(method, endpoint, url)
+		if !*shouldAuth {
+			req, err = commands.client.BuildRequestNoAuth(method, endpoint, url)
+		}
 		if err != nil {
 			return util.ProcessError(err)
 		}
+
+		statusCode, body, err := req.Run(reader, nil)
+		if err != nil {
+			return util.ProcessError(err)
+		}
+		reqURL := req.GetURL()
+		log.Logf("%s %s: %d\r\n", method, reqURL.String(), statusCode)
 
 		buf := new(bytes.Buffer)
 		json.Indent(buf, body, "", "    ")

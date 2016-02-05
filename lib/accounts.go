@@ -1,33 +1,36 @@
 package lib
 
 // GetAccount takes an account name or ID and returns a filled-out Account object
-func (c *bytemarkClient) GetAccount(name string) (*Account, error) {
-	err := c.validateAccountName(&name)
+func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
+	err = c.validateAccountName(&name)
 	if err != nil {
-		return nil, err
+		return
 	}
-	account := new(Account)
+	account = new(Account)
 
-	path := BuildURL("/accounts/%s?view=overview", name)
-
-	err = c.RequestAndUnmarshal(true, "GET", path, "", account)
+	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview", name)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	return account, nil
+	_, _, err = req.Run(nil, account)
+
+	return
 }
 
-func (c *bytemarkClient) GetAccounts() ([]*Account, error) {
-	accounts := make([]*Account, 1, 1)
+func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
+	accounts = make([]*Account, 1, 1)
 
-	path := BuildURL("/accounts")
-
-	err := c.RequestAndUnmarshal(true, "GET", path, "", &accounts)
+	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts")
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	return accounts, nil
+	_, _, err = req.Run(nil, &accounts)
+	if err != nil {
+		return
+	}
+
+	return
 
 }

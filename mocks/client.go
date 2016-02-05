@@ -6,10 +6,36 @@ import (
 	"fmt"
 	mock "github.com/maraino/go-mock"
 	"net/http"
+	"net/url"
 )
 
 type Client struct {
 	mock.Mock
+}
+
+func (c *Client) AllowInsecureRequests() {
+	c.Called()
+}
+func (c *Client) BuildRequestNoAuth(method string, endpoint lib.Endpoint, path string, parts ...string) (*lib.Request, error) {
+	r := c.Called(method, endpoint, path, parts)
+	req, _ := r.Get(0).(*lib.Request)
+	return req, r.Error(1)
+}
+func (c *Client) BuildRequest(method string, endpoint lib.Endpoint, path string, parts ...string) (*lib.Request, error) {
+	r := c.Called(method, endpoint, path, parts)
+	req, _ := r.Get(0).(*lib.Request)
+	return req, r.Error(1)
+
+}
+func (c *Client) NewRequestNoAuth(method string, url *url.URL) *lib.Request {
+	r := c.Called(method, url)
+	req, _ := r.Get(0).(*lib.Request)
+	return req
+}
+func (c *Client) NewRequest(method string, url *url.URL) *lib.Request {
+	r := c.Called(method, url)
+	req, _ := r.Get(0).(*lib.Request)
+	return req
 }
 
 func (c *Client) GetEndpoint() string {

@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+type UnsupportedEndpointError Endpoint
+
 // APIError is the basic error type which all errors return by the client library are subclassed from.
 type APIError struct {
 	Method       string
@@ -54,6 +56,10 @@ type NilAuthError struct {
 
 type AmbiguousKeyError struct {
 	APIError
+}
+
+func (e UnsupportedEndpointError) Error() string {
+	return fmt.Sprintf("%d was not a valid endpoint choice", e)
 }
 
 func (e APIError) Error() string {

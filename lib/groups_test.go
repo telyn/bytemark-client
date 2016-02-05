@@ -39,6 +39,7 @@ func TestCreateGroup(t *testing.T) {
 
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,6 +70,7 @@ func TestDeleteGroup(t *testing.T) {
 
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,13 +103,13 @@ func TestGetGroup(t *testing.T) {
 
 	defer authServer.Close()
 	defer brain.Close()
+	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)
 	}
 	err = client.AuthWithCredentials(map[string]string{})
 
 	group, err := client.GetGroup(GroupName{Group: "invalid-group", Account: "account"})
-	is.Nil(group)
 	is.NotNil(err)
 
 	group, err = client.GetGroup(GroupName{Group: "default", Account: "account"})

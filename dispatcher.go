@@ -26,7 +26,11 @@ func NewDispatcher(config util.ConfigManager) (d *Dispatcher, err error) {
 	if err != nil {
 		return nil, err
 	}
-	client, err := client.New(endpoint)
+	billingEndpoint, err := config.Get("billing-endpoint")
+	if err != nil {
+		return nil, err
+	}
+	client, err := client.New(endpoint, billingEndpoint)
 	if err != nil {
 		return nil, err
 	}
