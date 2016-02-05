@@ -34,6 +34,16 @@ type ConfigVar struct {
 	Source string
 }
 
+func (v *ConfigVar) SourceType() string {
+	bits := strings.Fields(v.Source)
+
+	return bits[0]
+}
+func (v *ConfigVar) SourceBaseName() string {
+	bits := strings.Split(v.Source, "/")
+	return bits[len(bits)-1]
+}
+
 // ConfigManager is an interface defining a key->value store that also knows where the values were set from.
 type ConfigManager interface {
 	Get(string) (string, error)

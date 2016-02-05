@@ -1,6 +1,8 @@
 package util
 
 import (
+	"encoding/hex"
+	"fmt"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"os"
@@ -25,12 +27,14 @@ func CleanEnv() {
 }
 
 func JunkEnv() {
-	os.Setenv("BM_CONFIG_DIR", "junk-env-config-dir")
-	os.Setenv("BM_USER", "junk-env-user")
-	os.Setenv("BM_ACCOUNT", "junk-env-account")
-	os.Setenv("BM_ENDPOINT", "junk-env-endpoint")
-	os.Setenv("BM_AUTH_ENDPOINT", "junk-env-auth-endpoint")
-	os.Setenv("BM_DEBUG_LEVEL", "junk-env-debug-level")
+	junk := map[string]string{
+		"endpoint":      "https://junk.env.localhost.local",
+		"user":          "junk-env-user",
+		"account":       "junk-env-account",
+		"auth-endpoint": "https://junk.env.auth.localhost.local",
+		"debug-level":   "junk-env-debug-level",
+	}
+	MakeEnvFromFixture(junk)
 }
 
 func FixtureEnv() (fixture map[string]string) {
@@ -42,6 +46,10 @@ func FixtureEnv() (fixture map[string]string) {
 		"auth-endpoint": "https://fixture.env.auth.localhost.local",
 		"debug-level":   "fixture-env-debug-level",
 	}
+	return MakeEnvFromFixture(fixture)
+}
+
+func MakeEnvFromFixture(fixture map[string]string) (fx map[string]string) {
 	os.Setenv("BM_CONFIG_DIR", fixture["config-dir"])
 	os.Setenv("BM_USER", fixture["user"])
 	os.Setenv("BM_ACCOUNT", fixture["account"])
@@ -76,14 +84,7 @@ func JunkDir() (name string) {
 		"debug-level":   "junk-dir-debug-level",
 	}
 
-	dir, err := ioutil.TempDir("", "bytemark-client-test")
-	if err != nil {
-		panic("Couldn't create test dir.")
-	}
-
-	for name, value := range junk {
-		ioutil.WriteFile(filepath.Join(dir, name), []byte(value), 0600)
-	}
+	dir, _ := MakeDirFromFixture(junk)
 	return dir
 }
 
@@ -96,11 +97,13 @@ func FixtureDir() (dir string, fixture map[string]string) {
 		"debug-level":   "fixture-dir-debug-level",
 	}
 
+	return MakeDirFromFixture(fixture)
+}
+func MakeDirFromFixture(fixture map[string]string) (dir string, fx map[string]string) {
 	dir, err := ioutil.TempDir("", "bytemark-client-test")
 	if err != nil {
-		panic("Couldn't create test dir.")
+		panic("Couldn't create test dir")
 	}
-
 	for name, value := range fixture {
 		ioutil.WriteFile(filepath.Join(dir, name), []byte(value), 0600)
 	}
@@ -375,4 +378,27 @@ func TestConfigSetPersistent(t *testing.T) {
 	is.Equal(fixture["debug-level"], config2.GetIgnoreErr("debug-level"))
 
 	os.RemoveAll(dir)
+}
+
+func TestConfigCorrectDefaultingAccountAndUserBug14038(t *testing.T) {
+	is := is.New(t)
+
+	envfixture := MakeEnvFromFixture(map[string]string{
+		"user": "test-env-user",
+	})
+	dir, dirfixture := MakeDirFromFixture(map[string]string{
+		"account": "test-fixture-account",
+	})
+
+	config, err := NewConfig(dir, nil)
+	is.Nil(err)
+
+	v, err := config.GetV("account")
+	is.Equal(v.Value, dirfixture["account"])
+
+	fmt.Printf("%v\r\n", hex.EncodeToString([]byte(v.Source)))
+	is.Equal(v.SourceType(), "FILE")
+	is.Equal(v.SourceBaseName(), "account")
+	is.NotEqual(v.Value, envfixture["user"])
+
 }

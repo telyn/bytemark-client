@@ -8,11 +8,10 @@ import (
 func (cmds *CommandSet) HelpForPower() util.ExitCode {
 	log.Log("bytemark power commands")
 	log.Log()
-	log.Log("usage: bytemark start")
-	log.Log("       bytemark shutdown")
-	log.Log("       bytemark restart")
-	log.Log("       bytemark reset")
-	log.Log("       bytemark reset")
+	log.Log("usage: bytemark start <server>")
+	log.Log("       bytemark shutdown <server>")
+	log.Log("       bytemark restart <server>")
+	log.Log("       bytemark reset <server>")
 	log.Log()
 	log.Log()
 	log.Log("start: Starts a stopped server.")
@@ -45,7 +44,7 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -79,7 +78,7 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -110,7 +109,7 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -142,7 +141,7 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 
@@ -173,7 +172,7 @@ func (cmds *CommandSet) ResetServer(args []string) util.ExitCode {
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
-		cmds.HelpForDelete()
+		cmds.HelpForPower()
 		return util.E_PEBKAC
 	}
 

@@ -7,7 +7,7 @@ import (
 
 const (
 	// shows client version & arguments passed in, HTTP URLs & status codes, subprocess calls.
-	DBG_OUTLINE = iota
+	DBG_OUTLINE = 1 + iota
 	// shows args going in to library functions
 	DBG_ARGS
 	// not used right now
