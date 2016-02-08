@@ -47,6 +47,15 @@ type Client interface {
 	NewRequestNoAuth(method string, url *url.URL) *Request
 	NewRequest(method string, url *url.URL) *Request
 
+	///////////////////////
+	//// BILLING STUFF ////
+	///////////////////////
+
+	//RegisterAccount(*Account) error
+
+	////////////////////
+	//// BRAIN STUFF ///
+	////////////////////
 	//
 	// Parsers
 	//

@@ -1,12 +1,42 @@
 package lib
 
-// GetAccount takes an account name or ID and returns a filled-out Account object
-func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
+/*func (c *Client) RegisterAccount() {
+
+}*/
+
+// getBillingAccount gets the billing account with the given name.
+// Due to the way the billing API is implemented this is done by grabbing them all and looping *shrug*
+func (c *bytemarkClient) getBillingAccount(name string) (account *billingAccount, err error) {
+	accounts, err := c.getBillingAccounts()
+	if err != nil {
+		return
+	}
+	for _, account = range accounts {
+		if account.Name == name {
+			return
+		}
+	}
+	account = nil
+	return
+}
+
+// getBillingAccounts returns all the billing accounts the currently logged in user can see.
+func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err error) {
+	req, err := c.BuildRequest("GET", EP_BILLING, "/api/v1/accounts")
+	if err != nil {
+		return
+	}
+	_, _, err = req.Run(nil, accounts)
+	return
+}
+
+// getBrainAccount gets the brain account with the given name.
+func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, err error) {
 	err = c.validateAccountName(&name)
 	if err != nil {
 		return
 	}
-	account = new(Account)
+	account = new(brainAccount)
 
 	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview", name)
 	if err != nil {
@@ -18,8 +48,26 @@ func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
-	accounts = make([]*Account, 1, 1)
+// GetAccount takes an account name or ID and returns a filled-out Account object
+func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
+	billingAccount, err := c.getBillingAccount(name)
+	if err != nil {
+		return
+	}
+	brainAccount, err := c.getBrainAccount(name)
+	if err != nil {
+		return
+	}
+	account = new(Account)
+	account.FillBrain(brainAccount)
+	account.FillBilling(billingAccount)
+
+	return
+
+}
+
+func (c *bytemarkClient) getBrainAccounts() (accounts []*brainAccount, err error) {
+	accounts = make([]*brainAccount, 1, 1)
 
 	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts")
 	if err != nil {
@@ -31,6 +79,36 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 		return
 	}
 
+	return
+}
+
+// Gets all Accounts you can see, merging data from both the brain and the billing
+func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
+	by_name := make(map[string]*Account)
+	billingAccounts, err := c.getBillingAccounts()
+	if err != nil {
+		return
+	}
+	brainAccounts, err := c.getBrainAccounts()
+	if err != nil {
+		return
+	}
+
+	for _, b := range brainAccounts {
+		if by_name[b.Name] == nil {
+			by_name[b.Name] = new(Account)
+		}
+		by_name[b.Name].FillBrain(b)
+	}
+	for _, b := range billingAccounts {
+		if by_name[b.Name] == nil {
+			by_name[b.Name] = new(Account)
+		}
+		by_name[b.Name].FillBilling(b)
+	}
+	for _, a := range by_name {
+		accounts = append(accounts, a)
+	}
 	return
 
 }

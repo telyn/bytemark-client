@@ -196,3 +196,30 @@ func (vm *VirtualMachine) AllIpv6Addresses() (ips []string) {
 	}
 	return ips
 }
+
+func (a *Account) FillBrain(b *brainAccount) {
+	if b != nil {
+		a.BrainID = b.ID
+		a.Groups = b.Groups
+		a.Suspended = b.Suspended
+		a.Name = b.Name
+	}
+}
+func (a *Account) FillBilling(b *billingAccount) {
+	if b != nil {
+		a.BillingID = b.ID
+		a.Owner = b.Owner
+		a.TechnicalContact = b.TechnicalContact
+		a.CardReference = b.CardReference
+		a.Name = b.Name
+	}
+}
+
+/*
+func (a *Account) ToBillingAccount() *billingAccount {
+
+}
+func (a *Account) ToBrainAccount() *brainAccount {
+
+}
+*/
