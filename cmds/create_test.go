@@ -17,7 +17,7 @@ func TestCreateDiskCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	config.When("ImportFlags").Return([]string{"test-server", "archive:35"})
+	config.When("ImportFlags").Return([]string{"test-server"})
 	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
 	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -28,7 +28,7 @@ func TestCreateDiskCommand(t *testing.T) {
 	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
 	cmds := NewCommandSet(config, c)
-	cmds.CreateDiscs([]string{"test-server", "archive:35"})
+	cmds.CreateDiscs([]string{"--disc", "archive:35", "test-server"})
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
