@@ -103,6 +103,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	if err != nil {
 		return nil, err
 	}
+	req.Close = true
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")

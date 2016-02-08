@@ -18,7 +18,7 @@ func TestListAccounts(t *testing.T) {
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("GetAccounts").Return([]*lib.Account{&lib.Account{ID: 1, Name: "Dr. Evil"}}).Times(1)
+	c.When("GetAccounts").Return([]*lib.Account{&lib.Account{BrainID: 1, Name: "dr-evil"}}).Times(1)
 
 	cmds := NewCommandSet(config, c)
 	cmds.ListAccounts([]string{})

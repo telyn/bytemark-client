@@ -34,11 +34,12 @@ func TestCreateGroup(t *testing.T) {
 		}
 
 	}
-	client, authServer, brain, err :=
-		mkTestClientAndServers(http.HandlerFunc(groupHandler))
+	client, authServer, brain, billing, err :=
+		mkTestClientAndServers(http.HandlerFunc(groupHandler), mkNilHandler(t))
 
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)
@@ -65,11 +66,12 @@ func TestDeleteGroup(t *testing.T) {
 		}
 
 	}
-	client, authServer, brain, err :=
-		mkTestClientAndServers(http.HandlerFunc(groupHandler))
+	client, authServer, brain, billing, err :=
+		mkTestClientAndServers(http.HandlerFunc(groupHandler), mkNilHandler(t))
 
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)
@@ -98,11 +100,12 @@ func TestGetGroup(t *testing.T) {
 		}
 
 	}
-	client, authServer, brain, err :=
-		mkTestClientAndServers(http.HandlerFunc(groupHandler))
+	client, authServer, brain, billing, err :=
+		mkTestClientAndServers(http.HandlerFunc(groupHandler), mkNilHandler(t))
 
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)

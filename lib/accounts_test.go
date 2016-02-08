@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
@@ -8,7 +9,7 @@ import (
 
 func TestGetAccount(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account" {
 			w.Write([]byte(`{
 			    "name": "account",
@@ -20,9 +21,18 @@ func TestGetAccount(t *testing.T) {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
+	}), http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/api/v1/accounts" {
+			w.Write([]byte(`[
+
+		]`))
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
 	}))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 
 	if err != nil {
 		t.Fatal(err)
@@ -48,14 +58,14 @@ func TestGetAccount(t *testing.T) {
 
 func TestGetAccounts(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts" {
 			w.Write([]byte(`[
 			{
 			    "name": "account",
 			    "id": 1
 			}, {
-			    "name": "Dr. Evil",
+			    "name": "dr-evil",
 			    "suspended": true,
 			    "id": 10
 			}
@@ -64,9 +74,18 @@ func TestGetAccounts(t *testing.T) {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
+	}), http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/api/v1/accounts" {
+			w.Write([]byte(`[
+
+		]`))
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
 	}))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 
 	if err != nil {
 		t.Fatal(err)
@@ -78,8 +97,9 @@ func TestGetAccounts(t *testing.T) {
 	client.AllowInsecureRequests()
 
 	acc, err := client.GetAccounts()
+	fmt.Print(err)
 	is.Nil(err)
 	is.Equal(2, len(acc))
-	is.Equal("Dr. Evil", acc[1].Name)
+	is.Equal("dr-evil", acc[1].Name)
 
 }

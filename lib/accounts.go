@@ -26,7 +26,7 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err e
 	if err != nil {
 		return
 	}
-	_, _, err = req.Run(nil, accounts)
+	_, _, err = req.Run(nil, &accounts)
 	return
 }
 
