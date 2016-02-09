@@ -1,5 +1,5 @@
-bytemark-client (0.3.0~fakeDONOTUSE-1) unstable; urgency=low
+bytemark-client (0.3.0-1) stable; urgency=low
 
-  * Just trying stuff out!
+  * First attempt at packaging bytemark-client for debian *properly*
 
  -- Telyn <telyn@bytemark.co.uk>  Tue, 09 Feb 2016 10:35:51 +0000

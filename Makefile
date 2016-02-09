@@ -3,8 +3,8 @@ SHELL:=/bin/bash
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/cmd/bytemark
 ALL_FILES := lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go cmd/*/*.go
 
-MAJORVERSION := 0
-MINORVERSION := 3
+MAJORVERSION ?= 0
+MINORVERSION ?= 3
 BUILD_NUMBER ?= 0
 
 OSAARCH:=x86_64
