@@ -1,10 +1,9 @@
 .*.sw*
-main/main
 Bytemark.app
-bytemark
+/bytemark
 bytemark.exe
 *.coverage
 *.coverage.html
-doc/*.html
-docs/
-lib/version.go
+/doc/*.html
+/docs/
+/lib/version.go
