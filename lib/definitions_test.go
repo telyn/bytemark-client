@@ -45,16 +45,17 @@ func TestProcessDefinitions(t *testing.T) {
 func TestReadDefinitions(t *testing.T) {
 	is := is.New(t)
 
-	client, authServer, brain, err := mkTestClientAndServers(
+	client, authServer, brain, billing, err := mkTestClientAndServers(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == "/definitions" {
 				w.Write([]byte(fixtureDefinitionsJSON))
 			} else {
 				http.NotFound(w, r)
 			}
-		}))
+		}), mkNilHandler(t))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 
 	if err != nil {

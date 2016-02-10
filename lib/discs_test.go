@@ -79,7 +79,7 @@ func TestValidateDisc(t *testing.T) {
 
 func TestCreateDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs" && req.Method == "POST" {
 			// TODO: unmarshal the disc
 			// then test for sanity, equality to disk put in
@@ -91,9 +91,10 @@ func TestCreateDisc(t *testing.T) {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
-	}))
+	}), mkNilHandler(t))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 
 	is.Nil(err)
@@ -111,7 +112,7 @@ func TestCreateDisc(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
 			if req.URL.Query().Get("purge") != "true" {
 				http.NotFound(w, req)
@@ -123,9 +124,10 @@ func TestDeleteDisc(t *testing.T) {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
-	}))
+	}), mkNilHandler(t))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 
 	if err != nil {
@@ -143,7 +145,7 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestResizeDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
 			bytes, err := ioutil.ReadAll(req.Body)
 			is.Nil(err)
@@ -157,9 +159,10 @@ func TestResizeDisc(t *testing.T) {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
-	}))
+	}), mkNilHandler(t))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 
 	if err != nil {
@@ -178,7 +181,7 @@ func TestResizeDisc(t *testing.T) {
 func TestShowDisc(t *testing.T) {
 	is := is.New(t)
 
-	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
 			bytes, err := json.Marshal(getFixtureDisc())
 			is.Nil(err)
@@ -189,9 +192,10 @@ func TestShowDisc(t *testing.T) {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
-	}))
+	}), mkNilHandler(t))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 
 	if err != nil {

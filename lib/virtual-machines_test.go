@@ -39,7 +39,7 @@ func getFixtureVM() (vm VirtualMachine) {
 
 func TestGetVirtualMachine(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/default/virtual_machines/valid-vm" {
 			str, err := json.Marshal(getFixtureVM())
 			if err != nil {
@@ -52,9 +52,10 @@ func TestGetVirtualMachine(t *testing.T) {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
-	}))
+	}), mkNilHandler(t))
 	defer authServer.Close()
 	defer brain.Close()
+	defer billing.Close()
 	client.AllowInsecureRequests()
 	if err != nil {
 		t.Fatal(err)

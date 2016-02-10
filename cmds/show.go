@@ -141,21 +141,8 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 		js, _ := json.MarshalIndent(acc, "", "    ")
 		log.Output(string(js))
 	} else {
-		gs := ""
-		if len(acc.Groups) != 1 {
-			gs = "s"
-		}
-		ss := ""
-		servers := 0
-		for _, g := range acc.Groups {
-			servers += len(g.VirtualMachines)
-		}
-		if servers != 1 {
-			ss = "s"
-		}
+		log.Output(util.FormatAccount(acc))
 
-		log.Outputf("%s - Account containing %d server%s across %d group%s\r\n", acc.Name, servers, ss, len(acc.Groups), gs)
-		log.Outputf("Groups in this account: %s\r\n")
 		switch {
 		case *verbose:
 			for _, g := range acc.Groups {
@@ -165,7 +152,6 @@ func (cmds *CommandSet) ShowAccount(args []string) util.ExitCode {
 				}
 			}
 		}
-
 	}
 	return util.E_SUCCESS
 
