@@ -297,8 +297,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		}
 		return v
 	case "billing-endpoint":
-		// TODO(telyn): !!! REAL BMBILLING ENDPOINT !!!
-		v := ConfigVar{"billing-endpoint", "", "CODE"}
+		v := ConfigVar{"billing-endpoint", "https://bmbilling.bytemark.co.uk", "CODE"}
 		if val := os.Getenv("BM_BILLING_ENDPOINT"); val != "" {
 			v.Value = val
 			v.Source = "ENV BM_BILLING_ENDPOINT"

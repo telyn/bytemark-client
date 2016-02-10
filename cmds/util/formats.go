@@ -166,3 +166,30 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 	return strings.Join(output, "\r\n")
 
 }
+
+func FormatAccount(a *client.Account) string {
+	output := make([]string, 0, 10)
+
+	gs := ""
+	if len(a.Groups) != 1 {
+		gs = "s"
+	}
+	ss := ""
+	servers := a.CountVirtualMachines()
+	if servers != 1 {
+		ss = "s"
+	}
+
+	groups := make([]string, len(a.Groups))
+
+	for i, g := range a.Groups {
+		groups[i] = g.Name
+	}
+	output = append(output, fmt.Sprintf("%s - Account containing %d server%s across %d group%s", a.Name, servers, ss, len(a.Groups), gs))
+	output = append(output, fmt.Sprintf("Owner: %s %s (%s), Tech Contact: %s %s (%s)", a.Owner.FirstName, a.Owner.LastName, a.Owner.Username, a.TechnicalContact.FirstName, a.TechnicalContact.LastName, a.TechnicalContact.Username))
+	output = append(output, "")
+	output = append(output, fmt.Sprintf("Groups in this account: %s", strings.Join(groups, ", ")))
+
+	return strings.Join(output, "\r\n")
+
+}

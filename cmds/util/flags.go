@@ -21,6 +21,7 @@ func MakeCommonFlagSet() *flag.FlagSet {
 	flags.String("user", "", "")
 	flags.String("account", "", "")
 	flags.String("endpoint", "", "")
+	flags.String("billing-endpoint", "", "")
 	flags.String("auth-endpoint", "", "")
 	flags.String("config-dir", "", "")
 	flags.String("yubikey-otp", "", "")

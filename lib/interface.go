@@ -2,7 +2,6 @@ package lib
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"
-	"net/url"
 )
 
 // Client provides the interface which all API clients should implement.
@@ -44,8 +43,6 @@ type Client interface {
 	AllowInsecureRequests()
 	BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
 	BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
-	NewRequestNoAuth(method string, url *url.URL) *Request
-	NewRequest(method string, url *url.URL) *Request
 
 	///////////////////////
 	//// BILLING STUFF ////

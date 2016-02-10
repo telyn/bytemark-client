@@ -215,6 +215,13 @@ func (a *Account) FillBilling(b *billingAccount) {
 	}
 }
 
+func (a *Account) CountVirtualMachines() (servers int) {
+	for _, g := range a.Groups {
+		servers += len(g.VirtualMachines)
+	}
+	return
+}
+
 /*
 func (a *Account) ToBillingAccount() *billingAccount {
 

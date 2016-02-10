@@ -30,6 +30,7 @@ func (e InsecureConnectionError) Error() string {
 type Request struct {
 	authenticate  bool
 	client        Client
+	endpoint      Endpoint
 	url           *url.URL
 	method        string
 	body          []byte
@@ -49,8 +50,13 @@ func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, pa
 	if err != nil {
 		return
 	}
-	r = c.NewRequestNoAuth(method, url)
-	return
+	return &Request{
+		client:        c,
+		endpoint:      endpoint,
+		url:           url,
+		method:        method,
+		allowInsecure: c.allowInsecure,
+	}, nil
 }
 
 func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
@@ -58,28 +64,14 @@ func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path str
 	if err != nil {
 		return
 	}
-	r = c.NewRequest(method, url)
-	return
-}
-
-func (c *bytemarkClient) NewRequestNoAuth(method string, url *url.URL) *Request {
-	return &Request{
-		client:        c,
-		url:           url,
-		method:        method,
-		allowInsecure: c.allowInsecure,
-	}
-}
-
-func (c *bytemarkClient) NewRequest(method string, url *url.URL) *Request {
 	return &Request{
 		authenticate:  true,
 		client:        c,
+		endpoint:      endpoint,
 		url:           url,
 		method:        method,
 		allowInsecure: c.allowInsecure,
-	}
-
+	}, nil
 }
 
 func (r *Request) AllowInsecure() {
@@ -111,7 +103,13 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 		if r.client.GetSessionToken() == "" {
 			return nil, &NilAuthError{}
 		}
-		req.Header.Add("Authorization", "Bearer "+r.client.GetSessionToken())
+		// if we could settle on a single standard
+		// rather than two basically-identical ones that'd be cool
+		if r.endpoint == EP_BILLING {
+			req.Header.Add("Authorization", "Token token="+r.client.GetSessionToken())
+		} else {
+			req.Header.Add("Authorization", "Bearer "+r.client.GetSessionToken())
+		}
 	}
 	return
 }
