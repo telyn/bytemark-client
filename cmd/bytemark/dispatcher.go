@@ -287,6 +287,7 @@ func (d *Dispatcher) Do(args []string) util.ExitCode {
 		"reset":         d.cmds.ResetServer,
 		"set":           d.DoSet,
 		"shutdown":      d.cmds.Shutdown,
+		"signup":        d.cmds.Signup,
 		//"stop":         d.cmds.Stop,
 		"storage":  d.cmds.StorageGrades,
 		"start":    d.cmds.Start,
