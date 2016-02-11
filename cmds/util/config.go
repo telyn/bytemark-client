@@ -25,6 +25,15 @@ var configVars = [...]string{
 	"yubikey",
 }
 
+type InvalidConfigVarError struct {
+	ConfigVar string
+}
+
+func (e InvalidConfigVarError) Error() string {
+	vs := "'" + strings.Join(configVars[:], "','") + "'"
+	return fmt.Sprintf("'%s' is not a valid config var. Valid config vars are: %s", e.ConfigVar, vs)
+}
+
 // ConfigVar is a struct which contains a name-value-source triplet
 // Source is up to two words separated by a space. The first word is the source type: FLAG, ENV, DIR, CODE.
 // The second is the name of the flag/file/environment var used.
@@ -377,6 +386,15 @@ func (config *Config) Set(name, value, source string) {
 
 // SetPersistent writes a file to the config directory for the given key-value pair.
 func (config *Config) SetPersistent(name, value, source string) error {
+	found := false
+	for _, v := range configVars {
+		if v == name {
+			found = true
+		}
+	}
+	if !found {
+		return InvalidConfigVarError{name}
+	}
 	path := config.GetPath(name)
 	config.Set(name, value, source)
 	err := ioutil.WriteFile(path, []byte(value), 0600)
@@ -388,6 +406,15 @@ func (config *Config) SetPersistent(name, value, source string) error {
 
 // Unset removes the named key from both config's Memo and the user's config directory.
 func (config *Config) Unset(name string) error {
+	found := false
+	for _, v := range configVars {
+		if v == name {
+			found = true
+		}
+	}
+	if !found {
+		return InvalidConfigVarError{name}
+	}
 	delete(config.Memo, name)
 	return os.Remove(config.GetPath(name))
 }

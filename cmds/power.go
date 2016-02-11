@@ -41,6 +41,11 @@ func (cmds *CommandSet) Start(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
+	if len(args) > 1 {
+		log.Log("Too many arguments to `bytemark start` - please specify only a single server.")
+		cmds.HelpForPower()
+		return util.E_PEBKAC
+	}
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
@@ -76,6 +81,12 @@ func (cmds *CommandSet) Shutdown(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
+	if len(args) > 1 {
+		log.Log("Too many arguments to `bytemark shutdown` - please specify only a single server.")
+		cmds.HelpForPower()
+		return util.E_PEBKAC
+	}
+
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForPower()
@@ -106,6 +117,12 @@ func (cmds *CommandSet) Stop(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
+
+	if len(args) > 1 {
+		log.Log("Too many arguments to `bytemark stop` - please specify only a single server.")
+		cmds.HelpForPower()
+		return util.E_PEBKAC
+	}
 
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
@@ -139,6 +156,12 @@ func (cmds *CommandSet) Restart(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
+	if len(args) > 1 {
+		log.Log("Too many arguments to `bytemark restart` - please specify only a single server.")
+		cmds.HelpForPower()
+		return util.E_PEBKAC
+	}
+
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForPower()
@@ -170,6 +193,11 @@ func (cmds *CommandSet) ResetServer(args []string) util.ExitCode {
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
+	if len(args) > 1 {
+		log.Log("Too many arguments to `bytemark reset` - please specify only a single server.")
+		cmds.HelpForPower()
+		return util.E_PEBKAC
+	}
 	nameStr, ok := util.ShiftArgument(&args, "server")
 	if !ok {
 		cmds.HelpForPower()

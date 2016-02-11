@@ -1,0 +1,15 @@
+Source: bytemark-client
+Section: net
+Priority: optional
+Maintainer: Telyn Z.F. <telyn@bytemark.co.uk>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.5
+Homepage: http://bytemark.co.uk/client
+#Vcs-Git: git://anonscm.debian.org/collab-maint/bytemark-client.git
+#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/bytemark-client.git;a=summary
+
+Package: bytemark-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, xdg-utils
+Description: command-line client for Bytemark's self-service hosting.
+ bytemark-client is a command line for Bytemark's self-service hosting.

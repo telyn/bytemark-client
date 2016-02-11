@@ -50,22 +50,24 @@ func (cmds *CommandSet) HelpForCreateServer() util.ExitCode {
 func (cmds *CommandSet) HelpForCreate() util.ExitCode {
 	log.Log("bytemark create")
 	log.Log()
-	log.Log("usage: bytemark create disc [--account <name>] [--group <group>] [--size <size>] [--grade <storage grade>] <cloud server> [disc specs]")
+	log.Log("usage: bytemark create disc[s] [--disc <disc spec>]... <cloud server>")
 	log.Log("               create group [--account <name>] <name>")
-	log.Log("               create disc[s] <disc specs> <cloud server>")
+	log.Log("               ")
 	log.Log("               create ip [--reason reason] <cloud server>")
 	log.Log("               create server (see bytemark help create server)")
 	log.Log("")
-	log.Log("Disc specs are a comma seperated list of size:storage grade pairs. Sizes are in GB by default but can be specified in M")
+	log.Log("A disc spec looks like the following: label:grade:size")
+	log.Log("The label and grade fields are optional. If grade is empty, defaults to sata.")
+	log.Log("If there are two fields, they are assumed to be grade and size.")
+	log.Log("Multiple --disc flags can be used to create multiple discs")
 	log.Log("")
 	return util.E_USAGE_DISPLAYED
 }
 
 func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
-	sizeFlag := flags.String("size", "", "")
-	gradeFlag := flags.String("grade", "", "")
-	labelFlag := flags.String("label", "", "")
+	var discs util.DiscSpecFlag
+	flags.Var(&discs, "disc", "")
 	flags.Parse(args)
 	args = cmds.config.ImportFlags(flags)
 
@@ -80,41 +82,6 @@ func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
 		return util.ProcessError(err)
 	}
 
-	var discs []lib.Disc
-	if *sizeFlag != "" || *gradeFlag != "" {
-		// if both flags and spec are specified, fail
-		if len(args) >= 1 {
-			if !cmds.config.Silent() {
-				log.Error("Ambiguous command given - please only specify disc specs as arguments or flags, not both")
-			}
-			return util.E_PEBKAC
-
-		} else {
-			// only flags
-			size, err := util.ParseSize(*sizeFlag)
-			if err != nil {
-				return util.ProcessError(err)
-			}
-			discs = append(discs, lib.Disc{Size: size, StorageGrade: *gradeFlag, Label: *labelFlag})
-		}
-
-	} else {
-		// if neither of flags and spec are specified, fail
-		if len(args) == 0 {
-			return cmds.HelpForCreate()
-		} else {
-			specs := strings.Split(strings.Join(args, " "), ",")
-			for _, spec := range specs {
-
-				disc, err := util.ParseDiscSpec(spec)
-				if err != nil {
-					return util.ProcessError(err)
-				}
-				discs = append(discs, *disc)
-			}
-		}
-
-	}
 	for i := range discs {
 		d, err := discs[i].Validate()
 		if err != nil {

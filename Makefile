@@ -1,10 +1,10 @@
 SHELL:=/bin/bash
 
-ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client
-ALL_FILES := *.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
+ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/cmd/bytemark
+ALL_FILES := lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go cmd/*/*.go
 
-MAJORVERSION := 0
-MINORVERSION := 3
+MAJORVERSION ?= 0
+MINORVERSION ?= 3
 BUILD_NUMBER ?= 0
 
 OSAARCH:=x86_64
@@ -22,7 +22,7 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 all: bytemark
 
 bytemark: $(ALL_FILES) gensrc
-	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client
+	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client/cmd/bytemark
 
 Bytemark.app.zip: Bytemark.app
 	zip -r $@ $<
@@ -55,12 +55,6 @@ clean:
 	rm -f main.coverage lib.coverage
 	rm -f main.coverage.html lib.coverage.html
 
-checkinstall: 
-	checkinstall -D --install=no -y --maintainer="telyn@bytemark.co.uk" \
-	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)" \
-	    --requires="" \
-	    --strip=no --stripso=no
-
 gensrc:
 	BUILD_NUMBER=$(BUILD_NUMBER) MAJORVERSION=$(MAJORVERSION) \
 	MINORVERSION=$(MINORVERSION) go generate ./...
@@ -88,7 +82,7 @@ else
 endif
 
 main.coverage: *.go
-	go test -coverprofile=$@ bytemark.co.uk/client
+	go test -coverprofile=$@ bytemark.co.uk/client/cmd/bytemark
 
 %.coverage.html: %.coverage
 	go tool cover -html=$< -o $@

@@ -98,7 +98,7 @@ func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge boo
 	if purge {
 		purgePart = "?purge=true"
 	}
-	r, err := c.BuildRequest("DELETE", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s%s", name.Account, name.Group, name.VirtualMachine, purgePart)
+	r, err := c.BuildRequest("DELETE", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s"+purgePart, name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
