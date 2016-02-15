@@ -169,7 +169,7 @@ type Person struct {
 	Address              string `json:"address"`
 	City                 string `json:"city"`
 	StateCounty          string `json:"statecounty"`
-	PostCode             string `json:"postcode"`
+	Postcode             string `json:"postcode"`
 	Country              string `json:"country"`
 	Phone                string `json:"phone"`
 	MobilePhone          string `json:"phonemobile"`
@@ -178,4 +178,15 @@ type Person struct {
 	Organization         string `json:"organization"`
 	OrganizationDivision string `json:"division"`
 	VATNumber            string `json:"vatnumber"`
+}
+
+type CreditCard struct {
+	Number   string `yaml:"account_number"`
+	Name     string `yaml:"name"`
+	Expiry   string `yaml:"expiry"`
+	CVV      string `yaml:"cvv"`
+	Street   string `yaml:"street" omitempty`
+	City     string `yaml:"city" omitempty`
+	Postcode string `yaml:"postcode" omitempty`
+	Country  string `yaml:"country" omitempty`
 }
