@@ -151,14 +151,14 @@ type billingAccount struct {
 }
 
 type Account struct {
-	Name             string
-	Owner            *Person
-	TechnicalContact *Person
-	BillingID        int
-	BrainID          int
-	CardReference    string
-	Groups           []*Group
-	Suspended        bool
+	Name             string   `json:"name"`
+	Owner            *Person  `json:"owner"`
+	TechnicalContact *Person  `json:"technical_contact"`
+	BillingID        int      `json:"billing_id"`
+	BrainID          int      `json:"brain_id"`
+	CardReference    string   `json:"card_reference"`
+	Groups           []*Group `json:"groups"`
+	Suspended        bool     `json:"suspended"`
 }
 
 type Person struct {
