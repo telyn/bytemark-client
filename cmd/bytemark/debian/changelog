@@ -1,3 +1,21 @@
+bytemark-client (0.4.0-1) stable; urgency=low
+
+    New features:
+    * `show account` now shows owner & tech contact details
+    * last debug.log is kept as debug.log.1
+
+    Changes:
+    * `create vm`, `show vm`, `list vms` now use 'server' in place of 'vm'
+
+    Fixes:
+    * `config set` now checks whether the var you're setting is real.
+    * power commands output correct help info
+    * power commands check for too many arguments
+    * `create server` now takes arguments after the name, bringing it in line
+      with the help.
+
+ -- Telyn <telyn@bytemark.co.uk>
+
 bytemark-client (0.3.0-1) stable; urgency=low
 
   * First attempt at packaging bytemark-client for debian *properly*
