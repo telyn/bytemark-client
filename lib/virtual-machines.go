@@ -226,7 +226,9 @@ func (c *bytemarkClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff
 		}
 
 		_, _, err = r.Run(bytes.NewBufferString(`{"autoreboot_on":false}`), nil)
-		return
+		if err != nil {
+			return
+		}
 	}
 	r, err = c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
