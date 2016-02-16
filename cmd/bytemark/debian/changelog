@@ -1,4 +1,4 @@
-bytemark-client (0.4.251-1) stable; urgency=low
+bytemark-client (0.4.252-1) stable; urgency=low
 
     New features:
     * `show account` now shows owner & tech contact details
