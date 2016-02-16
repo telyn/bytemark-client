@@ -154,7 +154,7 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 	}
 
 	if configDir != "" {
-		config.Dir = configDir
+		config.Dir = strings.Replace(configDir, "~", os.Getenv("HOME"), -1)
 	}
 
 	err = os.MkdirAll(config.Dir, 0700)
@@ -172,7 +172,17 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		return nil, &ConfigDirInvalidError{config.Dir}
 	}
 
-	log.LogFile, err = os.Create(config.GetPath("debug.log"))
+	dbgLog := config.GetPath("debug.log")
+	_, err = os.Stat(dbgLog)
+	if err == nil {
+		_, err1 := os.Stat(dbgLog + ".1")
+		if err1 == nil {
+			os.Remove(dbgLog + ".1")
+		}
+		os.Rename(dbgLog, dbgLog+".1")
+	}
+
+	log.LogFile, err = os.Create(dbgLog)
 	if err != nil {
 		log.Errorf("Couldn't open %s for writing\r\n", config.GetPath("debug.log"))
 	}
