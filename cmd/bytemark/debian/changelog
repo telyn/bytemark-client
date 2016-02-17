@@ -1,3 +1,9 @@
+bytemark-client (0.4.258) stable; urgency=low
+
+  * Switch to native package format & versioning
+
+ -- Telyn <telyn@bytemark.co.uk> Wed, 17 Feb 2016 09:55:27 +0000
+
 bytemark-client (0.4.254-1) stable; urgency=low
   
   * Fix issues with the change log
