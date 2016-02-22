@@ -7,3 +7,4 @@ bytemark.exe
 /doc/*.html
 /docs/
 /lib/version.go
+*.nupkg
