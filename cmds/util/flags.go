@@ -8,9 +8,16 @@ import (
 	"strings"
 )
 
+type nilWriter struct{}
+
+func (n *nilWriter) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
 // MakeCommonFlagSet creates a FlagSet which provides the flags shared between the main command and the sub-commands.
 func MakeCommonFlagSet() *flag.FlagSet {
 	flags := flag.NewFlagSet("bytemark", flag.ContinueOnError)
+	flags.SetOutput(&nilWriter{})
 
 	// because I'm creating my own help functions I'm not going to supply usage info. Neener neener.
 	flags.Bool("help", false, "")
