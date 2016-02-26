@@ -9,16 +9,15 @@
     <authors>Telyn Z.F., Matthew Bloch</authors>
     <owners>Telyn Z.F></owners>
     <summary>Command-line client for Bytemark's self-service hosting.</summary>
-    <description>This package downloads and installs the Bytemark command-line client, which is currently in alpha.
-    
+    <description>Bytemark Client is a command-line client for interacting
+    with Bytemark's self-service hosting.
     </description>
     <projectUrl>http://bytemark.co.uk/docs/cli</projectUrl>
-    <packageSourceUrl>http://repo.bytemark.co.uk/bytemark-client/windows</packageSourceUrl>
     <!--<projectSourceUrl></projectSourceUrl>
     <docsUrl></docsUrl>
     <mailingListUrl></mailingListUrl>
     <bugTrackerUrl>http://projects.bytemark.co.uk/projects/bytemark-client</bugTrackerUrl>-->
-    <tags>bytemark admin</tags>
+    <tags>bytemark hosting cloud</tags>
     <copyright>Copyright 2015-2016 Bytemark Limited</copyright>
     <licenseUrl>http://repo.bytemark.co.uk/bytemark-client/LICENSE.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
