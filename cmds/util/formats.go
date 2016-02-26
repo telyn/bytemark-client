@@ -186,7 +186,9 @@ func FormatAccount(a *client.Account) string {
 		groups[i] = g.Name
 	}
 	output = append(output, fmt.Sprintf("%s - Account containing %d server%s across %d group%s", a.Name, servers, ss, len(a.Groups), gs))
-	output = append(output, fmt.Sprintf("Owner: %s %s (%s), Tech Contact: %s %s (%s)", a.Owner.FirstName, a.Owner.LastName, a.Owner.Username, a.TechnicalContact.FirstName, a.TechnicalContact.LastName, a.TechnicalContact.Username))
+	if a.Owner != nil && a.TecnicalContact != nil {
+		output = append(output, fmt.Sprintf("Owner: %s %s (%s), Tech Contact: %s %s (%s)", a.Owner.FirstName, a.Owner.LastName, a.Owner.Username, a.TechnicalContact.FirstName, a.TechnicalContact.LastName, a.TechnicalContact.Username))
+	}
 	output = append(output, "")
 	output = append(output, fmt.Sprintf("Groups in this account: %s", strings.Join(groups, ", ")))
 
