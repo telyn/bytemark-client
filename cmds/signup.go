@@ -36,40 +36,35 @@ func (cmds *CommandSet) Signup(args []string) util.ExitCode {
 		ssoExists = true
 	}
 
-	log.Log("Okay, we're going to have to ask you a lot of questions in three parts - first about the account, second about you, and thirdly your card details.")
-	log.Log("If you wish to pay by BACS, PayPal, etc. you can either set up an account with a card now and email support, or email Bytemark at sales@bytemark.co.uk")
-	log.Log("At any time you may press Ctrl+C to exit.")
+	fields, frm := util.MakeSignupForm()
 
-	log.Log("Now some details about you / your organisation.")
-	questions := 15
-	curq := 1
+	frm.Run()
+
 	account := lib.Account{
-		Name: util.Promptf("[%d/%d] Account name (this will be used in your default DNS entries):", curq, questions),
+		Name: fields[util.FIELD_ACCOUNT].Value(),
 	}
 
 	account.Owner = &lib.Person{
-		Username:    util.Promptf("[%d/%d] Username (this is the name you will use to log in):", curq, questions),
-		Email:       util.Promptf("[%d/%d] Email address (it is important that this is correct):", curq, questions),
-		FirstName:   util.Promptf("[%d/%d] First name:", curq, questions),
-		LastName:    util.Promptf("[%d/%d] Last name:", curq, questions),
-		Country:     util.Promptf("[%d/%d] Post code:", curq, questions),
-		City:        util.Promptf("[%d/%d] City:", curq, questions),
-		Address:     util.Promptf("[%d/%d] Street address:", curq, questions),
-		Phone:       util.Promptf("[%d/%d] Phone number:", curq, questions),
-		MobilePhone: util.Promptf("[%d/%d] Mobile phone number (if different):", curq, questions),
+		Username:     fields[util.FIELD_OWNER_NAME].Value(),
+		Email:        fields[util.FIELD_OWNER_EMAIL].Value(),
+		FirstName:    fields[util.FIELD_OWNER_FIRSTNAME].Value(),
+		LastName:     fields[util.FIELD_OWNER_LASTNAME].Value(),
+		Country:      fields[util.FIELD_OWNER_CC].Value(),
+		City:         fields[util.FIELD_OWNER_POSTCODE].Value(),
+		Address:      fields[util.FIELD_OWNER_ADDRESS].Value(),
+		Phone:        fields[util.FIELD_OWNER_PHONE].Value(),
+		MobilePhone:  fields[util.FIELD_OWNER_MOBILE].Value(),
+		Organization: fields[util.FIELD_OWNER_ORG_NAME].Value(),
+		Division:     fields[util.FIELD_OWNER_ORG_DIVISION].Value(),
+		VATNumber:    fields[util.FIELD_OWNER_ORG_VAT].Value(),
 	}
 	account.TechnicalContact = account.Owner
-	if util.PromptYesNo("[%d/%d] Are you creating this account for a company?") {
-		account.Owner.Organization = util.Promptf("[%d/%d] Organization name:", curq, questions)
-		account.Owner.OrganizationDivision = util.Promptf("[%d/%d] Orgnization division:", curq, questions)
-		account.Owner.VATNumber = util.Promptf("[%d/%d] VAT number:", curq, questions)
-	}
 
 	card := lib.CreditCard{
-		Number: util.Promptf("[%d/%d] Credit card number:"),
-		Name:   util.Promptf("[%d/%d] Name on the card:"),
-		Expiry: util.Promptf("[%d/%d] Expiry date (MMYY):"),
-		CVV:    util.Promptf("[%d/%d] CVV (3-4 digit number on the back):"),
+		Number: fields[util.FIELD_CC_NUMBER].Value(),
+		Name:   fields[util.FIELD_CC_NAME].Value(),
+		Expiry: fields[util.FIELD_CC_EXPIRY].Value(),
+		CVV:    fields[util.FIELD_CC_CVV].Value(),
 	}
 
 	ref, err := cmds.client.CreateCreditCard(&card)
