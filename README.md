@@ -27,3 +27,10 @@ At this point you can run `go build -o bytemark .` to build it - or `make`.
 Whatever tickles your particular boat.
 
 Also run the tests with `go test ./...` - or `make test`. 
+
+External contributions
+----------------------
+Please note that we don't accept issues or PRs in Github at the moment.
+
+For now, you can find a Redmine issue tracker here:
+https://projects.bytemark.co.uk/projects/bytemark-client
