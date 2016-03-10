@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"github.com/cheekybits/is"
+	"net"
 	"net/http"
 	"testing"
 )
@@ -10,6 +11,7 @@ import (
 func getFixtureVM() (vm VirtualMachine) {
 	disc := getFixtureDisc()
 	nic := getFixtureNic()
+	ip := net.IPv4(127, 0, 0, 1)
 
 	return VirtualMachine{
 		Name:    "valid-vm",
@@ -27,7 +29,7 @@ func getFixtureVM() (vm VirtualMachine) {
 			&disc,
 		},
 		ID:                1,
-		ManagementAddress: "127.0.0.1",
+		ManagementAddress: &ip,
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
@@ -84,7 +86,7 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.NotNil(vm)
 	is.Nil(err)
 
-	is.Equal("127.0.0.1", vm.ManagementAddress)
-	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].IPs[0])
+	is.Equal("127.0.0.1", vm.ManagementAddress.String())
+	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].IPs[0].String())
 
 }

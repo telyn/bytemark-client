@@ -88,8 +88,8 @@ func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
 	}
 
 	if (format & _FormatVMWithAddrs) != 0 {
-		output = append(output, fmt.Sprintf("IPv4 Addresses: %s\r\n", strings.Join(vm.AllIpv4Addresses(), ",\r\n                ")))
-		output = append(output, fmt.Sprintf("IPv6 Addresses: %s\r\n", strings.Join(vm.AllIpv6Addresses(), ",\r\n                ")))
+		output = append(output, fmt.Sprintf("IPv4 Addresses: %s", vm.AllIPv4Addresses().StringSep(",\r\n                ")))
+		output = append(output, fmt.Sprintf("IPv6 Addresses: %s", vm.AllIPv6Addresses().StringSep(",\r\n                ")))
 	}
 
 	return strings.Join(output, "\r\n")

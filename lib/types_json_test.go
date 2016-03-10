@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cheekybits/is"
-	"reflect"
+	"net"
 	"testing"
 )
 
@@ -80,19 +80,6 @@ var (
 }`
 )
 
-// Contains loops over the given list looking for element
-// Returns (true, true) if found, (true, false) if not, and (false, false) if there was an error
-func Contains(list, element interface{}) (found bool) {
-	listValue := reflect.ValueOf(list)
-
-	for i := 0; i < listValue.Len(); i++ {
-		if listValue.Index(i).Interface() == element {
-			return true
-		}
-	}
-	return false
-}
-
 func TestDiscUnmarshal(t *testing.T) {
 	is := is.New(t)
 	disc := new(Disc)
@@ -110,6 +97,15 @@ func TestDiscUnmarshal(t *testing.T) {
 	is.Equal(99999, disc.VirtualMachineID)
 }
 
+func containsIP(ips []*net.IP, ip string) bool {
+	for _, i := range ips {
+		if i.String() == ip {
+			return true
+		}
+	}
+	return false
+}
+
 func TestNicUnmarshal(t *testing.T) {
 	is := is.New(t)
 
@@ -125,10 +121,10 @@ func TestNicUnmarshal(t *testing.T) {
 	is.Equal("ff:ff:ff:ff:ff:fe", nic.Mac)
 	is.Equal(999, nic.VlanNum)
 
-	is.Equal(true, Contains(nic.IPs, "192.168.99.1"))
-	is.Equal(true, Contains(nic.IPs, "fe80::9999"))
+	is.Equal(true, containsIP(nic.IPs, "192.168.99.1"))
+	is.Equal(true, containsIP(nic.IPs, "fe80::9999"))
 	is.OK(t, nic.ExtraIPs["192.168.99.2"])
-	is.Equal("192.168.99.1", nic.ExtraIPs["192.168.99.2"])
+	is.Equal("192.168.99.1", nic.ExtraIPs["192.168.99.2"].String())
 
 }
 
@@ -153,7 +149,7 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 	is.Equal("head99", vm.Head)
 	is.Equal("example.notarealgroup.bytemark.uk0.bigv.io", vm.Hostname)
 	is.Equal(99999, vm.ID)
-	is.Equal("10.0.0.1", vm.ManagementAddress)
+	is.Equal("10.0.0.1", vm.ManagementAddress.String())
 	is.Equal(2048, vm.Memory)
 	is.Equal("example", vm.Name)
 	is.Equal(true, vm.PowerOn)
@@ -184,10 +180,10 @@ func TestVirtualMachineUnmarshal(t *testing.T) {
 	is.Equal("ff:ff:ff:ff:ff:fe", nic.Mac)
 	is.Equal(999, nic.VlanNum)
 
-	is.Equal(true, Contains(nic.IPs, "192.168.99.1"))
-	is.Equal(true, Contains(nic.IPs, "fe80::9999"))
+	is.Equal(true, containsIP(nic.IPs, "192.168.99.1"))
+	is.Equal(true, containsIP(nic.IPs, "fe80::9999"))
 	is.OK(t, nic.ExtraIPs["192.168.99.2"])
-	is.Equal("192.168.99.1", nic.ExtraIPs["192.168.99.2"])
+	is.Equal("192.168.99.1", nic.ExtraIPs["192.168.99.2"].String())
 }
 
 func TestTotalDiscSize(t *testing.T) {
