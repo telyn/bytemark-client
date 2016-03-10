@@ -3,8 +3,6 @@ SHELL:=/bin/bash
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/cmd/bytemark
 ALL_FILES := lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go cmd/*/*.go
 
-MAJORVERSION ?= 0
-MINORVERSION ?= 4
 BUILD_NUMBER ?= 0
 
 OSAARCH:=x86_64
@@ -56,8 +54,7 @@ clean:
 	rm -f main.coverage.html lib.coverage.html
 
 gensrc:
-	BUILD_NUMBER=$(BUILD_NUMBER) MAJORVERSION=$(MAJORVERSION) \
-	MINORVERSION=$(MINORVERSION) go generate ./...
+	BUILD_NUMBER=$(BUILD_NUMBER) go generate ./...
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))

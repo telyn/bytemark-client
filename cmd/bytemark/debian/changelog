@@ -1,3 +1,20 @@
+bytemark-client (0.5.0) stable; urgency=low
+
+  New features: None!
+
+  Changes:
+  * MIT licensed (hooray)
+  * Build number no longer part of version number.
+
+  Fixes: 
+  * Hook up VNC and serial commands
+  * console connection instructions improved for v6-only clusters
+  * Entering a nonexistent flag no longer produces weird output
+  * Accounts with no owner/tech contact no longer cause crashes
+  * Shutdown now keeps the VM off once run.
+
+ -- Telyn <telyn@bytemark.co.uk> Thu, 10 Mar 2016 11:26:57 +0000
+
 bytemark-client (0.4.268) stable; urgency=low
 
   * Switch to native package format & versioning
