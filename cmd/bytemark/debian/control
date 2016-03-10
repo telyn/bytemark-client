@@ -4,9 +4,9 @@ Priority: optional
 Maintainer: Telyn Z.F. <telyn@bytemark.co.uk>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.5
-Homepage: http://bytemark.co.uk/client
-#Vcs-Git: git://anonscm.debian.org/collab-maint/bytemark-client.git
-#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/bytemark-client.git;a=summary
+Homepage: https://www.bytemark.co.uk/docs/command-line/
+Vcs-Git: https://projects.bytemark.co.uk/git/bytemark-client
+Vcs-Browser: https://projects.bytemark.co.uk/git/bytemark-client
 
 Package: bytemark-client
 Architecture: any
