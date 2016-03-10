@@ -12,12 +12,12 @@
     <description>Bytemark Client is a command-line client for interacting
     with Bytemark's self-service hosting.
     </description>
-    <projectUrl>http://bytemark.co.uk/docs/cli</projectUrl>
+    <projectUrl>http://bytemark.co.uk/docs/command-line</projectUrl>
     <!--<projectSourceUrl></projectSourceUrl>
     <docsUrl></docsUrl>
     <mailingListUrl></mailingListUrl>
     <bugTrackerUrl>http://projects.bytemark.co.uk/projects/bytemark-client</bugTrackerUrl>-->
-    <tags>bytemark hosting cloud</tags>
+    <tags>bytemark hosting cloud virtual-machines</tags>
     <copyright>Copyright 2015-2016 Bytemark Limited</copyright>
     <licenseUrl>http://repo.bytemark.co.uk/bytemark-client/LICENSE.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -30,6 +30,6 @@
     <!--<provides></provides>-->
   </metadata>
   <files>
-    <file src="tools\**" target="tools" />
+    <file src="tools/**" target="tools" />
   </files>
 </package>
