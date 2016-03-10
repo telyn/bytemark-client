@@ -48,22 +48,31 @@ func getExitCode(cmd *exec.Cmd) (exitCode int, err error) {
 }
 
 func (cmds *CommandSet) showVNCHowTo(vm *lib.VirtualMachine) {
+	mgmtAddress := vm.ManagementAddress.String()
+	if vm.ManagementAddress.To4() == nil {
+		mgmtAddress = "[" + mgmtAddress + "]"
+	}
+
 	log.Log("VNC connection information for", vm.Hostname)
 	log.Log()
 	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
-	log.Logf("Then set up a tunnel using SSH: ssh -L 9999:%s:5900 %s@%s\r\n", vm.ManagementAddress, cmds.client.GetSessionUser(), vm.ManagementAddress)
+	log.Logf("Then set up a tunnel using SSH: ssh -L 9999:%s:5900 %s@%s\r\n", mgmtAddress, cmds.client.GetSessionUser(), mgmtAddress)
 	log.Log()
 	log.Log("You will then be able to connect to vnc://localhost:9999/")
 	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
 }
 
 func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
+	mgmtAddress := vm.ManagementAddress.String()
+	if vm.ManagementAddress.To4() == nil {
+		mgmtAddress = "[" + mgmtAddress + "]"
+	}
 	log.Log("Serial console connection information for", vm.Hostname)
 	log.Log()
 	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
-	log.Logf("Then connect to %s@%s\r\n", cmds.client.GetSessionUser(), vm.ManagementAddress)
+	log.Logf("Then connect to %s@%s\r\n", cmds.client.GetSessionUser(), mgmtAddress)
 
 }
 
@@ -71,7 +80,7 @@ func (cmds *CommandSet) showSSHHowTo(vm *lib.VirtualMachine) {
 func (cmds *CommandSet) Console(args []string) util.ExitCode {
 	flags := util.MakeCommonFlagSet()
 	connect := flags.Bool("connect", false, "")
-	//panel := flags.Bool("panel", false, "")
+	panel := flags.Bool("panel", false, "")
 	flags.Bool("serial", false, "") // because we default to serial, we don't care if it's set
 	vnc := flags.Bool("vnc", false, "")
 	flags.Parse(args)
@@ -96,9 +105,9 @@ func (cmds *CommandSet) Console(args []string) util.ExitCode {
 	if err != nil {
 		return util.ProcessError(err)
 	}
-	if *vnc {
+	if *vnc || *panel {
 
-		if !*connect {
+		if !*connect && !*panel {
 			cmds.showVNCHowTo(vm)
 			return util.E_SUCCESS
 		}
