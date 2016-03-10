@@ -46,6 +46,9 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	rm -f Bytemark.app/Contents/MacOS/bytemark
 	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
 	# sign the code? anyone? shall we sign the code?
+	#
+changelog:
+	gen/changelog.sh
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)

@@ -1,6 +1,7 @@
 #!/bin/bash
 set -x
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR/../lib
 
 VERSION=$(head -n 1 $DIR/../cmd/bytemark/debian/changelog | grep -o '(.*)' | grep -oP '[^()]+')
 arrversion=(${VERSION//./ })
