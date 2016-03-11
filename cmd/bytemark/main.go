@@ -1,7 +1,7 @@
 package main
 
 import (
-	util "bytemark.co.uk/client/cmds/util"
+	util "bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
 	"os"
 	"os/signal"

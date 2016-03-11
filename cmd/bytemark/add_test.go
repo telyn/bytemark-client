@@ -1,4 +1,4 @@
-package cmds
+package main
 
 import (
 	"bytemark.co.uk/client/mocks"

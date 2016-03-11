@@ -1,8 +1,8 @@
-package cmds
+package main
 
 import (
 	auth3 "bytemark.co.uk/auth3/client"
-	util "bytemark.co.uk/client/cmds/util"
+	util "bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"fmt"

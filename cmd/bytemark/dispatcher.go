@@ -1,8 +1,7 @@
 package main
 
 import (
-	commands "./cmds"
-	"./cmds/util"
+	"bytemark.co.uk/client/cmd/bytemark/util"
 	client "bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"flag"
@@ -12,7 +11,7 @@ import (
 // Dispatcher is used to determine what functions to run for the command-line arguments provided
 type Dispatcher struct {
 	Flags      *flag.FlagSet
-	cmds       commands.CommandManager
+	cmds       CommandManager
 	config     util.ConfigManager
 	debugLevel int
 }
@@ -38,12 +37,12 @@ func NewDispatcher(config util.ConfigManager) (d *Dispatcher, err error) {
 	d.debugLevel = config.GetDebugLevel()
 	client.SetDebugLevel(d.debugLevel)
 
-	d.cmds = commands.NewCommandSet(config, client)
+	d.cmds = NewCommandSet(config, client)
 	return d, nil
 }
 
 // NewDispatcherWithCommandManager is for writing tests with mock CommandManagers
-func NewDispatcherWithCommandManager(config util.ConfigManager, commands commands.CommandManager) (*Dispatcher, error) {
+func NewDispatcherWithCommandManager(config util.ConfigManager, commands CommandManager) (*Dispatcher, error) {
 	d, err := NewDispatcher(config)
 	if err != nil {
 		return nil, err
@@ -51,9 +50,6 @@ func NewDispatcherWithCommandManager(config util.ConfigManager, commands command
 	d.cmds = commands
 	return d, nil
 }
-
-// CommandFunc is a type which takes an array of arguments and returns an util.ExitCode.
-type CommandFunc func([]string) util.ExitCode
 
 func (d *Dispatcher) DoAdd(args []string) util.ExitCode {
 	if len(args) == 0 {

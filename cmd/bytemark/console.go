@@ -1,7 +1,7 @@
-package cmds
+package main
 
 import (
-	"bytemark.co.uk/client/cmds/util"
+	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"fmt"
