@@ -1,8 +1,8 @@
 package main
 
 import (
-	commands "bytemark.co.uk/client/cmds"
-	"bytemark.co.uk/client/cmds/util"
+	commands "./cmds"
+	"./cmds/util"
 	client "bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"flag"
