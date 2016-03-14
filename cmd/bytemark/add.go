@@ -3,57 +3,65 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
+	"github.com/codegangsta/cli"
 	"io/ioutil"
 	"strings"
 )
 
-func (cmds *CommandSet) HelpForAdd() util.ExitCode {
-	log.Log("bytemark add")
-	log.Log()
-	log.Log("usage: bytemark add key [--public-key-file=<filename>] [--user=<user>] [<public key>]")
-	log.Log()
-	log.Log("Add the given public key to the given user (or the default user). This will allow them")
-	log.Log("to use that key to access management IPs they have access to using that key.")
-	log.Log("Specify --public-key-file=- to read the public key from stdin")
-	log.Log("--public-key-file will be ignored if a public key is specified in the arguments")
-	log.Log("To remove a key, use the remove key command.")
-	return util.E_USAGE_DISPLAYED
-}
+func init() {
 
-// AddKey implements the add key command, which is used to add an authorized_key from a user.
-func (cmds *CommandSet) AddKey(args []string) util.ExitCode {
-	flags := util.MakeCommonFlagSet()
-	keyFile := flags.String("public-key-file", "", "")
+	commands = append(commands, cli.Command{
+		Name:            "add",
+		SkipFlagParsing: true,
+		Subcommands: []cli.Command{{
+			Name:  "key",
+			Usage: "bytemark add key [--public-key-file=<filename>] [--user=<user>] [<public key>]",
+			UsageText: `Add the given public key to the given user (or the default user). This will allow them
+to use that key to access management IPs they have access to using that key.
+To remove a key, use the remove key command.`,
+			Description: `Specify --public-key-file= to read the public key from stdin
+--public-key-file will be ignored if a public key is specified in the arguments`,
+			SkipFlagParsing: true,
+			Action: func(ctx *cli.Context) {
+				flags := util.MakeCommonFlagSet()
+				keyFile := flags.String("public-key-file", "", "")
 
-	flags.Parse(args)
-	args = cmds.config.ImportFlags(flags)
+				flags.Parse(ctx.Args())
+				args := global.Config.ImportFlags(flags)
 
-	user := cmds.config.GetIgnoreErr("user")
+				user := global.Config.GetIgnoreErr("user")
 
-	key := strings.TrimSpace(strings.Join(args, " "))
-	if key == "" {
-		if *keyFile == "" {
-			cmds.HelpForAdd()
-			return util.E_PEBKAC
-		}
+				key := strings.TrimSpace(strings.Join(args, " "))
+				if key == "" {
+					if *keyFile == "" {
+						cli.ShowCommandHelp(ctx, ctx.Command.Name)
+						global.Error = &PEBKACError{}
+						return
+					}
 
-		keyBytes, err := ioutil.ReadFile(*keyFile)
-		if err != nil {
-			return util.ProcessError(err)
-		}
-		key = string(keyBytes)
-	}
+					keyBytes, err := ioutil.ReadFile(*keyFile)
+					if err != nil {
+						global.Error = err
+						return
+					}
+					key = string(keyBytes)
+				}
 
-	err := cmds.EnsureAuth()
-	if err != nil {
-		return util.ProcessError(err)
-	}
+				err := EnsureAuth()
+				if err != nil {
+					global.Error = err
+					return
+				}
 
-	err = cmds.client.AddUserAuthorizedKey(user, key)
-	if err == nil {
-		log.Log("Key added successfully")
-		return util.E_SUCCESS
-	} else {
-		return util.ProcessError(err)
-	}
+				err = global.Client.AddUserAuthorizedKey(user, key)
+				if err == nil {
+					log.Log("Key added successfully")
+					return
+				} else {
+					global.Error = err
+					return
+				}
+			},
+		}},
+	})
 }

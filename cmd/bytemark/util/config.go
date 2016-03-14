@@ -140,6 +140,7 @@ func (e *ConfigWriteError) Error() string {
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
 func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
+	log.Log("Imma making a config")
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
 	home := os.Getenv("HOME")
