@@ -35,7 +35,7 @@ To remove a key, use the remove key command.`,
 				if key == "" {
 					if *keyFile == "" {
 						cli.ShowCommandHelp(ctx, ctx.Command.Name)
-						global.Error = &PEBKACError{}
+						global.Error = &util.PEBKACError{}
 						return
 					}
 

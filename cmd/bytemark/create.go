@@ -4,135 +4,136 @@ import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
+	"github.com/codegangsta/cli"
 	"strconv"
 	"strings"
 )
 
-//HelpForCreateServer provides usage information for the create server command
-func (cmds *CommandSet) HelpForCreateServer() util.ExitCode {
-	log.Log("usage: bytemark create server [flags] <name> [<cores> [<memory> [<disc specs>]...]")
-	log.Log()
-	log.Log("flags available")
-	log.Log("    --account <name>")
-	log.Log("    --cores <num> (default 1)")
-	log.Log("    --cdrom <url>")
-	log.Log("    --disc <disc spec> - defaults to a single 25GiB sata-grade discs")
-	log.Log("    --firstboot-script-file <file name> - a script that will be run on first boot")
-	log.Log("    --force - disables the confirmation prompt")
-	log.Log("    --group <name>")
-	log.Log("    --hwprofile <profile>")
-	log.Log("    --hwprofile-locked")
-	log.Log("    --image <image name> - specify what to image the server with. Default is 'symbiosis'")
-	log.Log("    --ip <ip address> (v4 or v6) - up to one of each type may be specified")
-	log.Log("    --memory <size> (default 1, units are GiB)")
-	log.Log("    --no-image - specifies that the created server should not be imaged.")
-	log.Log("    --no-discs - specifies that the created server should not have any discs.")
-	log.Log("    --public-keys <keys> (newline seperated)")
-	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
-	log.Log("    --root-password <password> - if not set, will be randomly generated")
-	log.Log("    --stopped - if set, machine won't boot")
-	//log.Log("    --type ( cloud | dual | pro | max ) - specifies the type of server to create")
-	log.Log("    --zone <name> (default manchester)")
-	log.Log()
-	log.Log("Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.")
-	log.Log()
-	log.Log("A disc spec looks like the following: label:grade:size")
-	log.Log("The label and grade fields are optional. If grade is empty, defaults to sata.")
-	log.Log("If there are two fields, they are assumed to be grade and size.")
-	log.Log("Multiple --disc flags can be used to create multiple discs")
-	log.Log()
-	log.Log("If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.")
-	return util.E_USAGE_DISPLAYED
+func init() {
+	createServer := cli.Command{
+		Name:      "server",
+		Usage:     "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
+		UsageText: `Create a server with bytemark.`,
+		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
+flags available
+    --account <name>
+    --cores <num> (default 1)
+    --cdrom <url>
+    --disc <disc spec> - defaults to a single 25GiB sata-grade discs
+    --firstboot-script-file <file name> - a script that will be run on first boot
+    --force - disables the confirmation prompt
+    --group <name>
+    --hwprofile <profile>
+    --hwprofile-locked
+    --image <image name> - specify what to image the server with. Default is 'symbiosis'
+    --ip <ip address> (v4 or v6) - up to one of each type may be specified
+    --memory <size> (default 1, units are GiB)
+    --no-image - specifies that the created server should not be imaged.
+    --no-discs - specifies that the created server should not have any discs.
+    --public-keys <keys> (newline seperated)
+    --public-keys-file <file> (will be read & appended to --public-keys)
+    --root-password <password> - if not set, will be randomly generated
+    --stopped - if set, machine won't boot
+    --zone <name> (default manchester)
 
+A disc spec looks like the following: label:grade:size
+The label and grade fields are optional. If grade is empty, defaults to sata.
+If there are two fields, they are assumed to be grade and size.
+Multiple --disc flags can be used to create multiple discs
+
+If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
+		Action: WithVirtualMachineName(fn_createServer),
+	}
+
+	createDiscs := cli.Command{
+		Name:    "discs",
+		Aliases: []string{"disc", "disk", "disks"},
+		Usage:   "bytemark create discs [--disc <disc spec>]... <cloud server>",
+		Description: `A disc spec looks like the following: label:grade:size
+The label and grade fields are optional. If grade is empty, defaults to sata.
+If there are two fields, they are assumed to be grade and size.
+Multiple --disc flags can be used to create multiple discs`,
+		Action: WithVirtualMachineName(fn_createDisc),
+	}
+
+	createGroup := cli.Command{
+		Name:   "group",
+		Usage:  "bytemark create group <group name>",
+		Action: WithGroupName(fn_createGroup),
+	}
+
+	commands = append(commands, cli.Command{
+		Name:      "create",
+		Usage:     "bytemark create disc|group|ip|server",
+		UsageText: "Creates various kinds of things. See `bytemark create <kind of thing> help`",
+		Description: `	    bytemark create disc[s] [--disc <disc spec>]... <cloud server>
+	create group [--account <name>] <name>
+	create ip [--reason reason] <cloud server>
+	create server (see bytemark create server help)
+
+A disc spec looks like the following: label:grade:size
+The label and grade fields are optional. If grade is empty, defaults to sata.
+If there are two fields, they are assumed to be grade and size.
+Multiple --disc flags can be used to create multiple discs`,
+		Subcommands: []cli.Command{
+			createServer,
+			createDiscs,
+			createGroup,
+		},
+	})
 }
 
-//HelpForCreate provides usage information for the create command and its subcommands.
-func (cmds *CommandSet) HelpForCreate() util.ExitCode {
-	log.Log("bytemark create")
-	log.Log()
-	log.Log("usage: bytemark create disc[s] [--disc <disc spec>]... <cloud server>")
-	log.Log("               create group [--account <name>] <name>")
-	log.Log("               ")
-	log.Log("               create ip [--reason reason] <cloud server>")
-	log.Log("               create server (see bytemark help create server)")
-	log.Log("")
-	log.Log("A disc spec looks like the following: label:grade:size")
-	log.Log("The label and grade fields are optional. If grade is empty, defaults to sata.")
-	log.Log("If there are two fields, they are assumed to be grade and size.")
-	log.Log("Multiple --disc flags can be used to create multiple discs")
-	log.Log("")
-	return util.E_USAGE_DISPLAYED
-}
-
-func (cmds *CommandSet) CreateDiscs(args []string) util.ExitCode {
+func fn_createDisc(c *cli.Context, name *lib.VirtualMachineName) {
 	flags := util.MakeCommonFlagSet()
 	var discs util.DiscSpecFlag
 	flags.Var(&discs, "disc", "")
-	flags.Parse(args)
-	args = cmds.config.ImportFlags(flags)
-
-	nameStr, ok := util.ShiftArgument(&args, "cloud server")
-	if !ok {
-		cmds.HelpForCreate()
-		return util.E_PEBKAC
-	}
-
-	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
-	if err != nil {
-		return util.ProcessError(err)
-	}
+	flags.Parse(c.Args())
+	global.Config.ImportFlags(flags)
 
 	for i := range discs {
 		d, err := discs[i].Validate()
 		if err != nil {
-			return util.ProcessError(err)
+			global.Error = err
+			return
 		}
 		discs[i] = *d
 	}
-	cmds.EnsureAuth()
+	EnsureAuth()
 
 	log.Logf("Adding discs to %s:\r\n", name)
 	for _, d := range discs {
 		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
-		err = cmds.client.CreateDisc(name, d)
+		err := global.Client.CreateDisc(*name, d)
 		if err != nil {
 			log.Errorf("failure! %v\r\n", err.Error())
 		} else {
 			log.Log("success!")
 		}
 	}
-	return util.ProcessError(err)
 
 }
 
-// CreateGroup implements the create-group command. See HelpForCreateGroup for usage.
-func (cmds *CommandSet) CreateGroup(args []string) util.ExitCode {
+func fn_createGroup(c *cli.Context, name *lib.GroupName) {
 	flags := util.MakeCommonFlagSet()
-	flags.Parse(args)
-	args = cmds.config.ImportFlags(flags)
+	flags.Parse(c.Args())
+	global.Config.ImportFlags(flags)
 
-	nameStr, ok := util.ShiftArgument(&args, "group")
-	if !ok {
-		cmds.HelpForCreate()
-		return util.E_PEBKAC
-	}
-	name := cmds.client.ParseGroupName(nameStr, cmds.config.GetGroup())
-
-	err := cmds.EnsureAuth()
+	err := EnsureAuth()
 	if err != nil {
-		return util.ProcessError(err)
+		global.Error = err
+		return
 	}
 
-	err = cmds.client.CreateGroup(name)
+	err = global.Client.CreateGroup(*name)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", name.Group, name.Account)
 	}
-	return util.ProcessError(err)
+	global.Error = err
+	return
 
 }
 
-// CreateServer implements the create server command. See HelpForCreateServer for usage
-func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
+func fn_createServer(c *cli.Context, name *lib.VirtualMachineName) {
 	flags := util.MakeCommonFlagSet()
 	addImageInstallFlags(flags)
 	cores := flags.Int("cores", 1, "")
@@ -148,45 +149,39 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 	noImage := flags.Bool("no-image", false, "")
 	stopped := flags.Bool("stopped", false, "")
 	zone := flags.String("zone", "", "")
-	flags.Parse(args)
-	args = cmds.config.ImportFlags(flags)
+	flags.Parse(c.Args())
+	args := global.Config.ImportFlags(flags)
 
 	var err error
-	nameStr, ok := util.ShiftArgument(&args, "cloud server")
-	if !ok {
-		cmds.HelpForCreateServer()
-		return util.E_PEBKAC
-	}
-
-	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
-	if err != nil {
-		return util.ProcessError(err)
-	}
 	for i, arg := range args {
 		switch i {
+		// the first arg is the vm name which we already have
 		case 0:
+			continue
+		case 1:
 			cores64, err := strconv.ParseInt(arg, 10, 32)
 			if err != nil {
 				log.Error("Cores argument given was not an int.")
-				cmds.HelpForCreateServer()
-				return util.E_PEBKAC
+				global.Error = util.PEBKACError{}
+				return
 			} else {
 				*cores = int(cores64)
 			}
-		case 1:
+		case 2:
 			*memorySpec = arg
 		default:
 			if len(discs) != 0 {
 				log.Error("--disc flag used along with the discs spec argument - please use only one")
-				cmds.HelpForCreateServer()
-				return util.E_PEBKAC
+				global.Error = util.PEBKACError{}
+				return
 			}
 			for i, spec := range strings.Split(arg, ",") {
 				disc, err := util.ParseDiscSpec(spec)
 				if err != nil {
 					log.Errorf("Disc %d has a malformed spec - '%s' is invalid", i, spec)
 					//cmds.HelpForTopic('specs')
-					return util.E_PEBKAC
+					global.Error = util.PEBKACError{}
+					return
 				}
 				discs = append(discs, *disc)
 			}
@@ -196,7 +191,8 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 
 	memory, err := util.ParseSize(*memorySpec)
 	if err != nil {
-		return util.ProcessError(err)
+		global.Error = err
+		return
 	}
 
 	if *noDiscs {
@@ -210,14 +206,16 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 	for i := range discs {
 		d, err := discs[i].Validate()
 		if err != nil {
-			return util.ProcessError(err)
+			global.Error = err
+			return
 		}
 		discs[i] = *d
 	}
 
 	if len(ips) > 2 {
 		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-		return util.E_PEBKAC
+		global.Error = &util.PEBKACError{}
+		return
 	}
 
 	var ipspec *lib.IPSpec
@@ -228,13 +226,15 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 			if ip.To4() != nil {
 				if ipspec.IPv4 != "" {
 					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					return util.E_PEBKAC
+					global.Error = &util.PEBKACError{}
+					return
 				}
 				ipspec.IPv4 = ip.To4().String()
 			} else {
 				if ipspec.IPv6 != "" {
 					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					return util.E_PEBKAC
+					global.Error = &util.PEBKACError{}
+					return
 
 				}
 				ipspec.IPv6 = ip.String()
@@ -244,7 +244,8 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 
 	imageInstall, _, err := prepareImageInstall(flags)
 	if err != nil {
-		return util.ProcessError(err)
+		global.Error = err
+		return
 	}
 
 	if *noImage {
@@ -279,32 +280,36 @@ func (cmds *CommandSet) CreateServer(args []string) util.ExitCode {
 	log.Log(util.FormatVirtualMachineSpec(&groupName, &spec))
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
-	if !cmds.config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
+	if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
 		log.Error("Exiting.")
-		return util.ProcessError(&util.UserRequestedExit{})
+		global.Error = &util.UserRequestedExit{}
+		return
 	}
 
-	err = cmds.EnsureAuth()
+	err = EnsureAuth()
 	if err != nil {
-		return util.ProcessError(err)
+		global.Error = err
+		return
 	}
 
-	_, err = cmds.client.CreateVirtualMachine(groupName, spec)
+	_, err = global.Client.CreateVirtualMachine(groupName, spec)
 	if err != nil {
-		return util.ProcessError(err)
+		global.Error = err
+		return
 	}
-	vm, err := cmds.client.GetVirtualMachine(name)
+	vm, err := global.Client.GetVirtualMachine(*name)
 	if err != nil {
-		return util.ProcessError(err)
+		global.Error = err
+		return
 	}
 	log.Log("cloud server created successfully", "")
 	log.Log(util.FormatVirtualMachine(vm))
 	if imageInstall != nil {
+		log.Log()
 		log.Logf("Root password:") // logf so we don't get a tailing \r\n
 		log.Outputf("%s\r\n", imageInstall.RootPassword)
 	} else {
 		log.Log("Machine was not imaged")
 	}
-	return util.E_SUCCESS
 
 }

@@ -14,12 +14,6 @@ import (
 	"strings"
 )
 
-type PEBKACError struct{}
-
-func (err PEBKACError) Error() string {
-	return "Yo you did a thing wrong"
-}
-
 var client lib.Client
 var commands = make([]cli.Command, 0)
 var global = struct {

@@ -3,93 +3,86 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
+	"github.com/codegangsta/cli"
 	"strings"
 )
 
-// HelpForConfig outputs usage information for the bytemark config command.
-func (cmds *CommandSet) HelpForConfig() util.ExitCode {
-	log.Log("bytemark config")
-	log.Log()
-	log.Log("Usage:")
-	log.Log("    bytemark config")
-	log.Log("        Outputs the current values of all variables and what source they were derived from")
-	log.Log()
-	log.Log("    bytemark config set <variable> <value>")
-	log.Log("        Sets a variable by writing to your bytemark config (usually ~/.bytemark)")
-	log.Log()
-	log.Log("    bytemark config unset <variable>")
-	log.Log("        Unsets a variable by removing data from bytemark config (usually ~/.bytemark)")
-	log.Log()
-	log.Log("Available variables:")
-	log.Log("    endpoint - the API endpoint to connect to. https://uk0.bigv.io is the default")
-	//log.Log("    billing-endpoint - the billing API endpoint to connect to.")
-	log.Log("    auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.")
-	log.Log("    debug-level - the default debug level. Set to 0 unless you like lots of output")
-	log.Log("    token - the token used for authentication.") // You can get one using bytemark auth.")
-	log.Log()
-	return util.E_USAGE_DISPLAYED
+func init() {
+	commands = append(commands, cli.Command{
+		Name:      "config",
+		Usage:     "Manage the bytemark client's configuration",
+		UsageText: "Outputs the current values of all variables and what source they were derived from.",
+		Description: `When invoked with no subcommand, outputs the current values of all variables and what source they were derived from.
+The set and unset subcommands can be used to set and unset such variables.
+		
+Available variables:
+	endpoint - the API endpoint to connect to. https://uk0.bigv.io is the default
+	billing-endpoint - the billing API endpoint to connect to.
+	auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.
+	debug-level - the default debug level. Set to 0 unless you like lots of output
+	token - the token used for authentication.") // You can get one using bytemark auth.`,
+		Subcommands: []cli.Command{
+			{
+				Name:      "set",
+				Usage:     "bytemark config set <variable> <value>",
+				UsageText: "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
+				Action:    config_set, // defined below - it's just a bit long
+			},
+			{
+				Name:      "unset",
+				Usage:     "bytemark config unset <variable>",
+				UsageText: "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
+				Action: func(ctx *cli.Context) {
+					variable := strings.ToLower(ctx.Args()[0])
+					err := global.Config.Unset(variable)
+					global.Error = err
+				},
+			},
+		},
+		Action: func(ctx *cli.Context) {
+			vars, err := global.Config.GetAll()
+			if err != nil {
+				global.Error = err
+				return
+			}
+			for _, v := range vars {
+				log.Logf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
+			}
+		},
+	})
 }
 
-// Config provides the bytemark config command, which sets variables in the user's config. See HelpForConfig for usage information.
-// It's slightly more user friendly than echo "value" > ~/.bytemark/
-func (cmds *CommandSet) Config(args []string) util.ExitCode {
-	if len(args) == 0 {
-		vars, err := cmds.config.GetAll()
-		if err != nil {
-			return util.ProcessError(err)
-		}
-		for _, v := range vars {
-			log.Logf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
-		}
-		return util.E_SUCCESS
-	} else if len(args) == 1 {
-		cmds.HelpForConfig()
-		return util.E_SUCCESS
+func config_set(ctx *cli.Context) {
+	variable := strings.ToLower(ctx.Args().First())
+
+	oldVar, err := global.Config.GetV(variable)
+	if err != nil {
+		global.Error = err
 	}
 
-	switch strings.ToLower(args[0]) {
-	case "set":
-		variable := strings.ToLower(args[1])
+	if len(ctx.Args()) < 2 {
+		global.Error = util.PEBKACError{}
+		return
+	}
 
-		oldVar, err := cmds.config.GetV(variable)
-		if err != nil {
-			if e, ok := err.(*util.ConfigReadError); ok {
-				log.Errorf("Couldn't read the old value of %s - %v\r\n", e.Name, e.Err)
-			} else {
-				log.Errorf("Couldn't read the old value of %s - %v\r\n", variable, err)
-			}
-			return util.E_CANT_READ_CONFIG
-		}
-
-		if len(args) == 2 {
-			log.Logf("%s: '%s' (%s)\r\n", oldVar.Name, oldVar.Value, oldVar.Source)
-			return util.E_SUCCESS
-		}
-
-		// TODO(telyn): consider validating input for the set command
-		err = cmds.config.SetPersistent(variable, args[2], "CMD set")
-		if err != nil {
+	// TODO(telyn): consider validating input for the set command
+	err = global.Config.SetPersistent(variable, ctx.Args()[1], "CMD set")
+	if err != nil {
+		global.Error = err
+		return
+		// TODO(telyn): wrap the error in an error of my own to expose this bhvr
+		/*
 			if e, ok := err.(*util.ConfigReadError); ok {
 				log.Errorf("Couldn't set %s - %v\r\n", e.Name, e.Err)
 			} else {
 				log.Errorf("Couldn't set %s - %v\r\n", variable, err)
 			}
-			return util.E_CANT_WRITE_CONFIG
-		}
-
-		if oldVar.Source == "config" {
-			log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, args[2])
-		} else {
-			log.Logf("%s has been set. \r\nNew value: %s\r\n", variable, args[2])
-		}
-
-	case "unset":
-		variable := strings.ToLower(args[0])
-		err := cmds.config.Unset(variable)
-		return util.ProcessError(err)
-	default:
-		log.Errorf("Unrecognised command %s\r\n", args[0])
-		cmds.HelpForConfig()
+		*/
 	}
-	return util.E_SUCCESS
+
+	if oldVar.Source == "config" {
+		log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, global.Config.GetIgnoreErr(variable))
+	} else {
+		log.Logf("%s has been set. \r\nNew value: %s\r\n", variable, global.Config.GetIgnoreErr(variable))
+	}
 }

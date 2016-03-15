@@ -146,18 +146,6 @@ func (cmds *CommandSet) Help(args []string) util.ExitCode {
 
 	// please try and keep these in alphabetical order
 	switch strings.ToLower(args[0]) {
-	case "config":
-		return cmds.HelpForConfig()
-	case "console":
-		return cmds.HelpForConsole()
-	case "create":
-		if len(args) > 1 {
-			switch args[1] {
-			case "vm", "server":
-				return cmds.HelpForCreateServer()
-			}
-		}
-		return cmds.HelpForCreate()
 	case "debug":
 		return cmds.HelpForDebug()
 	case "delete", "undelete":
