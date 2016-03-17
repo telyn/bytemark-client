@@ -3,6 +3,7 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
+	"github.com/codegangsta/cli"
 	"strings"
 )
 
@@ -13,76 +14,52 @@ func (cmds *CommandSet) HelpForResize() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }
 
-func (cmds *CommandSet) ResizeDisc(args []string) util.ExitCode {
-	flags := util.MakeCommonFlagSet()
-	flags.Parse(args)
-	args = cmds.config.ImportFlags(flags)
+func init() {
+	commands = append(commands, cli.Command{
+		Name: "resize",
+		Subcommands: []cli.Command{{
+			Name:    "disc",
+			Aliases: []string{"disk"},
+			Action: With(VirtualMachineProvider, DiscLabelProvider, func(c *Context) (err error) {
+				const (
+					SET = iota
+					INCREASE
+				)
+				mode := SET
+				sizeStr, err := c.NextArg()
+				if err != nil {
+					log.Error("No size specified")
+					return err
+				}
+				if strings.HasPrefix(sizeStr, "+") {
+					sizeStr = sizeStr[1:]
+					mode = INCREASE
+				}
 
-	const (
-		SET = iota
-		INCREASE
-	)
-	mode := SET
+				size, err := util.ParseSize(sizeStr)
+				if err != nil {
+					return err
+				}
 
-	nameStr, ok := util.ShiftArgument(&args, "server")
-	if !ok {
-		log.Error("No server specified")
-		cmds.HelpForResize()
-		return util.E_PEBKAC
-	}
+				oldDisc, err := global.Client.GetDisc(c.VirtualMachineName, *c.DiscLabel)
+				if err != nil {
+					return err
+				}
 
-	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
-	if err != nil {
+				if mode == INCREASE {
+					size = oldDisc.Size + size
+				}
 
-	}
+				log.Logf("Resizing %s from %dGiB to %dGiB...", oldDisc.Label, oldDisc.Size/1024, size/1024)
 
-	discId, ok := util.ShiftArgument(&args, "disc id")
-	if !ok {
-		log.Error("No disc specified")
-		cmds.HelpForResize()
-		return util.E_PEBKAC
-	}
-
-	sizeStr, ok := util.ShiftArgument(&args, "")
-	if !ok {
-		log.Error("No size specified")
-		cmds.HelpForResize()
-		return util.E_PEBKAC
-	}
-
-	if strings.HasPrefix(sizeStr, "+") {
-		sizeStr = sizeStr[1:]
-		mode = INCREASE
-	}
-
-	size, err := util.ParseSize(sizeStr)
-	if err != nil {
-		return util.ProcessError(err)
-	}
-
-	err = cmds.EnsureAuth()
-
-	if err != nil {
-		return util.ProcessError(err)
-	}
-
-	oldDisc, err := cmds.client.GetDisc(name, discId)
-	if err != nil {
-		return util.ProcessError(err)
-	}
-
-	if mode == INCREASE {
-		size = oldDisc.Size + size
-	}
-
-	log.Logf("Resizing %s from %dGiB to %dGiB...", oldDisc.Label, oldDisc.Size/1024, size/1024)
-
-	err = cmds.client.ResizeDisc(name, discId, size)
-	if err != nil {
-		log.Logf("Failed!\r\n")
-		return util.ProcessError(err)
-	} else {
-		log.Logf("Completed.\r\n")
-		return util.E_SUCCESS
-	}
+				err = global.Client.ResizeDisc(c.VirtualMachineName, *c.DiscLabel, size)
+				if err != nil {
+					log.Logf("Failed!\r\n")
+					return
+				}
+				log.Logf("Completed.\r\n")
+				return
+			}),
+		}},
+	})
 }

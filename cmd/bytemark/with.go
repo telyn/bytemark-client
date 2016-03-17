@@ -6,30 +6,152 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func WithVirtualMachineName(fn func(*cli.Context, *lib.VirtualMachineName)) func(c *cli.Context) {
-	return func(c *cli.Context) {
-		args := c.Args()
-		if !args.Present() {
-			global.Error = &util.PEBKACError{}
-			return
-		}
-		name, err := global.Client.ParseVirtualMachineName(args.First())
-		if err != nil {
-			global.Error = err
-			return
-		}
-		fn(c, &name)
+type Context struct {
+	Context            *cli.Context
+	AccountName        *string
+	Account            *lib.Account
+	Authed             bool
+	GroupName          *lib.GroupName
+	Group              *lib.Group
+	Definitions        *lib.Definitions
+	DiscLabel          *string
+	VirtualMachine     *lib.VirtualMachine
+	VirtualMachineName *lib.VirtualMachineName
+
+	currentArgIndex int
+}
+
+func (c *Context) args() cli.Args {
+	return c.Context.Args()
+}
+
+func (c *Context) NextArg() (string, error) {
+	if len(c.args()) <= c.currentArgIndex {
+		return "", util.NotEnoughArgumentsError{}
+	}
+	arg := c.args()[c.currentArgIndex]
+	c.currentArgIndex++
+	return arg, nil
+}
+
+type ProviderFunc func(*Context) error
+
+func With(providers ...ProviderFunc) func(c *cli.Context) {
+	return func(cliContext *cli.Context) {
+		c := Context{Context: cliContext}
+		global.Error = foldProviders(&c, providers...)
 	}
 }
 
-func WithGroupName(fn func(*cli.Context, *lib.GroupName)) func(c *cli.Context) {
-	return func(c *cli.Context) {
-		args := c.Args()
-		if !args.Present() {
-			global.Error = util.PEBKACError{}
+func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
+	for _, provider := range providers {
+		err = provider(c)
+		if err != nil {
+			return
 		}
-
-		name := global.Client.ParseGroupName(args.First())
-		fn(c, &name)
 	}
+	return
+}
+
+func AccountNameProvider(c *Context) (err error) {
+	if c.AccountName != nil {
+	}
+	name, err := c.NextArg()
+	if err != nil {
+		return err
+	}
+	accName := global.Client.ParseAccountName(name)
+	c.AccountName = &accName
+	return
+}
+
+func AccountProvider(c *Context) (err error) {
+	err = foldProviders(c, AccountNameProvider, AuthProvider)
+	if err != nil {
+		return
+	}
+	c.Account, err = global.Client.GetAccount(*c.AccountName)
+	return
+}
+
+func AuthProvider(c *Context) (err error) {
+	if !c.Authed {
+		err = EnsureAuth()
+		if err != nil {
+			return
+		}
+	}
+	c.Authed = true
+	return
+}
+
+func DefinitionsProvider(c *Context) (err error) {
+	if c.Definitions != nil {
+		return
+	}
+	c.Definitions, err = global.Client.ReadDefinitions()
+	return
+}
+
+func DiscLabelProvider(c *Context) (err error) {
+	if c.DiscLabel != nil {
+		return
+	}
+	discLabel, err := c.NextArg()
+	if err != nil {
+		return err
+	}
+	c.DiscLabel = &discLabel
+	return
+}
+
+func GroupNameProvider(c *Context) (err error) {
+	if c.GroupName != nil {
+		return
+	}
+
+	name, err := c.NextArg()
+	if err != nil {
+		return err
+	}
+	c.GroupName = global.Client.ParseGroupName(name)
+	return
+}
+
+func GroupProvider(c *Context) (err error) {
+	if c.Group != nil {
+		return
+	}
+	err = foldProviders(c, GroupNameProvider, AuthProvider)
+	if err != nil {
+		return
+	}
+
+	c.Group, err = global.Client.GetGroup(c.GroupName)
+	return
+}
+
+func VirtualMachineNameProvider(c *Context) (err error) {
+	if c.VirtualMachineName != nil {
+		return
+	}
+	name, err := c.NextArg()
+	if err != nil {
+		return err
+	}
+
+	c.VirtualMachineName, err = global.Client.ParseVirtualMachineName(name)
+	return
+}
+
+func VirtualMachineProvider(c *Context) (err error) {
+	if c.VirtualMachine != nil {
+		return
+	}
+	err = foldProviders(c, VirtualMachineNameProvider, AuthProvider)
+	if err != nil {
+		return
+	}
+	c.VirtualMachine, err = global.Client.GetVirtualMachine(c.VirtualMachineName)
+	return
 }

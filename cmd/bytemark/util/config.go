@@ -59,8 +59,8 @@ type ConfigManager interface {
 	GetIgnoreErr(string) string
 	GetBool(string) (bool, error)
 	GetV(string) (ConfigVar, error)
-	GetVirtualMachine() lib.VirtualMachineName
-	GetGroup() lib.GroupName
+	GetVirtualMachine() *lib.VirtualMachineName
+	GetGroup() *lib.GroupName
 	GetAll() ([]ConfigVar, error)
 	Set(string, string, string)
 	SetPersistent(string, string, string) error
@@ -272,7 +272,8 @@ func (config *Config) GetV(name string) (ConfigVar, error) {
 	return config.read(name)
 }
 
-func (config *Config) GetVirtualMachine() (vm lib.VirtualMachineName) {
+func (config *Config) GetVirtualMachine() (vm *lib.VirtualMachineName) {
+	vm = new(lib.VirtualMachineName)
 	vm.Account = config.GetIgnoreErr("account")
 	vm.Group = config.GetIgnoreErr("group")
 	vm.VirtualMachine = ""
@@ -280,7 +281,8 @@ func (config *Config) GetVirtualMachine() (vm lib.VirtualMachineName) {
 	return vm
 }
 
-func (config *Config) GetGroup() (group lib.GroupName) {
+func (config *Config) GetGroup() (group *lib.GroupName) {
+	group = new(lib.GroupName)
 	group.Account = config.GetIgnoreErr("account")
 	group.Group = config.GetIgnoreErr("group")
 	return group

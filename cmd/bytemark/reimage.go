@@ -99,7 +99,6 @@ func (cmds *CommandSet) Reimage(args []string) util.ExitCode {
 		cmds.HelpForReimage()
 		return util.E_PEBKAC
 	}
-
 	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
 	if err != nil {
 		return util.ProcessError(err)

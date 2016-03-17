@@ -28,8 +28,8 @@ func (disc *Disc) Validate() (*Disc, error) {
 	return disc, nil
 }
 
-func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc Disc) (err error) {
-	err = c.validateVirtualMachineName(&name)
+func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc Disc) (err error) {
+	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return
 	}
@@ -55,8 +55,8 @@ func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc Disc) (err err
 
 }
 
-func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string) (err error) {
-	err = c.validateVirtualMachineName(&vm)
+func (c *bytemarkClient) DeleteDisc(vm *VirtualMachineName, discLabelOrID string) (err error) {
+	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return
 	}
@@ -71,8 +71,8 @@ func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string)
 	return
 }
 
-func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
-	err = c.validateVirtualMachineName(&vm)
+func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
+	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return err
 	}
@@ -88,9 +88,9 @@ func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string,
 	return err
 }
 
-func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
+func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
 	disc = new(Disc)
-	err = c.validateVirtualMachineName(&vm)
+	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return
 	}
