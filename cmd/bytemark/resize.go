@@ -7,19 +7,13 @@ import (
 	"strings"
 )
 
-func (cmds *CommandSet) HelpForResize() util.ExitCode {
-	log.Log("bytemark resize")
-	log.Log("")
-	log.Log("usage: bytemark resize disc <server> <disc> <size>")
-	return util.E_USAGE_DISPLAYED
-}
-
 func init() {
 	commands = append(commands, cli.Command{
 		Name: "resize",
 		Subcommands: []cli.Command{{
-			Name:    "disc",
-			Aliases: []string{"disk"},
+			Name:      "disc",
+			Aliases:   []string{"disk"},
+			UsageText: "bytemark resize disc <server> <disc> <size>",
 			Action: With(VirtualMachineProvider, DiscLabelProvider, func(c *Context) (err error) {
 				const (
 					SET = iota

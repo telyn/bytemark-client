@@ -11,10 +11,12 @@ type Context struct {
 	AccountName        *string
 	Account            *lib.Account
 	Authed             bool
-	GroupName          *lib.GroupName
-	Group              *lib.Group
 	Definitions        *lib.Definitions
 	DiscLabel          *string
+	GroupName          *lib.GroupName
+	Group              *lib.Group
+	User               *lib.User
+	UserName           *string
 	VirtualMachine     *lib.VirtualMachine
 	VirtualMachineName *lib.VirtualMachineName
 
@@ -128,6 +130,36 @@ func GroupProvider(c *Context) (err error) {
 	}
 
 	c.Group, err = global.Client.GetGroup(c.GroupName)
+	return
+}
+
+func UserNameProvider(c *Context) (err error) {
+	if c.UserName != nil {
+		return
+	}
+	var username string
+	username, err = c.NextArg()
+	if err != nil {
+		username, err = global.Config.Get("user")
+		if username == "" {
+			username = global.Client.GetSessionUser()
+			err = nil
+		}
+	}
+	c.UserName = &username
+	return
+
+}
+
+func UserProvider(c *Context) (err error) {
+	if c.User != nil {
+		return
+	}
+	err = UserNameProvider(c)
+	if err != nil {
+		return
+	}
+	c.User, err = global.Client.GetUser(*c.UserName)
 	return
 }
 

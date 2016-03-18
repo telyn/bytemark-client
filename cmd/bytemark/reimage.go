@@ -5,27 +5,40 @@ import (
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"flag"
+	"github.com/codegangsta/cli"
 	"io/ioutil"
 )
 
-func (cmds *CommandSet) HelpForReimage() util.ExitCode {
-	log.Log("usage: bytemark reimage (--image <image>) [flags] <server>")
-	log.Log("")
-	log.Log("flags available")
-	log.Log("    --firstboot-script-file <file name> - a script that will be run on first boot")
-	log.Log("    --force - disables the confirmation prompt")
-	log.Log("    --image <image name> - specify what to image the server with. Default is 'symbiosis'. See `bytemark images` for a list of available images")
-	log.Log("    --public-keys <keys> (newline seperated)")
-	log.Log("    --public-keys-file <file> (will be read & appended to --public-keys)")
-	log.Log("    --root-password <password> (if not set, will be randomly generated)")
-	log.Log()
-	log.Log("Image the given server with the specified image, prompting for confirmation.")
-	log.Log("If the --image flag is not specified, will prompt with a list.")
-	log.Log("Specify --force to prevent prompting.")
-	log.Log("")
-	log.Log("The root password will be the only thing output on stdout - good for scripts!")
+func init() {
+	commands = append(commands, cli.Command{
+		Name: "reimage",
+		Description: `flags available
+    --firstboot-script-file <file name> - a script that will be run on first boot
+    --force - disables the confirmation prompt
+    --image <image name> - specify what to image the server with. Default is 'symbiosis'. See bytemark images for a list of available images
+    --public-keys <keys> (newline seperated)
+    --public-keys-file <file> (will be read & appended to --public-keys)
+    --root-password <password> (if not set, will be randomly generated)
 
-	return util.E_USAGE_DISPLAYED
+Image the given server with the specified image, prompting for confirmation.
+If the --image flag is not specified, will prompt with a list.
+Specify --force to prevent prompting.
+
+The root password will be the only thing output on stdout - good for scripts!
+	    `,
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
+			imageInstall, defaulted, err := prepareImageInstall(nil) // TODO(telyn): this is going to take a bit of a rewrite.
+			if err != nil {
+				return err
+			}
+			if defaulted {
+				log.Log("No image was specified")
+				return &util.PEBKACError{}
+			}
+
+			return global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)
+		}),
+	})
 }
 
 func addImageInstallFlags(flags *flag.FlagSet) {
@@ -86,36 +99,4 @@ func prepareImageInstall(flags *flag.FlagSet) (imageInstall *lib.ImageInstall, d
 		PublicKeys:      pubkeys,
 		RootPassword:    rootpass,
 	}, defaulted, nil
-}
-
-func (cmds *CommandSet) Reimage(args []string) util.ExitCode {
-	flags := util.MakeCommonFlagSet()
-	addImageInstallFlags(flags)
-	flags.Parse(args)
-	args = cmds.config.ImportFlags(flags)
-
-	nameStr, ok := util.ShiftArgument(&args, "server")
-	if !ok {
-		cmds.HelpForReimage()
-		return util.E_PEBKAC
-	}
-	name, err := cmds.client.ParseVirtualMachineName(nameStr, cmds.config.GetVirtualMachine())
-	if err != nil {
-		return util.ProcessError(err)
-	}
-	imageInstall, defaulted, err := prepareImageInstall(flags)
-	if err != nil {
-		return util.ProcessError(err)
-	}
-	if defaulted {
-		log.Log("No image was specified")
-
-		cmds.HelpForReimage()
-		return util.E_PEBKAC
-	}
-
-	cmds.EnsureAuth()
-
-	err = cmds.client.ReimageVirtualMachine(name, imageInstall)
-	return util.ProcessError(err)
 }

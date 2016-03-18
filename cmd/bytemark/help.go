@@ -150,14 +150,8 @@ func (cmds *CommandSet) Help(args []string) util.ExitCode {
 		return util.HelpForExitCodes()
 	case "profiles":
 		return cmds.HelpForTopic("profiles")
-	case "reimage":
-		return cmds.HelpForReimage()
-	case "resize":
-		return cmds.HelpForResize()
 	case "scripting":
 		return cmds.HelpForTopic("scripting")
-	case "show":
-		return cmds.HelpForShow()
 	}
 	return cmds.HelpForHelp()
 
