@@ -24,14 +24,14 @@ Available variables:
 		Subcommands: []cli.Command{
 			{
 				Name:      "set",
-				Usage:     "bytemark config set <variable> <value>",
-				UsageText: "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
+				UsageText: "bytemark config set <variable> <value>",
+				Usage:     "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
 				Action:    config_set, // defined below - it's just a bit long
 			},
 			{
 				Name:      "unset",
-				Usage:     "bytemark config unset <variable>",
-				UsageText: "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
+				UsageText: "bytemark config unset <variable>",
+				Usage:     "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
 				Action: func(ctx *cli.Context) {
 					variable := strings.ToLower(ctx.Args()[0])
 					err := global.Config.Unset(variable)

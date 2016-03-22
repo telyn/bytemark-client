@@ -137,10 +137,10 @@ func (e *ConfigWriteError) Error() string {
 
 // Do I really need to have the flags passed in here?
 // Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
+// TODO(telyn): once codegangsta/cli has the idea of config providers (see codegansta/cli/issues/
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
 func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
-	log.Log("Imma making a config")
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
 	home := os.Getenv("HOME")
@@ -148,6 +148,7 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		home = os.Getenv("APPDATA")
 
 	}
+
 	config.Dir = filepath.Join(home, "/.bytemark")
 	config.mainFlags = flags
 	if os.Getenv("BM_CONFIG_DIR") != "" {

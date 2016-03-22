@@ -27,6 +27,10 @@ func (c *Context) args() cli.Args {
 	return c.Context.Args()
 }
 
+func (c *Context) Args() []string {
+	return c.args()[c.currentArgIndex:]
+}
+
 func (c *Context) NextArg() (string, error) {
 	if len(c.args()) <= c.currentArgIndex {
 		return "", util.NotEnoughArgumentsError{}
