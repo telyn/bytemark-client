@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	publicKeyFile := util.FileValue{}
+	publicKeyFile := util.FileFlag{}
 	commands = append(commands, cli.Command{
 		Name: "add",
 		Subcommands: []cli.Command{{

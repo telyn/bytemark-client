@@ -10,32 +10,93 @@ import (
 )
 
 func init() {
+	discs := util.DiscSpecFlag{}
+	authorizedKeysFile := util.FileFlag{}
+	memory := util.SizeSpecFlag(1)
+	ips := util.IPFlag{}
+
 	createServer := cli.Command{
 		Name:      "server",
 		Usage:     "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
-		UsageText: `Create a server with bytemark.`,
-		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
-flags available
-    --account <name>
-    --cores <num> (default 1)
-    --cdrom <url>
-    --disc <disc spec> - defaults to a single 25GiB sata-grade discs
-    --firstboot-script-file <file name> - a script that will be run on first boot
-    --force - disables the confirmation prompt
-    --group <name>
-    --hwprofile <profile>
-    --hwprofile-locked
-    --image <image name> - specify what to image the server with. Default is 'symbiosis'
-    --ip <ip address> (v4 or v6) - up to one of each type may be specified
-    --memory <size> (default 1, units are GiB)
-    --no-image - specifies that the created server should not be imaged.
-    --no-discs - specifies that the created server should not have any discs.
-    --public-keys <keys> (newline seperated)
-    --public-keys-file <file> (will be read & appended to --public-keys)
-    --root-password <password> - if not set, will be randomly generated
-    --stopped - if set, machine won't boot
-    --zone <name> (default manchester)
+		UsageText: `Create a new server with bytemark.`,
+		Flags: []cli.Flag{
+			cli.IntFlag{
+				Name:  "cores",
+				Value: 1,
+				Usage: "Number of CPU cores",
+			},
+			cli.StringFlag{
+				Name:  "cdrom",
+				Usage: "URL pointing to an ISO which will be attached to the cloud server as a CD",
+			},
+			cli.GenericFlag{
+				Name:  "disc",
+				Usage: "One of more disc specifications. Defaults to a single 25GiB sata-grade disc",
+				Value: &discs,
+			},
+			cli.GenericFlag{
+				Name:  "firstboot-script-file",
+				Usage: "Path to a script which will be run the first time the server boots after imaging",
+			},
+			cli.BoolFlag{
+				Name:  "force",
+				Usage: "Disables the confirmation prompt",
+			},
+			cli.StringFlag{
+				Name:  "hwprofile",
+				Usage: "The hardware profile to use. Defaults to the current modern profile. See `bytemark profiles` for a list of hardware profiles available.",
+			},
+			cli.BoolFlag{
+				Name:  "hwprofile-locked",
+				Usage: "If set, the hardware profile will be 'locked', meaning that when Bytemark updates the hardware profiles your VM will keep its current one.",
+			},
+			cli.StringFlag{
+				Name:  "image",
+				Usage: "Which operating system image to use. See `bytemark images` for a list of images available.",
+			},
+			cli.GenericFlag{
+				Name:  "ip",
+				Value: &ips,
+				Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
+			},
+			cli.GenericFlag{
+				Name:  "memory",
+				Value: &memory,
+				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units. Defaults to 1GiB.",
+			},
+			cli.BoolFlag{
+				Name:  "no-image",
+				Usage: "Specifies that the server should not be imaged.",
+			},
+			cli.BoolFlag{
+				Name:  "no-discs",
+				Usage: "Specifies that the server should not have discs.",
+			},
+			cli.GenericFlag{
+				Name:  "authorized-keys-file",
+				Value: &authorizedKeysFile,
+				Usage: "Specifies SSH authorized keys for the root user. Only affects linux images.",
+			},
+			cli.StringFlag{
+				Name:  "authorized-keys",
+				Usage: "Specifies SSH authorized keys for the root user. Only affects linux images.",
+			},
+			cli.StringFlag{
+				Name:  "root-password",
+				Usage: "Specifies the password for the root/Administrator user.",
+			},
+			cli.BoolFlag{
+				Name:  "stopped",
+				Usage: "If set, the server will not be started, even to image it.",
+			},
+			cli.StringFlag{
+				Name:  "zone",
+				Usage: "Which zone the server will be created in. See `bytemark zones` for the choices.",
+			},
+		},
 
+		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
+		
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
@@ -46,9 +107,10 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 	}
 
 	createDiscs := cli.Command{
-		Name:    "discs",
-		Aliases: []string{"disc", "disk", "disks"},
-		Usage:   "bytemark create discs [--disc <disc spec>]... <cloud server>",
+		Name:      "discs",
+		Aliases:   []string{"disc", "disk", "disks"},
+		Usage:     "create virtual discs attached to one of your cloud servers",
+		UsageText: "bytemark create discs [--disc <disc spec>]... <cloud server>",
 		Description: `A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.

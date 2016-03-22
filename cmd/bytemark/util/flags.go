@@ -78,3 +78,18 @@ func (discFlag *DiscSpecFlag) String() string {
 	}
 	return strings.Join(discs, ",")
 }
+
+type SizeSpecFlag int
+
+func (ssf *SizeSpecFlag) Set(spec string) error {
+	sz, err := ParseSize(spec)
+	if err != nil {
+		return err
+	}
+	*ssf = SizeSpecFlag(sz)
+	return nil
+}
+
+func (ssf *SizeSpecFlag) String() string {
+	return fmt.Sprintf("%d", ssf)
+}

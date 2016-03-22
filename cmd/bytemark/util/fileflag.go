@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 )
 
-//FileValue implements the flag.Value (aka codegangsta/cli.Generic) interface
+//FileFlag implements the flag.Value (aka codegangsta/cli.Generic) interface
 // to provide a flag value type that reads its effective value from the file named as its input.
-type FileValue struct {
+type FileFlag struct {
 	FileName string
 	Value    string
 }
@@ -21,13 +21,13 @@ func getPath(name string) string {
 	return name
 }
 
-func (f *FileValue) Set(name string) error {
+func (f *FileFlag) Set(name string) error {
 	f.FileName = getPath(name)
 	res, err := ioutil.ReadFile(f.FileName)
 	f.Value = string(res)
 	return err
 }
 
-func (f *FileValue) String() string {
+func (f *FileFlag) String() string {
 	return f.Value
 }
