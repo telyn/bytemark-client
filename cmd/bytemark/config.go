@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -26,17 +25,56 @@ Available variables:
 				Name:      "set",
 				UsageText: "bytemark config set <variable> <value>",
 				Usage:     "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
-				Action:    config_set, // defined below - it's just a bit long
-			},
-			{
+				Action: With(func(ctx *Context) error {
+					varname, err := ctx.NextArg()
+					if err != nil {
+						return err
+					}
+					varname = strings.ToLower(varname)
+
+					oldVar, err := global.Config.GetV(varname)
+					if err != nil {
+						return err
+					}
+
+					// TODO(telyn): consider validating input for the set command
+					value, err := ctx.NextArg()
+					if err != nil {
+						return err
+					}
+
+					err = global.Config.SetPersistent(varname, value, "CMD set")
+					if err != nil {
+						return err
+						// TODO(telyn): wrap the error in an error of my own to expose this bhvr
+						/*
+							if e, ok := err.(*util.ConfigReadError); ok {
+								log.Errorf("Couldn't set %s - %v\r\n", e.Name, e.Err)
+							} else {
+								log.Errorf("Couldn't set %s - %v\r\n", variable, err)
+							}
+						*/
+					}
+
+					if oldVar.Source == "config" {
+						log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", varname, oldVar.Value, global.Config.GetIgnoreErr(varname))
+					} else {
+						log.Logf("%s has been set. \r\nNew value: %s\r\n", varname, global.Config.GetIgnoreErr(varname))
+					}
+					return nil
+				}),
+			}, {
 				Name:      "unset",
 				UsageText: "bytemark config unset <variable>",
 				Usage:     "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
-				Action: func(ctx *cli.Context) {
-					variable := strings.ToLower(ctx.Args()[0])
-					err := global.Config.Unset(variable)
-					global.Error = err
-				},
+				Action: With(func(ctx *Context) error {
+					varname, err := ctx.NextArg()
+					if err != nil {
+						return err
+					}
+					varname = strings.ToLower(varname)
+					return global.Config.Unset(varname)
+				}),
 			},
 		},
 		Action: func(ctx *cli.Context) {
@@ -50,39 +88,4 @@ Available variables:
 			}
 		},
 	})
-}
-
-func config_set(ctx *cli.Context) {
-	variable := strings.ToLower(ctx.Args().First())
-
-	oldVar, err := global.Config.GetV(variable)
-	if err != nil {
-		global.Error = err
-	}
-
-	if len(ctx.Args()) < 2 {
-		global.Error = util.PEBKACError{}
-		return
-	}
-
-	// TODO(telyn): consider validating input for the set command
-	err = global.Config.SetPersistent(variable, ctx.Args()[1], "CMD set")
-	if err != nil {
-		global.Error = err
-		return
-		// TODO(telyn): wrap the error in an error of my own to expose this bhvr
-		/*
-			if e, ok := err.(*util.ConfigReadError); ok {
-				log.Errorf("Couldn't set %s - %v\r\n", e.Name, e.Err)
-			} else {
-				log.Errorf("Couldn't set %s - %v\r\n", variable, err)
-			}
-		*/
-	}
-
-	if oldVar.Source == "config" {
-		log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable, oldVar.Value, global.Config.GetIgnoreErr(variable))
-	} else {
-		log.Logf("%s has been set. \r\nNew value: %s\r\n", variable, global.Config.GetIgnoreErr(variable))
-	}
 }

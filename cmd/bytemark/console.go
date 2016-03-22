@@ -19,76 +19,48 @@ func init() {
 		UsageText: `Out-of-band access to a server's serial or graphical (VNC) console.
 Under systems with no GUI, sometimes errors will output to the graphical console and not the serial console.
 Defaults to connecting to the serial console for the given server.`,
-		/*		Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "serial",
-					Usage: "Connect to the serial console. Cannot be set at same time as  --vnc or --panel. You must have an ssh client on your computer.",
-				},
-				cli.BoolFlag{
-					Name:  "vnc",
-					Usage: "Connect to the graphical console. Cannot be set at the same time as --serial or --panel. You must have a openssh client and a VNC client set up on your computer.",
-				},
-				cli.BoolFlag{
-				    Name: "panel",
-				    Usage: "Connect to the graphical console via the Bytemark panel. Cannot be set at the same time as --serial or --vnc. You must have a graphical browser installed on your computer."
-				},
-				cli.BoolFlag{
-				    Name: "no-connect",
-				    Usage: "Output connection instructions, rather than directly connecting.",
-				},
-			},*/
-		Action: func(ctx *cli.Context) {
-			flags := util.MakeCommonFlagSet()
-			panel := flags.Bool("panel", false, "")
-			serial := flags.Bool("serial", false, "") // because we default to serial, we don't care if it's set
-			no_connect := flags.Bool("no-connect", false, "")
-			flags.Parse(ctx.Args())
-			args := global.Config.ImportFlags(flags)
-
-			if *serial && *panel {
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "serial",
+				Usage: "Connect to the serial console. Cannot be set at same time as  --vnc or --panel. You must have an ssh client on your computer.",
+			},
+			cli.BoolFlag{
+				Name:  "vnc",
+				Usage: "Connect to the graphical console. Cannot be set at the same time as --serial or --panel. You must have a openssh client and a VNC client set up on your computer.",
+			},
+			cli.BoolFlag{
+				Name:  "panel",
+				Usage: "Connect to the graphical console via the Bytemark panel. Cannot be set at the same time as --serial or --vnc. You must have a graphical browser installed on your computer.",
+			},
+			cli.BoolFlag{
+				Name:  "no-connect",
+				Usage: "Output connection instructions, rather than directly connecting.",
+			},
+		},
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(ctx *Context) error {
+			if ctx.Context.Bool("serial") && ctx.Context.Bool("panel") {
 				log.Logf("You must only specify one of --serial and --panel!")
-				global.Error = util.PEBKACError{}
-				return
+				return util.PEBKACError{}
 			}
 
-			nameStr, ok := util.ShiftArgument(&args, "server")
-			if !ok {
-				global.Error = util.PEBKACError{}
-				return
-			}
-			name, err := global.Client.ParseVirtualMachineName(nameStr, global.Config.GetVirtualMachine())
+			vm, err := global.Client.GetVirtualMachine(ctx.VirtualMachineName)
 			if err != nil {
-				log.Logf("server name cannot be blank\r\n")
-				global.Error = util.PEBKACError{}
-				return
+				return err
 			}
-			err = EnsureAuth()
-			if err != nil {
-				global.Error = err
-				return
-			}
-
-			vm, err := global.Client.GetVirtualMachine(name)
-			if err != nil {
-				global.Error = err
-				return
-			}
-			if *no_connect {
+			if ctx.Context.Bool("no_connect") {
 				console_serial_instructions(vm)
 				log.Log()
 				console_vnc_instructions(vm)
-				return
+				return nil
 			} else {
-				if *panel {
-					global.Error = console_panel(vm)
-					return
+				if ctx.Context.Bool("panel") {
+					return console_panel(vm)
 				} else {
-					global.Error = console_serial(vm)
-					return
+					return console_serial(vm)
 				}
 			}
 
-		},
+		}),
 	})
 	// TODO(telyn): decide whether to keep serial and panel commands
 	/*commands = append(commands, cli.Command{
