@@ -8,11 +8,6 @@ import (
 )
 
 func init() {
-	discs := util.DiscSpecFlag{}
-	authorizedKeysFile := util.FileFlag{}
-	memory := util.SizeSpecFlag(1)
-	ips := util.IPFlag{}
-
 	createServer := cli.Command{
 		Name:      "server",
 		Usage:     `Create a new server with bytemark.`,
@@ -30,7 +25,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "disc",
 				Usage: "One of more disc specifications. Defaults to a single 25GiB sata-grade disc",
-				Value: &discs,
+				Value: new(util.DiscSpecFlag),
 			},
 			cli.GenericFlag{
 				Name:  "firstboot-script-file",
@@ -54,12 +49,12 @@ func init() {
 			},
 			cli.GenericFlag{
 				Name:  "ip",
-				Value: &ips,
+				Value: new(util.IPFlag),
 				Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
 			},
 			cli.GenericFlag{
 				Name:  "memory",
-				Value: &memory,
+				Value: new(util.SizeSpecFlag),
 				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units. Defaults to 1GiB.",
 			},
 			cli.BoolFlag{
@@ -72,7 +67,7 @@ func init() {
 			},
 			cli.GenericFlag{
 				Name:  "authorized-keys-file",
-				Value: &authorizedKeysFile,
+				Value: new(util.FileFlag),
 				Usage: "Specifies SSH authorized keys for the root user. Only affects linux images.",
 			},
 			cli.StringFlag{

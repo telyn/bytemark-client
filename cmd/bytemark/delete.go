@@ -18,8 +18,6 @@ If the --force flag is given, you will not be prompted to confirm deletpaion.
 The undelete server command may be used to restore a deleted (but not purged) server to its state prior to deletion.
 `,
 		Subcommands: []cli.Command{{
-			Name: "account",
-		}, {
 			Name:    "disc",
 			Aliases: []string{"disk"},
 			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
