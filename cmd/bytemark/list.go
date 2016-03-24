@@ -52,7 +52,7 @@ func init() {
 			},
 		}, {
 			Name: "discs",
-			Action: With(VirtualMachineProvider, func(c *Context) (err error) {
+			Action: With(VirtualMachineProvider, AuthProvider, func(c *Context) (err error) {
 				for _, disc := range c.VirtualMachine.Discs {
 					log.Outputf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
 				}
@@ -60,7 +60,7 @@ func init() {
 			}),
 		}, {
 			Name: "groups",
-			Action: With(AccountProvider, func(c *Context) (err error) {
+			Action: With(AccountProvider, AuthProvider, func(c *Context) (err error) {
 				for _, group := range c.Account.Groups {
 					log.Output(group.Name)
 				}

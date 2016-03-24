@@ -5,8 +5,6 @@ import (
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
-	"strconv"
-	"strings"
 )
 
 func init() {
@@ -17,8 +15,8 @@ func init() {
 
 	createServer := cli.Command{
 		Name:      "server",
-		Usage:     "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
-		UsageText: `Create a new server with bytemark.`,
+		Usage:     `Create a new server with bytemark.`,
+		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
 		Flags: []cli.Flag{
 			cli.IntFlag{
 				Name:  "cores",
@@ -146,10 +144,8 @@ Multiple --disc flags can be used to create multiple discs`,
 }
 
 func fn_createDisc(c *Context) (err error) {
-	flags := util.MakeCommonFlagSet()
-	var discs util.DiscSpecFlag
-	flags.Var(&discs, "disc", "")
-	global.Config.ImportFlags(flags)
+	//flags.Var(&discs, "disc", "")
+	discs := c.Discs("disc")
 
 	for i := range discs {
 		d, err := discs[i].Validate()
@@ -173,9 +169,6 @@ func fn_createDisc(c *Context) (err error) {
 }
 
 func fn_createGroup(c *Context) (err error) {
-	flags := util.MakeCommonFlagSet()
-	global.Config.ImportFlags(flags)
-
 	err = global.Client.CreateGroup(c.GroupName)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", c.GroupName.Group, c.GroupName.Account)
@@ -186,69 +179,14 @@ func fn_createGroup(c *Context) (err error) {
 }
 
 func fn_createServer(c *Context) (err error) {
-	flags := util.MakeCommonFlagSet()
-	addImageInstallFlags(flags)
-	cores := flags.Int("cores", 1, "")
-	cdrom := flags.String("cdrom", "", "")
-	var discs util.DiscSpecFlag
-	flags.Var(&discs, "disc", "")
-	hwprofile := flags.String("hwprofile", "", "")
-	hwprofilelock := flags.Bool("hwprofile-locked", false, "")
-	var ips util.IPFlag
-	flags.Var(&ips, "ip", "")
-	memorySpec := flags.String("memory", "1", "")
-	noDiscs := flags.Bool("no-discs", false, "")
-	noImage := flags.Bool("no-image", false, "")
-	stopped := flags.Bool("stopped", false, "")
-	zone := flags.String("zone", "", "")
-	args := global.Config.ImportFlags(flags)
-
-	for i, arg := range args {
-		switch i {
-		// the first arg is the vm name which we already have
-		case 0:
-			continue
-		case 1:
-			cores64, err := strconv.ParseInt(arg, 10, 32)
-			if err != nil {
-				log.Error("Cores argument given was not an int.")
-				err = util.PEBKACError{}
-				return err
-			} else {
-				*cores = int(cores64)
-			}
-		case 2:
-			*memorySpec = arg
-		default:
-			if len(discs) != 0 {
-				log.Error("--disc flag used along with the discs spec argument - please use only one")
-				err = util.PEBKACError{}
-				return
-			}
-			for i, spec := range strings.Split(arg, ",") {
-				disc, err := util.ParseDiscSpec(spec)
-				if err != nil {
-					log.Errorf("Disc %d has a malformed spec - '%s' is invalid", i, spec)
-					//cmds.HelpForTopic('specs')
-					err = util.PEBKACError{}
-					return err
-				}
-				discs = append(discs, *disc)
-			}
-
-		}
+	noImage := c.Bool("no-image")
+	if c.Bool("no-discs") {
+		noImage = true
 	}
 
-	memory, err := util.ParseSize(*memorySpec)
-	if err != nil {
-		return
-	}
+	discs := c.Discs("disc")
 
-	if *noDiscs {
-		*noImage = true
-	}
-
-	if len(discs) == 0 && !*noDiscs {
+	if len(discs) == 0 && !c.Context.Bool("no-discs") {
 		discs = append(discs, lib.Disc{Size: 25600})
 	}
 
@@ -259,6 +197,8 @@ func fn_createServer(c *Context) (err error) {
 		}
 		discs[i] = *d
 	}
+
+	ips := c.IPs("ip")
 
 	if len(ips) > 2 {
 		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
@@ -290,28 +230,31 @@ func fn_createServer(c *Context) (err error) {
 		}
 	}
 
-	imageInstall, _, err := prepareImageInstall(flags)
+	imageInstall, _, err := prepareImageInstall(c)
 	if err != nil {
 		return
 	}
 
-	if *noImage {
+	if noImage {
 		imageInstall = nil
 	}
 
+	stopped := c.Bool("stopped")
+	cdrom := c.String("cdrom")
+
 	// if stopped isn't set and either cdrom or image are set, start the server
-	autoreboot := !*stopped && ((imageInstall != nil) || (*cdrom != ""))
+	autoreboot := !stopped && ((imageInstall != nil) || (cdrom != ""))
 
 	spec := lib.VirtualMachineSpec{
 		VirtualMachine: &lib.VirtualMachine{
 			Name:                  c.VirtualMachineName.VirtualMachine,
 			Autoreboot:            autoreboot,
-			Cores:                 *cores,
-			Memory:                memory,
-			ZoneName:              *zone,
-			CdromURL:              *cdrom,
-			HardwareProfile:       *hwprofile,
-			HardwareProfileLocked: *hwprofilelock,
+			Cores:                 c.Int("cores"),
+			Memory:                c.Size("memory"),
+			ZoneName:              c.String("zone"),
+			CdromURL:              c.String("cdrom"),
+			HardwareProfile:       c.String("hwprofile"),
+			HardwareProfileLocked: c.Bool("hwprofilelock"),
 		},
 		Discs:   discs,
 		IPs:     ipspec,

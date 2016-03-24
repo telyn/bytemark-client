@@ -1,44 +1,8 @@
 package main
 
 import (
-	"bytemark.co.uk/client/cmd/bytemark/util"
-	"bytemark.co.uk/client/lib"
 	"github.com/codegangsta/cli"
 )
-
-type Context struct {
-	Context            *cli.Context
-	AccountName        *string
-	Account            *lib.Account
-	Authed             bool
-	Definitions        *lib.Definitions
-	DiscLabel          *string
-	GroupName          *lib.GroupName
-	Group              *lib.Group
-	User               *lib.User
-	UserName           *string
-	VirtualMachine     *lib.VirtualMachine
-	VirtualMachineName *lib.VirtualMachineName
-
-	currentArgIndex int
-}
-
-func (c *Context) args() cli.Args {
-	return c.Context.Args()
-}
-
-func (c *Context) Args() []string {
-	return c.args()[c.currentArgIndex:]
-}
-
-func (c *Context) NextArg() (string, error) {
-	if len(c.args()) <= c.currentArgIndex {
-		return "", util.NotEnoughArgumentsError{}
-	}
-	arg := c.args()[c.currentArgIndex]
-	c.currentArgIndex++
-	return arg, nil
-}
 
 type ProviderFunc func(*Context) error
 

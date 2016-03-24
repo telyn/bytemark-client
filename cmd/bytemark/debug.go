@@ -19,70 +19,68 @@ func init() {
 		Usage:     "Test out the Bytemark API",
 		UsageText: "bytemark debug [--junk-token] [--auth] [--use-billing] GET|POST|PUT|DELETE <path>",
 		Description: `GET sends an HTTP GET request with an optional valid authorization header to the given path on the API endpoint and pretty-prints the received json.
-The rest do similar, but PUT and POST
-The --junk-token flag sets the token to empty - useful if you want to ensure that credential-auth is working, or you want to do something as another user
-The --auth flag tells the client to gain valid auth and send the auth header on that request.
-The --use-billing flag tells the client to send the request to the billing endpoint instead of the brain.`,
-		Action: func(c *cli.Context) {
-			flags := util.MakeCommonFlagSet()
-			junkToken := flags.Bool("junk-token", false, "")
-			shouldAuth := flags.Bool("auth", false, "")
-			billing := flags.Bool("use-billing", false, "")
-			flags.Parse(c.Args())
-			args := global.Config.ImportFlags(flags)
+The rest do similar, but PUT and POST both wait for input from stdin after authenticating. To finish entering, put an EOF (usually ctrl-d)`,
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "junk-token",
+				Usage: "Sets the auth token to empty - useful if you want to ensure that authenticating with credentials works, or you want to change user",
+			},
+			cli.BoolFlag{
+				Name:  "auth",
+				Usage: "Authenticate this request - without this will try to perform the call without authentication",
+			},
+			cli.BoolFlag{
+				Name:  "use-billing",
+				Usage: "Send the request to the billing endpoint instead of the brain.",
+			},
+		},
+		Action: With(func(c *Context) error {
+			shouldAuth := c.Bool("auth")
 
 			endpoint := lib.EP_BRAIN
-			if *billing {
+			if c.Bool("use-billing") {
 				endpoint = lib.EP_BILLING
 			}
 
-			if *junkToken {
+			if c.Bool("junk-token") {
 				global.Config.Set("token", "", "FLAG junk-token")
 			}
 
-			if len(args) < 1 {
-				global.Error = &util.PEBKACError{}
-				return
+			method, err := c.NextArg()
+			if err != nil {
+				return err
 			}
 
-			switch args[0] {
+			switch method {
 			case "GET", "PUT", "POST", "DELETE":
-				method := args[0]
-				if len(args) < 2 {
-					global.Error = &util.PEBKACError{}
-					return
-				}
-				url := args[1]
+				url, err := c.NextArg()
+
 				if !strings.HasPrefix(url, "/") {
 					url = "/" + url
 				}
-				if *shouldAuth {
+				if c.Bool("auth") {
 					err := EnsureAuth()
 					if err != nil {
-						global.Error = err
-						return
+						return err
 					}
 				}
 
-				err := error(nil)
 				reader := io.Reader(nil)
 				if method == "PUT" || method == "POST" {
 					reader = bufio.NewReader(os.Stdin)
 					// read until an eof
 				}
 				req, err := global.Client.BuildRequest(method, endpoint, url)
-				if !*shouldAuth {
+				if !shouldAuth {
 					req, err = global.Client.BuildRequestNoAuth(method, endpoint, url)
 				}
 				if err != nil {
-					global.Error = err
-					return
+					return err
 				}
 
 				statusCode, body, err := req.Run(reader, nil)
 				if err != nil {
-					global.Error = err
-					return
+					return err
 				}
 				reqURL := req.GetURL()
 				log.Logf("%s %s: %d\r\n", method, reqURL.String(), statusCode)
@@ -91,9 +89,10 @@ The --use-billing flag tells the client to send the request to the billing endpo
 				json.Indent(buf, body, "", "    ")
 				log.Log(buf.String())
 			default:
-				return
+				return nil
 			}
-		},
+			return new(util.PEBKACError)
+		}),
 	})
 
 }

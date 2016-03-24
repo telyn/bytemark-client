@@ -5,9 +5,11 @@ import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
+	"flag"
 	"fmt"
 	"github.com/bgentry/speakeasy"
 	"github.com/codegangsta/cli"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"os/signal"
@@ -37,17 +39,14 @@ func main() {
 	global.App = cli.NewApp()
 	global.App.Commands = commands
 
-	flags := util.MakeCommonFlagSet()
+	// TODO(telyn): ok I haven't figured out a better way than this to integrate Config and stuff, but this way works for now.
+	flags := flag.FlagSet{}
+	configDir := flag.String("config-dir", "", "")
+	flags.SetOutput(ioutil.Discard)
 
 	flags.Parse(os.Args[1:])
 
-	configDir := ""
-	value := flags.Lookup("config-dir").Value
-	if value != nil {
-		configDir = value.String()
-	}
-
-	config, err := util.NewConfig(configDir, flags)
+	config, err := util.NewConfig(*configDir, &flags)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}

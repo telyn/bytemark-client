@@ -37,19 +37,20 @@ The undelete server command may be used to restore a deleted (but not purged) se
 			}),
 		}, {
 			Name: "group",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "recursive",
+					Usage: "If set, all servers in the group will be irrevocably deleted.",
+				},
+			},
 			Action: With(GroupProvider, func(c *Context) (err error) {
-				flags := util.MakeCommonFlagSet()
-
-				recursive := flags.Bool("recursive", false, "")
-
-				global.Config.ImportFlags(flags)
-
-				if len(c.Group.VirtualMachines) > 0 && *recursive {
+				recursive := c.Bool("recursive")
+				if len(c.Group.VirtualMachines) > 0 && recursive {
 					err = recursiveDeleteGroup(c.GroupName, c.Group)
 					if err != nil {
 						return
 					}
-				} else if !*recursive {
+				} else if !recursive {
 					err = &util.WontDeleteNonEmptyGroupError{Group: c.GroupName}
 					return
 				}
@@ -87,14 +88,17 @@ The undelete server command may be used to restore a deleted (but not purged) se
 			},
 		}, {
 			Name: "server",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "purge",
+					Usage: "If set, the server will be irrevocably deleted.",
+				},
+			},
 			Action: With(VirtualMachineProvider, func(c *Context) (err error) {
-				flags := util.MakeCommonFlagSet()
-				purge := flags.Bool("purge", false, "")
-
+				purge := c.Bool("purge")
 				vm := c.VirtualMachine
-				global.Config.ImportFlags(flags)
 
-				if vm.Deleted && !*purge {
+				if vm.Deleted && !purge {
 					log.Errorf("Server %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge\r\n", vm.Hostname)
 					// we don't return an error because we want a 0 exit code - the deletion request has happened, just not now.
 					return
@@ -102,7 +106,7 @@ The undelete server command may be used to restore a deleted (but not purged) se
 
 				if !global.Config.Force() {
 					fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
-					if *purge {
+					if purge {
 						fstr = fmt.Sprintf("Are you certain you wish to permanently delete %s? You will not be able to un-delete it.", vm.Hostname)
 
 					}
@@ -113,11 +117,11 @@ The undelete server command may be used to restore a deleted (but not purged) se
 					}
 				}
 
-				err = global.Client.DeleteVirtualMachine(c.VirtualMachineName, *purge)
+				err = global.Client.DeleteVirtualMachine(c.VirtualMachineName, purge)
 				if err != nil {
 					return
 				}
-				if *purge {
+				if purge {
 					log.Logf("Server %s purged successfully.\r\n", vm.Hostname)
 				} else {
 					log.Logf("Server %s deleted successfully.\r\n", vm.Hostname)
