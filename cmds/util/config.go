@@ -430,8 +430,7 @@ func (config *Config) Unset(name string) error {
 }
 
 func (config *Config) Force() bool {
-	force, _ := config.GetBool("force")
-	return force
+	return false
 }
 func (config *Config) Silent() bool {
 	silent, _ := config.GetBool("silent")
