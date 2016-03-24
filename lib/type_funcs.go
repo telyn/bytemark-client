@@ -32,6 +32,13 @@ func (vm VirtualMachineName) String() string {
 	return fmt.Sprintf("%s.%s.%s", vm.VirtualMachine, vm.Group, vm.Account)
 }
 
+func (vm VirtualMachineName) GroupName() *GroupName {
+	return &GroupName{
+		Group:   vm.Group,
+		Account: vm.Account,
+	}
+}
+
 func (g GroupName) String() string {
 	if g.Group == "" {
 		g.Group = "default"
@@ -73,7 +80,8 @@ func (c *bytemarkClient) validateAccountName(account *string) error {
 }
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...VirtualMachineName) (vm VirtualMachineName, err error) {
+func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*VirtualMachineName) (vm *VirtualMachineName, err error) {
+	vm = new(VirtualMachineName)
 	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	if len(defaults) == 0 {
@@ -117,7 +125,8 @@ Loop:
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
-func (c *bytemarkClient) ParseGroupName(name string, defaults ...GroupName) (group GroupName) {
+func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (group *GroupName) {
+	group = new(GroupName)
 	// 1 or 2 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	if len(defaults) == 0 {
