@@ -21,7 +21,6 @@ func MakeCommonFlagSet() *flag.FlagSet {
 
 	// because I'm creating my own help functions I'm not going to supply usage info. Neener neener.
 	flags.Bool("help", false, "")
-	flags.Bool("silent", false, "")
 	flags.Bool("yubikey", false, "")
 	flags.Int("debug-level", 0, "")
 	flags.String("user", "", "")

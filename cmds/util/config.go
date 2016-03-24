@@ -433,8 +433,7 @@ func (config *Config) Force() bool {
 	return false
 }
 func (config *Config) Silent() bool {
-	silent, _ := config.GetBool("silent")
-	return silent
+	return false
 }
 
 func (config *Config) PanelURL() string {
