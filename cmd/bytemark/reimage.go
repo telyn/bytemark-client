@@ -45,7 +45,7 @@ The root password will be the only thing output on stdout - good for scripts!
 			},
 		},
 		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
-			imageInstall, defaulted, err := prepareImageInstall(c) // TODO(telyn): this is going to take a bit of a rewrite.
+			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {
 				return err
 			}
