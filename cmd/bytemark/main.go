@@ -25,6 +25,12 @@ var global = struct {
 	Error  error
 }{}
 
+func baseAppSetup() {
+	global.App = cli.NewApp()
+	global.App.Commands = commands
+
+}
+
 func main() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt)
@@ -36,8 +42,7 @@ func main() {
 
 	}()
 
-	global.App = cli.NewApp()
-	global.App.Commands = commands
+	baseAppSetup()
 
 	// TODO(telyn): ok I haven't figured out a better way than this to integrate Config and stuff, but this way works for now.
 	flags := flag.FlagSet{}
@@ -46,7 +51,7 @@ func main() {
 
 	flags.Parse(os.Args[1:])
 
-	config, err := util.NewConfig(*configDir, &flags)
+	config, err := util.NewConfig(*configDir)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}

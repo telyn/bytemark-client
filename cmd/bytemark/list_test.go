@@ -2,26 +2,24 @@ package main
 
 import (
 	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/mocks"
+	"github.com/cheekybits/is"
+	"strings"
 	"testing"
-	//"github.com/cheekybits/is"
 )
 
 func TestListAccounts(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-group.test-account"})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("GetAccounts").Return([]*lib.Account{&lib.Account{BrainID: 1, Name: "dr-evil"}}).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.ListAccounts([]string{})
+	global.App.Run(strings.Split("bytemark list accounts", " "))
+	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -29,13 +27,11 @@ func TestListAccounts(t *testing.T) {
 }
 
 func TestListDiscs(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"spooky-vm"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
 	name := lib.VirtualMachineName{
@@ -56,23 +52,20 @@ func TestListDiscs(t *testing.T) {
 	}
 	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.ListDiscs([]string{"spooky-vm"})
-
+	global.App.Run(strings.Split("bytemark list discs spooky-vm", " "))
+	is.Nil(global.Error)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
 }
 
 func TestListGroups(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
-	config.When("ImportFlags").Return([]string{"spooky-steve"})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
@@ -83,8 +76,8 @@ func TestListGroups(t *testing.T) {
 		},
 	}).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.ListGroups([]string{"spooky-steve"})
+	global.App.Run(strings.Split("bytemark list groups spooky-steve", " "))
+	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -92,13 +85,11 @@ func TestListGroups(t *testing.T) {
 }
 
 func TestListServers(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"halloween-vms.spooky-steve"})
 	config.When("GetGroup").Return(lib.GroupName{})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -112,8 +103,8 @@ func TestListServers(t *testing.T) {
 		},
 	}).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.ListServers([]string{"halloween-vms.spooky-steve"})
+	global.App.Run(strings.Split("bytemark list servers halloween-vms.spooky-steve", " "))
+	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

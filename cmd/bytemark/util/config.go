@@ -3,7 +3,6 @@ package util
 import (
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -67,11 +66,8 @@ type ConfigManager interface {
 	Unset(string) error
 	GetDebugLevel() int
 	Force() bool
-	Silent() bool
 	EndpointName() string
 	PanelURL() string
-
-	ImportFlags(*flag.FlagSet) []string
 }
 
 // Params currently used:
@@ -93,7 +89,6 @@ type ConfigManager interface {
 //
 type Config struct {
 	debugLevel  int
-	mainFlags   *flag.FlagSet
 	Dir         string
 	Memo        map[string]ConfigVar
 	Definitions map[string]string
@@ -140,7 +135,7 @@ func (e *ConfigWriteError) Error() string {
 // TODO(telyn): once codegangsta/cli has the idea of config providers (see codegansta/cli/issues/
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
-func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
+func NewConfig(configDir string) (config *Config, err error) {
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
 	home := os.Getenv("HOME")
@@ -150,7 +145,6 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 	}
 
 	config.Dir = filepath.Join(home, "/.bytemark")
-	config.mainFlags = flags
 	if os.Getenv("BM_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BM_CONFIG_DIR")
 	}
@@ -189,7 +183,6 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		log.Errorf("Couldn't open %s for writing\r\n", config.GetPath("debug.log"))
 	}
 
-	config.ImportFlags(flags)
 	strDL, err := config.Get("debug-level")
 	if err != nil {
 		log.Error(err)
@@ -201,44 +194,6 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		}
 	}
 	return config, nil
-}
-
-func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
-	if flags != nil {
-		if flags.Parsed() {
-			// dump all the flags into the memo
-			// should be reet...reet?
-			flags.Visit(func(f *flag.Flag) {
-				config.Memo[f.Name] = ConfigVar{
-					f.Name,
-					f.Value.String(),
-					"FLAG " + f.Name,
-				}
-			})
-
-			if flags != config.mainFlags {
-
-				args := flags.Args()
-				for _, arg := range args {
-					if strings.HasPrefix(arg, "-") {
-						log.Errorf("Flag-like argument '%s' specified after your arguments\r\nBe aware that only flags placed before your arguments are parsed.\r\nSee the help for the command you're calling for invocation examples.\r\n\r\n", arg)
-						break
-					}
-				}
-			}
-
-			log.Silent = config.Silent()
-			strDL := config.GetIgnoreErr("debug-level")
-			debugLevel, err := strconv.ParseInt(strDL, 10, 0)
-			if err == nil {
-				config.debugLevel = int(debugLevel)
-				log.DebugLevel = int(debugLevel)
-			}
-
-			return flags.Args()
-		}
-	}
-	return nil
 }
 
 // GetDebugLevel returns the current debug-level as an integer. This is used throughout the bytemark.co.uk/client library to determine verbosity of output.

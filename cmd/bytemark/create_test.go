@@ -2,22 +2,20 @@ package main
 
 import (
 	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/mocks"
+	"strings"
 	"testing"
 	//"github.com/cheekybits/is"
 )
 
 func TestCreateDiskCommand(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
+
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
-	config.When("ImportFlags").Return([]string{"test-server"})
 	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
 	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -27,8 +25,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.CreateDiscs([]string{"--disc", "archive:35", "test-server"})
+	global.App.Run(strings.Split("bytemark create disc --disc archive:35 test-server", " "))
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -38,15 +35,12 @@ func TestCreateDiskCommand(t *testing.T) {
 // TODO(telyn): TestCreateGroupCommand
 
 func TestCreateServerCommand(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-server"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
 	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server"})
@@ -97,8 +91,8 @@ func TestCreateServerCommand(t *testing.T) {
 	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.CreateServer([]string{
+	global.App.Run([]string{
+		"bytemark", "create", "server",
 		"--cdrom", "https://example.com/example.iso",
 		"--cores", "1",
 		"--disc", "25",
@@ -119,15 +113,12 @@ func TestCreateServerCommand(t *testing.T) {
 }
 
 func TestCreateServerNoImagesNoDiscs(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-server"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
 	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server"})
@@ -155,8 +146,8 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.CreateServer([]string{
+	global.App.Run([]string{
+		"bytemark", "create", "server",
 		"--cores", "1",
 		"--no-discs",
 		"--memory", "1",
@@ -168,15 +159,12 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 }
 
 func TestCreateServer(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-server", "3", "6565m", "archive:34"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
 
 	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server"})
@@ -209,8 +197,8 @@ func TestCreateServer(t *testing.T) {
 	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", vmname).Return(vm.VirtualMachine, nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.CreateServer([]string{
+	global.App.Run([]string{
+		"bytemark", "create", "server",
 		"--no-image",
 		"test-server", "3", "6565m", "archive:34",
 	})

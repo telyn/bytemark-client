@@ -1,16 +1,13 @@
 package main
 
 import (
-	"bytemark.co.uk/client/mocks"
+	"strings"
 	"testing"
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
 
-	args := []string{"ssh-rsa", "aaaaawhartevervAsde", "fake key"}
-	config.When("ImportFlags").Return(args).Times(1)
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
@@ -18,8 +15,7 @@ func TestAddKeyCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.AddKey(args)
+	global.App.Run(strings.Split("bytemark add key test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
 
 	if ok, err := config.Verify(); !ok {
 		t.Fatal(err)

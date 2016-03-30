@@ -2,14 +2,14 @@ package main
 
 import (
 	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/mocks"
+	"github.com/cheekybits/is"
+	"strings"
 	"testing"
-	//"github.com/cheekybits/is"
 )
 
 func TestLockHWProfileCommand(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -17,9 +17,7 @@ func TestLockHWProfileCommand(t *testing.T) {
 		Account:        "test-account"}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-server.test-group.test-account"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
 	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmname).Times(1)
@@ -27,8 +25,8 @@ func TestLockHWProfileCommand(t *testing.T) {
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(0)
 
-	cmds := NewCommandSet(config, c)
-	cmds.LockHWProfile([]string{"test-server.test-group.test-account"})
+	global.App.Run(strings.Split("bytemark lock hwprofile test-server.test-group.test-account", " "))
+	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -36,8 +34,8 @@ func TestLockHWProfileCommand(t *testing.T) {
 }
 
 func TestUnlockHWProfileCommand(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -45,19 +43,14 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 		Account:        "test-account"}
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-server.test-group.test-account"})
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
 	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(0)
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
-
-	cmds.UnlockHWProfile([]string{"test-server.test-group.test-account"})
+	global.App.Run(strings.Split("bytemark unlock hwprofile test-server.test-group.test-account", " "))
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
