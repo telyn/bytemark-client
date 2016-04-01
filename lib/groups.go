@@ -6,8 +6,8 @@ import (
 )
 
 // CreateGroup sends a request to the API server to create a group with the given name.
-func (c *bytemarkClient) CreateGroup(name GroupName) (err error) {
-	err = c.validateGroupName(&name)
+func (c *bytemarkClient) CreateGroup(name *GroupName) (err error) {
+	err = c.validateGroupName(name)
 	if err != nil {
 		return
 	}
@@ -29,8 +29,8 @@ func (c *bytemarkClient) CreateGroup(name GroupName) (err error) {
 }
 
 // DeleteGroup requests that a given group be deleted. Will return an error if there are VMs in the group.
-func (c *bytemarkClient) DeleteGroup(name GroupName) (err error) {
-	err = c.validateGroupName(&name)
+func (c *bytemarkClient) DeleteGroup(name *GroupName) (err error) {
+	err = c.validateGroupName(name)
 	if err != nil {
 		return
 	}
@@ -43,9 +43,9 @@ func (c *bytemarkClient) DeleteGroup(name GroupName) (err error) {
 }
 
 // GetGroup requests an overview of the group with the given name
-func (c *bytemarkClient) GetGroup(name GroupName) (group *Group, err error) {
+func (c *bytemarkClient) GetGroup(name *GroupName) (group *Group, err error) {
 	group = new(Group)
-	err = c.validateGroupName(&name)
+	err = c.validateGroupName(name)
 	if err != nil {
 		return
 	}
