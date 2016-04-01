@@ -5,6 +5,8 @@ import (
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
+	"strconv"
+	"strings"
 )
 
 func init() {
@@ -30,6 +32,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "firstboot-script-file",
 				Usage: "Path to a script which will be run the first time the server boots after imaging",
+				Value: new(util.FileFlag),
 			},
 			cli.BoolFlag{
 				Name:  "force",
@@ -100,8 +103,15 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 	}
 
 	createDiscs := cli.Command{
-		Name:      "discs",
-		Aliases:   []string{"disc", "disk", "disks"},
+		Name:    "discs",
+		Aliases: []string{"disc", "disk", "disks"},
+		Flags: []cli.Flag{
+			cli.GenericFlag{
+				Name:  "disc",
+				Usage: "A disc to add. You can specify as many discs as you like",
+				Value: new(util.DiscSpecFlag),
+			},
+		},
 		Usage:     "create virtual discs attached to one of your cloud servers",
 		UsageText: "bytemark create discs [--disc <disc spec>]... <cloud server>",
 		Description: `A disc spec looks like the following: label:grade:size
@@ -139,7 +149,6 @@ Multiple --disc flags can be used to create multiple discs`,
 }
 
 func fn_createDisc(c *Context) (err error) {
-	//flags.Var(&discs, "disc", "")
 	discs := c.Discs("disc")
 
 	for i := range discs {
@@ -150,7 +159,7 @@ func fn_createDisc(c *Context) (err error) {
 		discs[i] = *d
 	}
 
-	log.Logf("Adding discs to %s:\r\n", c.VirtualMachineName)
+	log.Logf("Adding %d discs to %s:\r\n", len(discs), c.VirtualMachineName)
 	for _, d := range discs {
 		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
 		err := global.Client.CreateDisc(c.VirtualMachineName, d)
@@ -180,6 +189,37 @@ func fn_createServer(c *Context) (err error) {
 	}
 
 	discs := c.Discs("disc")
+	cores := c.Int("cores")
+	memory := c.Size("memory")
+
+	for argNum, arg := range c.Args() {
+		switch argNum {
+		case 0: // cores
+			if tmpCores, err := strconv.Atoi(arg); err == nil {
+				cores = tmpCores
+			} else {
+				return err
+			}
+		case 1: // memory
+			if tmpMem, err := util.ParseSize(arg); err == nil {
+				memory = tmpMem
+			} else {
+				return err
+			}
+		case 2: // disc
+			discs = make([]lib.Disc, strings.Count(arg, ",")+1)
+			for discNum, discSpec := range strings.Split(arg, ",") {
+				if tmpDisc, err := util.ParseDiscSpec(discSpec); err == nil {
+					discs[discNum] = *tmpDisc
+				} else {
+					return err
+				}
+			}
+
+		case 3:
+			return new(util.PEBKACError)
+		}
+	}
 
 	if len(discs) == 0 && !c.Context.Bool("no-discs") {
 		discs = append(discs, lib.Disc{Size: 25600})
@@ -197,8 +237,7 @@ func fn_createServer(c *Context) (err error) {
 
 	if len(ips) > 2 {
 		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-		err = &util.PEBKACError{}
-		return
+		return new(util.PEBKACError)
 	}
 
 	var ipspec *lib.IPSpec
@@ -209,15 +248,13 @@ func fn_createServer(c *Context) (err error) {
 			if ip.To4() != nil {
 				if ipspec.IPv4 != "" {
 					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					err = &util.PEBKACError{}
-					return
+					return new(util.PEBKACError)
 				}
 				ipspec.IPv4 = ip.To4().String()
 			} else {
 				if ipspec.IPv6 != "" {
 					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					err = &util.PEBKACError{}
-					return
+					return new(util.PEBKACError)
 
 				}
 				ipspec.IPv6 = ip.String()
@@ -244,12 +281,12 @@ func fn_createServer(c *Context) (err error) {
 		VirtualMachine: &lib.VirtualMachine{
 			Name:                  c.VirtualMachineName.VirtualMachine,
 			Autoreboot:            autoreboot,
-			Cores:                 c.Int("cores"),
-			Memory:                c.Size("memory"),
+			Cores:                 cores,
+			Memory:                memory,
 			ZoneName:              c.String("zone"),
 			CdromURL:              c.String("cdrom"),
 			HardwareProfile:       c.String("hwprofile"),
-			HardwareProfileLocked: c.Bool("hwprofilelock"),
+			HardwareProfileLocked: c.Bool("hwprofile-locked"),
 		},
 		Discs:   discs,
 		IPs:     ipspec,
@@ -264,13 +301,12 @@ func fn_createServer(c *Context) (err error) {
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
 	if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
 		log.Error("Exiting.")
-		err = &util.UserRequestedExit{}
-		return
+		return new(util.UserRequestedExit)
 	}
 
 	_, err = global.Client.CreateVirtualMachine(groupName, spec)
 	if err != nil {
-		return
+		return err
 	}
 	vm, err := global.Client.GetVirtualMachine(c.VirtualMachineName)
 	if err != nil {

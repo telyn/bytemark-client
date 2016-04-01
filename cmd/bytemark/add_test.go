@@ -15,7 +15,7 @@ func TestAddKeyCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
 
-	global.App.Run(strings.Split("bytemark add key test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
+	global.App.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
 
 	if ok, err := config.Verify(); !ok {
 		t.Fatal(err)

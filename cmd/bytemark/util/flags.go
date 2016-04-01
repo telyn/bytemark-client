@@ -33,7 +33,9 @@ func (discsFlag *DiscSpecFlag) Set(value string) error {
 		if err != nil {
 			return err
 		}
+
 		*discsFlag = append(*discsFlag, *disc)
+
 	}
 	return nil
 }

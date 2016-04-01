@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bytemark.co.uk/client/cmd/bytemark/util"
+	"bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
+	"net"
 )
 
 type ProviderFunc func(*Context) error
@@ -10,6 +14,22 @@ func With(providers ...ProviderFunc) func(c *cli.Context) {
 	return func(cliContext *cli.Context) {
 		c := Context{Context: cliContext}
 		global.Error = foldProviders(&c, providers...)
+		cleanup(&c)
+	}
+}
+
+func cleanup(c *Context) {
+	ips := c.Context.Generic("ip")
+	if ips, ok := ips.(*util.IPFlag); ok {
+		*ips = make([]net.IP, 0)
+	}
+	disc := c.Context.Generic("disc")
+	if disc, ok := disc.(*util.DiscSpecFlag); ok {
+		*disc = make([]lib.Disc, 0)
+	}
+	size := c.Context.Generic("memory")
+	if size, ok := size.(*util.SizeSpecFlag); ok {
+		*size = 0
 	}
 }
 
@@ -133,10 +153,12 @@ func UserProvider(c *Context) (err error) {
 
 func VirtualMachineNameProvider(c *Context) (err error) {
 	if c.VirtualMachineName != nil {
+		log.Log("Early exit")
 		return
 	}
 	name, err := c.NextArg()
 	if err != nil {
+		log.Log(err)
 		return err
 	}
 

@@ -24,13 +24,13 @@ func TestResizeDisk(t *testing.T) {
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
 	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
-	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", nil).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetDisc", name, "disc-label").Return(&disc).Times(1)
+	c.When("GetDisc", &name, "disc-label").Return(&disc).Times(1)
 
-	c.When("ResizeDisc", name, "disc-label", 35*1024).Return(nil).Times(1)
+	c.When("ResizeDisc", &name, "disc-label", 35*1024).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark resize test-server disc-label 35", " "))
+	global.App.Run(strings.Split("bytemark resize disc test-server disc-label 35", " "))
 	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {

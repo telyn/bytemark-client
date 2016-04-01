@@ -14,12 +14,12 @@ func TestShowGroupCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetGroup").Return(lib.GroupName{})
-
-	c.When("ParseGroupName", "test-group.test-account", []lib.GroupName{{}}).Return(lib.GroupName{Group: "test-group", Account: "test-account"})
+	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
+	c.When("ParseGroupName", "test-group.test-account", nil).Return(&gpname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	group := getFixtureGroup()
-	c.When("GetGroup", lib.GroupName{Group: "test-group", Account: "test-account"}).Return(&group, nil).Times(1)
+	c.When("GetGroup", &gpname).Return(&group, nil).Times(1)
 
 	global.App.Run(strings.Split("bytemark show group test-group.test-account", " "))
 	is.Nil(global.Error)
@@ -36,11 +36,11 @@ func TestShowServerCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
-
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"})
+	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	vm := getFixtureVM()
-	c.When("GetVirtualMachine", lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}).Return(&vm, nil).Times(1)
+	c.When("GetVirtualMachine", &vmname).Return(&vm, nil).Times(1)
 
 	global.App.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
 	is.Nil(global.Error)
@@ -49,3 +49,5 @@ func TestShowServerCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// TODO(telyn): show account? show user?

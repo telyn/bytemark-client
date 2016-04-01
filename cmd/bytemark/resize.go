@@ -16,7 +16,7 @@ func init() {
 			Usage:       "Resize a cloud server's disc",
 			UsageText:   "bytemark resize disc <server> <disc label> <size>",
 			Description: "Resizes the given server's disc to the given size. Sizes may be specified with a + in front, in which case they are interpreted as relative. For example, '+2GB' is parsed as 'increase the disc size by 2GiB', where '2GB' is parsed as 'set the size of the disc to 2GiB'",
-			Action: With(VirtualMachineProvider, DiscLabelProvider, func(c *Context) (err error) {
+			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
 				const (
 					SET = iota
 					INCREASE

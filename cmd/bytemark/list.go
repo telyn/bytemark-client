@@ -37,19 +37,18 @@ func init() {
 		Name: "list",
 		Subcommands: []cli.Command{{
 			Name: "accounts",
-			Action: func(c *cli.Context) {
+			Action: With(AuthProvider, func(c *Context) error {
 				accounts, err := global.Client.GetAccounts()
 
 				if err != nil {
-					global.Error = err
-					return
+					return err
 				}
 
 				for _, group := range accounts {
 					log.Output(group.Name)
 				}
-
-			},
+				return nil
+			}),
 		}, {
 			Name: "discs",
 			Action: With(VirtualMachineProvider, AuthProvider, func(c *Context) (err error) {
@@ -93,9 +92,10 @@ func init() {
 			},
 		}, {
 			Name: "servers",
-			Action: func(c *cli.Context) {
+			// TODO: simplify this function
+			Action: With(AuthProvider, func(c *Context) error {
 				if len(c.Args()) >= 1 {
-					nameStr := c.Args().First()
+					nameStr, _ := c.NextArg()
 					name := global.Client.ParseGroupName(nameStr)
 
 					group, err := global.Client.GetGroup(name)
@@ -106,8 +106,7 @@ func init() {
 							if !strings.Contains(nameStr, ".") {
 								account, err := global.Client.GetAccount(nameStr)
 								if err != nil {
-									global.Error = err
-									return
+									return err
 								}
 
 								for _, g := range account.Groups {
@@ -116,22 +115,22 @@ func init() {
 
 									}
 								}
-								return
+								return nil
 							}
 
+						} else {
+							return err
 						}
-						return
 					}
 
 					for _, vm := range group.VirtualMachines {
 						log.Output(vm.Hostname)
 					}
 				} else {
-					global.Error = listDefaultAccountServers()
-					return
+					return listDefaultAccountServers()
 				}
-
-			},
+				return nil
+			}),
 		}},
 	})
 }

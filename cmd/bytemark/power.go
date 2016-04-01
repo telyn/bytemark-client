@@ -24,7 +24,7 @@ func init() {
 		Name:        "restart",
 		Usage:       "Power off a server and start it again",
 		Description: "This command will power down a server, cleanly if possible, and then start it back up again. For cloud servers this can cause the server to be started on a different head to the one it was running on, but this is not guaranteed.",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to restart %v...\r\n", c.VirtualMachineName)
 			err = global.Client.RestartVirtualMachine(c.VirtualMachineName)
 			if err != nil {
@@ -38,7 +38,7 @@ func init() {
 		Name:        "shutdown",
 		Usage:       "Cleanly shut down a server",
 		Description: "This command sends the ACPI shutdown signal to the server, causing a clean shut down. This is like pressing the power button on a computer you have physical access to.",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to shutdown %v...\r\n", c.VirtualMachineName)
 			err = global.Client.ShutdownVirtualMachine(c.VirtualMachineName, true)
 			if err != nil {
@@ -52,7 +52,7 @@ func init() {
 		Name:        "start",
 		Usage:       "Start a stopped server",
 		Description: "This command will start a server that is not currently running.",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to start %s...\r\n", c.VirtualMachineName)
 			err = global.Client.StartVirtualMachine(c.VirtualMachineName)
 			if err != nil {
@@ -66,7 +66,7 @@ func init() {
 		Name:        "stop",
 		Usage:       "Stop a server, as though pulling the power cable out.",
 		Description: "This command will instantly power down a server. Note that this may cause data loss, particularly on servers with unjournaled file systems (e.g. ext2)",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to stop %s...\r\n", c.VirtualMachineName)
 			err = global.Client.StopVirtualMachine(c.VirtualMachineName)
 			if err != nil {

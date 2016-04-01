@@ -20,10 +20,9 @@ func TestLockHWProfileCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(1)
-	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(0)
+	c.When("SetVirtualMachineHardwareProfileLock", &vmname, true).Return(nil).Times(1)
 
 	global.App.Run(strings.Split("bytemark lock hwprofile test-server.test-group.test-account", " "))
 	is.Nil(global.Error)
@@ -46,11 +45,12 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfileLock", &vmname, false).Return(nil).Times(1)
 
 	global.App.Run(strings.Split("bytemark unlock hwprofile test-server.test-group.test-account", " "))
+	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

@@ -47,8 +47,8 @@ func (c *Context) Bool(flagname string) bool {
 
 func (c *Context) Discs(flagname string) []lib.Disc {
 	disc := c.Context.Generic(flagname)
-	if disc, ok := disc.([]lib.Disc); ok {
-		return disc
+	if disc, ok := disc.(*util.DiscSpecFlag); ok {
+		return []lib.Disc(*disc)
 	}
 	return []lib.Disc{}
 }
@@ -75,8 +75,8 @@ func (c *Context) Int(flagname string) int {
 
 func (c *Context) IPs(flagname string) []net.IP {
 	ips := c.Context.Generic(flagname)
-	if ips, ok := ips.([]net.IP); ok {
-		return ips
+	if ips, ok := ips.(*util.IPFlag); ok {
+		return []net.IP(*ips)
 	}
 	return []net.IP{}
 }
@@ -87,8 +87,8 @@ func (c *Context) String(flagname string) string {
 
 func (c *Context) Size(flagname string) int {
 	size := c.Context.Generic(flagname)
-	if size, ok := size.(*int); ok {
-		return *size
+	if size, ok := size.(*util.SizeSpecFlag); ok {
+		return int(*size)
 	}
 	return 0
 }

@@ -27,7 +27,10 @@ func init() {
 				},
 			},
 			Action: With(AuthProvider, func(ctx *Context) (err error) {
-				user := global.Config.GetIgnoreErr("user")
+				user := ctx.String("user")
+				if user == "" {
+					user = global.Config.GetIgnoreErr("user")
+				}
 
 				key := strings.TrimSpace(strings.Join(ctx.Args(), " "))
 				if key == "" {

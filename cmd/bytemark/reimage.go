@@ -65,7 +65,7 @@ func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted 
 	firstbootScriptFile := c.FileContents("firstboot-script-file")
 	pubkeys := c.String("public-keys")
 	pubkeysFile := c.FileContents("public-keys-file")
-	rootPassword := c.FileContents("root-password")
+	rootPassword := c.String("root-password")
 
 	if image == "" {
 		image = "symbiosis"

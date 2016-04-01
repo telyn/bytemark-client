@@ -26,9 +26,9 @@ func TestReimage(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmname).Times(1)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("ReimageVirtualMachine", vmname, image).Return(nil).Times(1)
+	c.When("ReimageVirtualMachine", &vmname, image).Return(nil).Times(1)
 
 	global.App.Run([]string{"bytemark", "reimage", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
 

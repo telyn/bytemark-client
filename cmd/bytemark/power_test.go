@@ -16,10 +16,10 @@ func TestResetCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("ResetVirtualMachine", vmn).Times(1)
+	c.When("ResetVirtualMachine", &vmn).Times(1)
 
 	global.App.Run(strings.Split("bytemark reset test-server.test-group.test-account", " "))
 	is.Nil(global.Error)
@@ -37,10 +37,10 @@ func TestRestartCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("RestartVirtualMachine", vmn).Times(1)
+	c.When("RestartVirtualMachine", &vmn).Times(1)
 
 	global.App.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
 	is.Nil(global.Error)
@@ -57,10 +57,10 @@ func TestShutdownCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
+	c.When("ShutdownVirtualMachine", &vmn, true).Times(1)
 
 	global.App.Run(strings.Split("bytemark shutdown test-server.test-group.test-account", " "))
 	is.Nil(global.Error)
@@ -77,10 +77,10 @@ func TestStartCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("StartVirtualMachine", vmn).Times(1)
+	c.When("StartVirtualMachine", &vmn).Times(1)
 
 	global.App.Run(strings.Split("bytemark start test-server.test-group.test-account", " "))
 	is.Nil(global.Error)
@@ -98,10 +98,10 @@ func TestStopCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(vmn)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", nil).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("StopVirtualMachine", vmn).Times(1)
+	c.When("StopVirtualMachine", &vmn).Times(1)
 
 	global.App.Run(strings.Split("bytemark stop test-server.test-group.test-account", " "))
 	is.Nil(global.Error)

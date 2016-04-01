@@ -40,17 +40,17 @@ func TestListDiscs(t *testing.T) {
 		Account:        "",
 	}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("ParseVirtualMachineName", "spooky-vm", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "spooky-vm", nil).Return(&name).Times(1)
 
 	vm := lib.VirtualMachine{
 		ID:   4,
 		Name: "spooky-vm",
 		Discs: []*lib.Disc{
-			&lib.Disc{StorageGrade: "sata", Size: 25600},
-			&lib.Disc{StorageGrade: "archive", Size: 666666},
+			&lib.Disc{StorageGrade: "sata", Size: 25600, Label: "vda"},
+			&lib.Disc{StorageGrade: "archive", Size: 666666, Label: "vdb"},
 		},
 	}
-	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
+	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 
 	global.App.Run(strings.Split("bytemark list discs spooky-vm", " "))
 	is.Nil(global.Error)
@@ -68,6 +68,7 @@ func TestListGroups(t *testing.T) {
 	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("ParseAccountName", "spooky-steve", nil).Return("spooky-steve").Times(1)
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Groups: []*lib.Group{
@@ -94,9 +95,9 @@ func TestListServers(t *testing.T) {
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	groupname := lib.GroupName{Group: "halloween-vms", Account: "spooky-steve"}
-	c.When("ParseGroupName", "halloween-vms.spooky-steve", []lib.GroupName{{}}).Return(groupname).Times(1)
+	c.When("ParseGroupName", "halloween-vms.spooky-steve", nil).Return(&groupname).Times(1)
 
-	c.When("GetGroup", groupname).Return(&lib.Group{
+	c.When("GetGroup", &groupname).Return(&lib.Group{
 		VirtualMachines: []*lib.VirtualMachine{
 			&lib.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
 			&lib.VirtualMachine{ID: 23, Name: "jack-skellington"},
