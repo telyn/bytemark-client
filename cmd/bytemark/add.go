@@ -10,10 +10,15 @@ import (
 func init() {
 	publicKeyFile := util.FileFlag{}
 	commands = append(commands, cli.Command{
-		Name: "add",
+		Name:        "add",
+		Usage:       "Add public SSH keys to a Bytemark user",
+		UsageText:   "bytemark add key [--user <user>] <key>",
+		Description: "The add command has a single subcommand - add key. See the help text for `bytemark add key`.",
+		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "key",
 			Usage:       "Add public SSH keys to a Bytemark user",
+			UsageText:   "bytemark add key [--user <user>] [--public-key-file <filename>] <key>",
 			Description: `Add the given public key to the given user (or the default user). This will allow them to use that key to access management IPs they have access to using that key. To remove a key, use the remove key command. --public-key-file will be ignored if a public key is specified in the arguments`,
 			Flags: []cli.Flag{
 				cli.StringFlag{

@@ -22,9 +22,10 @@ Available variables:
 	token - the token used for authentication.") // You can get one using bytemark auth.`,
 		Subcommands: []cli.Command{
 			{
-				Name:      "set",
-				UsageText: "bytemark config set <variable> <value>",
-				Usage:     "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
+				Name:        "set",
+				UsageText:   "bytemark config set <variable> <value>",
+				Usage:       "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
+				Description: "Sets the named variable to the given value. See `bytemark help config` for which variables are available",
 				Action: With(func(ctx *Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {
@@ -64,9 +65,10 @@ Available variables:
 					return nil
 				}),
 			}, {
-				Name:      "unset",
-				UsageText: "bytemark config unset <variable>",
-				Usage:     "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
+				Name:        "unset",
+				UsageText:   "bytemark config unset <variable>",
+				Usage:       "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
+				Description: "Unsets the named variable.",
 				Action: With(func(ctx *Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {

@@ -11,15 +11,21 @@ import (
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name: "delete",
+		Name:      "delete",
+		Usage:     "Delete a given server, disc, group, account or key.",
+		UsageText: "bytemark delete account|disc|group|key|server",
 		Description: `Deletes the given server, disc, group, account or key. Only empty groups and accounts can be deleted.
 If the --purge flag is given and the target is a cloud server, will permanently delete the server. Billing will cease and you will be unable to recover the server or its data.
 If the --force flag is given, you will not be prompted to confirm deletpaion.
 The undelete server command may be used to restore a deleted (but not purged) server to its state prior to deletion.
 `,
+		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
-			Name:    "disc",
-			Aliases: []string{"disk"},
+			Name:        "disc",
+			Usage:       "Delete the given disc",
+			UsageText:   "bytemark delete disc <virtual machine name> <disc label>",
+			Description: "Deletes the given disc. To find out a disc's label you can use the `bytemark show server` command or `bytemark list discs` command.",
+			Aliases:     []string{"disk"},
 			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
 				if !(global.Config.Force() || util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.")) {
 					global.Error = &util.UserRequestedExit{}
@@ -34,7 +40,11 @@ The undelete server command may be used to restore a deleted (but not purged) se
 				return
 			}),
 		}, {
-			Name: "group",
+			Name:      "group",
+			Usage:     "Deletes the given group",
+			UsageText: "bytemark delete group [--recursive] <group name>",
+			Description: `Deletes the given group.
+If --recursive is specified, all servers in the group will be purged. Otherwise, if there are servers in the group, will return an error.`,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "recursive",
@@ -56,7 +66,10 @@ The undelete server command may be used to restore a deleted (but not purged) se
 				return
 			}),
 		}, {
-			Name: "key",
+			Name:        "key",
+			Usage:       "Deletes the specified key",
+			UsageText:   "bytemark delete key [--user <user>] <key>",
+			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
 			Action: func(c *cli.Context) {
 				user := global.Config.GetIgnoreErr("user")
 
@@ -85,7 +98,10 @@ The undelete server command may be used to restore a deleted (but not purged) se
 				}
 			},
 		}, {
-			Name: "server",
+			Name:        "server",
+			Usage:       "Delete the given server",
+			UsageText:   `bytemark delete server [--purge] <server name>`,
+			Description: "Deletes the given server. Deleted servers still exist and can be restored. To ensure a server is fully deleted, use the --purge flag.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "purge",

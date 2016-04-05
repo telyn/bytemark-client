@@ -14,6 +14,14 @@ func init() {
 		Name:      "server",
 		Usage:     `Create a new server with bytemark.`,
 		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
+		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
+		
+A disc spec looks like the following: label:grade:size
+The label and grade fields are optional. If grade is empty, defaults to sata.
+If there are two fields, they are assumed to be grade and size.
+Multiple --disc flags can be used to create multiple discs
+
+If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
 		Flags: []cli.Flag{
 			cli.IntFlag{
 				Name:  "cores",
@@ -91,14 +99,6 @@ func init() {
 			},
 		},
 
-		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
-		
-A disc spec looks like the following: label:grade:size
-The label and grade fields are optional. If grade is empty, defaults to sata.
-If there are two fields, they are assumed to be grade and size.
-Multiple --disc flags can be used to create multiple discs
-
-If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
 		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createServer),
 	}
 
@@ -122,16 +122,20 @@ Multiple --disc flags can be used to create multiple discs`,
 	}
 
 	createGroup := cli.Command{
-		Name:   "group",
-		Usage:  "bytemark create group <group name>",
-		Action: With(GroupNameProvider, AuthProvider, fn_createGroup),
+		Name:        "group",
+		Usage:       "create a group for organising your servers",
+		UsageText:   "bytemark create group <group name>",
+		Description: `Groups are part of your server's fqdn`,
+		Action:      With(GroupNameProvider, AuthProvider, fn_createGroup),
 	}
 
 	commands = append(commands, cli.Command{
 		Name:      "create",
-		Usage:     "bytemark create disc|group|ip|server",
-		UsageText: "Creates various kinds of things. See `bytemark create <kind of thing> help`",
-		Description: `	    bytemark create disc[s] [--disc <disc spec>]... <cloud server>
+		Usage:     "Creates various kinds of things. See `bytemark create <kind of thing> help`",
+		UsageText: "bytemark create disc|group|ip|server",
+		Description: `Create a new disc, group, IP or server.
+
+	create disc[s] [--disc <disc spec>]... <cloud server>
 	create group [--account <name>] <name>
 	create ip [--reason reason] <cloud server>
 	create server (see bytemark create server help)
@@ -140,6 +144,7 @@ A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
+		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			createServer,
 			createDiscs,

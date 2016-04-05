@@ -10,10 +10,17 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:        "show",
+		Action:      cli.ShowSubcommandHelp,
+		Usage:       `Displays information about the given server, group, or account.`,
+		UsageText:   "bytemark show account|server|group|user [flags] <name>",
 		Description: `Displays information about the given server, group, or account.`,
 		Subcommands: []cli.Command{{
-			Name:        "account",
-			Description: `Displays information about the given account`,
+			Name:      "account",
+			Usage:     `Displays information about the given account`,
+			UsageText: "bytemark show account [--json] <name>",
+			Description: `This command displays information about the given account, including contact details and how many servers are in it across its groups.
+			
+If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "json",
@@ -37,8 +44,11 @@ func init() {
 				return nil
 			}),
 		}, {
-			Name:  "group",
-			Usage: "Outputs info about a group",
+			Name:      "group",
+			Usage:     "Outputs info about a group",
+			UsageText: "bytemark show group [--json] <name>",
+			Description: `This command displays information about how many servers are in the given group.
+If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "json",
@@ -66,8 +76,10 @@ func init() {
 				return nil
 			}),
 		}, {
-			Name:  "server",
-			Usage: "Displays details about a server",
+			Name:        "server",
+			Usage:       "Displays details about a server",
+			UsageText:   "bytemark show server [--json] <name>",
+			Description: `Displays a collection of details about the server, including its full hostname, CPU and memory allocation, power status, disc capacities and IP addresses.`,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "json",
@@ -84,8 +96,10 @@ func init() {
 				return nil
 			}),
 		}, {
-			Name:  "user",
-			Usage: "Displays info about a user. Currently just what SSH keys are authorised for this user",
+			Name:        "user",
+			Usage:       "Displays info about a user.",
+			UsageText:   "bytemark show user <name>",
+			Description: `Currently the only details are what SSH keys are authorised for this user`,
 			Action: With(UserProvider, func(c *Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
 				for _, k := range c.User.AuthorizedKeys {

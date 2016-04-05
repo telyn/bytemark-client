@@ -6,17 +6,31 @@ import (
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name: "lock",
+		Name:        "lock",
+		Usage:       "Lock hardware profiles to prevent upgrading",
+		UsageText:   "bytemark lock hwprofile <server>",
+		Description: `This command locks the given server's hardware profile in place, preventing it from being automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
+		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
-			Name: "hwprofile",
+			Name:        "hwprofile",
+			Usage:       "Lock hardware profiles to prevent upgrading",
+			UsageText:   "bytemark lock hwprofile <server>",
+			Description: `This command locks the given server's hardware profile in place, preventing it from being automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
 			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
 				return global.Client.SetVirtualMachineHardwareProfileLock(c.VirtualMachineName, true)
 			}),
 		}},
 	}, cli.Command{
-		Name: "unlock",
+		Name:        "unlock",
+		Usage:       "unlock hardware profiles to allow upgrading",
+		UsageText:   "bytemark unlock hwprofile <server>",
+		Description: `This command unlocks the given server's hardware profile, allowing it to be automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
+		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
-			Name: "hwprofile",
+			Name:        "hwprofile",
+			Usage:       "unlock hardware profiles to allow upgrading",
+			UsageText:   "bytemark unlock hwprofile <server>",
+			Description: `This command unlocks the given server's hardware profile, allowing it to be automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
 			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
 				return global.Client.SetVirtualMachineHardwareProfileLock(c.VirtualMachineName, false)
 			}),
