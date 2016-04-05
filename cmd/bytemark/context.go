@@ -3,6 +3,8 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
+	"encoding/json"
 	"github.com/codegangsta/cli"
 	"net"
 )
@@ -91,4 +93,16 @@ func (c *Context) Size(flagname string) int {
 		return int(*size)
 	}
 	return 0
+}
+
+func (c *Context) IfNotMarshalJSON(obj interface{}, fn func() error) error {
+	if c.Bool("json") {
+		js, err := json.MarshalIndent(obj, "", "    ")
+		if err != nil {
+			return err
+		}
+		log.Output(string(js))
+		return nil
+	}
+	return fn()
 }

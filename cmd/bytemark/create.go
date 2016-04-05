@@ -63,6 +63,10 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Value: new(util.IPFlag),
 				Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
 			},
+			cli.BoolFlag{
+				Name:  "json",
+				Usage: "If set, will output the spec and created virtual machine as a JSON object.",
+			},
 			cli.GenericFlag{
 				Name:  "memory",
 				Value: new(util.SizeSpecFlag),
@@ -317,14 +321,17 @@ func fn_createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	log.Log("cloud server created successfully", "")
-	log.Log(util.FormatVirtualMachine(vm))
-	if imageInstall != nil {
-		log.Log()
-		log.Logf("Root password:") // logf so we don't get a tailing \r\n
-		log.Outputf("%s\r\n", imageInstall.RootPassword)
-	} else {
-		log.Log("Machine was not imaged")
-	}
-	return
+	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() error {
+
+		log.Log("cloud server created successfully", "")
+		log.Log(util.FormatVirtualMachine(vm))
+		if imageInstall != nil {
+			log.Log()
+			log.Logf("Root password:") // logf so we don't get a tailing \r\n
+			log.Outputf("%s\r\n", imageInstall.RootPassword)
+		} else {
+			log.Log("Machine was not imaged")
+		}
+		return nil
+	})
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
-	"encoding/json"
 	"github.com/codegangsta/cli"
 )
 
@@ -28,10 +27,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				},
 			},
 			Action: With(AccountProvider, func(c *Context) error {
-				if c.Bool("json") {
-					js, _ := json.MarshalIndent(c.Account, "", "    ")
-					log.Output(string(js))
-				} else {
+				return c.IfNotMarshalJSON(c.Account, func() error {
 					log.Output(util.FormatAccount(c.Account))
 
 					for _, g := range c.Account.Groups {
@@ -40,8 +36,8 @@ If the --json flag is specified, prints a complete overview of the account in JS
 							log.Output(v)
 						}
 					}
-				}
-				return nil
+					return nil
+				})
 			}),
 		}, {
 			Name:      "group",
@@ -56,10 +52,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				},
 			},
 			Action: With(GroupProvider, func(c *Context) error {
-				if c.Bool("json") {
-					js, _ := json.MarshalIndent(c.Group, "", "    ")
-					log.Output(string(js))
-				} else {
+				return c.IfNotMarshalJSON(c.Group, func() error {
 					s := ""
 					if len(c.Group.VirtualMachines) != 1 {
 						s = "s"
@@ -72,8 +65,8 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 						log.Output(v)
 					}
 
-				}
-				return nil
+					return nil
+				})
 			}),
 		}, {
 			Name:        "server",
@@ -87,13 +80,10 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				},
 			},
 			Action: With(VirtualMachineProvider, func(c *Context) error {
-				if c.Bool("json") {
-					js, _ := json.MarshalIndent(c.VirtualMachine, "", "    ")
-					log.Output(string(js))
-				} else {
+				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
 					log.Log(util.FormatVirtualMachine(c.VirtualMachine))
-				}
-				return nil
+					return nil
+				})
 			}),
 		}, {
 			Name:        "user",
