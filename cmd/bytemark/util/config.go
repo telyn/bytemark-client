@@ -117,6 +117,9 @@ type ConfigReadError struct {
 }
 
 func (e *ConfigReadError) Error() string {
+	if e.Err != nil {
+		return fmt.Sprintf("Unable to read config for %s from %s - %v", e.Name, e.Path, e.Err)
+	}
 	return fmt.Sprintf("Unable to read config for %s from %s.", e.Name, e.Path)
 }
 
@@ -127,7 +130,10 @@ type ConfigWriteError struct {
 }
 
 func (e *ConfigWriteError) Error() string {
-	return fmt.Sprintf("Unable to write persistent config for %s (%s).", e.Name, e.Path)
+	if e.Err != nil {
+		return fmt.Sprintf("Unable to write config for %s to %s.", e.Name, e.Path)
+	}
+	return fmt.Sprintf("Unable to write config for %s to %s - ", e.Name, e.Path, e.Err)
 }
 
 // Do I really need to have the flags passed in here?

@@ -63,23 +63,6 @@ Defaults to connecting to the serial console for the given server.`,
 
 		}),
 	})
-	// TODO(telyn): decide whether to keep serial and panel commands
-	/*commands = append(commands, cli.Command{
-			Name:      "serial",
-			Usage:     "bytemark serial <server>",
-			UsageText: "Out-of-band access to a server's serial console.",
-			Description: `outputs connection information for the out-of-band serial console
-	specified. If the --connect flag is given, will attempt to open a connection as well.`,
-			Action: console_serial,
-		})*/
-	/*commands = append(commands, cli.Command{
-			Name:      "vnc",
-			Usage:     "bytemark vnc <server>", // [--connect | --panel]
-			UsageText: "Out-of-band access to a server's graphical console.",
-			Description: `Outputs instructions for connecting to the VNC console.
-	If --connect is given, will also attempt to connect to the VNC console using the Bytemark panel.`,
-			Action: console_serial,
-		})*/
 }
 
 func shortEndpoint(endpoint string) string {

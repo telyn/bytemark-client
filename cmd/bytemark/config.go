@@ -47,14 +47,6 @@ Available variables:
 					err = global.Config.SetPersistent(varname, value, "CMD set")
 					if err != nil {
 						return err
-						// TODO(telyn): wrap the error in an error of my own to expose this bhvr
-						/*
-							if e, ok := err.(*util.ConfigReadError); ok {
-								log.Errorf("Couldn't set %s - %v\r\n", e.Name, e.Err)
-							} else {
-								log.Errorf("Couldn't set %s - %v\r\n", variable, err)
-							}
-						*/
 					}
 
 					if oldVar.Source == "config" {
