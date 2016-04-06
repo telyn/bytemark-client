@@ -34,7 +34,26 @@ func TestCreateDiskCommand(t *testing.T) {
 	}
 }
 
-// TODO(telyn): TestCreateGroupCommand
+func TestCreateGroupCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup()
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+
+	group := lib.GroupName{
+		Group: "test-group",
+	}
+	c.When("ParseGroupName", "test-group", nil).Return(&group).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("CreateGroup", &group).Return(nil).Times(1)
+
+	global.App.Run(strings.Split("bytemark create group test-group", " "))
+	is.Nil(global.Error)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
 
 func TestCreateServerCommand(t *testing.T) {
 	config, c := baseTestSetup()
