@@ -45,8 +45,8 @@ func main() {
 	baseAppSetup()
 
 	// TODO(telyn): ok I haven't figured out a better way than this to integrate Config and stuff, but this way works for now.
-	flags := flag.FlagSet{}
-	configDir := flag.String("config-dir", "", "")
+	flags := flag.NewFlagSet("flags", flag.ContinueOnError)
+	configDir := flags.String("config-dir", "", "")
 	flags.SetOutput(ioutil.Discard)
 
 	flags.Parse(os.Args[1:])
@@ -63,8 +63,13 @@ func main() {
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
-
-	global.App.Run(os.Args)
+	//juggle the arguments in order to get the executable on the beginning
+	flargs := flags.Args()
+	newArgs := make([]string, len(flargs)+1)
+	newArgs[0] = os.Args[0]
+	copy(newArgs[1:], flargs)
+	log.Logf("orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flag.Args(), newArgs)
+	global.App.Run(newArgs)
 
 	os.Exit(int(util.ProcessError(global.Error)))
 }

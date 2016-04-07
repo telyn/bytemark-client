@@ -48,8 +48,44 @@ func TestCommandsComplete(t *testing.T) {
 
 func TestFlagsHaveUsage(t *testing.T) {
 	traverseAllCommands(commands, func(c cli.Command) {
-		/*for _, f := range c.Flags {
-			// TODO(telyn): checking
-		}*/
+		for _, f := range c.Flags {
+			switch f := f.(type) {
+			case cli.BoolFlag:
+				if f.Usage == "" {
+					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					t.Fail()
+				}
+			case cli.BoolTFlag:
+				if f.Usage == "" {
+					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					t.Fail()
+				}
+			case cli.DurationFlag:
+				if f.Usage == "" {
+					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					t.Fail()
+				}
+			case cli.Float64Flag:
+				if f.Usage == "" {
+					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					t.Fail()
+				}
+			case cli.GenericFlag:
+				if f.Usage == "" {
+					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					t.Fail()
+				}
+			case cli.StringFlag:
+				if f.Usage == "" {
+					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					t.Fail()
+				}
+			case cli.StringSliceFlag:
+				if f.Usage == "" {
+					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					t.Fail()
+				}
+			}
+		}
 	})
 }
