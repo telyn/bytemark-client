@@ -50,7 +50,7 @@ func AccountNameProvider(c *Context) (err error) {
 	if err != nil {
 		return err
 	}
-	accName := global.Client.ParseAccountName(name)
+	accName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
 	c.AccountName = &accName
 	return
 }
@@ -104,7 +104,7 @@ func GroupNameProvider(c *Context) (err error) {
 	if err != nil {
 		return err
 	}
-	c.GroupName = global.Client.ParseGroupName(name)
+	c.GroupName = global.Client.ParseGroupName(name, global.Config.GetGroup())
 	return
 }
 
@@ -162,7 +162,7 @@ func VirtualMachineNameProvider(c *Context) (err error) {
 		return err
 	}
 
-	c.VirtualMachineName, err = global.Client.ParseVirtualMachineName(name)
+	c.VirtualMachineName, err = global.Client.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
 	return
 }
 

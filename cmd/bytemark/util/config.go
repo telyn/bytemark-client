@@ -3,6 +3,7 @@ package util
 import (
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -68,6 +69,8 @@ type ConfigManager interface {
 	Force() bool
 	EndpointName() string
 	PanelURL() string
+
+	ImportFlags(*flag.FlagSet) []string
 }
 
 // Params currently used:
@@ -200,6 +203,32 @@ func NewConfig(configDir string) (config *Config, err error) {
 		}
 	}
 	return config, nil
+}
+
+func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
+	if flags != nil {
+		if flags.Parsed() {
+			// dump all the flags into the memo
+			// should be reet...reet?
+			flags.Visit(func(f *flag.Flag) {
+				config.Memo[f.Name] = ConfigVar{
+					f.Name,
+					f.Value.String(),
+					"FLAG " + f.Name,
+				}
+			})
+
+			strDL := config.GetIgnoreErr("debug-level")
+			debugLevel, err := strconv.ParseInt(strDL, 10, 0)
+			if err == nil {
+				config.debugLevel = int(debugLevel)
+				log.DebugLevel = int(debugLevel)
+			}
+
+			return flags.Args()
+		}
+	}
+	return nil
 }
 
 // GetDebugLevel returns the current debug-level as an integer. This is used throughout the bytemark.co.uk/client library to determine verbosity of output.

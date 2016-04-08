@@ -7,6 +7,9 @@ import (
 	"testing"
 )
 
+var defVM lib.VirtualMachineName
+var defGroup lib.GroupName
+
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup()
@@ -15,12 +18,12 @@ func TestCreateDiskCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
-	c.When("ParseVirtualMachineName", "test-server", nil).Return(&name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(&lib.VirtualMachine{Hostname: "test-server.default.test-user.endpoint"})
+	c.When("GetVirtualMachine", &name).Return(&lib.VirtualMachine{Hostname: "test-server.default.test-user.endpoint"})
 
 	disc := lib.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
@@ -40,11 +43,12 @@ func TestCreateGroupCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetGroup").Return(&defGroup)
 
 	group := lib.GroupName{
 		Group: "test-group",
 	}
-	c.When("ParseGroupName", "test-group", nil).Return(&group).Times(1)
+	c.When("ParseGroupName", "test-group", []*lib.GroupName{&defGroup}).Return(&group).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("CreateGroup", &group).Return(nil).Times(1)
 
@@ -62,9 +66,9 @@ func TestCreateServerCommand(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server", nil).Return(&lib.VirtualMachineName{VirtualMachine: "test-server"})
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&lib.VirtualMachineName{VirtualMachine: "test-server"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := lib.VirtualMachineSpec{
@@ -140,7 +144,7 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
@@ -164,7 +168,7 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 		Account:        "",
 	}
 
-	c.When("ParseVirtualMachineName", "test-server", nil).Return(&vmname)
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(vm.VirtualMachine, nil).Times(1)
 
@@ -188,7 +192,7 @@ func TestCreateServer(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -211,7 +215,7 @@ func TestCreateServer(t *testing.T) {
 
 	group := lib.GroupName{}
 
-	c.When("ParseVirtualMachineName", "test-server", nil).Return(&vmname).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("CreateVirtualMachine", &group, vm).Return(vm.VirtualMachine, nil).Times(1)

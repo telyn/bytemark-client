@@ -17,7 +17,7 @@ func TestDeleteServer(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -27,7 +27,7 @@ func TestDeleteServer(t *testing.T) {
 
 	vm := getFixtureVM()
 
-	c.When("ParseVirtualMachineName", "test-server", nil).Return(&name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, false).Return(nil).Times(1)
@@ -39,7 +39,7 @@ func TestDeleteServer(t *testing.T) {
 	}
 	c.Reset()
 
-	c.When("ParseVirtualMachineName", "test-server", nil).Return(&name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, true).Return(nil).Times(1)
@@ -60,14 +60,14 @@ func TestDeleteDisc(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account",
 	}
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName(nil)).Return(&name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteDisc", &name, "666").Return(nil).Times(1)
 

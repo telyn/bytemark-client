@@ -126,7 +126,7 @@ Your default account is determined by the --account flag, the account variable i
 			Action: With(AuthProvider, func(c *Context) error {
 				if len(c.Args()) >= 1 {
 					nameStr, _ := c.NextArg()
-					name := global.Client.ParseGroupName(nameStr)
+					name := global.Client.ParseGroupName(nameStr, global.Config.GetGroup())
 
 					group, err := global.Client.GetGroup(name)
 
