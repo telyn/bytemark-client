@@ -26,7 +26,11 @@ func listDefaultAccountServers() error {
 	}
 	for _, group := range acc.Groups {
 		for _, vm := range group.VirtualMachines {
-			log.Output(vm.Hostname)
+			if vm.Deleted {
+				log.Output(vm.Hostname + " (deleted)")
+			} else {
+				log.Output(vm.Hostname)
+			}
 		}
 	}
 	return nil
@@ -118,10 +122,11 @@ Your default account is determined by the --account flag, the account variable i
 
 			},
 		}, {
-			Name:        "servers",
-			Usage:       "List all the servers in an account",
-			UsageText:   "bytemark list servers [account]",
-			Description: `This command lists all the servers in the given account, or in your default account if you didn't specify an account on the command-line.`,
+			Name:      "servers",
+			Usage:     "List all the servers in an account",
+			UsageText: "bytemark list servers [account]",
+			Description: `This command lists all the servers in the given account, or in your default account if you didn't specify an account on the command-line.
+Deleted servers are included in the list, with ' (deleted)' appended.`,
 			// TODO: simplify this function
 			Action: With(AuthProvider, func(c *Context) error {
 				if len(c.Args()) >= 1 {
@@ -141,8 +146,11 @@ Your default account is determined by the --account flag, the account variable i
 
 								for _, g := range account.Groups {
 									for _, vm := range g.VirtualMachines {
-										log.Output(vm.Hostname)
-
+										if vm.Deleted {
+											log.Output(vm.Hostname + " (deleted)")
+										} else {
+											log.Output(vm.Hostname)
+										}
 									}
 								}
 								return nil
