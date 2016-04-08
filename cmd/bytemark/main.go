@@ -44,8 +44,6 @@ func main() {
 
 	baseAppSetup()
 
-	// TODO(telyn): ok I haven't figured out a better way than this to integrate Config and stuff, but this way works for now.
-	// the reason we can't just use cli.App.Before and have these as our app.Flags is that app.Before doesn't get called for subcommands or something, and we absolutely 100% must have the config ready before the Actions start being executed
 	flags := flag.NewFlagSet("flags", flag.ContinueOnError)
 	configDir := flags.String("config-dir", "", "")
 	help := flags.Bool("help", false, "")
@@ -80,7 +78,7 @@ func main() {
 	newArgs := make([]string, len(flargs)+1)
 	newArgs[0] = os.Args[0]
 	copy(newArgs[1:], flargs)
-	log.Logf("orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, newArgs)
+	log.Debugf(log.DBG_FLAGS, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, newArgs)
 
 	if *help || *h {
 		helpArgs := make([]string, len(newArgs)+1)

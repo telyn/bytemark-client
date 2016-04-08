@@ -70,33 +70,27 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			Usage:       "Deletes the specified key",
 			UsageText:   "bytemark delete key [--user <user>] <key>",
 			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
-			Action: func(c *cli.Context) {
+			Action: With(func(c *Context) error {
 				user := global.Config.GetIgnoreErr("user")
 
 				key := strings.Join(c.Args(), " ")
 				if key == "" {
-					log.Log("You must specify a key to delete.\r\n")
-					global.Error = &util.PEBKACError{}
-					return
-
+					return c.Help("You must specify a key to delete.\r\n")
 				}
 
 				err := EnsureAuth()
 				if err != nil {
-					global.Error = err
-					return
-
+					return err
 				}
 
 				err = global.Client.DeleteUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key deleted successfullly")
-					return
+					return err
 				} else {
-					global.Error = err
-					return
+					return err
 				}
-			},
+			}),
 		}, {
 			Name:        "server",
 			Usage:       "Delete the given server",

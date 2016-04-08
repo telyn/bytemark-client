@@ -226,7 +226,7 @@ func fn_createServer(c *Context) (err error) {
 			}
 
 		case 3:
-			return new(util.PEBKACError)
+			return c.Help("Too many arguments given.")
 		}
 	}
 
@@ -245,8 +245,7 @@ func fn_createServer(c *Context) (err error) {
 	ips := c.IPs("ip")
 
 	if len(ips) > 2 {
-		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-		return new(util.PEBKACError)
+		return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 	}
 
 	var ipspec *lib.IPSpec
@@ -256,14 +255,12 @@ func fn_createServer(c *Context) (err error) {
 		for _, ip := range ips {
 			if ip.To4() != nil {
 				if ipspec.IPv4 != "" {
-					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					return new(util.PEBKACError)
+					return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 				}
 				ipspec.IPv4 = ip.To4().String()
 			} else {
 				if ipspec.IPv6 != "" {
-					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					return new(util.PEBKACError)
+					return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 
 				}
 				ipspec.IPv6 = ip.String()

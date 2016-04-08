@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
-	"bytemark.co.uk/client/util/log"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strconv"
 )
@@ -26,8 +26,7 @@ func init() {
 				}
 				cores, err := strconv.Atoi(coresStr)
 				if err != nil || cores < 1 {
-					log.Errorf("Invalid number of cores \"%s\"\r\n", coresStr)
-					return &util.PEBKACError{}
+					c.Help(fmt.Sprintf("Invalid number of cores \"%s\"\r\n", coresStr))
 				}
 				return global.Client.SetVirtualMachineCores(c.VirtualMachineName, cores)
 
@@ -49,14 +48,12 @@ func init() {
 			},
 			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
 				if c.Bool("lock") && c.Bool("unlock") {
-					log.Log("Ambiguous command, both lock and unlock specified")
-					return &util.PEBKACError{}
+					return c.Help("Ambiguous command, both lock and unlock specified")
 				}
 
 				profileStr, err := c.NextArg()
 				if err != nil {
-					log.Log("No hardware profile name was specified")
-					return &util.PEBKACError{}
+					return c.Help("No hardware profile name was specified")
 				}
 				if c.Bool("lock") {
 					return global.Client.SetVirtualMachineHardwareProfile(c.VirtualMachineName, profileStr, true)
@@ -75,13 +72,12 @@ func init() {
 
 				memoryStr, err := c.NextArg()
 				if err != nil {
-					return &util.PEBKACError{}
+					return c.Help("No memory amount was specified")
 				}
 
 				memory, err := util.ParseSize(memoryStr)
 				if err != nil || memory < 1 {
-					log.Errorf("Invalid amount of memory \"%s\"\r\n", memoryStr)
-					return &util.PEBKACError{}
+					return c.Help(fmt.Sprintf("Invalid amount of memory \"%s\"\r\n", memoryStr))
 				}
 
 				return global.Client.SetVirtualMachineMemory(c.VirtualMachineName, memory)

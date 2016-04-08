@@ -268,7 +268,6 @@ func (config *Config) GetVirtualMachine() (vm *lib.VirtualMachineName) {
 	vm.Account = config.GetIgnoreErr("account")
 	vm.Group = config.GetIgnoreErr("group")
 	vm.VirtualMachine = ""
-	//TODO(telyn): make it possible to set a default VM?
 	return vm
 }
 

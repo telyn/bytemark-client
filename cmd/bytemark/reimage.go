@@ -3,7 +3,6 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
 )
 
@@ -52,8 +51,7 @@ The root password will be the only thing output on stdout - good for scripts!
 				return err
 			}
 			if defaulted {
-				log.Log("No image was specified")
-				return &util.PEBKACError{}
+				return c.Help("No image was specified")
 			}
 
 			return global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)

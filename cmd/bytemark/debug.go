@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"bytes"
@@ -88,10 +87,9 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 				buf := new(bytes.Buffer)
 				json.Indent(buf, body, "", "    ")
 				log.Log(buf.String())
-			default:
 				return nil
 			}
-			return new(util.PEBKACError)
+			return c.Help("Unexpected debug command '" + method + "'")
 		}),
 	})
 

@@ -40,8 +40,7 @@ Defaults to connecting to the serial console for the given server.`,
 		},
 		Action: With(VirtualMachineNameProvider, AuthProvider, func(ctx *Context) error {
 			if ctx.Context.Bool("serial") && ctx.Context.Bool("panel") {
-				log.Logf("You must only specify one of --serial and --panel!")
-				return util.PEBKACError{}
+				return ctx.Help("You must only specify one of --serial and --panel!")
 			}
 
 			vm, err := global.Client.GetVirtualMachine(ctx.VirtualMachineName)

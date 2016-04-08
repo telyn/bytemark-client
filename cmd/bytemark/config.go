@@ -38,7 +38,6 @@ Available variables:
 						return err
 					}
 
-					// TODO(telyn): consider validating input for the set command
 					value, err := ctx.NextArg()
 					if err != nil {
 						return err

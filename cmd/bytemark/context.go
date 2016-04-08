@@ -43,6 +43,14 @@ func (c *Context) NextArg() (string, error) {
 	return arg, nil
 }
 
+func (c *Context) Help(whatsyourproblem string) error {
+	log.Output(whatsyourproblem, "")
+	cli.ShowSubcommandHelp(c.Context)
+	return util.UsageDisplayedError{TheProblem: whatsyourproblem}
+}
+
+// flags below
+
 func (c *Context) Bool(flagname string) bool {
 	return c.Context.Bool(flagname)
 }

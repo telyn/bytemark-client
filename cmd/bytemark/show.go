@@ -7,6 +7,7 @@ import (
 )
 
 func init() {
+
 	commands = append(commands, cli.Command{
 		Name:        "show",
 		Action:      cli.ShowSubcommandHelp,

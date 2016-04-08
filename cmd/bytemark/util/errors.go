@@ -22,6 +22,15 @@ func (e NotEnoughArgumentsError) Error() string {
 	return "Not enough arguments passed to the command!"
 }
 
+// UsageDisplayedError is returned by commands when the user entered wrong info and the help was output
+type UsageDisplayedError struct {
+	TheProblem string
+}
+
+func (e UsageDisplayedError) Error() string {
+	return e.TheProblem
+}
+
 type WontDeleteNonEmptyGroupError struct {
 	Group *lib.GroupName
 }
