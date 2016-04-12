@@ -1,6 +1,8 @@
 package lib
 
-import ()
+import (
+	"net"
+)
 
 // VirtualMachineName is the triplet-form of the name of a VirtualMachine, which should be enough to find the VM.
 type VirtualMachineName struct {
@@ -40,8 +42,11 @@ type IP struct {
 	RDns string `json:"rdns"`
 
 	// this cannot be set.
-	IP string `json:"ip"`
+	IP *net.IP `json:"ip"`
 }
+
+// IPs represent multiple net.IPs
+type IPs []*net.IP
 
 // IPSpec represents one v4 and one v6 address to assign to a server during creation.
 type IPSpec struct {
@@ -57,11 +62,11 @@ type NetworkInterface struct {
 
 	// the following can't be set (or at least, so I'm assuming..)
 
-	ID               int               `json:"id"`
-	VlanNum          int               `json:"vlan_num"`
-	IPs              []string          `json:"ips"`
-	ExtraIPs         map[string]string `json:"extra_ips"`
-	VirtualMachineID int               `json:"virtual_machine_id"`
+	ID               int                `json:"id"`
+	VlanNum          int                `json:"vlan_num"`
+	IPs              IPs                `json:"ips"`
+	ExtraIPs         map[string]*net.IP `json:"extra_ips"`
+	VirtualMachineID int                `json:"virtual_machine_id"`
 }
 
 type JSONUser struct {
@@ -104,7 +109,7 @@ type VirtualMachine struct {
 	// the following cannot be set
 	Discs             []*Disc             `json:"discs"`
 	ID                int                 `json:"id"`
-	ManagementAddress string              `json:"management_address"`
+	ManagementAddress *net.IP             `json:"management_address"`
 	Deleted           bool                `json:"deleted"`
 	Hostname          string              `json:"hostname"`
 	Head              string              `json:"head"`
@@ -151,14 +156,14 @@ type billingAccount struct {
 }
 
 type Account struct {
-	Name             string
-	Owner            *Person
-	TechnicalContact *Person
-	BillingID        int
-	BrainID          int
-	CardReference    string
-	Groups           []*Group
-	Suspended        bool
+	Name             string   `json:"name"`
+	Owner            *Person  `json:"owner"`
+	TechnicalContact *Person  `json:"technical_contact"`
+	BillingID        int      `json:"billing_id"`
+	BrainID          int      `json:"brain_id"`
+	CardReference    string   `json:"card_reference"`
+	Groups           []*Group `json:"groups"`
+	Suspended        bool     `json:"suspended"`
 }
 
 type Person struct {

@@ -38,7 +38,7 @@ func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, er
 	}
 	account = new(brainAccount)
 
-	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview", name)
+	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview&include_deleted=true", name)
 	if err != nil {
 		return
 	}
@@ -46,6 +46,16 @@ func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, er
 	_, _, err = req.Run(nil, account)
 
 	return
+}
+
+/*
+func (c *bytemarkClient) CreateAccount(account *Account) (newAccount *Account, err error) {
+    // TODO(telyn): implement
+	return nil, nil
+}*/
+
+func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err error) {
+	return nil, nil
 }
 
 // GetAccount takes an account name or ID and returns a filled-out Account object

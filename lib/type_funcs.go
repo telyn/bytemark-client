@@ -2,9 +2,25 @@ package lib
 
 import (
 	"fmt"
-	"net"
 	"strings"
 )
+
+// StringWithSep combines all the IPs into a single string with the given seperator
+func (ips IPs) StringSep(sep string) string {
+	return strings.Join(ips.Strings(), sep)
+}
+
+func (ips IPs) Strings() (strings []string) {
+	strings = make([]string, len(ips))
+	for i, ip := range ips {
+		strings[i] = ip.String()
+	}
+	return
+}
+
+func (ips IPs) String() string {
+	return ips.StringSep(", ")
+}
 
 func (vm VirtualMachineName) String() string {
 	if vm.Group == "" {
@@ -14,6 +30,13 @@ func (vm VirtualMachineName) String() string {
 		return fmt.Sprintf("%s.%s", vm.VirtualMachine, vm.Group)
 	}
 	return fmt.Sprintf("%s.%s.%s", vm.VirtualMachine, vm.Group, vm.Account)
+}
+
+func (vm VirtualMachineName) GroupName() *GroupName {
+	return &GroupName{
+		Group:   vm.Group,
+		Account: vm.Account,
+	}
 }
 
 func (g GroupName) String() string {
@@ -57,7 +80,8 @@ func (c *bytemarkClient) validateAccountName(account *string) error {
 }
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...VirtualMachineName) (vm VirtualMachineName, err error) {
+func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*VirtualMachineName) (vm *VirtualMachineName, err error) {
+	vm = new(VirtualMachineName)
 	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	if len(defaults) == 0 {
@@ -101,7 +125,8 @@ Loop:
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
-func (c *bytemarkClient) ParseGroupName(name string, defaults ...GroupName) (group GroupName) {
+func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (group *GroupName) {
+	group = new(GroupName)
 	// 1 or 2 pieces with optional extra cruft for the fqdn
 	bits := strings.Split(name, ".")
 	if len(defaults) == 0 {
@@ -163,16 +188,16 @@ func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
 	return total
 }
 
-// AllIpv4Addresses flattens all the IPs for a VM into a single []string
-func (vm *VirtualMachine) AllIpv4Addresses() (ips []string) {
+// AllIPv4Addresses flattens all the IPs for a VM into a single IPs (a []*net.IP with some convenience methods)
+func (vm *VirtualMachine) AllIPv4Addresses() (ips IPs) {
 	for _, nic := range vm.NetworkInterfaces {
 		for _, ip := range nic.IPs {
-			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() != nil {
+			if ip != nil && ip.To4() != nil {
 				ips = append(ips, ip)
 			}
 		}
-		for ip := range nic.ExtraIPs {
-			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() != nil {
+		for _, ip := range nic.ExtraIPs {
+			if ip != nil && ip.To4() != nil {
 				ips = append(ips, ip)
 			}
 		}
@@ -180,16 +205,16 @@ func (vm *VirtualMachine) AllIpv4Addresses() (ips []string) {
 	return ips
 }
 
-// AllIpv6Addresses flattens all the v6 IPs for a VM into a single []string
-func (vm *VirtualMachine) AllIpv6Addresses() (ips []string) {
+// AllIPv6Addresses flattens all the v6 IPs for a VM into a single IPs (a []*net.IP with some convenience methods)
+func (vm *VirtualMachine) AllIPv6Addresses() (ips IPs) {
 	for _, nic := range vm.NetworkInterfaces {
 		for _, ip := range nic.IPs {
-			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() == nil {
+			if ip != nil && ip.To4() == nil {
 				ips = append(ips, ip)
 			}
 		}
-		for ip := range nic.ExtraIPs {
-			if net.ParseIP(ip) != nil && net.ParseIP(ip).To4() == nil {
+		for _, ip := range nic.ExtraIPs {
+			if ip != nil && ip.To4() == nil {
 				ips = append(ips, ip)
 			}
 		}

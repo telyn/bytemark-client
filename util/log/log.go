@@ -10,8 +10,8 @@ const (
 	DBG_OUTLINE = 1 + iota
 	// shows args going in to library functions
 	DBG_ARGS
-	// not used right now
-	DBG_RESERVED
+	// shows the way flags and command line arguments are being messed with
+	DBG_FLAGS
 	// raw request/response bodies.
 	DBG_HTTPDATA
 	DBG_MISC

@@ -1,12 +1,15 @@
 #!/bin/bash
+set -x
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR/../lib
 
-if [ -z "$MAJORVERSION" ]; then
-    MAJORVERSION=0
-fi
-if [ -z "$MINORVERSION" ]; then
-    MINORVERSION=0
-fi
+VERSION=$(head -n 1 $DIR/../cmd/bytemark/debian/changelog | grep -o '(.*)' | grep -oP '[^()]+')
+arrversion=(${VERSION//./ })
+
+MAJORVERSION=${arrversion[0]}
+MINORVERSION=${arrversion[1]}
+REVISION=${arrversion[2]}
+
 BUILD_DATE=`date +%Y-%m-%d\ %H:%M`
 if [ -z "$BUILD_NUMBER" ]; then
     BUILD_NUMBER=0
@@ -18,6 +21,7 @@ echo "package lib" > version.go
 echo "const (" >> version.go
 echo "  majorversion = $MAJORVERSION" >> version.go
 echo "  minorversion = $MINORVERSION" >> version.go
+echo "  revision = $REVISION" >> version.go
 echo "  buildnumber = $BUILD_NUMBER" >> version.go
 echo "  gitcommit = \"$GIT_COMMIT\"" >> version.go
 echo "  gitbranch = \"$GIT_BRANCH\"" >> version.go

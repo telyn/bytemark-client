@@ -100,6 +100,16 @@ func TestGetAccounts(t *testing.T) {
 	fmt.Print(err)
 	is.Nil(err)
 	is.Equal(2, len(acc))
-	is.Equal("dr-evil", acc[1].Name)
+	seenDrEvil := false
+	seenAccount := false
+	for _, a := range acc {
+		if a.Name == "dr-evil" {
+			seenDrEvil = true
+		} else if a.Name == "account" {
+			seenAccount = true
+		}
+	}
+	is.Equal(true, seenDrEvil)
+	is.Equal(true, seenAccount)
 
 }

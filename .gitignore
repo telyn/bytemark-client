@@ -1,9 +1,11 @@
 .*.sw*
 Bytemark.app
 /bytemark
+/cmd/bytemark/bytemark
 bytemark.exe
 *.coverage
 *.coverage.html
 /doc/*.html
 /docs/
 /lib/version.go
+*.nupkg

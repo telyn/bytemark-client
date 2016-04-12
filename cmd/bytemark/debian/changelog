@@ -1,3 +1,63 @@
+bytemark-client (0.6.0) stable; urgency=low
+
+  New features: 
+  * deleted servers are shown when using `list servers`
+  * --json flag added to `create server`
+  
+  Changes: 
+  * Much better help text for all commands
+  * --force and --silent flags have been removed
+  * Mention of non-existent `delete account` command has been removed
+
+ -- Telyn ZF Roat <telyn.roat@bytemark.co.uk> Fri, 08 Apr 2016 14:21:10 +0100
+
+bytemark-client (0.5.0) stable; urgency=low
+
+  New features: None!
+
+  Changes:
+  * MIT licensed (hooray)
+  * Build number no longer part of version number.
+
+  Fixes: 
+  * Hook up VNC and serial commands
+  * console connection instructions improved for v6-only clusters
+  * Entering a nonexistent flag no longer produces weird output
+  * Accounts with no owner/tech contact no longer cause crashes
+  * Shutdown now keeps the VM off once run.
+
+ -- Telyn <telyn@bytemark.co.uk> Thu, 10 Mar 2016 11:26:57 +0000
+
+bytemark-client (0.4.268) stable; urgency=low
+
+  * Switch to native package format & versioning
+
+ -- Telyn <telyn@bytemark.co.uk> Wed, 17 Feb 2016 09:55:27 +0000
+
+bytemark-client (0.4.254-1) stable; urgency=low
+  
+  * Fix issues with the change log
+
+ -- Telyn <telyn@bytemark.co.uk> Tue, 16 Feb 2016 11:45:49 +0000
+
+bytemark-client (0.4.253-1) stable; urgency=low
+  
+    New features:
+    * `show account` now shows owner & tech contact details
+    * last debug.log is kept as debug.log.1
+  
+    Changes:
+    * `create vm`, `show vm`, `list vms` now use 'server' in place of 'vm'
+  
+    Fixes:
+    * `config set` now checks whether the var you're setting is real.
+    * power commands output correct help info
+    * power commands check for too many arguments
+    * `create server` now takes arguments after the name, bringing it in line
+      with the help.
+  
+ -- Telyn <telyn@bytemark.co.uk> Tue, 16 Feb 2016 11:41:45 +0000
+
 bytemark-client (0.3.0-1) stable; urgency=low
 
   * First attempt at packaging bytemark-client for debian *properly*

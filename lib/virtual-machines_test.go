@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"github.com/cheekybits/is"
+	"net"
 	"net/http"
 	"testing"
 )
@@ -10,6 +11,7 @@ import (
 func getFixtureVM() (vm VirtualMachine) {
 	disc := getFixtureDisc()
 	nic := getFixtureNic()
+	ip := net.IPv4(127, 0, 0, 1)
 
 	return VirtualMachine{
 		Name:    "valid-vm",
@@ -27,7 +29,7 @@ func getFixtureVM() (vm VirtualMachine) {
 			&disc,
 		},
 		ID:                1,
-		ManagementAddress: "127.0.0.1",
+		ManagementAddress: &ip,
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
@@ -66,25 +68,25 @@ func TestGetVirtualMachine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	vm, err := client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
+	vm, err := client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
 	is.Nil(vm)
 	is.NotNil(err)
 	if _, ok := err.(BadNameError); !ok {
 		t.Fatalf("Expected BadNameError, got %T", err)
 	}
 
-	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
+	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
 	is.NotNil(err)
 
-	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
+	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
 	is.NotNil(vm)
 	is.Nil(err)
 
-	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
+	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
 	is.NotNil(vm)
 	is.Nil(err)
 
-	is.Equal("127.0.0.1", vm.ManagementAddress)
-	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].IPs[0])
+	is.Equal("127.0.0.1", vm.ManagementAddress.String())
+	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].IPs[0].String())
 
 }

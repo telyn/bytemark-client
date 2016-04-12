@@ -3,8 +3,6 @@ SHELL:=/bin/bash
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/cmd/bytemark
 ALL_FILES := lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go cmd/*/*.go
 
-MAJORVERSION ?= 0
-MINORVERSION ?= 3
 BUILD_NUMBER ?= 0
 
 OSAARCH:=x86_64
@@ -48,6 +46,9 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	rm -f Bytemark.app/Contents/MacOS/bytemark
 	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
 	# sign the code? anyone? shall we sign the code?
+	#
+changelog:
+	gen/changelog.sh
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
@@ -56,8 +57,7 @@ clean:
 	rm -f main.coverage.html lib.coverage.html
 
 gensrc:
-	BUILD_NUMBER=$(BUILD_NUMBER) MAJORVERSION=$(MAJORVERSION) \
-	MINORVERSION=$(MINORVERSION) go generate ./...
+	BUILD_NUMBER=$(BUILD_NUMBER) go generate ./...
 
 $(LAUNCHER_APP): ports/mac/launcher-script.txt
 ifeq (Darwin, $(shell uname -s))
