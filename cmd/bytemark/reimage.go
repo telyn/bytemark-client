@@ -3,6 +3,7 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
 )
 
@@ -50,8 +51,17 @@ The root password will be the only thing output on stdout - good for scripts!
 			if err != nil {
 				return err
 			}
+
 			if defaulted {
 				return c.Help("No image was specified")
+			}
+
+			log.Logf("%s will be reimaged with the following:\r\n\r\n", c.VirtualMachineName.String())
+			log.Log(util.FormatImageInstall(imageInstall))
+
+			if !util.PromptYesNo("Are you certain you wish to continue?") {
+				log.Error("Exiting")
+				return new(util.UserRequestedExit)
 			}
 
 			return global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)
