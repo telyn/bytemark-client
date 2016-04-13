@@ -59,7 +59,7 @@ The root password will be the only thing output on stdout - good for scripts!
 			log.Logf("%s will be reimaged with the following:\r\n\r\n", c.VirtualMachineName.String())
 			log.Log(util.FormatImageInstall(imageInstall))
 
-			if !util.PromptYesNo("Are you certain you wish to continue?") {
+			if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
 				log.Error("Exiting")
 				return new(util.UserRequestedExit)
 			}
