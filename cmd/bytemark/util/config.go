@@ -25,6 +25,15 @@ var configVars = [...]string{
 	"yubikey",
 }
 
+func IsConfigVar(name string) bool {
+	for _, v := range configVars {
+		if v == name {
+			return true
+		}
+	}
+	return false
+}
+
 type InvalidConfigVarError struct {
 	ConfigVar string
 }
