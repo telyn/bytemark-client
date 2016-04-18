@@ -94,6 +94,12 @@ func (c *Client) ReadDefinitions() (*lib.Definitions, error) {
 	return defs, r.Error(1)
 }
 
+func (c *Client) AddIP(name *lib.VirtualMachineName, spec *lib.IPCreateRequest) (lib.IPs, error) {
+	r := c.Called(name, spec)
+	ips, _ := r.Get(0).(lib.IPs)
+	return ips, r.Error(1)
+}
+
 func (c *Client) AddUserAuthorizedKey(name, key string) error {
 	r := c.Called(name, key)
 	return r.Error(0)

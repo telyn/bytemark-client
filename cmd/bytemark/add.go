@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
+	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -11,8 +12,8 @@ func init() {
 	publicKeyFile := util.FileFlag{}
 	commands = append(commands, cli.Command{
 		Name:        "add",
-		Usage:       "Add public SSH keys to a Bytemark user",
-		UsageText:   "bytemark add key [--user <user>] <key>",
+		Usage:       "Add SSH keys to a user / IPs to a server",
+		UsageText:   "bytemark add key|ip",
 		Description: "The add command has a single subcommand - add key. See the help text for `bytemark add key`.",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
@@ -49,6 +50,64 @@ func init() {
 				} else {
 					return
 				}
+			}),
+		}, {
+			Name:        "ips",
+			Aliases:     []string{"ip"},
+			Usage:       "Add extra IP addresses to a server",
+			UsageText:   "bytemark add ips [--ipv4 | --ipv6] [--ips <number>] <server name>",
+			Description: `Add an extra IP to the given server. The IP will be chosen by the brain and output to standard out.`,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "ipv4",
+					Usage: "Add an IPv4 address. This is the default",
+				},
+				cli.BoolFlag{
+					Name:  "ipv6",
+					Usage: "Add an IPv6 address.",
+				},
+				cli.IntFlag{
+					Name:  "ips",
+					Usage: "How many IPs to add (1 to 4) - defaults to one.",
+				},
+				cli.StringFlag{
+					Name:  "reason",
+					Usage: "Reason for adding the IP. If not set, will prompt.",
+				},
+			},
+			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
+				addrs := c.Int("ips")
+				if addrs < 1 {
+					addrs = 1
+				}
+				family := "ipv4"
+				if c.Bool("ipv6") {
+					if c.Bool("ipv4") {
+						return c.Help("--ipv4 cannot be specified at the same time as --ipv6")
+					}
+					family = "ipv6"
+				}
+				reason := c.String("reason")
+				if reason == "" {
+					if addrs == 1 {
+						reason = util.Prompt("Enter the purpose for this extra IP: ")
+					} else {
+						reason = util.Prompt("Enter the purpose for these extra IPs: ")
+					}
+				}
+				ipcr := lib.IPCreateRequest{
+					Addresses:  addrs,
+					Family:     family,
+					Reason:     reason,
+					Contiguous: c.Bool("contiguous"),
+				}
+				ips, err := global.Client.AddIP(c.VirtualMachineName, &ipcr)
+				if err != nil {
+					return err
+				}
+				log.Log("IPs addded:")
+				log.Output(ips.String(), "\r\n")
+				return nil
 			}),
 		}},
 	})

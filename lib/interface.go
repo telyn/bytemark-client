@@ -94,6 +94,12 @@ type Client interface {
 	GetGroup(name *GroupName) (*Group, error)
 
 	//
+	// NICS
+	//
+
+	AddIP(name *VirtualMachineName, ipcr *IPCreateRequest) (IPs, error)
+
+	//
 	// USERS
 	//
 
