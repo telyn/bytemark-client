@@ -200,6 +200,11 @@ func ProcessError(err error, message ...string) ExitCode {
 		case *exec.Error:
 			if e.Name == "xdg-open" || e.Name == "x-www-browser" {
 				errorMessage = "Unable to find a browser to start. You may wish to install xdg-open (part of the xdg-utils package on Debian systems)"
+			} else if e.Name == "open" {
+				errorMessage = "Unable to find a browser to start. Ensure that the 'open' tool is in your PATH (usually lives in /usr/bin)."
+
+			} else if e.Name == "ssh" {
+				errorMessage = fmt.Sprintf("Unable to find an SSH client, please check you have one installed.")
 			} else {
 				errorMessage = fmt.Sprintf("Unable to find %s in your PATH.", e.Name)
 			}
