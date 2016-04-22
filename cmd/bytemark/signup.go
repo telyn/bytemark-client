@@ -3,6 +3,8 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
+	"encoding/json"
 	"github.com/codegangsta/cli"
 )
 
@@ -16,6 +18,12 @@ func init() {
 If you are creating an account on behalf of an organisation needing a different payment method, you'll need to email Bytemark support instead.
 
 If you have previously used the client, you'll have a login and will need to add the --force flag in order to create a new account`,
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "force",
+				Usage: "sign up for a new account & login despite already having a login.",
+			},
+		},
 		Action: With(func(c *Context) error {
 
 			// TODO(telyn): check a terminal is attached to stdin to try to help prevent fraudy/spammy crap just in case
@@ -29,9 +37,16 @@ If you have previously used the client, you'll have a login and will need to add
 				ssoExists = true
 			}
 
+			if ssoExists && !c.Bool("force") {
+				return c.Help("You already have a login configured, you may wish to use 'create account' to add another account to your user, or add the force flag.")
+			}
+
 			fields, frm := util.MakeSignupForm()
 
-			frm.Run()
+			err = frm.Run()
+			if err != nil {
+				return nil
+			}
 
 			account := lib.Account{
 				Name: fields[util.FIELD_ACCOUNT].Value(),
@@ -67,6 +82,13 @@ If you have previously used the client, you'll have a login and will need to add
 			account.CardReference = ref
 			createdAccount, err := global.Client.RegisterNewAccount(&account)
 			return err
+
+			buf, err := json.Marshal(createdAccount)
+			if err != nil {
+				return err
+			}
+			log.Output(string(buf))
+			return nil
 		}),
 	})
 }

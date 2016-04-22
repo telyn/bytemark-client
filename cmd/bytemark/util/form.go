@@ -36,7 +36,7 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form) {
 		FIELD_OWNER_EMAIL:        mkField("Email address", 24, validNonEmpty), // TODO(telyn): make sure it's email-lookin'
 		FIELD_OWNER_FIRSTNAME:    mkField("First name", 24, validNonEmpty),
 		FIELD_OWNER_LASTNAME:     mkField("Last name", 24, validNonEmpty),
-		FIELD_OWNER_CC:           mkField("ISO Country code (2-digit country code)\r\nNote that the UK's code is actually GB. Most others are what you'd expect", 2, validCC),
+		FIELD_OWNER_CC:           mkField("ISO Country code (2-digit country code)\r\nNote that the UK's code is actually GB. Most others are what you'd expect", 3, validISOCountry),
 		FIELD_OWNER_POSTCODE:     mkField("Post code", 24, validPostcode),
 		FIELD_OWNER_CITY:         mkField("City", 24, validNonEmpty),
 		FIELD_OWNER_ADDRESS:      mkField("Street Address", 24, validNonEmpty),
@@ -45,17 +45,33 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form) {
 		FIELD_OWNER_ORG_NAME:     mkField("Organisation name (optional)", 24, validAlways),
 		FIELD_OWNER_ORG_DIVISION: mkField("Organisation division (optional)", 24, validAlways),
 		FIELD_OWNER_ORG_VAT:      mkField("VAT Number (optional)", 24, validAlways),
-		FIELD_CC_NUMBER:          mkField("Debit/Credit card number", 16, validCC),
-		FIELD_CC_NAME:            mkField("Name on card", 16, validNonEmpty),
-		FIELD_CC_EXPIRY:          mkField("Expiry (MMYY)", 4, validExpiry),
-		FIELD_CC_CVV:             mkField("CVV2 number (3-4 digit number on back of card)", 4, validCVV),
+		FIELD_CC_NUMBER:          mkField("Debit/Credit card number", 17, validCC),
+		FIELD_CC_NAME:            mkField("Name on card", 17, validNonEmpty),
+		FIELD_CC_EXPIRY:          mkField("Expiry (MMYY)", 5, validExpiry),
+		FIELD_CC_CVV:             mkField("CVV2 number (3-4 digit number on back of card)", 5, validCVV),
 	}
-	fieldsArr := make([]form.Field, len(fields))
-	i := 0
-	for _, f := range fields {
-		fieldsArr[i] = f
-		i++
+	fieldsArr := make([]form.Field, len(fields)+2)
+	for i, f := range fields {
+		fieldsArr[i+1] = f
 	}
+	fieldsArr[0] = form.NewLabelField("Welcome to Bytemark!\r\n\r\nFilling out this form will create a Bytemark account for you. You can cancel at any time by pressing Esc twice, or using Ctrl+C. Press Tab to cycle through the fields. The fields are underlined in red when invalid, and green when valid.")
+	pointer := &f
+	fieldsArr[len(fields)+1] = form.NewButtonsField([]form.Button{
+		{
+			Text: "Sign up",
+			Action: func() {
+				// this is some fun to prevent a dependency cycle. it is gross.
+				(*pointer).Stop()
+			},
+		},
+		{
+			Text: "Cancel",
+			Action: func() {
+				// this is some fun to prevent cyclical dependencies. it is gross
+				(*pointer).Stop()
+			},
+		},
+	})
 	f = form.NewForm(fieldsArr)
 	return
 }

@@ -65,6 +65,10 @@ func validCVV(cvv string) bool {
 	return validNumber(cvv) && (len(cvv) == 3 || len(cvv) == 4)
 }
 
+func validISOCountry(code string) bool {
+	return len(code) > 1 && len(code) < 4
+}
+
 func validExpiry(exp string) bool {
 	if len(exp) != 4 {
 		return false
