@@ -11,12 +11,14 @@ const (
 	EP_AUTH Endpoint = iota
 	EP_BRAIN
 	EP_BILLING
+	EP_SPP
 )
 
 // bytemarkClient is the main type in the Bytemark API client library
 type bytemarkClient struct {
 	brainEndpoint   string
 	billingEndpoint string
+	sppEndpoint     string
 	allowInsecure   bool
 	auth            *auth3.Client
 	authSession     *auth3.SessionData
@@ -24,19 +26,20 @@ type bytemarkClient struct {
 }
 
 // New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
-func New(brainEndpoint, billingEndpoint string) (c *bytemarkClient, err error) {
+func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient, err error) {
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
 	}
-	return NewWithAuth(brainEndpoint, billingEndpoint, auth), nil
+	return NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint, auth), nil
 }
 
 // NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and bytemark.co.uk/auth3/client Client
-func NewWithAuth(brainEndpoint, billingEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
+func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
 	c = new(bytemarkClient)
 	c.brainEndpoint = brainEndpoint
 	c.billingEndpoint = billingEndpoint
+	c.sppEndpoint = sppEndpoint
 	c.debugLevel = 0
 	c.auth = auth
 	return c

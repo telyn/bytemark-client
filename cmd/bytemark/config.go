@@ -18,6 +18,7 @@ Available variables:
 	endpoint - the API endpoint to connect to. https://uk0.bigv.io is the default
 	billing-endpoint - the billing API endpoint to connect to.
 	auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.
+	spp-endpoint - the SPP endpoint to use. https://spp-submissions.bytemark.co.uk is the default.
 	debug-level - the default debug level. Set to 0 unless you like lots of output
 	token - the token used for authentication.") // You can get one using bytemark auth.`,
 		Subcommands: []cli.Command{

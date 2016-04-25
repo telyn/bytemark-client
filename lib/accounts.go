@@ -1,5 +1,10 @@
 package lib
 
+import (
+	"bytes"
+	"encoding/json"
+)
+
 /*func (c *Client) RegisterAccount() {
 
 }*/
@@ -40,7 +45,7 @@ func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, er
 
 	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview&include_deleted=true", name)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	_, _, err = req.Run(nil, account)
@@ -49,24 +54,38 @@ func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, er
 }
 
 /*
+// CreateAccount creates a new account with you as the owner.
 func (c *bytemarkClient) CreateAccount(account *Account) (newAccount *Account, err error) {
     // TODO(telyn): implement
 	return nil, nil
 }*/
 
+// RegisterNewAccount registers a new account with bmbilling. This will create a new user for the owner.
+// If you would like an extra account attached to your regular user, use CreateAccount
 func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err error) {
-	return nil, nil
+	req, err := c.BuildRequestNoAuth("POST", EP_BILLING, "/api/v1/accounts")
+	if err != nil {
+		return nil, err
+	}
+
+	js, err := json.Marshal(acc)
+	if err != nil {
+		return nil, err
+	}
+
+	_, _, err = req.Run(bytes.NewBuffer(js), newAcc)
+	return newAcc, err
 }
 
 // GetAccount takes an account name or ID and returns a filled-out Account object
 func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
 	billingAccount, err := c.getBillingAccount(name)
 	if err != nil {
-		return
+		return nil, err
 	}
 	brainAccount, err := c.getBrainAccount(name)
 	if err != nil {
-		return
+		return nil, err
 	}
 	account = new(Account)
 	account.FillBrain(brainAccount)

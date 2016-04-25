@@ -54,6 +54,7 @@ func main() {
 	flags.String("account", "", "")
 	flags.String("endpoint", "", "")
 	flags.String("billing-endpoint", "", "")
+	flags.String("spp-endpoint", "", "")
 	flags.String("auth-endpoint", "", "")
 	flags.String("yubikey-otp", "", "")
 
@@ -68,7 +69,7 @@ func main() {
 	global.Config = config
 	global.App.Version = lib.GetVersion().String()
 
-	global.Client, err = lib.New(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"))
+	global.Client, err = lib.New(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"), global.Config.GetIgnoreErr("spp-endpoint"))
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))

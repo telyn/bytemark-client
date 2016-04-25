@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytemark.co.uk/client/util/log"
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -126,14 +127,21 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		return
 	}
 
-	cli := r.mkHTTPClient()
+	rb, err := ioutil.ReadAll(body)
+	if err != nil {
+		return 0, nil, err
+	}
+	log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", string(rb))
 
-	req, err := r.mkHTTPRequest(body)
+	//cli := r.mkHTTPClient()
+
+	req, err := r.mkHTTPRequest(bytes.NewBuffer(rb))
 	if err != nil {
 		return
 	}
-
-	res, err := cli.Do(req)
+	res := (*http.Response)(nil)
+	err = APIError{}
+	//res, err := cli.Do(req)
 	if err != nil {
 		return
 	}
@@ -143,20 +151,10 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	log.Debugf(log.DBG_OUTLINE, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
 
 	baseErr := APIError{
-		Method:     r.method,
-		URL:        req.URL,
-		StatusCode: res.StatusCode,
-	}
-
-	if sBody, ok := body.(io.ReadSeeker); ok {
-		sBody.Seek(0, 0)
-		if err == nil {
-			rb, _ := ioutil.ReadAll(sBody)
-			baseErr.RequestBody = string(rb)
-			if err == nil {
-				log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", baseErr.RequestBody)
-			}
-		}
+		Method:      r.method,
+		URL:         req.URL,
+		StatusCode:  res.StatusCode,
+		RequestBody: string(rb),
 	}
 
 	response, err = ioutil.ReadAll(res.Body)
@@ -207,6 +205,8 @@ func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...stri
 		endpointUrl = c.brainEndpoint
 	case EP_BILLING:
 		endpointUrl = c.billingEndpoint
+	case EP_SPP:
+		endpointUrl = c.sppEndpoint
 	default:
 		return nil, UnsupportedEndpointError(endpoint)
 	}
