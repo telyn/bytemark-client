@@ -6,6 +6,7 @@ import (
 	"bytemark.co.uk/client/util/log"
 	"encoding/json"
 	"github.com/codegangsta/cli"
+	"strings"
 )
 
 func init() {
@@ -45,7 +46,11 @@ If you have previously used the client, you'll have a login and will need to add
 
 			err = frm.Run()
 			if err != nil {
-				return nil
+				return err
+			}
+			if problems, ok := frm.Validate(); !ok {
+				log.Log(strings.Join(problems, "\r\n"))
+				return new(util.UserRequestedExit)
 			}
 
 			account := lib.Account{

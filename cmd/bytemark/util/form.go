@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytemark.co.uk/client/util/log"
 	"github.com/telyn/form"
 )
 
@@ -25,14 +26,14 @@ const (
 	FIELD_CC_CVV
 )
 
-func mkField(label string, size int, fn func(string) bool) form.Field {
+func mkField(label string, size int, fn func(string) (string, bool)) form.Field {
 	return form.Label(form.NewTextField(size, []rune(""), fn), label)
 }
 
 func MakeSignupForm() (fields map[int]form.Field, f *form.Form, cancelled *bool) {
 	fields = map[int]form.Field{
 		FIELD_ACCOUNT:            mkField("Account name (this will be used as part of your machines hostnames)", 24, validName),
-		FIELD_OWNER_NAME:         mkField("Account owner's username.\r\nThis is the name you will use to log in. At a later time you can add a technical contact to the account by emailing support. This tool will eventually have support for that also.", 24, validName),
+		FIELD_OWNER_NAME:         mkField("Account owner's username\r\nThis is the name you will use to log in. At a later time you can add a technical contact to the account by emailing support. This tool will eventually have support for that also.", 24, validName),
 		FIELD_OWNER_EMAIL:        mkField("Email address", 24, validNonEmpty), // TODO(telyn): make sure it's email-lookin'
 		FIELD_OWNER_FIRSTNAME:    mkField("First name", 24, validNonEmpty),
 		FIELD_OWNER_LASTNAME:     mkField("Last name", 24, validNonEmpty),
@@ -63,7 +64,11 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form, cancelled *bool)
 			Text: "Sign up",
 			Action: func() {
 				// this is some fun to prevent a dependency cycle. it is gross.
-				(*pointer).Stop()
+				if probs, ok := (*pointer).Validate(); !ok {
+					log.Debugf(6, "problems with form: %#v", probs)
+				} else {
+					(*pointer).Stop()
+				}
 			},
 		},
 		{
