@@ -41,7 +41,7 @@ If you have previously used the client, you'll have a login and will need to add
 				return c.Help("You already have a login configured, you may wish to use 'create account' to add another account to your user, or add the force flag.")
 			}
 
-			fields, frm := util.MakeSignupForm()
+			fields, frm, cancelled := util.MakeSignupForm()
 
 			err = frm.Run()
 			if err != nil {
@@ -73,6 +73,10 @@ If you have previously used the client, you'll have a login and will need to add
 				Name:   fields[util.FIELD_CC_NAME].Value(),
 				Expiry: fields[util.FIELD_CC_EXPIRY].Value(),
 				CVV:    fields[util.FIELD_CC_CVV].Value(),
+			}
+			if *cancelled {
+				log.Logf("%#v\r\n%#v\r\n%#v\r\nCancelled by user request\r\n\r\n", card, account, account.Owner)
+				return new(util.UserRequestedExit)
 			}
 
 			ref, err := global.Client.CreateCreditCard(&card)

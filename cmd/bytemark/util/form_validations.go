@@ -70,17 +70,17 @@ func validISOCountry(code string) bool {
 }
 
 func validExpiry(exp string) bool {
-	if len(exp) != 4 {
+	if len(exp) != 5 {
 		return false
 	}
-	if !validNumber(exp) {
+	if exp[2] != '/' {
 		return false
 	}
 	mo, _ := strconv.ParseInt(exp[0:1], 10, 8)
 	if mo < 1 || mo > 12 {
 		return false
 	}
-	yr, _ := strconv.ParseInt(exp[2:3], 10, 8)
+	yr, _ := strconv.ParseInt(exp[3:4], 10, 8)
 
 	// this doesn't handle century boundaries well.
 	// but if this code is still in use at the end of the 2000s let me know and I'll

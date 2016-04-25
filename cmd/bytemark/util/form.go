@@ -29,7 +29,7 @@ func mkField(label string, size int, fn func(string) bool) form.Field {
 	return form.Label(form.NewTextField(size, []rune(""), fn), label)
 }
 
-func MakeSignupForm() (fields map[int]form.Field, f *form.Form) {
+func MakeSignupForm() (fields map[int]form.Field, f *form.Form, cancelled *bool) {
 	fields = map[int]form.Field{
 		FIELD_ACCOUNT:            mkField("Account name (this will be used as part of your machines hostnames)", 24, validName),
 		FIELD_OWNER_NAME:         mkField("Account owner's username.\r\nThis is the name you will use to log in. At a later time you can add a technical contact to the account by emailing support. This tool will eventually have support for that also.", 24, validName),
@@ -47,7 +47,7 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form) {
 		FIELD_OWNER_ORG_VAT:      mkField("VAT Number (optional)", 24, validAlways),
 		FIELD_CC_NUMBER:          mkField("Debit/Credit card number", 17, validCC),
 		FIELD_CC_NAME:            mkField("Name on card", 17, validNonEmpty),
-		FIELD_CC_EXPIRY:          mkField("Expiry (MMYY)", 5, validExpiry),
+		FIELD_CC_EXPIRY:          mkField("Expiry (MM/YY)", 6, validExpiry),
 		FIELD_CC_CVV:             mkField("CVV2 number (3-4 digit number on back of card)", 5, validCVV),
 	}
 	fieldsArr := make([]form.Field, len(fields)+2)
@@ -56,6 +56,8 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form) {
 	}
 	fieldsArr[0] = form.NewLabelField("Welcome to Bytemark!\r\n\r\nFilling out this form will create a Bytemark account for you. You can cancel at any time by pressing Esc twice, or using Ctrl+C. Press Tab to cycle through the fields. The fields are underlined in red when invalid, and green when valid.")
 	pointer := &f
+	c := false
+	cancelled = &c
 	fieldsArr[len(fields)+1] = form.NewButtonsField([]form.Button{
 		{
 			Text: "Sign up",
@@ -69,6 +71,7 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form) {
 			Action: func() {
 				// this is some fun to prevent cyclical dependencies. it is gross
 				(*pointer).Stop()
+				*cancelled = true
 			},
 		},
 	})
