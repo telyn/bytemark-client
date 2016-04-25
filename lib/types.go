@@ -167,19 +167,24 @@ type Account struct {
 }
 
 type Person struct {
-	ID                   int    `json:"id"`
-	Username             string `json:"username"`
-	FirstName            string `json:"firstname"`
-	LastName             string `json:"surname"`
-	Address              string `json:"address"`
-	City                 string `json:"city"`
-	StateCounty          string `json:"statecounty"`
-	Postcode             string `json:"postcode"`
-	Country              string `json:"country"`
-	Phone                string `json:"phone"`
-	MobilePhone          string `json:"phonemobile"`
-	Email                string `json:"email"`
-	BackupEmail          string `json:"email_backup"`
+	ID          int    `json:"id"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	BackupEmail string `json:"email_backup"`
+
+	// only set in the creation request
+	Password string `json:"password"`
+
+	FirstName   string `json:"firstname"`
+	LastName    string `json:"surname"`
+	Address     string `json:"address"`
+	City        string `json:"city"`
+	StateCounty string `json:"statecounty"`
+	Postcode    string `json:"postcode"`
+	Country     string `json:"country"`
+	Phone       string `json:"phone"`
+	MobilePhone string `json:"phonemobile"`
+
 	Organization         string `json:"organization"`
 	OrganizationDivision string `json:"division"`
 	VATNumber            string `json:"vatnumber"`

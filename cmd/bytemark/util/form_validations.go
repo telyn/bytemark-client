@@ -22,8 +22,15 @@ func validEmptyOr(otherFn func(string) (string, bool)) func(string) (string, boo
 }
 
 func validNonEmpty(s string) (string, bool) {
-	if len(s) > 1 {
+	if len(s) < 1 {
 		return "is empty", false
+	}
+	return "", true
+}
+
+func validPassword(s string) (string, bool) {
+	if len(s) < 12 {
+		return "is not long enough", false
 	}
 	return "", true
 }
@@ -46,6 +53,9 @@ func validPostcode(s string) (string, bool) {
 }
 
 func validNumber(s string) (string, bool) {
+	if p, ok := validNonEmpty(s); !ok {
+		return p, ok
+	}
 	for _, c := range s {
 		if c < '0' && c > '9' {
 			return "is not a number", false

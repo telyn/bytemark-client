@@ -8,6 +8,8 @@ import (
 const (
 	FIELD_ACCOUNT = iota
 	FIELD_OWNER_NAME
+	FIELD_OWNER_PASS
+	FIELD_OWNER_PASS_CONFIRM
 	FIELD_OWNER_EMAIL
 	FIELD_OWNER_FIRSTNAME
 	FIELD_OWNER_LASTNAME
@@ -29,12 +31,32 @@ const (
 func mkField(label string, size int, fn func(string) (string, bool)) form.Field {
 	return form.Label(form.NewTextField(size, []rune(""), fn), label)
 }
+func mkPasswordFields(size int) (passField, confirmField form.Field) {
+	passTextField := form.NewTextField(size, []rune(""), validPassword)
+	passField = form.Label(passTextField, "Password")
+	confirmTextField := form.NewTextField(size, []rune(""), func(val string) (string, bool) {
+		if prob, ok := validPassword(val); !ok {
+			return prob, ok
+		}
+		if val != passTextField.Value() {
+			return "Passwords not identical", false
+		}
+		return "", true
 
-func MakeSignupForm() (fields map[int]form.Field, f *form.Form, cancelled *bool) {
+	})
+	confirmField = form.Label(confirmTextField, "Enter the password again for confirmation")
+
+	return
+}
+
+func MakeSignupForm() (fields map[int]form.Field, f *form.Form, signup *bool) {
+	pass, confirm := mkPasswordFields(24)
 	fields = map[int]form.Field{
 		FIELD_ACCOUNT:            mkField("Account name (this will be used as part of your machines hostnames)", 24, validName),
 		FIELD_OWNER_NAME:         mkField("Account owner's username\r\nThis is the name you will use to log in. At a later time you can add a technical contact to the account by emailing support. This tool will eventually have support for that also.", 24, validName),
 		FIELD_OWNER_EMAIL:        mkField("Email address", 24, validNonEmpty), // TODO(telyn): make sure it's email-lookin'
+		FIELD_OWNER_PASS:         pass,
+		FIELD_OWNER_PASS_CONFIRM: confirm,
 		FIELD_OWNER_FIRSTNAME:    mkField("First name", 24, validNonEmpty),
 		FIELD_OWNER_LASTNAME:     mkField("Last name", 24, validNonEmpty),
 		FIELD_OWNER_CC:           mkField("ISO Country code (2-digit country code)\r\nNote that the UK's code is actually GB. Most others are what you'd expect", 3, validISOCountry),
@@ -57,8 +79,8 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form, cancelled *bool)
 	}
 	fieldsArr[0] = form.NewLabelField("Welcome to Bytemark!\r\n\r\nFilling out this form will create a Bytemark account for you. You can cancel at any time by pressing Esc twice, or using Ctrl+C. Press Tab to cycle through the fields. The fields are underlined in red when invalid, and green when valid.")
 	pointer := &f
-	c := false
-	cancelled = &c
+	s := false
+	signup = &s
 	fieldsArr[len(fields)+1] = form.NewButtonsField([]form.Button{
 		{
 			Text: "Sign up",
@@ -67,6 +89,7 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form, cancelled *bool)
 				if probs, ok := (*pointer).Validate(); !ok {
 					log.Debugf(6, "problems with form: %#v", probs)
 				} else {
+					*signup = true
 					(*pointer).Stop()
 				}
 			},
@@ -76,7 +99,6 @@ func MakeSignupForm() (fields map[int]form.Field, f *form.Form, cancelled *bool)
 			Action: func() {
 				// this is some fun to prevent cyclical dependencies. it is gross
 				(*pointer).Stop()
-				*cancelled = true
 			},
 		},
 	})

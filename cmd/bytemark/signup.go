@@ -42,7 +42,7 @@ If you have previously used the client, you'll have a login and will need to add
 				return c.Help("You already have a login configured, you may wish to use 'create account' to add another account to your user, or add the force flag.")
 			}
 
-			fields, frm, cancelled := util.MakeSignupForm()
+			fields, frm, signup := util.MakeSignupForm()
 
 			err = frm.Run()
 			if err != nil {
@@ -59,6 +59,7 @@ If you have previously used the client, you'll have a login and will need to add
 
 			account.Owner = &lib.Person{
 				Username:             fields[util.FIELD_OWNER_NAME].Value(),
+				Password:             fields[util.FIELD_OWNER_PASS].Value(),
 				Email:                fields[util.FIELD_OWNER_EMAIL].Value(),
 				FirstName:            fields[util.FIELD_OWNER_FIRSTNAME].Value(),
 				LastName:             fields[util.FIELD_OWNER_LASTNAME].Value(),
@@ -79,7 +80,7 @@ If you have previously used the client, you'll have a login and will need to add
 				Expiry: fields[util.FIELD_CC_EXPIRY].Value(),
 				CVV:    fields[util.FIELD_CC_CVV].Value(),
 			}
-			if *cancelled {
+			if !*signup {
 				log.Logf("%#v\r\n%#v\r\n%#v\r\nCancelled by user request\r\n\r\n", card, account, account.Owner)
 				return new(util.UserRequestedExit)
 			}
