@@ -146,13 +146,13 @@ type brainAccount struct {
 	Groups    []*Group `json:"groups"`
 }
 type billingAccount struct {
-	ID                 int     `json:"id"`
-	Name               string  `json:"bigv_account_subscription"`
-	Owner              *Person `json:"owner"`
-	TechnicalContact   *Person `json:"tech"`
-	OwnerID            int     `json:"owner_id" omitempty`
-	CardReference      string  `json:"card_reference" omitempty`
-	TechnicalContactID int     `json:"tech_id" omitempty`
+	ID                 int     `json:"id,omitempty"`
+	Name               string  `json:"bigv_account_subscription,omitempty"`
+	Owner              *Person `json:"owner,omitempty"`
+	TechnicalContact   *Person `json:"tech,omitempty"`
+	OwnerID            int     `json:"owner_id,omitempty"`
+	CardReference      string  `json:"card_reference,omitempty"`
+	TechnicalContactID int     `json:"tech_id,omitempty"`
 }
 
 type Account struct {
@@ -167,10 +167,10 @@ type Account struct {
 }
 
 type Person struct {
-	ID          int    `json:"id"`
+	ID          int    `json:"id,omitempty"`
 	Username    string `json:"username"`
 	Email       string `json:"email"`
-	BackupEmail string `json:"email_backup"`
+	BackupEmail string `json:"email_backup,omitempty"`
 
 	// only set in the creation request
 	Password string `json:"password"`
@@ -179,15 +179,15 @@ type Person struct {
 	LastName    string `json:"surname"`
 	Address     string `json:"address"`
 	City        string `json:"city"`
-	StateCounty string `json:"statecounty"`
+	StateCounty string `json:"statecounty,omitempty"`
 	Postcode    string `json:"postcode"`
 	Country     string `json:"country"`
 	Phone       string `json:"phone"`
-	MobilePhone string `json:"phonemobile"`
+	MobilePhone string `json:"phonemobile,omitempty"`
 
-	Organization         string `json:"organization"`
-	OrganizationDivision string `json:"division"`
-	VATNumber            string `json:"vatnumber"`
+	Organization         string `json:"organization,omitempty"`
+	OrganizationDivision string `json:"division,omitempty"`
+	VATNumber            string `json:"vatnumber,omitempty"`
 }
 
 type CreditCard struct {

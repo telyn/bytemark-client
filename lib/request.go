@@ -97,9 +97,14 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 		return nil, err
 	}
 	req.Close = true
+	req.Header.Add("User-Agent", "bytemark-client"+GetVersion().String())
 
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/json")
+	if r.endpoint == EP_SPP {
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	} else {
+		req.Header.Add("Accept", "application/json")
+		req.Header.Add("Content-Type", "application/json")
+	}
 	if r.authenticate {
 		if r.client.GetSessionToken() == "" {
 			return nil, &NilAuthError{}
@@ -126,22 +131,26 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		err = InsecureConnectionError{r}
 		return
 	}
+	rb := make([]byte, 0)
+	if body != nil {
 
-	rb, err := ioutil.ReadAll(body)
-	if err != nil {
-		return 0, nil, err
+		rb, err = ioutil.ReadAll(body)
+		if err != nil {
+			return 0, nil, err
+		}
+		log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", string(rb))
 	}
-	log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", string(rb))
 
-	//cli := r.mkHTTPClient()
+	cli := r.mkHTTPClient()
 
 	req, err := r.mkHTTPRequest(bytes.NewBuffer(rb))
 	if err != nil {
 		return
 	}
-	res := (*http.Response)(nil)
-	err = APIError{}
-	//res, err := cli.Do(req)
+	if len(rb) > 0 {
+		req.Header.Add("Content-Length", fmt.Sprintf("%d", len(rb)))
+	}
+	res, err := cli.Do(req)
 	if err != nil {
 		return
 	}

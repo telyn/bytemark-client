@@ -68,12 +68,20 @@ func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err 
 		return nil, err
 	}
 
-	js, err := json.Marshal(acc)
+	js, err := json.Marshal(acc.billingAccount())
 	if err != nil {
 		return nil, err
 	}
 
-	_, _, err = req.Run(bytes.NewBuffer(js), newAcc)
+	status, _, err := req.Run(bytes.NewBuffer(js), newAcc)
+	if err != nil {
+		if _, ok := err.(*json.InvalidUnmarshalError); !ok {
+			return newAcc, err
+		}
+	}
+	if status == 202 {
+		return newAcc, new(AccountCreationDeferredError)
+	}
 	return newAcc, err
 }
 
@@ -88,8 +96,8 @@ func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
 		return nil, err
 	}
 	account = new(Account)
-	account.FillBrain(brainAccount)
-	account.FillBilling(billingAccount)
+	account.fillBrain(brainAccount)
+	account.fillBilling(billingAccount)
 
 	return
 
@@ -127,13 +135,13 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 		if by_name[b.Name] == nil {
 			by_name[b.Name] = new(Account)
 		}
-		by_name[b.Name].FillBrain(b)
+		by_name[b.Name].fillBrain(b)
 	}
 	for _, b := range billingAccounts {
 		if by_name[b.Name] == nil {
 			by_name[b.Name] = new(Account)
 		}
-		by_name[b.Name].FillBilling(b)
+		by_name[b.Name].fillBilling(b)
 	}
 	for _, a := range by_name {
 		accounts = append(accounts, a)

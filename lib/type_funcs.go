@@ -222,7 +222,7 @@ func (vm *VirtualMachine) AllIPv6Addresses() (ips IPs) {
 	return ips
 }
 
-func (a *Account) FillBrain(b *brainAccount) {
+func (a *Account) fillBrain(b *brainAccount) {
 	if b != nil {
 		a.BrainID = b.ID
 		a.Groups = b.Groups
@@ -230,7 +230,7 @@ func (a *Account) FillBrain(b *brainAccount) {
 		a.Name = b.Name
 	}
 }
-func (a *Account) FillBilling(b *billingAccount) {
+func (a *Account) fillBilling(b *billingAccount) {
 	if b != nil {
 		a.BillingID = b.ID
 		a.Owner = b.Owner
@@ -247,11 +247,12 @@ func (a *Account) CountVirtualMachines() (servers int) {
 	return
 }
 
-/*
-func (a *Account) ToBillingAccount() *billingAccount {
-
+func (a *Account) billingAccount() (b *billingAccount) {
+	b = new(billingAccount)
+	b.ID = a.BillingID
+	b.Owner = a.Owner
+	b.TechnicalContact = a.TechnicalContact
+	b.CardReference = a.CardReference
+	b.Name = a.Name
+	return
 }
-func (a *Account) ToBrainAccount() *brainAccount {
-
-}
-*/
