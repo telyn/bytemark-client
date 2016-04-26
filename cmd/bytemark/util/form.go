@@ -31,9 +31,9 @@ func mkField(label string, size int, fn func(string) (string, bool)) form.Field 
 	return form.Label(form.NewTextField(size, []rune(""), fn), label)
 }
 func mkPasswordFields(size int) (passField, confirmField form.Field) {
-	passTextField := form.NewTextField(size, []rune(""), validPassword)
+	passTextField := form.NewMaskedTextField(size, []rune(""), validPassword)
 	passField = form.Label(passTextField, "Password")
-	confirmTextField := form.NewTextField(size, []rune(""), func(val string) (string, bool) {
+	confirmTextField := form.NewMaskedTextField(size, []rune(""), func(val string) (string, bool) {
 		if prob, ok := validPassword(val); !ok {
 			return prob, ok
 		}
