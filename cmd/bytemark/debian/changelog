@@ -1,3 +1,16 @@
+bytemark-client (0.6.0) stable; urgency=low
+
+  New features: 
+  * deleted servers are shown when using `list servers`
+  * --json flag added to `create server`
+  
+  Changes: 
+  * Much better help text for all commands
+  * --force and --silent flags have been removed
+  * Mention of non-existent `delete account` command has been removed
+
+ -- Telyn ZF Roat <telyn.roat@bytemark.co.uk> Fri, 08 Apr 2016 14:21:10 +0100
+
 bytemark-client (0.5.0) stable; urgency=low
 
   New features: None!

@@ -10,15 +10,18 @@ import (
 )
 
 func init() {
-	discs := util.DiscSpecFlag{}
-	authorizedKeysFile := util.FileFlag{}
-	memory := util.SizeSpecFlag(1)
-	ips := util.IPFlag{}
-
 	createServer := cli.Command{
 		Name:      "server",
-		Usage:     "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
-		UsageText: `Create a new server with bytemark.`,
+		Usage:     `Create a new server with bytemark.`,
+		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
+		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
+		
+A disc spec looks like the following: label:grade:size
+The label and grade fields are optional. If grade is empty, defaults to sata.
+If there are two fields, they are assumed to be grade and size.
+Multiple --disc flags can be used to create multiple discs
+
+If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
 		Flags: []cli.Flag{
 			cli.IntFlag{
 				Name:  "cores",
@@ -32,11 +35,12 @@ func init() {
 			cli.GenericFlag{
 				Name:  "disc",
 				Usage: "One of more disc specifications. Defaults to a single 25GiB sata-grade disc",
-				Value: &discs,
+				Value: new(util.DiscSpecFlag),
 			},
 			cli.GenericFlag{
 				Name:  "firstboot-script-file",
 				Usage: "Path to a script which will be run the first time the server boots after imaging",
+				Value: new(util.FileFlag),
 			},
 			cli.BoolFlag{
 				Name:  "force",
@@ -56,12 +60,16 @@ func init() {
 			},
 			cli.GenericFlag{
 				Name:  "ip",
-				Value: &ips,
+				Value: new(util.IPFlag),
 				Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
+			},
+			cli.BoolFlag{
+				Name:  "json",
+				Usage: "If set, will output the spec and created virtual machine as a JSON object.",
 			},
 			cli.GenericFlag{
 				Name:  "memory",
-				Value: &memory,
+				Value: new(util.SizeSpecFlag),
 				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units. Defaults to 1GiB.",
 			},
 			cli.BoolFlag{
@@ -74,7 +82,7 @@ func init() {
 			},
 			cli.GenericFlag{
 				Name:  "authorized-keys-file",
-				Value: &authorizedKeysFile,
+				Value: new(util.FileFlag),
 				Usage: "Specifies SSH authorized keys for the root user. Only affects linux images.",
 			},
 			cli.StringFlag{
@@ -95,20 +103,19 @@ func init() {
 			},
 		},
 
-		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
-		
-A disc spec looks like the following: label:grade:size
-The label and grade fields are optional. If grade is empty, defaults to sata.
-If there are two fields, they are assumed to be grade and size.
-Multiple --disc flags can be used to create multiple discs
-
-If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
 		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createServer),
 	}
 
 	createDiscs := cli.Command{
-		Name:      "discs",
-		Aliases:   []string{"disc", "disk", "disks"},
+		Name:    "discs",
+		Aliases: []string{"disc", "disk", "disks"},
+		Flags: []cli.Flag{
+			cli.GenericFlag{
+				Name:  "disc",
+				Usage: "A disc to add. You can specify as many discs as you like",
+				Value: new(util.DiscSpecFlag),
+			},
+		},
 		Usage:     "create virtual discs attached to one of your cloud servers",
 		UsageText: "bytemark create discs [--disc <disc spec>]... <cloud server>",
 		Description: `A disc spec looks like the following: label:grade:size
@@ -119,16 +126,20 @@ Multiple --disc flags can be used to create multiple discs`,
 	}
 
 	createGroup := cli.Command{
-		Name:   "group",
-		Usage:  "bytemark create group <group name>",
-		Action: With(GroupNameProvider, AuthProvider, fn_createGroup),
+		Name:        "group",
+		Usage:       "create a group for organising your servers",
+		UsageText:   "bytemark create group <group name>",
+		Description: `Groups are part of your server's fqdn`,
+		Action:      With(GroupNameProvider, AuthProvider, fn_createGroup),
 	}
 
 	commands = append(commands, cli.Command{
 		Name:      "create",
-		Usage:     "bytemark create disc|group|ip|server",
-		UsageText: "Creates various kinds of things. See `bytemark create <kind of thing> help`",
-		Description: `	    bytemark create disc[s] [--disc <disc spec>]... <cloud server>
+		Usage:     "Creates various kinds of things. See `bytemark create <kind of thing> help`",
+		UsageText: "bytemark create disc|group|ip|server",
+		Description: `Create a new disc, group, IP or server.
+
+	create disc[s] [--disc <disc spec>]... <cloud server>
 	create group [--account <name>] <name>
 	create ip [--reason reason] <cloud server>
 	create server (see bytemark create server help)
@@ -137,6 +148,7 @@ A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
+		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			createServer,
 			createDiscs,
@@ -146,10 +158,7 @@ Multiple --disc flags can be used to create multiple discs`,
 }
 
 func fn_createDisc(c *Context) (err error) {
-	flags := util.MakeCommonFlagSet()
-	var discs util.DiscSpecFlag
-	flags.Var(&discs, "disc", "")
-	global.Config.ImportFlags(flags)
+	discs := c.Discs("disc")
 
 	for i := range discs {
 		d, err := discs[i].Validate()
@@ -159,7 +168,7 @@ func fn_createDisc(c *Context) (err error) {
 		discs[i] = *d
 	}
 
-	log.Logf("Adding discs to %s:\r\n", c.VirtualMachineName)
+	log.Logf("Adding %d discs to %s:\r\n", len(discs), c.VirtualMachineName)
 	for _, d := range discs {
 		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
 		err := global.Client.CreateDisc(c.VirtualMachineName, d)
@@ -173,9 +182,6 @@ func fn_createDisc(c *Context) (err error) {
 }
 
 func fn_createGroup(c *Context) (err error) {
-	flags := util.MakeCommonFlagSet()
-	global.Config.ImportFlags(flags)
-
 	err = global.Client.CreateGroup(c.GroupName)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", c.GroupName.Group, c.GroupName.Account)
@@ -186,69 +192,48 @@ func fn_createGroup(c *Context) (err error) {
 }
 
 func fn_createServer(c *Context) (err error) {
-	flags := util.MakeCommonFlagSet()
-	addImageInstallFlags(flags)
-	cores := flags.Int("cores", 1, "")
-	cdrom := flags.String("cdrom", "", "")
-	var discs util.DiscSpecFlag
-	flags.Var(&discs, "disc", "")
-	hwprofile := flags.String("hwprofile", "", "")
-	hwprofilelock := flags.Bool("hwprofile-locked", false, "")
-	var ips util.IPFlag
-	flags.Var(&ips, "ip", "")
-	memorySpec := flags.String("memory", "1", "")
-	noDiscs := flags.Bool("no-discs", false, "")
-	noImage := flags.Bool("no-image", false, "")
-	stopped := flags.Bool("stopped", false, "")
-	zone := flags.String("zone", "", "")
-	args := global.Config.ImportFlags(flags)
+	noImage := c.Bool("no-image")
+	if c.Bool("no-discs") {
+		noImage = true
+	}
 
-	for i, arg := range args {
-		switch i {
-		// the first arg is the vm name which we already have
-		case 0:
-			continue
-		case 1:
-			cores64, err := strconv.ParseInt(arg, 10, 32)
-			if err != nil {
-				log.Error("Cores argument given was not an int.")
-				err = util.PEBKACError{}
-				return err
+	discs := c.Discs("disc")
+	cores := c.Int("cores")
+	memory := c.Size("memory")
+	if memory == 0 {
+		memory = 1024
+	}
+
+	for argNum, arg := range c.Args() {
+		switch argNum {
+		case 0: // cores
+			if tmpCores, err := strconv.Atoi(arg); err == nil {
+				cores = tmpCores
 			} else {
-				*cores = int(cores64)
+				return err
 			}
-		case 2:
-			*memorySpec = arg
-		default:
-			if len(discs) != 0 {
-				log.Error("--disc flag used along with the discs spec argument - please use only one")
-				err = util.PEBKACError{}
-				return
+		case 1: // memory
+			if tmpMem, err := util.ParseSize(arg); err == nil {
+				memory = tmpMem
+			} else {
+				return err
 			}
-			for i, spec := range strings.Split(arg, ",") {
-				disc, err := util.ParseDiscSpec(spec)
-				if err != nil {
-					log.Errorf("Disc %d has a malformed spec - '%s' is invalid", i, spec)
-					//cmds.HelpForTopic('specs')
-					err = util.PEBKACError{}
+		case 2: // disc
+			discs = make([]lib.Disc, strings.Count(arg, ",")+1)
+			for discNum, discSpec := range strings.Split(arg, ",") {
+				if tmpDisc, err := util.ParseDiscSpec(discSpec); err == nil {
+					discs[discNum] = *tmpDisc
+				} else {
 					return err
 				}
-				discs = append(discs, *disc)
 			}
 
+		case 3:
+			return c.Help("Too many arguments given.")
 		}
 	}
 
-	memory, err := util.ParseSize(*memorySpec)
-	if err != nil {
-		return
-	}
-
-	if *noDiscs {
-		*noImage = true
-	}
-
-	if len(discs) == 0 && !*noDiscs {
+	if len(discs) == 0 && !c.Context.Bool("no-discs") {
 		discs = append(discs, lib.Disc{Size: 25600})
 	}
 
@@ -260,10 +245,10 @@ func fn_createServer(c *Context) (err error) {
 		discs[i] = *d
 	}
 
+	ips := c.IPs("ip")
+
 	if len(ips) > 2 {
-		log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-		err = &util.PEBKACError{}
-		return
+		return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 	}
 
 	var ipspec *lib.IPSpec
@@ -273,16 +258,12 @@ func fn_createServer(c *Context) (err error) {
 		for _, ip := range ips {
 			if ip.To4() != nil {
 				if ipspec.IPv4 != "" {
-					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					err = &util.PEBKACError{}
-					return
+					return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 				}
 				ipspec.IPv4 = ip.To4().String()
 			} else {
 				if ipspec.IPv6 != "" {
-					log.Log("A maximum of one IPv4 and one IPv6 address may be specified")
-					err = &util.PEBKACError{}
-					return
+					return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 
 				}
 				ipspec.IPv6 = ip.String()
@@ -290,28 +271,31 @@ func fn_createServer(c *Context) (err error) {
 		}
 	}
 
-	imageInstall, _, err := prepareImageInstall(flags)
+	imageInstall, _, err := prepareImageInstall(c)
 	if err != nil {
 		return
 	}
 
-	if *noImage {
+	if noImage {
 		imageInstall = nil
 	}
 
+	stopped := c.Bool("stopped")
+	cdrom := c.String("cdrom")
+
 	// if stopped isn't set and either cdrom or image are set, start the server
-	autoreboot := !*stopped && ((imageInstall != nil) || (*cdrom != ""))
+	autoreboot := !stopped && ((imageInstall != nil) || (cdrom != ""))
 
 	spec := lib.VirtualMachineSpec{
 		VirtualMachine: &lib.VirtualMachine{
 			Name:                  c.VirtualMachineName.VirtualMachine,
 			Autoreboot:            autoreboot,
-			Cores:                 *cores,
+			Cores:                 cores,
 			Memory:                memory,
-			ZoneName:              *zone,
-			CdromURL:              *cdrom,
-			HardwareProfile:       *hwprofile,
-			HardwareProfileLocked: *hwprofilelock,
+			ZoneName:              c.String("zone"),
+			CdromURL:              c.String("cdrom"),
+			HardwareProfile:       c.String("hwprofile"),
+			HardwareProfileLocked: c.Bool("hwprofile-locked"),
 		},
 		Discs:   discs,
 		IPs:     ipspec,
@@ -326,26 +310,28 @@ func fn_createServer(c *Context) (err error) {
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
 	if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
 		log.Error("Exiting.")
-		err = &util.UserRequestedExit{}
-		return
+		return new(util.UserRequestedExit)
 	}
 
 	_, err = global.Client.CreateVirtualMachine(groupName, spec)
 	if err != nil {
-		return
+		return err
 	}
 	vm, err := global.Client.GetVirtualMachine(c.VirtualMachineName)
 	if err != nil {
 		return
 	}
-	log.Log("cloud server created successfully", "")
-	log.Log(util.FormatVirtualMachine(vm))
-	if imageInstall != nil {
-		log.Log()
-		log.Logf("Root password:") // logf so we don't get a tailing \r\n
-		log.Outputf("%s\r\n", imageInstall.RootPassword)
-	} else {
-		log.Log("Machine was not imaged")
-	}
-	return
+	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() error {
+
+		log.Log("cloud server created successfully", "")
+		log.Log(util.FormatVirtualMachine(vm))
+		if imageInstall != nil {
+			log.Log()
+			log.Logf("Root password:") // logf so we don't get a tailing \r\n
+			log.Outputf("%s\r\n", imageInstall.RootPassword)
+		} else {
+			log.Log("Machine was not imaged")
+		}
+		return nil
+	})
 }

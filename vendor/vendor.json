@@ -1,0 +1,64 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "bytemark.co.uk/auth3/client",
+			"revision": "4275124fdd5a4b6a16e5d893fd7058b09bb023a7"
+		},
+		{
+			"checksumSHA1": "7SbTaY0kaYxgQrG3/9cjrI+BcyU=",
+			"path": "github.com/bgentry/speakeasy",
+			"revision": "36e9cfdd690967f4f690c6edcc9ffacd006014a0"
+		},
+		{
+			"checksumSHA1": "twtRfb6484vfr2qqjiFkLThTjcQ=",
+			"path": "github.com/bgentry/speakeasy/example",
+			"revision": "36e9cfdd690967f4f690c6edcc9ffacd006014a0"
+		},
+		{
+			"checksumSHA1": "BGwU8hMfLiAGyvi6jxPirHe+ayY=",
+			"path": "github.com/cheekybits/is",
+			"revision": "68e9c0620927fb5427fda3708222d0edee89eae9"
+		},
+		{
+			"checksumSHA1": "BLBx9HSRPH8EPHHFEnBErhC8QfU=",
+			"path": "github.com/codegangsta/cli",
+			"revision": "aca5b047ed14d17224157c3434ea93bf6cdaadee",
+			"revisionTime": "2016-03-07T04:12:29Z"
+		},
+		{
+			"checksumSHA1": "1YeGotQXMZMqk+mmm8sbBVJywpw=",
+			"comment": "go.weekly.2011-12-22-27-ge6ac2fc",
+			"path": "github.com/kr/pretty",
+			"revision": "e6ac2fc51e89a3249e82157fa0bb7a18ef9dd5bb"
+		},
+		{
+			"checksumSHA1": "P29nLcVx4WzwhEDgDTCN76rS5WI=",
+			"comment": "release.r56-29-gf7ee69f",
+			"path": "github.com/kr/pty",
+			"revision": "f7ee69f31298ecbe5d2b349c711e2547a617d398"
+		},
+		{
+			"checksumSHA1": "uulQHQ7IsRKqDudBC8Go9J0gtAc=",
+			"path": "github.com/kr/text",
+			"revision": "bb797dc4fb8320488f47bf11de07a733d7233e1f"
+		},
+		{
+			"checksumSHA1": "zPU7BBYHn03iiTgGk+q21zFjYU0=",
+			"path": "github.com/kr/text/colwriter",
+			"revision": "bb797dc4fb8320488f47bf11de07a733d7233e1f"
+		},
+		{
+			"checksumSHA1": "UUwogtp9fA45TfzuXEj3cCfDkiI=",
+			"path": "github.com/kr/text/mc",
+			"revision": "bb797dc4fb8320488f47bf11de07a733d7233e1f"
+		},
+		{
+			"checksumSHA1": "1ber1h9izL2ssf0V28UrQW6tgAw=",
+			"path": "github.com/maraino/go-mock",
+			"revision": "3d044b7ea45759510b4e24b679e1df257289675a"
+		}
+	],
+	"rootPath": "bytemark.co.uk/client"
+}

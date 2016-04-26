@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -15,16 +17,21 @@ func init() {
 The set and unset subcommands can be used to set and unset such variables.
 		
 Available variables:
-	endpoint - the API endpoint to connect to. https://uk0.bigv.io is the default
-	billing-endpoint - the billing API endpoint to connect to.
+	account - the default account, used when you do not explicitly state an account - defaults to the same as your user name
+	token - the token used for authentication
+	user - the user that you log in as by default
+	group - the default group, used when you do not explicitly state a group (defaults to 'default')
+
+	debug-level - the default debug level. Set to 0 unless you like lots of output.
 	auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.
-	debug-level - the default debug level. Set to 0 unless you like lots of output
-	token - the token used for authentication.") // You can get one using bytemark auth.`,
+	endpoint - the brain endpoint to connect to. https://uk0.bigv.io is the default.
+	billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.`,
 		Subcommands: []cli.Command{
 			{
-				Name:      "set",
-				UsageText: "bytemark config set <variable> <value>",
-				Usage:     "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
+				Name:        "set",
+				UsageText:   "bytemark config set <variable> <value>",
+				Usage:       "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
+				Description: "Sets the named variable to the given value. See `bytemark help config` for which variables are available",
 				Action: With(func(ctx *Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {
@@ -32,12 +39,15 @@ Available variables:
 					}
 					varname = strings.ToLower(varname)
 
+					if !util.IsConfigVar(varname) {
+						return ctx.Help(fmt.Sprintf("%s is not a valid variable name", varname))
+					}
+
 					oldVar, err := global.Config.GetV(varname)
 					if err != nil {
 						return err
 					}
 
-					// TODO(telyn): consider validating input for the set command
 					value, err := ctx.NextArg()
 					if err != nil {
 						return err
@@ -46,14 +56,6 @@ Available variables:
 					err = global.Config.SetPersistent(varname, value, "CMD set")
 					if err != nil {
 						return err
-						// TODO(telyn): wrap the error in an error of my own to expose this bhvr
-						/*
-							if e, ok := err.(*util.ConfigReadError); ok {
-								log.Errorf("Couldn't set %s - %v\r\n", e.Name, e.Err)
-							} else {
-								log.Errorf("Couldn't set %s - %v\r\n", variable, err)
-							}
-						*/
 					}
 
 					if oldVar.Source == "config" {
@@ -64,9 +66,10 @@ Available variables:
 					return nil
 				}),
 			}, {
-				Name:      "unset",
-				UsageText: "bytemark config unset <variable>",
-				Usage:     "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
+				Name:        "unset",
+				UsageText:   "bytemark config unset <variable>",
+				Usage:       "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
+				Description: "Unsets the named variable.",
 				Action: With(func(ctx *Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {

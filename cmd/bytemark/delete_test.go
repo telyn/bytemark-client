@@ -1,26 +1,23 @@
 package main
 
 import (
-	util "bytemark.co.uk/client/cmd/bytemark/util"
+	"strings"
 
 	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/mocks"
+
 	"github.com/cheekybits/is"
 	"testing"
 )
 
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-server"})
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -30,24 +27,25 @@ func TestDeleteServer(t *testing.T) {
 
 	vm := getFixtureVM()
 
-	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
-	c.When("DeleteVirtualMachine", name, false).Return(nil).Times(1)
-	cmds := NewCommandSet(config, c)
+	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
+	c.When("DeleteVirtualMachine", &name, false).Return(nil).Times(1)
 
-	is.Equal(util.E_SUCCESS, cmds.DeleteServer([]string{"test-server"}))
+	global.App.Run(strings.Split("bytemark delete server test-server", " "))
+	is.Nil(global.Error)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
 	c.Reset()
 
-	c.When("ParseVirtualMachineName", "test-server", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
-	c.When("DeleteVirtualMachine", name, true).Return(nil).Times(1)
+	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
+	c.When("DeleteVirtualMachine", &name, true).Return(nil).Times(1)
 
-	is.Equal(util.E_SUCCESS, cmds.DeleteServer([]string{"--purge", "test-server"}))
+	global.App.Run(strings.Split("bytemark delete server --purge test-server", " "))
+	is.Nil(global.Error)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -56,29 +54,26 @@ func TestDeleteServer(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-server.test-group.test-account", "666"})
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account",
 	}
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(name).Times(1)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("DeleteDisc", name, "666").Return(nil).Times(1)
+	c.When("DeleteDisc", &name, "666").Return(nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
+	global.App.Run(strings.Split("bytemark delete disc test-server.test-group.test-account 666", " "))
 
-	is.Equal(util.E_SUCCESS, cmds.DeleteDisc([]string{"--force", "test-server.test-group.test-account", "666"}))
+	is.Nil(global.Error)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -86,8 +81,7 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestDeleteKey(t *testing.T) {
 	is := is.New(t)
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	config, c := baseTestSetup()
 
 	usr := lib.User{
 		Username: "test-user",
@@ -101,7 +95,6 @@ func TestDeleteKey(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	c.When("AuthWithToken", "test-token").Return(nil)
@@ -109,13 +102,9 @@ func TestDeleteKey(t *testing.T) {
 
 	c.When("DeleteUserAuthorizedKey", "test-user", "ssh-rsa AAAAFakeKey test-key-one").Return(nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
+	global.App.Run(strings.Split("bytemark delete key ssh-rsa AAAAFakeKey test-key-one", " "))
 
-	args := []string{"ssh-rsa", "AAAAFakeKey", "test-key-one"}
-	config.When("ImportFlags").Return(args)
-	exitCode := cmds.DeleteKey(args)
-
-	is.Equal(util.E_SUCCESS, exitCode)
+	is.Nil(global.Error)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -123,19 +112,17 @@ func TestDeleteKey(t *testing.T) {
 	config.Reset()
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil)
 	c.When("GetUser", usr.Username).Return(&usr)
-	c.When("DeleteUserAuthorizedKey", "test-user", "test-key-two").Return(lib.AmbiguousKeyError{}).Times(1)
+	kerr := new(lib.AmbiguousKeyError)
+	c.When("DeleteUserAuthorizedKey", "test-user", "test-key-two").Return(kerr).Times(1)
 
-	args = []string{"test-key-two"}
-	config.When("ImportFlags").Return(args)
-	exitCode = cmds.DeleteKey(args)
+	global.App.Run(strings.Split("bytemark delete key test-key-two", " "))
 
-	is.Equal(util.E_PEBKAC, exitCode)
+	is.Equal(kerr, global.Error)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

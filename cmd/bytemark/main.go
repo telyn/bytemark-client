@@ -5,9 +5,11 @@ import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
+	"flag"
 	"fmt"
 	"github.com/bgentry/speakeasy"
 	"github.com/codegangsta/cli"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"os/signal"
@@ -23,6 +25,12 @@ var global = struct {
 	Error  error
 }{}
 
+func baseAppSetup() {
+	global.App = cli.NewApp()
+	global.App.Commands = commands
+
+}
+
 func main() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt)
@@ -34,20 +42,26 @@ func main() {
 
 	}()
 
-	global.App = cli.NewApp()
-	global.App.Commands = commands
+	baseAppSetup()
 
-	flags := util.MakeCommonFlagSet()
+	flags := flag.NewFlagSet("flags", flag.ContinueOnError)
+	configDir := flags.String("config-dir", "", "")
+	help := flags.Bool("help", false, "")
+	h := flags.Bool("h", false, "")
+	flags.Bool("yubikey", false, "")
+	flags.Int("debug-level", 0, "")
+	flags.String("user", "", "")
+	flags.String("account", "", "")
+	flags.String("endpoint", "", "")
+	flags.String("billing-endpoint", "", "")
+	flags.String("auth-endpoint", "", "")
+	flags.String("yubikey-otp", "", "")
+
+	flags.SetOutput(ioutil.Discard)
 
 	flags.Parse(os.Args[1:])
 
-	configDir := ""
-	value := flags.Lookup("config-dir").Value
-	if value != nil {
-		configDir = value.String()
-	}
-
-	config, err := util.NewConfig(configDir, flags)
+	config, err := util.NewConfig(*configDir)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
@@ -59,8 +73,26 @@ func main() {
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
+	//juggle the arguments in order to get the executable on the beginning
+	flargs := config.ImportFlags(flags)
+	newArgs := make([]string, len(flargs)+1)
+	if flargs[0] == "help" {
+		copy(newArgs[1:], flargs[1:])
+		newArgs[len(newArgs)-1] = "--help"
+	} else {
+		copy(newArgs[1:], flargs)
+	}
+	newArgs[0] = os.Args[0]
+	log.Debugf(log.DBG_FLAGS, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, newArgs)
 
-	global.App.Run(os.Args)
+	if *help || *h {
+		helpArgs := make([]string, len(newArgs)+1)
+		helpArgs[0] = "--help"
+		copy(helpArgs[1:], newArgs)
+		global.App.Run(helpArgs)
+	} else {
+		global.App.Run(newArgs)
+	}
 
 	os.Exit(int(util.ProcessError(global.Error)))
 }

@@ -38,7 +38,7 @@ func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, er
 	}
 	account = new(brainAccount)
 
-	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview", name)
+	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview&include_deleted=true", name)
 	if err != nil {
 		return
 	}

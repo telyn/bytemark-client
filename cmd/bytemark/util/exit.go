@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 	"syscall"
@@ -166,13 +167,12 @@ func ProcessError(err error, message ...string) ExitCode {
 	errorMessage := "Unknown error"
 	exitCode := ExitCode(E_UNKNOWN_ERROR)
 	if err != nil {
-		switch err.(type) {
+		switch e := err.(type) {
 		case *auth3.Error:
 			// TODO(telyn): I feel like this entire chunk should be in bytemark.co.uk/auth3/client
-			authErr, _ := err.(*auth3.Error)
-			switch authErr.Err.(type) {
+			switch e.Err.(type) {
 			case *url.Error:
-				urlErr, _ := authErr.Err.(*url.Error)
+				urlErr, _ := e.Err.(*url.Error)
 				if urlErr.Error != nil {
 					if opError, ok := urlErr.Err.(*net.OpError); ok {
 						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", opError.Err)
@@ -184,55 +184,71 @@ func ProcessError(err error, message ...string) ExitCode {
 				}
 				exitCode = E_CANT_CONNECT_AUTH
 			default:
-				errorMessage = fmt.Sprintf("Couldn't create auth session - internal error of type %T: %v", authErr.Err, authErr.Err)
+				errorMessage = fmt.Sprintf("Couldn't create auth session - internal error of type %T: %v", e.Err, e.Err)
 				exitCode = E_UNKNOWN_AUTH_ERROR
 			}
 		case *url.Error:
-			urlErr, _ := err.(*url.Error)
-			if urlErr.Error != nil {
-				if opError, ok := urlErr.Err.(*net.OpError); ok {
+			if e.Error != nil {
+				if opError, ok := e.Err.(*net.OpError); ok {
 					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", opError.Err)
 				} else {
-					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %T %v\r\nPlease file a bug report quoting this message.", urlErr.Err, urlErr.Err)
+					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %T %v\r\nPlease file a bug report quoting this message.", e.Err, e.Err)
 				}
 			} else {
-				errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", urlErr)
+				errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", e)
 			}
+		case *exec.Error:
+			if e.Name == "xdg-open" || e.Name == "x-www-browser" {
+				errorMessage = "Unable to find a browser to start. You may wish to install xdg-open (part of the xdg-utils package on Debian systems)"
+			} else if e.Name == "open" {
+				errorMessage = "Unable to find a browser to start. Ensure that the 'open' tool is in your PATH (usually lives in /usr/bin)."
+
+			} else if e.Name == "ssh" {
+				errorMessage = fmt.Sprintf("Unable to find an SSH client, please check you have one installed.")
+			} else {
+				errorMessage = fmt.Sprintf("Unable to find %s in your PATH.", e.Name)
+			}
+			exitCode = E_SUBPROCESS_FAILED
 		case *SubprocessFailedError:
-			spErr, _ := err.(*SubprocessFailedError)
-			if spErr.Err == nil {
+			if e.Err == nil {
 				return E_SUCCESS
 			}
 			errorMessage = err.Error()
 			exitCode = E_SUBPROCESS_FAILED
-		case lib.NotAuthorizedError:
+		case *lib.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_AUTHORIZED_API
-		case lib.BadRequestError:
+		case *lib.BadRequestError:
 			errorMessage = err.Error()
 			exitCode = E_BAD_REQUEST_API
-		case lib.InternalServerError:
+		case *lib.InternalServerError:
 			errorMessage = err.Error()
 			exitCode = E_API_REPORTED_ERROR
-		case lib.NotFoundError:
+		case *lib.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_FOUND_API
 		case *UserRequestedExit:
 			errorMessage = ""
 			exitCode = E_USER_EXIT
-		case syscall.Errno:
-			errno, _ := err.(*syscall.Errno)
-			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", errno)
+		case *syscall.Errno:
+			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", e)
 			exitCode = E_UNKNOWN_ERROR
 		case lib.AmbiguousKeyError:
 			exitCode = E_PEBKAC
 			errorMessage = err.Error()
+		case NotEnoughArgumentsError:
+			exitCode = E_PEBKAC
+			errorMessage = err.Error()
+		case UsageDisplayedError:
+			exitCode = E_PEBKAC
+			errorMessage = err.Error()
+
 		default:
-			e := err.Error()
-			if strings.Contains(e, "Badly-formed parameters") {
+			msg := err.Error()
+			if strings.Contains(msg, "Badly-formed parameters") {
 				exitCode = E_CREDENTIALS_INVALID
 				errorMessage = "The supplied credentials contained invalid characters - please try again"
-			} else if strings.Contains(e, "Bad login credentials") {
+			} else if strings.Contains(msg, "Bad login credentials") {
 				exitCode = E_CREDENTIALS_WRONG
 				errorMessage = "A user account with those credentials could not be found. Check your details and try again"
 

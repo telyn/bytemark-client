@@ -25,6 +25,15 @@ var configVars = [...]string{
 	"yubikey",
 }
 
+func IsConfigVar(name string) bool {
+	for _, v := range configVars {
+		if v == name {
+			return true
+		}
+	}
+	return false
+}
+
 type InvalidConfigVarError struct {
 	ConfigVar string
 }
@@ -67,7 +76,6 @@ type ConfigManager interface {
 	Unset(string) error
 	GetDebugLevel() int
 	Force() bool
-	Silent() bool
 	EndpointName() string
 	PanelURL() string
 
@@ -93,7 +101,6 @@ type ConfigManager interface {
 //
 type Config struct {
 	debugLevel  int
-	mainFlags   *flag.FlagSet
 	Dir         string
 	Memo        map[string]ConfigVar
 	Definitions map[string]string
@@ -122,6 +129,9 @@ type ConfigReadError struct {
 }
 
 func (e *ConfigReadError) Error() string {
+	if e.Err != nil {
+		return fmt.Sprintf("Unable to read config for %s from %s - %v", e.Name, e.Path, e.Err)
+	}
 	return fmt.Sprintf("Unable to read config for %s from %s.", e.Name, e.Path)
 }
 
@@ -132,7 +142,10 @@ type ConfigWriteError struct {
 }
 
 func (e *ConfigWriteError) Error() string {
-	return fmt.Sprintf("Unable to write persistent config for %s (%s).", e.Name, e.Path)
+	if e.Err != nil {
+		return fmt.Sprintf("Unable to write config for %s to %s.", e.Name, e.Path)
+	}
+	return fmt.Sprintf("Unable to write config for %s to %s - ", e.Name, e.Path, e.Err)
 }
 
 // Do I really need to have the flags passed in here?
@@ -140,7 +153,7 @@ func (e *ConfigWriteError) Error() string {
 // TODO(telyn): once codegangsta/cli has the idea of config providers (see codegansta/cli/issues/
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
-func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error) {
+func NewConfig(configDir string) (config *Config, err error) {
 	config = new(Config)
 	config.Memo = make(map[string]ConfigVar)
 	home := os.Getenv("HOME")
@@ -150,7 +163,6 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 	}
 
 	config.Dir = filepath.Join(home, "/.bytemark")
-	config.mainFlags = flags
 	if os.Getenv("BM_CONFIG_DIR") != "" {
 		config.Dir = os.Getenv("BM_CONFIG_DIR")
 	}
@@ -189,7 +201,6 @@ func NewConfig(configDir string, flags *flag.FlagSet) (config *Config, err error
 		log.Errorf("Couldn't open %s for writing\r\n", config.GetPath("debug.log"))
 	}
 
-	config.ImportFlags(flags)
 	strDL, err := config.Get("debug-level")
 	if err != nil {
 		log.Error(err)
@@ -216,18 +227,6 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 				}
 			})
 
-			if flags != config.mainFlags {
-
-				args := flags.Args()
-				for _, arg := range args {
-					if strings.HasPrefix(arg, "-") {
-						log.Errorf("Flag-like argument '%s' specified after your arguments\r\nBe aware that only flags placed before your arguments are parsed.\r\nSee the help for the command you're calling for invocation examples.\r\n\r\n", arg)
-						break
-					}
-				}
-			}
-
-			log.Silent = config.Silent()
 			strDL := config.GetIgnoreErr("debug-level")
 			debugLevel, err := strconv.ParseInt(strDL, 10, 0)
 			if err == nil {
@@ -278,7 +277,6 @@ func (config *Config) GetVirtualMachine() (vm *lib.VirtualMachineName) {
 	vm.Account = config.GetIgnoreErr("account")
 	vm.Group = config.GetIgnoreErr("group")
 	vm.VirtualMachine = ""
-	//TODO(telyn): make it possible to set a default VM?
 	return vm
 }
 
@@ -434,12 +432,10 @@ func (config *Config) Unset(name string) error {
 }
 
 func (config *Config) Force() bool {
-	force, _ := config.GetBool("force")
-	return force
+	return false
 }
 func (config *Config) Silent() bool {
-	silent, _ := config.GetBool("silent")
-	return silent
+	return false
 }
 
 func (config *Config) PanelURL() string {

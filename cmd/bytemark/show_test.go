@@ -2,29 +2,27 @@ package main
 
 import (
 	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/mocks"
+	"github.com/cheekybits/is"
+	"strings"
 	"testing"
-	//"github.com/cheekybits/is"
 )
 
 func TestShowGroupCommand(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("ImportFlags").Return([]string{"test-group.test-account"})
-	config.When("GetGroup").Return(lib.GroupName{})
-
-	c.When("ParseGroupName", "test-group.test-account", []lib.GroupName{{}}).Return(lib.GroupName{Group: "test-group", Account: "test-account"})
+	config.When("GetGroup").Return(&defGroup)
+	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
+	c.When("ParseGroupName", "test-group.test-account", []*lib.GroupName{&defGroup}).Return(&gpname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	group := getFixtureGroup()
-	c.When("GetGroup", lib.GroupName{Group: "test-group", Account: "test-account"}).Return(&group, nil).Times(1)
+	c.When("GetGroup", &gpname).Return(&group, nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.ShowGroup([]string{"test-group.test-account"})
+	global.App.Run(strings.Split("bytemark show group test-group.test-account", " "))
+	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -32,24 +30,24 @@ func TestShowGroupCommand(t *testing.T) {
 }
 
 func TestShowServerCommand(t *testing.T) {
-	c := &mocks.Client{}
-	config := &mocks.Config{}
+	is := is.New(t)
+	config, c := baseTestSetup()
 
 	config.When("Get", "token").Return("test-token")
-	config.When("Silent").Return(true)
-	config.When("ImportFlags").Return([]string{"test-server.test-group.test-account"})
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
-
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []lib.VirtualMachineName{{}}).Return(lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"})
+	config.When("GetVirtualMachine").Return(&defVM)
+	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	vm := getFixtureVM()
-	c.When("GetVirtualMachine", lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}).Return(&vm, nil).Times(1)
+	c.When("GetVirtualMachine", &vmname).Return(&vm, nil).Times(1)
 
-	cmds := NewCommandSet(config, c)
-	cmds.ShowServer([]string{"test-server.test-group.test-account"})
+	global.App.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
+	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
 }
+
+// TODO(telyn): show account? show user?

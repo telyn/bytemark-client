@@ -121,7 +121,7 @@ func TestConfigDefaultConfigDir(t *testing.T) {
 
 	CleanEnv()
 
-	config, err := NewConfig("", nil)
+	config, err := NewConfig("")
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -137,7 +137,7 @@ func TestConfigEnvConfigDir(t *testing.T) {
 	expected := "/tmp"
 	os.Setenv("BM_CONFIG_DIR", expected)
 
-	config, err := NewConfig("", nil)
+	config, err := NewConfig("")
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -150,7 +150,7 @@ func TestConfigPassedConfigDir(t *testing.T) {
 	JunkEnv()
 
 	expected := "/home"
-	config, err := NewConfig(expected, nil)
+	config, err := NewConfig(expected)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -170,7 +170,7 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 	CleanEnv()
 	dir := CleanDir()
 
-	config, err := NewConfig(dir, nil)
+	config, err := NewConfig(dir)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -193,7 +193,7 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	expected := "test-username"
 	os.Setenv("BM_USER", expected)
 
-	config, err := NewConfig(dir, nil)
+	config, err := NewConfig(dir)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -222,7 +222,7 @@ func TestConfigDefaultsFixtureEnv(t *testing.T) {
 	fixture := FixtureEnv()
 	dir := CleanDir()
 
-	config, err := NewConfig(dir, nil)
+	config, err := NewConfig(dir)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -248,7 +248,7 @@ func TestConfigDir(t *testing.T) {
 	JunkEnv()
 	dir, fixture := FixtureDir()
 
-	config, err := NewConfig(dir, nil)
+	config, err := NewConfig(dir)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -263,52 +263,6 @@ func TestConfigDir(t *testing.T) {
 }
 
 /*
- ============
-  Flag Tests
- ============
-*/
-
-func testFlagsWithArgs(args []string) (*Config, error) {
-	CleanEnv()
-	dir := CleanDir()
-	flags := MakeCommonFlagSet()
-
-	flags.Parse(args)
-	return NewConfig(dir, flags)
-
-}
-
-func TestMainFlags(t *testing.T) {
-	is := is.New(t)
-
-	config, err := testFlagsWithArgs([]string{"--help", "--force"})
-	is.Nil(err)
-
-	for _, v := range configVars {
-		// if this line ever fails then either configVars is out of date, GetDefault is out of date, or something weird has happened
-
-		vv, err := config.GetV(v)
-		is.Nil(err)
-		is.Equal(config.GetDefault(v), vv)
-	}
-
-	config, err = testFlagsWithArgs([]string{"--user=test-user", "-account=test-account", "--endpoint", "example.com"})
-
-	v, err := config.GetV("user")
-	is.Nil(err)
-	is.Equal(ConfigVar{"user", "test-user", "FLAG user"}, v)
-
-	v, err = config.GetV("account")
-	is.Nil(err)
-	is.Equal(ConfigVar{"account", "test-account", "FLAG account"}, v)
-
-	v, err = config.GetV("endpoint")
-	is.Nil(err)
-	is.Equal(ConfigVar{"endpoint", "example.com", "FLAG endpoint"}, v)
-
-}
-
-/*
  ===========
   Set Tests
  ===========
@@ -319,7 +273,7 @@ func TestConfigSet(t *testing.T) {
 
 	CleanEnv()
 	dir, fixture := FixtureDir()
-	config, err := NewConfig(dir, nil)
+	config, err := NewConfig(dir)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -346,7 +300,7 @@ func TestConfigSetPersistent(t *testing.T) {
 
 	CleanEnv()
 	dir, fixture := FixtureDir()
-	config, err := NewConfig(dir, nil)
+	config, err := NewConfig(dir)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -368,7 +322,7 @@ func TestConfigSetPersistent(t *testing.T) {
 
 	CleanEnv() // in case for some wacky reason I write to the environment
 	//create a new config (blanking the memo) to test the file in the directory has changed.
-	config2, err := NewConfig(dir, nil)
+	config2, err := NewConfig(dir)
 	is.Nil(err)
 
 	is.Equal(fixture["endpoint"], config2.GetIgnoreErr("endpoint"))
@@ -390,7 +344,7 @@ func TestConfigCorrectDefaultingAccountAndUserBug14038(t *testing.T) {
 		"account": "test-fixture-account",
 	})
 
-	config, err := NewConfig(dir, nil)
+	config, err := NewConfig(dir)
 	is.Nil(err)
 
 	v, err := config.GetV("account")

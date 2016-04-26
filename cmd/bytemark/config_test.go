@@ -2,24 +2,27 @@ package main
 
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
-	"bytemark.co.uk/client/mocks"
+	"github.com/cheekybits/is"
+	"strings"
 	"testing"
-	//"github.com/cheekybits/is"
 )
 
-func TestCommandConfig(t *testing.T) {
-	config := &mocks.Config{}
+func TestCommandConfigSet(t *testing.T) {
+	is := is.New(t)
+	config, _ := baseTestSetup()
 
 	config.When("GetV", "user").Return(util.ConfigVar{"user", "old-test-user", "config"})
-	config.When("Get", "user").Return("old-test-user")
-	config.When("Silent").Return(true)
+	config.When("GetIgnoreErr", "user").Return("old-test-user")
 
 	config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
 
-	cmds := NewCommandSet(config, nil)
-	cmds.Config([]string{"set", "user", "test-user"})
+	global.App.Run(strings.Split("bytemark config set user test-user", " "))
+	is.Nil(global.Error)
 
 	if ok, err := config.Verify(); !ok {
 		t.Fatal(err)
 	}
+
+	global.App.Run(strings.Split("bytemark config set flimflam test-user", " "))
+	is.NotNil(global.Error)
 }

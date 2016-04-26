@@ -5,31 +5,12 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-/*
-start: Starts a stopped server.
-
-shutdown: Sends the ACPI shutdown signal, as if you had
-          pressed the power/standby button. Allows the
-          operating system to gracefully shut down.
-          Hardware changes will be applied after the
-          machine has been started again.
-
-stop: Stops a running server, as if you had just pulled the
-      cord out. Hardware changes will be applied when the
-      machine has been started again.
-
-restart: Stops and then starts a running server, as if you had
-         pulled the cord out, then plugged it in and
-         powered the machine on again.
-
-reset: Instantly restarts a running server, as if you had
-       pressed the reset button. Doesn't apply hardware
-       changes.
-*/
-
 func init() {
 	commands = append(commands, cli.Command{
-		Name: "reset",
+		Name:        "reset",
+		Usage:       "Restart a server as though the reset button had been pushed",
+		UsageText:   "bytemark reset <server>",
+		Description: "For cloud servers, this does not cause the qemu process to be restarted. This means that the server will remain on the same head and will not notice hardware changes.",
 		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to reset %v...\r\n", c.VirtualMachineName)
 			err = global.Client.ResetVirtualMachine(c.VirtualMachineName)
@@ -41,8 +22,11 @@ func init() {
 			return
 		}),
 	}, cli.Command{
-		Name: "restart",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Name:        "restart",
+		Usage:       "Power off a server and start it again",
+		UsageText:   "bytemark restart <server>",
+		Description: "This command will power down a server, cleanly if possible, and then start it back up again. For cloud servers this can cause the server to be started on a different head to the one it was running on, but this is not guaranteed.",
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to restart %v...\r\n", c.VirtualMachineName)
 			err = global.Client.RestartVirtualMachine(c.VirtualMachineName)
 			if err != nil {
@@ -53,8 +37,11 @@ func init() {
 			return
 		}),
 	}, cli.Command{
-		Name: "shutdown",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Name:        "shutdown",
+		Usage:       "Cleanly shut down a server",
+		UsageText:   "bytemark shutdown <server>",
+		Description: "This command sends the ACPI shutdown signal to the server, causing a clean shut down. This is like pressing the power button on a computer you have physical access to.",
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to shutdown %v...\r\n", c.VirtualMachineName)
 			err = global.Client.ShutdownVirtualMachine(c.VirtualMachineName, true)
 			if err != nil {
@@ -65,8 +52,11 @@ func init() {
 			return
 		}),
 	}, cli.Command{
-		Name: "start",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Name:        "start",
+		Usage:       "Start a stopped server",
+		UsageText:   "bytemark start <server>",
+		Description: "This command will start a server that is not currently running.",
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to start %s...\r\n", c.VirtualMachineName)
 			err = global.Client.StartVirtualMachine(c.VirtualMachineName)
 			if err != nil {
@@ -77,8 +67,11 @@ func init() {
 			return
 		}),
 	}, cli.Command{
-		Name: "stop",
-		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+		Name:        "stop",
+		Usage:       "Stop a server, as though pulling the power cable out.",
+		UsageText:   "bytemark stop <server>",
+		Description: "This command will instantly power down a server. Note that this may cause data loss, particularly on servers with unjournaled file systems (e.g. ext2)",
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			log.Logf("Attempting to stop %s...\r\n", c.VirtualMachineName)
 			err = global.Client.StopVirtualMachine(c.VirtualMachineName)
 			if err != nil {

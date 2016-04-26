@@ -4,36 +4,64 @@ import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
-	"flag"
 	"github.com/codegangsta/cli"
-	"io/ioutil"
 )
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name: "reimage",
-		Description: `flags available
-    --firstboot-script-file <file name> - a script that will be run on first boot
-    --force - disables the confirmation prompt
-    --image <image name> - specify what to image the server with. Default is 'symbiosis'. See bytemark images for a list of available images
-    --public-keys <keys> (newline seperated)
-    --public-keys-file <file> (will be read & appended to --public-keys)
-    --root-password <password> (if not set, will be randomly generated)
-
-Image the given server with the specified image, prompting for confirmation.
+		Name:      "reimage",
+		Usage:     "Install a fresh operating system on a server from bytemark's images",
+		UsageText: "bytemark reimage [flags] --image <image name> <server>",
+		Description: `Image the given server with the specified image, prompting for confirmation.
 If the --image flag is not specified, will prompt with a list.
 Specify --force to prevent prompting.
 
 The root password will be the only thing output on stdout - good for scripts!
 	    `,
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "firstboot-script",
+				Usage: "Script which runs on the server's first boot after imaging.",
+			},
+			cli.GenericFlag{
+				Name:  "firstboot-script-file",
+				Usage: "Local file to read the firstboot script from.",
+				Value: new(util.FileFlag),
+			},
+			cli.StringFlag{
+				Name:  "image",
+				Usage: "Image to install on the server. See `bytemark images` for the list of available images.",
+			},
+			cli.StringFlag{
+				Name:  "public-keys",
+				Usage: "Public keys that will be authorised to log in as root, separated by newlines.",
+			},
+			cli.GenericFlag{
+				Name:  "public-keys-file",
+				Usage: "Local file to read the public keys from",
+				Value: new(util.FileFlag),
+			},
+			cli.StringFlag{
+				Name:  "root-password",
+				Usage: "Password for the root/Administrator user. If unset, will be randomly generated.",
+			},
+		},
 		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
-			imageInstall, defaulted, err := prepareImageInstall(nil) // TODO(telyn): this is going to take a bit of a rewrite.
+			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {
 				return err
 			}
+
 			if defaulted {
-				log.Log("No image was specified")
-				return &util.PEBKACError{}
+				return c.Help("No image was specified")
+			}
+
+			log.Logf("%s will be reimaged with the following:\r\n\r\n", c.VirtualMachineName.String())
+			log.Log(util.FormatImageInstall(imageInstall))
+
+			if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
+				log.Error("Exiting")
+				return new(util.UserRequestedExit)
 			}
 
 			return global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)
@@ -41,62 +69,34 @@ The root password will be the only thing output on stdout - good for scripts!
 	})
 }
 
-func addImageInstallFlags(flags *flag.FlagSet) {
-	flags.String("firstboot-script-file", "", "")
-	flags.String("image", "", "")
-	flags.String("public-keys", "", "")
-	flags.String("public-keys-file", "", "")
-	flags.String("root-password", "", "")
-}
+func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted bool, err error) {
+	image := c.String("image")
+	firstbootScript := c.String("firstboot-script")
+	firstbootScriptFile := c.FileContents("firstboot-script-file")
+	pubkeys := c.String("public-keys")
+	pubkeysFile := c.FileContents("public-keys-file")
+	rootPassword := c.String("root-password")
 
-func prepareImageInstall(flags *flag.FlagSet) (imageInstall *lib.ImageInstall, defaulted bool, err error) {
-	if flags == nil || !flags.Parsed() {
-		return nil, false, nil
-	}
-	firstbootScriptFileF := flags.Lookup("firstboot-script-file")
-	imageF := flags.Lookup("image")
-	publicKeysF := flags.Lookup("public-keys")
-	publicKeysFileF := flags.Lookup("public-keys-file")
-	rootPasswordF := flags.Lookup("root-password")
-
-	var image, pubkeys, rootpass string
-
-	if imageF != nil && imageF.Value.String() != "" {
-		image = imageF.Value.String()
-	} else {
+	if image == "" {
 		image = "symbiosis"
 		defaulted = true
 	}
-	firstbootScript := ""
-	if firstbootScriptFileF != nil && firstbootScriptFileF.Value.String() != "" {
-		firstbootScriptContents, err := ioutil.ReadFile(firstbootScriptFileF.Value.String())
-		if err != nil {
-			return nil, false, err
-		}
-		firstbootScript = string(firstbootScriptContents)
+	if pubkeysFile != "" {
+		pubkeys += "\r\n" + pubkeysFile
 	}
 
-	if publicKeysF != nil {
-		pubkeys = publicKeysF.Value.String()
-	}
-	if publicKeysFileF != nil && publicKeysFileF.Value.String() != "" {
-		pubkeysContents, err := ioutil.ReadFile(publicKeysFileF.Value.String())
-		if err != nil {
-			return nil, false, err
-		}
-		pubkeys = pubkeys + "\n" + string(pubkeysContents)
+	if firstbootScript == "" {
+		firstbootScript = firstbootScriptFile
 	}
 
-	if rootPasswordF != nil && rootPasswordF.Value.String() != "" {
-		rootpass = rootPasswordF.Value.String()
-	} else {
-		rootpass = util.GeneratePassword()
+	if rootPassword == "" {
+		rootPassword = util.GeneratePassword()
 	}
 
 	return &lib.ImageInstall{
 		Distribution:    image,
-		FirstbootScript: string(firstbootScript),
+		FirstbootScript: firstbootScript,
 		PublicKeys:      pubkeys,
-		RootPassword:    rootpass,
+		RootPassword:    rootPassword,
 	}, defaulted, nil
 }

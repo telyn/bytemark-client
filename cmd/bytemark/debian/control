@@ -10,6 +10,7 @@ Vcs-Browser: https://projects.bytemark.co.uk/git/bytemark-client
 
 Package: bytemark-client
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, xdg-utils
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: xdg-utils
 Description: command-line client for Bytemark's self-service hosting.
  bytemark-client is a command line for Bytemark's self-service hosting.

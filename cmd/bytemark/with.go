@@ -3,42 +3,10 @@ package main
 import (
 	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/lib"
+	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
+	"net"
 )
-
-type Context struct {
-	Context            *cli.Context
-	AccountName        *string
-	Account            *lib.Account
-	Authed             bool
-	Definitions        *lib.Definitions
-	DiscLabel          *string
-	GroupName          *lib.GroupName
-	Group              *lib.Group
-	User               *lib.User
-	UserName           *string
-	VirtualMachine     *lib.VirtualMachine
-	VirtualMachineName *lib.VirtualMachineName
-
-	currentArgIndex int
-}
-
-func (c *Context) args() cli.Args {
-	return c.Context.Args()
-}
-
-func (c *Context) Args() []string {
-	return c.args()[c.currentArgIndex:]
-}
-
-func (c *Context) NextArg() (string, error) {
-	if len(c.args()) <= c.currentArgIndex {
-		return "", util.NotEnoughArgumentsError{}
-	}
-	arg := c.args()[c.currentArgIndex]
-	c.currentArgIndex++
-	return arg, nil
-}
 
 type ProviderFunc func(*Context) error
 
@@ -46,6 +14,22 @@ func With(providers ...ProviderFunc) func(c *cli.Context) {
 	return func(cliContext *cli.Context) {
 		c := Context{Context: cliContext}
 		global.Error = foldProviders(&c, providers...)
+		cleanup(&c)
+	}
+}
+
+func cleanup(c *Context) {
+	ips := c.Context.Generic("ip")
+	if ips, ok := ips.(*util.IPFlag); ok {
+		*ips = make([]net.IP, 0)
+	}
+	disc := c.Context.Generic("disc")
+	if disc, ok := disc.(*util.DiscSpecFlag); ok {
+		*disc = make([]lib.Disc, 0)
+	}
+	size := c.Context.Generic("memory")
+	if size, ok := size.(*util.SizeSpecFlag); ok {
+		*size = 0
 	}
 }
 
@@ -66,7 +50,7 @@ func AccountNameProvider(c *Context) (err error) {
 	if err != nil {
 		return err
 	}
-	accName := global.Client.ParseAccountName(name)
+	accName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
 	c.AccountName = &accName
 	return
 }
@@ -120,7 +104,7 @@ func GroupNameProvider(c *Context) (err error) {
 	if err != nil {
 		return err
 	}
-	c.GroupName = global.Client.ParseGroupName(name)
+	c.GroupName = global.Client.ParseGroupName(name, global.Config.GetGroup())
 	return
 }
 
@@ -169,14 +153,16 @@ func UserProvider(c *Context) (err error) {
 
 func VirtualMachineNameProvider(c *Context) (err error) {
 	if c.VirtualMachineName != nil {
+		log.Log("Early exit")
 		return
 	}
 	name, err := c.NextArg()
 	if err != nil {
+		log.Log(err)
 		return err
 	}
 
-	c.VirtualMachineName, err = global.Client.ParseVirtualMachineName(name)
+	c.VirtualMachineName, err = global.Client.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
 	return
 }
 

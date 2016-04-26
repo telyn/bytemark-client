@@ -14,9 +14,10 @@ import (
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:  "console",
-		Usage: "bytemark console [--serial | --vnc | --panel] [--no-connect] <server>",
-		UsageText: `Out-of-band access to a server's serial or graphical (VNC) console.
+		Name:      "console",
+		Usage:     "Connect to a server's serial or graphical console - as though physically plugging in",
+		UsageText: "bytemark console [--serial | --vnc | --panel] [--no-connect] <server>",
+		Description: `Out-of-band access to a server's serial or graphical (VNC) console.
 Under systems with no GUI, sometimes errors will output to the graphical console and not the serial console.
 Defaults to connecting to the serial console for the given server.`,
 		Flags: []cli.Flag{
@@ -39,8 +40,7 @@ Defaults to connecting to the serial console for the given server.`,
 		},
 		Action: With(VirtualMachineNameProvider, AuthProvider, func(ctx *Context) error {
 			if ctx.Context.Bool("serial") && ctx.Context.Bool("panel") {
-				log.Logf("You must only specify one of --serial and --panel!")
-				return util.PEBKACError{}
+				return ctx.Help("You must only specify one of --serial and --panel!")
 			}
 
 			vm, err := global.Client.GetVirtualMachine(ctx.VirtualMachineName)
@@ -62,23 +62,6 @@ Defaults to connecting to the serial console for the given server.`,
 
 		}),
 	})
-	// TODO(telyn): decide whether to keep serial and panel commands
-	/*commands = append(commands, cli.Command{
-			Name:      "serial",
-			Usage:     "bytemark serial <server>",
-			UsageText: "Out-of-band access to a server's serial console.",
-			Description: `outputs connection information for the out-of-band serial console
-	specified. If the --connect flag is given, will attempt to open a connection as well.`,
-			Action: console_serial,
-		})*/
-	/*commands = append(commands, cli.Command{
-			Name:      "vnc",
-			Usage:     "bytemark vnc <server>", // [--connect | --panel]
-			UsageText: "Out-of-band access to a server's graphical console.",
-			Description: `Outputs instructions for connecting to the VNC console.
-	If --connect is given, will also attempt to connect to the VNC console using the Bytemark panel.`,
-			Action: console_serial,
-		})*/
 }
 
 func shortEndpoint(endpoint string) string {
@@ -129,6 +112,7 @@ func console_panel(vm *lib.VirtualMachine) error {
 	ep := global.Config.EndpointName()
 	token := global.Config.GetIgnoreErr("token")
 	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", global.Config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
+	log.Logf("Opening %s in a browser.\r\n", url)
 	return util.CallBrowser(url)
 }
 
@@ -137,7 +121,6 @@ func console_serial(vm *lib.VirtualMachine) error {
 	log.Logf("ssh %s\r\n", host)
 	bin, err := exec.LookPath("ssh")
 	if err != nil {
-		log.Log("Unable to find an ssh executable")
 		return err
 	}
 	err = syscall.Exec(bin, []string{"ssh", host}, os.Environ())
@@ -148,7 +131,7 @@ func console_serial(vm *lib.VirtualMachine) error {
 				return err
 			}
 		} else {
-			log.Log("Couldn't connect to the management address. Please ensure you have an SSH client in your $PATH.")
+			log.Log("Couldn't connect to the management address.")
 			return err
 		}
 	}
