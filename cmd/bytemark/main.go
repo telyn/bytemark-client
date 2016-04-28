@@ -76,7 +76,7 @@ func main() {
 	//juggle the arguments in order to get the executable on the beginning
 	flargs := config.ImportFlags(flags)
 	newArgs := make([]string, len(flargs)+1)
-	if flargs[0] == "help" {
+	if len(flargs) > 0 && flargs[0] == "help" {
 		copy(newArgs[1:], flargs[1:])
 		newArgs[len(newArgs)-1] = "--help"
 	} else {
