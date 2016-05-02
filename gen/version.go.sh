@@ -3,12 +3,11 @@ set -x
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../lib
 
-VERSION=$(head -n 1 $DIR/../cmd/bytemark/debian/changelog | grep -o '(.*)' | grep -oP '[^()]+')
-arrversion=(${VERSION//./ })
+VERSION=($(head -n 1 $DIR/../cmd/bytemark/debian/changelog | grep -o '(.*)' | grep -oE '[[:digit:]]+'))
 
-MAJORVERSION=${arrversion[0]}
-MINORVERSION=${arrversion[1]}
-REVISION=${arrversion[2]}
+MAJORVERSION=${VERSION[0]}
+MINORVERSION=${VERSION[1]}
+REVISION=${VERSION[2]}
 
 BUILD_DATE=`date +%Y-%m-%d\ %H:%M`
 if [ -z "$BUILD_NUMBER" ]; then
