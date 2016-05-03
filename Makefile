@@ -17,6 +17,8 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 .PHONY: find-uk0 find-bugs-todos find-exits
 .PHONY: gensrc
 
+all: bytemark 
+
 bytemark: $(ALL_FILES) gensrc
 	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client/cmd/bytemark
 
@@ -47,8 +49,13 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	# sign the code? anyone? shall we sign the code?
 	#
 	
+# make changelog opens vim to update the changelog
+# then generates a new version.go file.
 changelog:
 	gen/changelog.sh
+	make gensrc
+	echo ""
+echo "Now update ports/chocolatey/bytemark.nuspec and ports/chocolatey/tools/chocolateyinstall.ps1."
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
