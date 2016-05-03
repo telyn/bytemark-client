@@ -9,3 +9,4 @@ bytemark.exe
 /docs/
 /lib/version.go
 *.nupkg
+*.json
