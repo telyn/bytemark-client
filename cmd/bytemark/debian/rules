@@ -24,6 +24,7 @@ include /usr/share/dpkg/default.mk
 	dh $@ --with golang --buildsystem=golang
 
 override_dh_auto_build:
+	cd ../.. && make gensrc
 	GO15VENDOREXPERIMENT=1 go build
 
 override_dh_auto_test:
