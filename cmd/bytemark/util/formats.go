@@ -66,7 +66,7 @@ func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
 		powerstate = "powered on"
 	}
 
-	title := fmt.Sprintf("VM %s, %d cores, %d GiB RAM, %d GiB on %d discs (%s) =", vm.Name, vm.Cores, vm.Memory/1024, vm.TotalDiscSize("")/1024, len(vm.Discs), powerstate)
+	title := fmt.Sprintf("'%s' - %d cores, %d GiB RAM, %d GiB on %d discs (%s) =", vm.Name, vm.Cores, vm.Memory/1024, vm.TotalDiscSize("")/1024, len(vm.Discs), powerstate)
 	padding := ""
 	for i := 0; i < width-len(title); i++ {
 		padding += "="
