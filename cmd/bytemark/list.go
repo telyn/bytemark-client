@@ -119,22 +119,23 @@ Your default account is determined by the --account flag, the account variable i
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if you didn't specify an account on the command-line.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			// TODO: rewrite this function
 			Action: With(AuthProvider, func(c *Context) error {
+				var account *lib.Account
+				var err error
+
 				if len(c.Args()) >= 1 {
 					nameStr, _ := c.NextArg()
-
 					name := global.Client.ParseAccountName(nameStr, global.Config.GetIgnoreErr("account"))
+					account, err = global.Client.GetAccount(name)
+				} else {
+					account, err = global.Client.GetDefaultAccount()
+				}
 
-					account, err := global.Client.GetAccount(name)
-					if err != nil {
-						return err
-					}
-
-					for _, g := range account.Groups {
-						listServersInGroup(g)
-					}
-
+				if err != nil {
+					return err
+				}
+				for _, g := range account.Groups {
+					listServersInGroup(g)
 				}
 				return nil
 			}),
