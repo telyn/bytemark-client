@@ -55,7 +55,7 @@ changelog:
 	gen/changelog.sh
 	make gensrc
 	echo ""
-echo "Now update ports/chocolatey/bytemark.nuspec and ports/chocolatey/tools/chocolateyinstall.ps1."
+	echo "Now update ports/chocolatey/bytemark.nuspec and ports/chocolatey/tools/chocolateyinstall.ps1."
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
@@ -78,7 +78,7 @@ install: all
 	cp bytemark /usr/bin/bytemark
 	cp bytemark.1 /usr/share/man/man1
 
-coverage: lib.coverage.html main.coverage.html cmds.coverage.html 
+coverage: lib.coverage.html main.coverage.html
 ifeq (Darwin, $(shell uname -s))
 	open lib.coverage.html
 	open main.coverage.html
@@ -89,7 +89,7 @@ else
 	xdg-open cmds.coverage.html
 endif
 
-main.coverage: *.go
+main.coverage: cmd/bytemark/*.go
 	go test -coverprofile=$@ bytemark.co.uk/client/cmd/bytemark
 
 %.coverage.html: %.coverage
