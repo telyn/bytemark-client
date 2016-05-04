@@ -91,20 +91,24 @@ func TestListServers(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 	config.When("GetGroup").Return(&defGroup)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	groupname := lib.GroupName{Group: "halloween-vms", Account: "spooky-steve"}
-	c.When("ParseGroupName", "halloween-vms.spooky-steve", []*lib.GroupName{&defGroup}).Return(&groupname).Times(1)
+	c.When("ParseAccountName", "spooky-steve", []string{"spokny-stevn"}).Return("spooky-steve").Times(1)
 
-	c.When("GetGroup", &groupname).Return(&lib.Group{
-		VirtualMachines: []*lib.VirtualMachine{
-			&lib.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
-			&lib.VirtualMachine{ID: 23, Name: "jack-skellington"},
-		},
+	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
+		Name: "spooky-steve",
+		Groups: []*lib.Group{{
+			Name: "default",
+			VirtualMachines: []*lib.VirtualMachine{
+				&lib.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
+				&lib.VirtualMachine{ID: 23, Name: "jack-skellington"},
+			},
+		}},
 	}).Times(1)
 
-	global.App.Run(strings.Split("bytemark list servers halloween-vms.spooky-steve", " "))
+	global.App.Run(strings.Split("bytemark list servers spooky-steve", " "))
 	is.Nil(global.Error)
 
 	if ok, err := c.Verify(); !ok {

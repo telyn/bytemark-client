@@ -122,6 +122,12 @@ func (c *Client) GetAccount(name string) (account *lib.Account, err error) {
 	return acc, r.Error(1)
 }
 
+func (c *Client) GetDefaultAccount() (account *lib.Account, err error) {
+	r := c.Called()
+	acc, _ := r.Get(0).(*lib.Account)
+	return acc, r.Error(1)
+}
+
 func (c *Client) GetAccounts() (accounts []*lib.Account, err error) {
 	r := c.Called()
 	acc, _ := r.Get(0).([]*lib.Account)

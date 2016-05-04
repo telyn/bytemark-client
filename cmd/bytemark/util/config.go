@@ -342,9 +342,11 @@ func (config *Config) GetDefault(name string) ConfigVar {
 				"ENV BM_ACCOUNT",
 			}
 		}
-		def := config.GetDefault("user")
-		def.Name = "account"
-		return def
+		return ConfigVar{
+			"account",
+			"",
+			"CODE",
+		}
 	case "group":
 		val := os.Getenv("BM_GROUP")
 		if val != "" {

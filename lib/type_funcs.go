@@ -134,7 +134,7 @@ func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (gr
 		group.Account = ""
 	} else {
 		group.Group = defaults[0].Group
-		group.Account = defaults[0].Account
+		group.Account = c.ParseAccountName(defaults[0].Account)
 	}
 
 Loop:
@@ -156,13 +156,20 @@ Loop:
 }
 
 // ParseAccountName parses a group name given in .account[.extrabits] format.
+// If there is a blank account name, tries to figure out the best possible account name to use.
+// If authentication has already happened, this also involves asking bmbilling.
 func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (account string) {
 	// 1 piece with optional extra cruft for the fqdn
 
-	if len(defaults) == 0 {
-		account = ""
-	} else {
+	if len(defaults) != 0 {
 		account = defaults[0]
+	}
+	// if the default was blank, then use billing (if auth has already happened)
+	if account == "" && c.authSession != nil {
+		billAcc, err := c.getDefaultBillingAccount()
+		if err == nil {
+			account = billAcc.Name
+		}
 	}
 
 	// there's a micro-optimisation to do here to not use Split,

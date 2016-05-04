@@ -82,6 +82,36 @@ func (c *bytemarkClient) getBrainAccounts() (accounts []*brainAccount, err error
 	return
 }
 
+func (c *bytemarkClient) getDefaultBillingAccount() (*billingAccount, error) {
+	billAccs, err := c.getBillingAccounts()
+	if err != nil {
+		return nil, err
+	}
+
+	return billAccs[0], nil
+}
+
+// GetDefaultAccount gets the account *most likely* to be your default account.
+// In practice, this is the first account returned by the billing endpoint,
+// with the brain's data for it attached. Fingers crossed.
+func (c *bytemarkClient) GetDefaultAccount() (*Account, error) {
+	billAcc, err := c.getDefaultBillingAccount()
+	if err != nil {
+		return nil, err
+	}
+
+	brainAcc, err := c.getBrainAccount(billAcc.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	acc := new(Account)
+	acc.FillBrain(brainAcc)
+	acc.FillBilling(billAcc)
+
+	return acc, nil
+}
+
 // Gets all Accounts you can see, merging data from both the brain and the billing
 func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 	by_name := make(map[string]*Account)
