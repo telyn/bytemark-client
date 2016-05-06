@@ -98,6 +98,11 @@ func TestGetGroup(t *testing.T) {
 		}
 
 	}
+	billingHandler := func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/api/v1/accounts" {
+			w.Write([]byte(`[{ "bigv_account_subscription": "account" }]`))
+		}
+	}
 	client, authServer, brain, billing, err :=
 		mkTestClientAndServers(http.HandlerFunc(groupHandler), mkNilHandler(t))
 
@@ -108,6 +113,9 @@ func TestGetGroup(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	group, err := client.GetGroup(&GroupName{Group: "invalid-group", Account: "account"})
 	is.NotNil(err)
@@ -115,6 +123,20 @@ func TestGetGroup(t *testing.T) {
 	group, err = client.GetGroup(&GroupName{Group: "default", Account: "account"})
 	is.NotNil(group)
 	is.Nil(err)
+
+	authServer.Close()
+	brain.Close()
+	billing.Close()
+
+	client, authServer, brain, billing, err =
+		mkTestClientAndServers(http.HandlerFunc(groupHandler), http.HandlerFunc(billingHandler))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	group, err = client.GetGroup(&GroupName{Group: "", Account: ""})
 	is.NotNil(group)

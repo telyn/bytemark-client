@@ -65,3 +65,22 @@ func TestParseAccountName(t *testing.T) {
 	is.Equal("endpoint", client.ParseAccountName("endpoint.tld.a.endpoint.tld"))
 	is.Equal("endpoint", client.ParseAccountName("endpoint.tld.a.endpoint.tld."))
 }
+
+func TestParseAccountNameDefaulting(t *testing.T) {
+	is := is.New(t)
+
+	client, auth, brain, billing, err := mkTestClientAndServers(mkNilHandler(t), mkNilHandler(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer auth.Close()
+	defer brain.Close()
+	defer billing.Close()
+
+	is.Equal("", client.ParseAccountName(""))
+	is.Equal("hey", client.ParseAccountName("hey"))
+	is.Equal("hey", client.ParseAccountName("hey.guys.it.me.telyn"))
+	is.Equal("hey", client.ParseAccountName("hey", ""))
+	is.Equal("hey", client.ParseAccountName("", "hey"))
+
+}

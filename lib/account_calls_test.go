@@ -24,7 +24,10 @@ func TestGetAccount(t *testing.T) {
 	}), http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/api/v1/accounts" {
 			w.Write([]byte(`[
-
+			{
+			    "bigv_account_subscription": "account"
+			},
+			{ "bigv_account_subscription": "wrong-account" }
 		]`))
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())

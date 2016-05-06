@@ -103,36 +103,6 @@ type Group struct {
 	VirtualMachines []*VirtualMachine `json:"virtual_machines"`
 }
 
-// Account represents an account that's used by the brains. I think billing accounts will probably need their own type.
-type brainAccount struct {
-	Name string `json:"name"`
-
-	// the following cannot be set
-	ID        int      `json:"id"`
-	Suspended bool     `json:"suspended"`
-	Groups    []*Group `json:"groups"`
-}
-type billingAccount struct {
-	ID                 int     `json:"id"`
-	Name               string  `json:"bigv_account_subscription"`
-	Owner              *Person `json:"owner"`
-	TechnicalContact   *Person `json:"tech"`
-	OwnerID            int     `json:"owner_id" omitempty`
-	CardReference      string  `json:"card_reference" omitempty`
-	TechnicalContactID int     `json:"tech_id" omitempty`
-}
-
-type Account struct {
-	Name             string   `json:"name"`
-	Owner            *Person  `json:"owner"`
-	TechnicalContact *Person  `json:"technical_contact"`
-	BillingID        int      `json:"billing_id"`
-	BrainID          int      `json:"brain_id"`
-	CardReference    string   `json:"card_reference"`
-	Groups           []*Group `json:"groups"`
-	Suspended        bool     `json:"suspended"`
-}
-
 type Person struct {
 	ID                   int    `json:"id"`
 	Username             string `json:"username"`
