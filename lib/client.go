@@ -108,3 +108,40 @@ func (c *bytemarkClient) GetSessionUser() string {
 func (c *bytemarkClient) AllowInsecureRequests() {
 	c.allowInsecure = true
 }
+
+func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) error {
+	if vm.Account == "" {
+		if err := c.validateAccountName(&vm.Account); err != nil {
+			return err
+		}
+	}
+	if vm.Group == "" {
+		vm.Group = "default"
+	}
+	if vm.VirtualMachine == "" {
+		return BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+	}
+	return nil
+}
+
+func (c *bytemarkClient) validateGroupName(group *GroupName) error {
+	if group.Account == "" {
+		if err := c.validateAccountName(&group.Account); err != nil {
+			return err
+		}
+	}
+	if group.Group == "" {
+		group.Group = "default"
+	}
+	return nil
+}
+
+func (c *bytemarkClient) validateAccountName(account *string) error {
+	if *account == "" && c.authSession != nil {
+		billAcc, err := c.getDefaultBillingAccount()
+		if err == nil {
+			*account = billAcc.Name
+		}
+	}
+	return nil
+}
