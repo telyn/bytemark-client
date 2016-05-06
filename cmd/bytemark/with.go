@@ -45,6 +45,11 @@ func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
 
 func AccountNameProvider(c *Context) (err error) {
 	if c.AccountName != nil {
+		return
+	}
+
+	if err = AuthProvider(c); err != nil {
+		return
 	}
 	name, err := c.NextArg()
 	if err != nil {
@@ -56,7 +61,7 @@ func AccountNameProvider(c *Context) (err error) {
 }
 
 func AccountProvider(c *Context) (err error) {
-	err = foldProviders(c, AccountNameProvider, AuthProvider)
+	err = AccountNameProvider(c)
 	if err != nil {
 		return
 	}
@@ -100,6 +105,10 @@ func GroupNameProvider(c *Context) (err error) {
 		return
 	}
 
+	if err = AuthProvider(c); err != nil {
+		return
+	}
+
 	name, err := c.NextArg()
 	if err != nil {
 		return err
@@ -112,7 +121,7 @@ func GroupProvider(c *Context) (err error) {
 	if c.Group != nil {
 		return
 	}
-	err = foldProviders(c, GroupNameProvider, AuthProvider)
+	err = GroupNameProvider(c)
 	if err != nil {
 		return
 	}
@@ -152,8 +161,12 @@ func UserProvider(c *Context) (err error) {
 }
 
 func VirtualMachineNameProvider(c *Context) (err error) {
+	if err = AuthProvider(c); err != nil {
+		return
+	}
+
 	if c.VirtualMachineName != nil {
-		log.Log("Early exit")
+		log.Log("VMNameProvider: VirtualMachineName already defined")
 		return
 	}
 	name, err := c.NextArg()
@@ -170,7 +183,7 @@ func VirtualMachineProvider(c *Context) (err error) {
 	if c.VirtualMachine != nil {
 		return
 	}
-	err = foldProviders(c, VirtualMachineNameProvider, AuthProvider)
+	err = VirtualMachineNameProvider(c)
 	if err != nil {
 		return
 	}

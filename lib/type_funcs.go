@@ -82,8 +82,7 @@ func (c *bytemarkClient) validateAccountName(account *string) error {
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
 func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*VirtualMachineName) (vm *VirtualMachineName, err error) {
 	vm = new(VirtualMachineName)
-	// 1, 2 or 3 pieces with optional extra cruft for the fqdn
-	bits := strings.Split(name, ".")
+
 	if len(defaults) == 0 {
 		vm.Group = ""
 		vm.Account = ""
@@ -94,30 +93,14 @@ func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*Virtu
 		vm.VirtualMachine = defaults[0].VirtualMachine
 	}
 
-	if len(bits) > 3 && bits[len(bits)-1] == "" {
-		bits = bits[0 : len(bits)-1]
+	bits := strings.SplitN(name, ".", 2)
+	vm.VirtualMachine = bits[0]
+	if len(bits) > 1 {
+		gp := c.ParseGroupName(bits[1], &GroupName{Group: vm.Group, Account: vm.Account})
+		vm.Group = gp.Group
+		vm.Account = gp.Account
 	}
 
-	// a for loop seems an odd choice here maybe but it means
-	// I don't need to do lots of ifs to see if the next bit exists
-Loop:
-	for i, bit := range bits {
-		bit = strings.TrimSpace(strings.ToLower(bit))
-		if bit != "" {
-			switch i {
-			case 0:
-				vm.VirtualMachine = bit
-				break
-			case 1:
-				// want to be able to do vm..account to get the default group
-				vm.Group = bit
-				break
-			case 2:
-				vm.Account = bit
-				break Loop
-			}
-		}
-	}
 	if vm.VirtualMachine == "" {
 		return vm, BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
 	}
@@ -134,22 +117,16 @@ func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (gr
 		group.Account = ""
 	} else {
 		group.Group = defaults[0].Group
-		group.Account = c.ParseAccountName(defaults[0].Account)
+		group.Account = defaults[0].Account
 	}
 
-Loop:
-	for i, bit := range bits {
-		bit = strings.TrimSpace(strings.ToLower(bit))
-		if bit != "" {
-			switch i {
-			case 0:
-				group.Group = bit
-				break
-			case 1:
-				group.Account = bit
-				break Loop
-			}
-		}
+	bits = strings.SplitN(name, ".", 2)
+	if len(bits) >= 1 {
+		group.Group = bits[0]
+
+	}
+	if len(bits) >= 2 {
+		group.Account = c.ParseAccountName(bits[1], group.Account)
 	}
 	return group
 
