@@ -76,6 +76,12 @@
 			"path": "github.com/telyn/form",
 			"revision": "0ba36cd7909b5981fbde8a58471b28cf1c4a5856",
 			"revisionTime": "2016-05-09T10:48:00Z"
+		},
+		{
+			"checksumSHA1": "E7L0II5K7ivwGtJazYaBD6D7ggI=",
+			"path": "github.com/telyn/form/box",
+			"revision": "0ba36cd7909b5981fbde8a58471b28cf1c4a5856",
+			"revisionTime": "2016-05-09T10:48:00Z"
 		}
 	],
 	"rootPath": "bytemark.co.uk/client"
