@@ -17,7 +17,8 @@ func mkTestClientAndServers(brainHandler http.Handler, billingHandler http.Handl
 	billing = mkTestServer(billingHandler)
 
 	auth, err := auth3.New(authServer.URL)
-	client := NewWithAuth(brain.URL, billing.URL, auth)
+	//FIXME: the "" is the spp endpoint. at the moment there are no tests that hit it.
+	client := NewWithAuth(brain.URL, billing.URL, "", auth)
 	client.AllowInsecureRequests()
 	return client, authServer, brain, billing, err
 }
