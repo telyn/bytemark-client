@@ -179,7 +179,7 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 	is.Equal("https://auth.bytemark.co.uk", config.GetIgnoreErr("auth-endpoint"))
 
 	is.Equal(os.Getenv("USER"), config.GetIgnoreErr("user"))
-	is.Equal(os.Getenv("USER"), config.GetIgnoreErr("account"))
+	is.Equal("", config.GetIgnoreErr("account"))
 
 	os.RemoveAll(dir)
 }
@@ -210,8 +210,8 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	v, err = config.GetV("account")
 	is.Nil(err)
 	is.Equal("account", v.Name)
-	is.Equal(expected, v.Value)
-	is.Equal("ENV BM_USER", v.Source)
+	is.Equal("", v.Value)
+	is.Equal("CODE", v.Source)
 
 	os.RemoveAll(dir)
 }

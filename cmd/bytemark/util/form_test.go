@@ -92,13 +92,14 @@ func TestCreditCardValidation(t *testing.T) {
 	is := is.New(t)
 	for _, cc := range validCards {
 		t.Logf("%s should be valid card\r\n", cc)
-
-		is.True(validCC(cc))
+		_, ok := validCC(cc)
+		is.True(ok)
 
 	}
 	for _, cc := range invalidCards {
 		t.Logf("%s should be invalid card\r\n", cc)
-		is.False(validCC(cc))
+		_, ok := validCC(cc)
+		is.False(ok)
 	}
 
 }
