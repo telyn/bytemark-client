@@ -11,12 +11,14 @@ const (
 	EP_AUTH Endpoint = iota
 	EP_BRAIN
 	EP_BILLING
+	EP_SPP
 )
 
 // bytemarkClient is the main type in the Bytemark API client library
 type bytemarkClient struct {
 	brainEndpoint   string
 	billingEndpoint string
+	sppEndpoint     string
 	allowInsecure   bool
 	auth            *auth3.Client
 	authSession     *auth3.SessionData
@@ -24,19 +26,20 @@ type bytemarkClient struct {
 }
 
 // New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
-func New(brainEndpoint, billingEndpoint string) (c *bytemarkClient, err error) {
+func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient, err error) {
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
 	}
-	return NewWithAuth(brainEndpoint, billingEndpoint, auth), nil
+	return NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint, auth), nil
 }
 
 // NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and bytemark.co.uk/auth3/client Client
-func NewWithAuth(brainEndpoint, billingEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
+func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
 	c = new(bytemarkClient)
 	c.brainEndpoint = brainEndpoint
 	c.billingEndpoint = billingEndpoint
+	c.sppEndpoint = sppEndpoint
 	c.debugLevel = 0
 	c.auth = auth
 	return c
@@ -107,4 +110,41 @@ func (c *bytemarkClient) GetSessionUser() string {
 
 func (c *bytemarkClient) AllowInsecureRequests() {
 	c.allowInsecure = true
+}
+
+func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) error {
+	if vm.Account == "" {
+		if err := c.validateAccountName(&vm.Account); err != nil {
+			return err
+		}
+	}
+	if vm.Group == "" {
+		vm.Group = "default"
+	}
+	if vm.VirtualMachine == "" {
+		return BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+	}
+	return nil
+}
+
+func (c *bytemarkClient) validateGroupName(group *GroupName) error {
+	if group.Account == "" {
+		if err := c.validateAccountName(&group.Account); err != nil {
+			return err
+		}
+	}
+	if group.Group == "" {
+		group.Group = "default"
+	}
+	return nil
+}
+
+func (c *bytemarkClient) validateAccountName(account *string) error {
+	if *account == "" && c.authSession != nil {
+		billAcc, err := c.getDefaultBillingAccount()
+		if err == nil {
+			*account = billAcc.Name
+		}
+	}
+	return nil
 }

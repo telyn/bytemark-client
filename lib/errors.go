@@ -58,6 +58,8 @@ type AmbiguousKeyError struct {
 	APIError
 }
 
+type AccountCreationDeferredError struct{}
+
 func (e UnsupportedEndpointError) Error() string {
 	return fmt.Sprintf("%d was not a valid endpoint choice", e)
 }
@@ -109,4 +111,8 @@ func (e NilAuthError) Error() string {
 
 func (e AmbiguousKeyError) Error() string {
 	return fmt.Sprint("The specified key was ambiguous - please specify the full key")
+}
+
+func (e AccountCreationDeferredError) Error() string {
+	return fmt.Sprintf("Account creation request accepted\r\n\r\nYour account requires a manual check, which shouldn't take long. We'll send an email when your account is ready.")
 }

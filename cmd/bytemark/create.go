@@ -200,6 +200,9 @@ func fn_createServer(c *Context) (err error) {
 	discs := c.Discs("disc")
 	cores := c.Int("cores")
 	memory := c.Size("memory")
+	if memory == 0 {
+		memory = 1024
+	}
 
 	for argNum, arg := range c.Args() {
 		switch argNum {

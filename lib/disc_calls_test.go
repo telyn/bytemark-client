@@ -95,7 +95,6 @@ func TestCreateDisc(t *testing.T) {
 	defer authServer.Close()
 	defer brain.Close()
 	defer billing.Close()
-	client.AllowInsecureRequests()
 
 	is.Nil(err)
 	err = client.AuthWithCredentials(map[string]string{})
@@ -128,7 +127,6 @@ func TestDeleteDisc(t *testing.T) {
 	defer authServer.Close()
 	defer brain.Close()
 	defer billing.Close()
-	client.AllowInsecureRequests()
 
 	if err != nil {
 		t.Fatal(err)
@@ -163,7 +161,6 @@ func TestResizeDisc(t *testing.T) {
 	defer authServer.Close()
 	defer brain.Close()
 	defer billing.Close()
-	client.AllowInsecureRequests()
 
 	if err != nil {
 		t.Fatal(err)
@@ -196,7 +193,6 @@ func TestShowDisc(t *testing.T) {
 	defer authServer.Close()
 	defer brain.Close()
 	defer billing.Close()
-	client.AllowInsecureRequests()
 
 	if err != nil {
 		t.Fatal(err)

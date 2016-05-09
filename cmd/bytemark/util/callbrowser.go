@@ -23,10 +23,14 @@ func CallBrowser(url string) error {
 	command := openCommand()
 	bin, err := exec.LookPath(command)
 	if err != nil {
+		if runtime.GOOS != "darwin" {
 
-		command = "/usr/bin/x-www-browser"
-		bin, err = exec.LookPath(command)
-		if err != nil {
+			command = "/usr/bin/x-www-browser"
+			bin, err = exec.LookPath(command)
+			if err != nil {
+				return err
+			}
+		} else {
 			return err
 		}
 	}

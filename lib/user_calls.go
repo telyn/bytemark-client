@@ -27,7 +27,11 @@ func (c *bytemarkClient) GetUser(name string) (user *User, err error) {
 	}
 
 	var jsUser JSONUser
-	_, _, err = r.Run(nil, &user)
+	_, _, err = r.Run(nil, &jsUser)
+	if err != nil {
+		return
+	}
+	user = new(User)
 	jsUser.Process(user)
 	return
 }

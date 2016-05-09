@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytemark.co.uk/client/cmd/bytemark/util"
 	"bytemark.co.uk/client/util/log"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -15,11 +17,16 @@ func init() {
 The set and unset subcommands can be used to set and unset such variables.
 		
 Available variables:
-	endpoint - the API endpoint to connect to. https://uk0.bigv.io is the default
-	billing-endpoint - the billing API endpoint to connect to.
+	account - the default account, used when you do not explicitly state an account - defaults to the same as your user name
+	token - the token used for authentication
+	user - the user that you log in as by default
+	group - the default group, used when you do not explicitly state a group (defaults to 'default')
+
+	debug-level - the default debug level. Set to 0 unless you like lots of output.
 	auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.
-	debug-level - the default debug level. Set to 0 unless you like lots of output
-	token - the token used for authentication.") // You can get one using bytemark auth.`,
+	endpoint - the brain endpoint to connect to. https://uk0.bigv.io is the default.
+	billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.
+	spp-endpoint - the SPP endpoint to use. https://spp-submissions.bytemark.co.uk is the default.`,
 		Subcommands: []cli.Command{
 			{
 				Name:        "set",
@@ -32,6 +39,10 @@ Available variables:
 						return err
 					}
 					varname = strings.ToLower(varname)
+
+					if !util.IsConfigVar(varname) {
+						return ctx.Help(fmt.Sprintf("%s is not a valid variable name", varname))
+					}
 
 					oldVar, err := global.Config.GetV(varname)
 					if err != nil {

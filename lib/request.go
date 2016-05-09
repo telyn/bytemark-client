@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytemark.co.uk/client/util/log"
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -96,9 +97,14 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 		return nil, err
 	}
 	req.Close = true
+	req.Header.Add("User-Agent", "bytemark-client"+GetVersion().String())
 
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/json")
+	if r.endpoint == EP_SPP {
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	} else {
+		req.Header.Add("Accept", "application/json")
+		req.Header.Add("Content-Type", "application/json")
+	}
 	if r.authenticate {
 		if r.client.GetSessionToken() == "" {
 			return nil, &NilAuthError{}
@@ -125,14 +131,25 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		err = InsecureConnectionError{r}
 		return
 	}
+	rb := make([]byte, 0)
+	if body != nil {
+
+		rb, err = ioutil.ReadAll(body)
+		if err != nil {
+			return 0, nil, err
+		}
+		log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", string(rb))
+	}
 
 	cli := r.mkHTTPClient()
 
-	req, err := r.mkHTTPRequest(body)
+	req, err := r.mkHTTPRequest(bytes.NewBuffer(rb))
 	if err != nil {
 		return
 	}
-
+	if len(rb) > 0 {
+		req.Header.Add("Content-Length", fmt.Sprintf("%d", len(rb)))
+	}
 	res, err := cli.Do(req)
 	if err != nil {
 		return
@@ -143,20 +160,10 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	log.Debugf(log.DBG_OUTLINE, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
 
 	baseErr := APIError{
-		Method:     r.method,
-		URL:        req.URL,
-		StatusCode: res.StatusCode,
-	}
-
-	if sBody, ok := body.(io.ReadSeeker); ok {
-		sBody.Seek(0, 0)
-		if err == nil {
-			rb, _ := ioutil.ReadAll(sBody)
-			baseErr.RequestBody = string(rb)
-			if err == nil {
-				log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", baseErr.RequestBody)
-			}
-		}
+		Method:      r.method,
+		URL:         req.URL,
+		StatusCode:  res.StatusCode,
+		RequestBody: string(rb),
 	}
 
 	response, err = ioutil.ReadAll(res.Body)
@@ -207,6 +214,8 @@ func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...stri
 		endpointUrl = c.brainEndpoint
 	case EP_BILLING:
 		endpointUrl = c.billingEndpoint
+	case EP_SPP:
+		endpointUrl = c.sppEndpoint
 	default:
 		return nil, UnsupportedEndpointError(endpoint)
 	}

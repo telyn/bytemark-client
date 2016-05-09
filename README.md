@@ -22,8 +22,11 @@ to be ~/projects/go, and you want to aid in development.
 	mkdir -p $GOPATH/src/bytemark.co.uk/auth3
 	git clone https://projects.bytemark.co.uk/git/auth-client $GOPATH/src/bytemark.co.uk/auth3/client
 	git clone https://projects.bytemark.co.uk/git/bytemark-client $GOPATH/src/bytemark.co.uk/client
+	cd $GOPATH/src/bytemark.co.uk/client
+	make gensrc
 
-At this point you can run `go build -o bytemark .` to build it - or `make`.
+At this point you can run `go build bytemark.co.uk/client/cmd/bytemark` to build it - or `make`.
+To install it, `go install bytemark.co.uk/client/cmd/bytemark` to install it to your go folder or `make install` to install it and the manpage in /usr/bin
 Whatever tickles your particular boat.
 
 Also run the tests with `go test ./...` - or `make test`. 

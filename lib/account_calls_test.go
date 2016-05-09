@@ -24,7 +24,10 @@ func TestGetAccount(t *testing.T) {
 	}), http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/api/v1/accounts" {
 			w.Write([]byte(`[
-
+			{
+			    "bigv_account_subscription": "account"
+			},
+			{ "bigv_account_subscription": "wrong-account" }
 		]`))
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
@@ -41,7 +44,6 @@ func TestGetAccount(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	client.AllowInsecureRequests()
 
 	acc, err := client.GetAccount("invalid-account")
 	is.NotNil(err)
@@ -94,7 +96,6 @@ func TestGetAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	client.AllowInsecureRequests()
 
 	acc, err := client.GetAccounts()
 	fmt.Print(err)

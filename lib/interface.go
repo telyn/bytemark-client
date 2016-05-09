@@ -45,10 +45,17 @@ type Client interface {
 	BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
 
 	///////////////////////
+	////// SPP STUFF //////
+	///////////////////////
+
+	CreateCreditCard(*CreditCard) (string, error)
+
+	///////////////////////
 	//// BILLING STUFF ////
 	///////////////////////
 
-	//RegisterAccount(*Account) error
+	// CreateAccount(*Account) (*Account, error) // TODO(telyn): figure out if CreateAccount is needed/useful
+	RegisterNewAccount(acc *Account) (*Account, error)
 
 	////////////////////
 	//// BRAIN STUFF ///
@@ -72,7 +79,9 @@ type Client interface {
 
 	// GetAccount takes an account name or ID and returns a filled-out Account object
 	GetAccount(name string) (account *Account, err error)
-	// GetAccount gets all the accounts the logged-in user can see.
+	// GetDefaultAccount gets the most-likely default account for the user.
+	GetDefaultAccount() (account *Account, err error)
+	// GetAccounts gets all the accounts the logged-in user can see.
 	GetAccounts() (accounts []*Account, err error)
 
 	//
@@ -92,6 +101,12 @@ type Client interface {
 	CreateGroup(name *GroupName) error
 	DeleteGroup(name *GroupName) error
 	GetGroup(name *GroupName) (*Group, error)
+
+	//
+	// NICS
+	//
+
+	AddIP(name *VirtualMachineName, ipcr *IPCreateRequest) (IPs, error)
 
 	//
 	// USERS

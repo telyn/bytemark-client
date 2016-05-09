@@ -54,6 +54,7 @@ func main() {
 	flags.String("account", "", "")
 	flags.String("endpoint", "", "")
 	flags.String("billing-endpoint", "", "")
+	flags.String("spp-endpoint", "", "")
 	flags.String("auth-endpoint", "", "")
 	flags.String("yubikey-otp", "", "")
 
@@ -68,7 +69,7 @@ func main() {
 	global.Config = config
 	global.App.Version = lib.GetVersion().String()
 
-	global.Client, err = lib.New(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"))
+	global.Client, err = lib.New(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"), global.Config.GetIgnoreErr("spp-endpoint"))
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
@@ -76,8 +77,13 @@ func main() {
 	//juggle the arguments in order to get the executable on the beginning
 	flargs := config.ImportFlags(flags)
 	newArgs := make([]string, len(flargs)+1)
+	if len(flargs) > 0 && flargs[0] == "help" {
+		copy(newArgs[1:], flargs[1:])
+		newArgs[len(newArgs)-1] = "--help"
+	} else {
+		copy(newArgs[1:], flargs)
+	}
 	newArgs[0] = os.Args[0]
-	copy(newArgs[1:], flargs)
 	log.Debugf(log.DBG_FLAGS, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, newArgs)
 
 	if *help || *h {

@@ -94,6 +94,12 @@ func (c *Client) ReadDefinitions() (*lib.Definitions, error) {
 	return defs, r.Error(1)
 }
 
+func (c *Client) AddIP(name *lib.VirtualMachineName, spec *lib.IPCreateRequest) (lib.IPs, error) {
+	r := c.Called(name, spec)
+	ips, _ := r.Get(0).(lib.IPs)
+	return ips, r.Error(1)
+}
+
 func (c *Client) AddUserAuthorizedKey(name, key string) error {
 	r := c.Called(name, key)
 	return r.Error(0)
@@ -110,8 +116,30 @@ func (c *Client) GetUser(name string) (*lib.User, error) {
 	return u, r.Error(1)
 }
 
+func (c *Client) CreateCreditCard(cc *lib.CreditCard) (string, error) {
+	r := c.Called(cc)
+	return r.String(0), r.Error(1)
+}
+func (c *Client) CreateAccount(acc *lib.Account) (*lib.Account, error) {
+	r := c.Called(acc)
+	a, _ := r.Get(0).(*lib.Account)
+	return a, r.Error(1)
+}
+
+func (c *Client) RegisterNewAccount(acc *lib.Account) (*lib.Account, error) {
+	r := c.Called(acc)
+	a, _ := r.Get(0).(*lib.Account)
+	return a, r.Error(1)
+}
+
 func (c *Client) GetAccount(name string) (account *lib.Account, err error) {
 	r := c.Called(name)
+	acc, _ := r.Get(0).(*lib.Account)
+	return acc, r.Error(1)
+}
+
+func (c *Client) GetDefaultAccount() (account *lib.Account, err error) {
+	r := c.Called()
 	acc, _ := r.Get(0).(*lib.Account)
 	return acc, r.Error(1)
 }

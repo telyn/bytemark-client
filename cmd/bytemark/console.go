@@ -112,6 +112,7 @@ func console_panel(vm *lib.VirtualMachine) error {
 	ep := global.Config.EndpointName()
 	token := global.Config.GetIgnoreErr("token")
 	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", global.Config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
+	log.Logf("Opening %s in a browser.\r\n", url)
 	return util.CallBrowser(url)
 }
 
@@ -120,7 +121,6 @@ func console_serial(vm *lib.VirtualMachine) error {
 	log.Logf("ssh %s\r\n", host)
 	bin, err := exec.LookPath("ssh")
 	if err != nil {
-		log.Log("Unable to find an ssh executable")
 		return err
 	}
 	err = syscall.Exec(bin, []string{"ssh", host}, os.Environ())
@@ -131,7 +131,7 @@ func console_serial(vm *lib.VirtualMachine) error {
 				return err
 			}
 		} else {
-			log.Log("Couldn't connect to the management address. Please ensure you have an SSH client in your $PATH.")
+			log.Log("Couldn't connect to the management address.")
 			return err
 		}
 	}

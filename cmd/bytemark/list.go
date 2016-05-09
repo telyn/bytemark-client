@@ -4,7 +4,6 @@ import (
 	"bytemark.co.uk/client/lib"
 	"bytemark.co.uk/client/util/log"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 /*
@@ -19,21 +18,14 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }*/
 
-func listDefaultAccountServers() error {
-	acc, err := global.Client.GetAccount(global.Config.GetIgnoreErr("account"))
-	if err != nil {
-		return err
-	}
-	for _, group := range acc.Groups {
-		for _, vm := range group.VirtualMachines {
-			if vm.Deleted {
-				log.Output(vm.Hostname + " (deleted)")
-			} else {
-				log.Output(vm.Hostname)
-			}
+func listServersInGroup(g *lib.Group) {
+	for _, vm := range g.VirtualMachines {
+		if vm.Deleted {
+			log.Output(vm.Hostname + " (deleted)")
+		} else {
+			log.Output(vm.Hostname)
 		}
 	}
-	return nil
 }
 
 func init() {
@@ -127,45 +119,23 @@ Your default account is determined by the --account flag, the account variable i
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if you didn't specify an account on the command-line.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			// TODO: simplify this function
 			Action: With(AuthProvider, func(c *Context) error {
+				var account *lib.Account
+				var err error
+
 				if len(c.Args()) >= 1 {
 					nameStr, _ := c.NextArg()
-					name := global.Client.ParseGroupName(nameStr, global.Config.GetGroup())
-
-					group, err := global.Client.GetGroup(name)
-
-					if err != nil {
-						if _, ok := err.(lib.NotFoundError); ok {
-
-							if !strings.Contains(nameStr, ".") {
-								account, err := global.Client.GetAccount(nameStr)
-								if err != nil {
-									return err
-								}
-
-								for _, g := range account.Groups {
-									for _, vm := range g.VirtualMachines {
-										if vm.Deleted {
-											log.Output(vm.Hostname + " (deleted)")
-										} else {
-											log.Output(vm.Hostname)
-										}
-									}
-								}
-								return nil
-							}
-
-						} else {
-							return err
-						}
-					}
-
-					for _, vm := range group.VirtualMachines {
-						log.Output(vm.Hostname)
-					}
+					name := global.Client.ParseAccountName(nameStr, global.Config.GetIgnoreErr("account"))
+					account, err = global.Client.GetAccount(name)
 				} else {
-					return listDefaultAccountServers()
+					account, err = global.Client.GetDefaultAccount()
+				}
+
+				if err != nil {
+					return err
+				}
+				for _, g := range account.Groups {
+					listServersInGroup(g)
 				}
 				return nil
 			}),

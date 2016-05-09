@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytemark.co.uk/client/lib"
+	"net"
 	"strings"
 	"testing"
 )
@@ -24,4 +26,35 @@ func TestAddKeyCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 	c.Reset()
+}
+func TestAddIPCommand(t *testing.T) {
+	config, c := baseTestSetup()
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "user").Return("test-user")
+	config.When("GetVirtualMachine").Return(&defVM)
+
+	vm := lib.VirtualMachineName{VirtualMachine: "test-server"}
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vm, nil).Times(1)
+
+	ipcr := lib.IPCreateRequest{
+		Addresses:  1,
+		Family:     "ipv4",
+		Reason:     "testing",
+		Contiguous: false,
+	}
+
+	ip := net.ParseIP("10.10.10.10")
+
+	ipcres := ipcr
+	ipcres.IPs = []*net.IP{&ip}
+
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("AddIP", &vm, &ipcr).Return(&ipcres, nil)
+
+	global.App.Run(strings.Split("bytemark add ip --reason testing test-server", " "))
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
 }

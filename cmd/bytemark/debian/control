@@ -2,7 +2,7 @@ Source: bytemark-client
 Section: net
 Priority: optional
 Maintainer: Telyn Z.F. <telyn@bytemark.co.uk>
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 9), dh-golang
 Standards-Version: 3.9.5
 Homepage: https://www.bytemark.co.uk/docs/command-line/
 Vcs-Git: https://projects.bytemark.co.uk/git/bytemark-client
@@ -10,6 +10,7 @@ Vcs-Browser: https://projects.bytemark.co.uk/git/bytemark-client
 
 Package: bytemark-client
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, xdg-utils
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: xdg-utils
 Description: command-line client for Bytemark's self-service hosting.
  bytemark-client is a command line for Bytemark's self-service hosting.

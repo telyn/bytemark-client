@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 
 ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/cmd/bytemark
-ALL_FILES := lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go cmd/*/*.go
+ALL_FILES := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
 
 BUILD_NUMBER ?= 0
 
@@ -17,7 +17,7 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 .PHONY: find-uk0 find-bugs-todos find-exits
 .PHONY: gensrc
 
-all: bytemark
+all: bytemark 
 
 bytemark: $(ALL_FILES) gensrc
 	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client/cmd/bytemark
@@ -26,6 +26,7 @@ Bytemark.app.zip: Bytemark.app
 	zip -r $@ $<
 
 Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
+	@echo "WARNING: Building Bytemark.app is deprecated and no longer really supported."
 	mkdir -p Bytemark.app/Contents/Resources/bin
 	mkdir -p Bytemark.app/Contents/Resources/Scripts
 	mkdir -p Bytemark.app/Contents/MacOS
@@ -47,8 +48,14 @@ Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
 	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
 	# sign the code? anyone? shall we sign the code?
 	#
+	
+# make changelog opens vim to update the changelog
+# then generates a new version.go file.
 changelog:
 	gen/changelog.sh
+	make gensrc
+	echo ""
+	echo "Now update ports/chocolatey/bytemark.nuspec and ports/chocolatey/tools/chocolateyinstall.ps1."
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
@@ -69,8 +76,9 @@ endif
 
 install: all
 	cp bytemark /usr/bin/bytemark
+	cp bytemark.1 /usr/share/man/man1
 
-coverage: lib.coverage.html main.coverage.html cmds.coverage.html 
+coverage: lib.coverage.html main.coverage.html
 ifeq (Darwin, $(shell uname -s))
 	open lib.coverage.html
 	open main.coverage.html
@@ -81,7 +89,7 @@ else
 	xdg-open cmds.coverage.html
 endif
 
-main.coverage: *.go
+main.coverage: cmd/bytemark/*.go
 	go test -coverprofile=$@ bytemark.co.uk/client/cmd/bytemark
 
 %.coverage.html: %.coverage

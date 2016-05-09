@@ -17,7 +17,9 @@ func mkTestClientAndServers(brainHandler http.Handler, billingHandler http.Handl
 	billing = mkTestServer(billingHandler)
 
 	auth, err := auth3.New(authServer.URL)
-	return NewWithAuth(brain.URL, billing.URL, auth), authServer, brain, billing, err
+	client := NewWithAuth(brain.URL, billing.URL, auth)
+	client.AllowInsecureRequests()
+	return client, authServer, brain, billing, err
 }
 
 // mkTestServer creates an httptest.Server for the given http.Handler. It's basically an alias for httptest.NewServer. Why did I write it?

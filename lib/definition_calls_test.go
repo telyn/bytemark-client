@@ -56,7 +56,6 @@ func TestReadDefinitions(t *testing.T) {
 	defer authServer.Close()
 	defer brain.Close()
 	defer billing.Close()
-	client.AllowInsecureRequests()
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

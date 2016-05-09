@@ -66,7 +66,7 @@ func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
 		powerstate = "powered on"
 	}
 
-	title := fmt.Sprintf("VM %s, %d cores, %d GiB RAM, %d GiB on %d discs (%s) =", vm.Name, vm.Cores, vm.Memory/1024, vm.TotalDiscSize("")/1024, len(vm.Discs), powerstate)
+	title := fmt.Sprintf("'%s' - %d cores, %d GiB RAM, %d GiB on %d discs (%s) =", vm.Name, vm.Cores, vm.Memory/1024, vm.TotalDiscSize("")/1024, len(vm.Discs), powerstate)
 	padding := ""
 	for i := 0; i < width-len(title); i++ {
 		padding += "="
@@ -144,6 +144,13 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 			output = append(output, "Image: "+spec.Reimage.Distribution)
 		}
 		output = append(output, "Root/Administrator password: "+spec.Reimage.RootPassword)
+	} else {
+
+		if spec.VirtualMachine.CdromURL == "" {
+			output = append(output, "No image or CD URL specified")
+		} else {
+			output = append(output, fmt.Sprintf("CD URL: %s", spec.VirtualMachine.CdromURL))
+		}
 	}
 
 	s = ""
@@ -165,6 +172,31 @@ func FormatVirtualMachineSpec(group *client.GroupName, spec *client.VirtualMachi
 	}
 	return strings.Join(output, "\r\n")
 
+}
+
+func FormatImageInstall(ii *client.ImageInstall) string {
+	output := make([]string, 0)
+	if ii.Distribution != "" {
+		output = append(output, "Image: "+ii.Distribution)
+	}
+	if ii.PublicKeys != "" {
+		keynames := make([]string, 0)
+		for _, k := range strings.Split(ii.PublicKeys, "\n") {
+			kbits := strings.SplitN(k, " ", 3)
+			if len(kbits) == 3 {
+				keynames = append(keynames, strings.TrimSpace(kbits[2]))
+			}
+
+		}
+		output = append(output, fmt.Sprintf("%d public keys: %s", len(keynames), strings.Join(keynames, ", ")))
+	}
+	if ii.RootPassword != "" {
+		output = append(output, "Root/Administrator password: "+ii.RootPassword)
+	}
+	if ii.FirstbootScript != "" {
+		output = append(output, "With a firstboot script")
+	}
+	return strings.Join(output, "\r\n")
 }
 
 func FormatAccount(a *client.Account) string {
