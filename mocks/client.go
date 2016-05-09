@@ -116,6 +116,22 @@ func (c *Client) GetUser(name string) (*lib.User, error) {
 	return u, r.Error(1)
 }
 
+func (c *Client) CreateCreditCard(cc *lib.CreditCard) (string, error) {
+	r := c.Called(cc)
+	return r.String(0), r.Error(1)
+}
+func (c *Client) CreateAccount(acc *lib.Account) (*lib.Account, error) {
+	r := c.Called(acc)
+	a, _ := r.Get(0).(*lib.Account)
+	return a, r.Error(1)
+}
+
+func (c *Client) RegisterNewAccount(acc *lib.Account) (*lib.Account, error) {
+	r := c.Called(acc)
+	a, _ := r.Get(0).(*lib.Account)
+	return a, r.Error(1)
+}
+
 func (c *Client) GetAccount(name string) (account *lib.Account, err error) {
 	r := c.Called(name)
 	acc, _ := r.Get(0).(*lib.Account)

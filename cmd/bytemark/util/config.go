@@ -17,6 +17,7 @@ var configVars = [...]string{
 	"endpoint",
 	"billing-endpoint",
 	"auth-endpoint",
+	"spp-endpoint",
 	"user",
 	"account",
 	"group",
@@ -267,6 +268,12 @@ func (config *Config) GetV(name string) (ConfigVar, error) {
 	// try to read the Memo
 	name = strings.ToLower(name)
 	if val, ok := config.Memo[name]; ok {
+		if val.Name == "" {
+			val.Name = name
+		}
+		if val.Source == "" {
+			val.Source = "SOURCE UNSET"
+		}
 		return val, nil
 	}
 	return config.read(name)
@@ -324,6 +331,13 @@ func (config *Config) GetDefault(name string) ConfigVar {
 			v.Source = "ENV BM_BILLING_ENDPOINT"
 		}
 		return v
+	case "spp-endpoint":
+		v := ConfigVar{"spp-endpoint", "https://spp-submissions.bytemark.co.uk", "CODE"}
+		if val := os.Getenv("BM_SPP_ENDPOINT"); val != "" {
+			v.Value = val
+			v.Source = "ENV BM_SPP_ENDPOINT"
+		}
+		return v
 	case "auth-endpoint":
 		v := ConfigVar{"auth-endpoint", "https://auth.bytemark.co.uk", "CODE"}
 
@@ -368,7 +382,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 	case "force":
 		return ConfigVar{"force", "false", "CODE"}
 	}
-	return ConfigVar{"", "", ""}
+	return ConfigVar{name, "", "UNSET"}
 }
 
 func (config *Config) GetBool(name string) (bool, error) {

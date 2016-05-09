@@ -45,10 +45,17 @@ type Client interface {
 	BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
 
 	///////////////////////
+	////// SPP STUFF //////
+	///////////////////////
+
+	CreateCreditCard(*CreditCard) (string, error)
+
+	///////////////////////
 	//// BILLING STUFF ////
 	///////////////////////
 
-	//RegisterAccount(*Account) error
+	// CreateAccount(*Account) (*Account, error) // TODO(telyn): figure out if CreateAccount is needed/useful
+	RegisterNewAccount(acc *Account) (*Account, error)
 
 	////////////////////
 	//// BRAIN STUFF ///

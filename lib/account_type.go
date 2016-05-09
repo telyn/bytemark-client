@@ -12,13 +12,13 @@ type brainAccount struct {
 
 // billingAccount represents the parts of an account that are discussed with bmbilling
 type billingAccount struct {
-	ID                 int     `json:"id"`
-	Name               string  `json:"bigv_account_subscription"`
-	Owner              *Person `json:"owner"`
-	TechnicalContact   *Person `json:"tech"`
-	OwnerID            int     `json:"owner_id" omitempty`
-	CardReference      string  `json:"card_reference" omitempty`
-	TechnicalContactID int     `json:"tech_id" omitempty`
+	ID                 int     `json:"id,omitempty"`
+	Name               string  `json:"bigv_account_subscription,omitempty"`
+	Owner              *Person `json:"owner,omitempty"`
+	TechnicalContact   *Person `json:"tech,omitempty"`
+	OwnerID            int     `json:"owner_id,omitempty"`
+	CardReference      string  `json:"card_reference,omitempty"`
+	TechnicalContactID int     `json:"tech_id,omitempty"`
 }
 
 type Account struct {
@@ -32,7 +32,7 @@ type Account struct {
 	Suspended        bool     `json:"suspended"`
 }
 
-func (a *Account) FillBrain(b *brainAccount) {
+func (a *Account) fillBrain(b *brainAccount) {
 	if b != nil {
 		a.BrainID = b.ID
 		a.Groups = b.Groups
@@ -40,7 +40,7 @@ func (a *Account) FillBrain(b *brainAccount) {
 		a.Name = b.Name
 	}
 }
-func (a *Account) FillBilling(b *billingAccount) {
+func (a *Account) fillBilling(b *billingAccount) {
 	if b != nil {
 		a.BillingID = b.ID
 		a.Owner = b.Owner
@@ -57,6 +57,16 @@ func (a *Account) CountVirtualMachines() (servers int) {
 	return
 }
 
+func (a *Account) billingAccount() (b *billingAccount) {
+	b = new(billingAccount)
+	b.ID = a.BillingID
+	b.Owner = a.Owner
+	b.TechnicalContact = a.TechnicalContact
+	b.CardReference = a.CardReference
+	b.Name = a.Name
+	return
+}
+
 /*
 func (a *Account) ToBillingAccount() *billingAccount {
 
@@ -65,3 +75,27 @@ func (a *Account) ToBrainAccount() *brainAccount {
 
 }
 */
+
+type Person struct {
+	ID          int    `json:"id,omitempty"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	BackupEmail string `json:"email_backup,omitempty"`
+
+	// only set in the creation request
+	Password string `json:"password"`
+
+	FirstName   string `json:"firstname"`
+	LastName    string `json:"surname"`
+	Address     string `json:"address"`
+	City        string `json:"city"`
+	StateCounty string `json:"statecounty,omitempty"`
+	Postcode    string `json:"postcode"`
+	Country     string `json:"country"`
+	Phone       string `json:"phone"`
+	MobilePhone string `json:"phonemobile,omitempty"`
+
+	Organization         string `json:"organization,omitempty"`
+	OrganizationDivision string `json:"division,omitempty"`
+	VATNumber            string `json:"vatnumber,omitempty"`
+}

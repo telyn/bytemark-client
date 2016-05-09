@@ -25,7 +25,8 @@ Available variables:
 	debug-level - the default debug level. Set to 0 unless you like lots of output.
 	auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.
 	endpoint - the brain endpoint to connect to. https://uk0.bigv.io is the default.
-	billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.`,
+	billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.
+	spp-endpoint - the SPP endpoint to use. https://spp-submissions.bytemark.co.uk is the default.`,
 		Subcommands: []cli.Command{
 			{
 				Name:        "set",
