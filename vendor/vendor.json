@@ -58,6 +58,18 @@
 			"checksumSHA1": "1ber1h9izL2ssf0V28UrQW6tgAw=",
 			"path": "github.com/maraino/go-mock",
 			"revision": "3d044b7ea45759510b4e24b679e1df257289675a"
+		},
+		{
+			"checksumSHA1": "y7KpcDRhKz/IDhJmbiwEBhRI2Ug=",
+			"path": "github.com/mattn/go-runewidth",
+			"revision": "e882a96ec18dd43fa283187b66af74497c9101c0",
+			"revisionTime": "2016-01-09T11:42:48Z"
+		},
+		{
+			"checksumSHA1": "kaaW7bJe/+GStqqL66NO/eAj/Vs=",
+			"path": "github.com/nsf/termbox-go",
+			"revision": "362329b0aa6447eadd52edd8d660ec1dff470295",
+			"revisionTime": "2016-01-22T23:29:15Z"
 		}
 	],
 	"rootPath": "bytemark.co.uk/client"
