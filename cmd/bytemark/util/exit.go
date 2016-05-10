@@ -1,9 +1,9 @@
 package util
 
 import (
-	auth3 "bytemark.co.uk/auth3/client"
-	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/util/log"
+	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"fmt"
 	"net"
 	"net/url"
@@ -169,7 +169,7 @@ func ProcessError(err error, message ...string) ExitCode {
 	if err != nil {
 		switch e := err.(type) {
 		case *auth3.Error:
-			// TODO(telyn): I feel like this entire chunk should be in bytemark.co.uk/auth3/client
+			// TODO(telyn): I feel like this entire chunk should be in github.com/BytemarkHosting/auth-client
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)

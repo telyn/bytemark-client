@@ -1,7 +1,7 @@
 package lib
 
 import (
-	auth3 "bytemark.co.uk/auth3/client"
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"errors"
 )
 
@@ -34,7 +34,7 @@ func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient,
 	return NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint, auth), nil
 }
 
-// NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and bytemark.co.uk/auth3/client Client
+// NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and github.com/BytemarkHosting/auth-client Client
 func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
 	c = new(bytemarkClient)
 	c.brainEndpoint = brainEndpoint

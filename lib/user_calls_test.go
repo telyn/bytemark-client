@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"bytemark.co.uk/client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"encoding/json"
 	"github.com/cheekybits/is"
 	"net/http"

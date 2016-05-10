@@ -2,7 +2,7 @@ package util
 
 import (
 	"bufio"
-	"bytemark.co.uk/client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"fmt"
 	"os"
 	"regexp"

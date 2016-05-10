@@ -3,7 +3,7 @@ package main
 import (
 	"strings"
 
-	"bytemark.co.uk/client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 
 	"github.com/cheekybits/is"
 	"testing"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytemark.co.uk/client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/cheekybits/is"
 	"strings"
 	"testing"

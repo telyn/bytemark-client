@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytemark.co.uk/client/mocks"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
 func baseTestSetup() (config *mocks.Config, client *mocks.Client) {

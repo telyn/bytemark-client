@@ -1,10 +1,10 @@
 package main
 
 import (
-	auth3 "bytemark.co.uk/auth3/client"
-	"bytemark.co.uk/client/cmd/bytemark/util"
-	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/util/log"
+	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"flag"
 	"fmt"
 	"github.com/bgentry/speakeasy"

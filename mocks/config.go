@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	"bytemark.co.uk/client/cmd/bytemark/util"
-	"bytemark.co.uk/client/lib"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"flag"
 	mock "github.com/maraino/go-mock"
 )

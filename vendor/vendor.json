@@ -3,10 +3,6 @@
 	"ignore": "test",
 	"package": [
 		{
-			"path": "bytemark.co.uk/auth3/client",
-			"revision": "4275124fdd5a4b6a16e5d893fd7058b09bb023a7"
-		},
-		{
 			"checksumSHA1": "7SbTaY0kaYxgQrG3/9cjrI+BcyU=",
 			"path": "github.com/bgentry/speakeasy",
 			"revision": "36e9cfdd690967f4f690c6edcc9ffacd006014a0"
@@ -84,5 +80,5 @@
 			"revisionTime": "2016-05-09T10:48:00Z"
 		}
 	],
-	"rootPath": "bytemark.co.uk/client"
+	"rootPath": "github.com/BytemarkHosting/bytemark-client"
 }

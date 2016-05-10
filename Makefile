@@ -1,6 +1,6 @@
 SHELL:=/bin/bash
 
-ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client/cmd/bytemark
+ALL_PACKAGES := github.com/BytemarkHosting/bytemark-client/lib github.com/BytemarkHosting/bytemark-client/cmds/util github.com/BytemarkHosting/bytemark-client/cmds github.com/BytemarkHosting/bytemark-client/cmd/bytemark
 ALL_FILES := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
 
 BUILD_NUMBER ?= 0
@@ -20,7 +20,7 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefi
 all: bytemark 
 
 bytemark: $(ALL_FILES) gensrc
-	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client/cmd/bytemark
+	GO15VENDOREXPERIMENT=1 go build -o bytemark github.com/BytemarkHosting/bytemark-client/cmd/bytemark
 
 Bytemark.app.zip: Bytemark.app
 	zip -r $@ $<
@@ -90,13 +90,13 @@ else
 endif
 
 main.coverage: cmd/bytemark/*.go
-	go test -coverprofile=$@ bytemark.co.uk/client/cmd/bytemark
+	go test -coverprofile=$@ github.com/BytemarkHosting/bytemark-client/cmd/bytemark
 
 %.coverage.html: %.coverage
 	go tool cover -html=$< -o $@
 
 %.coverage: % %/*
-	go test -coverprofile=$@ bytemark.co.uk/client/$<
+	go test -coverprofile=$@ github.com/BytemarkHosting/bytemark-client/$<
 
 docs: doc/*.md
 	for file in doc/*.md; do \

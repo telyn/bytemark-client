@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bytemark.co.uk/client/cmd/bytemark/util"
-	"bytemark.co.uk/client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"

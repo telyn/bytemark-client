@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: bytemark-client
-Source: <http://bytemark.co.uk/client>
+Source: <http://bytemark.co.uk/docs/command-line>
 
 Files: *
 Copyright: 2015-2016 Telyn Z.F. <telyn@bytemark.co.uk>

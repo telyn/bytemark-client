@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
-	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"bytes"
 	"encoding/json"
 	"github.com/codegangsta/cli"

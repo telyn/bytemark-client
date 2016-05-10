@@ -1,7 +1,7 @@
 package lib
 
 import (
-	auth3 "bytemark.co.uk/auth3/client"
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"fmt"
 	"net/http"
 	"net/http/httptest"

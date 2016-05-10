@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytemark.co.uk/client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"net"
 	"strings"
 	"testing"

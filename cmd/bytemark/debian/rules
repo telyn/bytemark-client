@@ -3,7 +3,7 @@
 # output every command that modifies files on the build system.
 DH_VERBOSE = 1
 
-export DH_GOPKG := bytemark.co.uk/client/cmd/bytemark-client
+export DH_GOPKG := github.com/BytemarkHosting/bytemark-client/cmd/bytemark-client
 
 # see EXAMPLES in dpkg-buildflags(1) and read /usr/share/dpkg/*
 DPKG_EXPORT_BUILDFLAGS = 1

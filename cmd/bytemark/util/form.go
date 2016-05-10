@@ -1,7 +1,7 @@
 package util
 
 import (
-	"bytemark.co.uk/client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/telyn/form"
 )
 

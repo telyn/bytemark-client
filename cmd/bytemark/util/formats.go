@@ -1,7 +1,7 @@
 package util
 
 import (
-	client "bytemark.co.uk/client/lib"
+	client "github.com/BytemarkHosting/bytemark-client/lib"
 	"fmt"
 	"math"
 	"strings"

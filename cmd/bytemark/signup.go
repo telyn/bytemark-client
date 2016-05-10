@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bytemark.co.uk/client/cmd/bytemark/util"
-	"bytemark.co.uk/client/lib"
-	"bytemark.co.uk/client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/codegangsta/cli"
 	"strings"
 )

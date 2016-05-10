@@ -3,7 +3,7 @@
 package util
 
 import (
-	"bytemark.co.uk/client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"os"
 	"os/exec"
 	"runtime"
