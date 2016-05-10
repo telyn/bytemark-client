@@ -6,7 +6,8 @@ before_script:
 
 go-test:
   script:
-    - mkdir -p src/github.com/BytemarkHosting/bytemark-client; mv * src
+    - mkdir -p src/github.com/BytemarkHosting/bytemark-client
+    - mv * src/github.com/BytemarkHosting/bytemark-client || 1
     - export GOPATH=`pwd`
     - go get github.com/BytemarkHosting/auth-client
     - cd src/github.com/BytemarkHosting/bytemark-client && GO15VENDOREXPERIMENT=1 go test ./...
