@@ -1,5 +1,6 @@
 before_script:
-  - apt-get update -qq && apt-get install -y -qq golang-go
+  - echo "deb http://mirror.bytemark.co.uk/debian jessie-backports main" >> /etc/apt/sources.list
+  - apt-get update -qq && apt-get -qq install -y golang-go
   - go version
 
 go-test:
