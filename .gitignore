@@ -10,3 +10,6 @@ bytemark.exe
 /lib/version.go
 *.nupkg
 *.json
+ports/chocolatey/package
+ports/chocolatey/VERSION
+ports/chocolatey/choco.exe

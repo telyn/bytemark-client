@@ -1,82 +1,89 @@
 SHELL:=/bin/bash
-
-ALL_PACKAGES := github.com/BytemarkHosting/bytemark-client/lib github.com/BytemarkHosting/bytemark-client/cmds/util github.com/BytemarkHosting/bytemark-client/cmds github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-ALL_FILES := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
+PKGBASE := github.com/BytemarkHosting/bytemark-client
+CHOCOBASE := ports/chocolatey/package
+ALL_PACKAGES := $(PKGBASE)/lib $(PKGBASE)/cmds/util $(PKGBASE)/cmds $(PKGBASE)/cmd/bytemark
+ALL_SOURCE := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
+TAR_FILES := bytemark doc/bytemark.1
+ZIP_FILES := bytemark.exe doc/bytemark.pdf
 
 BUILD_NUMBER ?= 0
 
-OSAARCH:=x86_64
-ifeq ($(GOARCH),386)
-OSAARCH:=i386
-endif
 LAUNCHER_APP:=ports/mac/launcher.app
 RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefile
 
 .PHONY: test update-dependencies
-.PHONY: Bytemark.app
+.PHONY: bytemark-client.nupkg
 .PHONY: find-uk0 find-bugs-todos find-exits
 .PHONY: gensrc
 
 all: bytemark 
 
-bytemark: $(ALL_FILES) gensrc
-	GO15VENDOREXPERIMENT=1 go build -o bytemark github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+bytemark-client.zip: $(ZIP_FILES)
+	zip $@ $^
 
-Bytemark.app.zip: Bytemark.app
-	zip -r $@ $<
+bytemark-client.tar.gz: $(TAR_FILES)
+	tar czf $@ $^
 
-Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
-	@echo "WARNING: Building Bytemark.app is deprecated and no longer really supported."
-	mkdir -p Bytemark.app/Contents/Resources/bin
-	mkdir -p Bytemark.app/Contents/Resources/Scripts
-	mkdir -p Bytemark.app/Contents/MacOS
-	# pilfer the applet binary, applescript and resource file from the compiled script
-	cp $(LAUNCHER_APP)/Contents/Resources/Scripts/main.scpt Bytemark.app/Contents/Resources/Scripts
-	cp $(LAUNCHER_APP)/Contents/Resources/applet.rsrc Bytemark.app/Contents/Resources
-	cp $(LAUNCHER_APP)/Contents/MacOS/applet Bytemark.app/Contents/MacOS/launcher
-	# then put in our own Info.plist which has Bytemark branding and copyright and paths and stuff
-	cp ports/mac/Info.plist Bytemark.app/Contents
-	# copy in the terminal profile and start script
-	cp -r ports/mac/Bytemark.terminal Bytemark.app/Contents/Resources
-	cp -r ports/mac/start Bytemark.app/Contents/Resources
-	# copy in bytemark into its own folder (this allows us to say 
-	# "add Bytemark.app/Contents/Resources/bin to your PATH" and it'll only add bytemark
-	# and not the launcher too.)
-	cp bytemark Bytemark.app/Contents/Resources/bin
-	# make a symlink into MacOS. This step is totally unnecessary but it means all the binaries live in MacOS which is nice I guess?
-	rm -f Bytemark.app/Contents/MacOS/bytemark
-	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
-	# sign the code? anyone? shall we sign the code?
-	#
-	
+bytemark-client.deb: $(ALL_SOURCE) cmd/bytemark/debian/*
+	cd cmd/bytemark && fakeroot debian/rules binary
+
+bytemark-client.changes: cmd/bytemark/debian/control cmd/bytemark/debian/changes
+	cd cmd/bytemark && dpkg-genchanges -b > ../../bytemark-client.changes
+
+bytemark-client.nupkg: VERSION
+	cd ports/chocolatey && make VERSION=$(<VERSION)
+	mv $(CHOCOBASE)/bytemark.nupkg bytemark-client.nupkg
+
+%.pdf: %.ps
+	ps2pdf $< $@
+
+doc/bytemark-client.ps: doc/bytemark.1
+	groff -mandoc -T ps $< > $@
+
+bytemark.exe: bytemark
+	mv bytemark bytemark.exe
+
+bytemark: $(ALL_SOURCE) gensrc
+	GO15VENDOREXPERIMENT=1 go build -o bytemark $(PKGBASE)/cmd/bytemark
+
+install-jessie-golang:
+ifeq ($(build_distribution),"jessie")
+	echo "deb http://mirror.bytemark.co.uk/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list
+	sudo apt-get update
+	sudo apt-get install -y --force-yes -t jessie-backports golang-go
+endif
+
+
+install-build-deps: install-jessie-golang
+	sudo apt-get install git golang-go-$(GOOS)-$(GOARCH)
+
+install-dpkg-build-deps: install-build-deps
+	sudo apt-get install -y --force-yes dh-golang 
+
+#install-rpm-build-deps:
+
+install-windows-build-deps: install-build-deps
+	sudo apt-get install -y --force-yes curl wget unzip mono-runtime libmono-system-core4.0-cil libmono-system-componentmodel-dataannotations4.0-cil libmono-windowsbase4.0-cil libmono-system-xml-linq4.0-cil ghostscript
+
 # make changelog opens vim to update the changelog
 # then generates a new version.go file.
 changelog:
 	gen/changelog.sh
 	make gensrc
-	echo ""
-	echo "Now update ports/chocolatey/bytemark.nuspec and ports/chocolatey/tools/chocolateyinstall.ps1."
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
-	rm -f bytemark
+	rm -f bytemark bytemark.exe
+	rm -f bytemark-client.zip bytemark-client.tar
 	rm -f main.coverage lib.coverage
 	rm -f main.coverage.html lib.coverage.html
 
 gensrc:
 	BUILD_NUMBER=$(BUILD_NUMBER) go generate ./...
 
-$(LAUNCHER_APP): ports/mac/launcher-script.txt
-ifeq (Darwin, $(shell uname -s))
-	rm -rf $@
-	osacompile -a $(OSAARCH) -x -o $@ $<
-else
-	echo "WARNING using old pre-built launcher."
-endif
-
-install: all
+install: bytemark doc/bytemark.1
 	cp bytemark /usr/bin/bytemark
-	cp bytemark.1 /usr/share/man/man1
+	cp doc/bytemark.1 /usr/share/man/man1
 
 coverage: lib.coverage.html main.coverage.html
 ifeq (Darwin, $(shell uname -s))
@@ -90,18 +97,21 @@ else
 endif
 
 main.coverage: cmd/bytemark/*.go
-	go test -coverprofile=$@ github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+	go test -coverprofile=$@ $(PKGBASE)/cmd/bytemark
+
+util.coverage: cmd/bytemark/util/*.go
+	go test -coverprofile=$@ $(PKGBASE)/cmd/bytemark/util
 
 %.coverage.html: %.coverage
 	go tool cover -html=$< -o $@
 
 %.coverage: % %/*
-	go test -coverprofile=$@ github.com/BytemarkHosting/bytemark-client/$<
+	go test -coverprofile=$@ $(PKGBASE)/$<
 
-docs: doc/*.md
-	for file in doc/*.md; do \
-	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
-	done
+#docs: doc/*.md
+#	for file in doc/*.md; do \
+#	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
+#	done
 
 test: gensrc
 ifdef $(VERBOSE)
