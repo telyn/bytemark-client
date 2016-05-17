@@ -6,6 +6,7 @@ bytemark.exe
 *.coverage
 *.coverage.html
 /doc/*.html
+/doc/*.ps
 /docs/
 /lib/version.go
 *.nupkg
