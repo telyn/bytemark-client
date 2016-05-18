@@ -69,7 +69,6 @@ install-windows-build-deps: install-build-deps
 # then generates a new version.go file.
 changelog:
 	gen/changelog.sh
-	make gensrc
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
@@ -77,9 +76,6 @@ clean:
 	rm -f bytemark-client.zip bytemark-client.tar
 	rm -f main.coverage lib.coverage
 	rm -f main.coverage.html lib.coverage.html
-
-gensrc:
-	BUILD_NUMBER=$(BUILD_NUMBER) go generate ./...
 
 install: bytemark doc/bytemark.1
 	cp bytemark /usr/bin/bytemark

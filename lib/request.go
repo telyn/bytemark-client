@@ -1,11 +1,11 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -97,7 +97,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 		return nil, err
 	}
 	req.Close = true
-	req.Header.Add("User-Agent", "bytemark-client"+GetVersion().String())
+	req.Header.Add("User-Agent", "bytemark-client-"+Version)
 
 	if r.endpoint == EP_SPP {
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
