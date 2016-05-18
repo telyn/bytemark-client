@@ -1,12 +1,12 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"flag"
-	"fmt"
 	"github.com/bgentry/speakeasy"
 	"github.com/codegangsta/cli"
 	"io/ioutil"
@@ -67,7 +67,7 @@ func main() {
 		os.Exit(int(util.ProcessError(err)))
 	}
 	global.Config = config
-	global.App.Version = lib.GetVersion().String()
+	global.App.Version = lib.Version
 
 	global.Client, err = lib.New(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"), global.Config.GetIgnoreErr("spp-endpoint"))
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
