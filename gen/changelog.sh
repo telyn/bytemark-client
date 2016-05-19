@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CHANGELOG=$DIR/../cmd/bytemark/debian/changelog
+CHANGELOG=$DIR/../doc/changelog
 
 mv $CHANGELOG $CHANGELOG.bak
 head -n 1 $CHANGELOG.bak > $CHANGELOG

@@ -18,7 +18,7 @@ bytemark-client (0.7.0) UNRELEASED; urgency=low
   * Fix crash when zero arguments given
   * Fix finding a default account
   * Fix list servers when no account specified
-  * Add unit tests for lib/User and fix a terrible bug
+  * Add unit tests for lib.User and fix a terrible bug
   * Ensure that create server doesn't allow memory to be 0.
   * Nicer output when xdg-open can't be run.
 
