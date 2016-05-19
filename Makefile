@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 PKGBASE := github.com/BytemarkHosting/bytemark-client
 CHOCOBASE := ports/chocolatey/package
-ALL_PACKAGES := $(PKGBASE)/lib $(PKGBASE)/cmds/util $(PKGBASE)/cmds $(PKGBASE)/cmd/bytemark
+	ALL_PACKAGES := $(PKGBASE)/lib $(PKGBASE)/cmd/bytemark/util $(PKGBASE)/cmd/bytemark
 ALL_SOURCE := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
 TAR_FILES := bytemark doc/bytemark.1
 ZIP_FILES := bytemark.exe doc/bytemark.pdf
@@ -46,24 +46,6 @@ bytemark.exe: bytemark
 bytemark: $(ALL_SOURCE) gensrc
 	GO15VENDOREXPERIMENT=1 go build -o bytemark $(PKGBASE)/cmd/bytemark
 
-install-jessie-golang:
-ifeq ($(build_distribution),"jessie")
-	echo "deb http://mirror.bytemark.co.uk/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list
-	sudo apt-get update
-	sudo apt-get install -y --force-yes -t jessie-backports golang-go
-endif
-
-
-install-build-deps: install-jessie-golang
-	sudo apt-get install git golang-go-$(GOOS)-$(GOARCH)
-
-install-dpkg-build-deps: install-build-deps
-	sudo apt-get install -y --force-yes dh-golang 
-
-#install-rpm-build-deps:
-
-install-windows-build-deps: install-build-deps
-	sudo apt-get install -y --force-yes curl wget unzip mono-runtime libmono-system-core4.0-cil libmono-system-componentmodel-dataannotations4.0-cil libmono-windowsbase4.0-cil libmono-system-xml-linq4.0-cil ghostscript
 
 # make changelog opens vim to update the changelog
 # then generates a new version.go file.
@@ -109,7 +91,7 @@ util.coverage: cmd/bytemark/util/*.go
 #	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
 #	done
 
-test: gensrc
+test: 
 ifdef $(VERBOSE)
 	GO15VENDOREXPERIMENT=1 go test -v $(ALL_PACKAGES)
 else 
