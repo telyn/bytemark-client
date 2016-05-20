@@ -4,7 +4,7 @@ CHOCOBASE := ports/chocolatey/package
 	ALL_PACKAGES := $(PKGBASE)/lib $(PKGBASE)/cmd/bytemark/util $(PKGBASE)/cmd/bytemark
 ALL_SOURCE := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
 TAR_FILES := bytemark doc/bytemark.1
-ZIP_FILES := bytemark.exe doc/bytemark.pdf
+ZIP_FILES := bytemark.exe doc/bytemark-client.pdf
 
 BUILD_NUMBER ?= 0
 
@@ -18,17 +18,11 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude-dir=ve
 
 all: bytemark 
 
-bytemark-client.zip: $(ZIP_FILES)
+bytemark.zip: $(ZIP_FILES)
 	zip $@ $^
 
-bytemark-client.tar.gz: $(TAR_FILES)
+bytemark.tar.gz: $(TAR_FILES)
 	tar czf $@ $^
-
-bytemark-client.deb: $(ALL_SOURCE) cmd/bytemark/debian/*
-	cd cmd/bytemark && fakeroot debian/rules binary
-
-bytemark-client.changes: cmd/bytemark/debian/control cmd/bytemark/debian/changes
-	cd cmd/bytemark && dpkg-genchanges -b > ../../bytemark-client.changes
 
 bytemark-client.nupkg: VERSION
 	cd ports/chocolatey && make VERSION=$(<VERSION)
