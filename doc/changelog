@@ -1,3 +1,9 @@
+bytemark-client (0.7.1) UNRELEASED; urgency=low
+
+  No changes; this is a repackage of 0.7.0's code with a new build pipeline
+
+ -- Telyn ZF Roat <telyn.roat@bytemark.co.uk>  Fri, 20 May 2016 12:54:27 +0100
+
 bytemark-client (0.7.0) UNRELEASED; urgency=low
 
   New features:

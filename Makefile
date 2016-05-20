@@ -9,7 +9,7 @@ ZIP_FILES := bytemark.exe doc/bytemark.pdf
 BUILD_NUMBER ?= 0
 
 LAUNCHER_APP:=ports/mac/launcher.app
-RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefile
+RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude-dir=vendor --exclude=Makefile
 
 .PHONY: test update-dependencies
 .PHONY: bytemark-client.nupkg
@@ -41,7 +41,7 @@ doc/bytemark-client.ps: doc/bytemark.1
 	groff -mandoc -T ps $< > $@
 
 bytemark.exe: bytemark
-	mv bytemark bytemark.exe
+	cp bytemark bytemark.exe
 
 bytemark: $(ALL_SOURCE) gensrc
 	GO15VENDOREXPERIMENT=1 go build -o bytemark $(PKGBASE)/cmd/bytemark
