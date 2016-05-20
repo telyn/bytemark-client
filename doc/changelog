@@ -22,7 +22,7 @@ bytemark-client (0.7.0) UNRELEASED; urgency=low
   * Ensure that create server doesn't allow memory to be 0.
   * Nicer output when xdg-open can't be run.
 
- -- Telyn ZF Roat <telyn.roat@bytemark.co.uk> Mon, 09 May 2016 13:22:06 +0100
+ -- Telyn ZF Roat <telyn.roat@bytemark.co.uk>  Mon, 09 May 2016 13:22:06 +0100
 
 bytemark-client (0.6.0) UNRELEASED; urgency=low
 
@@ -35,7 +35,7 @@ bytemark-client (0.6.0) UNRELEASED; urgency=low
   * --force and --silent flags have been removed
   * Mention of non-existent `delete account` command has been removed
 
- -- Telyn ZF Roat <telyn.roat@bytemark.co.uk> Fri, 08 Apr 2016 14:21:10 +0100
+ -- Telyn ZF Roat <telyn.roat@bytemark.co.uk>  Fri, 08 Apr 2016 14:21:10 +0100
 
 bytemark-client (0.5.0) UNRELEASED; urgency=low
 
@@ -52,19 +52,19 @@ bytemark-client (0.5.0) UNRELEASED; urgency=low
   * Accounts with no owner/tech contact no longer cause crashes
   * Shutdown now keeps the VM off once run.
 
- -- Telyn <telyn@bytemark.co.uk> Thu, 10 Mar 2016 11:26:57 +0000
+ -- Telyn <telyn@bytemark.co.uk>  Thu, 10 Mar 2016 11:26:57 +0000
 
 bytemark-client (0.4.268) UNRELEASED; urgency=low
 
   * Switch to native package format & versioning
 
- -- Telyn <telyn@bytemark.co.uk> Wed, 17 Feb 2016 09:55:27 +0000
+ -- Telyn <telyn@bytemark.co.uk>  Wed, 17 Feb 2016 09:55:27 +0000
 
 bytemark-client (0.4.254-1) UNRELEASED; urgency=low
   
   * Fix issues with the change log
 
- -- Telyn <telyn@bytemark.co.uk> Tue, 16 Feb 2016 11:45:49 +0000
+ -- Telyn <telyn@bytemark.co.uk>  Tue, 16 Feb 2016 11:45:49 +0000
 
 bytemark-client (0.4.253-1) UNRELEASED; urgency=low
   
@@ -82,7 +82,7 @@ bytemark-client (0.4.253-1) UNRELEASED; urgency=low
     * `create server` now takes arguments after the name, bringing it in line
       with the help.
   
- -- Telyn <telyn@bytemark.co.uk> Tue, 16 Feb 2016 11:41:45 +0000
+ -- Telyn <telyn@bytemark.co.uk>  Tue, 16 Feb 2016 11:41:45 +0000
 
 bytemark-client (0.3.0-1) UNRELEASED; urgency=low
 
