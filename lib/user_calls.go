@@ -36,7 +36,7 @@ func (c *bytemarkClient) GetUser(name string) (user *User, err error) {
 	return
 }
 
-// AddUserAuthorizedKey
+// AddUserAuthorizedKey adds a key to the named user. These keys are used for logging into the management IPs for cloud servers
 func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error {
 	user, err := c.GetUser(username)
 	if err != nil {
