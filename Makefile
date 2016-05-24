@@ -14,7 +14,6 @@ RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude-dir=ve
 .PHONY: test update-dependencies
 .PHONY: bytemark-client.nupkg
 .PHONY: find-uk0 find-bugs-todos find-exits
-.PHONY: gensrc
 
 all: bytemark 
 
@@ -37,7 +36,7 @@ doc/bytemark-client.ps: doc/bytemark.1
 bytemark.exe: bytemark
 	cp bytemark bytemark.exe
 
-bytemark: $(ALL_SOURCE) gensrc
+bytemark: $(ALL_SOURCE)
 	GO15VENDOREXPERIMENT=1 go build -o bytemark $(PKGBASE)/cmd/bytemark
 
 
