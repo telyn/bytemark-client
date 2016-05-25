@@ -1,10 +1,10 @@
 package util
 
 import (
+	"fmt"
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"fmt"
 	"net"
 	"net/url"
 	"os"
@@ -221,6 +221,9 @@ func ProcessError(err error, message ...string) ExitCode {
 		case *lib.BadRequestError:
 			errorMessage = err.Error()
 			exitCode = E_BAD_REQUEST_API
+		case *lib.ServiceUnavailableError:
+			errorMessage = err.Error()
+			exitCode = E_CANT_CONNECT_API
 		case *lib.InternalServerError:
 			errorMessage = err.Error()
 			exitCode = E_API_REPORTED_ERROR

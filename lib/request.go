@@ -187,6 +187,8 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		err = NotFoundError{baseErr}
 	case 500:
 		err = InternalServerError{baseErr}
+	case 503:
+		err = ServiceUnavailableError{baseErr}
 	default:
 		if 200 <= res.StatusCode && res.StatusCode <= 299 {
 			if responseObject != nil {
