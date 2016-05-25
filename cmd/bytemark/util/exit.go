@@ -215,19 +215,19 @@ func ProcessError(err error, message ...string) ExitCode {
 			}
 			errorMessage = err.Error()
 			exitCode = E_SUBPROCESS_FAILED
-		case *lib.NotAuthorizedError:
+		case lib.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_AUTHORIZED_API
-		case *lib.BadRequestError:
+		case lib.BadRequestError:
 			errorMessage = err.Error()
 			exitCode = E_BAD_REQUEST_API
-		case *lib.ServiceUnavailableError:
+		case lib.ServiceUnavailableError:
 			errorMessage = err.Error()
 			exitCode = E_CANT_CONNECT_API
-		case *lib.InternalServerError:
+		case lib.InternalServerError:
 			errorMessage = err.Error()
 			exitCode = E_API_REPORTED_ERROR
-		case *lib.NotFoundError:
+		case lib.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_FOUND_API
 		case *UserRequestedExit:

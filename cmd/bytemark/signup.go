@@ -100,7 +100,7 @@ If you have previously used the client, you'll have a login and will need to add
 			account.CardReference = cardRef
 			createdAccount, err := global.Client.RegisterNewAccount(&account)
 
-			if _, ok := err.(*lib.AccountCreationDeferredError); ok {
+			if _, ok := err.(lib.AccountCreationDeferredError); ok {
 				log.Log(err.Error())
 				return nil
 			} else if err != nil {

@@ -107,7 +107,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	}
 	if r.authenticate {
 		if r.client.GetSessionToken() == "" {
-			return nil, &NilAuthError{}
+			return nil, NilAuthError{}
 		}
 		// if we could settle on a single standard
 		// rather than two basically-identical ones that'd be cool
@@ -175,12 +175,14 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 
 	switch res.StatusCode {
 	case 400:
-		err := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
-		jsonErr := json.Unmarshal(response, &err.Problems)
+		// because we need to reference fields specific to BadRequestError later
+		brErr := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
+		jsonErr := json.Unmarshal(response, &brErr.Problems)
 		if jsonErr != nil {
 			log.Debug(log.DBG_OUTLINE, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
-			err.Problems["The problem"] = []string{baseErr.ResponseBody}
+			brErr.Problems["The problem"] = []string{baseErr.ResponseBody}
 		}
+		err = brErr
 	case 403:
 		err = NotAuthorizedError{baseErr}
 	case 404:

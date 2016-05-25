@@ -80,7 +80,7 @@ func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err 
 		}
 	}
 	if status == 202 {
-		return newAcc, new(AccountCreationDeferredError)
+		return newAcc, AccountCreationDeferredError{}
 	}
 	return newAcc, err
 }
