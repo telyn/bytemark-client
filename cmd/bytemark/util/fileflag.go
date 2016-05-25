@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-//FileFlag implements the flag.Value (aka codegangsta/cli.Generic) interface
+//FileFlag implements the flag.Value (aka urfave/cli.Generic) interface
 // to provide a flag value type that reads its effective value from the file named as its input.
 type FileFlag struct {
 	FileName string

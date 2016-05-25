@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"strconv"
 )
 

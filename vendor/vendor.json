@@ -18,12 +18,6 @@
 			"revision": "68e9c0620927fb5427fda3708222d0edee89eae9"
 		},
 		{
-			"checksumSHA1": "BLBx9HSRPH8EPHHFEnBErhC8QfU=",
-			"path": "github.com/codegangsta/cli",
-			"revision": "aca5b047ed14d17224157c3434ea93bf6cdaadee",
-			"revisionTime": "2016-03-07T04:12:29Z"
-		},
-		{
 			"checksumSHA1": "1YeGotQXMZMqk+mmm8sbBVJywpw=",
 			"comment": "go.weekly.2011-12-22-27-ge6ac2fc",
 			"path": "github.com/kr/pretty",
@@ -78,6 +72,12 @@
 			"path": "github.com/telyn/form/box",
 			"revision": "0ba36cd7909b5981fbde8a58471b28cf1c4a5856",
 			"revisionTime": "2016-05-09T10:48:00Z"
+		},
+		{
+			"checksumSHA1": "l0h7xesS0Qe3qGWcMf+MnEQnja8=",
+			"path": "github.com/urfave/cli",
+			"revision": "595ba45e735c1e9c1f9ddc9e2ef21997fca893f2",
+			"revisionTime": "2016-05-24T20:27:12Z"
 		}
 	],
 	"rootPath": "github.com/BytemarkHosting/bytemark-client"

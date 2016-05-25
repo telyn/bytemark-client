@@ -151,7 +151,7 @@ func (e *ConfigWriteError) Error() string {
 
 // Do I really need to have the flags passed in here?
 // Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
-// TODO(telyn): once codegangsta/cli has the idea of config providers (see codegansta/cli/issues/
+// TODO(telyn): once urfave/cli has the idea of config providers (see codegansta/cli/issues/
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
 func NewConfig(configDir string) (config *Config, err error) {

@@ -6,7 +6,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"bytes"
 	"encoding/json"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"io"
 	"os"
 	"strings"

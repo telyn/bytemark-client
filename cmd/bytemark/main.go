@@ -8,7 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/bgentry/speakeasy"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"io/ioutil"
 	"net/url"
 	"os"

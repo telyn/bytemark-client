@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 /*
