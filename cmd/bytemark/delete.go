@@ -48,9 +48,23 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			Action: With(GroupProvider, func(c *Context) (err error) {
 				recursive := c.Bool("recursive")
 				if len(c.Group.VirtualMachines) > 0 && recursive {
-					err = recursiveDeleteGroup(c.GroupName, c.Group)
-					if err != nil {
-						return
+					running := 0
+					for _, vm := range c.Group.VirtualMachines {
+						if vm.PowerOn {
+							running++
+						}
+					}
+					prompt := fmt.Sprintf("The group '%s' has %d virtual machines in it", c.GroupName.Group, len(c.Group.VirtualMachines))
+					if running != 0 {
+						prompt = fmt.Sprintf("The group '%s' has %d running virtual machines in it", c.GroupName.Group, running)
+					}
+
+					if global.Config.Force() || PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
+						// TODO(telyn): Prompt
+						err = recursiveDeleteGroup(c.GroupName, c.Group)
+						if err != nil {
+							return
+						}
 					}
 				} else if !recursive {
 					err = &util.WontDeleteNonEmptyGroupError{Group: c.GroupName}
