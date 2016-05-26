@@ -9,7 +9,6 @@ func baseTestSetup() (config *mocks.Config, client *mocks.Client) {
 	client = new(mocks.Client)
 	global.Client = client
 	global.Config = config
-	global.Error = nil
 
 	baseAppSetup()
 	return

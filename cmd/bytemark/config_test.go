@@ -16,13 +16,13 @@ func TestCommandConfigSet(t *testing.T) {
 
 	config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
 
-	global.App.Run(strings.Split("bytemark config set user test-user", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark config set user test-user", " "))
+	is.Nil(err)
 
 	if ok, err := config.Verify(); !ok {
 		t.Fatal(err)
 	}
 
-	global.App.Run(strings.Split("bytemark config set flimflam test-user", " "))
-	is.NotNil(global.Error)
+	err = global.App.Run(strings.Split("bytemark config set flimflam test-user", " "))
+	is.NotNil(err)
 }

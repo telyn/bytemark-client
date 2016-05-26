@@ -29,8 +29,8 @@ func TestCreateDiskCommand(t *testing.T) {
 
 	c.When("CreateDisc", &name, disc).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark create disc --disc archive:35 test-server", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark create disc --disc archive:35 test-server", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -52,8 +52,8 @@ func TestCreateGroupCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("CreateGroup", &group).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark create group test-group", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark create group test-group", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -221,12 +221,12 @@ func TestCreateServer(t *testing.T) {
 	c.When("CreateVirtualMachine", &group, vm).Return(vm.VirtualMachine, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(vm.VirtualMachine, nil).Times(1)
 
-	global.App.Run([]string{
+	err := global.App.Run([]string{
 		"bytemark", "create", "server",
 		"--no-image",
 		"test-server", "3", "6565m", "archive:34",
 	})
-	is.Nil(global.Error)
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

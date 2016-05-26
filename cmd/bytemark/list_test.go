@@ -18,8 +18,8 @@ func TestListAccounts(t *testing.T) {
 
 	c.When("GetAccounts").Return([]*lib.Account{&lib.Account{BrainID: 1, Name: "dr-evil"}}).Times(1)
 
-	global.App.Run(strings.Split("bytemark list accounts", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark list accounts", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -52,8 +52,8 @@ func TestListDiscs(t *testing.T) {
 	}
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 
-	global.App.Run(strings.Split("bytemark list discs spooky-vm", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark list discs spooky-vm", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -77,8 +77,8 @@ func TestListGroups(t *testing.T) {
 		},
 	}).Times(1)
 
-	global.App.Run(strings.Split("bytemark list groups spooky-steve", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark list groups spooky-steve", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -108,8 +108,8 @@ func TestListServers(t *testing.T) {
 		}},
 	}).Times(1)
 
-	global.App.Run(strings.Split("bytemark list servers spooky-steve", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark list servers spooky-steve", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

@@ -32,8 +32,8 @@ func TestDeleteServer(t *testing.T) {
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, false).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark delete server test-server", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark delete server test-server", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -44,8 +44,8 @@ func TestDeleteServer(t *testing.T) {
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, true).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark delete server --purge test-server", " "))
-	is.Nil(global.Error)
+	err = global.App.Run(strings.Split("bytemark delete server --purge test-server", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -71,9 +71,9 @@ func TestDeleteDisc(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteDisc", &name, "666").Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark delete disc test-server.test-group.test-account 666", " "))
+	err := global.App.Run(strings.Split("bytemark delete disc test-server.test-group.test-account 666", " "))
 
-	is.Nil(global.Error)
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -102,9 +102,9 @@ func TestDeleteKey(t *testing.T) {
 
 	c.When("DeleteUserAuthorizedKey", "test-user", "ssh-rsa AAAAFakeKey test-key-one").Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark delete key ssh-rsa AAAAFakeKey test-key-one", " "))
+	err := global.App.Run(strings.Split("bytemark delete key ssh-rsa AAAAFakeKey test-key-one", " "))
 
-	is.Nil(global.Error)
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -120,9 +120,9 @@ func TestDeleteKey(t *testing.T) {
 	kerr := new(lib.AmbiguousKeyError)
 	c.When("DeleteUserAuthorizedKey", "test-user", "test-key-two").Return(kerr).Times(1)
 
-	global.App.Run(strings.Split("bytemark delete key test-key-two", " "))
+	err = global.App.Run(strings.Split("bytemark delete key test-key-two", " "))
 
-	is.Equal(kerr, global.Error)
+	is.Equal(kerr, err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

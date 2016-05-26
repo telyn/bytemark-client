@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"fmt"
 	"github.com/urfave/cli"
 	"strings"
 )
@@ -28,16 +28,10 @@ The undelete server command may be used to restore a deleted (but not purged) se
 			Aliases:     []string{"disk"},
 			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
 				if !(global.Config.Force() || util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.")) {
-					global.Error = &util.UserRequestedExit{}
-					return
+					return &util.UserRequestedExit{}
 				}
 
-				err = global.Client.DeleteDisc(c.VirtualMachineName, *c.DiscLabel)
-				if err != nil {
-					return
-				}
-
-				return
+				return global.Client.DeleteDisc(c.VirtualMachineName, *c.DiscLabel)
 			}),
 		}, {
 			Name:      "group",

@@ -90,7 +90,7 @@ Your default account is determined by the --account flag, the account variable i
 			Usage:       "List all the SSH public keys associated with a user",
 			UsageText:   "bytemark list keys [user]",
 			Description: "Lists all the SSH public keys associated with a user, defaulting to your log-in user.",
-			Action: func(c *cli.Context) {
+			Action: func(c *cli.Context) error {
 				username := global.Config.GetIgnoreErr("user")
 				if len(c.Args()) == 1 {
 					username = c.Args().First()
@@ -98,20 +98,19 @@ Your default account is determined by the --account flag, the account variable i
 
 				err := EnsureAuth()
 				if err != nil {
-					global.Error = err
-					return
+					return err
 				}
 
 				user, err := global.Client.GetUser(username)
 				if err != nil {
-					global.Error = err
-					return
+					return err
 				}
 
 				for _, k := range user.AuthorizedKeys {
 					log.Output(k)
 				}
 
+				return nil
 			},
 		}, {
 			Name:      "servers",

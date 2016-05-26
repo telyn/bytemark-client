@@ -22,7 +22,6 @@ var global = struct {
 	Config util.ConfigManager
 	Client lib.Client
 	App    *cli.App
-	Error  error
 }{}
 
 func baseAppSetup() {
@@ -122,12 +121,12 @@ OPTIONS:
 		helpArgs := make([]string, len(newArgs)+1)
 		helpArgs[0] = "--help"
 		copy(helpArgs[1:], newArgs)
-		global.App.Run(helpArgs)
+		err = global.App.Run(helpArgs)
 	} else {
-		global.App.Run(newArgs)
+		err = global.App.Run(newArgs)
 	}
 
-	os.Exit(int(util.ProcessError(global.Error)))
+	os.Exit(int(util.ProcessError(err)))
 }
 
 // EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.

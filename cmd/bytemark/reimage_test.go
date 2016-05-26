@@ -31,9 +31,9 @@ func TestReimage(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("ReimageVirtualMachine", &vmname, image).Return(nil).Times(1)
 
-	global.App.Run([]string{"bytemark", "reimage", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
+	err := global.App.Run([]string{"bytemark", "reimage", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
 
-	is.Nil(global.Error)
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

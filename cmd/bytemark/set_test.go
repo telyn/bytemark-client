@@ -24,8 +24,8 @@ func TestSetCores(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineCores", &vmname, 4).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark set cores test-server.test-group.test-account 4", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark set cores test-server.test-group.test-account 4", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -49,8 +49,8 @@ func TestSetMemory(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineMemory", &vmname, 4096).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark set memory test-server 4", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark set memory test-server 4", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -91,8 +91,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", &vmname).Return(nil).Times(0) // don't do anything
 
-	global.App.Run(strings.Split("bytemark set hwprofile test-server", " "))
-	is.NotNil(global.Error) // TODO(telyn): actually check error type
+	err := global.App.Run(strings.Split("bytemark set hwprofile test-server", " "))
+	is.NotNil(err) // TODO(telyn): actually check error type
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -110,8 +110,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", &vmname, "virtio123", []bool(nil)).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark set hwprofile test-server virtio123", " "))
-	is.Nil(global.Error)
+	err = global.App.Run(strings.Split("bytemark set hwprofile test-server virtio123", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -123,8 +123,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", &vmname, "virtio123", []bool{true}).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark set hwprofile --lock test-server virtio123", " "))
-	is.Nil(global.Error)
+	err = global.App.Run(strings.Split("bytemark set hwprofile --lock test-server virtio123", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -136,8 +136,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", &vmname, "virtio123", []bool{false}).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark set hwprofile --unlock test-server virtio123", " "))
-	is.Nil(global.Error)
+	err = global.App.Run(strings.Split("bytemark set hwprofile --unlock test-server virtio123", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

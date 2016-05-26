@@ -21,8 +21,8 @@ func TestResetCommand(t *testing.T) {
 
 	c.When("ResetVirtualMachine", &vmn).Times(1)
 
-	global.App.Run(strings.Split("bytemark reset test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark reset test-server.test-group.test-account", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -42,8 +42,8 @@ func TestRestartCommand(t *testing.T) {
 
 	c.When("RestartVirtualMachine", &vmn).Times(1)
 
-	global.App.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -62,8 +62,8 @@ func TestShutdownCommand(t *testing.T) {
 
 	c.When("ShutdownVirtualMachine", &vmn, true).Times(1)
 
-	global.App.Run(strings.Split("bytemark shutdown test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark shutdown test-server.test-group.test-account", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -82,8 +82,8 @@ func TestStartCommand(t *testing.T) {
 
 	c.When("StartVirtualMachine", &vmn).Times(1)
 
-	global.App.Run(strings.Split("bytemark start test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark start test-server.test-group.test-account", " "))
+	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -103,8 +103,8 @@ func TestStopCommand(t *testing.T) {
 
 	c.When("StopVirtualMachine", &vmn).Times(1)
 
-	global.App.Run(strings.Split("bytemark stop test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark stop test-server.test-group.test-account", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

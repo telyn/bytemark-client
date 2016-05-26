@@ -24,8 +24,8 @@ func TestLockHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfileLock", &vmname, true).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark lock hwprofile test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark lock hwprofile test-server.test-group.test-account", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -49,8 +49,8 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfileLock", &vmname, false).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark unlock hwprofile test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark unlock hwprofile test-server.test-group.test-account", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

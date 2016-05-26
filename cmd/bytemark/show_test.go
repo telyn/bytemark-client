@@ -21,8 +21,8 @@ func TestShowGroupCommand(t *testing.T) {
 	group := getFixtureGroup()
 	c.When("GetGroup", &gpname).Return(&group, nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark show group test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark show group test-group.test-account", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -42,8 +42,8 @@ func TestShowServerCommand(t *testing.T) {
 	vm := getFixtureVM()
 	c.When("GetVirtualMachine", &vmname).Return(&vm, nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
-	is.Nil(global.Error)
+	err := global.App.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
+	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

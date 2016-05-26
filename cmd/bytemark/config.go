@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"fmt"
 	"github.com/urfave/cli"
 	"strings"
 )
@@ -81,15 +81,15 @@ Available variables:
 				}),
 			},
 		},
-		Action: func(ctx *cli.Context) {
+		Action: func(ctx *cli.Context) error {
 			vars, err := global.Config.GetAll()
 			if err != nil {
-				global.Error = err
-				return
+				return err
 			}
 			for _, v := range vars {
 				log.Logf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
 			}
+			return nil
 		},
 	})
 }

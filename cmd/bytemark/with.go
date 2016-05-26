@@ -10,11 +10,13 @@ import (
 
 type ProviderFunc func(*Context) error
 
-func With(providers ...ProviderFunc) func(c *cli.Context) {
-	return func(cliContext *cli.Context) {
+// With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
+func With(providers ...ProviderFunc) func(c *cli.Context) error {
+	return func(cliContext *cli.Context) error {
 		c := Context{Context: cliContext}
-		global.Error = foldProviders(&c, providers...)
+		err := foldProviders(&c, providers...)
 		cleanup(&c)
+		return err
 	}
 }
 
