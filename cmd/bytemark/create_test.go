@@ -102,6 +102,13 @@ func TestCreateServerCommand(t *testing.T) {
 		},
 	}
 
+	getvm := new(lib.VirtualMachine)
+	*getvm = *vm.VirtualMachine
+	getvm.Discs = make([]*lib.Disc, 2)
+	getvm.Discs[0] = &vm.Discs[0]
+	getvm.Discs[1] = &vm.Discs[1]
+	getvm.Hostname = "test-server.test-group.test-account.tld"
+
 	group := lib.GroupName{
 		Group:   "",
 		Account: "",
@@ -114,9 +121,9 @@ func TestCreateServerCommand(t *testing.T) {
 	}
 
 	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(vm.VirtualMachine, nil).Times(1)
+	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
-	global.App.Run([]string{
+	err := global.App.Run([]string{
 		"bytemark", "create", "server",
 		"--cdrom", "https://example.com/example.iso",
 		"--cores", "1",
@@ -132,6 +139,9 @@ func TestCreateServerCommand(t *testing.T) {
 		"--zone", "test-zone",
 		"test-server",
 	})
+	if err != nil {
+		t.Error(err)
+	}
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
@@ -156,6 +166,10 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 		},
 		Discs: []lib.Disc{},
 	}
+
+	getvm := new(lib.VirtualMachine)
+	*getvm = *vm.VirtualMachine
+	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	group := lib.GroupName{
 		Group:   "",
@@ -212,6 +226,9 @@ func TestCreateServer(t *testing.T) {
 		},
 		},
 	}
+	getvm := new(lib.VirtualMachine)
+	*getvm = *vm.VirtualMachine
+	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	group := lib.GroupName{}
 
@@ -219,7 +236,7 @@ func TestCreateServer(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("CreateVirtualMachine", &group, vm).Return(vm.VirtualMachine, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(vm.VirtualMachine, nil).Times(1)
+	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
 		"bytemark", "create", "server",

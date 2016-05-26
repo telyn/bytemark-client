@@ -1,8 +1,8 @@
 package util
 
 import (
-	client "github.com/BytemarkHosting/bytemark-client/lib"
 	"fmt"
+	client "github.com/BytemarkHosting/bytemark-client/lib"
 	"math"
 	"strings"
 )
@@ -18,22 +18,46 @@ const (
 	_FormatVMWithDiscs
 	// _FormatVMWithCDURL causes the URL of the image being used as the CD to be included in the output, if applicable
 	_FormatVMWithCDURL
-)
-
-// VMListFormatMode is the way that FormatVirtualMachineList will format the VMList
-type VMListFormatMode uint8
-
-const (
-	// _FormatVMListName outputs only the names of the VMs
-	_FormatVMListName VMListFormatMode = iota
-	// _FormatVMListNameDotGroup outputs the VMs in name.group format
-	_FormatVMListNameDotGroup
-	// _FormatVMListFQDN outputs the full hostnames of the VMs.
-	_FormatVMListFQDN
+	// _FormatVMSingleLine causes a minimal set of details to be output on a single line, and overrides the other options
+	_FormatVMSingleLine
+	// _FormatVMTwoLine causes a relatively minimal set of details to be output on two lines and overrides the other options with the exception of _FormatVMSingleLine
+	_FormatVMTwoLine
 )
 
 // FORMAT_DEFAULT_WIDTH is the default width to attempt to print to.
 const _FormatDefaultWidth = 80
+
+// FlowString adds newlines and spaces such that the string never gets longer than width, and remains consistently indented to the given number of spaces. It is dumb and assumes every character has a width of one.
+// Really it should do it by words, but that's harder and I just want *something* right now
+func FlowString(width int, indent int, str string) string {
+	lines := make([]string, 0)
+	curline := make([]rune, 0, width)
+
+	for i := 0; i < indent; i++ {
+		curline = append(curline, ' ')
+	}
+	ch := 0
+	for _, char := range str {
+		if ch == width {
+			lines = append(lines, string(curline))
+			curline = make([]rune, 0, width)
+			ch = indent
+			for i := 0; i < indent; i++ {
+				curline = append(curline, ' ')
+			}
+		}
+		ch++
+		curline = append(curline, char)
+	}
+	lines = append(lines, string(curline))
+	return strings.Join(lines, "\r\n")
+}
+
+// FlowStringf formats the given string like Sprintf then runs FlowString on the result.
+func FlowStringf(width int, indent int, str string, params ...interface{}) string {
+	str = fmt.Sprintf(str, params...)
+	return FlowString(width, indent, str)
+}
 
 // FormatVirtualMachines loops through a bunch of VMs, formatting each one as it goes, and returns each formatted VM as a string.
 // The options are the same as FormatVirtualMachine
@@ -61,35 +85,80 @@ func FormatVirtualMachine(vm *client.VirtualMachine, options ...int) string {
 
 	output := make([]string, 0, 10)
 
+	// outputIndentedf formats the given string, flows it so it's indented two spaces, and appends it to the output array.
+	outputIndentedf := func(str string, params ...interface{}) {
+		output = append(output, FlowStringf(width, 4, str, params...))
+	}
+
 	powerstate := "powered off"
 	if vm.PowerOn {
 		powerstate = "powered on"
 	}
-
-	title := fmt.Sprintf("'%s' - %d cores, %d GiB RAM, %d GiB on %d discs (%s) =", vm.Name, vm.Cores, vm.Memory/1024, vm.TotalDiscSize("")/1024, len(vm.Discs), powerstate)
-	padding := ""
-	for i := 0; i < width-len(title); i++ {
-		padding += "="
+	if vm.Deleted {
+		powerstate = "deleted"
 	}
 
-	output = append(output, padding+title)
+	hostnameparts := strings.Split(vm.Hostname, ".")
+	shortname := hostnameparts[0] + "." + hostnameparts[1]
+	zone := strings.Title(vm.ZoneName)
 
-	output = append(output, fmt.Sprintf("Hostname: %s", vm.Hostname))
+	// append & format by hand because we dont want this to be indented
+	output = append(output, fmt.Sprintf("= %s (%s) in %s", shortname, powerstate, zone))
+
+	// if !singleline
+	if format&_FormatVMSingleLine == _FormatVMSingleLine {
+		return output[0]
+	}
+
+	memAmt := vm.Memory
+	memCh := 'M'
+	if memAmt >= 1024 {
+		memAmt /= 1024
+		memCh = 'G'
+	}
+
+	diskAmt := float64(vm.TotalDiscSize("")) / 1024
+	diskCh := 'G'
+	if diskAmt >= 1024 {
+		diskCh = 'T'
+		diskAmt = diskAmt / 1024
+	}
+	diskN := len(vm.Discs)
+	sForDisks := "s"
+	sForCores := "s"
+	if vm.Cores == 1 {
+		sForCores = ""
+	}
+	if diskN == 1 {
+		sForDisks = ""
+	}
+
+	if diskCh == 'T' {
+		outputIndentedf("%d core%s, %d%ciB RAM, %.1f%ciB storage on %d disk%s", vm.Cores, sForCores, memAmt, memCh, diskAmt, diskCh, diskN, sForDisks)
+	} else {
+		outputIndentedf("%d core%s, %d%ciB RAM, %.0f%ciB storage on %d disk%s", vm.Cores, sForCores, memAmt, memCh, diskAmt, diskCh, diskN, sForDisks)
+	}
+
+	if format&_FormatVMTwoLine == _FormatVMTwoLine {
+		return strings.Join(output, "\r\n")
+	}
+	output = append(output, "")
+
 	if (format&_FormatVMWithCDURL) != 0 && vm.CdromURL != "" {
-		output = append(output, fmt.Sprintf("CD-ROM: %s", vm.CdromURL))
+		outputIndentedf("CD-ROM: %s", vm.CdromURL)
 	}
 
 	output = append(output, "")
 	if (format & _FormatVMWithDiscs) != 0 {
 		for _, disc := range vm.Discs {
-			output = append(output, fmt.Sprintf("Disc %s: %d GiB, %s grade", disc.Label, disc.Size/1024, disc.StorageGrade))
+			outputIndentedf("Disc %s: %d GiB, %s grade", disc.Label, disc.Size/1024, disc.StorageGrade)
 		}
 		output = append(output, "")
 	}
 
 	if (format & _FormatVMWithAddrs) != 0 {
-		output = append(output, fmt.Sprintf("IPv4 Addresses: %s", vm.AllIPv4Addresses().StringSep(",\r\n                ")))
-		output = append(output, fmt.Sprintf("IPv6 Addresses: %s", vm.AllIPv6Addresses().StringSep(",\r\n                ")))
+		outputIndentedf("IPv4 Addresses: %s", vm.AllIPv4Addresses().StringSep(",\r\n                "))
+		outputIndentedf("IPv6 Addresses: %s", vm.AllIPv6Addresses().StringSep(",\r\n                "))
 	}
 
 	return strings.Join(output, "\r\n")

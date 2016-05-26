@@ -32,9 +32,9 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					log.Output(util.FormatAccount(c.Account))
 
 					for _, g := range c.Account.Groups {
-						log.Outputf("Group %s\r\n", g.Name)
+						log.Outputf("Group %s =========================================\r\n\r\n", g.Name)
 						for _, v := range util.FormatVirtualMachines(g.VirtualMachines) {
-							log.Output(v)
+							log.Output(v + "\r\n")
 						}
 					}
 					return nil
