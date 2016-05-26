@@ -17,7 +17,10 @@ func TestAddKeyCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
 
-	global.App.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
+	err := global.App.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
+	if err != nil {
+		t.Error(err)
+	}
 
 	if ok, err := config.Verify(); !ok {
 		t.Fatal(err)
@@ -53,7 +56,11 @@ func TestAddIPCommand(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddIP", &vm, &ipcr).Return(&ipcres, nil)
 
-	global.App.Run(strings.Split("bytemark add ip --reason testing test-server", " "))
+	err := global.App.Run(strings.Split("bytemark add ip --reason testing test-server", " "))
+	if err != nil {
+		t.Error(err)
+	}
+
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

@@ -66,7 +66,10 @@ func TestSetMemory(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineMemory", &vmname, 16384).Return(nil).Times(1)
 
-	global.App.Run(strings.Split("bytemark set memory test-server 16384M", " "))
+	err = global.App.Run(strings.Split("bytemark set memory test-server 16384M", " "))
+	if err != nil {
+		t.Error(err)
+	}
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

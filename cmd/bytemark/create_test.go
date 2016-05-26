@@ -167,6 +167,7 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 		Discs: []lib.Disc{},
 	}
 
+	// TODO(telyn): refactor this getvm crap into a function someplace
 	getvm := new(lib.VirtualMachine)
 	*getvm = *vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
@@ -184,15 +185,18 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(vm.VirtualMachine, nil).Times(1)
+	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
-	global.App.Run([]string{
+	err := global.App.Run([]string{
 		"bytemark", "create", "server",
 		"--cores", "1",
 		"--no-discs",
 		"--memory", "1",
 		"test-server",
 	})
+	if err != nil {
+		t.Error(err)
+	}
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
