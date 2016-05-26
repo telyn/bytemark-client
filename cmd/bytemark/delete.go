@@ -59,7 +59,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 						prompt = fmt.Sprintf("The group '%s' has %d running virtual machines in it", c.GroupName.Group, running)
 					}
 
-					if global.Config.Force() || PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
+					if global.Config.Force() || util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
 						// TODO(telyn): Prompt
 						err = recursiveDeleteGroup(c.GroupName, c.Group)
 						if err != nil {
