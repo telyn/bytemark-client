@@ -18,6 +18,9 @@ func With(providers ...ProviderFunc) func(c *cli.Context) {
 	}
 }
 
+// cleanup resets the value of special flags between invocations of global.App.Run so that the tests pass.
+// This is needed because the init() functions are only executed once during the testing cycle.
+// Outside of the tests, global.App.Run is only called once before the program closes.
 func cleanup(c *Context) {
 	ips := c.Context.Generic("ip")
 	if ips, ok := ips.(*util.IPFlag); ok {
@@ -33,6 +36,7 @@ func cleanup(c *Context) {
 	}
 }
 
+// foldProviders runs all the providers with the given context, stopping if there's an error
 func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
 	for _, provider := range providers {
 		err = provider(c)
@@ -43,6 +47,7 @@ func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
 	return
 }
 
+// AccountNameProvider stitches the next argument to the context as AccountName
 func AccountNameProvider(c *Context) (err error) {
 	if c.AccountName != nil {
 		return
@@ -60,6 +65,7 @@ func AccountNameProvider(c *Context) (err error) {
 	return
 }
 
+// AccountProvider uses AccountNameProvider and then gets the account details from the API, then stitches it to the context
 func AccountProvider(c *Context) (err error) {
 	err = AccountNameProvider(c)
 	if err != nil {
