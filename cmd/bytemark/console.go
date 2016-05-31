@@ -37,6 +37,10 @@ Defaults to connecting to the serial console for the given server.`,
 				Name:  "no-connect",
 				Usage: "Output connection instructions, rather than directly connecting.",
 			},
+			cli.StringFlag{
+				Name:  "ssh-args",
+				Usage: "Arguments that will be passed to SSH (only applies to --serial).",
+			},
 		},
 		Action: With(VirtualMachineNameProvider, AuthProvider, func(ctx *Context) error {
 			if ctx.Context.Bool("serial") && ctx.Context.Bool("panel") {
@@ -56,7 +60,7 @@ Defaults to connecting to the serial console for the given server.`,
 				if ctx.Context.Bool("panel") {
 					return console_panel(vm)
 				} else {
-					return console_serial(vm)
+					return console_serial(vm, ctx.String("ssh-args"))
 				}
 			}
 
@@ -116,14 +120,58 @@ func console_panel(vm *lib.VirtualMachine) error {
 	return util.CallBrowser(url)
 }
 
-func console_serial(vm *lib.VirtualMachine) error {
+func collect_args(args string) (slice []string) {
+	in_dbl := false
+	in_sgl := false
+	slice = make([]string, 0)
+	cur := make([]rune, 0)
+	for _, ch := range args {
+		if in_dbl && ch == '"' {
+			in_dbl = false
+			continue
+		} else if in_sgl && ch == '\'' {
+			in_sgl = false
+			continue
+		}
+
+		if !in_sgl && ch == '"' {
+			in_dbl = true
+			continue
+		} else if !in_dbl && ch == '\'' {
+			in_sgl = true
+			continue
+		}
+
+		if !in_dbl && !in_sgl && ch == ' ' {
+			slice = append(slice, string(cur))
+			cur = make([]rune, 0)
+			continue
+		}
+		cur = append(cur, ch)
+
+	}
+	slice = append(slice, string(cur))
+	return
+}
+
+func console_serial(vm *lib.VirtualMachine, sshargs string) error {
 	host := fmt.Sprintf("%s@%s", global.Client.GetSessionUser(), vm.ManagementAddress)
 	log.Logf("ssh %s\r\n", host)
+
 	bin, err := exec.LookPath("ssh")
 	if err != nil {
 		return err
 	}
-	err = syscall.Exec(bin, []string{"ssh", host}, os.Environ())
+
+	sshargsli := collect_args(sshargs)
+	args := make([]string, len(sshargsli)+2)
+	copy(args[1:], sshargsli[0:])
+	args[0] = "ssh"
+	args[len(args)-1] = host
+
+	log.Debugf(5, "%+v\r\n", args)
+
+	err = syscall.Exec(bin, args, os.Environ())
 	if err != nil {
 		if errno, ok := err.(syscall.Errno); ok {
 			if errno != 0 {
