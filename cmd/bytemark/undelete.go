@@ -7,19 +7,21 @@ import (
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:        "undelete",
+		Name:        "restore",
 		Usage:       "Restores a previously deleted cloud server",
-		UsageText:   "bytemark undelete server <name>",
-		Action:      cli.ShowSubcommandHelp,
-		Description: `This command restores a previously deleted cloud server. Note that it cannot be used to restore a server that has been permanently deleted (purged).`,
+		UsageText:   "bytemark restore server <name>",
+		Description: `Restores a previously deleted cloud server.`,
+
+		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
-			Name:        "server",
-			Usage:       "Restores a previously deleted cloud server",
-			UsageText:   "bytemark undelete server <name>",
-			Description: `This command restores a previously deleted cloud server. Note that it cannot be used to restore a server that has been permanently deleted (purged).`,
+			Name:      "server",
+			Usage:     "Restores a previously deleted cloud server",
+			UsageText: "bytemark restore server <name>",
+			Description: `This command restores a previously deleted cloud server to its non-deleted state.
+Note that it cannot be used to restore a server that has been permanently deleted (purged).`,
 			Action: With(VirtualMachineProvider, func(c *Context) (err error) {
 				if !c.VirtualMachine.Deleted {
-					log.Errorf("%s was already undeleted\r\n", c.VirtualMachine.Hostname)
+					log.Errorf("%s was already restored\r\n", c.VirtualMachine.Hostname)
 					return
 				}
 
