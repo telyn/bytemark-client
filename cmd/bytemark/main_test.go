@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
