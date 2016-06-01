@@ -1,8 +1,8 @@
 package lib
 
 import (
-	auth3 "github.com/BytemarkHosting/auth-client"
 	"fmt"
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"net/http"
 	"net/http/httptest"
 	"testing"

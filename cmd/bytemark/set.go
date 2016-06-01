@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/urfave/cli"
 	"strconv"
 )

@@ -1,8 +1,8 @@
 package lib
 
 import (
-	auth3 "github.com/BytemarkHosting/auth-client"
 	"errors"
+	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
 type Endpoint int
