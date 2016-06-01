@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"bytes"
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"io"
 	"os"

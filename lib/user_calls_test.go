@@ -1,8 +1,8 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/cheekybits/is"
 	"net/http"
 	"testing"

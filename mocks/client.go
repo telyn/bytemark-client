@@ -1,9 +1,9 @@
 package mocks
 
 import (
+	"fmt"
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	"fmt"
 	mock "github.com/maraino/go-mock"
 	"net/http"
 	"net/url"

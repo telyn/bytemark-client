@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"encoding/json"
 	"github.com/urfave/cli"
 	"net"
 )
