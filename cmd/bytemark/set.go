@@ -10,13 +10,13 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:        "set",
-		Usage:       "Change hardware properties of Bytemark servers",
+		Usage:       "change hardware properties of Bytemark servers",
 		UsageText:   "bytemark set cores|memory|hwprofile <server>",
 		Description: `These commands set various hardware properties of Bytemark servers. Note that for memory increases, cores and hwprofile to take effect you will need to restart the server.`,
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "cores",
-			Usage:       "Set the number of CPU cores on a Bytemark cloud server",
+			Usage:       "set the number of CPU cores on a Bytemark cloud server",
 			UsageText:   "bytemark set cores <server name> <cores>",
 			Description: "This command sets the number of CPU cores used by the cloud server. This will usually require a restart of the server to take effect.",
 			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
@@ -33,7 +33,7 @@ func init() {
 			}),
 		}, {
 			Name:        "hwprofile",
-			Usage:       "Set the hardware profile used by the cloud server",
+			Usage:       "set the hardware profile used by the cloud server",
 			UsageText:   "bytemark set hwprofile <server> <profile>",
 			Description: "This sets the hardware profile used. Hardware profiles can be simply thought of as what virtual motherboard you're using - generally you want a pretty recent one for maximum speed, but if you're running a very old or experimental OS (e.g. DOS or OS/2 or something) you may require the compatibility one. See `bytemark hwprofiles` for which ones are currently available.",
 			Flags: []cli.Flag{
@@ -65,7 +65,7 @@ func init() {
 			}),
 		}, {
 			Name:        "memory",
-			Usage:       "Sets the amount of memory the server has",
+			Usage:       "sets the amount of memory the server has",
 			UsageText:   "bytemark set memory <server> <memory size>",
 			Description: "Memory is specified in GiB by default, but can be suffixed with an M to indicate that it is provided in MiB",
 			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {

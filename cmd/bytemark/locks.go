@@ -7,13 +7,13 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:        "lock",
-		Usage:       "Lock hardware profiles to prevent upgrading",
+		Usage:       "lock hardware profiles to prevent upgrading",
 		UsageText:   "bytemark lock hwprofile <server>",
 		Description: `This command locks the given server's hardware profile in place, preventing it from being automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "hwprofile",
-			Usage:       "Lock hardware profiles to prevent upgrading",
+			Usage:       "lock hardware profiles to prevent upgrading",
 			UsageText:   "bytemark lock hwprofile <server>",
 			Description: `This command locks the given server's hardware profile in place, preventing it from being automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
 			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {

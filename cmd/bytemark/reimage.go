@@ -10,7 +10,7 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:      "reimage",
-		Usage:     "Install a fresh operating system on a server from bytemark's images",
+		Usage:     "install a fresh operating system on a server from bytemark's images",
 		UsageText: "bytemark reimage [flags] --image <image name> <server>",
 		Description: `Image the given server with the specified image, prompting for confirmation.
 If the --image flag is not specified, will prompt with a list.

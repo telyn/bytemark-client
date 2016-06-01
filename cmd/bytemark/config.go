@@ -11,8 +11,8 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:      "config",
-		Usage:     "Manage the bytemark client's configuration",
-		UsageText: "Outputs the current values of all variables and what source they were derived from.",
+		Usage:     "manage the bytemark client's configuration",
+		UsageText: "config [ set | unset ]",
 		Description: `When invoked with no subcommand, outputs the current values of all variables and what source they were derived from.
 The set and unset subcommands can be used to set and unset such variables.
 		
@@ -31,7 +31,7 @@ Available variables:
 			{
 				Name:        "set",
 				UsageText:   "bytemark config set <variable> <value>",
-				Usage:       "Sets a variable by writing to your bytemark config (usually ~/.bytemark)",
+				Usage:       "sets a bytemark client configuration request",
 				Description: "Sets the named variable to the given value. See `bytemark help config` for which variables are available",
 				Action: With(func(ctx *Context) error {
 					varname, err := ctx.NextArg()
@@ -69,7 +69,7 @@ Available variables:
 			}, {
 				Name:        "unset",
 				UsageText:   "bytemark config unset <variable>",
-				Usage:       "Unsets a variable by removing data from bytemark config (usually ~/.bytemark)",
+				Usage:       "unsets a bytemark client configuration option",
 				Description: "Unsets the named variable.",
 				Action: With(func(ctx *Context) error {
 					varname, err := ctx.NextArg()

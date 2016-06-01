@@ -11,7 +11,7 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:      "signup",
-		Usage:     "Sign up for Bytemark's hosting service.",
+		Usage:     "sign up for Bytemark's hosting service",
 		UsageText: "bytemark signup",
 		Description: `This will create a new SSO and billing account and set your credit card details.
 

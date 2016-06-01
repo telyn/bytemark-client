@@ -7,7 +7,7 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:      "profiles",
-		Usage:     "Information on using multiple configurations",
+		Usage:     "information on using multiple bytemark client configurations",
 		UsageText: "bytemark profiles",
 		Action:    cli.ShowSubcommandHelp,
 		Description: `Having multiple configurations with Bytemark client is useful if you regularly log in as two different users,
@@ -28,7 +28,7 @@ Now you can run 'bytemark-bob list servers' to list all the servers in bob's def
 Sorted.`,
 	}, cli.Command{
 		Name:      "scripting",
-		Usage:     "Information on scripting with the client",
+		Usage:     "information on scripting with the client",
 		UsageText: "bytemark scripting",
 		Action:    cli.ShowSubcommandHelp,
 		Description: `The Bytemark client has been programmed from the beginning to attempt to make it easy for users to script with it.

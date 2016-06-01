@@ -12,13 +12,13 @@ func init() {
 	publicKeyFile := util.FileFlag{}
 	commands = append(commands, cli.Command{
 		Name:        "add",
-		Usage:       "Add SSH keys to a user / IPs to a server",
+		Usage:       "add SSH keys to a user / IPs to a server",
 		UsageText:   "bytemark add key|ip",
 		Description: "The add command has a single subcommand - add key. See the help text for `bytemark add key`.",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "key",
-			Usage:       "Add public SSH keys to a Bytemark user",
+			Usage:       "add public SSH keys to a Bytemark user",
 			UsageText:   "bytemark add key [--user <user>] [--public-key-file <filename>] <key>",
 			Description: `Add the given public key to the given user (or the default user). This will allow them to use that key to access management IPs they have access to using that key. To remove a key, use the remove key command. --public-key-file will be ignored if a public key is specified in the arguments`,
 			Flags: []cli.Flag{
@@ -54,7 +54,7 @@ func init() {
 		}, {
 			Name:        "ips",
 			Aliases:     []string{"ip"},
-			Usage:       "Add extra IP addresses to a server",
+			Usage:       "add extra IP addresses to a server",
 			UsageText:   "bytemark add ips [--ipv4 | --ipv6] [--ips <number>] <server name>",
 			Description: `Add an extra IP to the given server. The IP will be chosen by the brain and output to standard out.`,
 			Flags: []cli.Flag{

@@ -5,6 +5,7 @@ import (
 	"github.com/urfave/cli"
 	"strings"
 	"testing"
+	"unicode"
 )
 
 func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
@@ -52,40 +53,55 @@ func TestFlagsHaveUsage(t *testing.T) {
 			switch f := f.(type) {
 			case cli.BoolFlag:
 				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
 					t.Fail()
 				}
 			case cli.BoolTFlag:
 				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
 					t.Fail()
 				}
 			case cli.DurationFlag:
 				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
 					t.Fail()
 				}
 			case cli.Float64Flag:
 				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
 					t.Fail()
 				}
 			case cli.GenericFlag:
 				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
 					t.Fail()
 				}
 			case cli.StringFlag:
 				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
 					t.Fail()
 				}
 			case cli.StringSliceFlag:
 				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage", c.FullName(), f.Name)
+					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
 					t.Fail()
 				}
 			}
+		}
+	})
+}
+
+func TestUsageStyleConformance(t *testing.T) {
+	traverseAllCommands(commands, func(c cli.Command) {
+		usage := []rune(c.Usage)
+		if unicode.IsUpper(usage[0]) {
+			log.Logf("Command %s's Usage begins with an uppercase letter. Please change it - Usages should be lowercase.\r\n", c.FullName())
+			t.Fail()
+		}
+
+		if strings.Contains(c.Usage, ".") {
+			log.Logf("Command %s's Usage has a full-stop. Get rid of it.\r\n", c.FullName())
+			t.Fail()
 		}
 	})
 }

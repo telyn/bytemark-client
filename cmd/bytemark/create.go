@@ -12,7 +12,7 @@ import (
 func init() {
 	createServer := cli.Command{
 		Name:      "server",
-		Usage:     `Create a new server with bytemark.`,
+		Usage:     `create a new server with bytemark`,
 		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
 		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
 		
@@ -135,7 +135,7 @@ Multiple --disc flags can be used to create multiple discs`,
 
 	commands = append(commands, cli.Command{
 		Name:      "create",
-		Usage:     "Creates various kinds of things. See `bytemark create <kind of thing> help`",
+		Usage:     "creates servers, discs, etc - see `bytemark create <kind of thing> help`",
 		UsageText: "bytemark create disc|group|ip|server",
 		Description: `Create a new disc, group, IP or server.
 

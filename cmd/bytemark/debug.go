@@ -15,7 +15,7 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:      "debug",
-		Usage:     "Test out the Bytemark API",
+		Usage:     "test out the Bytemark API",
 		UsageText: "bytemark debug [--junk-token] [--auth] [--use-billing] GET|POST|PUT|DELETE <path>",
 		Description: `GET sends an HTTP GET request with an optional valid authorization header to the given path on the API endpoint and pretty-prints the received json.
 The rest do similar, but PUT and POST both wait for input from stdin after authenticating. To finish entering, put an EOF (usually ctrl-d)`,

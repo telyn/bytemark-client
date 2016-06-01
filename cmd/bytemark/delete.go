@@ -12,7 +12,7 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:      "delete",
-		Usage:     "Delete a given server, disc, group, account or key.",
+		Usage:     "delete a given server, disc, group, account or key",
 		UsageText: "bytemark delete account|disc|group|key|server",
 		Description: `Deletes the given server, disc, group, account or key. Only empty groups and accounts can be deleted.
 If the --purge flag is given and the target is a cloud server, will permanently delete the server. Billing will cease and you will be unable to recover the server or its data.
@@ -22,7 +22,7 @@ The undelete server command may be used to restore a deleted (but not purged) se
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "disc",
-			Usage:       "Delete the given disc",
+			Usage:       "delete the given disc",
 			UsageText:   "bytemark delete disc <virtual machine name> <disc label>",
 			Description: "Deletes the given disc. To find out a disc's label you can use the `bytemark show server` command or `bytemark list discs` command.",
 			Aliases:     []string{"disk"},
@@ -35,7 +35,7 @@ The undelete server command may be used to restore a deleted (but not purged) se
 			}),
 		}, {
 			Name:      "group",
-			Usage:     "Deletes the given group",
+			Usage:     "deletes the given group",
 			UsageText: "bytemark delete group [--recursive] <group name>",
 			Description: `Deletes the given group.
 If --recursive is specified, all servers in the group will be purged. Otherwise, if there are servers in the group, will return an error.`,
@@ -75,7 +75,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			}),
 		}, {
 			Name:        "key",
-			Usage:       "Deletes the specified key",
+			Usage:       "deletes the specified key",
 			UsageText:   "bytemark delete key [--user <user>] <key>",
 			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
 			Action: With(func(c *Context) error {
@@ -101,7 +101,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			}),
 		}, {
 			Name:        "server",
-			Usage:       "Delete the given server",
+			Usage:       "delete the given server",
 			UsageText:   `bytemark delete server [--purge] <server name>`,
 			Description: "Deletes the given server. Deleted servers still exist and can be restored. To ensure a server is fully deleted, use the --purge flag.",
 			Flags: []cli.Flag{

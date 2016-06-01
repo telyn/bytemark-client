@@ -31,13 +31,13 @@ func listServersInGroup(g *lib.Group) {
 func init() {
 	commands = append(commands, cli.Command{
 		Name:        "list",
-		Usage:       "Scripting-friendly lists of your assets at Bytemark",
+		Usage:       "scripting-friendly lists of your assets at Bytemark",
 		UsageText:   "bytemark list accounts|discs|groups|keys|servers",
 		Description: `This commmand will list the kind of object you request, one per line. Perfect for piping into a bash while loop!`,
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "accounts",
-			Usage:       "List all the accounts you're able to see",
+			Usage:       "list all the accounts you're able to see",
 			UsageText:   "bytemark list accounts",
 			Description: `This will list all the accounts that your authentication token has some form of access to.`,
 			Action: With(AuthProvider, func(c *Context) error {
@@ -54,7 +54,7 @@ func init() {
 			}),
 		}, {
 			Name:        "discs",
-			Usage:       "List all the discs attached to a given virtual machine",
+			Usage:       "list all the discs attached to a given virtual machine",
 			UsageText:   "bytemark list discs <virtual machine>",
 			Description: `This command lists all the discs attached to the given virtual machine. They're presented in the following format: 'LABEL: SIZE GRADE', where size is an integer number of megabytes. Add the --human flag to output the size in GiB (rounded down to the nearest GiB)`,
 			Flags: []cli.Flag{
@@ -75,7 +75,7 @@ func init() {
 			}),
 		}, {
 			Name:      "groups",
-			Usage:     "List all the groups in an account",
+			Usage:     "list all the groups in an account",
 			UsageText: "bytemark list groups <account>",
 			Description: `This command lists all the groups in the given account, or in your default account.
 Your default account is determined by the --account flag, the account variable in your config, falling back to the account with the same name as you log in with.`,
@@ -87,7 +87,7 @@ Your default account is determined by the --account flag, the account variable i
 			}),
 		}, {
 			Name:        "keys",
-			Usage:       "List all the SSH public keys associated with a user",
+			Usage:       "list all the SSH public keys associated with a user",
 			UsageText:   "bytemark list keys [user]",
 			Description: "Lists all the SSH public keys associated with a user, defaulting to your log-in user.",
 			Action: func(c *cli.Context) error {
@@ -114,7 +114,7 @@ Your default account is determined by the --account flag, the account variable i
 			},
 		}, {
 			Name:      "servers",
-			Usage:     "List all the servers in an account",
+			Usage:     "list all the servers in an account",
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if you didn't specify an account on the command-line.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
