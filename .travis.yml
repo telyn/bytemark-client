@@ -1,9 +1,14 @@
 language: go
 sudo: false
 go:
-          - tip
+- tip
 before_install:
-          - go get github.com/mattn/goveralls
-          - go get golang.org/x/tools/cmd/cover
+- go get github.com/mattn/goveralls
+- go get golang.org/x/tools/cmd/cover
+- go get github.com/modocache/gover
 script:
-          - $HOME/gopath/bin/goveralls -service=travis-ci
+- go test -coverprofile=bytemark.coverprofile ./cmd/bytemark
+- go test -coverprofile=util.coverprofile ./cmd/bytemark/util
+- go test -coverprofile=lib.coverprofile ./cmd/lib
+- $HOME/gopath/bin/gover
+- $HOME/gopath/bin/goveralls -service=travis-ci
