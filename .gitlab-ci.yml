@@ -1,14 +1,8 @@
-image: debian:jessie
+image: golang:1.6
 before_script:
-  - echo "deb http://mirror.bytemark.co.uk/debian jessie-backports main" >> /etc/apt/sources.list
-  - apt-get -qq update && apt-get -qq install -y golang-go 2>&1 > /dev/null
-  - apt-get -qq install -t jessie-backports -y golang-go 2>&1 > /dev/null
   - go version
+  - go get -t -v -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
 
-go-test:
+test:
   script:
-    - mkdir -p src/github.com/BytemarkHosting/bytemark-client
-    - mv * src/github.com/BytemarkHosting/bytemark-client || true
-    - export GOPATH=`pwd`
-    - go get github.com/BytemarkHosting/auth-client
-    - cd src/github.com/BytemarkHosting/bytemark-client && GO15VENDOREXPERIMENT=1 go test ./...
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client && make test
