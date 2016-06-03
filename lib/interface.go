@@ -131,6 +131,9 @@ type Client interface {
 	// GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
 	GetVirtualMachine(name *VirtualMachineName) (*VirtualMachine, error)
 
+	// MoveVirtualMachine moves a server from one VirtualMachineName to another.
+	MoveVirtualMachine(old *VirtualMachineName, new *VirtualMachineName) error
+
 	// ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 	// Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
 	ReimageVirtualMachine(name *VirtualMachineName, image *ImageInstall) (err error)

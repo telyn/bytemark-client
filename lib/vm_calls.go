@@ -126,6 +126,44 @@ func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *Virtua
 	return
 }
 
+//MoveVirtualMachine moves the virtual machine to the given name, across groups if needed.
+func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName *VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(oldName)
+	if err != nil {
+		return
+	}
+	err = c.validateVirtualMachineName(newName)
+	if err != nil {
+		return
+	}
+
+	// create the change we want to see in the server
+	change := VirtualMachine{Name: newName.VirtualMachine}
+	if newName.Group != "" || newName.Account != "" {
+		// get group
+		groupName := GroupName{Group: newName.Group, Account: newName.Account}
+		group, err := c.GetGroup(&groupName)
+		if err != nil {
+			return err
+		}
+		change.GroupID = group.ID
+	}
+
+	// PUT the change
+	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", oldName.Account, oldName.Group, oldName.VirtualMachine)
+	if err != nil {
+		return err
+	}
+
+	js, err := json.Marshal(change)
+	if err != nil {
+		return err
+	}
+	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	return err
+
+}
+
 // ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 // Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
 func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *ImageInstall) (err error) {

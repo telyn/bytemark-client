@@ -199,6 +199,11 @@ func (c *Client) GetVirtualMachine(name *lib.VirtualMachineName) (vm *lib.Virtua
 	return vm, r.Error(1)
 }
 
+func (c *Client) MoveVirtualMachine(oldName *lib.VirtualMachineName, newName *lib.VirtualMachineName) error {
+	r := c.Called(oldName, newName)
+	return r.Error(0)
+}
+
 func (c *Client) ParseVirtualMachineName(name string, defaults ...*lib.VirtualMachineName) (*lib.VirtualMachineName, error) {
 	r := c.Called(name, defaults)
 	n, _ := r.Get(0).(*lib.VirtualMachineName)

@@ -6,27 +6,27 @@ import (
 
 // VirtualMachine represents a VirtualMachine, as passed around from the virtual_machines endpoint
 type VirtualMachine struct {
-	Autoreboot            bool   `json:"autoreboot_on"`
-	CdromURL              string `json:"cdrom_url"`
-	Cores                 int    `json:"cores"`
-	Memory                int    `json:"memory"`
-	Name                  string `json:"name"`
-	PowerOn               bool   `json:"power_on"`
-	HardwareProfile       string `json:"hardware_profile"`
-	HardwareProfileLocked bool   `json:"hardware_profile_locked"`
-	GroupID               int    `json:"group_id"`
+	Autoreboot            bool   `json:"autoreboot_on,omitempty"`
+	CdromURL              string `json:"cdrom_url,omitempty"`
+	Cores                 int    `json:"cores,omitempty"`
+	Memory                int    `json:"memory,omitempty"`
+	Name                  string `json:"name,omitempty"`
+	PowerOn               bool   `json:"power_on,omitempty"`
+	HardwareProfile       string `json:"hardware_profile,omitempty"`
+	HardwareProfileLocked bool   `json:"hardware_profile_locked,omitempty"`
+	GroupID               int    `json:"group_id,omitempty"`
 
 	// zone name can be set during creation but not changed
-	ZoneName string `json:"zone_name"`
+	ZoneName string `json:"zone_name,omitempty"`
 
 	// the following cannot be set
-	Discs             []*Disc             `json:"discs"`
-	ID                int                 `json:"id"`
-	ManagementAddress *net.IP             `json:"management_address"`
-	Deleted           bool                `json:"deleted"`
-	Hostname          string              `json:"hostname"`
-	Head              string              `json:"head"`
-	NetworkInterfaces []*NetworkInterface `json:"network_interfaces"`
+	Discs             []*Disc             `json:"discs,omitempty"`
+	ID                int                 `json:"id,omitempty"`
+	ManagementAddress *net.IP             `json:"management_address,omitempty"`
+	Deleted           bool                `json:"deleted,omitempty"`
+	Hostname          string              `json:"hostname,omitempty"`
+	Head              string              `json:"head,omitempty"`
+	NetworkInterfaces []*NetworkInterface `json:"network_interfaces,omitempty"`
 
 	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
 }

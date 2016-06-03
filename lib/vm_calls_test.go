@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"github.com/cheekybits/is"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"testing"
@@ -39,6 +40,101 @@ func getFixtureVM() (vm VirtualMachine) {
 	}
 }
 
+func TestMoveVirtualMachine(t *testing.T) {
+	is := is.New(t)
+
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts/old-account/groups/old-group" {
+			w.Write([]byte(`{"id":101, "name": "old-group"}`))
+		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/rename-test" {
+			if req.Method == "PUT" {
+				decoded := make(map[string]interface{})
+				body, err := ioutil.ReadAll(req.Body)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = json.Unmarshal(body, &decoded)
+				if err != nil {
+					t.Fatal(err)
+				}
+				is.Equal("new-name", decoded["name"])
+				is.Equal(101, decoded["group_id"])
+				w.Write(body)
+			}
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+	}), mkNilHandler(t))
+	defer authServer.Close()
+	defer brain.Close()
+	defer billing.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	oldName := VirtualMachineName{VirtualMachine: "rename-test", Group: "old-group", Account: "old-account"}
+	newName := oldName
+	newName.VirtualMachine = "new-name"
+
+	err = client.MoveVirtualMachine(&oldName, &newName)
+	if err != nil {
+		t.Log(err.Error())
+	}
+	is.Nil(err)
+}
+
+func TestMoveServerGroup(t *testing.T) {
+	is := is.New(t)
+
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts/old-account/groups/new-group" {
+			w.Write([]byte(`{"id":105, "name": "new-group"}`))
+		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/group-test" {
+			if req.Method == "PUT" {
+				decoded := make(map[string]interface{})
+				body, err := ioutil.ReadAll(req.Body)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = json.Unmarshal(body, &decoded)
+				if err != nil {
+					t.Fatal(err)
+				}
+				is.Equal("new-name", decoded["name"])
+				is.Equal(105, decoded["group_id"])
+				w.Write(body)
+			}
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+	}), mkNilHandler(t))
+	defer authServer.Close()
+	defer brain.Close()
+	defer billing.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	oldName := VirtualMachineName{VirtualMachine: "group-test", Group: "old-group", Account: "old-account"}
+	newName := oldName
+	newName.VirtualMachine = "new-name"
+	newName.Group = "new-group"
+
+	err = client.MoveVirtualMachine(&oldName, &newName)
+	if err != nil {
+		t.Log(err.Error())
+	}
+}
 func TestGetVirtualMachine(t *testing.T) {
 	is := is.New(t)
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
