@@ -125,6 +125,9 @@ func collect_args(args string) (slice []string) {
 	in_sgl := false
 	slice = make([]string, 0)
 	cur := make([]rune, 0)
+	if args == "" {
+		return
+	}
 	for _, ch := range args {
 		if in_dbl && ch == '"' {
 			in_dbl = false
