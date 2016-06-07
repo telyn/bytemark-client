@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	"github.com/urfave/cli"
 )
 
 func baseTestSetup() (config *mocks.Config, client *mocks.Client) {
@@ -13,6 +14,16 @@ func baseTestSetup() (config *mocks.Config, client *mocks.Client) {
 
 	baseAppSetup()
 	return
+}
+
+func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
+	if cmds == nil {
+		return
+	}
+	for _, c := range cmds {
+		fn(c)
+		traverseAllCommands(c.Subcommands, fn)
+	}
 }
 
 func getFixtureVM() lib.VirtualMachine {

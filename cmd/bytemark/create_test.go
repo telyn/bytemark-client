@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
+	"github.com/urfave/cli"
 	"strings"
 	"testing"
 )
@@ -57,6 +58,47 @@ func TestCreateGroupCommand(t *testing.T) {
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
+}
+
+func TestCreateServerHasCorrectFlags(t *testing.T) {
+	is := is.New(t)
+	seenCmd := false
+	seenAuthKeys := false
+	seenAuthKeysFile := false
+	seenFirstbootScript := false
+	seenFirstbootScriptFile := false
+	seenImage := false
+	seenRootPassword := false
+
+	traverseAllCommands(commands, func(cmd cli.Command) {
+		if cmd.FullName() == "create server" {
+			seenCmd = true
+			for _, f := range cmd.Flags {
+				switch f.GetName() {
+				case "authorized-keys":
+					seenAuthKeys = true
+				case "authorized-keys-file":
+					seenAuthKeysFile = true
+				case "firstboot-script":
+					seenFirstbootScript = true
+				case "firstboot-script-file":
+					seenFirstbootScriptFile = true
+				case "image":
+					seenImage = true
+				case "root-password":
+					seenRootPassword = true
+				}
+			}
+		}
+	})
+	is.True(seenCmd)
+	is.True(seenAuthKeys)
+	is.True(seenAuthKeysFile)
+	is.True(seenFirstbootScript)
+	is.True(seenFirstbootScriptFile)
+	is.True(seenImage)
+	is.True(seenRootPassword)
+
 }
 
 func TestCreateServerCommand(t *testing.T) {

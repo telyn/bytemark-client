@@ -37,11 +37,6 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Usage: "One of more disc specifications. Defaults to a single 25GiB sata-grade disc",
 				Value: new(util.DiscSpecFlag),
 			},
-			cli.GenericFlag{
-				Name:  "firstboot-script-file",
-				Usage: "Path to a script which will be run the first time the server boots after imaging",
-				Value: new(util.FileFlag),
-			},
 			cli.BoolFlag{
 				Name:  "force",
 				Usage: "Disables the confirmation prompt",
@@ -53,10 +48,6 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			cli.BoolFlag{
 				Name:  "hwprofile-locked",
 				Usage: "If set, the hardware profile will be 'locked', meaning that when Bytemark updates the hardware profiles your VM will keep its current one.",
-			},
-			cli.StringFlag{
-				Name:  "image",
-				Usage: "Which operating system image to use. See `bytemark images` for a list of images available.",
 			},
 			cli.GenericFlag{
 				Name:  "ip",
@@ -80,19 +71,6 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Name:  "no-discs",
 				Usage: "Specifies that the server should not have discs.",
 			},
-			cli.GenericFlag{
-				Name:  "authorized-keys-file",
-				Value: new(util.FileFlag),
-				Usage: "Specifies SSH authorized keys for the root user. Only affects linux images.",
-			},
-			cli.StringFlag{
-				Name:  "authorized-keys",
-				Usage: "Specifies SSH authorized keys for the root user. Only affects linux images.",
-			},
-			cli.StringFlag{
-				Name:  "root-password",
-				Usage: "Specifies the password for the root/Administrator user.",
-			},
 			cli.BoolFlag{
 				Name:  "stopped",
 				Usage: "If set, the server will not be started, even to image it.",
@@ -104,6 +82,10 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 		},
 
 		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createServer),
+	}
+	for _, flag := range imageInstallFlags {
+		log.Log("ImageInstallFlag: " + flag.GetName())
+		createServer.Flags = append(createServer.Flags, flag)
 	}
 
 	createDiscs := cli.Command{

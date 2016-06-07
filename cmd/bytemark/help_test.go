@@ -8,16 +8,6 @@ import (
 	"unicode"
 )
 
-func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
-	if cmds == nil {
-		return
-	}
-	for _, c := range cmds {
-		fn(c)
-		traverseAllCommands(c.Subcommands, fn)
-	}
-}
-
 // This test ensures that all commands have an Action, Description, Usage and UsageText
 // and that all their subcommands do too.
 func TestCommandsComplete(t *testing.T) {
