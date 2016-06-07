@@ -135,8 +135,10 @@ func TestCreateServerCommand(t *testing.T) {
 			ZoneName:              "test-zone",
 		},
 		Reimage: &lib.ImageInstall{
-			Distribution: "test-image",
-			RootPassword: "test-password",
+			Distribution:    "test-image",
+			RootPassword:    "test-password",
+			PublicKeys:      "test-pubkey",
+			FirstbootScript: "test-script",
 		},
 		IPs: &lib.IPSpec{
 			IPv4: "192.168.1.123",
@@ -167,6 +169,8 @@ func TestCreateServerCommand(t *testing.T) {
 
 	err := global.App.Run([]string{
 		"bytemark", "create", "server",
+		"--authorized-keys", "test-pubkey",
+		"--firstboot-script", "test-script",
 		"--cdrom", "https://example.com/example.iso",
 		"--cores", "1",
 		"--disc", "25",
