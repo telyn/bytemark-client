@@ -84,7 +84,6 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createServer),
 	}
 	for _, flag := range imageInstallFlags {
-		log.Log("ImageInstallFlag: " + flag.GetName())
 		createServer.Flags = append(createServer.Flags, flag)
 	}
 
