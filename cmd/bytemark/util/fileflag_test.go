@@ -3,6 +3,7 @@ package util
 import (
 	"github.com/cheekybits/is"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 

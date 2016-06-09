@@ -60,10 +60,12 @@ func TestReimageFileFlags(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer os.Remove("firstboot")
 	err = ioutil.WriteFile("authorized-keys", []byte("i am the authorized keys"), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer os.Remove("authorized-keys")
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
