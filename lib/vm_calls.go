@@ -62,6 +62,7 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec VirtualMach
 			reimage["root_password"] = spec.Reimage.RootPassword
 		}
 		reimage["ssh_public_key"] = spec.Reimage.PublicKeys
+		reimage["firstboot_script"] = spec.Reimage.FirstbootScript
 
 		req["reimage"] = reimage
 	}
