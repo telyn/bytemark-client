@@ -84,7 +84,11 @@ func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted 
 		defaulted = true
 	}
 	if pubkeysFile != "" {
-		pubkeys += "\r\n" + pubkeysFile
+		if pubkeys != "" {
+			pubkeys += "\r\n" + pubkeysFile
+		} else {
+			pubkeys = pubkeysFile
+		}
 	}
 
 	if firstbootScript == "" {
