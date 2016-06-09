@@ -4,6 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
