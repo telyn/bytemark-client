@@ -1,10 +1,10 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"flag"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -377,8 +377,6 @@ func (config *Config) GetDefault(name string) ConfigVar {
 			v.Value = val
 		}
 		return v
-	case "silent":
-		return ConfigVar{"silent", "false", "CODE"}
 	case "force":
 		return ConfigVar{"force", "false", "CODE"}
 	}
@@ -448,9 +446,6 @@ func (config *Config) Unset(name string) error {
 }
 
 func (config *Config) Force() bool {
-	return false
-}
-func (config *Config) Silent() bool {
 	return false
 }
 

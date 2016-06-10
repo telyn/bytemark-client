@@ -70,10 +70,6 @@ func (c *Config) SetPersistent(name, value, source string) error {
 	ret := c.Called(name, value, source)
 	return ret.Error(0)
 }
-func (c *Config) Silent() bool {
-	ret := c.Called()
-	return ret.Bool(0)
-}
 
 func (c *Config) Unset(name string) error {
 	r := c.Called(name)
