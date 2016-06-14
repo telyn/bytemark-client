@@ -63,7 +63,7 @@ The root password will be the only thing output on stdout - good for scripts!
 
 			if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
 				log.Error("Exiting")
-				return new(util.UserRequestedExit)
+				return util.UserRequestedExit{}
 			}
 
 			return global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)

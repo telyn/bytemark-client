@@ -58,12 +58,12 @@ If you have previously used the client, you'll have a login and will need to add
 			}
 
 			if !*signup {
-				return new(util.UserRequestedExit)
+				return util.UserRequestedExit{}
 			}
 
 			if problems, ok := frm.Validate(); !ok {
 				log.Log(strings.Join(problems, "\r\n"))
-				return new(util.UserRequestedExit)
+				return util.UserRequestedExit{}
 			}
 
 			account := lib.Account{}

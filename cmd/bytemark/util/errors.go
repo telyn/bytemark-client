@@ -1,8 +1,8 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 )
 
 type SubprocessFailedError struct {
@@ -11,7 +11,7 @@ type SubprocessFailedError struct {
 	Err      error
 }
 
-func (e *SubprocessFailedError) Error() string {
+func (e SubprocessFailedError) Error() string {
 	return fmt.Sprintf("Running %s failed - %s", e.Args[0], e.Err.Error())
 }
 

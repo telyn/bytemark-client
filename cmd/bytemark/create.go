@@ -291,7 +291,7 @@ func fn_createServer(c *Context) (err error) {
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
 	if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
 		log.Error("Exiting.")
-		return new(util.UserRequestedExit)
+		return util.UserRequestedExit{}
 	}
 
 	_, err = global.Client.CreateVirtualMachine(groupName, spec)

@@ -45,7 +45,7 @@ func CallBrowser(url string) error {
 	subprocErr := SubprocessFailedError{Args: []string{bin, url}}
 	if err != nil {
 		subprocErr.Err = err
-		return &subprocErr
+		return subprocErr
 	}
 	state, err := proc.Wait()
 
@@ -54,6 +54,6 @@ func CallBrowser(url string) error {
 	if ok {
 		subprocErr.ExitCode = waitStatus.ExitStatus()
 	}
-	return &subprocErr
+	return subprocErr
 
 }

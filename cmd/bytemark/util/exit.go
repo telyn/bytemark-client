@@ -16,7 +16,7 @@ import (
 
 type UserRequestedExit struct{}
 
-func (e *UserRequestedExit) Error() string {
+func (e UserRequestedExit) Error() string {
 	return "User requested exit"
 }
 
@@ -209,7 +209,7 @@ func ProcessError(err error, message ...string) ExitCode {
 				errorMessage = fmt.Sprintf("Unable to find %s in your PATH.", e.Name)
 			}
 			exitCode = E_SUBPROCESS_FAILED
-		case *SubprocessFailedError:
+		case SubprocessFailedError:
 			if e.Err == nil {
 				return E_SUCCESS
 			}
@@ -230,7 +230,7 @@ func ProcessError(err error, message ...string) ExitCode {
 		case lib.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_FOUND_API
-		case *UserRequestedExit:
+		case UserRequestedExit:
 			errorMessage = ""
 			exitCode = E_USER_EXIT
 		case *syscall.Errno:

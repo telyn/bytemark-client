@@ -167,7 +167,7 @@ func recursiveDeleteGroup(name *lib.GroupName, group *lib.Group) error {
 
 		}
 	} else {
-		return &util.UserRequestedExit{}
+		return util.UserRequestedExit{}
 	}
 	return nil
 }
