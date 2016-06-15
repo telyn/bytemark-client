@@ -90,7 +90,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 		Flags: []cli.Flag{
 			cli.GenericFlag{
 				Name:  "disc",
-				Usage: "A disc to add. You can specify as many discs as you like",
+				Usage: "A disc to add. You can specify as many discs as you like by adding more --disc flags.",
 				Value: new(util.DiscSpecFlag),
 			},
 			forceFlag,

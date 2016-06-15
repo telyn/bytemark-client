@@ -2,8 +2,8 @@ package util
 
 import (
 	"bufio"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"os"
 	"regexp"
 	"strings"
