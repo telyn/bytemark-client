@@ -32,7 +32,7 @@ func TestDeleteServer(t *testing.T) {
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, false).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark delete server test-server", " "))
+	err := global.App.Run(strings.Split("bytemark delete server --force test-server", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -44,7 +44,7 @@ func TestDeleteServer(t *testing.T) {
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, true).Return(nil).Times(1)
 
-	err = global.App.Run(strings.Split("bytemark delete server --purge test-server", " "))
+	err = global.App.Run(strings.Split("bytemark delete server --force --purge test-server", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -71,7 +71,7 @@ func TestDeleteDisc(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteDisc", &name, "666").Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark delete disc test-server.test-group.test-account 666", " "))
+	err := global.App.Run(strings.Split("bytemark delete disc --force test-server.test-group.test-account 666", " "))
 
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {

@@ -47,7 +47,7 @@ Specify --force to prevent prompting.
 
 The root password will be the only thing output on stdout - good for scripts!
 	    `,
-		Flags: imageInstallFlags,
+		Flags: append(imageInstallFlags, forceFlag),
 		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
 			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {
@@ -61,7 +61,7 @@ The root password will be the only thing output on stdout - good for scripts!
 			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", c.VirtualMachineName.String())
 			log.Log(util.FormatImageInstall(imageInstall))
 
-			if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
+			if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
 				log.Error("Exiting")
 				return util.UserRequestedExit{}
 			}

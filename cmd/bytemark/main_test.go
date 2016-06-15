@@ -6,6 +6,9 @@ import (
 	"github.com/urfave/cli"
 )
 
+var defVM lib.VirtualMachineName
+var defGroup lib.GroupName
+
 func baseTestSetup() (config *mocks.Config, client *mocks.Client) {
 	config = new(mocks.Config)
 	client = new(mocks.Client)

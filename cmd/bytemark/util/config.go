@@ -76,7 +76,6 @@ type ConfigManager interface {
 	SetPersistent(string, string, string) error
 	Unset(string) error
 	GetDebugLevel() int
-	Force() bool
 	EndpointName() string
 	PanelURL() string
 
@@ -443,10 +442,6 @@ func (config *Config) Unset(name string) error {
 	}
 	delete(config.Memo, name)
 	return os.Remove(config.GetPath(name))
-}
-
-func (config *Config) Force() bool {
-	return false
 }
 
 func (config *Config) PanelURL() string {

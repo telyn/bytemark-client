@@ -16,6 +16,11 @@ import (
 	"strings"
 )
 
+var forceFlag = cli.BoolFlag{
+	Name:  "force",
+	Usage: "Do not prompt for confirmation when destroying data or increasing costs.",
+}
+
 var client lib.Client
 var commands = make([]cli.Command, 0)
 var global = struct {

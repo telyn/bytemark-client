@@ -30,7 +30,7 @@ func TestResizeDisk(t *testing.T) {
 
 	c.When("ResizeDisc", &name, "disc-label", 35*1024).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark resize disc test-server disc-label 35", " "))
+	err := global.App.Run(strings.Split("bytemark resize disc --force test-server disc-label 35", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

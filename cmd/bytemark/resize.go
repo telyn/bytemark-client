@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -20,6 +21,7 @@ func init() {
 			Usage:       "resize a cloud server's disc",
 			UsageText:   "bytemark resize disc <server> <disc label> <size>",
 			Description: "Resizes the given server's disc to the given size. Sizes may be specified with a + in front, in which case they are interpreted as relative. For example, '+2GB' is parsed as 'increase the disc size by 2GiB', where '2GB' is parsed as 'set the size of the disc to 2GiB'",
+			Flags:       []cli.Flag{forceFlag},
 			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
 				const (
 					SET = iota
@@ -49,8 +51,11 @@ func init() {
 				if mode == INCREASE {
 					size = oldDisc.Size + size
 				}
-
 				log.Logf("Resizing %s from %dGiB to %dGiB...", oldDisc.Label, oldDisc.Size/1024, size/1024)
+
+				if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("Are you certain you wish to perform this resize?")) {
+					return util.UserRequestedExit{}
+				}
 
 				err = global.Client.ResizeDisc(c.VirtualMachineName, *c.DiscLabel, size)
 				if err != nil {

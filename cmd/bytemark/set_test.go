@@ -20,11 +20,13 @@ func TestSetCores(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
+	vm := getFixtureVM()
+	c.When("GetVirtualMachine", &vmname).Return(&vm)
 	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineCores", &vmname, 4).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark set cores test-server.test-group.test-account 4", " "))
+	err := global.App.Run(strings.Split("bytemark set cores --force test-server.test-group.test-account 4", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -45,11 +47,13 @@ func TestSetMemory(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
+	vm := getFixtureVM()
+	c.When("GetVirtualMachine", &vmname).Return(&vm)
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineMemory", &vmname, 4096).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark set memory test-server 4", " "))
+	err := global.App.Run(strings.Split("bytemark set memory --force test-server 4", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -62,11 +66,12 @@ func TestSetMemory(t *testing.T) {
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.Reset()
+	c.When("GetVirtualMachine", &vmname).Return(&vm)
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineMemory", &vmname, 16384).Return(nil).Times(1)
 
-	err = global.App.Run(strings.Split("bytemark set memory test-server 16384M", " "))
+	err = global.App.Run(strings.Split("bytemark set memory --force test-server 16384M", " "))
 	if err != nil {
 		t.Error(err)
 	}

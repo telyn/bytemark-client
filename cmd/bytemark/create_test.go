@@ -8,16 +8,12 @@ import (
 	"testing"
 )
 
-var defVM lib.VirtualMachineName
-var defGroup lib.GroupName
-
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup()
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
-	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
@@ -30,7 +26,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 	c.When("CreateDisc", &name, disc).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create disc --disc archive:35 test-server", " "))
+	err := global.App.Run(strings.Split("bytemark create disc --force --disc archive:35 test-server", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -106,7 +102,6 @@ func TestCreateServerCommand(t *testing.T) {
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
-	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
@@ -175,6 +170,7 @@ func TestCreateServerCommand(t *testing.T) {
 		"--cores", "1",
 		"--disc", "25",
 		"--disc", "archive:50",
+		"--force",
 		"--hwprofile", "test-profile",
 		"--hwprofile-locked",
 		"--image", "test-image",
@@ -198,7 +194,6 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
-	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
 
@@ -236,6 +231,7 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 	err := global.App.Run([]string{
 		"bytemark", "create", "server",
 		"--cores", "1",
+		"--force",
 		"--no-discs",
 		"--memory", "1",
 		"test-server",
@@ -254,7 +250,6 @@ func TestCreateServer(t *testing.T) {
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
-	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
 
@@ -290,6 +285,7 @@ func TestCreateServer(t *testing.T) {
 
 	err := global.App.Run([]string{
 		"bytemark", "create", "server",
+		"--force",
 		"--no-image",
 		"test-server", "3", "6565m", "archive:34",
 	})

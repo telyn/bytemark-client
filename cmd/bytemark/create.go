@@ -37,10 +37,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Usage: "One of more disc specifications. Defaults to a single 25GiB sata-grade disc",
 				Value: new(util.DiscSpecFlag),
 			},
-			cli.BoolFlag{
-				Name:  "force",
-				Usage: "Disables the confirmation prompt",
-			},
+			forceFlag,
 			cli.StringFlag{
 				Name:  "hwprofile",
 				Usage: "The hardware profile to use. Defaults to the current modern profile. See `bytemark profiles` for a list of hardware profiles available.",
@@ -96,6 +93,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Usage: "A disc to add. You can specify as many discs as you like",
 				Value: new(util.DiscSpecFlag),
 			},
+			forceFlag,
 		},
 		Usage:     "create virtual discs attached to one of your cloud servers",
 		UsageText: "bytemark create discs [--disc <disc spec>]... <cloud server>",
@@ -289,7 +287,7 @@ func fn_createServer(c *Context) (err error) {
 	log.Log(util.FormatVirtualMachineSpec(groupName, &spec))
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
-	if !global.Config.Force() && !util.PromptYesNo("Are you certain you wish to continue?") {
+	if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
 		log.Error("Exiting.")
 		return util.UserRequestedExit{}
 	}

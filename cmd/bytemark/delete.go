@@ -25,10 +25,11 @@ The undelete server command may be used to restore a deleted (but not purged) se
 			Usage:       "delete the given disc",
 			UsageText:   "bytemark delete disc <virtual machine name> <disc label>",
 			Description: "Deletes the given disc. To find out a disc's label you can use the `bytemark show server` command or `bytemark list discs` command.",
+			Flags:       []cli.Flag{forceFlag},
 			Aliases:     []string{"disk"},
 			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
-				if !(global.Config.Force() || util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.")) {
-					return &util.UserRequestedExit{}
+				if !c.Bool("force") && !util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.") {
+					return util.UserRequestedExit{}
 				}
 
 				return global.Client.DeleteDisc(c.VirtualMachineName, *c.DiscLabel)
@@ -36,7 +37,7 @@ The undelete server command may be used to restore a deleted (but not purged) se
 		}, {
 			Name:      "group",
 			Usage:     "deletes the given group",
-			UsageText: "bytemark delete group [--recursive] <group name>",
+			UsageText: "bytemark delete group [--force] [--recursive] <group name>",
 			Description: `Deletes the given group.
 If --recursive is specified, all servers in the group will be purged. Otherwise, if there are servers in the group, will return an error.`,
 			Flags: []cli.Flag{
@@ -44,6 +45,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Name:  "recursive",
 					Usage: "If set, all servers in the group will be irrevocably deleted.",
 				},
+				forceFlag,
 			},
 			Action: With(GroupProvider, func(c *Context) (err error) {
 				recursive := c.Bool("recursive")
@@ -59,12 +61,12 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 						prompt = fmt.Sprintf("The group '%s' has %d running virtual machines in it", c.GroupName.Group, running)
 					}
 
-					if global.Config.Force() || util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
-						// TODO(telyn): Prompt
-						err = recursiveDeleteGroup(c.GroupName, c.Group)
-						if err != nil {
-							return
-						}
+					if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
+						return util.UserRequestedExit{}
+					}
+					err = recursiveDeleteGroup(c.GroupName, c.Group)
+					if err != nil {
+						return
 					}
 				} else if !recursive {
 					err = &util.WontDeleteNonEmptyGroupError{Group: c.GroupName}
@@ -109,6 +111,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Name:  "purge",
 					Usage: "If set, the server will be irrevocably deleted.",
 				},
+				forceFlag,
 			},
 			Action: With(VirtualMachineProvider, func(c *Context) (err error) {
 				purge := c.Bool("purge")
@@ -119,18 +122,15 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					// we don't return an error because we want a 0 exit code - the deletion request has happened, just not now.
 					return
 				}
+				fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
+				if purge {
+					fstr = fmt.Sprintf("Are you certain you wish to permanently delete %s? You will not be able to un-delete it.", vm.Hostname)
 
-				if !global.Config.Force() {
-					fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
-					if purge {
-						fstr = fmt.Sprintf("Are you certain you wish to permanently delete %s? You will not be able to un-delete it.", vm.Hostname)
+				}
 
-					}
-					if !util.PromptYesNo(fstr) {
-						err = &util.UserRequestedExit{}
-						return
-
-					}
+				if !c.Bool("force") && !util.PromptYesNo(fstr) {
+					err = util.UserRequestedExit{}
+					return
 				}
 
 				err = global.Client.DeleteVirtualMachine(c.VirtualMachineName, purge)
@@ -154,20 +154,16 @@ func recursiveDeleteGroup(name *lib.GroupName, group *lib.Group) error {
 		log.Logf("\t%s\r\n", vm.Name)
 	}
 	log.Log("", "")
-	if util.PromptYesNo("Are you sure you want to continue? The above servers will be permanently deleted.") {
-		vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
-		for _, vm := range group.VirtualMachines {
-			vmn.VirtualMachine = vm.Name
-			err := global.Client.DeleteVirtualMachine(&vmn, true)
-			if err != nil {
-				return err
-			} else {
-				log.Logf("Server %s purged successfully.\r\n", name)
-			}
-
+	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
+	for _, vm := range group.VirtualMachines {
+		vmn.VirtualMachine = vm.Name
+		err := global.Client.DeleteVirtualMachine(&vmn, true)
+		if err != nil {
+			return err
+		} else {
+			log.Logf("Server %s purged successfully.\r\n", name)
 		}
-	} else {
-		return util.UserRequestedExit{}
+
 	}
 	return nil
 }
