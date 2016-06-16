@@ -14,11 +14,11 @@ func init() {
 		Name:      "delete",
 		Usage:     "delete a given server, disc, group, account or key",
 		UsageText: "bytemark delete account|disc|group|key|server",
-		Description: `Deletes the given server, disc, group, account or key. Only empty groups and accounts can be deleted.
-If the --purge flag is given and the target is a cloud server, will permanently delete the server. Billing will cease and you will be unable to recover the server or its data.
-If the --force flag is given, you will not be prompted to confirm deletpaion.
-The undelete server command may be used to restore a deleted (but not purged) server to its state prior to deletion.
-`,
+		Description: `delete a given server, disc, group, account or key
+
+   Only empty groups and accounts can be deleted.
+
+   The restore server command may be used to restore a deleted (but not purged) server to its state prior to deletion.`,
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "disc",

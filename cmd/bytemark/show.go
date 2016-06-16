@@ -13,7 +13,7 @@ func init() {
 		Action:      cli.ShowSubcommandHelp,
 		Usage:       `displays information about the given server, group, or account`,
 		UsageText:   "bytemark show account|server|group|user [flags] <name>",
-		Description: `Displays information about the given server, group, or account.`,
+		Description: `displays information about the given server, group, or account`,
 		Subcommands: []cli.Command{{
 			Name:      "account",
 			Usage:     `displays information about the given account`,

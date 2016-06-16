@@ -95,3 +95,34 @@ func TestUsageStyleConformance(t *testing.T) {
 		}
 	})
 }
+
+// Tests for commands which have subcommands having the correct Description format
+// the first line should start lowercase and end without a full stop, and the second
+// should be blank
+func TestSubcommandStyleConformance(t *testing.T) {
+	traverseAllCommands(commands, func(c cli.Command) {
+		if c.Subcommands == nil {
+			return
+		}
+		if len(c.Subcommands) == 0 {
+			return
+		}
+		lines := strings.Split(c.Description, "\n")
+		desc := []rune(lines[0])
+		if unicode.IsUpper(desc[0]) {
+			log.Logf("Command %s's Description begins with an uppercase letter, but it has subcommands, so should be lowercase.\r\n", c.FullName())
+			t.Fail()
+		}
+		if strings.Contains(lines[0], ".") {
+			log.Logf("The first line of Command %s's Description contains a full stop. It shouldn't.\r\n", c.FullName())
+			t.Fail()
+		}
+		if len(lines) > 1 {
+			if len(strings.TrimSpace(lines[1])) > 0 {
+				log.Logf("The second line of Command %s's Description should be blank.\r\n", c.FullName())
+				t.Fail()
+			}
+		}
+
+	})
+}

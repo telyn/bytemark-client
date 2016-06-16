@@ -116,7 +116,7 @@ Multiple --disc flags can be used to create multiple discs`,
 		Name:      "create",
 		Usage:     "creates servers, discs, etc - see `bytemark create <kind of thing> help`",
 		UsageText: "bytemark create disc|group|ip|server",
-		Description: `Create a new disc, group, IP or server.
+		Description: `create a new disc, group, IP or server
 
 	create disc[s] [--disc <disc spec>]... <cloud server>
 	create group [--account <name>] <name>

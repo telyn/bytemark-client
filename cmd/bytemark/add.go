@@ -14,7 +14,7 @@ func init() {
 		Name:        "add",
 		Usage:       "add SSH keys to a user / IPs to a server",
 		UsageText:   "bytemark add key|ip",
-		Description: "The add command has a single subcommand - add key. See the help text for `bytemark add key`.",
+		Description: "add SSH keys to a user or IPs to a server",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "key",

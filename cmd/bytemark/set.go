@@ -9,11 +9,13 @@ import (
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:        "set",
-		Usage:       "change hardware properties of Bytemark servers",
-		UsageText:   "bytemark set cores|memory|hwprofile <server>",
-		Description: `These commands set various hardware properties of Bytemark servers. Note that for memory increases, cores and hwprofile to take effect you will need to restart the server.`,
-		Action:      cli.ShowSubcommandHelp,
+		Name:      "set",
+		Usage:     "change hardware properties of Bytemark servers",
+		UsageText: "bytemark set cores|memory|hwprofile <server>",
+		Description: `change hardware properties of Bytemark servers
+		
+These commands set various hardware properties of Bytemark servers. Note that for memory increases, cores and hwprofile to take effect you will need to restart the server.`,
+		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
 				Name:        "cores",

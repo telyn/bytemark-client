@@ -30,11 +30,13 @@ func listServersInGroup(g *lib.Group) {
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:        "list",
-		Usage:       "scripting-friendly lists of your assets at Bytemark",
-		UsageText:   "bytemark list accounts|discs|groups|keys|servers",
-		Description: `This commmand will list the kind of object you request, one per line. Perfect for piping into a bash while loop!`,
-		Action:      cli.ShowSubcommandHelp,
+		Name:      "list",
+		Usage:     "scripting-friendly lists of your assets at Bytemark",
+		UsageText: "bytemark list accounts|discs|groups|keys|servers",
+		Description: `scripting-friendly lists of your assets at Bytemark
+
+This commmand will list the kind of object you request, one per line. Perfect for piping into a bash while loop!`,
+		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "accounts",
 			Usage:       "list all the accounts you're able to see",

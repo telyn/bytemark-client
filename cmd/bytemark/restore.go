@@ -10,7 +10,7 @@ func init() {
 		Name:        "restore",
 		Usage:       "restores a previously deleted cloud server",
 		UsageText:   "bytemark restore server <name>",
-		Description: `Restores a previously deleted cloud server.`,
+		Description: `restores a previously deleted cloud server`,
 
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
