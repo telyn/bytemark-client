@@ -48,21 +48,6 @@ type IPCreateRequest struct {
 	IPs []*net.IP `json:"ips"`
 }
 
-// NetworkInterface represents a virtual NIC and what IPs it has routed.
-type NetworkInterface struct {
-	Label string `json:"label"`
-
-	Mac string `json:"mac"`
-
-	// the following can't be set (or at least, so I'm assuming..)
-
-	ID               int                `json:"id"`
-	VlanNum          int                `json:"vlan_num"`
-	IPs              IPs                `json:"ips"`
-	ExtraIPs         map[string]*net.IP `json:"extra_ips"`
-	VirtualMachineID int                `json:"virtual_machine_id"`
-}
-
 type JSONUser struct {
 	Username       string `json:"username"`
 	Email          string `json:"email"`

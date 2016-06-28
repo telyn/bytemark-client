@@ -51,9 +51,10 @@ func (vm *VirtualMachine) AllIPv4Addresses() (ips IPs) {
 				ips = append(ips, ip)
 			}
 		}
-		for _, ip := range nic.ExtraIPs {
-			if ip != nil && ip.To4() != nil {
-				ips = append(ips, ip)
+		for ip := range nic.ExtraIPs {
+			netip := net.ParseIP(ip)
+			if netip != nil && netip.To4() != nil {
+				ips = append(ips, &netip)
 			}
 		}
 	}
@@ -68,9 +69,10 @@ func (vm *VirtualMachine) AllIPv6Addresses() (ips IPs) {
 				ips = append(ips, ip)
 			}
 		}
-		for _, ip := range nic.ExtraIPs {
-			if ip != nil && ip.To4() == nil {
-				ips = append(ips, ip)
+		for ip := range nic.ExtraIPs {
+			netip := net.ParseIP(ip)
+			if netip != nil && netip.To4() == nil {
+				ips = append(ips, &netip)
 			}
 		}
 	}
