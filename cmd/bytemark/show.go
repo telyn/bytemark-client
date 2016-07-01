@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
+	"os"
 )
 
 func init() {
@@ -29,12 +30,21 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			},
 			Action: With(AccountProvider, func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
-					log.Output(util.FormatAccount(c.Account))
+					err := lib.FormatAccount(os.Stderr, c.Account)
+					if err != nil {
+						return err
+					}
+					log.Output()
+					log.Output()
 
 					for _, g := range c.Account.Groups {
-						log.Outputf("Group %s =========================================\r\n\r\n", g.Name)
-						for _, v := range util.FormatVirtualMachines(g.VirtualMachines) {
-							log.Output(v + "\r\n")
+						for _, vm := range g.VirtualMachines {
+							err := lib.FormatVirtualMachine(os.Stderr, vm, "servertwoline")
+							log.Output()
+							log.Output()
+							if err != nil {
+								return err
+							}
 						}
 					}
 					return nil
@@ -61,9 +71,14 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					log.Outputf("%s - Group containing %d cloud server%s\r\n", c.Group.Name, len(c.Group.VirtualMachines), s)
 
 					log.Output()
+					for _, vm := range c.Group.VirtualMachines {
 
-					for _, v := range util.FormatVirtualMachines(c.Group.VirtualMachines) {
-						log.Output(v)
+						err := lib.FormatVirtualMachine(os.Stderr, vm, "servertwoline")
+						log.Output()
+						log.Output()
+						if err != nil {
+							return err
+						}
 					}
 
 					return nil
@@ -82,8 +97,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			},
 			Action: With(VirtualMachineProvider, func(c *Context) error {
 				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
-					log.Log(util.FormatVirtualMachine(c.VirtualMachine))
-					return nil
+					return lib.FormatVirtualMachine(os.Stderr, c.VirtualMachine, "serverfull")
 				})
 			}),
 		}, {

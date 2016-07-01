@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"github.com/cheekybits/is"
 	"net"
 	"testing"
 )
@@ -84,4 +85,11 @@ func TestAllIPv6Addresses(t *testing.T) {
 			t.Error(ip + " was missing")
 		}
 	}
+}
+
+func TestNames(t *testing.T) {
+	is := is.New(t)
+	vm := getFixtureVM()
+	is.Equal("valid-vm.default", vm.ShortName())
+	is.Equal("valid-vm.default.account", vm.FullName())
 }

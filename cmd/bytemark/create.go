@@ -5,6 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -284,7 +285,7 @@ func fn_createServer(c *Context) (err error) {
 	groupName := c.VirtualMachineName.GroupName()
 
 	log.Log("The following server will be created:")
-	log.Log(util.FormatVirtualMachineSpec(groupName, &spec))
+	lib.FormatVirtualMachineSpec(os.Stderr, groupName, &spec, "specfull")
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
 	if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
@@ -303,7 +304,7 @@ func fn_createServer(c *Context) (err error) {
 	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() error {
 
 		log.Log("cloud server created successfully", "")
-		log.Log(util.FormatVirtualMachine(vm))
+		lib.FormatVirtualMachine(os.Stderr, vm, "serverfull")
 		if imageInstall != nil {
 			log.Log()
 			log.Logf("Root password:") // logf so we don't get a tailing \r\n

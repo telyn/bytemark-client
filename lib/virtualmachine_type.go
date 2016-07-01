@@ -2,6 +2,7 @@ package lib
 
 import (
 	"net"
+	"strings"
 )
 
 // VirtualMachine represents a VirtualMachine, as passed around from the virtual_machines endpoint
@@ -43,6 +44,18 @@ func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
 	return total
 }
 
+// ShortName returns the first two parts of the hostname (i.e. name.group)
+func (vm *VirtualMachine) ShortName() string {
+	bits := strings.SplitN(vm.Hostname, ".", 3)
+	return strings.Join(bits[0:2], ".")
+}
+
+// FullName returns the first three parts of the hostname (i.e. name.group.account)
+func (vm *VirtualMachine) FullName() string {
+	bits := strings.SplitN(vm.Hostname, ".", 4)
+	return strings.Join(bits[0:3], ".")
+}
+
 // AllIPv4Addresses flattens all the IPs for a VM into a single IPs (a []*net.IP with some convenience methods)
 func (vm *VirtualMachine) AllIPv4Addresses() (ips IPs) {
 	for _, nic := range vm.NetworkInterfaces {
@@ -77,4 +90,13 @@ func (vm *VirtualMachine) AllIPv6Addresses() (ips IPs) {
 		}
 	}
 	return ips
+}
+
+func (vm *VirtualMachine) PrimaryIP() net.IP {
+	for _, nic := range vm.NetworkInterfaces {
+		if len(nic.IPs) > 0 {
+			return *nic.IPs[0]
+		}
+	}
+	return nil
 }

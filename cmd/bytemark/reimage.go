@@ -5,6 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
+	"os"
 )
 
 var imageInstallFlags = []cli.Flag{
@@ -59,7 +60,7 @@ The root password will be the only thing output on stdout - good for scripts!
 			}
 
 			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", c.VirtualMachineName.String())
-			log.Log(util.FormatImageInstall(imageInstall))
+			lib.FormatImageInstall(os.Stderr, imageInstall, "imageinstall")
 
 			if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
 				log.Error("Exiting")
