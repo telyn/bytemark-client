@@ -1,24 +1,19 @@
 Bytemark command-line client
 ============================
 
+[![Build Status](https://travis-ci.org/BytemarkHosting/bytemark-client.svg)](https://travis-ci.org/BytemarkHosting/bytemark-client) [![Coverage Status](https://coveralls.io/repos/github/BytemarkHosting/bytemark-client/badge.svg?branch=develop)](https://coveralls.io/github/BytemarkHosting/bytemark-client?branch=develop) 
+
 Installation
 ------------
 
 If you have a binary then it's easy - just run it!
 
-If you have the source then it's tougher - you'll need a go workspace (convention seems to be to have a projects/go folder in your home folder).
-Stick all the source into $GOPATH/src/bytemark.co.uk/client
+If you have a go workspace you can also just `go get github.com/BytemarkHosting/bytemark-client/cmd/bytemark` if you like, to get the latest stable.
 
-At the moment you'll also need to manually clone bytemark.co.uk/auth3/client - we're looking forward to making that project `go get`-able but it's not yet.
+And if you want to work on the develop branch, probably the easiest way is to `go get` it and then wipe it out and clone it by hand.
 
-Here's a shell script that will do it all for you assuming you want your GOPATH to be ~/projects/go, and you want to aid in development. If you want something that just works, remove the "-b develop" from the final line.
+`cmd/bytemark` is where 'main' is, so `cd` into there to build or use the full import path, as with go get.
 
-	cd ~
-	export GOPATH=$HOME/projects/go
-	mkdir -p $GOPATH/{bin,src,pkg}
-	mkdir -p $GOPATH/src/bytemark.co.uk/auth3
-	git clone git@gitlab.bytemark.co.uk:auth/client.git $GOPATH/src/bytemark.co.uk/auth3/client
-	git clone -b develop git@dev.bytemark.co.uk:bytemark-client $GOPATH/src/bytemark.co.uk/client
+IME `make test` is a bit better to use than `go test ./...` 'cause `go test` outputs about everything in the vendor dir. But if the code structure changes then `go test ./...` will always test everything, so maybe that's better.
 
-At this point you can run `go build -o bytemark .` to build it - or `make`. Whatever tickles your particular boat.
-Also run the tests with `go test ./...` - or `make test`. 
+Feel free to open issues & merge requests on the github repo at http://github.com/BytemarkHosting/bytemark-client 

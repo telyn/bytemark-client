@@ -10,26 +10,26 @@ lib
   `virtual_machines`, `groups`, `accounts`. Replace `_` with `-`.
 
 * Add the function you just made to the interface to
-  `lib/interface.go`. Now `go test bytemark.co.uk/client/main` will break.
+  `lib/interface.go`. Now `go test github.com/BytemarkHosting/bytemark-client/main` will break.
 
 * Add a unit test for your API call to the relavent `_test.go` file
   in `lib/`.
 
-* Add a mock version of the function to `mocks/bigv-client.go`
-  Now `go test bytemark.co.uk/client/main` will work.
+* Add a mock version of the function to `mocks/bytemark-client.go`
+  Now `go test github.com/BytemarkHosting/bytemark-client/main` will work.
   Commit if you like.
 
 cmds
 ----
 
 * Add a CamelCased version of the command to `cmds/cmds.go`
-  `CommandManager` interface. Now `go test bytemark.co.uk/client/main` will break.
+  `CommandManager` interface. Now `go test github.com/BytemarkHosting/bytemark-client/main` will break.
 
 * Add a mock version of the function to `mocks/cmds.go`'s
-  `CommandManager`. Now `go test bytemark.co.uk/client/main` will work.
+  `CommandManager`. Now `go test github.com/BytemarkHosting/bytemark-client/main` will work.
 
 * Implement the function in `cmds/<base>.go` where `<base>` is
-  the first word of the command. See cmd-show.go and ShowVM for a
+  the first word of the command. See cmd-show.go and ShowServer for a
   kind of template, although its output is more complicated than you likely need
 
 * Add usage info to `cmds/<base>.go`'s `HelpFor<Base>` function.
@@ -55,8 +55,8 @@ main
 Finishing up
 ------------
 
-Now do testing. `go test bytemark.co.uk/client/lib` and
-`go test bytemark.co.uk/client/main`. If that works then YOU'RE NOT DONE YET
+Now do testing. `go test github.com/BytemarkHosting/bytemark-client/lib` and
+`go test github.com/BytemarkHosting/bytemark-client/main`. If that works then YOU'RE NOT DONE YET
 
 Run `make` and then try out your new `bytemark`. Make sure the API
 calls you're making actually work (--debug-level=5). Make sure errors
@@ -72,4 +72,4 @@ arguments and junky ~/.bytemark folders and such and send me logs with
 I suspect there will still be weird edge cases in the first release
 and maybe for all time, but the basic idea is that `exit` in
 `main/exit.go` should be smart enough 90% of the time, and all weird
-errors just need wrapping in a `GoBigvWeirdError` or something.
+errors just need wrapping in a `BytemarkWeirdError` or something.

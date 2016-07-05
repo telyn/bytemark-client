@@ -1,0 +1,10 @@
+image: golang:1.6
+before_script:
+  - go get -t -v -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+  - ls -l
+  - rm -rf $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+  - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+
+test:
+  script:
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client && make test

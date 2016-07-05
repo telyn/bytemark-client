@@ -5,18 +5,27 @@ import (
 	"os"
 )
 
+const (
+	// shows client version & arguments passed in, HTTP URLs & status codes, subprocess calls.
+	DBG_OUTLINE = 1 + iota
+	// shows args going in to library functions
+	DBG_ARGS
+	// shows the way flags and command line arguments are being messed with
+	DBG_FLAGS
+	// raw request/response bodies.
+	DBG_HTTPDATA
+	DBG_MISC
+)
+
 var DebugLevel int
 var LogFile *os.File
-var Silent bool
 
 func Error(stuff ...interface{}) {
 	if len(stuff) == 0 {
 		Error("")
 	}
 	for _, v := range stuff {
-		if !Silent {
-			fmt.Fprintln(os.Stderr, v)
-		}
+		fmt.Fprintln(os.Stderr, v)
 		if LogFile != nil {
 			fmt.Fprintln(LogFile, v)
 		}
@@ -25,9 +34,7 @@ func Error(stuff ...interface{}) {
 }
 
 func Errorf(format string, args ...interface{}) {
-	if !Silent {
-		fmt.Fprintf(os.Stderr, format, args...)
-	}
+	fmt.Fprintf(os.Stderr, format, args...)
 	if LogFile != nil {
 		fmt.Fprintf(LogFile, format, args...)
 	}
@@ -38,9 +45,7 @@ func Log(stuff ...interface{}) {
 		Log("")
 	}
 	for _, v := range stuff {
-		if !Silent {
-			fmt.Fprintln(os.Stderr, v)
-		}
+		fmt.Fprintln(os.Stderr, v)
 		if LogFile != nil {
 			fmt.Fprintln(LogFile, v)
 		}
@@ -48,9 +53,7 @@ func Log(stuff ...interface{}) {
 }
 
 func Logf(format string, args ...interface{}) {
-	if !Silent {
-		fmt.Fprintf(os.Stderr, format, args...)
-	}
+	fmt.Fprintf(os.Stderr, format, args...)
 	if LogFile != nil {
 		fmt.Fprintf(LogFile, format, args...)
 	}
@@ -62,9 +65,7 @@ func Output(stuff ...interface{}) {
 		Output("")
 	}
 	for _, v := range stuff {
-		if !Silent {
-			fmt.Println(v)
-		}
+		fmt.Println(v)
 		if LogFile != nil {
 			fmt.Fprintln(LogFile, v)
 		}
@@ -72,9 +73,7 @@ func Output(stuff ...interface{}) {
 }
 
 func Outputf(format string, args ...interface{}) {
-	if !Silent {
-		fmt.Printf(format, args...)
-	}
+	fmt.Printf(format, args...)
 	if LogFile != nil {
 		fmt.Fprintf(LogFile, format, args...)
 	}
@@ -82,7 +81,7 @@ func Outputf(format string, args ...interface{}) {
 
 func Debug(level int, stuff ...interface{}) {
 	for _, v := range stuff {
-		if level <= DebugLevel && !Silent {
+		if level <= DebugLevel {
 			fmt.Fprintln(os.Stderr, v)
 		}
 		if LogFile != nil {
@@ -92,7 +91,7 @@ func Debug(level int, stuff ...interface{}) {
 }
 
 func Debugf(level int, format string, args ...interface{}) {
-	if level <= DebugLevel && !Silent {
+	if level <= DebugLevel {
 		fmt.Fprintf(os.Stderr, format, args...)
 	}
 	if LogFile != nil {

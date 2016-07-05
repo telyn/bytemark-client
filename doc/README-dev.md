@@ -13,22 +13,22 @@ Inside that folder, create src, bin and pkg folders.
 Get the code
 ============
 
-In the future we want to be able to `go get bytemark.co.uk/client` but that's not ready yet. For now:
+In the future we want to be able to `go get github.com/BytemarkHosting/bytemark-client` but that's not ready yet. For now:
 
-	git clone git@dev.bytemark.co.uk:go-bigv-client $GOPATH/src/bytemark.co.uk/client
+	git clone git@dev.bytemark.co.uk:go-bigv-client $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
 Install dependencies
 ====================
 
 	go get github.com/tools/godep
-	cd $GOPATH/src/bytemark.co.uk/client
+	cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 	godep restore
 
 Compile!
 ========
 
 I made a Makefile for convenience so you can just run `make`, but all that does
-is run `go build bytemark.co.uk/client/main` with the -o flag set so it comes out in
+is run `go build github.com/BytemarkHosting/bytemark-client/main` with the -o flag set so it comes out in
 the current directory.
 
 If you want to build for different operating systems you just need to install

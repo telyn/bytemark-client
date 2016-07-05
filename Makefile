@@ -1,82 +1,62 @@
 SHELL:=/bin/bash
+PKGBASE := github.com/BytemarkHosting/bytemark-client
+CHOCOBASE := ports/chocolatey/package
+	ALL_PACKAGES := $(PKGBASE)/lib $(PKGBASE)/cmd/bytemark/util $(PKGBASE)/cmd/bytemark
+ALL_SOURCE := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
+TAR_FILES := bytemark doc/bytemark.1
+ZIP_FILES := bytemark.exe doc/bytemark-client.pdf
 
-ALL_PACKAGES := bytemark.co.uk/client/lib bytemark.co.uk/client/cmds/util bytemark.co.uk/client/cmds bytemark.co.uk/client
-ALL_FILES := *.go lib/*.go cmds/*.go cmds/util/*.go mocks/*.go util/*/*.go
-
-MAJORVERSION := 0
-MINORVERSION := 3
 BUILD_NUMBER ?= 0
 
-OSAARCH:=x86_64
-ifeq ($(GOARCH),386)
-OSAARCH:=i386
-endif
 LAUNCHER_APP:=ports/mac/launcher.app
-RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude=Makefile
+RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude-dir=vendor --exclude=Makefile
 
 .PHONY: test update-dependencies
-.PHONY: Bytemark.app
+.PHONY: bytemark-client.nupkg
 .PHONY: find-uk0 find-bugs-todos find-exits
-.PHONY: gensrc
 
-all: bytemark
+all: bytemark 
 
-bytemark: $(ALL_FILES) gensrc
-	GO15VENDOREXPERIMENT=1 go build -o bytemark bytemark.co.uk/client
+bytemark.zip: $(ZIP_FILES)
+	zip $@ $^
 
-Bytemark.app.zip: Bytemark.app
-	zip -r $@ $<
+bytemark.tar.gz: $(TAR_FILES)
+	tar czf $@ $^
 
-Bytemark.app: bytemark $(LAUNCHER_APP) ports/mac/*
-	mkdir -p Bytemark.app/Contents/Resources/bin
-	mkdir -p Bytemark.app/Contents/Resources/Scripts
-	mkdir -p Bytemark.app/Contents/MacOS
-	# pilfer the applet binary, applescript and resource file from the compiled script
-	cp $(LAUNCHER_APP)/Contents/Resources/Scripts/main.scpt Bytemark.app/Contents/Resources/Scripts
-	cp $(LAUNCHER_APP)/Contents/Resources/applet.rsrc Bytemark.app/Contents/Resources
-	cp $(LAUNCHER_APP)/Contents/MacOS/applet Bytemark.app/Contents/MacOS/launcher
-	# then put in our own Info.plist which has Bytemark branding and copyright and paths and stuff
-	cp ports/mac/Info.plist Bytemark.app/Contents
-	# copy in the terminal profile and start script
-	cp -r ports/mac/Bytemark.terminal Bytemark.app/Contents/Resources
-	cp -r ports/mac/start Bytemark.app/Contents/Resources
-	# copy in bytemark into its own folder (this allows us to say 
-	# "add Bytemark.app/Contents/Resources/bin to your PATH" and it'll only add bytemark
-	# and not the launcher too.)
-	cp bytemark Bytemark.app/Contents/Resources/bin
-	# make a symlink into MacOS. This step is totally unnecessary but it means all the binaries live in MacOS which is nice I guess?
-	rm -f Bytemark.app/Contents/MacOS/bytemark
-	ln -s ../Resources/bin/bytemark Bytemark.app/Contents/MacOS
-	# sign the code? anyone? shall we sign the code?
+bytemark-client.nupkg: VERSION
+	cd ports/chocolatey && make VERSION=$(<VERSION)
+	mv $(CHOCOBASE)/bytemark.nupkg bytemark-client.nupkg
+
+%.pdf: %.ps
+	ps2pdf $< $@
+
+doc/bytemark-client.ps: doc/bytemark.1
+	groff -mandoc -T ps $< > $@
+
+bytemark.exe: bytemark
+	cp bytemark bytemark.exe
+
+bytemark: $(ALL_SOURCE)
+	GO15VENDOREXPERIMENT=1 go build -o bytemark $(PKGBASE)/cmd/bytemark
+
+
+# make changelog opens vim to update the changelog
+# then generates a new version.go file.
+changelog:
+	gen/changelog.sh
 
 clean:
 	rm -rf Bytemark.app rm $(LAUNCHER_APP)
-	rm -f bytemark
+	rm -f bytemark bytemark.exe
+	rm -f bytemark-client.zip bytemark-client.tar
 	rm -f main.coverage lib.coverage
 	rm -f main.coverage.html lib.coverage.html
 
-checkinstall: 
-	checkinstall -D --install=no -y --maintainer="telyn@bytemark.co.uk" \
-	    --pkgname=bytemark-client --pkgversion="$(MAJORVERSION).$(MINORVERSION).$(BUILD_NUMBER)" \
-	    --requires="" \
-	    --strip=no --stripso=no
-
-gensrc:
-	BUILD_NUMBER=$(BUILD_NUMBER) MAJORVERSION=$(MAJORVERSION) \
-	MINORVERSION=$(MINORVERSION) go generate ./...
-
-$(LAUNCHER_APP): ports/mac/launcher-script.txt
-ifeq (Darwin, $(shell uname -s))
-	rm -rf $@
-	osacompile -a $(OSAARCH) -x -o $@ $<
-else
-	echo "WARNING using old pre-built launcher."
-endif
-
-install: all
+install: bytemark doc/bytemark.1
 	cp bytemark /usr/bin/bytemark
+	cp doc/bytemark.1 /usr/share/man/man1
 
-coverage: lib.coverage.html main.coverage.html cmds.coverage.html 
+coverage: lib.coverage.html main.coverage.html
 ifeq (Darwin, $(shell uname -s))
 	open lib.coverage.html
 	open main.coverage.html
@@ -87,21 +67,24 @@ else
 	xdg-open cmds.coverage.html
 endif
 
-main.coverage: *.go
-	go test -coverprofile=$@ bytemark.co.uk/client
+main.coverage: cmd/bytemark/*.go
+	go test -coverprofile=$@ $(PKGBASE)/cmd/bytemark
+
+util.coverage: cmd/bytemark/util/*.go
+	go test -coverprofile=$@ $(PKGBASE)/cmd/bytemark/util
 
 %.coverage.html: %.coverage
 	go tool cover -html=$< -o $@
 
 %.coverage: % %/*
-	go test -coverprofile=$@ bytemark.co.uk/client/$<
+	go test -coverprofile=$@ $(PKGBASE)/$<
 
-docs: doc/*.md
-	for file in doc/*.md; do \
-	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
-	done
+#docs: doc/*.md
+#	for file in doc/*.md; do \
+#	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
+#	done
 
-test: gensrc
+test: 
 ifdef $(VERBOSE)
 	GO15VENDOREXPERIMENT=1 go test -v $(ALL_PACKAGES)
 else 
@@ -110,9 +93,6 @@ endif
 
 find-uk0: 
 	$(RGREP) --exclude=bytemark "uk0" .
-
-find-bigv:
-	$(RGREP) --exclude=bytemark -i bigv . | grep -v "bigv.io"
 
 find-bugs-todos:
 	$(RGREP) -P "// BUG(.*):" . || echo ""

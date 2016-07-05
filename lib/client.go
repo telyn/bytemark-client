@@ -1,90 +1,150 @@
 package lib
 
 import (
-	auth3 "bytemark.co.uk/auth3/client"
-	"bytemark.co.uk/client/util/log"
 	"errors"
+	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
-// bigvClient is the main type in the BigV client library
-type bigvClient struct {
-	endpoint    string
-	auth        *auth3.Client
-	authSession *auth3.SessionData
-	debugLevel  int
+type Endpoint int
+
+const (
+	EP_AUTH Endpoint = iota
+	EP_BRAIN
+	EP_BILLING
+	EP_SPP
+)
+
+// bytemarkClient is the main type in the Bytemark API client library
+type bytemarkClient struct {
+	brainEndpoint   string
+	billingEndpoint string
+	sppEndpoint     string
+	allowInsecure   bool
+	auth            *auth3.Client
+	authSession     *auth3.SessionData
+	debugLevel      int
 }
 
-// New creates a new BigV client using the given BigV endpoint and the default Bytemark auth endpoint
-func New(endpoint string) (bigv *bigvClient, err error) {
+// New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
+func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient, err error) {
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
 	}
-	return NewWithAuth(endpoint, auth), nil
+	return NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint, auth), nil
 }
 
-// NewWithAuth creates a new BigV client using the given BigV endpoint and bytemark.co.uk/auth3/client Client
-func NewWithAuth(endpoint string, auth *auth3.Client) (bigv *bigvClient) {
-	bigv = new(bigvClient)
-	bigv.endpoint = endpoint
-	bigv.debugLevel = 0
-	bigv.auth = auth
-	return bigv
+// NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and github.com/BytemarkHosting/auth-client Client
+func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
+	c = new(bytemarkClient)
+	c.brainEndpoint = brainEndpoint
+	c.billingEndpoint = billingEndpoint
+	c.sppEndpoint = sppEndpoint
+	c.debugLevel = 0
+	c.auth = auth
+	return c
 }
 
 // AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
-func (bigv *bigvClient) AuthWithCredentials(credentials auth3.Credentials) error {
-	session, err := bigv.auth.CreateSession(credentials)
+func (c *bytemarkClient) AuthWithCredentials(credentials auth3.Credentials) error {
+	session, err := c.auth.CreateSession(credentials)
 	if err == nil {
-		bigv.authSession = session
+		c.authSession = session
 	}
 	return err
 }
 
 // AuthWithToken attempts to read sessiondata from auth for the given token. Returns nil on success or an error otherwise.
-func (bigv *bigvClient) AuthWithToken(token string) error {
+func (c *bytemarkClient) AuthWithToken(token string) error {
 	if token == "" {
 		return errors.New("No token provided")
 	}
 
-	session, err := bigv.auth.ReadSession(token)
+	session, err := c.auth.ReadSession(token)
 	if err == nil {
-		bigv.authSession = session
+		c.authSession = session
 	}
-	log.Debug(5, session)
 	return err
 
 }
 
-// GetEndpoint returns the BigV endpoint currently in use.
-func (bigv *bigvClient) GetEndpoint() string {
-	return bigv.endpoint
+// GetEndpoint returns the Bytemark API endpoint currently in use.
+func (c *bytemarkClient) GetEndpoint() string {
+	return c.brainEndpoint
 }
 
-// SetDebugLevel sets the debug level / verbosity of the BigV client. 0 (default) is silent.
-func (bigv *bigvClient) SetDebugLevel(debugLevel int) {
-	bigv.debugLevel = debugLevel
+// GetBillingEndpoint returns the Bytemark Billing API endpoint in use.
+// This function is deprecated and will be removed in a point release.
+// DO NOT DEPEND ON IT
+func (c *bytemarkClient) GetBillingEndpoint() string {
+	return c.billingEndpoint
+}
+
+// SetDebugLevel sets the debug level / verbosity of the Bytemark API client. 0 (default) is silent.
+func (c *bytemarkClient) SetDebugLevel(debugLevel int) {
+	c.debugLevel = debugLevel
 }
 
 // GetSessionFactors returns the factors provided when the current auth session was set up
-func (bigv *bigvClient) GetSessionFactors() []string {
-	if bigv.authSession == nil {
+func (c *bytemarkClient) GetSessionFactors() []string {
+	if c.authSession == nil {
 		return []string{}
 	}
-	return bigv.authSession.Factors
+	return c.authSession.Factors
 }
 
 // GetSessionToken returns the token for the current auth session
-func (bigv *bigvClient) GetSessionToken() string {
-	if bigv.authSession == nil {
+func (c *bytemarkClient) GetSessionToken() string {
+	if c.authSession == nil {
 		return ""
 	}
-	return bigv.authSession.Token
+	return c.authSession.Token
 }
 
-func (bigv *bigvClient) GetSessionUser() string {
-	if bigv.authSession == nil {
+func (c *bytemarkClient) GetSessionUser() string {
+	if c.authSession == nil {
 		return ""
 	}
-	return bigv.authSession.Username
+	return c.authSession.Username
+}
+
+func (c *bytemarkClient) AllowInsecureRequests() {
+	c.allowInsecure = true
+}
+
+func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) error {
+	if vm.Account == "" {
+		if err := c.validateAccountName(&vm.Account); err != nil {
+			return err
+		}
+	}
+	if vm.Group == "" {
+		vm.Group = "default"
+	}
+	if vm.VirtualMachine == "" {
+		return BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+	}
+	return nil
+}
+
+func (c *bytemarkClient) validateGroupName(group *GroupName) error {
+	if group.Account == "" {
+		if err := c.validateAccountName(&group.Account); err != nil {
+			return err
+		}
+	}
+	if group.Group == "" {
+		group.Group = "default"
+	}
+	return nil
+}
+
+func (c *bytemarkClient) validateAccountName(account *string) error {
+	if *account == "" && c.authSession != nil {
+		billAcc, err := c.getDefaultBillingAccount()
+		if err == nil {
+			*account = billAcc.Name
+		}
+	}
+	return nil
 }

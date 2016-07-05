@@ -1,21 +1,10 @@
 package lib
 
-import ()
+import (
+	"net"
+)
 
-// VirtualMachineName is the triplet-form of the name of a VirtualMachine, which should be enough to find the VM.
-type VirtualMachineName struct {
-	VirtualMachine string
-	Group          string
-	Account        string
-}
-
-// GroupName is the double-form of the name of a Group, which should be enough to find the group.
-type GroupName struct {
-	Group   string
-	Account string
-}
-
-// Disc is a representation of a VM's disc, which can be unmarshalled from JSON output by the BigV server.
+// Disc is a representation of a VM's disc.
 type Disc struct {
 	Label        string `json:"label"`
 	StorageGrade string `json:"storage_grade"`
@@ -35,33 +24,28 @@ type ImageInstall struct {
 	PublicKeys      string `json:"ssh_public_key"`
 }
 
-// IP represents an IP for the purpose of setting RDNS with BigV
+// IP represents an IP for the purpose of setting RDNS
 type IP struct {
 	RDns string `json:"rdns"`
 
 	// this cannot be set.
-	IP string `json:"ip"`
+	IP *net.IP `json:"ip"`
 }
 
-// IPSpec represents one v4 and one v6 address to assign to a bigv during creation.
+// IPSpec represents one v4 and one v6 address to assign to a server during creation.
 type IPSpec struct {
 	IPv4 string `json:"ipv4"`
 	IPv6 string `json:"ipv6"`
 }
 
-// NetworkInterface represents a BigV virtual NIC and what IPs it has routed.
-type NetworkInterface struct {
-	Label string `json:"label"`
-
-	Mac string `json:"mac"`
-
-	// the following can't be set (or at least, so I'm assuming..)
-
-	ID               int               `json:"id"`
-	VlanNum          int               `json:"vlan_num"`
-	IPs              []string          `json:"ips"`
-	ExtraIPs         map[string]string `json:"extra_ips"`
-	VirtualMachineID int               `json:"virtual_machine_id"`
+// IPCreateRequest is used by the create_ip endpoint on a nic
+type IPCreateRequest struct {
+	Addresses  int    `json:"addresses"`
+	Family     string `json:"family"`
+	Reason     string `json:"reason"`
+	Contiguous bool   `json:"contiguous"`
+	// don't actually specify the IPs - this is for filling in from the response!
+	IPs []*net.IP `json:"ips"`
 }
 
 type JSONUser struct {
@@ -86,33 +70,6 @@ type User struct {
 	AuthorizedKeys []string
 }
 
-// VirtualMachine represents a VirtualMachine, as passed around from the BigV virtual_machines endpoint
-type VirtualMachine struct {
-	Autoreboot            bool   `json:"autoreboot_on"`
-	CdromURL              string `json:"cdrom_url"`
-	Cores                 int    `json:"cores"`
-	Memory                int    `json:"memory"`
-	Name                  string `json:"name"`
-	PowerOn               bool   `json:"power_on"`
-	HardwareProfile       string `json:"hardware_profile"`
-	HardwareProfileLocked bool   `json:"hardware_profile_locked"`
-	GroupID               int    `json:"group_id"`
-
-	// zone name can be set during creation but not changed
-	ZoneName string `json:"zone_name"`
-
-	// the following cannot be set
-	Discs             []*Disc             `json:"discs"`
-	ID                int                 `json:"id"`
-	ManagementAddress string              `json:"management_address"`
-	Deleted           bool                `json:"deleted"`
-	Hostname          string              `json:"hostname"`
-	Head              string              `json:"head"`
-	NetworkInterfaces []*NetworkInterface `json:"network_interfaces"`
-
-	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
-}
-
 // VirtualMachineSpec represents the specification for a VM that is passed to the create_vm endpoint
 type VirtualMachineSpec struct {
 	VirtualMachine *VirtualMachine `json:"virtual_machine"`
@@ -131,12 +88,13 @@ type Group struct {
 	VirtualMachines []*VirtualMachine `json:"virtual_machines"`
 }
 
-// Account represents a BigV account
-type Account struct {
-	Name string `json:"name"`
-
-	// the following cannot be set
-	ID        int      `json:"id"`
-	Suspended bool     `json:"suspended"`
-	Groups    []*Group `json:"groups"`
+type CreditCard struct {
+	Number   string `yaml:"account_number"`
+	Name     string `yaml:"name"`
+	Expiry   string `yaml:"expiry"`
+	CVV      string `yaml:"cvv"`
+	Street   string `yaml:"street" omitempty`
+	City     string `yaml:"city" omitempty`
+	Postcode string `yaml:"postcode" omitempty`
+	Country  string `yaml:"country" omitempty`
 }

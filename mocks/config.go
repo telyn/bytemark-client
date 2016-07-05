@@ -1,9 +1,9 @@
 package mocks
 
 import (
-	"bytemark.co.uk/client/cmds/util"
-	"bytemark.co.uk/client/lib"
 	"flag"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	mock "github.com/maraino/go-mock"
 )
 
@@ -41,14 +41,14 @@ func (c *Config) GetV(name string) (util.ConfigVar, error) {
 	return ret.Get(0).(util.ConfigVar), ret.Error(1)
 }
 
-func (c *Config) GetVirtualMachine() lib.VirtualMachineName {
+func (c *Config) GetVirtualMachine() *lib.VirtualMachineName {
 	ret := c.Called()
-	return ret.Get(0).(lib.VirtualMachineName)
+	return ret.Get(0).(*lib.VirtualMachineName)
 }
 
-func (c *Config) GetGroup() lib.GroupName {
+func (c *Config) GetGroup() *lib.GroupName {
 	ret := c.Called()
-	return ret.Get(0).(lib.GroupName)
+	return ret.Get(0).(*lib.GroupName)
 }
 
 func (c *Config) GetAll() ([]util.ConfigVar, error) {
@@ -69,10 +69,6 @@ func (c *Config) Set(name, value, source string) {
 func (c *Config) SetPersistent(name, value, source string) error {
 	ret := c.Called(name, value, source)
 	return ret.Error(0)
-}
-func (c *Config) Silent() bool {
-	ret := c.Called()
-	return ret.Bool(0)
 }
 
 func (c *Config) Unset(name string) error {
