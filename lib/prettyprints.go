@@ -77,6 +77,10 @@ var templateFuncMap = map[string]interface{}{
 		return fmt.Sprintf("%s%d%ciB", lt, size, gt)
 	},
 	"capitalize": func(str string) string {
+		if len(str) == 0 {
+			return str
+		}
+
 		runes := []rune(str)
 		runes[0] = unicode.ToUpper(runes[0])
 		return string(runes)
