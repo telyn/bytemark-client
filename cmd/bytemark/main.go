@@ -80,6 +80,7 @@ OPTIONS:
 
 	baseAppSetup()
 
+	// set up our global flags by hand for REASONS
 	flags := flag.NewFlagSet("flags", flag.ContinueOnError)
 	configDir := flags.String("config-dir", "", "")
 	help := flags.Bool("help", false, "")
@@ -97,21 +98,25 @@ OPTIONS:
 	flags.SetOutput(ioutil.Discard)
 
 	flags.Parse(os.Args[1:])
-
+	// needing *configDir is the REASONS mentioned above
 	config, err := util.NewConfig(*configDir)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
+	// import the flags into config
+	flargs := config.ImportFlags(flags)
+
 	global.Config = config
 	global.App.Version = lib.Version
 
+	// build ourselves an api client
 	global.Client, err = lib.New(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"), global.Config.GetIgnoreErr("spp-endpoint"))
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
+
 	//juggle the arguments in order to get the executable on the beginning
-	flargs := config.ImportFlags(flags)
 	newArgs := make([]string, len(flargs)+1)
 	if len(flargs) > 0 && flargs[0] == "help" {
 		copy(newArgs[1:], flargs[1:])
@@ -126,8 +131,10 @@ OPTIONS:
 		helpArgs := make([]string, len(newArgs)+1)
 		helpArgs[0] = "--help"
 		copy(helpArgs[1:], newArgs)
+
 		err = global.App.Run(helpArgs)
 	} else {
+		// now we get to actually run the thing!! wooooooo
 		err = global.App.Run(newArgs)
 	}
 

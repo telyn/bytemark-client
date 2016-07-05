@@ -144,7 +144,12 @@ func (c *bytemarkClient) validateAccountName(account *string) error {
 		billAcc, err := c.getDefaultBillingAccount()
 		if err == nil {
 			*account = billAcc.Name
+		} else {
+			return err
 		}
+	}
+	if *account == "" {
+		return NoDefaultAccountError{}
 	}
 	return nil
 }
