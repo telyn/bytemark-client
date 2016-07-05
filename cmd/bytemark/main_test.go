@@ -34,7 +34,6 @@ func getFixtureVM() lib.VirtualMachine {
 		Name:     "test-server",
 		Hostname: "test-server.test-group",
 		GroupID:  1,
-		ZoneName: "test-zone",
 	}
 }
 
