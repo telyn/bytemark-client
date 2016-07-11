@@ -9,7 +9,7 @@ import (
 	"unicode"
 )
 
-const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }}{{ if .Name }} - {{ end }}{{ end }}{{ if .Name }}{{ .Name }}{{ end }}{{ end }}
+const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
 
 {{ define "account_bullet" }}• {{ template "account_name" . -}}
 {{- if isDefaultAccount . }} (this is your default account){{ end -}}
@@ -35,7 +35,7 @@ Accounts you can access:
 {{- end -}}
 {{- range .OtherAccounts }}
   {{template "account_bullet" . }}
-{{ end -}}
+{{- end -}}
 {{- end -}}
 {{- end }}
 
@@ -67,6 +67,7 @@ Accounts you can access:
 
 {{ template "owned_accounts" . }}
 {{ template "extra_accounts" . }}
+
 {{ template "account_overview" .DefaultAccount }}
 {{ end }}
 `

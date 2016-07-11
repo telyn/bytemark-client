@@ -111,6 +111,9 @@ func TestFormatOverview(t *testing.T) {
 				&gp,
 			},
 		},
+		&Account{
+			BillingID: 2406,
+		},
 	}
 
 	err := FormatOverview(b, accs, accs[0], "test-user")
@@ -126,6 +129,7 @@ Accounts you own:
 
 Other accounts you can access:
   • test-unowned-account
+  • 2406 - [no bigv account]
 
 Your default account (2402 - test-account)
   • default - 1 server
