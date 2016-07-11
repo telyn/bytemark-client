@@ -30,7 +30,11 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			},
 			Action: With(AccountProvider, func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
-					err := lib.FormatAccount(os.Stderr, c.Account)
+					def, err := global.Client.GetDefaultAccount()
+					if err != nil {
+						return err
+					}
+					err = lib.FormatAccount(os.Stderr, c.Account, def, "account_overview")
 					if err != nil {
 						return err
 					}
@@ -39,7 +43,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 
 					for _, g := range c.Account.Groups {
 						for _, vm := range g.VirtualMachines {
-							err := lib.FormatVirtualMachine(os.Stderr, vm, "servertwoline")
+							err := lib.FormatVirtualMachine(os.Stderr, vm, lib.TwoLine)
 							log.Output()
 							log.Output()
 							if err != nil {
@@ -73,7 +77,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					log.Output()
 					for _, vm := range c.Group.VirtualMachines {
 
-						err := lib.FormatVirtualMachine(os.Stderr, vm, "servertwoline")
+						err := lib.FormatVirtualMachine(os.Stderr, vm, lib.TwoLine)
 						log.Output()
 						log.Output()
 						if err != nil {
@@ -97,7 +101,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			},
 			Action: With(VirtualMachineProvider, func(c *Context) error {
 				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
-					return lib.FormatVirtualMachine(os.Stderr, c.VirtualMachine, "serverfull")
+					return lib.FormatVirtualMachine(os.Stderr, c.VirtualMachine, lib.All)
 				})
 			}),
 		}, {
