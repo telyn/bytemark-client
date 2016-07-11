@@ -114,3 +114,88 @@ func TestGetAccounts(t *testing.T) {
 	is.Equal(true, seenAccount)
 
 }
+
+func TestDefaultAccount(t *testing.T) {
+	is := is.New(t)
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts/default-account" {
+			w.Write([]byte(`
+			{ "id": 2402, "suspended": false, "name": "default-account" }
+			`))
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+
+	}),
+		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/api/v1/accounts" {
+				w.Write([]byte(`[
+				{ "bigv_account_subscription": "default-account" },
+				{ "bigv_account_subscription": "not-default-account" },
+				{ "bigv_account_subscription": "also-not-default-account" }
+				]`))
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
+		}))
+	defer authServer.Close()
+	defer brain.Close()
+	defer billing.Close()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	acc, err := client.GetDefaultAccount()
+	if err != nil {
+		t.Fatalf("%#v\r\n", err)
+	}
+
+	is.Equal("default-account", acc.Name)
+	is.Equal(2402, acc.BrainID)
+}
+
+// TestDefaultAccountHasNoBigVSubscription relates to open-source/bytemark-client#33
+func TestDefaultAccountHasNoBigVSubscription(t *testing.T) {
+	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/accounts/default-account" {
+			w.Write([]byte(`
+			{ "id": 2402, "suspended": false, "name": "default-account" }
+			`))
+		} else {
+			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+		}
+
+	}),
+		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/api/v1/accounts" {
+				w.Write([]byte(`[
+				{ },
+				{ "bigv_account_subscription": "not-default-account" }
+				]`))
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
+		}))
+	defer authServer.Close()
+	defer brain.Close()
+	defer billing.Close()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = client.GetDefaultAccount()
+	_, ok := err.(NoDefaultAccountError)
+	if !ok {
+		t.Fatal(err)
+	}
+}
