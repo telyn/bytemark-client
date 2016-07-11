@@ -27,6 +27,9 @@ func (c *bytemarkClient) getBillingAccount(name string) (account *billingAccount
 
 // getBillingAccounts returns all the billing accounts the currently logged in user can see.
 func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err error) {
+	if c.billingEndpoint == "" {
+		return make([]*billingAccount, 0), nil
+	}
 	req, err := c.BuildRequest("GET", EP_BILLING, "/api/v1/accounts")
 	if err != nil {
 		return
@@ -196,4 +199,26 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 	}
 	return
 
+}
+
+type Overview struct {
+	DefaultAccount *Account
+	Username       string
+	Accounts       []*Account
+}
+
+func (c *bytemarkClient) GetOverview() (*Overview, error) {
+	o := new(Overview)
+	acc, err := c.GetDefaultAccount()
+	if err != nil {
+		return nil, err
+	}
+	accs, err := c.GetAccounts()
+	if err != nil {
+		return nil, err
+	}
+	o.DefaultAccount = acc
+	o.Accounts = accs
+	o.Username = c.authSession.Username
+	return o, nil
 }
