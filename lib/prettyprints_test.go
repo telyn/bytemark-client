@@ -138,25 +138,35 @@ Your default account (2402 - test-account)
 `
 	actual := b.String()
 
-	//	expctdjs, err := json.Marshal(expctd)
-	//	if err != nil {
-	//		t.Fatal(err)
-	//	}
-	//	actualjs, err := json.Marshal(actual)
-	//	if err != nil {
-	//		t.Fatal(err)
-	//	}
-	//	expr := []rune(expctd)
-	//	actr := []rune(actual)
-	//
-	//	is.Equal(len(expr), len(actr))
-	//
-	//	for i := 0; i < len(expr); i++ {
-	//		if expr[i] != actr[i] {
-	//			fmt.Printf("chr #%d differs. e:'%c' a:'%c'\r\n", i, expr[i], actr[i])
-	//		}
-	//	}
-
-	//	fmt.Printf("\r\n%s\r\n%s", map[string]string{"data": string(expctdjs)}, map[string]string{"data": string(actualjs)})
 	is.Equal(expctd, actual)
+
+	b.Reset()
+	accs = []*Account{
+		&Account{
+			Name: "test-unowned-account",
+			Groups: []*Group{
+				&gp,
+			},
+		},
+		&Account{
+			BillingID: 2406,
+		},
+	}
+
+	err = FormatOverview(b, accs, nil, "test-user")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expctd = `You are 'test-user'
+
+Accounts you can access:
+  • test-unowned-account
+  • 2406 - [no bigv account]
+
+It was not possible to determine your default account. Please set one using bytemark config set account.
+
+`
+	actual = b.String()
+	IsEqualString(t, expctd, actual)
 }

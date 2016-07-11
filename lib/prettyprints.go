@@ -29,8 +29,9 @@ const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .Bill
 {{ define "extra_accounts" -}}
 {{- if .OtherAccounts -}}
 {{- if .OwnedAccounts }}
+
 Other accounts you can access:
-{{- else }}
+{{- else -}}
 Accounts you can access:
 {{- end -}}
 {{- range .OtherAccounts }}
@@ -65,11 +66,16 @@ Accounts you can access:
 {{ define "full_overview" -}}
 {{- template "whoami" . }}
 
-{{ template "owned_accounts" . }}
-{{ template "extra_accounts" . }}
+{{ template "owned_accounts" . -}}
+{{- template "extra_accounts" . }}
 
-{{ template "account_overview" .DefaultAccount }}
-{{ end }}
+{{ if .DefaultAccount -}}
+{{- template "account_overview" .DefaultAccount }}
+{{ else -}}
+It was not possible to determine your default account. Please set one using bytemark config set account.
+
+{{ end -}}
+{{- end }}
 `
 
 const serverTemplate = `{{ define "server_summary" }} ▸ {{.ShortName }} ({{ if .Deleted }}deleted{{ else if .PowerOn }}powered on{{else}}powered off{{end}}) in {{capitalize .ZoneName}}{{ end }}
@@ -292,6 +298,9 @@ func FormatAccount(wr io.Writer, a *Account, def *Account, tpl string) error {
 func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
 	tmpl, err := template.New("accounts").Funcs(templateFuncMap).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {
+			if a == nil || defaultAccount == nil {
+				return false
+			}
 			if a.BillingID != 0 && a.BillingID == defaultAccount.BillingID {
 				return true
 			}

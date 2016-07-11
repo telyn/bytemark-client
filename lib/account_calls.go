@@ -27,6 +27,9 @@ func (c *bytemarkClient) getBillingAccount(name string) (account *billingAccount
 
 // getBillingAccounts returns all the billing accounts the currently logged in user can see.
 func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err error) {
+	if c.billingEndpoint == "" {
+		return make([]*billingAccount, 0), nil
+	}
 	req, err := c.BuildRequest("GET", EP_BILLING, "/api/v1/accounts")
 	if err != nil {
 		return
