@@ -105,6 +105,9 @@ OPTIONS:
 	}
 	// import the flags into config
 	flargs := config.ImportFlags(flags)
+	if config.GetIgnoreErr("endpoint") == "https://int.bigv.io" {
+		config.Set("billing-endpoint", "", "CODE NULL BILLING WHEN INT")
+	}
 
 	global.Config = config
 	global.App.Version = lib.Version
