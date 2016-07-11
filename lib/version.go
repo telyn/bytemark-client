@@ -1,5 +1,5 @@
 package lib
 
 const (
-	Version = "0.7.1"
+	Version = "1.0"
 )
