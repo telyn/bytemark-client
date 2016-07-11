@@ -9,16 +9,70 @@ import (
 	"unicode"
 )
 
-// = name.group (power state) in Zone
-//     xxx.yyy.zzz.www n cores, nGiB RAM, nnnGiB storage on n discs
-//     discs:
-//       + vda - 35GiB, sata grade
-//       + vdd - 100GiB, sata grade
-//
-//     ips: 213.13
+const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }}{{ if .Name }} - {{ end }}{{ end }}{{ if .Name }}{{ .Name }}{{ end }}{{ end }}
 
-const serverTemplate = `{{ define "serversummary" }} ▸ {{.ShortName }} ({{ if .Deleted }}deleted{{ else if .PowerOn }}powered on{{else}}powered off{{end}}) in {{capitalize .ZoneName}}{{ end }}
-{{ define "serverspec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ end }}
+{{ define "account_bullet" }}• {{ template "account_name" . -}}
+{{- if isDefaultAccount . }} (this is your default account){{ end -}}
+{{- end }}
+
+{{ define "whoami" }}You are '{{ .Username }}'{{ end }}
+
+{{ define "owned_accounts" -}}
+  {{- if .OwnedAccounts -}}
+    Accounts you own: 
+    {{- range .OwnedAccounts }}
+  {{ template "account_bullet" . -}}
+    {{ end -}}
+  {{- end -}}
+{{- end -}}
+
+{{ define "extra_accounts" -}}
+{{- if .OtherAccounts -}}
+{{- if .OwnedAccounts }}
+Other accounts you can access:
+{{- else }}
+Accounts you can access:
+{{- end -}}
+{{- range .OtherAccounts }}
+  {{template "account_bullet" . }}
+{{ end -}}
+{{- end -}}
+{{- end }}
+
+{{ define "group_overview" }}  • {{ .Name }} - {{  pluralize "server" "servers" ( len .VirtualMachines ) }}
+{{ if ( len .VirtualMachines ) le 5 -}}
+{{- range .VirtualMachines }}   {{ template "server_summary" . }}
+{{ end -}}
+{{- end -}}
+{{- end -}}
+
+{{/* account_overview needs $ to be defined, so use single_account_overview as entrypoint */}}
+{{ define "account_overview" }}
+  {{- if isDefaultAccount . -}}	
+    Your default account ({{ template "account_name" . }})
+  {{- else -}}
+    {{- template "account_name" . -}}
+  {{- end }}
+{{ range .Groups -}}
+    {{ template "group_overview" . -}}
+{{- end -}}
+{{- end }}
+
+{{ define "single_account_overview" }}
+{{ template "account_overview" .Account }}
+{{ end }}
+
+{{ define "full_overview" -}}
+{{- template "whoami" . }}
+
+{{ template "owned_accounts" . }}
+{{ template "extra_accounts" . }}
+{{ template "account_overview" .DefaultAccount }}
+{{ end }}
+`
+
+const serverTemplate = `{{ define "server_summary" }} ▸ {{.ShortName }} ({{ if .Deleted }}deleted{{ else if .PowerOn }}powered on{{else}}powered off{{end}}) in {{capitalize .ZoneName}}{{ end }}
+{{ define "server_spec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ end }}
 
 {{ define "discs" }}    discs:
 {{- range .Discs }}
@@ -35,11 +89,11 @@ const serverTemplate = `{{ define "serversummary" }} ▸ {{.ShortName }} ({{ if 
 {{- end }}
 {{ end }}
 
-{{ define "servertwoline" }}{{ template "serversummary" . }}
-{{ template "serverspec" . }}{{ end }}
+{{ define "server_twoline" }}{{ template "server_summary" . }}
+{{ template "server_spec" . }}{{ end }}
 
-{{ define "serverfull" -}}
-{{ template "servertwoline" . }}
+{{ define "server_full" -}}
+{{ template "server_twoline" . }}
 
 {{ template "discs" . }}
 {{ template "ips" . }}
@@ -48,9 +102,9 @@ const serverTemplate = `{{ define "serversummary" }} ▸ {{.ShortName }} ({{ if 
 type TemplateChoice string
 
 const (
-	OneLine TemplateChoice = "serversummary"
-	TwoLine                = "servertwoline"
-	All                    = "serverfull"
+	OneLine TemplateChoice = "server_summary"
+	TwoLine                = "server_twoline"
+	All                    = "server_full"
 )
 
 var templateFuncMap = map[string]interface{}{
@@ -212,31 +266,61 @@ func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *VirtualMachi
 	return err
 }
 
-func FormatAccount(wr io.Writer, a *Account) error {
-	output := make([]string, 0, 10)
+func FormatAccount(wr io.Writer, a *Account, def *Account, tpl string) error {
+	tmpl, err := template.New("accounts").Funcs(templateFuncMap).Funcs(map[string]interface{}{
+		"isDefaultAccount": func(a *Account) bool {
+			if a.BillingID != 0 && a.BillingID == def.BillingID {
+				return true
+			}
+			return a.Name != "" && a.Name == def.Name
+		},
+	}).Parse(accountsTemplate + serverTemplate)
 
-	gs := ""
-	if len(a.Groups) != 1 {
-		gs = "s"
-	}
-	ss := ""
-	servers := a.CountVirtualMachines()
-	if servers != 1 {
-		ss = "s"
+	if err != nil {
+		return err
 	}
 
-	groups := make([]string, len(a.Groups))
-
-	for i, g := range a.Groups {
-		groups[i] = g.Name
+	err = tmpl.ExecuteTemplate(wr, tpl, a)
+	if err != nil {
+		return err
 	}
-	output = append(output, fmt.Sprintf("%s - Account containing %d server%s across %d group%s", a.Name, servers, ss, len(a.Groups), gs))
-	if a.Owner != nil && a.TechnicalContact != nil {
-		output = append(output, fmt.Sprintf("Owner: %s %s (%s), Tech Contact: %s %s (%s)", a.Owner.FirstName, a.Owner.LastName, a.Owner.Username, a.TechnicalContact.FirstName, a.TechnicalContact.LastName, a.TechnicalContact.Username))
-	}
-	output = append(output, "")
-	output = append(output, fmt.Sprintf("Groups in this account: %s", strings.Join(groups, ", ")))
 
-	_, err := wr.Write([]byte(strings.Join(output, "\r\n")))
-	return err
+	return nil
+}
+
+func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
+	tmpl, err := template.New("accounts").Funcs(templateFuncMap).Funcs(map[string]interface{}{
+		"isDefaultAccount": func(a *Account) bool {
+			if a.BillingID != 0 && a.BillingID == defaultAccount.BillingID {
+				return true
+			}
+			return a.Name != "" && a.Name == defaultAccount.Name
+		},
+	}).Parse(accountsTemplate + serverTemplate)
+	if err != nil {
+		return err
+	}
+	ownedAccounts := make([]*Account, 0)
+	otherAccounts := make([]*Account, 0)
+	for _, a := range accounts {
+		if a.Owner != nil && a.Owner.Username != "" && a.Owner.Username == username {
+			ownedAccounts = append(ownedAccounts, a)
+		} else {
+			otherAccounts = append(otherAccounts, a)
+		}
+	}
+	data := map[string]interface{}{
+		"Accounts":       accounts,
+		"DefaultAccount": defaultAccount,
+		"Username":       username,
+		"OwnedAccounts":  ownedAccounts,
+		"OtherAccounts":  otherAccounts,
+	}
+
+	err = tmpl.ExecuteTemplate(wr, "full_overview", data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

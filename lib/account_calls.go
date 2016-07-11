@@ -179,3 +179,25 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 	return
 
 }
+
+type Overview struct {
+	DefaultAccount *Account
+	Username       string
+	Accounts       []*Account
+}
+
+func (c *bytemarkClient) GetOverview() (*Overview, error) {
+	o := new(Overview)
+	acc, err := c.GetDefaultAccount()
+	if err != nil {
+		return nil, err
+	}
+	accs, err := c.GetAccounts()
+	if err != nil {
+		return nil, err
+	}
+	o.DefaultAccount = acc
+	o.Accounts = accs
+	o.Username = c.authSession.Username
+	return o, nil
+}
