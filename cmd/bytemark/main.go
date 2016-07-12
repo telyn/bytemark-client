@@ -132,8 +132,10 @@ OPTIONS:
 
 	if *help || *h {
 		helpArgs := make([]string, len(newArgs)+1)
-		helpArgs[0] = "--help"
-		copy(helpArgs[1:], newArgs)
+		helpArgs[len(newArgs)] = "--help"
+		copy(helpArgs, newArgs)
+
+		log.Debugf(log.DBG_FLAGS, "helping! helpArgs: %v\r\n", helpArgs)
 
 		err = global.App.Run(helpArgs)
 	} else {
