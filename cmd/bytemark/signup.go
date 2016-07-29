@@ -107,7 +107,7 @@ If you have previously used the client, you'll have a login and will need to add
 				log.Log("Couldn't create an account for you")
 				return err
 			}
-			log.Log("Account created successfully - you'll now be able to log in as '%s' and set up some servers! You should also be receiving a welcome email shortly.", createdAccount.Owner.Username)
+			log.Logf("Account created successfully - you'll now be able to log in as '%s' and set up some servers! You should also be receiving a welcome email shortly.\r\n", createdAccount.Owner.Username)
 			return nil
 
 		}),

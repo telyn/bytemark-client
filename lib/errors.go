@@ -13,7 +13,15 @@ func (e UnsupportedEndpointError) Error() string {
 	return fmt.Sprintf("%d was not a valid endpoint choice", e)
 }
 
-// APIError is the basic error type which all errors return by the client library are subclassed from.
+type NoDefaultAccountError struct {
+	InnerErr error
+}
+
+func (e NoDefaultAccountError) Error() string {
+	return "Couldn't find a default BigV account - please set one using `bytemark config set account`, or specify one on the command line using the --account flag or server.group.account or group.acccount notation."
+}
+
+// APIError is the basic error type which most errors returned by the client library are subclassed from.
 type APIError struct {
 	Method       string
 	URL          *url.URL

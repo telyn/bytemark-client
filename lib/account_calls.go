@@ -27,6 +27,9 @@ func (c *bytemarkClient) getBillingAccount(name string) (account *billingAccount
 
 // getBillingAccounts returns all the billing accounts the currently logged in user can see.
 func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err error) {
+	if c.billingEndpoint == "" {
+		return make([]*billingAccount, 0), nil
+	}
 	req, err := c.BuildRequest("GET", EP_BILLING, "/api/v1/accounts")
 	if err != nil {
 		return
@@ -120,6 +123,9 @@ func (c *bytemarkClient) getBrainAccounts() (accounts []*brainAccount, err error
 }
 
 func (c *bytemarkClient) getDefaultBillingAccount() (*billingAccount, error) {
+	if c.brainEndpoint == "https://int.bigv.io" {
+		return &billingAccount{Name: "bytemark"}, nil
+	}
 	billAccs, err := c.getBillingAccounts()
 	if err != nil {
 		return nil, err
@@ -129,24 +135,39 @@ func (c *bytemarkClient) getDefaultBillingAccount() (*billingAccount, error) {
 }
 
 // GetDefaultAccount gets the account *most likely* to be your default account.
-// In practice, this is the first account returned by the billing endpoint,
+// This is the first account returned by the billing endpoint,
 // with the brain's data for it attached. Fingers crossed.
+// Returns the default billing account with NoDefaultAccountError if there's
+// not a bigv_subscription_account on the billing account, and returns nil
 func (c *bytemarkClient) GetDefaultAccount() (*Account, error) {
+	acc := new(Account)
+	// there is only one account worth mentioning on int.
+	if c.brainEndpoint == "https://int.bigv.io" {
+		brainAcc, err := c.getBrainAccount("bytemark")
+		if err != nil {
+			return nil, err
+		}
+		acc.fillBrain(brainAcc)
+		return acc, nil
+	}
 	billAcc, err := c.getDefaultBillingAccount()
 	if err != nil {
-		return nil, err
+		return nil, NoDefaultAccountError{err}
 	}
 
-	brainAcc, err := c.getBrainAccount(billAcc.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	acc := new(Account)
-	acc.fillBrain(brainAcc)
 	acc.fillBilling(billAcc)
 
-	return acc, nil
+	if billAcc.Name != "" {
+		brainAcc, err := c.getBrainAccount(billAcc.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		acc.fillBrain(brainAcc)
+		return acc, nil
+	}
+
+	return acc, NoDefaultAccountError{}
 }
 
 // Gets all Accounts you can see, merging data from both the brain and the billing
@@ -178,4 +199,26 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 	}
 	return
 
+}
+
+type Overview struct {
+	DefaultAccount *Account
+	Username       string
+	Accounts       []*Account
+}
+
+func (c *bytemarkClient) GetOverview() (*Overview, error) {
+	o := new(Overview)
+	acc, err := c.GetDefaultAccount()
+	if err != nil {
+		return nil, err
+	}
+	accs, err := c.GetAccounts()
+	if err != nil {
+		return nil, err
+	}
+	o.DefaultAccount = acc
+	o.Accounts = accs
+	o.Username = c.authSession.Username
+	return o, nil
 }

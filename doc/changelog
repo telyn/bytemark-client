@@ -1,3 +1,27 @@
+bytemark-client (1.0) UNRELEASED; urgency=low
+
+  New features:
+  * overview command - shows an overview of what accounts the user can access
+  * move command - rename a server and/or move it between groups
+
+  Changes: 
+  * show account, show group and show server now have different, prettier
+    output
+  * prompt for confirmation on all commands that could increase cost or delete
+    data (delete disc, delete group --recursive, delete server, set memory and
+    set cores)
+  * help text is now better in many places
+  * 'undelete server' has been renamed to 'restore server'
+  * Add --ssh-args to console command, so that you can specify a different key
+    to use, etc.
+
+  Fixes:
+  * show server: Correct IPv4 addresses are shown 
+  * create server: firstboot script no longer ignored
+  * reimage/create server: fix bug with authorized-keys-file
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 11 Jul 2016 16:18:53 +0100
+
 bytemark-client (0.7.1) UNRELEASED; urgency=low
 
   No changes; this is a repackage of 0.7.0's code with a new build pipeline

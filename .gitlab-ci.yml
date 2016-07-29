@@ -1,10 +1,33 @@
 image: golang:1.6
 before_script:
-  - go get -t -v -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-  - ls -l
+  # these two are needed for coverage stats
+  - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
+  # go get the client so that we get all dependencies and test dependencies of bytemark
+  - go get -t -d ./cmd/bytemark ./cmd/bytemark/util ./lib
+  # then ensure that we don't have any github copy of bytemark-client lying around
   - rm -rf $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+  # stick our actual code in the correct place.
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+
+stages:
+  - vet
+  - test
+
+vet:
+  script:
+    - go vet github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+    - go vet github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
+    - go vet github.com/BytemarkHosting/bytemark-client/lib
 
 test:
   script:
-    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client && make test
+    # vet everything
+    - go test -coverprofile=bytemark.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+    - go test -coverprofile=util.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
+    - go test -coverprofile=lib.coverprofile github.com/BytemarkHosting/bytemark-client/lib
+    - gover
+    - go tool cover -func gover.coverprofile | tail -n 1
+    - go tool cover -html gover.coverprofile -o coverage.html
+  artifacts:
+    paths:
+    - coverage.html

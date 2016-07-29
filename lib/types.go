@@ -93,8 +93,8 @@ type CreditCard struct {
 	Name     string `yaml:"name"`
 	Expiry   string `yaml:"expiry"`
 	CVV      string `yaml:"cvv"`
-	Street   string `yaml:"street" omitempty`
-	City     string `yaml:"city" omitempty`
-	Postcode string `yaml:"postcode" omitempty`
-	Country  string `yaml:"country" omitempty`
+	Street   string `yaml:"street,omitempty"`
+	City     string `yaml:"city,omitempty"`
+	Postcode string `yaml:"postcode,omitempty"`
+	Country  string `yaml:"country,omitempty"`
 }

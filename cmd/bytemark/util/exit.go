@@ -43,6 +43,9 @@ const (
 	// E_SUBPROCESS_FAILED is the exit code returned when the client attempted to run a subprocess (e.g. ssh, a browser or a vpn client) but couldn't
 	E_SUBPROCESS_FAILED = 8
 
+	// E_NO_DEFAULT_ACCOUNT is the exit code returned when the client couldn't determine a default account. In this situation, the user should manually specify the account to use with the --account flag or using `bytemark config set account`
+	E_NO_DEFAULT_ACCOUNT = 9
+
 	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
 	E_UNKNOWN_ERROR = 49
 
@@ -173,7 +176,7 @@ func ProcessError(err error, message ...string) ExitCode {
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)
-				if urlErr.Error != nil {
+				if urlErr.Err != nil {
 					if opError, ok := urlErr.Err.(*net.OpError); ok {
 						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", opError.Err)
 					} else {
@@ -188,7 +191,7 @@ func ProcessError(err error, message ...string) ExitCode {
 				exitCode = E_UNKNOWN_AUTH_ERROR
 			}
 		case *url.Error:
-			if e.Error != nil {
+			if e.Err != nil {
 				if opError, ok := e.Err.(*net.OpError); ok {
 					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", opError.Err)
 				} else {
@@ -215,6 +218,9 @@ func ProcessError(err error, message ...string) ExitCode {
 			}
 			errorMessage = err.Error()
 			exitCode = E_SUBPROCESS_FAILED
+		case lib.NoDefaultAccountError:
+			errorMessage = err.Error()
+			exitCode = E_NO_DEFAULT_ACCOUNT
 		case lib.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = E_NOT_AUTHORIZED_API
