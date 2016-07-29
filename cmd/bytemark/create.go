@@ -166,9 +166,7 @@ func fn_createGroup(c *Context) (err error) {
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", c.GroupName.Group, c.GroupName.Account)
 	}
-	err = err
 	return
-
 }
 
 func fn_createServer(c *Context) (err error) {

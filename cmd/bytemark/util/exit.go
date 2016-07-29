@@ -176,7 +176,7 @@ func ProcessError(err error, message ...string) ExitCode {
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)
-				if urlErr.Error != nil {
+				if urlErr.Err != nil {
 					if opError, ok := urlErr.Err.(*net.OpError); ok {
 						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", opError.Err)
 					} else {
@@ -191,7 +191,7 @@ func ProcessError(err error, message ...string) ExitCode {
 				exitCode = E_UNKNOWN_AUTH_ERROR
 			}
 		case *url.Error:
-			if e.Error != nil {
+			if e.Err != nil {
 				if opError, ok := e.Err.(*net.OpError); ok {
 					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", opError.Err)
 				} else {

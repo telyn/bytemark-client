@@ -13,7 +13,7 @@ func TestGeneratePassword(t *testing.T) {
 		is.Equal(16, len(pass))
 		for x, c := range []byte(pass) {
 			if c < 'A' || c > 'z' || (c > 'Z' && c < 'a') {
-				t.Logf("character %d ('%c') was not in accepted range.", i, pass, x, c)
+				t.Logf("character %d ('%c') was not in accepted range.", x, c)
 				t.Fail()
 			}
 		}

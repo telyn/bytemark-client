@@ -145,7 +145,7 @@ func (e *ConfigWriteError) Error() string {
 	if e.Err != nil {
 		return fmt.Sprintf("Unable to write config for %s to %s.", e.Name, e.Path)
 	}
-	return fmt.Sprintf("Unable to write config for %s to %s - ", e.Name, e.Path, e.Err)
+	return fmt.Sprintf("Unable to write config for %s to %s - %s", e.Name, e.Path, e.Err.Error())
 }
 
 // Do I really need to have the flags passed in here?
