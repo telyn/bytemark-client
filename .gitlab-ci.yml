@@ -14,3 +14,7 @@ test:
     - go test -coverprofile=lib.coverprofile github.com/BytemarkHosting/bytemark-client/lib
     - gover
     - go tool cover -func gover.coverprofile | tail -n 1
+    - go tool cover -html gover.coverprofile -o coverage.html
+  artifacts:
+    paths:
+    - coverage.html
