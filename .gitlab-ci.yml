@@ -1,10 +1,16 @@
 image: golang:1.6
 before_script:
-  - go get -t -v -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+  - go get github.com/modocache/gover
+  - go get golang.org/x/tools/cmd/cover
+  - go get -t -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
   - ls -l
   - rm -rf $GOPATH/src/github.com/BytemarkHosting/bytemark-client
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
 test:
   script:
-    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client && make test
+    - go test -coverprofile=bytemark.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+    - go test -coverprofile=util.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
+    - go test -coverprofile=lib.coverprofile github.com/BytemarkHosting/bytemark-client/lib
+    - gover
+    - go tool cover -func gover.coverprofile | tail -n 1
