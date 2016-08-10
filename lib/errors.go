@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
 	"strings"
 )
@@ -80,21 +81,51 @@ type BadRequestError struct {
 	Problems map[string][]string
 }
 
-func newBadRequestError(ctx BigVError, response []byte) BadRequestError {
+func newBadRequestError(ctx APIError, response []byte) error {
 	problems := make(map[string][]string)
-	err := json.Unmarshal(response, problems)
+	jsonProblems := make(map[string]json.RawMessage)
+	err := json.Unmarshal(response, &jsonProblems)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	log.Errorf("jsonProblems len: %d\r\n", len(jsonProblems))
+	for t, data := range jsonProblems {
+		switch t {
+		case "discs":
+			discProblems := make([]map[string][]string, 0, 1)
+			err = json.Unmarshal(data, &discProblems)
+			if err != nil {
+				return err
+			}
+			problems[t] = make([]string, 0)
+			for i, thisDiscProbs := range discProblems {
+				for field, plist := range thisDiscProbs {
+					for _, p := range plist {
+						problems[t] = append(problems[t], fmt.Sprintf("• Disc %d - %s %s", i+1, field, p))
+					}
+				}
+			}
+		default:
+			thoseProblems := make([]string, 0, 1)
+			err := json.Unmarshal(data, &thoseProblems)
+			if err != nil {
+				return err
+			}
+			problems[t] = thoseProblems
+		}
+	}
 	return BadRequestError{
-		context,
+		ctx,
 		problems}
 }
 func (e BadRequestError) Error() string {
 	if len(e.Problems) == 0 {
-		return fmt.Sprintf("The API told us our request was bad\r\n%s", e.ResponseBody)
+		return fmt.Sprintf("The request was bad:\r\n%s", e.ResponseBody)
 	}
-	out := make([]string, len(e.Problems))
-	out = append(out, "Our request had some problems:")
-	for k, probs := range e.Problems {
-		out = append(out, fmt.Sprintf("%s:\r\n    %s", k, strings.Join(probs, "\r\n    ")))
+	out := make([]string, 0, len(e.Problems))
+	for _, probs := range e.Problems {
+		out = append(out, strings.Join(probs, "\r\n    "))
 	}
 	return strings.Join(out, "\r\n")
 }

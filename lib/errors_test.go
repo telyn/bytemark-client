@@ -2,6 +2,7 @@ package lib
 
 import (
 	"github.com/cheekybits/is"
+	"strings"
 	"testing"
 )
 
@@ -14,7 +15,7 @@ func TestBadRequestError(t *testing.T) {
 	tests := []test{
 		test{`{"discs":[{},{},{},{},{"size":["must be greater than or equal to 50"]}]}`,
 			[]string{
-				"• Disc 5 (vde) - size must be greater than or equal to 50",
+				"• Disc 5 - size must be greater than or equal to 50",
 			},
 		},
 		test{`{"name":["can't be blank"],"memory":["is not included in the list","is not a number"]}`,
@@ -31,8 +32,8 @@ func TestBadRequestError(t *testing.T) {
 		},
 	}
 
-	for i, d := range tests {
-		err := newBadRequestError([]byte(input))
-		is.Equal(d.output, err.FormatProblems())
+	for _, d := range tests {
+		err := newBadRequestError(APIError{}, []byte(d.input))
+		is.Equal(strings.Join(d.output, "\r\n"), err.Error())
 	}
 }
