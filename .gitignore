@@ -11,6 +11,7 @@ bytemark.exe
 /lib/version.go
 *.nupkg
 *.json
+*.coverprofile
 ports/chocolatey/package
 ports/chocolatey/VERSION
 ports/chocolatey/choco.exe
