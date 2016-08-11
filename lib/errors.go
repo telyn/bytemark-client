@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
+	"sort"
 	"strings"
+	"unicode"
 )
 
 type UnsupportedEndpointError Endpoint
@@ -81,6 +83,39 @@ type BadRequestError struct {
 	Problems map[string][]string
 }
 
+// friendlifyBadRequestPhrases makes the brain's validation messages
+// a bit more friendly. De-abbreviates, de-jargonises and removes redundancy
+// (no need to say something isn't a number if you're also saying it wasn't set)
+func friendlifyBadRequestPhrases(phrases []string) (newPhrases []string) {
+	replacer := strings.NewReplacer(
+		"can't", "cannot",
+		"doesn't", "does not",
+	)
+
+	newPhrases = make([]string, 0, len(phrases))
+
+	found := make(map[string]bool)
+	for _, p := range phrases {
+		found[p] = true
+	}
+	for _, p := range phrases {
+		switch p {
+		case "is not included in the list":
+			newPhrases = append(newPhrases, "was not set")
+		case "is invalid":
+			if len(phrases) == 0 {
+				newPhrases = append(newPhrases, p)
+			}
+		default:
+			if found["is not included in the list"] {
+				continue
+			}
+			newPhrases = append(newPhrases, replacer.Replace(p))
+		}
+	}
+	return
+}
+
 func newBadRequestError(ctx APIError, response []byte) error {
 	problems := make(map[string][]string)
 	jsonProblems := make(map[string]json.RawMessage)
@@ -98,35 +133,63 @@ func newBadRequestError(ctx APIError, response []byte) error {
 			if err != nil {
 				return err
 			}
-			problems[t] = make([]string, 0)
+			problems["disc"] = make([]string, 0)
 			for i, thisDiscProbs := range discProblems {
-				for field, plist := range thisDiscProbs {
-					for _, p := range plist {
-						problems[t] = append(problems[t], fmt.Sprintf("• Disc %d - %s %s", i+1, field, p))
+				for field, fieldProbs := range thisDiscProbs {
+					fieldProbs = friendlifyBadRequestPhrases(fieldProbs)
+					for _, p := range fieldProbs {
+						problems["disc"] = append(problems[t], fmt.Sprintf("%d - %s %s", i+1, field, p))
 					}
 				}
 			}
+		case "memory":
+			thoseProblems := make([]string, 0, 1)
+			err := json.Unmarshal(data, &thoseProblems)
+			if err != nil {
+				return err
+			}
+			problems["memory_amount"] = friendlifyBadRequestPhrases(thoseProblems)
 		default:
 			thoseProblems := make([]string, 0, 1)
 			err := json.Unmarshal(data, &thoseProblems)
 			if err != nil {
 				return err
 			}
-			problems[t] = thoseProblems
+			problems[t] = friendlifyBadRequestPhrases(thoseProblems)
 		}
 	}
 	return BadRequestError{
 		ctx,
 		problems}
 }
+
+func capitaliseJSON(s string) string {
+	rs := []rune(s)
+	rs[0] = unicode.ToUpper(rs[0])
+	s = string(rs)
+	return strings.Replace(s, "_", " ", -1)
+}
+
 func (e BadRequestError) Error() string {
 	if len(e.Problems) == 0 {
 		return fmt.Sprintf("The request was bad:\r\n%s", e.ResponseBody)
 	}
 	out := make([]string, 0, len(e.Problems))
-	for _, probs := range e.Problems {
-		out = append(out, strings.Join(probs, "\r\n    "))
+	nProbs := 0
+	keys := make([]string, len(e.Problems))
+	for field, probs := range e.Problems {
+		nProbs += len(probs)
+		keys = append(keys, field)
 	}
+	sort.Strings(keys)
+	for _, field := range keys {
+		probs := e.Problems[field]
+		for _, p := range probs {
+			out = append(out, "• "+capitaliseJSON(field)+" "+p)
+
+		}
+	}
+
 	return strings.Join(out, "\r\n")
 }
 
