@@ -101,13 +101,17 @@ func friendlifyBadRequestPhrases(phrases []string) (newPhrases []string) {
 	for _, p := range phrases {
 		switch p {
 		case "is not included in the list":
-			newPhrases = append(newPhrases, "was not set")
+			newPhrases = append(newPhrases, "is invalid")
+		case "is not a number":
+			if !found["is not included in the list"] {
+				newPhrases = append(newPhrases, replacer.Replace(p))
+			}
 		case "is invalid":
 			if len(phrases) == 0 {
-				newPhrases = append(newPhrases, p)
+				newPhrases = append(newPhrases, replacer.Replace(p))
 			}
 		default:
-			if found["is not included in the list"] {
+			if found["can't be blank"] && p != "can't be blank" {
 				continue
 			}
 			newPhrases = append(newPhrases, replacer.Replace(p))
@@ -121,8 +125,9 @@ func newBadRequestError(ctx APIError, response []byte) error {
 	jsonProblems := make(map[string]json.RawMessage)
 	err := json.Unmarshal(response, &jsonProblems)
 	if err != nil {
-		log.Error(err)
-		return err
+		log.Debug(log.DBG_OUTLINE, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
+		bytes, _ := json.Marshal([]string{string(response)})
+		jsonProblems[""] = bytes
 	}
 	log.Errorf("jsonProblems len: %d\r\n", len(jsonProblems))
 	for t, data := range jsonProblems {

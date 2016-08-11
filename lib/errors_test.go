@@ -20,14 +20,19 @@ func TestBadRequestError(t *testing.T) {
 		},
 		test{`{"name":["can't be blank"],"memory":["is not included in the list","is not a number"]}`,
 			[]string{
-				"• Memory amount was not set",
+				"• Memory amount is invalid",
 				"• Name cannot be blank",
 			},
 		},
 		test{`{"name":["is invalid","is too short (minimum is 3 characters)"],"memory":["is not included in the list","is not a number"]}`,
 			[]string{
-				"• Memory amount was not set",
+				"• Memory amount is invalid",
 				"• Name is too short (minimum is 3 characters)",
+			},
+		},
+		test{`{"hardware_profile":["is not included in the list"]}`,
+			[]string{
+				"• Hardware profile is invalid",
 			},
 		},
 	}
