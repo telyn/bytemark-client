@@ -6,12 +6,14 @@ import (
 	"strings"
 )
 
+// Process turns this JSONUser into a User.
 func (jsonUser *JSONUser) Process(into *User) {
 	into.Username = jsonUser.Username
 	into.Email = jsonUser.Email
 	into.AuthorizedKeys = strings.Split(jsonUser.AuthorizedKeys, "\n")
 }
 
+// MarshalJSON marshals the User into a JSON bytestream.
 func (user *User) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&JSONUser{
 		Username:       user.Username,
@@ -20,8 +22,9 @@ func (user *User) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// GetUser grabs the named user from the brain
 func (c *bytemarkClient) GetUser(name string) (user *User, err error) {
-	r, err := c.BuildRequest("GET", EP_BRAIN, "/users/%s", name)
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/users/%s", name)
 	if err != nil {
 		return
 	}
@@ -50,7 +53,7 @@ func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error
 		return err
 	}
 
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/users/%s", username)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/users/%s", username)
 	if err != nil {
 		return err
 	}
@@ -92,7 +95,7 @@ func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) er
 		return err
 	}
 
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/users/%s", username)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/users/%s", username)
 	_, _, err = r.Run(bytes.NewBuffer(userjs), nil)
 	return err
 

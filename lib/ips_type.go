@@ -13,6 +13,7 @@ func (ips IPs) StringSep(sep string) string {
 	return strings.Join(ips.Strings(), sep)
 }
 
+// Strings returns each IP in this IPs as a string.
 func (ips IPs) Strings() (strings []string) {
 	strings = make([]string, len(ips))
 	for i, ip := range ips {

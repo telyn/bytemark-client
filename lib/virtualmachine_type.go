@@ -92,6 +92,7 @@ func (vm *VirtualMachine) AllIPv6Addresses() (ips IPs) {
 	return ips
 }
 
+// PrimaryIP returns the VM's primary IP - the (usually) IPv4 address that was created first.
 func (vm *VirtualMachine) PrimaryIP() net.IP {
 	for _, nic := range vm.NetworkInterfaces {
 		if len(nic.IPs) > 0 {

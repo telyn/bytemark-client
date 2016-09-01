@@ -36,9 +36,9 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 		Action: With(func(c *Context) error {
 			shouldAuth := c.Bool("auth")
 
-			endpoint := lib.EP_BRAIN
+			endpoint := lib.BrainEndpoint
 			if c.Bool("use-billing") {
-				endpoint = lib.EP_BILLING
+				endpoint = lib.BillingEndpoint
 			}
 
 			if c.Bool("junk-token") {

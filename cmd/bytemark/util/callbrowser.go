@@ -19,6 +19,9 @@ func openCommand() string {
 	}
 }
 
+// CallBrowser opens the user's desktop browser to the given URL.
+// It tries really hard - first trying open on mac or xdg-open on other systems.
+// If xdg-open couldn't be used, it attempts to use /usr/bin/x-www-browser
 func CallBrowser(url string) error {
 	command := openCommand()
 	bin, err := exec.LookPath(command)

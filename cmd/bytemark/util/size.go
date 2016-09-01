@@ -6,10 +6,14 @@ import (
 	"unicode/utf8"
 )
 
+// SizeSpecError indicates that the size spec could not be parsed.
 type SizeSpecError struct {
-	Position  int
+	// Position is the index in Spec at which the the unexpected character was found.
+	Position int
+	// Character is the character that was unexpected.
 	Character rune
-	Spec      string
+	// Spec is the full size spec that caused the error.
+	Spec string
 }
 
 func (e *SizeSpecError) Error() string {

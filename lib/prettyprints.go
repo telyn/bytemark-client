@@ -106,12 +106,16 @@ const serverTemplate = `{{ define "server_summary" }} ▸ {{.ShortName }} ({{ if
 {{ template "ips" . }}
 {{ end }}`
 
+// TemplateChoice is which template to use for a server.
 type TemplateChoice string
 
 const (
+	// OneLine means to use a one-line template for a server
 	OneLine TemplateChoice = "server_summary"
-	TwoLine                = "server_twoline"
-	All                    = "server_full"
+	// TwoLine means to use a two-line template for a server
+	TwoLine = "server_twoline"
+	// All means to display all details about a server.
+	All = "server_full"
 )
 
 var templateFuncMap = map[string]interface{}{
@@ -154,6 +158,8 @@ var templateFuncMap = map[string]interface{}{
 	},
 }
 
+// FormatVirtualMachine outputs the given vm using the named template to the given writer.
+// TODO(telyn): make template choice not a string
 func FormatVirtualMachine(wr io.Writer, vm *VirtualMachine, tpl TemplateChoice) error {
 	tmpl, err := template.New("virtualmachine").Funcs(templateFuncMap).Parse(serverTemplate)
 	if err != nil {
@@ -168,6 +174,8 @@ func FormatVirtualMachine(wr io.Writer, vm *VirtualMachine, tpl TemplateChoice) 
 	return nil
 }
 
+// FormatImageInstall outputs the given image install using the named template to the given writer.
+// TODO(telyn): make template choice not a string
 func FormatImageInstall(wr io.Writer, ii *ImageInstall, tpl TemplateChoice) error {
 	output := make([]string, 0)
 	if ii.Distribution != "" {
@@ -194,6 +202,8 @@ func FormatImageInstall(wr io.Writer, ii *ImageInstall, tpl TemplateChoice) erro
 	return err
 }
 
+// FormatVirtualMachine outputs the given vm spec using the named template to the given writer.
+// TODO(telyn): make template choice not a string
 func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *VirtualMachineSpec, tpl TemplateChoice) error {
 	output := make([]string, 0, 10)
 	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
@@ -273,6 +283,8 @@ func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *VirtualMachi
 	return err
 }
 
+// FormatAccount outputs the given account using the named template to the given writer.
+// TODO(telyn): make template choice not a string
 func FormatAccount(wr io.Writer, a *Account, def *Account, tpl string) error {
 	tmpl, err := template.New("accounts").Funcs(templateFuncMap).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {
@@ -295,6 +307,9 @@ func FormatAccount(wr io.Writer, a *Account, def *Account, tpl string) error {
 	return nil
 }
 
+// FormatOverview outputs the given overview using the named template to the given writer.
+// TODO(telyn): make template choice not a string
+// TODO(telyn): use an actual Overview object?
 func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
 	tmpl, err := template.New("accounts").Funcs(templateFuncMap).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {

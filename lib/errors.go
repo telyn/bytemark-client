@@ -10,12 +10,14 @@ import (
 	"unicode"
 )
 
+// UnsupportedEndpointError is returned when the Endpoint given was not valid.
 type UnsupportedEndpointError Endpoint
 
 func (e UnsupportedEndpointError) Error() string {
 	return fmt.Sprintf("%d was not a valid endpoint choice", e)
 }
 
+// NoDefaultAccountError is returned when the library couldn't figure out what account to use as a default.
 type NoDefaultAccountError struct {
 	InnerErr error
 }
@@ -198,6 +200,7 @@ func (e BadRequestError) Error() string {
 	return strings.Join(out, "\r\n")
 }
 
+// InternalServerError is returned when the endpoint responds with an HTTP 500 Internal Server Error.
 type InternalServerError struct {
 	APIError
 }
@@ -229,7 +232,6 @@ func (e NilAuthError) Error() string {
 }
 
 // AmbiguousKeyError is returned when a call to DeleteUserAuthorizedKey has an insufficiently unique
-
 type AmbiguousKeyError struct {
 	APIError
 }

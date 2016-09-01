@@ -6,7 +6,7 @@ import (
 )
 
 func (c *bytemarkClient) CreateCreditCard(cc *CreditCard) (ref string, err error) {
-	req, err := c.BuildRequestNoAuth("POST", EP_SPP, "/card.ref")
+	req, err := c.BuildRequestNoAuth("POST", SPPEndpoint, "/card.ref")
 	if err != nil {
 		return "", err
 	}

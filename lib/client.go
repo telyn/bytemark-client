@@ -5,13 +5,18 @@ import (
 	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
+// Endpoint is an enum-style type to avoid people using endpoints like ints
 type Endpoint int
 
 const (
-	EP_AUTH Endpoint = iota
-	EP_BRAIN
-	EP_BILLING
-	EP_SPP
+	// AuthEndpoint means "make the connection to auth!"
+	AuthEndpoint Endpoint = iota
+	// BrainEndpoint means "make the connection to the brain!"
+	BrainEndpoint
+	// BillingEndpoint means "make the connection to bmbilling!"
+	BillingEndpoint
+	// SPPEndpoint means "make the connection to SPP!"
+	SPPEndpoint
 )
 
 // bytemarkClient is the main type in the Bytemark API client library

@@ -1,8 +1,8 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"strings"
 )
 
@@ -16,6 +16,7 @@ func (e *DiscSpecError) Error() string {
 	return fmt.Sprintf("Disc spec error: Unexpected %c at character %d.", e.Character, e.Position)
 }
 
+// ParseDiscSpec reads the given string and attempts to interpret it as a disc spec.
 func ParseDiscSpec(spec string) (*lib.Disc, error) {
 	bits := strings.Split(spec, ":")
 	size, err := ParseSize(bits[len(bits)-1])

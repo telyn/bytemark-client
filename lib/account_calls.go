@@ -30,7 +30,7 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err e
 	if c.billingEndpoint == "" {
 		return make([]*billingAccount, 0), nil
 	}
-	req, err := c.BuildRequest("GET", EP_BILLING, "/api/v1/accounts")
+	req, err := c.BuildRequest("GET", BillingEndpoint, "/api/v1/accounts")
 	if err != nil {
 		return
 	}
@@ -46,7 +46,7 @@ func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, er
 	}
 	account = new(brainAccount)
 
-	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s?view=overview&include_deleted=true", name)
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s?view=overview&include_deleted=true", name)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *bytemarkClient) CreateAccount(account *Account) (newAccount *Account, e
 // RegisterNewAccount registers a new account with bmbilling. This will create a new user for the owner.
 // If you would like an extra account attached to your regular user, use CreateAccount
 func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err error) {
-	req, err := c.BuildRequestNoAuth("POST", EP_BILLING, "/api/v1/accounts")
+	req, err := c.BuildRequestNoAuth("POST", BillingEndpoint, "/api/v1/accounts")
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
 func (c *bytemarkClient) getBrainAccounts() (accounts []*brainAccount, err error) {
 	accounts = make([]*brainAccount, 1, 1)
 
-	req, err := c.BuildRequest("GET", EP_BRAIN, "/accounts")
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts")
 	if err != nil {
 		return
 	}
@@ -201,12 +201,14 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 
 }
 
+// Overview is a combination of a user's default account, their username, and all the accounts they have access to see.
 type Overview struct {
 	DefaultAccount *Account
 	Username       string
 	Accounts       []*Account
 }
 
+// GetOverview gets an Overview for everything the user can access at bytemark
 func (c *bytemarkClient) GetOverview() (*Overview, error) {
 	o := new(Overview)
 	acc, err := c.GetDefaultAccount()
