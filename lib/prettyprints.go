@@ -202,7 +202,7 @@ func FormatImageInstall(wr io.Writer, ii *ImageInstall, tpl TemplateChoice) erro
 	return err
 }
 
-// FormatVirtualMachine outputs the given vm spec using the named template to the given writer.
+// FormatVirtualMachineSpec outputs the given vm spec using the named template to the given writer.
 // TODO(telyn): make template choice not a string
 func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *VirtualMachineSpec, tpl TemplateChoice) error {
 	output := make([]string, 0, 10)

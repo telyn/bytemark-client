@@ -148,7 +148,7 @@ func (e *ConfigReadError) Error() string {
 	return fmt.Sprintf("Unable to read config for %s from %s.", e.Name, e.Path)
 }
 
-// ConfigReadError is returned when a file containing a value for a configVar couldn't be written to.
+// ConfigWriteError is returned when a file containing a value for a configVar couldn't be written to.
 type ConfigWriteError struct {
 	Name string
 	Path string

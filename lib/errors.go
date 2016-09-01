@@ -213,7 +213,7 @@ func (e InternalServerError) Error() string {
 	return strings.Join(out, "\r\n")
 }
 
-// ServiceUnavialableError is returned by anything that makes an HTTP request resulting in a 503
+// ServiceUnavailableError is returned by anything that makes an HTTP request resulting in a 503
 type ServiceUnavailableError struct {
 	APIError
 }
