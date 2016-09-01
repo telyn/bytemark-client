@@ -6,15 +6,16 @@ import (
 )
 
 const (
-	// shows client version & arguments passed in, HTTP URLs & status codes, subprocess calls.
-	DBG_OUTLINE = 1 + iota
-	// shows args going in to library functions
-	DBG_ARGS
-	// shows the way flags and command line arguments are being messed with
-	DBG_FLAGS
-	// raw request/response bodies.
-	DBG_HTTPDATA
-	DBG_MISC
+	// LvlOutline shows client version & arguments passed in, HTTP URLs & status codes, subprocess calls.
+	LvlOutline = 1 + iota
+	// LvlArgs shows args going in to library functions
+	LvlArgs
+	// LvlFlags is used to show/hide the way flags and command line arguments are being messed with in main
+	LvlFlags
+	// LvlHTTPData is used to show/hide raw HTTP request and response bodies.
+	LvlHTTPData
+	// LvlMisc is used for any other minutiae
+	LvlMisc
 )
 
 var DebugLevel int
