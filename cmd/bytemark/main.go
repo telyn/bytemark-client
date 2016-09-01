@@ -128,14 +128,14 @@ OPTIONS:
 		copy(newArgs[1:], flargs)
 	}
 	newArgs[0] = os.Args[0]
-	log.Debugf(log.DBG_FLAGS, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, newArgs)
+	log.Debugf(log.LvlFlags, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, newArgs)
 
 	if *help || *h {
 		helpArgs := make([]string, len(newArgs)+1)
 		helpArgs[len(newArgs)] = "--help"
 		copy(helpArgs, newArgs)
 
-		log.Debugf(log.DBG_FLAGS, "helping! helpArgs: %v\r\n", helpArgs)
+		log.Debugf(log.LvlFlags, "helping! helpArgs: %v\r\n", helpArgs)
 
 		err = global.App.Run(helpArgs)
 	} else {

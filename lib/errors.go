@@ -125,7 +125,7 @@ func newBadRequestError(ctx APIError, response []byte) error {
 	jsonProblems := make(map[string]json.RawMessage)
 	err := json.Unmarshal(response, &jsonProblems)
 	if err != nil {
-		log.Debug(log.DBG_OUTLINE, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
+		log.Debug(log.LvlOutline, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
 		bytes, _ := json.Marshal([]string{string(response)})
 		jsonProblems[""] = bytes
 	}

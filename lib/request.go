@@ -138,7 +138,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		if err != nil {
 			return 0, nil, err
 		}
-		log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", string(rb))
+		log.Debugf(log.LvlHTTPData, "request body: '%s'\r\n", string(rb))
 	}
 
 	cli := r.mkHTTPClient()
@@ -157,7 +157,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 
 	statusCode = res.StatusCode
 
-	log.Debugf(log.DBG_OUTLINE, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
+	log.Debugf(log.LvlOutline, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
 
 	baseErr := APIError{
 		Method:      r.method,
@@ -167,7 +167,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	}
 
 	response, err = ioutil.ReadAll(res.Body)
-	log.Debugf(log.DBG_HTTPDATA, "response body: '%s'\r\n", response)
+	log.Debugf(log.LvlHTTPData, "response body: '%s'\r\n", response)
 	if err != nil {
 		return
 	}
