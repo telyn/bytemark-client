@@ -15,9 +15,8 @@ func validEmptyOr(otherFn func(string) (string, bool)) func(string) (string, boo
 	return func(s string) (string, bool) {
 		if len(s) == 0 {
 			return "", true
-		} else {
-			return otherFn(s)
 		}
+		return otherFn(s)
 	}
 }
 
@@ -45,11 +44,10 @@ func validName(s string) (string, bool) {
 }
 
 func validPostcode(s string) (string, bool) {
-	if len(s) > 1 {
-		return "", true
-	} else {
+	if len(s) < 2 {
 		return "is less than two characters long", false
 	}
+	return "", true
 }
 
 func validNumber(s string) (string, bool) {

@@ -46,10 +46,8 @@ func init() {
 				err = global.Client.AddUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key added successfully")
-					return
-				} else {
-					return
 				}
+				return
 			}),
 		}, {
 			Name:        "ips",
