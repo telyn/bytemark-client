@@ -176,13 +176,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	switch res.StatusCode {
 	case 400:
 		// because we need to reference fields specific to BadRequestError later
-		brErr := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
-		jsonErr := json.Unmarshal(response, &brErr.Problems)
-		if jsonErr != nil {
-			log.Debug(log.LvlOutline, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
-			brErr.Problems["The problem"] = []string{baseErr.ResponseBody}
-		}
-		err = brErr
+		err = newBadRequestError(baseErr, response)
 	case 403:
 		err = NotAuthorizedError{baseErr}
 	case 404:
