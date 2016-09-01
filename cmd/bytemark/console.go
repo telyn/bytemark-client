@@ -123,8 +123,8 @@ func console_panel(vm *lib.VirtualMachine) error {
 func collect_args(args string) (slice []string) {
 	in_dbl := false
 	in_sgl := false
-	slice = make([]string, 0)
-	cur := make([]rune, 0)
+
+	var cur []rune
 	if args == "" {
 		return
 	}

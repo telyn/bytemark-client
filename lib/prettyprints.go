@@ -177,12 +177,12 @@ func FormatVirtualMachine(wr io.Writer, vm *VirtualMachine, tpl TemplateChoice) 
 // FormatImageInstall outputs the given image install using the named template to the given writer.
 // TODO(telyn): make template choice not a string
 func FormatImageInstall(wr io.Writer, ii *ImageInstall, tpl TemplateChoice) error {
-	output := make([]string, 0)
+	var output []string
 	if ii.Distribution != "" {
 		output = append(output, "Image: "+ii.Distribution)
 	}
 	if ii.PublicKeys != "" {
-		keynames := make([]string, 0)
+		var keynames []string
 		for _, k := range strings.Split(ii.PublicKeys, "\n") {
 			kbits := strings.SplitN(k, " ", 3)
 			if len(kbits) == 3 {
@@ -325,8 +325,8 @@ func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, 
 	if err != nil {
 		return err
 	}
-	ownedAccounts := make([]*Account, 0)
-	otherAccounts := make([]*Account, 0)
+	var ownedAccounts []*Account
+	var otherAccounts []*Account
 	for _, a := range accounts {
 		if a.Owner != nil && a.Owner.Username != "" && a.Owner.Username == username {
 			ownedAccounts = append(ownedAccounts, a)

@@ -69,7 +69,7 @@ func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) er
 		return err
 	}
 	key = strings.TrimSpace(key)
-	newKeys := make([]string, 0)
+	var newKeys []string
 	potentiallyAmbiguous := false
 	for _, k := range user.AuthorizedKeys {
 		if strings.TrimSpace(k) == key {

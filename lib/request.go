@@ -142,7 +142,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		err = InsecureConnectionError{r}
 		return
 	}
-	rb := make([]byte, 0)
+	var rb []byte
 	if body != nil {
 
 		rb, err = ioutil.ReadAll(body)
