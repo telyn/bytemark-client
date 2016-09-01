@@ -94,14 +94,3 @@ func Prompt(prompt string) string {
 	}
 	return strings.TrimSpace(res)
 }
-
-// ShiftArgument pulls the next argument off the arguments slice. It is unused (replaced by Context.NextArg) and will be removed in my deadcode delinting sweep.
-func ShiftArgument(args *[]string, kindOfThing string) (string, bool) {
-	if len(*args) == 0 {
-		log.Errorf("Not enough arguments. A %s was not specified.\r\n", kindOfThing)
-		return "", false
-	}
-	value := (*args)[0]
-	*args = (*args)[1:]
-	return value, true
-}

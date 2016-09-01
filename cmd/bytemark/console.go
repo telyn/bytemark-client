@@ -72,17 +72,6 @@ func shortEndpoint(endpoint string) string {
 	return strings.Split(endpoint, ".")[0]
 }
 
-func getExitCode(cmd *exec.Cmd) (exitCode int, err error) {
-	err = cmd.Wait()
-	if exitErr, ok := err.(*exec.ExitError); ok {
-		if waitStatus, ok := exitErr.Sys().(*syscall.WaitStatus); ok {
-			return waitStatus.ExitStatus(), err
-
-		}
-	}
-	return 0, err
-}
-
 func vncConsoleInstructions(vm *lib.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
