@@ -42,27 +42,27 @@ Defaults to connecting to the serial console for the given server.`,
 				Usage: "Arguments that will be passed to SSH (only applies to --serial).",
 			},
 		},
-		Action: With(VirtualMachineNameProvider, AuthProvider, func(ctx *Context) error {
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(ctx *Context) (err error) {
 			if ctx.Context.Bool("serial") && ctx.Context.Bool("panel") {
 				return ctx.Help("You must only specify one of --serial and --panel!")
 			}
 
 			vm, err := global.Client.GetVirtualMachine(ctx.VirtualMachineName)
 			if err != nil {
-				return err
+				return
 			}
 			if ctx.Context.Bool("no_connect") {
 				console_serial_instructions(vm)
 				log.Log()
 				console_vnc_instructions(vm)
 				return nil
-			} else {
-				if ctx.Context.Bool("panel") {
-					return console_panel(vm)
-				} else {
-					return console_serial(vm, ctx.String("ssh-args"))
-				}
 			}
+			if ctx.Context.Bool("panel") {
+				err = console_panel(vm)
+			} else {
+				err = console_serial(vm, ctx.String("ssh-args"))
+			}
+			return
 
 		}),
 	})
