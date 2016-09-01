@@ -305,14 +305,14 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name *VirtualMachineNa
 	if err != nil {
 		return err
 	}
-	hwprofile_lock := ""
+	hwprofileLock := ""
 	if len(locked) > 0 {
-		hwprofile_lock = `, "hardware_profile_locked": false`
+		hwprofileLock = `, "hardware_profile_locked": false`
 		if locked[0] {
-			hwprofile_lock = `, "hardware_profile_locked": true`
+			hwprofileLock = `, "hardware_profile_locked": true`
 		}
 	}
-	profileJSON := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofile_lock)
+	profileJSON := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofileLock)
 
 	_, _, err = r.Run(bytes.NewBufferString(profileJSON), nil)
 	return err

@@ -44,9 +44,9 @@ func (discsFlag *DiscSpecFlag) Set(value string) error {
 	return nil
 }
 
-func (discFlag *DiscSpecFlag) String() string {
+func (discsFlag *DiscSpecFlag) String() string {
 	var discs []string
-	for _, d := range *discFlag {
+	for _, d := range *discsFlag {
 		if d.Label == "" {
 			discs = append(discs, fmt.Sprintf("%s:%dGiB", d.StorageGrade, d.Size/1024))
 		} else {

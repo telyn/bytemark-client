@@ -31,7 +31,7 @@ type bytemarkClient struct {
 }
 
 // New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
-func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient, err error) {
+func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c Client, err error) {
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
@@ -40,8 +40,8 @@ func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient,
 }
 
 // NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and github.com/BytemarkHosting/auth-client Client
-func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
-	c = new(bytemarkClient)
+func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) Client {
+	c := new(bytemarkClient)
 	c.brainEndpoint = brainEndpoint
 	c.billingEndpoint = billingEndpoint
 	c.sppEndpoint = sppEndpoint

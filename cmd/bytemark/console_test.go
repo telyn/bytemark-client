@@ -16,7 +16,7 @@ func TestCollectArgs(t *testing.T) {
 	}
 
 	for argstr, argsli := range tests {
-		collected := collect_args(argstr)
+		collected := collectArgs(argstr)
 
 		is.Equal(len(argsli), len(collected))
 		for i := range collected {
