@@ -5,6 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 )
 
+// SubprocessFailedError is returned when a process run by bytemark-client (e.g. open/xdg-open to open a browser) failed
 type SubprocessFailedError struct {
 	Args     []string
 	ExitCode int
@@ -15,6 +16,7 @@ func (e SubprocessFailedError) Error() string {
 	return fmt.Sprintf("Running %s failed - %s", e.Args[0], e.Err.Error())
 }
 
+// NotEnoughArgumentsError is returned from command's Actions when there weren't enough arguments to satisfy the requirements. This is no longer used in favour of return c.Help("not enough arguments") now and will be removed when I do a deadcode delinting pass.
 type NotEnoughArgumentsError struct {
 }
 
@@ -31,6 +33,7 @@ func (e UsageDisplayedError) Error() string {
 	return e.TheProblem
 }
 
+// WontDeleteNonEmptyGroupError is returned when 'delete group' was called on a group with stuff in, without --recursive being specified
 type WontDeleteNonEmptyGroupError struct {
 	Group *lib.GroupName
 }

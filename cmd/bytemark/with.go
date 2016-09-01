@@ -8,6 +8,7 @@ import (
 	"net"
 )
 
+// ProviderFunc is the function type that can be passed to With()
 type ProviderFunc func(*Context) error
 
 // With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
@@ -67,7 +68,7 @@ func AccountNameProvider(c *Context) (err error) {
 	return
 }
 
-// AccountProvider uses AccountNameProvider and then gets the account details from the API, then stitches it to the context
+// AccountProvider uses AccountNameProvider and then gets the named account details from the API, then stitches it to the context
 func AccountProvider(c *Context) (err error) {
 	err = AccountNameProvider(c)
 	if err != nil {
@@ -77,6 +78,7 @@ func AccountProvider(c *Context) (err error) {
 	return
 }
 
+// AuthProvider makes sure authentication has been successfully completed, attempting it if necessary.
 func AuthProvider(c *Context) (err error) {
 	if !c.Authed {
 		err = EnsureAuth()
@@ -88,6 +90,7 @@ func AuthProvider(c *Context) (err error) {
 	return
 }
 
+// DefinitionsProvider gets the Definitions from the brain and attaches them to the Context.
 func DefinitionsProvider(c *Context) (err error) {
 	if c.Definitions != nil {
 		return
@@ -96,6 +99,7 @@ func DefinitionsProvider(c *Context) (err error) {
 	return
 }
 
+// DiscLabelProvider reads the NextArg, parses it as a DiscLabel and attaches it to the Context
 func DiscLabelProvider(c *Context) (err error) {
 	if c.DiscLabel != nil {
 		return
@@ -108,6 +112,7 @@ func DiscLabelProvider(c *Context) (err error) {
 	return
 }
 
+// GroupNameProvider reads the NextArg, parses it as a GroupName and attaches it to the Context
 func GroupNameProvider(c *Context) (err error) {
 	if c.GroupName != nil {
 		return
@@ -125,6 +130,7 @@ func GroupNameProvider(c *Context) (err error) {
 	return
 }
 
+// GroupProvider calls GroupNameProvider then gets the named Group from the brain and attaches it to the Context.
 func GroupProvider(c *Context) (err error) {
 	if c.Group != nil {
 		return
@@ -138,6 +144,7 @@ func GroupProvider(c *Context) (err error) {
 	return
 }
 
+// UserNameProvider reads the NextArg and attaches it to the Context as UserName
 func UserNameProvider(c *Context) (err error) {
 	if c.UserName != nil {
 		return
@@ -156,6 +163,7 @@ func UserNameProvider(c *Context) (err error) {
 
 }
 
+// UserProvider calls UserNameProvider, gets the User from the brain, and attaches it to the Context.
 func UserProvider(c *Context) (err error) {
 	if c.User != nil {
 		return
@@ -168,6 +176,7 @@ func UserProvider(c *Context) (err error) {
 	return
 }
 
+// VirtualMachineNameProvider reads the NextArg, parses it as a VirtualMachineName and attaches it to the Context
 func VirtualMachineNameProvider(c *Context) (err error) {
 	if err = AuthProvider(c); err != nil {
 		return
@@ -187,6 +196,7 @@ func VirtualMachineNameProvider(c *Context) (err error) {
 	return
 }
 
+// VirtualMachineProvider calls VirtualMachineNameProvider then gets the named VirtualMachine from the brain and attaches it to the Context.
 func VirtualMachineProvider(c *Context) (err error) {
 	if c.VirtualMachine != nil {
 		return

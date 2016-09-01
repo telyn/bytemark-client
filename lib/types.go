@@ -48,6 +48,7 @@ type IPCreateRequest struct {
 	IPs []*net.IP `json:"ips"`
 }
 
+// JSONUser is used as an intermediate type that gets processed into a User. It should not have been exported.
 type JSONUser struct {
 	Username       string `json:"username"`
 	Email          string `json:"email"`
@@ -88,6 +89,7 @@ type Group struct {
 	VirtualMachines []*VirtualMachine `json:"virtual_machines"`
 }
 
+// CreditCard represents all the data for a credit card with SPP.
 type CreditCard struct {
 	Number   string `yaml:"account_number"`
 	Name     string `yaml:"name"`

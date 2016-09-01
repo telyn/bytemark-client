@@ -21,6 +21,7 @@ type billingAccount struct {
 	TechnicalContactID int     `json:"tech_id,omitempty"`
 }
 
+// Account represents both the BigV and bmbilling parts of an account.
 type Account struct {
 	Name             string   `json:"name"`
 	Owner            *Person  `json:"owner"`
@@ -50,6 +51,7 @@ func (a *Account) fillBilling(b *billingAccount) {
 	}
 }
 
+// CountVirtualMachines returns the number of virtual machines across all the Account's Groups.
 func (a *Account) CountVirtualMachines() (servers int) {
 	for _, g := range a.Groups {
 		servers += len(g.VirtualMachines)
@@ -57,6 +59,7 @@ func (a *Account) CountVirtualMachines() (servers int) {
 	return
 }
 
+// billingAccount copies all the billing parts of the account into a new billingAccount.
 func (a *Account) billingAccount() (b *billingAccount) {
 	b = new(billingAccount)
 	b.ID = a.BillingID
@@ -76,8 +79,10 @@ func (a *Account) ToBrainAccount() *brainAccount {
 }
 */
 
+// Person represents a bmbilling person
 type Person struct {
-	ID          int    `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
+	// Username is the name this person uses to log in to our services.
 	Username    string `json:"username"`
 	Email       string `json:"email"`
 	BackupEmail string `json:"email_backup,omitempty"`

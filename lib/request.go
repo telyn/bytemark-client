@@ -13,9 +13,12 @@ import (
 	"strings"
 )
 
+// RequestAlreadyRunError is returned if the Run method was already called for this Request.
 type RequestAlreadyRunError struct {
 	Request *Request
 }
+
+// InsecureConnectionError is returned if the endpoint isn't https but AllowInsecure was not called.
 type InsecureConnectionError struct {
 	Request *Request
 }
@@ -28,6 +31,7 @@ func (e InsecureConnectionError) Error() string {
 	return "A Request to an insecure endpoint was attempted when AllowInsecure had not been called."
 }
 
+// Request is the workhorse of the bytemark-client/lib - it builds up a request, then Run can be called to get its results.
 type Request struct {
 	authenticate  bool
 	client        Client
@@ -39,6 +43,7 @@ type Request struct {
 	hasRun        bool
 }
 
+// GetURL returns the URL that the Request is for.
 func (r *Request) GetURL() url.URL {
 	if r.url == nil {
 		return url.URL{}
@@ -46,6 +51,7 @@ func (r *Request) GetURL() url.URL {
 	return *r.url
 }
 
+// BuildRequestNoAuth creates a new Request with the intention of not authenticating.
 func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
 	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
@@ -60,6 +66,7 @@ func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, pa
 	}, nil
 }
 
+// BuildRequest builds a request that will be authenticated by the endpoint given.
 func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
 	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
@@ -75,10 +82,12 @@ func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path str
 	}, nil
 }
 
+// AllowInsecure tells the Request that it's ok if the endpoint isn't communicated with over HTTPS.
 func (r *Request) AllowInsecure() {
 	r.allowInsecure = true
 }
 
+// mkHTTPClient creates an http.Client for this request. If the staging endpoint is used, InsecureSkipVerify is used because I guess we don't have a good cert for that brain.
 func (r *Request) mkHTTPClient() (c *http.Client) {
 	c = new(http.Client)
 	if r.url.Host == "staging.bigv.io" {
@@ -91,6 +100,7 @@ func (r *Request) mkHTTPClient() (c *http.Client) {
 	return c
 }
 
+// mkHTTPRequest assembles an http.Request for this Request, adding Authorization headers as needed, setting the Content-Type correctly for whichever endpoint it's talking to.
 func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	req, err = http.NewRequest(r.method, r.url.String(), body)
 	if err != nil {
@@ -99,7 +109,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	req.Close = true
 	req.Header.Add("User-Agent", "bytemark-client-"+Version)
 
-	if r.endpoint == EP_SPP {
+	if r.endpoint == SPPEndpoint {
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	} else {
 		req.Header.Add("Accept", "application/json")
@@ -111,7 +121,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 		}
 		// if we could settle on a single standard
 		// rather than two basically-identical ones that'd be cool
-		if r.endpoint == EP_BILLING {
+		if r.endpoint == BillingEndpoint {
 			req.Header.Add("Authorization", "Token token="+r.client.GetSessionToken())
 		} else {
 			req.Header.Add("Authorization", "Bearer "+r.client.GetSessionToken())
@@ -120,6 +130,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	return
 }
 
+// Run performs the request with the given body, and attempts to unmarshal a successful response into responseObject
 func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode int, response []byte, err error) {
 	if r.hasRun {
 		err = RequestAlreadyRunError{r}
@@ -208,11 +219,11 @@ func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...stri
 	}
 	endpointUrl := ""
 	switch endpoint {
-	case EP_BRAIN:
+	case BrainEndpoint:
 		endpointUrl = c.brainEndpoint
-	case EP_BILLING:
+	case BillingEndpoint:
 		endpointUrl = c.billingEndpoint
-	case EP_SPP:
+	case SPPEndpoint:
 		endpointUrl = c.sppEndpoint
 	default:
 		return nil, UnsupportedEndpointError(endpoint)

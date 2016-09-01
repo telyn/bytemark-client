@@ -14,6 +14,7 @@ import (
 	"syscall"
 )
 
+// UserRequestedExit is returned when the user said 'No' to a 'yes/no' prompt.
 type UserRequestedExit struct{}
 
 func (e UserRequestedExit) Error() string {
@@ -155,6 +156,7 @@ Exit code ranges:
 	return E_USAGE_DISPLAYED
 }
 
+// ProcessError processes the given error, outputs a message, and returns the relevant ExitCode for the given error.
 func ProcessError(err error, message ...string) ExitCode {
 	if err == nil {
 		return E_SUCCESS

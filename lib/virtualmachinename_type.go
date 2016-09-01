@@ -21,6 +21,7 @@ func (vm VirtualMachineName) String() string {
 	return fmt.Sprintf("%s.%s.%s", vm.VirtualMachine, vm.Group, vm.Account)
 }
 
+// GroupName returns the group and account of this VirtualMachineName as a group.
 func (vm VirtualMachineName) GroupName() *GroupName {
 	return &GroupName{
 		Group:   vm.Group,

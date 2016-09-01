@@ -11,7 +11,7 @@ func (c *bytemarkClient) CreateGroup(name *GroupName) (err error) {
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups", name.Account)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups", name.Account)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (c *bytemarkClient) DeleteGroup(name *GroupName) (err error) {
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("DELETE", EP_BRAIN, "/accounts/%s/groups/%s", name.Account, name.Group)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s", name.Account, name.Group)
 	if err != nil {
 		return
 	}
@@ -50,7 +50,7 @@ func (c *bytemarkClient) GetGroup(name *GroupName) (group *Group, err error) {
 		return
 	}
 
-	r, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s/groups/%s?view=overview&include_deleted=true", name.Account, name.Group)
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s?view=overview&include_deleted=true", name.Account, name.Group)
 	if err != nil {
 		return
 	}
