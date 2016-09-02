@@ -1,4 +1,8 @@
 image: golang:1.6
+
+variables:
+  GO15VENDOREXPERIMENT: "1"
+
 before_script:
   # these two are needed for coverage stats
   - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
@@ -10,18 +14,27 @@ before_script:
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
 stages:
-  - vet
   - test
 
+lint:
+  stage: test
+  allow_failure: true # delete me once we've got the lintiness down to 0
+  script: |
+    go get github.com/alecthomas/gometalinter
+    gometalinter -i
+    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+
 vet:
+  stage: test
   script:
     - go vet github.com/BytemarkHosting/bytemark-client/cmd/bytemark
     - go vet github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
     - go vet github.com/BytemarkHosting/bytemark-client/lib
 
 test:
+  stage: test
   script:
-    # vet everything
     - go test -coverprofile=bytemark.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark
     - go test -coverprofile=util.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
     - go test -coverprofile=lib.coverprofile github.com/BytemarkHosting/bytemark-client/lib
