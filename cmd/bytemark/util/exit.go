@@ -79,7 +79,7 @@ const (
 	// E_BAD_REQUEST_API is the exit code returned when we send a bad request to API. (E.g. names being too short or having wrong characters in)
 	E_BAD_REQUEST_API = 157
 
-	// E_UNKNOWN_AUTH is the exit code returned when we get an unexpected error from the auth server.
+	// E_UNKNOWN_AUTH_ERROR is the exit code returned when we get an unexpected error from the auth server.
 	E_UNKNOWN_AUTH_ERROR = 149
 	// E_UNKNOWN_API_ERROR is the exit code returned when we get an unexpected error from the Bytemark API.
 	E_UNKNOWN_API_ERROR = 249

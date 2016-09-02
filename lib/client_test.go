@@ -11,7 +11,7 @@ import (
 // mkTestClientAndServers constructs httptest Servers for a pretend auth and API endpoint, then constructs a Client that uses those servers.
 // The http.Handler passed is for the API endpoint - see the definition of mkTestAuthServer for the auth handler.
 // Used to test that the right URLs are being requested and such.
-func mkTestClientAndServers(brainHandler http.Handler, billingHandler http.Handler) (c *bytemarkClient, authServer *httptest.Server, brain *httptest.Server, billing *httptest.Server, err error) {
+func mkTestClientAndServers(brainHandler http.Handler, billingHandler http.Handler) (c Client, authServer *httptest.Server, brain *httptest.Server, billing *httptest.Server, err error) {
 	authServer = mkTestAuthServer()
 	brain = mkTestServer(brainHandler)
 	billing = mkTestServer(billingHandler)

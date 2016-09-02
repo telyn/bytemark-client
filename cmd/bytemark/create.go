@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	createServer := cli.Command{
+	createServerCmd := cli.Command{
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,
 		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
@@ -79,13 +79,13 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			},
 		},
 
-		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createServer),
+		Action: With(VirtualMachineNameProvider, AuthProvider, createServer),
 	}
 	for _, flag := range imageInstallFlags {
-		createServer.Flags = append(createServer.Flags, flag)
+		createServerCmd.Flags = append(createServerCmd.Flags, flag)
 	}
 
-	createDiscs := cli.Command{
+	createDiscsCmd := cli.Command{
 		Name:    "discs",
 		Aliases: []string{"disc", "disk", "disks"},
 		Flags: []cli.Flag{
@@ -102,15 +102,15 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
-		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createDisc),
+		Action: With(VirtualMachineNameProvider, AuthProvider, createDiscs),
 	}
 
-	createGroup := cli.Command{
+	createGroupCmd := cli.Command{
 		Name:        "group",
 		Usage:       "create a group for organising your servers",
 		UsageText:   "bytemark create group <group name>",
 		Description: `Groups are part of your server's fqdn`,
-		Action:      With(GroupNameProvider, AuthProvider, fn_createGroup),
+		Action:      With(GroupNameProvider, AuthProvider, createGroup),
 	}
 
 	commands = append(commands, cli.Command{
@@ -130,14 +130,14 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
-			createServer,
-			createDiscs,
-			createGroup,
+			createServerCmd,
+			createDiscsCmd,
+			createGroupCmd,
 		},
 	})
 }
 
-func fn_createDisc(c *Context) (err error) {
+func createDiscs(c *Context) (err error) {
 	discs := c.Discs("disc")
 
 	for i := range discs {
@@ -161,7 +161,7 @@ func fn_createDisc(c *Context) (err error) {
 	return
 }
 
-func fn_createGroup(c *Context) (err error) {
+func createGroup(c *Context) (err error) {
 	err = global.Client.CreateGroup(c.GroupName)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", c.GroupName.Group, c.GroupName.Account)
@@ -169,7 +169,7 @@ func fn_createGroup(c *Context) (err error) {
 	return
 }
 
-func fn_createServer(c *Context) (err error) {
+func createServer(c *Context) (err error) {
 	noImage := c.Bool("no-image")
 	if c.Bool("no-discs") {
 		noImage = true

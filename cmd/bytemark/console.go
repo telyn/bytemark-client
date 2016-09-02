@@ -52,15 +52,15 @@ Defaults to connecting to the serial console for the given server.`,
 				return
 			}
 			if ctx.Context.Bool("no_connect") {
-				console_serial_instructions(vm)
+				serialConsoleInstructions(vm)
 				log.Log()
-				console_vnc_instructions(vm)
+				vncConsoleInstructions(vm)
 				return nil
 			}
 			if ctx.Context.Bool("panel") {
-				err = console_panel(vm)
+				err = openPanelConsole(vm)
 			} else {
-				err = console_serial(vm, ctx.String("ssh-args"))
+				err = connectSerialConsole(vm, ctx.String("ssh-args"))
 			}
 			return
 
@@ -83,7 +83,7 @@ func getExitCode(cmd *exec.Cmd) (exitCode int, err error) {
 	return 0, err
 }
 
-func console_vnc_instructions(vm *lib.VirtualMachine) {
+func vncConsoleInstructions(vm *lib.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -99,7 +99,7 @@ func console_vnc_instructions(vm *lib.VirtualMachine) {
 	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
 }
 
-func console_serial_instructions(vm *lib.VirtualMachine) {
+func serialConsoleInstructions(vm *lib.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -112,7 +112,7 @@ func console_serial_instructions(vm *lib.VirtualMachine) {
 
 }
 
-func console_panel(vm *lib.VirtualMachine) error {
+func openPanelConsole(vm *lib.VirtualMachine) error {
 	ep := global.Config.EndpointName()
 	token := global.Config.GetIgnoreErr("token")
 	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", global.Config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
@@ -120,32 +120,32 @@ func console_panel(vm *lib.VirtualMachine) error {
 	return util.CallBrowser(url)
 }
 
-func collect_args(args string) (slice []string) {
-	in_dbl := false
-	in_sgl := false
-	slice = make([]string, 0)
-	cur := make([]rune, 0)
+func collectArgs(args string) (slice []string) {
+	inDbl := false
+	inSgl := false
+
+	var cur []rune
 	if args == "" {
 		return
 	}
 	for _, ch := range args {
-		if in_dbl && ch == '"' {
-			in_dbl = false
+		if inDbl && ch == '"' {
+			inDbl = false
 			continue
-		} else if in_sgl && ch == '\'' {
-			in_sgl = false
-			continue
-		}
-
-		if !in_sgl && ch == '"' {
-			in_dbl = true
-			continue
-		} else if !in_dbl && ch == '\'' {
-			in_sgl = true
+		} else if inSgl && ch == '\'' {
+			inSgl = false
 			continue
 		}
 
-		if !in_dbl && !in_sgl && ch == ' ' {
+		if !inSgl && ch == '"' {
+			inDbl = true
+			continue
+		} else if !inDbl && ch == '\'' {
+			inSgl = true
+			continue
+		}
+
+		if !inDbl && !inSgl && ch == ' ' {
 			slice = append(slice, string(cur))
 			cur = make([]rune, 0)
 			continue
@@ -157,7 +157,7 @@ func collect_args(args string) (slice []string) {
 	return
 }
 
-func console_serial(vm *lib.VirtualMachine, sshargs string) error {
+func connectSerialConsole(vm *lib.VirtualMachine, sshargs string) error {
 	host := fmt.Sprintf("%s@%s", global.Client.GetSessionUser(), vm.ManagementAddress)
 	log.Logf("ssh %s\r\n", host)
 
@@ -166,7 +166,7 @@ func console_serial(vm *lib.VirtualMachine, sshargs string) error {
 		return err
 	}
 
-	sshargsli := collect_args(sshargs)
+	sshargsli := collectArgs(sshargs)
 	args := make([]string, len(sshargsli)+2)
 	copy(args[1:], sshargsli[0:])
 	args[0] = "ssh"

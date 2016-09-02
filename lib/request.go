@@ -142,7 +142,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		err = InsecureConnectionError{r}
 		return
 	}
-	rb := make([]byte, 0)
+	var rb []byte
 	if body != nil {
 
 		rb, err = ioutil.ReadAll(body)
@@ -217,19 +217,19 @@ func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...stri
 	for i, str := range args {
 		arr[i] = url.QueryEscape(str)
 	}
-	endpointUrl := ""
+	endpointURL := ""
 	switch endpoint {
 	case BrainEndpoint:
-		endpointUrl = c.brainEndpoint
+		endpointURL = c.brainEndpoint
 	case BillingEndpoint:
-		endpointUrl = c.billingEndpoint
+		endpointURL = c.billingEndpoint
 	case SPPEndpoint:
-		endpointUrl = c.sppEndpoint
+		endpointURL = c.sppEndpoint
 	default:
 		return nil, UnsupportedEndpointError(endpoint)
 	}
 	if !strings.HasPrefix(format, "/") {
 		return nil, UnsupportedEndpointError(-1)
 	}
-	return url.Parse(endpointUrl + fmt.Sprintf(format, arr...))
+	return url.Parse(endpointURL + fmt.Sprintf(format, arr...))
 }

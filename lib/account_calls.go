@@ -172,7 +172,7 @@ func (c *bytemarkClient) GetDefaultAccount() (*Account, error) {
 
 // Gets all Accounts you can see, merging data from both the brain and the billing
 func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
-	by_name := make(map[string]*Account)
+	byName := make(map[string]*Account)
 	billingAccounts, err := c.getBillingAccounts()
 	if err != nil {
 		return
@@ -183,18 +183,18 @@ func (c *bytemarkClient) GetAccounts() (accounts []*Account, err error) {
 	}
 
 	for _, b := range brainAccounts {
-		if by_name[b.Name] == nil {
-			by_name[b.Name] = new(Account)
+		if byName[b.Name] == nil {
+			byName[b.Name] = new(Account)
 		}
-		by_name[b.Name].fillBrain(b)
+		byName[b.Name].fillBrain(b)
 	}
 	for _, b := range billingAccounts {
-		if by_name[b.Name] == nil {
-			by_name[b.Name] = new(Account)
+		if byName[b.Name] == nil {
+			byName[b.Name] = new(Account)
 		}
-		by_name[b.Name].fillBilling(b)
+		byName[b.Name].fillBilling(b)
 	}
-	for _, a := range by_name {
+	for _, a := range byName {
 		accounts = append(accounts, a)
 	}
 	return
