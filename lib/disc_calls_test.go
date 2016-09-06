@@ -3,15 +3,15 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
-func getFixtureDisc() bigv.Disc {
-	return bigv.Disc{
+func getFixtureDisc() brain.Disc {
+	return brain.Disc{
 		Label:            "",
 		StorageGrade:     "sata",
 		Size:             26400,
@@ -21,16 +21,16 @@ func getFixtureDisc() bigv.Disc {
 	}
 }
 
-func getFixtureDiscSet() []bigv.Disc {
-	return []bigv.Disc{
+func getFixtureDiscSet() []brain.Disc {
+	return []brain.Disc{
 		getFixtureDisc(),
-		bigv.Disc{
+		brain.Disc{
 			ID:           2,
 			StorageGrade: "archive",
 			Label:        "arch",
 			Size:         1024000,
 		},
-		bigv.Disc{
+		brain.Disc{
 			ID:           3,
 			StorageGrade: "",
 			Size:         2048,
@@ -123,11 +123,11 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestResizeDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brainServer, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
 			bytes, err := ioutil.ReadAll(req.Body)
 			is.Nil(err)
-			var disc bigv.Disc
+			var disc brain.Disc
 			err = json.Unmarshal(bytes, &disc)
 			is.Nil(err)
 
@@ -139,7 +139,7 @@ func TestResizeDisc(t *testing.T) {
 
 	}), mkNilHandler(t))
 	defer authServer.Close()
-	defer brain.Close()
+	defer brainServer.Close()
 	defer billing.Close()
 
 	if err != nil {

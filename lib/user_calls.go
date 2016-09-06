@@ -3,23 +3,23 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strings"
 )
 
 // Getbigv.User grabs the named user from the brain
-func (c *bytemarkClient) GetUser(name string) (user *bigv.User, err error) {
+func (c *bytemarkClient) GetUser(name string) (user *brain.User, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/users/%s", name)
 	if err != nil {
 		return
 	}
 
-	var jsUser bigv.JSONUser
+	var jsUser brain.JSONUser
 	_, _, err = r.Run(nil, &jsUser)
 	if err != nil {
 		return
 	}
-	user = new(bigv.User)
+	user = new(brain.User)
 	jsUser.Process(user)
 	return
 }

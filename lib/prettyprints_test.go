@@ -2,8 +2,8 @@ package lib
 
 import (
 	"bytes"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"testing"
 )
@@ -41,7 +41,7 @@ func TestFormatAccount(t *testing.T) {
 		TechnicalContact: &billing.Person{
 			Username: "test-user",
 		},
-		Groups: []*bigv.Group{
+		Groups: []*brain.Group{
 			&gp,
 		},
 	}
@@ -71,8 +71,8 @@ func TestFormatOverview(t *testing.T) {
 
 	gp := getFixtureGroup()
 	vm := getFixtureVM()
-	megaGroup := &bigv.Group{
-		VirtualMachines: []*bigv.VirtualMachine{
+	megaGroup := &brain.Group{
+		VirtualMachines: []*brain.VirtualMachine{
 			&vm, &vm, &vm, &vm,
 			&vm, &vm, &vm, &vm,
 			&vm, &vm, &vm, &vm,
@@ -90,7 +90,7 @@ func TestFormatOverview(t *testing.T) {
 			TechnicalContact: &billing.Person{
 				Username: "test-user",
 			},
-			Groups: []*bigv.Group{
+			Groups: []*brain.Group{
 				&gp,
 			},
 		},
@@ -103,13 +103,13 @@ func TestFormatOverview(t *testing.T) {
 			TechnicalContact: &billing.Person{
 				Username: "test-user",
 			},
-			Groups: []*bigv.Group{
+			Groups: []*brain.Group{
 				megaGroup,
 			},
 		},
 		&Account{
 			Name: "test-unowned-account",
-			Groups: []*bigv.Group{
+			Groups: []*brain.Group{
 				&gp,
 			},
 		},
@@ -146,7 +146,7 @@ Your default account (2402 - test-account)
 	accs = []*Account{
 		&Account{
 			Name: "test-unowned-account",
-			Groups: []*bigv.Group{
+			Groups: []*brain.Group{
 				&gp,
 			},
 		},

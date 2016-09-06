@@ -2,7 +2,7 @@ package lib
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"io"
 	"math"
 	"strings"
@@ -161,7 +161,7 @@ var templateFuncMap = map[string]interface{}{
 
 // FormatVirtualMachine outputs the given vm using the named template to the given writer.
 // TODO(telyn): make template choice not a string
-func FormatVirtualMachine(wr io.Writer, vm *bigv.VirtualMachine, tpl TemplateChoice) error {
+func FormatVirtualMachine(wr io.Writer, vm *brain.VirtualMachine, tpl TemplateChoice) error {
 	tmpl, err := template.New("virtualmachine").Funcs(templateFuncMap).Parse(serverTemplate)
 	if err != nil {
 		return err
@@ -177,7 +177,7 @@ func FormatVirtualMachine(wr io.Writer, vm *bigv.VirtualMachine, tpl TemplateCho
 
 // FormatImageInstall outputs the given image install using the named template to the given writer.
 // TODO(telyn): make template choice not a string
-func FormatImageInstall(wr io.Writer, ii *bigv.ImageInstall, tpl TemplateChoice) error {
+func FormatImageInstall(wr io.Writer, ii *brain.ImageInstall, tpl TemplateChoice) error {
 	var output []string
 	if ii.Distribution != "" {
 		output = append(output, "Image: "+ii.Distribution)
@@ -205,7 +205,7 @@ func FormatImageInstall(wr io.Writer, ii *bigv.ImageInstall, tpl TemplateChoice)
 
 // FormatVirtualMachineSpec outputs the given vm spec using the named template to the given writer.
 // TODO(telyn): make template choice not a string
-func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *bigv.VirtualMachineSpec, tpl TemplateChoice) error {
+func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *brain.VirtualMachineSpec, tpl TemplateChoice) error {
 	output := make([]string, 0, 10)
 	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
 	output = append(output, fmt.Sprintf("Group: '%s'", group.Group))

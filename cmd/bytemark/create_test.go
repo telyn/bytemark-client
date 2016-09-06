@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"github.com/urfave/cli"
 	"strings"
@@ -21,9 +21,9 @@ func TestCreateDiskCommand(t *testing.T) {
 	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", &name).Return(&bigv.VirtualMachine{Hostname: "test-server.default.test-user.endpoint"})
+	c.When("GetVirtualMachine", &name).Return(&brain.VirtualMachine{Hostname: "test-server.default.test-user.endpoint"})
 
-	disc := bigv.Disc{Size: 35 * 1024, StorageGrade: "archive"}
+	disc := brain.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
 	c.When("CreateDisc", &name, disc).Return(nil).Times(1)
 
@@ -109,18 +109,18 @@ func TestCreateServerCommand(t *testing.T) {
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&lib.VirtualMachineName{VirtualMachine: "test-server"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	vm := bigv.VirtualMachineSpec{
-		Discs: []bigv.Disc{
-			bigv.Disc{
+	vm := brain.VirtualMachineSpec{
+		Discs: []brain.Disc{
+			brain.Disc{
 				Size:         25 * 1024,
 				StorageGrade: "sata",
 			},
-			bigv.Disc{
+			brain.Disc{
 				Size:         50 * 1024,
 				StorageGrade: "archive",
 			},
 		},
-		VirtualMachine: &bigv.VirtualMachine{
+		VirtualMachine: &brain.VirtualMachine{
 			Name:                  "test-server",
 			Autoreboot:            true,
 			Cores:                 1,
@@ -130,21 +130,21 @@ func TestCreateServerCommand(t *testing.T) {
 			HardwareProfileLocked: true,
 			ZoneName:              "test-zone",
 		},
-		Reimage: &bigv.ImageInstall{
+		Reimage: &brain.ImageInstall{
 			Distribution:    "test-image",
 			RootPassword:    "test-password",
 			PublicKeys:      "test-pubkey",
 			FirstbootScript: "test-script",
 		},
-		IPs: &bigv.IPSpec{
+		IPs: &brain.IPSpec{
 			IPv4: "192.168.1.123",
 			IPv6: "fe80::123",
 		},
 	}
 
-	getvm := new(bigv.VirtualMachine)
+	getvm := new(brain.VirtualMachine)
 	*getvm = *vm.VirtualMachine
-	getvm.Discs = make([]*bigv.Disc, 2)
+	getvm.Discs = make([]*brain.Disc, 2)
 	getvm.Discs[0] = &vm.Discs[0]
 	getvm.Discs[1] = &vm.Discs[1]
 	getvm.Hostname = "test-server.test-group.test-account.tld"
@@ -200,17 +200,17 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	vm := bigv.VirtualMachineSpec{
-		VirtualMachine: &bigv.VirtualMachine{
+	vm := brain.VirtualMachineSpec{
+		VirtualMachine: &brain.VirtualMachine{
 			Name:   "test-server",
 			Cores:  1,
 			Memory: 1024,
 		},
-		Discs: []bigv.Disc{},
+		Discs: []brain.Disc{},
 	}
 
 	// TODO(telyn): refactor this getvm crap into a function someplace
-	getvm := new(bigv.VirtualMachine)
+	getvm := new(brain.VirtualMachine)
 	*getvm = *vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
@@ -260,19 +260,19 @@ func TestCreateServer(t *testing.T) {
 		Account:        "",
 	}
 
-	vm := bigv.VirtualMachineSpec{
-		VirtualMachine: &bigv.VirtualMachine{
+	vm := brain.VirtualMachineSpec{
+		VirtualMachine: &brain.VirtualMachine{
 			Name:   "test-server",
 			Cores:  3,
 			Memory: 6565,
 		},
-		Discs: []bigv.Disc{{
+		Discs: []brain.Disc{{
 			Size:         34 * 1024,
 			StorageGrade: "archive",
 		},
 		},
 	}
-	getvm := new(bigv.VirtualMachine)
+	getvm := new(brain.VirtualMachine)
 	*getvm = *vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 

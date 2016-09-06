@@ -2,7 +2,7 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net"
@@ -10,10 +10,10 @@ import (
 	"testing"
 )
 
-func getFixtureVMWithManyIPs() (vm bigv.VirtualMachine, v4 []string, v6 []string) {
+func getFixtureVMWithManyIPs() (vm brain.VirtualMachine, v4 []string, v6 []string) {
 	vm = getFixtureVM()
-	vm.NetworkInterfaces = make([]*bigv.NetworkInterface, 1)
-	vm.NetworkInterfaces[0] = &bigv.NetworkInterface{
+	vm.NetworkInterfaces = make([]*brain.NetworkInterface, 1)
+	vm.NetworkInterfaces[0] = &brain.NetworkInterface{
 		Label: "test-nic",
 		Mac:   "FF:FE:FF:FF:FF",
 		IPs: []*net.IP{
@@ -45,12 +45,12 @@ func getFixtureVMWithManyIPs() (vm bigv.VirtualMachine, v4 []string, v6 []string
 	v6 = []string{"fe80::10", "fe80::100", "fe80::1:1", "fe80::2:1"}
 	return
 }
-func getFixtureVM() (vm bigv.VirtualMachine) {
+func getFixtureVM() (vm brain.VirtualMachine) {
 	disc := getFixtureDisc()
 	nic := getFixtureNic()
 	ip := net.IPv4(127, 0, 0, 1)
 
-	return bigv.VirtualMachine{
+	return brain.VirtualMachine{
 		Name:    "valid-vm",
 		GroupID: 1,
 
@@ -62,7 +62,7 @@ func getFixtureVM() (vm bigv.VirtualMachine) {
 		HardwareProfile:       "fake-hardwareprofile",
 		HardwareProfileLocked: false,
 		ZoneName:              "default",
-		Discs: []*bigv.Disc{
+		Discs: []*brain.Disc{
 			&disc,
 		},
 		ID:                1,
@@ -70,7 +70,7 @@ func getFixtureVM() (vm bigv.VirtualMachine) {
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
-		NetworkInterfaces: []*bigv.NetworkInterface{
+		NetworkInterfaces: []*brain.NetworkInterface{
 			&nic,
 		},
 	}

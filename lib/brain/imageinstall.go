@@ -1,4 +1,4 @@
-package bigv
+package brain
 
 // ImageInstall represents what image was most recently installed on a VM along with its root password.
 // This might only be returned when creating a VM.

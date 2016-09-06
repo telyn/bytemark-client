@@ -2,18 +2,18 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
 )
 
-func getFixtureGroup() bigv.Group {
+func getFixtureGroup() brain.Group {
 	vm := getFixtureVM()
-	return bigv.Group{
+	return brain.Group{
 		ID:   1,
 		Name: "default",
-		VirtualMachines: []*bigv.VirtualMachine{
+		VirtualMachines: []*brain.VirtualMachine{
 			&vm,
 		},
 	}

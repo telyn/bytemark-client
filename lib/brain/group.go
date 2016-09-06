@@ -1,4 +1,4 @@
-package bigv
+package brain
 
 // Group represents a group
 type Group struct {

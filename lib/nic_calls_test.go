@@ -1,13 +1,13 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 )
 
-func getFixtureNic() bigv.NetworkInterface {
+func getFixtureNic() brain.NetworkInterface {
 	ip := net.IPv4(127, 0, 0, 2)
-	return bigv.NetworkInterface{
+	return brain.NetworkInterface{
 		Label:            "",
 		Mac:              "00:00:00:00:00",
 		ID:               1,

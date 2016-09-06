@@ -1,4 +1,4 @@
-package bigv
+package brain
 
 import (
 	"github.com/cheekybits/is"

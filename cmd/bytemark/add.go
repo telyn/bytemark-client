@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -93,7 +93,7 @@ func init() {
 						reason = util.Prompt("Enter the purpose for these extra IPs: ")
 					}
 				}
-				ipcr := bigv.IPCreateRequest{
+				ipcr := brain.IPCreateRequest{
 					Addresses:  addrs,
 					Family:     family,
 					Reason:     reason,

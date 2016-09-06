@@ -3,7 +3,7 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // CreateGroup sends a request to the API server to create a group with the given name.
@@ -44,8 +44,8 @@ func (c *bytemarkClient) DeleteGroup(name *GroupName) (err error) {
 }
 
 // GetGroup requests an overview of the group with the given name
-func (c *bytemarkClient) GetGroup(name *GroupName) (group *bigv.Group, err error) {
-	group = new(bigv.Group)
+func (c *bytemarkClient) GetGroup(name *GroupName) (group *brain.Group, err error) {
+	group = new(brain.Group)
 	err = c.validateGroupName(name)
 	if err != nil {
 		return

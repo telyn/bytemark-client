@@ -3,8 +3,8 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 /*func (c *Client) RegisterAccount() {
@@ -41,12 +41,12 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []*billing.Account, err 
 }
 
 // getBrainAccount gets the brain account with the given name.
-func (c *bytemarkClient) getBrainAccount(name string) (account *bigv.Account, err error) {
+func (c *bytemarkClient) getBrainAccount(name string) (account *brain.Account, err error) {
 	err = c.validateAccountName(&name)
 	if err != nil {
 		return
 	}
-	account = new(bigv.Account)
+	account = new(brain.Account)
 
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s?view=overview&include_deleted=true", name)
 	if err != nil {
@@ -108,8 +108,8 @@ func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
 
 }
 
-func (c *bytemarkClient) getBrainAccounts() (accounts []*bigv.Account, err error) {
-	accounts = make([]*bigv.Account, 1, 1)
+func (c *bytemarkClient) getBrainAccounts() (accounts []*brain.Account, err error) {
+	accounts = make([]*brain.Account, 1, 1)
 
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts")
 	if err != nil {

@@ -2,15 +2,15 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
 )
 
-func getFixtureUser() (user *bigv.User) {
-	return &bigv.User{
+func getFixtureUser() (user *brain.User) {
+	return &brain.User{
 		Username: "test-user",
 		Email:    "test@user.com",
 		AuthorizedKeys: []string{

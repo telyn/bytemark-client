@@ -2,7 +2,7 @@ package lib
 
 import (
 	auth3 "github.com/BytemarkHosting/auth-client"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 )
 
@@ -90,9 +90,9 @@ type Client interface {
 	// DISCS
 	//
 
-	CreateDisc(vm *VirtualMachineName, disc bigv.Disc) error
+	CreateDisc(vm *VirtualMachineName, disc brain.Disc) error
 	DeleteDisc(vm *VirtualMachineName, idOrLabel string) error
-	GetDisc(vm *VirtualMachineName, idOrLabel string) (*bigv.Disc, error)
+	GetDisc(vm *VirtualMachineName, idOrLabel string) (*brain.Disc, error)
 	ResizeDisc(vm *VirtualMachineName, idOrLabel string, size int) error
 
 	//
@@ -102,19 +102,19 @@ type Client interface {
 	// CreateGroup sends a request to the API server to create a group with the given name.
 	CreateGroup(name *GroupName) error
 	DeleteGroup(name *GroupName) error
-	GetGroup(name *GroupName) (*bigv.Group, error)
+	GetGroup(name *GroupName) (*brain.Group, error)
 
 	//
 	// NICS
 	//
 
-	AddIP(name *VirtualMachineName, ipcr *bigv.IPCreateRequest) (bigv.IPs, error)
+	AddIP(name *VirtualMachineName, ipcr *brain.IPCreateRequest) (brain.IPs, error)
 
 	//
 	// USERS
 	//
 
-	GetUser(name string) (*bigv.User, error)
+	GetUser(name string) (*brain.User, error)
 	AddUserAuthorizedKey(username, key string) error
 	DeleteUserAuthorizedKey(username, key string) error
 
@@ -124,21 +124,21 @@ type Client interface {
 
 	// CreateVirtualMachine creates a virtual machine with a given specification in the given group.
 	// returns nil on success or an error otherwise.
-	CreateVirtualMachine(group *GroupName, vm bigv.VirtualMachineSpec) (*bigv.VirtualMachine, error)
+	CreateVirtualMachine(group *GroupName, vm brain.VirtualMachineSpec) (*brain.VirtualMachine, error)
 
 	// DeleteVirtualMachine deletes the named virtual machine.
 	// returns nil on success or an error otherwise.
 	DeleteVirtualMachine(name *VirtualMachineName, purge bool) error
 
 	// GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-	GetVirtualMachine(name *VirtualMachineName) (*bigv.VirtualMachine, error)
+	GetVirtualMachine(name *VirtualMachineName) (*brain.VirtualMachine, error)
 
 	// MoveVirtualMachine moves a server from one VirtualMachineName to another.
 	MoveVirtualMachine(old *VirtualMachineName, new *VirtualMachineName) error
 
 	// ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 	// Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
-	ReimageVirtualMachine(name *VirtualMachineName, image *bigv.ImageInstall) (err error)
+	ReimageVirtualMachine(name *VirtualMachineName, image *brain.ImageInstall) (err error)
 
 	// ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
 	// button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.

@@ -1,8 +1,8 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // Account represents both the BigV and bmbilling parts of an account.
@@ -13,11 +13,11 @@ type Account struct {
 	BillingID        int             `json:"billing_id"`
 	BrainID          int             `json:"brain_id"`
 	CardReference    string          `json:"card_reference"`
-	Groups           []*bigv.Group   `json:"groups"`
+	Groups           []*brain.Group  `json:"groups"`
 	Suspended        bool            `json:"suspended"`
 }
 
-func (a *Account) fillBrain(b *bigv.Account) {
+func (a *Account) fillBrain(b *brain.Account) {
 	if b != nil {
 		a.BrainID = b.ID
 		a.Groups = b.Groups

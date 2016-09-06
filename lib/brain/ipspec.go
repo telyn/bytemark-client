@@ -1,4 +1,4 @@
-package bigv
+package brain
 
 // IPSpec represents one v4 and one v6 address to assign to a server during creation.
 type IPSpec struct {

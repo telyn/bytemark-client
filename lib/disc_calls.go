@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-func labelDiscs(discs []bigv.Disc, offset ...int) {
+func labelDiscs(discs []brain.Disc, offset ...int) {
 	realOffset := 0
 	if len(offset) >= 1 {
 		realOffset = offset[0]
@@ -21,7 +21,7 @@ func labelDiscs(discs []bigv.Disc, offset ...int) {
 }
 
 // CreateDisc creates the given Disc and attaches it to the given virtual machine.
-func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc bigv.Disc) (err error) {
+func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc brain.Disc) (err error) {
 	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return
@@ -30,7 +30,7 @@ func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc bigv.Disc) (e
 	if err != nil {
 		return
 	}
-	discs := []bigv.Disc{disc}
+	discs := []brain.Disc{disc}
 	labelDiscs(discs, len(vm.Discs))
 
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
@@ -84,8 +84,8 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 }
 
 // GetDisc returns the specified disc from the given virtual machine.
-func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *bigv.Disc, err error) {
-	disc = new(bigv.Disc)
+func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *brain.Disc, err error) {
+	disc = new(brain.Disc)
 	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return

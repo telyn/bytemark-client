@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
-func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec bigv.VirtualMachineSpec) (vm *bigv.VirtualMachine, err error) {
+func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.VirtualMachineSpec) (vm *brain.VirtualMachine, err error) {
 	err = c.validateGroupName(group)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec bigv.Virtua
 		return nil, err
 	}
 
-	vm = new(bigv.VirtualMachine)
+	vm = new(brain.VirtualMachine)
 	_, _, err = r.Run(bytes.NewBuffer(js), vm)
 	return vm, err
 }
@@ -110,12 +110,12 @@ func (c *bytemarkClient) DeleteVirtualMachine(name *VirtualMachineName, purge bo
 }
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *bigv.VirtualMachine, err error) {
+func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *brain.VirtualMachine, err error) {
 	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return
 	}
-	vm = new(bigv.VirtualMachine)
+	vm = new(brain.VirtualMachine)
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return
@@ -140,7 +140,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 	}
 
 	// create the change we want to see in the server
-	change := bigv.VirtualMachine{Name: newName.VirtualMachine}
+	change := brain.VirtualMachine{Name: newName.VirtualMachine}
 	if newName.Group != "" || newName.Account != "" {
 		// get group
 		groupName := GroupName{Group: newName.Group, Account: newName.Account}
@@ -168,7 +168,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 
 // ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 // Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
-func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *bigv.ImageInstall) (err error) {
+func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *brain.ImageInstall) (err error) {
 	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return err

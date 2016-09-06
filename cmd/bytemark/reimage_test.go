@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"os"
@@ -18,7 +18,7 @@ func TestReimage(t *testing.T) {
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	image := &bigv.ImageInstall{
+	image := &brain.ImageInstall{
 		Distribution:    "symbiosis",
 		FirstbootScript: "",
 		RootPassword:    "gNFgYYIgayyDOjkV",
@@ -51,7 +51,7 @@ func TestReimageFileFlags(t *testing.T) {
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	image := &bigv.ImageInstall{
+	image := &brain.ImageInstall{
 		FirstbootScript: "i am the firstboot script! FEAR ME",
 		PublicKeys:      "i am the authorized keys",
 		Distribution:    "image",

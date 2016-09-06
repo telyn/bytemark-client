@@ -1,4 +1,4 @@
-package bigv
+package brain
 
 // Account represents an account object that's returned by the brain
 type Account struct {

@@ -1,4 +1,4 @@
-package bigv
+package brain
 
 // Disc is a representation of a VM's disc.
 type Disc struct {

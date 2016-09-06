@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 	"strings"
 	"testing"
@@ -42,7 +42,7 @@ func TestAddIPCommand(t *testing.T) {
 	vm := lib.VirtualMachineName{VirtualMachine: "test-server"}
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vm, nil).Times(1)
 
-	ipcr := bigv.IPCreateRequest{
+	ipcr := brain.IPCreateRequest{
 		Addresses:  1,
 		Family:     "ipv4",
 		Reason:     "testing",
