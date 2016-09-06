@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"net"
@@ -31,7 +31,7 @@ func cleanup(c *Context) {
 	}
 	disc := c.Context.Generic("disc")
 	if disc, ok := disc.(*util.DiscSpecFlag); ok {
-		*disc = make([]lib.Disc, 0)
+		*disc = make([]bigv.Disc, 0)
 	}
 	size := c.Context.Generic("memory")
 	if size, ok := size.(*util.SizeSpecFlag); ok {

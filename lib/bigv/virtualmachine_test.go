@@ -1,4 +1,4 @@
-package lib
+package bigv
 
 import (
 	"github.com/cheekybits/is"
@@ -6,6 +6,49 @@ import (
 	"testing"
 )
 
+func getFixtureNic() NetworkInterface {
+	ip := net.IPv4(127, 0, 0, 2)
+	return NetworkInterface{
+		Label:            "",
+		Mac:              "00:00:00:00:00",
+		ID:               1,
+		VlanNum:          1,
+		IPs:              []*net.IP{&ip},
+		ExtraIPs:         map[string]*net.IP{},
+		VirtualMachineID: 1,
+	}
+}
+
+func getFixtureVM() (vm VirtualMachine) {
+	disc := getFixtureDisc()
+	nic := getFixtureNic()
+	ip := net.IPv4(127, 0, 0, 1)
+
+	return VirtualMachine{
+		Name:    "valid-vm",
+		GroupID: 1,
+
+		Autoreboot:            true,
+		CdromURL:              "",
+		Cores:                 1,
+		Memory:                1,
+		PowerOn:               true,
+		HardwareProfile:       "fake-hardwareprofile",
+		HardwareProfileLocked: false,
+		ZoneName:              "default",
+		Discs: []*Disc{
+			&disc,
+		},
+		ID:                1,
+		ManagementAddress: &ip,
+		Deleted:           false,
+		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
+		Head:              "fakehead",
+		NetworkInterfaces: []*NetworkInterface{
+			&nic,
+		},
+	}
+}
 func getFixtureVMWithManyIPs() (vm VirtualMachine, v4 []string, v6 []string) {
 	vm = getFixtureVM()
 	vm.NetworkInterfaces = make([]*NetworkInterface, 1)

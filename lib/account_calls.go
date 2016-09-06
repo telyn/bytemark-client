@@ -3,6 +3,8 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 )
 
 /*func (c *Client) RegisterAccount() {
@@ -11,7 +13,7 @@ import (
 
 // getBillingAccount gets the billing account with the given name.
 // Due to the way the billing API is implemented this is done by grabbing them all and looping *shrug*
-func (c *bytemarkClient) getBillingAccount(name string) (account *billingAccount, err error) {
+func (c *bytemarkClient) getBillingAccount(name string) (account *billing.Account, err error) {
 	accounts, err := c.getBillingAccounts()
 	if err != nil {
 		return
@@ -26,9 +28,9 @@ func (c *bytemarkClient) getBillingAccount(name string) (account *billingAccount
 }
 
 // getBillingAccounts returns all the billing accounts the currently logged in user can see.
-func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err error) {
+func (c *bytemarkClient) getBillingAccounts() (accounts []*billing.Account, err error) {
 	if c.billingEndpoint == "" {
-		return make([]*billingAccount, 0), nil
+		return make([]*billing.Account, 0), nil
 	}
 	req, err := c.BuildRequest("GET", BillingEndpoint, "/api/v1/accounts")
 	if err != nil {
@@ -39,12 +41,12 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err e
 }
 
 // getBrainAccount gets the brain account with the given name.
-func (c *bytemarkClient) getBrainAccount(name string) (account *brainAccount, err error) {
+func (c *bytemarkClient) getBrainAccount(name string) (account *bigv.Account, err error) {
 	err = c.validateAccountName(&name)
 	if err != nil {
 		return
 	}
-	account = new(brainAccount)
+	account = new(bigv.Account)
 
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s?view=overview&include_deleted=true", name)
 	if err != nil {
@@ -106,8 +108,8 @@ func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
 
 }
 
-func (c *bytemarkClient) getBrainAccounts() (accounts []*brainAccount, err error) {
-	accounts = make([]*brainAccount, 1, 1)
+func (c *bytemarkClient) getBrainAccounts() (accounts []*bigv.Account, err error) {
+	accounts = make([]*bigv.Account, 1, 1)
 
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts")
 	if err != nil {
@@ -122,9 +124,9 @@ func (c *bytemarkClient) getBrainAccounts() (accounts []*brainAccount, err error
 	return
 }
 
-func (c *bytemarkClient) getDefaultBillingAccount() (*billingAccount, error) {
+func (c *bytemarkClient) getDefaultBillingAccount() (*billing.Account, error) {
 	if c.brainEndpoint == "https://int.bigv.io" {
-		return &billingAccount{Name: "bytemark"}, nil
+		return &billing.Account{Name: "bytemark"}, nil
 	}
 	billAccs, err := c.getBillingAccounts()
 	if err != nil {

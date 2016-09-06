@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/cheekybits/is"
 	"strings"
 	"testing"
@@ -16,7 +17,7 @@ func TestResizeDisk(t *testing.T) {
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
 
-	disc := lib.Disc{
+	disc := bigv.Disc{
 		Size:         25600,
 		StorageGrade: "sata",
 	}

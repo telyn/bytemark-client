@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
@@ -72,7 +73,7 @@ The root password will be the only thing output on stdout - good for scripts!
 	})
 }
 
-func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted bool, err error) {
+func prepareImageInstall(c *Context) (imageInstall *bigv.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
 	firstbootScriptFile := c.FileContents("firstboot-script-file")
@@ -100,7 +101,7 @@ func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted 
 		rootPassword = util.GeneratePassword()
 	}
 
-	return &lib.ImageInstall{
+	return &bigv.ImageInstall{
 		Distribution:    image,
 		FirstbootScript: firstbootScript,
 		PublicKeys:      pubkeys,

@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 )
 
-func labelDiscs(discs []Disc, offset ...int) {
+func labelDiscs(discs []bigv.Disc, offset ...int) {
 	realOffset := 0
 	if len(offset) >= 1 {
 		realOffset = offset[0]
@@ -19,18 +20,8 @@ func labelDiscs(discs []Disc, offset ...int) {
 
 }
 
-// Validate makes sure the disc has a storage grade. Doesn't modify the origin disc.
-func (disc *Disc) Validate() (*Disc, error) {
-	if disc.StorageGrade == "" {
-		newDisc := *disc
-		newDisc.StorageGrade = "sata"
-		return &newDisc, nil
-	}
-	return disc, nil
-}
-
 // CreateDisc creates the given Disc and attaches it to the given virtual machine.
-func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc Disc) (err error) {
+func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc bigv.Disc) (err error) {
 	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return
@@ -39,7 +30,7 @@ func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc Disc) (err er
 	if err != nil {
 		return
 	}
-	discs := []Disc{disc}
+	discs := []bigv.Disc{disc}
 	labelDiscs(discs, len(vm.Discs))
 
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
@@ -93,8 +84,8 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 }
 
 // GetDisc returns the specified disc from the given virtual machine.
-func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
-	disc = new(Disc)
+func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *bigv.Disc, err error) {
+	disc = new(bigv.Disc)
 	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return

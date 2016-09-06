@@ -4,6 +4,8 @@ import (
 	"fmt"
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	mock "github.com/maraino/go-mock"
 	"net/http"
 	"net/url"
@@ -94,9 +96,9 @@ func (c *Client) ReadDefinitions() (*lib.Definitions, error) {
 	return defs, r.Error(1)
 }
 
-func (c *Client) AddIP(name *lib.VirtualMachineName, spec *lib.IPCreateRequest) (lib.IPs, error) {
+func (c *Client) AddIP(name *lib.VirtualMachineName, spec *bigv.IPCreateRequest) (bigv.IPs, error) {
 	r := c.Called(name, spec)
-	ips, _ := r.Get(0).(lib.IPs)
+	ips, _ := r.Get(0).(bigv.IPs)
 	return ips, r.Error(1)
 }
 
@@ -110,13 +112,13 @@ func (c *Client) DeleteUserAuthorizedKey(name, key string) error {
 	return r.Error(0)
 }
 
-func (c *Client) GetUser(name string) (*lib.User, error) {
+func (c *Client) GetUser(name string) (*bigv.User, error) {
 	r := c.Called(name)
-	u, _ := r.Get(0).(*lib.User)
+	u, _ := r.Get(0).(*bigv.User)
 	return u, r.Error(1)
 }
 
-func (c *Client) CreateCreditCard(cc *lib.CreditCard) (string, error) {
+func (c *Client) CreateCreditCard(cc *spp.CreditCard) (string, error) {
 	r := c.Called(cc)
 	return r.String(0), r.Error(1)
 }
@@ -150,14 +152,14 @@ func (c *Client) GetAccounts() (accounts []*lib.Account, err error) {
 	return acc, r.Error(1)
 }
 
-func (c *Client) CreateDisc(name *lib.VirtualMachineName, disc lib.Disc) error {
+func (c *Client) CreateDisc(name *lib.VirtualMachineName, disc bigv.Disc) error {
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
 
-func (c *Client) GetDisc(name *lib.VirtualMachineName, discId string) (disc *lib.Disc, err error) {
+func (c *Client) GetDisc(name *lib.VirtualMachineName, discId string) (disc *bigv.Disc, err error) {
 	r := c.Called(name, discId)
-	disc, _ = r.Get(0).(*lib.Disc)
+	disc, _ = r.Get(0).(*bigv.Disc)
 	return disc, r.Error(1)
 }
 
@@ -166,9 +168,9 @@ func (c *Client) CreateGroup(name *lib.GroupName) error {
 	return r.Error(0)
 }
 
-func (c *Client) GetGroup(name *lib.GroupName) (*lib.Group, error) {
+func (c *Client) GetGroup(name *lib.GroupName) (*bigv.Group, error) {
 	r := c.Called(name)
-	group, _ := r.Get(0).(*lib.Group)
+	group, _ := r.Get(0).(*bigv.Group)
 	return group, r.Error(1)
 }
 
@@ -187,15 +189,15 @@ func (c *Client) DeleteVirtualMachine(name *lib.VirtualMachineName, purge bool) 
 	return r.Error(0)
 }
 
-func (c *Client) CreateVirtualMachine(group *lib.GroupName, vm lib.VirtualMachineSpec) (*lib.VirtualMachine, error) {
+func (c *Client) CreateVirtualMachine(group *lib.GroupName, vm bigv.VirtualMachineSpec) (*bigv.VirtualMachine, error) {
 	r := c.Called(group, vm)
-	rvm, _ := r.Get(0).(*lib.VirtualMachine)
+	rvm, _ := r.Get(0).(*bigv.VirtualMachine)
 	return rvm, r.Error(1)
 }
 
-func (c *Client) GetVirtualMachine(name *lib.VirtualMachineName) (vm *lib.VirtualMachine, err error) {
+func (c *Client) GetVirtualMachine(name *lib.VirtualMachineName) (vm *bigv.VirtualMachine, err error) {
 	r := c.Called(name)
-	vm, _ = r.Get(0).(*lib.VirtualMachine)
+	vm, _ = r.Get(0).(*bigv.VirtualMachine)
 	return vm, r.Error(1)
 }
 
@@ -221,7 +223,7 @@ func (c *Client) ParseAccountName(name string, defaults ...string) string {
 	return r.String(0)
 }
 
-func (c *Client) ReimageVirtualMachine(name *lib.VirtualMachineName, image *lib.ImageInstall) error {
+func (c *Client) ReimageVirtualMachine(name *lib.VirtualMachineName, image *bigv.ImageInstall) error {
 	r := c.Called(name, image)
 	return r.Error(0)
 }

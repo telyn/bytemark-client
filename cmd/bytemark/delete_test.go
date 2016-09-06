@@ -1,11 +1,10 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/BytemarkHosting/bytemark-client/lib"
-
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/cheekybits/is"
+	"strings"
 	"testing"
 )
 
@@ -83,7 +82,7 @@ func TestDeleteKey(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup()
 
-	usr := lib.User{
+	usr := bigv.User{
 		Username: "test-user",
 		Email:    "test-user@example.com",
 		AuthorizedKeys: []string{

@@ -2,10 +2,11 @@ package lib
 
 import (
 	"bytes"
+	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"net/url"
 )
 
-func (c *bytemarkClient) CreateCreditCard(cc *CreditCard) (ref string, err error) {
+func (c *bytemarkClient) CreateCreditCard(cc *spp.CreditCard) (ref string, err error) {
 	req, err := c.BuildRequestNoAuth("POST", SPPEndpoint, "/card.ref")
 	if err != nil {
 		return "", err

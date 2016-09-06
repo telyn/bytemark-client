@@ -1,10 +1,13 @@
 package lib
 
-import "net"
+import (
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
+	"net"
+)
 
-func getFixtureNic() NetworkInterface {
+func getFixtureNic() bigv.NetworkInterface {
 	ip := net.IPv4(127, 0, 0, 2)
-	return NetworkInterface{
+	return bigv.NetworkInterface{
 		Label:            "",
 		Mac:              "00:00:00:00:00",
 		ID:               1,

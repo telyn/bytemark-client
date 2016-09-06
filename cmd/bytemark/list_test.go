@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/cheekybits/is"
 	"strings"
 	"testing"
@@ -42,12 +43,12 @@ func TestListDiscs(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("ParseVirtualMachineName", "spooky-vm", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 
-	vm := lib.VirtualMachine{
+	vm := bigv.VirtualMachine{
 		ID:   4,
 		Name: "spooky-vm",
-		Discs: []*lib.Disc{
-			&lib.Disc{StorageGrade: "sata", Size: 25600, Label: "vda"},
-			&lib.Disc{StorageGrade: "archive", Size: 666666, Label: "vdb"},
+		Discs: []*bigv.Disc{
+			&bigv.Disc{StorageGrade: "sata", Size: 25600, Label: "vda"},
+			&bigv.Disc{StorageGrade: "archive", Size: 666666, Label: "vdb"},
 		},
 	}
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
@@ -71,9 +72,9 @@ func TestListGroups(t *testing.T) {
 	c.When("ParseAccountName", "spooky-steve", []string{"spooky-steve-other-account"}).Return("spooky-steve").Times(1)
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
-		Groups: []*lib.Group{
-			&lib.Group{ID: 1, Name: "halloween-vms"},
-			&lib.Group{ID: 200, Name: "gravediggers-biscuits"},
+		Groups: []*bigv.Group{
+			&bigv.Group{ID: 1, Name: "halloween-vms"},
+			&bigv.Group{ID: 200, Name: "gravediggers-biscuits"},
 		},
 	}).Times(1)
 
@@ -99,11 +100,11 @@ func TestListServers(t *testing.T) {
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Name: "spooky-steve",
-		Groups: []*lib.Group{{
+		Groups: []*bigv.Group{{
 			Name: "default",
-			VirtualMachines: []*lib.VirtualMachine{
-				&lib.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
-				&lib.VirtualMachine{ID: 23, Name: "jack-skellington"},
+			VirtualMachines: []*bigv.VirtualMachine{
+				&bigv.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
+				&bigv.VirtualMachine{ID: 23, Name: "jack-skellington"},
 			},
 		}},
 	}).Times(1)

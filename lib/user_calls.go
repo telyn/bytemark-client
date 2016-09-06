@@ -3,43 +3,28 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"strings"
 )
 
-// Process turns this JSONUser into a User.
-func (jsonUser *JSONUser) Process(into *User) {
-	into.Username = jsonUser.Username
-	into.Email = jsonUser.Email
-	into.AuthorizedKeys = strings.Split(jsonUser.AuthorizedKeys, "\n")
-}
-
-// MarshalJSON marshals the User into a JSON bytestream.
-func (user *User) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&JSONUser{
-		Username:       user.Username,
-		Email:          user.Email,
-		AuthorizedKeys: strings.Join(user.AuthorizedKeys, "\n"),
-	})
-}
-
-// GetUser grabs the named user from the brain
-func (c *bytemarkClient) GetUser(name string) (user *User, err error) {
+// Getbigv.User grabs the named user from the brain
+func (c *bytemarkClient) GetUser(name string) (user *bigv.User, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/users/%s", name)
 	if err != nil {
 		return
 	}
 
-	var jsUser JSONUser
+	var jsUser bigv.JSONUser
 	_, _, err = r.Run(nil, &jsUser)
 	if err != nil {
 		return
 	}
-	user = new(User)
+	user = new(bigv.User)
 	jsUser.Process(user)
 	return
 }
 
-// AddUserAuthorizedKey adds a key to the named user. These keys are used for logging into the management IPs for cloud servers
+// Addbigv.UserAuthorizedKey adds a key to the named user. These keys are used for logging into the management IPs for cloud servers
 func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error {
 	user, err := c.GetUser(username)
 	if err != nil {
@@ -62,7 +47,7 @@ func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error
 
 }
 
-// DeleteUserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part (as long as it's unique)
+// Deletebigv.UserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part (as long as it's unique)
 func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) error {
 	user, err := c.GetUser(username)
 	if err != nil {

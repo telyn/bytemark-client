@@ -1,4 +1,4 @@
-package lib
+package bigv
 
 import (
 	"net"
@@ -15,7 +15,7 @@ type NetworkInterface struct {
 	ID      int `json:"id"`
 	VlanNum int `json:"vlan_num"`
 	IPs     IPs `json:"ips"`
-	// sadly we can't use map[net.IP]*net.IP because slices have no equality
+	// sadly we can't use map[net.IP]*net.IP because net.IP is a slice and slices don't have equality
 	// and we can't use map[*net.IP]*net.IP because we could have two identical IPs in different memory locations and they wouldn't be equal. Rubbish.
 	ExtraIPs         map[string]*net.IP `json:"extra_ips"`
 	VirtualMachineID int                `json:"virtual_machine_id"`

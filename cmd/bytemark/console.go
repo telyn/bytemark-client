@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
@@ -72,7 +72,7 @@ func shortEndpoint(endpoint string) string {
 	return strings.Split(endpoint, ".")[0]
 }
 
-func vncConsoleInstructions(vm *lib.VirtualMachine) {
+func vncConsoleInstructions(vm *bigv.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -88,7 +88,7 @@ func vncConsoleInstructions(vm *lib.VirtualMachine) {
 	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
 }
 
-func serialConsoleInstructions(vm *lib.VirtualMachine) {
+func serialConsoleInstructions(vm *bigv.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -101,7 +101,7 @@ func serialConsoleInstructions(vm *lib.VirtualMachine) {
 
 }
 
-func openPanelConsole(vm *lib.VirtualMachine) error {
+func openPanelConsole(vm *bigv.VirtualMachine) error {
 	ep := global.Config.EndpointName()
 	token := global.Config.GetIgnoreErr("token")
 	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", global.Config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
@@ -146,7 +146,7 @@ func collectArgs(args string) (slice []string) {
 	return
 }
 
-func connectSerialConsole(vm *lib.VirtualMachine, sshargs string) error {
+func connectSerialConsole(vm *bigv.VirtualMachine, sshargs string) error {
 	host := fmt.Sprintf("%s@%s", global.Client.GetSessionUser(), vm.ManagementAddress)
 	log.Logf("ssh %s\r\n", host)
 

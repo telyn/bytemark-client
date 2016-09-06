@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 )
@@ -29,20 +30,20 @@ func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	}
 }
 
-func getFixtureVM() lib.VirtualMachine {
-	return lib.VirtualMachine{
+func getFixtureVM() bigv.VirtualMachine {
+	return bigv.VirtualMachine{
 		Name:     "test-server",
 		Hostname: "test-server.test-group",
 		GroupID:  1,
 	}
 }
 
-func getFixtureGroup() lib.Group {
-	vms := make([]*lib.VirtualMachine, 1, 1)
+func getFixtureGroup() bigv.Group {
+	vms := make([]*bigv.VirtualMachine, 1, 1)
 	vm := getFixtureVM()
 	vms[0] = &vm
 
-	return lib.Group{
+	return bigv.Group{
 		Name:            "test-group",
 		VirtualMachines: vms,
 	}

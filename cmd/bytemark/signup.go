@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -68,7 +70,7 @@ If you have previously used the client, you'll have a login and will need to add
 
 			account := lib.Account{}
 
-			account.Owner = &lib.Person{
+			account.Owner = &billing.Person{
 				Username:             fields[util.FIELD_OWNER_NAME].Value(),
 				Password:             fields[util.FIELD_OWNER_PASS].Value(),
 				Email:                fields[util.FIELD_OWNER_EMAIL].Value(),
@@ -86,7 +88,7 @@ If you have previously used the client, you'll have a login and will need to add
 			}
 
 			if creditCardForm {
-				card := lib.CreditCard{
+				card := spp.CreditCard{
 					Number: fields[util.FIELD_CC_NUMBER].Value(),
 					Name:   fields[util.FIELD_CC_NAME].Value(),
 					Expiry: fields[util.FIELD_CC_EXPIRY].Value(),

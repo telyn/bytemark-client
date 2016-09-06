@@ -1,4 +1,4 @@
-package lib
+package bigv
 
 import (
 	"encoding/json"

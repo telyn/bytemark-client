@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
@@ -197,7 +198,7 @@ func createServer(c *Context) (err error) {
 				return err
 			}
 		case 2: // disc
-			discs = make([]lib.Disc, strings.Count(arg, ",")+1)
+			discs = make([]bigv.Disc, strings.Count(arg, ",")+1)
 			for discNum, discSpec := range strings.Split(arg, ",") {
 				if tmpDisc, err := util.ParseDiscSpec(discSpec); err == nil {
 					discs[discNum] = *tmpDisc
@@ -212,7 +213,7 @@ func createServer(c *Context) (err error) {
 	}
 
 	if len(discs) == 0 && !c.Context.Bool("no-discs") {
-		discs = append(discs, lib.Disc{Size: 25600})
+		discs = append(discs, bigv.Disc{Size: 25600})
 	}
 
 	for i := range discs {
@@ -229,9 +230,9 @@ func createServer(c *Context) (err error) {
 		return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 	}
 
-	var ipspec *lib.IPSpec
+	var ipspec *bigv.IPSpec
 	if len(ips) > 0 {
-		ipspec = &lib.IPSpec{}
+		ipspec = &bigv.IPSpec{}
 
 		for _, ip := range ips {
 			if ip.To4() != nil {
@@ -264,8 +265,8 @@ func createServer(c *Context) (err error) {
 	// if stopped isn't set and either cdrom or image are set, start the server
 	autoreboot := !stopped && ((imageInstall != nil) || (cdrom != ""))
 
-	spec := lib.VirtualMachineSpec{
-		VirtualMachine: &lib.VirtualMachine{
+	spec := bigv.VirtualMachineSpec{
+		VirtualMachine: &bigv.VirtualMachine{
 			Name:                  c.VirtualMachineName.VirtualMachine,
 			Autoreboot:            autoreboot,
 			Cores:                 cores,

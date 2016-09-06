@@ -2,6 +2,7 @@ package lib
 
 import (
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net"
@@ -9,12 +10,47 @@ import (
 	"testing"
 )
 
-func getFixtureVM() (vm VirtualMachine) {
+func getFixtureVMWithManyIPs() (vm bigv.VirtualMachine, v4 []string, v6 []string) {
+	vm = getFixtureVM()
+	vm.NetworkInterfaces = make([]*bigv.NetworkInterface, 1)
+	vm.NetworkInterfaces[0] = &bigv.NetworkInterface{
+		Label: "test-nic",
+		Mac:   "FF:FE:FF:FF:FF",
+		IPs: []*net.IP{
+			&net.IP{192, 168, 1, 16},
+			&net.IP{192, 168, 1, 22},
+			&net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x10},
+			&net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x01, 0x00},
+		},
+		ExtraIPs: map[string]*net.IP{
+			"192.168.2.1":  &net.IP{192, 168, 1, 16},
+			"192.168.5.34": &net.IP{192, 168, 1, 22},
+			"fe80::1:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x01, 0x00},
+			"fe80::2:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x10},
+		},
+	}
+	v4 = []string{"192.168.1.16", "192.168.1.22", "192.168.2.1", "192.168.5.34"}
+	v6 = []string{"fe80::10", "fe80::100", "fe80::1:1", "fe80::2:1"}
+	return
+}
+func getFixtureVM() (vm bigv.VirtualMachine) {
 	disc := getFixtureDisc()
 	nic := getFixtureNic()
 	ip := net.IPv4(127, 0, 0, 1)
 
-	return VirtualMachine{
+	return bigv.VirtualMachine{
 		Name:    "valid-vm",
 		GroupID: 1,
 
@@ -26,7 +62,7 @@ func getFixtureVM() (vm VirtualMachine) {
 		HardwareProfile:       "fake-hardwareprofile",
 		HardwareProfileLocked: false,
 		ZoneName:              "default",
-		Discs: []*Disc{
+		Discs: []*bigv.Disc{
 			&disc,
 		},
 		ID:                1,
@@ -34,7 +70,7 @@ func getFixtureVM() (vm VirtualMachine) {
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
-		NetworkInterfaces: []*NetworkInterface{
+		NetworkInterfaces: []*bigv.NetworkInterface{
 			&nic,
 		},
 	}

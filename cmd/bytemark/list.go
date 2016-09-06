@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/bigv"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -18,7 +19,7 @@ func (cmds *CommandSet) HelpForList() util.ExitCode {
 	return util.E_USAGE_DISPLAYED
 }*/
 
-func listServersInGroup(g *lib.Group) {
+func listServersInGroup(g *bigv.Group) {
 	for _, vm := range g.VirtualMachines {
 		if vm.Deleted {
 			log.Output(vm.Hostname + " (deleted)")
