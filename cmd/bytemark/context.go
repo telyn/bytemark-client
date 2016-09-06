@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"net"
@@ -20,10 +21,10 @@ type Context struct {
 	Definitions        *lib.Definitions
 	DiscLabel          *string
 	GroupName          *lib.GroupName
-	Group              *lib.Group
-	User               *lib.User
+	Group              *brain.Group
+	User               *brain.User
 	UserName           *string
-	VirtualMachine     *lib.VirtualMachine
+	VirtualMachine     *brain.VirtualMachine
 	VirtualMachineName *lib.VirtualMachineName
 
 	currentArgIndex int
@@ -65,12 +66,12 @@ func (c *Context) Bool(flagname string) bool {
 
 // Discs returns the discs passed along as the named flag.
 // I can't imagine why I'd ever name a disc flag anything other than --disc, but the flexibility is there just in case.
-func (c *Context) Discs(flagname string) []lib.Disc {
+func (c *Context) Discs(flagname string) []brain.Disc {
 	disc := c.Context.Generic(flagname)
 	if disc, ok := disc.(*util.DiscSpecFlag); ok {
-		return []lib.Disc(*disc)
+		return []brain.Disc(*disc)
 	}
-	return []lib.Disc{}
+	return []brain.Disc{}
 }
 
 // FileName returns the name of the file given by the named flag

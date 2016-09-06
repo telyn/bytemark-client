@@ -3,9 +3,10 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-func (c *bytemarkClient) AddIP(name *VirtualMachineName, spec *IPCreateRequest) (IPs, error) {
+func (c *bytemarkClient) AddIP(name *VirtualMachineName, spec *brain.IPCreateRequest) (brain.IPs, error) {
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return nil, err
@@ -21,7 +22,7 @@ func (c *bytemarkClient) AddIP(name *VirtualMachineName, spec *IPCreateRequest) 
 	if err != nil {
 		return nil, err
 	}
-	var newSpec *IPCreateRequest
+	var newSpec *brain.IPCreateRequest
 	_, _, err = r.Run(bytes.NewBuffer(js), newSpec)
 	if err != nil {
 		return nil, err

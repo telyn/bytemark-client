@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -146,7 +147,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 	})
 }
 
-func recursiveDeleteGroup(name *lib.GroupName, group *lib.Group) error {
+func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("WARNING: The following servers will be permanently deleted, without any way to recover or un-delete them:")
 	for _, vm := range group.VirtualMachines {
 		log.Logf("\t%s\r\n", vm.Name)

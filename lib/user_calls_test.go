@@ -2,14 +2,15 @@ package lib
 
 import (
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
 )
 
-func getFixtureUser() (user *User) {
-	return &User{
+func getFixtureUser() (user *brain.User) {
+	return &brain.User{
 		Username: "test-user",
 		Email:    "test@user.com",
 		AuthorizedKeys: []string{

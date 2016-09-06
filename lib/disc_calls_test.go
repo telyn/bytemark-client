@@ -3,14 +3,15 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
-func getFixtureDisc() Disc {
-	return Disc{
+func getFixtureDisc() brain.Disc {
+	return brain.Disc{
 		Label:            "",
 		StorageGrade:     "sata",
 		Size:             26400,
@@ -20,16 +21,16 @@ func getFixtureDisc() Disc {
 	}
 }
 
-func getFixtureDiscSet() []Disc {
-	return []Disc{
+func getFixtureDiscSet() []brain.Disc {
+	return []brain.Disc{
 		getFixtureDisc(),
-		Disc{
+		brain.Disc{
 			ID:           2,
 			StorageGrade: "archive",
 			Label:        "arch",
 			Size:         1024000,
 		},
-		Disc{
+		brain.Disc{
 			ID:           3,
 			StorageGrade: "",
 			Size:         2048,
@@ -52,27 +53,6 @@ func TestLabelDisc(t *testing.T) {
 		default:
 			fmt.Printf("Unexpected disc ID %d\r\n", d.ID)
 			t.Fail()
-		}
-	}
-}
-
-func TestValidateDisc(t *testing.T) {
-	is := is.New(t)
-	discs := getFixtureDiscSet()
-	for _, d := range discs {
-		d2, err := d.Validate()
-		is.Nil(err)
-
-		is.Equal(d.ID, d2.ID)
-		is.Equal(d.Label, d2.Label)
-		is.Equal(d.Size, d2.Size)
-		is.Equal(d.StoragePool, d2.StoragePool)
-		is.Equal(d.VirtualMachineID, d2.VirtualMachineID)
-		switch d.ID {
-		case 1, 3:
-			is.Equal("sata", d2.StorageGrade)
-		case 2:
-			is.Equal("archive", d2.StorageGrade)
 		}
 	}
 }
@@ -143,11 +123,11 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestResizeDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	client, authServer, brainServer, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
 			bytes, err := ioutil.ReadAll(req.Body)
 			is.Nil(err)
-			var disc Disc
+			var disc brain.Disc
 			err = json.Unmarshal(bytes, &disc)
 			is.Nil(err)
 
@@ -159,7 +139,7 @@ func TestResizeDisc(t *testing.T) {
 
 	}), mkNilHandler(t))
 	defer authServer.Close()
-	defer brain.Close()
+	defer brainServer.Close()
 	defer billing.Close()
 
 	if err != nil {

@@ -2,7 +2,7 @@ package util
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 	"strings"
 )
@@ -28,7 +28,7 @@ func (ips *IPFlag) String() string {
 }
 
 // DiscSpecFlag is a flag which reads its argument as a disc spec. It can be specified multiple times to add multiple discs.
-type DiscSpecFlag []lib.Disc
+type DiscSpecFlag []brain.Disc
 
 // Set adds all the defined discs to this flag's value
 func (discsFlag *DiscSpecFlag) Set(value string) error {
