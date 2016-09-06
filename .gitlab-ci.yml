@@ -2,15 +2,13 @@ image: golang:1.6
 
 variables:
   GO15VENDOREXPERIMENT: "1"
+  GOPATH: /go
 
 before_script:
   # these two are needed for coverage stats
-  - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
-  # go get the client so that we get all dependencies and test dependencies of bytemark
-  - go get -t -d ./cmd/bytemark ./cmd/bytemark/util ./lib
-  # then ensure that we don't have any github copy of bytemark-client lying around
-  - rm -rf $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-  # stick our actual code in the correct place.
+  - go get github.com/modocache/gover golang.org/x/tools/cmd/cover github.com/BytemarkHosting/auth-client
+  - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+  # stick our code in the correct place.
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
 stages:
@@ -28,19 +26,23 @@ lint:
 vet:
   stage: test
   script:
-    - go vet github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-    - go vet github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
-    - go vet github.com/BytemarkHosting/bytemark-client/lib
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - go vet $(go list ./... | grep -v vendor/)
 
 test:
   stage: test
   script:
-    - go test -coverprofile=bytemark.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-    - go test -coverprofile=util.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
-    - go test -coverprofile=lib.coverprofile github.com/BytemarkHosting/bytemark-client/lib
+    - OLDPWD="$PWD"
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - |
+      for pkg in $(go list ./... | grep -v vendor/); do
+        shortpkg="${pkg##github.com/BytemarkHosting/}"
+        pkg_with_underscores="${shortpkg//\//_}"
+        go test -coverprofile="${pkg_with_underscores}.coverprofile" $pkg
+      done
     - gover
     - go tool cover -func gover.coverprofile | tail -n 1
-    - go tool cover -html gover.coverprofile -o coverage.html
+    - go tool cover -html gover.coverprofile -o "$OLDPWD/coverage.html"
   artifacts:
     paths:
     - coverage.html
