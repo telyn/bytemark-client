@@ -6,11 +6,13 @@ before_install:
 - go get github.com/mattn/goveralls
 - go get golang.org/x/tools/cmd/cover
 - go get github.com/modocache/gover
-- go get -t -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-- go get -t -d github.com/BytemarkHosting/bytemark-client/lib
+- go get -t -d github.com/BytemarkHosting/bytemark-client/...
 script:
-- go test -coverprofile=bytemark.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-- go test -coverprofile=util.coverprofile github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util
-- go test -coverprofile=lib.coverprofile github.com/BytemarkHosting/bytemark-client/lib
+- |
+  for pkg in $(go list github.com/BytemarkHosting/bytemark-client/... | grep -v vendor/); do
+    shortpkg="${pkg##github.com/BytemarkHosting/}"
+    pkg_with_underscores="${shortpkg//\//_}"
+    go test -coverprofile="${pkg_with_underscores}.coverprofile" $pkg
+  done
 - $HOME/gopath/bin/gover
 - $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci
