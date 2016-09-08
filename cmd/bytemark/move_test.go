@@ -8,7 +8,7 @@ import (
 
 func TestMove(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	oldName := lib.VirtualMachineName{
 		VirtualMachine: "old-name",

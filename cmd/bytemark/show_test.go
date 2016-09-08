@@ -9,7 +9,7 @@ import (
 
 func TestShowGroupCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -31,7 +31,7 @@ func TestShowGroupCommand(t *testing.T) {
 
 func TestShowServerCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")

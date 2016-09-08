@@ -9,7 +9,7 @@ import (
 
 func TestLockHWProfileCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -34,7 +34,7 @@ func TestLockHWProfileCommand(t *testing.T) {
 
 func TestUnlockHWProfileCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
