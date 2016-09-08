@@ -9,7 +9,7 @@ import (
 
 func TestCommandConfigSet(t *testing.T) {
 	is := is.New(t)
-	config, _ := baseTestSetup()
+	config, _ := baseTestSetup(t, false)
 
 	config.When("GetV", "user").Return(util.ConfigVar{"user", "old-test-user", "config"})
 	config.When("GetIgnoreErr", "user").Return("old-test-user")

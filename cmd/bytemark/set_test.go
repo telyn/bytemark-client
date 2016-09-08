@@ -9,7 +9,7 @@ import (
 
 func TestSetCores(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -36,7 +36,7 @@ func TestSetCores(t *testing.T) {
 
 func TestSetMemory(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -83,7 +83,7 @@ func TestSetMemory(t *testing.T) {
 
 func TestSetHWProfileCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",

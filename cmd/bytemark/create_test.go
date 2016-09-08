@@ -11,7 +11,7 @@ import (
 
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -37,7 +37,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 func TestCreateGroupCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -99,7 +99,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 }
 
 func TestCreateServerCommand(t *testing.T) {
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -191,7 +191,7 @@ func TestCreateServerCommand(t *testing.T) {
 }
 
 func TestCreateServerNoImagesNoDiscs(t *testing.T) {
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -247,7 +247,7 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 
 func TestCreateServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")

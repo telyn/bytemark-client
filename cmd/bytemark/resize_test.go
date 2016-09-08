@@ -10,7 +10,7 @@ import (
 
 func TestResizeDisk(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")

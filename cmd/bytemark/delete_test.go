@@ -10,7 +10,7 @@ import (
 
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -53,7 +53,7 @@ func TestDeleteServer(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -80,7 +80,7 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestDeleteKey(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	usr := brain.User{
 		Username: "test-user",

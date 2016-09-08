@@ -9,7 +9,7 @@ import (
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -32,7 +32,7 @@ func TestAddKeyCommand(t *testing.T) {
 	c.Reset()
 }
 func TestAddIPCommand(t *testing.T) {
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
