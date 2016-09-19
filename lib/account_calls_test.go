@@ -51,6 +51,7 @@ func TestGetAccount(t *testing.T) {
 	acc, err = client.GetAccount("")
 	is.Nil(err)
 	is.Equal("account", acc.Name)
+	is.Equal(1, acc.BrainID)
 
 	acc, err = client.GetAccount("account")
 	is.Nil(err)
