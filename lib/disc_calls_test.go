@@ -130,7 +130,7 @@ func TestResizeDisc(t *testing.T) {
 			var disc brain.Disc
 			err = json.Unmarshal(bytes, &disc)
 			is.Nil(err)
-
+			// TODO check that we send the right stuff
 		} else if req.URL.Path == "/accounts/invalid-account" {
 			http.NotFound(w, req)
 		} else {

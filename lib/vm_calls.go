@@ -17,69 +17,26 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.Virtu
 	if err != nil {
 		return nil, err
 	}
-
-	req := make(map[string]interface{})
-	rvm := make(map[string]interface{})
-	rvm["autoreboot_on"] = spec.VirtualMachine.Autoreboot
-	if spec.VirtualMachine.CdromURL != "" {
-		rvm["cdrom_url"] = spec.VirtualMachine.CdromURL
-	}
-	rvm["cores"] = spec.VirtualMachine.Cores
-	rvm["memory"] = spec.VirtualMachine.Memory
-	rvm["name"] = spec.VirtualMachine.Name
-	if spec.VirtualMachine.HardwareProfile != "" {
-		rvm["hardware_profile"] = spec.VirtualMachine.HardwareProfile
-	}
-	rvm["hardware_profile_locked"] = spec.VirtualMachine.HardwareProfileLocked
-	if spec.VirtualMachine.ZoneName != "" {
-		rvm["zone_name"] = spec.VirtualMachine.ZoneName
-	}
-
-	req["virtual_machine"] = rvm
-
-	labelDiscs(spec.Discs)
-
-	discs := make([]map[string]interface{}, 0, 4)
-
-	for _, d := range spec.Discs {
-		disc := make(map[string]interface{})
-		label := d.Label
-		disc["label"] = label
-		disc["size"] = d.Size
-		disc["storage_grade"] = d.StorageGrade
-
-		discs = append(discs, disc)
-	}
-
-	req["discs"] = discs
-
-	if spec.Reimage != nil {
-		reimage := make(map[string]interface{})
-
-		if spec.Reimage.Distribution != "" {
-			reimage["distribution"] = spec.Reimage.Distribution
-		}
-		if spec.Reimage.RootPassword != "" {
-			reimage["root_password"] = spec.Reimage.RootPassword
-		}
-		reimage["ssh_public_key"] = spec.Reimage.PublicKeys
-		reimage["firstboot_script"] = spec.Reimage.FirstbootScript
-
-		req["reimage"] = reimage
-	}
-
 	if spec.IPs != nil {
-		ips := make(map[string]interface{})
-		if spec.IPs.IPv4 != "" {
-			ips["ipv4"] = spec.IPs.IPv4
+		if spec.IPs.IPv4 == "" && spec.IPs.IPv6 == "" {
+			spec.IPs = nil
 		}
-		if spec.IPs.IPv6 != "" {
-			ips["ipv6"] = spec.IPs.IPv6
+	}
+	if spec.Discs != nil {
+		if len(spec.Discs) == 0 {
+			spec.Discs = nil
 		}
-		rvm["ips"] = ips
+		for i, disc := range spec.Discs {
+			newDisc, err := disc.Validate()
+			if err != nil {
+				return nil, err
+			}
+			spec.Discs[i] = *newDisc
+		}
+		labelDiscs(spec.Discs, 0)
 	}
 
-	js, err := json.Marshal(req)
+	js, err := json.Marshal(spec)
 	if err != nil {
 		return nil, err
 	}
