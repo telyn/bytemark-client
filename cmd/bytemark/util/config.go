@@ -18,6 +18,7 @@ var configVars = [...]string{
 	"billing-endpoint",
 	"auth-endpoint",
 	"spp-endpoint",
+	"admin",
 	"user",
 	"account",
 	"group",
@@ -337,6 +338,9 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		}
 		return v
 	case "billing-endpoint":
+		if config.GetIgnoreErr("endpoint") == "https://staging.bigv.io" {
+			return ConfigVar{"billing-endpoint", "", "CODE STAGING DEFAULT"}
+		}
 		v := ConfigVar{"billing-endpoint", "https://bmbilling.bytemark.co.uk", "CODE"}
 		if val := os.Getenv("BM_BILLING_ENDPOINT"); val != "" {
 			v.Value = val
