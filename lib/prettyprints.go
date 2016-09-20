@@ -80,22 +80,25 @@ It was not possible to determine your default account. Please set one using byte
 `
 
 const serverTemplate = `{{ define "server_summary" }} ▸ {{.ShortName }} ({{ if .Deleted }}deleted{{ else if .PowerOn }}powered on{{else}}powered off{{end}}) in {{capitalize .ZoneName}}{{ end }}
-{{ define "server_spec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ end }}
+{{ define "server_spec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{ if .Discs}}{{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ else }}no discs{{ end }}{{ end }}
 
-{{ define "discs" }}    discs:
+{{ define "discs" -}}
+{{- if .Discs }}    discs:
 {{- range .Discs }}
       • {{ .Label }} - {{ gibtib .Size }}, {{ .StorageGrade }} grade
 {{- end }}
+
+{{ end -}}
 {{ end }}
 
 {{ define "ips" }}    ips:
-{{- range .AllIPv4Addresses }}
+{{- range .AllIPv4Addresses.Sort }}
       • {{.}}
 {{- end}}
-{{- range .AllIPv6Addresses }}
+{{- range .AllIPv6Addresses.Sort }}
       • {{.}}
+{{- end -}}
 {{- end }}
-{{ end }}
 
 {{ define "server_twoline" }}{{ template "server_summary" . }}
 {{ template "server_spec" . }}{{ end }}
@@ -103,8 +106,8 @@ const serverTemplate = `{{ define "server_summary" }} ▸ {{.ShortName }} ({{ if
 {{ define "server_full" -}}
 {{ template "server_twoline" . }}
 
-{{ template "discs" . }}
-{{ template "ips" . }}
+{{ template "discs" . -}}
+{{- template "ips" . }}
 {{ end }}`
 
 // TemplateChoice is which template to use for a server.
@@ -131,7 +134,7 @@ var templateFuncMap = map[string]interface{}{
 	"gibtib": func(size int) string {
 		// lt is a less than sign if < 1GiB
 		lt := ""
-		if size < 1024 {
+		if size < 1024 && size != 0 {
 			lt = "< "
 		}
 		size /= 1024
