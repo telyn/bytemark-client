@@ -1,3 +1,23 @@
+bytemark-client (1.1) UNRELEASED; urgency=low
+
+  Prevent the following from being output to the log file during account
+  creation:
+  * card reference
+  * user password
+
+  Also prevent card references from being output to the log file whenever
+  account information is downloaded, and root passwords for servers being
+  output to the log file during reimaging and server creation.
+  Passwords during the authentication step have never been logged.
+
+  Temporarily this means that less debugging information is available.
+  A better, more precise fix for this secrets-leaking will be available in
+  either version 2.0 or 2.1.
+
+  No new features or other changes in this release.
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 20 Sep 2016 16:37:34 +0100
+
 bytemark-client (1.0) UNRELEASED; urgency=low
 
   New features:
