@@ -35,7 +35,10 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []*billingAccount, err e
 	if err != nil {
 		return
 	}
+	oldfile := log.LogFile
+	log.LogFile = nil
 	_, _, err = req.Run(nil, &accounts)
+	log.LogFile = oldfile
 	return
 }
 
