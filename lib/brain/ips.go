@@ -28,14 +28,17 @@ func (ips IPs) String() string {
 }
 
 // Sort sorts the given IPs in-place and also returns it, for daisy chaining.
+// Sorting is done by the golang sort package, which uses the Less, Len and Swap functions defined below
 func (ips IPs) Sort() IPs {
 	sort.Sort(ips)
 	return ips
 }
 
+// Less looks at the ips at index i and j, and returns true if i should come before j.
 func (ips IPs) Less(i, j int) bool {
 	a := *ips[i]
 	b := *ips[j]
+	// loop over each byte of the address and compare.
 	if a.Equal(a.To4()) && b.Equal(b.To4()) {
 		a4 := a.To4()
 		b4 := b.To4()
@@ -55,18 +58,21 @@ func (ips IPs) Less(i, j int) bool {
 			}
 		}
 	}
+	// v4 < v6 always
 	if a.Equal(a.To4()) && b.Equal(b.To16()) {
 		return true
 	}
 	return false
 }
 
+// Swap moves the ip at i to j, and vice versa.
 func (ips IPs) Swap(i, j int) {
 	t := ips[i]
 	ips[i] = ips[j]
 	ips[j] = t
 }
 
+// Len returns how many ips there are in this IPs
 func (ips IPs) Len() int {
 	return len(ips)
 }
