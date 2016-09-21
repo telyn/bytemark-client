@@ -62,12 +62,14 @@ func main() {
 	global.App = app
 
 	// build ourselves an api client
-	cli, err := lib.New(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"), global.Config.GetIgnoreErr("spp-endpoint"))
-	global.Client = cli
-	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
+	auth, err := auth3.New(global.Config.GetIgnoreErr("auth-endpoint"))
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
+
+	cli := lib.NewWithAuth(global.Config.GetIgnoreErr("endpoint"), global.Config.GetIgnoreErr("billing-endpoint"), global.Config.GetIgnoreErr("spp-endpoint"), auth)
+	global.Client = cli
+	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
 
 	err = global.App.Run(args)
 

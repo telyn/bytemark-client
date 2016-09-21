@@ -13,18 +13,61 @@ func TestFormatVM(t *testing.T) {
 	b := new(bytes.Buffer)
 	vm, _, _ := getFixtureVMWithManyIPs()
 
-	err := FormatVirtualMachine(b, &vm, "server_summary")
-	if err != nil {
-		t.Error(err)
+	tests := []struct {
+		in   brain.VirtualMachine
+		tmpl TemplateChoice
+		expt string
+	}{
+		{
+			in:   vm,
+			tmpl: "server_summary",
+			expt: " ▸ valid-vm.default (powered on) in Default",
+		},
+		{
+			in:   vm,
+			tmpl: "server_spec",
+			expt: "   192.168.1.16 - 1 core, 1MiB, 25GiB on 1 disc",
+		},
+		{
+			in:   vm,
+			tmpl: "server_full",
+			expt: ` ▸ valid-vm.default (powered on) in Default
+   192.168.1.16 - 1 core, 1MiB, 25GiB on 1 disc
+
+    discs:
+      •  - 25GiB, sata grade
+
+    ips:
+      • 192.168.1.16
+      • 192.168.1.22
+      • 192.168.2.1
+      • 192.168.5.34
+      • fe80::10
+      • fe80::100
+      • fe80::1:1
+      • fe80::2:1
+`,
+		},
+		{
+			in:   brain.VirtualMachine{},
+			tmpl: "discs",
+			expt: "",
+		},
+		{
+			in:   brain.VirtualMachine{},
+			tmpl: "server_spec",
+			expt: "   <nil> - 0 cores, 0MiB, no discs",
+		},
 	}
 
-	is.Equal(" ▸ valid-vm.default (powered on) in Default", b.String())
-	b.Truncate(0)
-	err = FormatVirtualMachine(b, &vm, "server_spec")
-	if err != nil {
-		t.Error(err)
+	for _, test := range tests {
+		b.Truncate(0)
+		err := FormatVirtualMachine(b, &test.in, test.tmpl)
+		if err != nil {
+			t.Error(err)
+		}
+		is.Equal(test.expt, b.String())
 	}
-	is.Equal("   192.168.1.16 - 1 core, 1MiB, 25GiB on 1 disc", b.String())
 }
 
 func TestFormatAccount(t *testing.T) {
