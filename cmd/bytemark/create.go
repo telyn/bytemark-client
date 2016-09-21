@@ -305,7 +305,7 @@ func createServer(c *Context) (err error) {
 	}
 	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
 		log.Log("cloud server created successfully")
-		err = lib.FormatVirtualMachine(os.Stderr, vm, "serverfull")
+		err = lib.FormatVirtualMachine(os.Stderr, vm, "server_full")
 		if err != nil {
 			return
 		}
