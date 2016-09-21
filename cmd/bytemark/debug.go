@@ -85,7 +85,10 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 				log.Logf("%s %s: %d\r\n", method, reqURL.String(), statusCode)
 
 				buf := new(bytes.Buffer)
-				json.Indent(buf, body, "", "    ")
+				err = json.Indent(buf, body, "", "    ")
+				if err != nil {
+					return err
+				}
 				log.Log(buf.String())
 				return nil
 			}

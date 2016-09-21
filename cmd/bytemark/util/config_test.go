@@ -18,12 +18,12 @@ import (
 
 func CleanEnv() {
 	// apparently os.Unsetenv doesn't exist in the version of go I'm using
-	os.Setenv("BM_CONFIG_DIR", "")
-	os.Setenv("BM_USER", "")
-	os.Setenv("BM_ACCOUNT", "")
-	os.Setenv("BM_ENDPOINT", "")
-	os.Setenv("BM_AUTH_ENDPOINT", "")
-	os.Setenv("BM_DEBUG_LEVEL", "")
+	_ = os.Setenv("BM_CONFIG_DIR", "")
+	_ = os.Setenv("BM_USER", "")
+	_ = os.Setenv("BM_ACCOUNT", "")
+	_ = os.Setenv("BM_ENDPOINT", "")
+	_ = os.Setenv("BM_AUTH_ENDPOINT", "")
+	_ = os.Setenv("BM_DEBUG_LEVEL", "")
 }
 
 func JunkEnv() {
@@ -50,12 +50,12 @@ func FixtureEnv() (fixture map[string]string) {
 }
 
 func MakeEnvFromFixture(fixture map[string]string) (fx map[string]string) {
-	os.Setenv("BM_CONFIG_DIR", fixture["config-dir"])
-	os.Setenv("BM_USER", fixture["user"])
-	os.Setenv("BM_ACCOUNT", fixture["account"])
-	os.Setenv("BM_ENDPOINT", fixture["endpoint"])
-	os.Setenv("BM_AUTH_ENDPOINT", fixture["auth-endpoint"])
-	os.Setenv("BM_DEBUG_LEVEL", fixture["debug-level"])
+	_ = os.Setenv("BM_CONFIG_DIR", fixture["config-dir"])
+	_ = os.Setenv("BM_USER", fixture["user"])
+	_ = os.Setenv("BM_ACCOUNT", fixture["account"])
+	_ = os.Setenv("BM_ENDPOINT", fixture["endpoint"])
+	_ = os.Setenv("BM_AUTH_ENDPOINT", fixture["auth-endpoint"])
+	_ = os.Setenv("BM_DEBUG_LEVEL", fixture["debug-level"])
 	return fixture
 }
 
@@ -65,17 +65,11 @@ func MakeEnvFromFixture(fixture map[string]string) (fx map[string]string) {
  ===================
 */
 
-func CleanDir() (name string) {
-	dir, err := ioutil.TempDir("", "bytemark-client-test")
-	if err != nil {
-		panic("Couldn't create test dir.")
-	}
-
-	return dir
-
+func CleanDir() (dirName string, err error) {
+	return ioutil.TempDir("", "bytemark-client-test")
 }
 
-func JunkDir() (name string) {
+func JunkDir() (dirName string, err error) {
 	junk := map[string]string{
 		"endpoint":      "https://junk.dir.localhost.local",
 		"user":          "junk-dir-user",
@@ -84,11 +78,11 @@ func JunkDir() (name string) {
 		"debug-level":   "junk-dir-debug-level",
 	}
 
-	dir, _ := MakeDirFromFixture(junk)
-	return dir
+	dirName, _, err = MakeDirFromFixture(junk)
+	return
 }
 
-func FixtureDir() (dir string, fixture map[string]string) {
+func FixtureDir() (dir string, fixture map[string]string, err error) {
 	fixture = map[string]string{
 		"endpoint":      "https://fixture.dir.localhost.local",
 		"user":          "fixture-dir-user",
@@ -99,15 +93,21 @@ func FixtureDir() (dir string, fixture map[string]string) {
 
 	return MakeDirFromFixture(fixture)
 }
-func MakeDirFromFixture(fixture map[string]string) (dir string, fx map[string]string) {
-	dir, err := ioutil.TempDir("", "bytemark-client-test")
+
+// MakeDirFromFixture takes a map[variable]value and writes it out as a config-dir.
+func MakeDirFromFixture(fixture map[string]string) (dir string, fx map[string]string, err error) {
+	fx = fixture
+	dir, err = ioutil.TempDir("", "bytemark-client-test")
 	if err != nil {
-		panic("Couldn't create test dir")
+		return
 	}
 	for name, value := range fixture {
-		ioutil.WriteFile(filepath.Join(dir, name), []byte(value), 0600)
+		err = ioutil.WriteFile(filepath.Join(dir, name), []byte(value), 0600)
+		if err != nil {
+			return
+		}
 	}
-	return dir, fixture
+	return
 }
 
 /*
@@ -123,7 +123,7 @@ func TestConfigDefaultConfigDir(t *testing.T) {
 
 	config, err := NewConfig("")
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	expected := filepath.Join(os.Getenv("HOME"), "/.bytemark")
 	is.Equal(expected, config.Dir)
@@ -135,11 +135,11 @@ func TestConfigEnvConfigDir(t *testing.T) {
 	CleanEnv()
 
 	expected := "/tmp"
-	os.Setenv("BM_CONFIG_DIR", expected)
+	_ = os.Setenv("BM_CONFIG_DIR", expected)
 
 	config, err := NewConfig("")
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	is.Equal(expected, config.Dir)
 }
@@ -152,7 +152,7 @@ func TestConfigPassedConfigDir(t *testing.T) {
 	expected := "/home"
 	config, err := NewConfig(expected)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	is.Equal(expected, config.Dir)
 }
@@ -168,11 +168,15 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
-	dir := CleanDir()
+
+	dir, err := CleanDir()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config, err := NewConfig(dir)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 
 	is.Equal("https://uk0.bigv.io", config.GetIgnoreErr("endpoint"))
@@ -181,21 +185,25 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 	is.Equal(os.Getenv("USER"), config.GetIgnoreErr("user"))
 	is.Equal("", config.GetIgnoreErr("account"))
 
-	os.RemoveAll(dir)
+	// nbd if we leave a load of files lying about in a temp folder.
+	_ = os.RemoveAll(dir)
 }
 
 func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
-	dir := CleanDir()
+	dir, err := CleanDir()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	expected := "test-username"
-	os.Setenv("BM_USER", expected)
+	_ = os.Setenv("BM_USER", expected)
 
 	config, err := NewConfig(dir)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 
 	is.Equal("https://uk0.bigv.io", config.GetIgnoreErr("endpoint"))
@@ -213,18 +221,21 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	is.Equal("", v.Value)
 	is.Equal("CODE", v.Source)
 
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 func TestConfigDefaultsFixtureEnv(t *testing.T) {
 	is := is.New(t)
 
 	fixture := FixtureEnv()
-	dir := CleanDir()
+	dir, err := CleanDir()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config, err := NewConfig(dir)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 
 	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
@@ -232,7 +243,7 @@ func TestConfigDefaultsFixtureEnv(t *testing.T) {
 	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
 	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
 	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 /*
@@ -246,11 +257,14 @@ func TestConfigDir(t *testing.T) {
 	is := is.New(t)
 
 	JunkEnv()
-	dir, fixture := FixtureDir()
+	dir, fixture, err := FixtureDir()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config, err := NewConfig(dir)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err.Error())
 	}
 
 	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
@@ -259,7 +273,7 @@ func TestConfigDir(t *testing.T) {
 	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
 	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 /*
@@ -272,10 +286,13 @@ func TestConfigSet(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
-	dir, fixture := FixtureDir()
+	dir, fixture, err := FixtureDir()
+	if err != nil {
+		t.Fatal(err)
+	}
 	config, err := NewConfig(dir)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 
 	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
@@ -292,17 +309,20 @@ func TestConfigSet(t *testing.T) {
 	is.Equal(fixture["user"], config.GetIgnoreErr("user"))
 	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
 	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 func TestConfigSetPersistent(t *testing.T) {
 	is := is.New(t)
 
 	CleanEnv()
-	dir, fixture := FixtureDir()
+	dir, fixture, err := FixtureDir()
+	if err != nil {
+		t.Fatal(err)
+	}
 	config, err := NewConfig(dir)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 
 	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
@@ -311,7 +331,11 @@ func TestConfigSetPersistent(t *testing.T) {
 	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
 	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 
-	config.SetPersistent("user", "test-user", "TEST")
+	err = config.SetPersistent("user", "test-user", "TEST")
+	if err != nil {
+		t.Errorf("Couldn't SetPersistent(user, test-user, TEST): %v", err)
+		t.Fail()
+	}
 	fixture["user"] = "test-user"
 
 	is.Equal(fixture["endpoint"], config.GetIgnoreErr("endpoint"))
@@ -320,7 +344,7 @@ func TestConfigSetPersistent(t *testing.T) {
 	is.Equal(fixture["account"], config.GetIgnoreErr("account"))
 	is.Equal(fixture["debug-level"], config.GetIgnoreErr("debug-level"))
 
-	CleanEnv() // in case for some wacky reason I write to the environment
+	CleanEnv()
 	//create a new config (blanking the memo) to test the file in the directory has changed.
 	config2, err := NewConfig(dir)
 	is.Nil(err)
@@ -331,7 +355,7 @@ func TestConfigSetPersistent(t *testing.T) {
 	is.Equal(fixture["account"], config2.GetIgnoreErr("account"))
 	is.Equal(fixture["debug-level"], config2.GetIgnoreErr("debug-level"))
 
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 func TestConfigCorrectDefaultingAccountAndUserBug14038(t *testing.T) {
@@ -340,9 +364,12 @@ func TestConfigCorrectDefaultingAccountAndUserBug14038(t *testing.T) {
 	envfixture := MakeEnvFromFixture(map[string]string{
 		"user": "test-env-user",
 	})
-	dir, dirfixture := MakeDirFromFixture(map[string]string{
+	dir, dirfixture, err := MakeDirFromFixture(map[string]string{
 		"account": "test-fixture-account",
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config, err := NewConfig(dir)
 	is.Nil(err)

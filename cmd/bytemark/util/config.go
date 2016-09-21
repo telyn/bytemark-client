@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -197,13 +198,21 @@ func NewConfig(configDir string) (config *Config, err error) {
 	}
 
 	dbgLog := config.GetPath("debug.log")
+	// if there's already a debug.log, rename it debug.log.1
 	_, err = os.Stat(dbgLog)
 	if err == nil {
-		_, err1 := os.Stat(dbgLog + ".1")
-		if err1 == nil {
-			os.Remove(dbgLog + ".1")
+		_, err = os.Stat(dbgLog + ".1")
+		if err == nil {
+			// if debug.log.1 exists, remove it
+			err = os.Remove(dbgLog + ".1") // we don't truly care if we couldn't clean up
+			if err != nil {
+				return nil, errors.New("Couldn't remove debug.log.1: " + err.Error())
+			}
 		}
-		os.Rename(dbgLog, dbgLog+".1")
+		err = os.Rename(dbgLog, dbgLog+".1")
+		if err != nil {
+			return nil, errors.New("Couldn't rename debug.log to debug.log.1: " + err.Error())
+		}
 	}
 
 	log.LogFile, err = os.Create(dbgLog)

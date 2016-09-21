@@ -13,10 +13,13 @@ func TestFileFlag(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove("test-fileflag")
 
 	flag := FileFlag{}
 
-	flag.Set("test-fileflag")
+	err = flag.Set("test-fileflag")
+	if err != nil {
+		t.Fatal(err)
+	}
 	is.Equal("contents here yay!", flag.String())
+	_ = os.Remove("test-fileflag")
 }

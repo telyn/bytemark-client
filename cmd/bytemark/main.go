@@ -91,7 +91,10 @@ func EnsureAuth() error {
 		for err != nil {
 			attempts--
 
-			PromptForCredentials()
+			err = PromptForCredentials()
+			if err != nil {
+				return err
+			}
 			credents := map[string]string{
 				"username": global.Config.GetIgnoreErr("user"),
 				"password": global.Config.GetIgnoreErr("pass"),
@@ -103,7 +106,8 @@ func EnsureAuth() error {
 			err = global.Client.AuthWithCredentials(credents)
 			if err == nil {
 				// sucess!
-				global.Config.SetPersistent("token", global.Client.GetSessionToken(), "AUTH")
+				// it doesn't _really_ matter if we can't write the token to the token place, right?
+				_ = global.Config.SetPersistent("token", global.Client.GetSessionToken(), "AUTH")
 				break
 			} else {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
@@ -235,7 +239,10 @@ func prepConfig() (args []string) {
 
 	flags.SetOutput(ioutil.Discard)
 
-	flags.Parse(os.Args[1:])
+	err := flags.Parse(os.Args[1:])
+	if err != nil {
+		os.Exit(int(util.ProcessError(err)))
+	}
 	config, err := util.NewConfig(*configDir)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))

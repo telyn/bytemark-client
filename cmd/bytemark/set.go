@@ -30,7 +30,7 @@ These commands set various hardware properties of Bytemark servers. Note that fo
 					}
 					cores, err := strconv.Atoi(coresStr)
 					if err != nil || cores < 1 {
-						c.Help(fmt.Sprintf("Invalid number of cores \"%s\"\r\n", coresStr))
+						return c.Help(fmt.Sprintf("Invalid number of cores \"%s\"\r\n", coresStr))
 					}
 					if c.VirtualMachine.Cores < cores {
 						if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {

@@ -284,7 +284,10 @@ func createServer(c *Context) (err error) {
 	groupName := c.VirtualMachineName.GroupName()
 
 	log.Log("The following server will be created:")
-	lib.FormatVirtualMachineSpec(os.Stderr, groupName, &spec, "specfull")
+	err = lib.FormatVirtualMachineSpec(os.Stderr, groupName, &spec, "specfull")
+	if err != nil {
+		return err
+	}
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
 	if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
@@ -300,10 +303,12 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() error {
-
-		log.Log("cloud server created successfully", "")
-		lib.FormatVirtualMachine(os.Stderr, vm, "serverfull")
+	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
+		log.Log("cloud server created successfully")
+		err = lib.FormatVirtualMachine(os.Stderr, vm, "serverfull")
+		if err != nil {
+			return
+		}
 		if imageInstall != nil {
 			log.Log()
 			log.Logf("Root password:") // logf so we don't get a tailing \r\n
@@ -311,6 +316,6 @@ func createServer(c *Context) (err error) {
 		} else {
 			log.Log("Machine was not imaged")
 		}
-		return nil
+		return
 	})
 }

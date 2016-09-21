@@ -48,7 +48,10 @@ func TestReadDefinitions(t *testing.T) {
 	client, authServer, brain, billing, err := mkTestClientAndServers(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == "/definitions" {
-				w.Write([]byte(fixtureDefinitionsJSON))
+				_, err := w.Write([]byte(fixtureDefinitionsJSON))
+				if err != nil {
+					t.Fatal(err)
+				}
 			} else {
 				http.NotFound(w, r)
 			}

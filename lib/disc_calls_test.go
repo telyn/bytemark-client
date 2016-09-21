@@ -63,10 +63,16 @@ func TestCreateDisc(t *testing.T) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs" && req.Method == "POST" {
 			// TODO: unmarshal the disc
 			// then test for sanity, equality to disk put in
-			w.Write([]byte("{}"))
+			_, err := w.Write([]byte("{}"))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm" {
 			// TODO: return a VM that has some discs
-			w.Write([]byte("{}"))
+			_, err := w.Write([]byte("{}"))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
@@ -162,7 +168,10 @@ func TestShowDisc(t *testing.T) {
 		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
 			bytes, err := json.Marshal(getFixtureDisc())
 			is.Nil(err)
-			w.Write(bytes)
+			_, err = w.Write(bytes)
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/invalid-account" {
 			http.NotFound(w, req)
 		} else {
