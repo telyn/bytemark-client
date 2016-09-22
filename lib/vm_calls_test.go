@@ -321,7 +321,10 @@ func TestCreateVirtualMachine(t *testing.T) {
 				if !reflect.DeepEqual(test.Expect, spec) {
 					t.Error("spec did not deep-equal what was expected.")
 				} else {
-					w.Write(bytes)
+					_, err = w.Write(bytes)
+					if err != nil {
+						t.Fatal(err)
+					}
 				}
 			} else {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
