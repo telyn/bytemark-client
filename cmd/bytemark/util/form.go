@@ -18,14 +18,14 @@ const (
 	FIELD_OWNER_FIRSTNAME
 	// FIELD_OWNER_LASTNAME is the index of the account owner's last name field in the signup form
 	FIELD_OWNER_LASTNAME
-	// FIELD_OWNER_CC is the index of the account owner's country code field in the signup form
-	FIELD_OWNER_CC
-	// FIELD_OWNER_POSTCODE is the index of the account owner's postcode field in the signup form
-	FIELD_OWNER_POSTCODE
-	// FIELD_OWNER_CITY is the index of the account owner's city field in the signup form
-	FIELD_OWNER_CITY
 	// FIELD_OWNER_ADDRESS is the index of the account owner's address field in the signup form
 	FIELD_OWNER_ADDRESS
+	// FIELD_OWNER_CITY is the index of the account owner's city field in the signup form
+	FIELD_OWNER_CITY
+	// FIELD_OWNER_POSTCODE is the index of the account owner's postcode field in the signup form
+	FIELD_OWNER_POSTCODE
+	// FIELD_OWNER_CC is the index of the account owner's country code field in the signup form
+	FIELD_OWNER_CC
 	// FIELD_OWNER_PHONE is the index of the account owner's phone number field in the signup form
 	FIELD_OWNER_PHONE
 	// FIELD_OWNER_MOBILE is the index of the account owner's mobile number field in the signup form
@@ -77,10 +77,10 @@ func MakeSignupForm(creditCardForm bool) (fields map[int]form.Field, f *form.For
 		FIELD_OWNER_PASS_CONFIRM: confirm,
 		FIELD_OWNER_FIRSTNAME:    mkField("First name", 24, validNonEmpty),
 		FIELD_OWNER_LASTNAME:     mkField("Last name", 24, validNonEmpty),
-		FIELD_OWNER_CC:           mkField("ISO Country code (2-digit country code)\r\nNote that the UK's code is actually GB. Most others are what you'd expect", 3, validISOCountry),
-		FIELD_OWNER_POSTCODE:     mkField("Post code", 24, validPostcode),
-		FIELD_OWNER_CITY:         mkField("City", 24, validNonEmpty),
 		FIELD_OWNER_ADDRESS:      mkField("Street Address", 24, validNonEmpty),
+		FIELD_OWNER_CITY:         mkField("City", 24, validNonEmpty),
+		FIELD_OWNER_POSTCODE:     mkField("Post code", 24, validPostcode),
+		FIELD_OWNER_CC:           mkField("ISO Country code (2-digit country code)\r\nNote that the UK's code is actually GB. Most others are what you'd expect", 3, validISOCountry),
 		FIELD_OWNER_PHONE:        mkField("Phone number", 24, validNumber),
 		FIELD_OWNER_MOBILE:       mkField("Mobile phone (optional)", 24, validEmptyOr(validNumber)),
 		FIELD_OWNER_ORG_NAME:     mkField("Organisation name (optional)", 24, validAlways),
