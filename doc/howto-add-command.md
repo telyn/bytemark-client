@@ -12,7 +12,7 @@ lib
 * Add the function you just made to the interface to
   `lib/interface.go`. Now `go test github.com/BytemarkHosting/bytemark-client/main` will break.
 
-* Add a unit test for your API call to the relavent `_test.go` file
+* Add a unit test for your API call to the relevant `_test.go` file
   in `lib/`.
 
 * Add a mock version of the function to `mocks/bytemark-client.go`
