@@ -14,7 +14,7 @@ before_script:
 stages:
   - test
 
-lint:
+lint: &lint
   stage: test
   allow_failure: true # delete me once we've got the lintiness down to 0
   script: |
@@ -22,6 +22,16 @@ lint:
     gometalinter -i
     cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+
+lint-errcheck:
+  <<: *lint
+  script: |
+    go get github.com/alecthomas/gometalinter
+    gometalinter -i
+    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+  allow_failure: false
+
 
 vet:
   stage: test

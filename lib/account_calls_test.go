@@ -11,10 +11,13 @@ func TestGetAccount(t *testing.T) {
 	is := is.New(t)
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account" {
-			w.Write([]byte(`{
+			_, err := w.Write([]byte(`{
 			    "name": "account",
 			    "id": 1
 			}`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/invalid-account" {
 			http.NotFound(w, req)
 		} else {
@@ -23,12 +26,15 @@ func TestGetAccount(t *testing.T) {
 
 	}), http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/api/v1/accounts" {
-			w.Write([]byte(`[
-			{
-			    "bigv_account_subscription": "account"
-			},
-			{ "bigv_account_subscription": "wrong-account" }
-		]`))
+			_, err := w.Write([]byte(`[
+				{
+				    "bigv_account_subscription": "account"
+				},
+				{ "bigv_account_subscription": "wrong-account" }
+			]`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
@@ -62,7 +68,7 @@ func TestGetAccounts(t *testing.T) {
 	is := is.New(t)
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts" {
-			w.Write([]byte(`[
+			_, err := w.Write([]byte(`[
 			{
 			    "name": "account",
 			    "id": 1
@@ -72,15 +78,19 @@ func TestGetAccounts(t *testing.T) {
 			    "id": 10
 			}
 			]`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
 	}), http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/api/v1/accounts" {
-			w.Write([]byte(`[
-
-		]`))
+			_, err := w.Write([]byte(`[]`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
@@ -119,9 +129,12 @@ func TestDefaultAccount(t *testing.T) {
 	is := is.New(t)
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/default-account" {
-			w.Write([]byte(`
+			_, err := w.Write([]byte(`
 			{ "id": 2402, "suspended": false, "name": "default-account" }
 			`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
@@ -129,11 +142,14 @@ func TestDefaultAccount(t *testing.T) {
 	}),
 		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/api/v1/accounts" {
-				w.Write([]byte(`[
+				_, err := w.Write([]byte(`[
 				{ "bigv_account_subscription": "default-account" },
 				{ "bigv_account_subscription": "not-default-account" },
 				{ "bigv_account_subscription": "also-not-default-account" }
 				]`))
+				if err != nil {
+					t.Fatal(err)
+				}
 			} else {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
@@ -163,9 +179,12 @@ func TestDefaultAccount(t *testing.T) {
 func TestDefaultAccountHasNoBigVSubscription(t *testing.T) {
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/default-account" {
-			w.Write([]byte(`
+			_, err := w.Write([]byte(`
 			{ "id": 2402, "suspended": false, "name": "default-account" }
 			`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
@@ -173,10 +192,13 @@ func TestDefaultAccountHasNoBigVSubscription(t *testing.T) {
 	}),
 		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/api/v1/accounts" {
-				w.Write([]byte(`[
+				_, err := w.Write([]byte(`[
 				{ },
 				{ "bigv_account_subscription": "not-default-account" }
 				]`))
+				if err != nil {
+					t.Fatal(err)
+				}
 			} else {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}

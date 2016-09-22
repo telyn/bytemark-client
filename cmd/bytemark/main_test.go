@@ -36,7 +36,7 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 
 		if c.Subcommands != nil && len(c.Subcommands) > 0 {
 			fmt.Fprintf(os.Stderr, c.Name)
-			global.App.Run([]string{"bytemark.test", c.Name, "help"})
+			_ = global.App.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
 	return

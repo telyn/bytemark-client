@@ -81,7 +81,10 @@ func TestMoveVirtualMachine(t *testing.T) {
 
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/old-account/groups/old-group" {
-			w.Write([]byte(`{"id":101, "name": "old-group"}`))
+			_, err := w.Write([]byte(`{"id":101, "name": "old-group"}`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/rename-test" {
 			if req.Method == "PUT" {
 				decoded := make(map[string]interface{})
@@ -95,7 +98,10 @@ func TestMoveVirtualMachine(t *testing.T) {
 				}
 				is.Equal("new-name", decoded["name"])
 				is.Equal(101, decoded["group_id"])
-				w.Write(body)
+				_, err = w.Write(body)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
@@ -129,7 +135,10 @@ func TestMoveServerGroup(t *testing.T) {
 
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/old-account/groups/new-group" {
-			w.Write([]byte(`{"id":105, "name": "new-group"}`))
+			_, err := w.Write([]byte(`{"id":105, "name": "new-group"}`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/group-test" {
 			if req.Method == "PUT" {
 				decoded := make(map[string]interface{})
@@ -143,7 +152,10 @@ func TestMoveServerGroup(t *testing.T) {
 				}
 				is.Equal("new-name", decoded["name"])
 				is.Equal(105, decoded["group_id"])
-				w.Write(body)
+				_, err = w.Write(body)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
@@ -179,7 +191,10 @@ func TestGetVirtualMachine(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			w.Write(str)
+			_, err = w.Write(str)
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/account/groups/default/virtual_machines/invalid-vm" {
 			http.NotFound(w, req)
 		} else {

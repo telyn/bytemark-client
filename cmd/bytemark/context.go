@@ -51,9 +51,12 @@ func (c *Context) NextArg() (string, error) {
 }
 
 // Help returns the Help for this Context (i.e. command or subcommand) with the given string prepended with a couple of newlines
-func (c *Context) Help(whatsyourproblem string) error {
+func (c *Context) Help(whatsyourproblem string) (err error) {
 	log.Output(whatsyourproblem, "")
-	cli.ShowSubcommandHelp(c.Context)
+	err = cli.ShowSubcommandHelp(c.Context)
+	if err != nil {
+		return
+	}
 	return util.UsageDisplayedError{TheProblem: whatsyourproblem}
 }
 

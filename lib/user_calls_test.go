@@ -29,7 +29,10 @@ func TestGetUser(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			w.Write(str)
+			_, err = w.Write(str)
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/users/nonexistent-user" {
 			http.NotFound(w, req)
 		} else {

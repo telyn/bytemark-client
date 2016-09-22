@@ -29,7 +29,10 @@ func TestCreateGroup(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			w.Write(str)
+			_, err = w.Write(str)
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
@@ -55,13 +58,19 @@ func TestDeleteGroup(t *testing.T) {
 	is := is.New(t)
 	groupHandler := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/account/groups/default" && req.Method == "DELETE" {
-			w.Write([]byte(""))
+			_, err := w.Write([]byte(""))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/account/groups/default" && req.Method == "GET" {
 			str, err := json.Marshal(getFixtureGroup())
 			if err != nil {
 				t.Fatal(err)
 			}
-			w.Write(str)
+			_, err = w.Write(str)
+			if err != nil {
+				t.Fatal(err)
+			}
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 		}
 
@@ -91,7 +100,10 @@ func TestGetGroup(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			w.Write(str)
+			_, err = w.Write(str)
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/account/groups/invalid-group" {
 			http.NotFound(w, req)
 		} else {
@@ -101,7 +113,10 @@ func TestGetGroup(t *testing.T) {
 	}
 	billingHandler := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/api/v1/accounts" {
-			w.Write([]byte(`[{ "bigv_account_subscription": "account" }]`))
+			_, err := w.Write([]byte(`[{ "bigv_account_subscription": "account" }]`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		}
 	}
 	client, authServer, brain, billing, err :=
