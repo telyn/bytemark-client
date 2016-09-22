@@ -36,7 +36,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			},
 			cli.GenericFlag{
 				Name:  "disc",
-				Usage: "One of more disc specifications. Defaults to a single 25GiB sata-grade disc",
+				Usage: "One or more disc specifications. Defaults to a single 25GiB sata-grade disc",
 				Value: new(util.DiscSpecFlag),
 			},
 			forceFlag,
