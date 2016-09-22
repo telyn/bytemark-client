@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"reflect"
 	"testing"
 )
 
@@ -235,4 +236,113 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.Equal("127.0.0.1", vm.ManagementAddress.String())
 	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].IPs[0].String())
 
+}
+
+func TestCreateVirtualMachine(t *testing.T) {
+
+	// TODO add more tests
+	tests := []struct {
+		Input     brain.VirtualMachineSpec
+		Expect    brain.VirtualMachineSpec
+		ExpectErr bool
+	}{
+		{
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{
+					Name: "new-vm",
+				},
+				Discs: []brain.Disc{},
+			},
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{
+					Name: "new-vm",
+				},
+				Discs: nil,
+			},
+			false,
+		},
+		{
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{},
+				Discs: []brain.Disc{
+					{},
+					{
+						Size:         25600,
+						StorageGrade: "archive",
+					},
+					{
+						Label: "gav",
+					},
+					{},
+				},
+			},
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{},
+				Discs: []brain.Disc{
+					{
+						StorageGrade: "sata",
+						Label:        "vda",
+					},
+					{
+						Size:         25600,
+						StorageGrade: "archive",
+						Label:        "vdb",
+					},
+					{
+						Label:        "gav",
+						StorageGrade: "sata",
+					},
+					{
+						StorageGrade: "sata",
+						Label:        "vdd",
+					},
+				},
+			},
+			false,
+		},
+	}
+
+	for i, test := range tests {
+		client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/test-account/groups/test-group/vm_create" {
+				bytes, err := ioutil.ReadAll(req.Body)
+				if err != nil {
+					t.Fatalf("#%d - %v", i, err)
+				}
+				var spec brain.VirtualMachineSpec
+				err = json.Unmarshal(bytes, &spec)
+
+				if err != nil {
+					t.Fatalf("#%d - %v", i, err)
+				}
+				js, err := json.MarshalIndent(spec, "IN", "    ")
+				t.Log(string(js))
+				bytes, err = json.Marshal(test.Expect.VirtualMachine)
+				if !reflect.DeepEqual(test.Expect, spec) {
+					t.Error("spec did not deep-equal what was expected.")
+				} else {
+					w.Write(bytes)
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
+
+		}), mkNilHandler(t))
+		defer authServer.Close()
+		defer brain.Close()
+		defer billing.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = client.AuthWithCredentials(map[string]string{})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		group := GroupName{Group: "test-group", Account: "test-account"}
+		_, err = client.CreateVirtualMachine(&group, test.Input)
+		if err != nil && !test.ExpectErr {
+			t.Fatal(err)
+		}
+	}
 }

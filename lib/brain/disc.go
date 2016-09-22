@@ -6,9 +6,9 @@ type Disc struct {
 	StorageGrade string `json:"storage_grade"`
 	Size         int    `json:"size"`
 
-	ID               int    `json:"id"`
-	VirtualMachineID int    `json:"virtual_machine_id"`
-	StoragePool      string `json:"storage_pool"`
+	ID               int    `json:"id,omitempty"`
+	VirtualMachineID int    `json:"virtual_machine_id,omitempty"`
+	StoragePool      string `json:"storage_pool,omitempty"`
 }
 
 // Validate makes sure the disc has a storage grade. Doesn't modify the origin disc.
