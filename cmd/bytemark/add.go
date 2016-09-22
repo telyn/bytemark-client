@@ -41,8 +41,7 @@ func init() {
 				key := strings.TrimSpace(strings.Join(ctx.Args(), " "))
 				if key == "" {
 					if publicKeyFile.Value == "" {
-						log.Log("Please specify a key")
-						return
+						return ctx.Help("Please specify a key")
 					}
 					key = publicKeyFile.Value
 				}
