@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -77,12 +76,11 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 				return
 			}),
 		}, {
-			Name:      "groups",
-			Usage:     "list all the groups in an account",
-			UsageText: "bytemark list groups <account>",
-			Description: `This command lists all the groups in the given account, or in your default account.
-Your default account is determined by the --account flag, the account variable in your config, falling back to the account with the same name as you log in with.`,
-			Action: With(AccountProvider, AuthProvider, func(c *Context) (err error) {
+			Name:        "groups",
+			Usage:       "list all the groups in an account",
+			UsageText:   "bytemark list groups [account]",
+			Description: `This command lists all the groups in the given account, or in your default account if not specified.`,
+			Action: With(AccountProvider(false), AuthProvider, func(c *Context) (err error) {
 				for _, group := range c.Account.Groups {
 					log.Output(group.Name)
 				}
@@ -119,27 +117,13 @@ Your default account is determined by the --account flag, the account variable i
 			Name:      "servers",
 			Usage:     "list all the servers in an account",
 			UsageText: "bytemark list servers [account]",
-			Description: `This command lists all the servers in the given account, or in your default account if you didn't specify an account on the command-line.
+			Description: `This command lists all the servers in the given account, or in your default account if not specified.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			Action: With(AuthProvider, func(c *Context) error {
-				var account *lib.Account
-				var err error
-
-				if len(c.Args()) >= 1 {
-					nameStr, _ := c.NextArg()
-					name := global.Client.ParseAccountName(nameStr, global.Config.GetIgnoreErr("account"))
-					account, err = global.Client.GetAccount(name)
-				} else {
-					account, err = global.Client.GetDefaultAccount()
-				}
-
-				if err != nil {
-					return err
-				}
-				for _, g := range account.Groups {
+			Action: With(AccountProvider(false), AuthProvider, func(c *Context) (err error) {
+				for _, g := range c.Account.Groups {
 					listServersInGroup(g)
 				}
-				return nil
+				return
 			}),
 		}},
 	})

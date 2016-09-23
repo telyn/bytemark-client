@@ -92,6 +92,9 @@ func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err 
 
 // GetAccount takes an account name or ID and returns a filled-out Account object
 func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
+	if name == "" {
+		return c.GetDefaultAccount()
+	}
 	billingAccount, err := c.getBillingAccount(name)
 	if err != nil {
 		return nil, err

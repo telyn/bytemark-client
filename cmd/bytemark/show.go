@@ -18,8 +18,9 @@ func init() {
 		Subcommands: []cli.Command{{
 			Name:      "account",
 			Usage:     `displays information about the given account`,
-			UsageText: "bytemark show account [--json] <name>",
+			UsageText: "bytemark show account [--json] [name]",
 			Description: `This command displays information about the given account, including contact details and how many servers are in it across its groups.
+If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
 			Flags: []cli.Flag{
@@ -28,7 +29,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					Usage: "Output account details as a JSON object",
 				},
 			},
-			Action: With(AccountProvider, func(c *Context) error {
+			Action: With(AccountProvider(false), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
 					def, err := global.Client.GetDefaultAccount()
 					if err != nil {
