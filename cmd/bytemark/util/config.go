@@ -479,7 +479,7 @@ func (config *Config) PanelURL() string {
 	}
 	if strings.EqualFold(endpoint, "int.bigv.io") {
 		// am i leaking a secret?
-		return "https://panel-int.vlan863.bytemark.uk0.bigv.io"
+		return "https://panel-int.admin.bytemark.co.uk"
 	}
 	panel := config.GetIgnoreErr("panel-address")
 	if panel == "" {
