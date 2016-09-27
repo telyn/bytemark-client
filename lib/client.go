@@ -147,7 +147,7 @@ func (c *bytemarkClient) validateGroupName(group *GroupName) error {
 func (c *bytemarkClient) validateAccountName(account *string) error {
 	if *account == "" && c.authSession != nil {
 		billAcc, err := c.getDefaultBillingAccount()
-		if err == nil {
+		if err == nil && billAcc != nil {
 			*account = billAcc.Name
 		} else {
 			return err
