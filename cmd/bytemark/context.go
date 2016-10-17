@@ -43,7 +43,7 @@ func (c *Context) Args() []string {
 // NextArg returns the next unused argument, and marks it as used.
 func (c *Context) NextArg() (string, error) {
 	if len(c.args()) <= c.currentArgIndex {
-		return "", util.NotEnoughArgumentsError{}
+		return "", c.Help("not enough arguments were specified")
 	}
 	arg := c.args()[c.currentArgIndex]
 	c.currentArgIndex++
