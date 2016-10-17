@@ -131,7 +131,6 @@ func newBadRequestError(ctx APIError, response []byte) error {
 		bytes, _ := json.Marshal([]string{string(response)})
 		jsonProblems[""] = bytes
 	}
-	log.Errorf("jsonProblems len: %d\r\n", len(jsonProblems))
 	for t, data := range jsonProblems {
 		switch t {
 		case "discs":
