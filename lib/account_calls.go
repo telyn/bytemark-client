@@ -37,7 +37,10 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []*billing.Account, err 
 	if err != nil {
 		return
 	}
+	oldfile := log.LogFile
+	log.LogFile = nil
 	_, _, err = req.Run(nil, &accounts)
+	log.LogFile = oldfile
 	return
 }
 
@@ -79,12 +82,19 @@ func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err 
 		return nil, err
 	}
 
+	// prevent password & card reference from being written to debug log
+	// this is a bit of a sledgehammer
+	// TODO make it not a sledgehammer somehow
+	oldfile := log.LogFile
+	log.LogFile = nil
+
 	status, _, err := req.Run(bytes.NewBuffer(js), newAcc)
 	if err != nil {
 		if _, ok := err.(*json.InvalidUnmarshalError); !ok {
 			return newAcc, err
 		}
 	}
+	log.LogFile = oldfile
 	if status == 202 {
 		return newAcc, AccountCreationDeferredError{}
 	}

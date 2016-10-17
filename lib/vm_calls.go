@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
@@ -42,7 +43,10 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.Virtu
 	}
 
 	vm = new(brain.VirtualMachine)
+	oldfile := log.LogFile
+	log.LogFile = nil
 	_, _, err = r.Run(bytes.NewBuffer(js), vm)
+	log.LogFile = oldfile
 	return vm, err
 }
 
@@ -139,7 +143,10 @@ func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *
 	if err != nil {
 		return err
 	}
+	oldfile := log.LogFile
+	log.LogFile = nil
 	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	log.LogFile = oldfile
 	return err
 }
 
