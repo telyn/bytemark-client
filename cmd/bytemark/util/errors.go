@@ -16,14 +16,6 @@ func (e SubprocessFailedError) Error() string {
 	return fmt.Sprintf("Running %s failed - %s", e.Args[0], e.Err.Error())
 }
 
-// NotEnoughArgumentsError is returned from command's Actions when there weren't enough arguments to satisfy the requirements. This is no longer used in favour of return c.Help("not enough arguments") now and will be removed when I do a deadcode delinting pass.
-type NotEnoughArgumentsError struct {
-}
-
-func (e NotEnoughArgumentsError) Error() string {
-	return "Not enough arguments passed to the command!"
-}
-
 // UsageDisplayedError is returned by commands when the user entered wrong info and the help was output
 type UsageDisplayedError struct {
 	TheProblem string

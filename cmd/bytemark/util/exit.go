@@ -247,9 +247,6 @@ func ProcessError(err error, message ...string) ExitCode {
 		case lib.AmbiguousKeyError:
 			exitCode = E_PEBKAC
 			errorMessage = err.Error()
-		case NotEnoughArgumentsError:
-			exitCode = E_PEBKAC
-			errorMessage = err.Error()
 		case UsageDisplayedError:
 			exitCode = E_PEBKAC
 			errorMessage = err.Error()
