@@ -28,10 +28,11 @@ func (e NotEnoughArgumentsError) Error() string {
 // UsageDisplayedError is returned by commands when the user entered wrong info and the help was output
 type UsageDisplayedError struct {
 	TheProblem string
+	Command    string
 }
 
 func (e UsageDisplayedError) Error() string {
-	return e.TheProblem
+	return e.TheProblem + "\r\n\r\nFor more information, see `bytemark help " + e.Command + "`"
 }
 
 // WontDeleteNonEmptyGroupError is returned when 'delete group' was called on a group with stuff in, without --recursive being specified
