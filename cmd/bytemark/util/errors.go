@@ -17,6 +17,7 @@ func (e SubprocessFailedError) Error() string {
 }
 
 // NotEnoughArgumentsError is returned from command's Actions when there weren't enough arguments to satisfy the requirements. This is no longer used in favour of return c.Help("not enough arguments") now and will be removed when I do a deadcode delinting pass.
+// TODO(telyn): remove NotEnoughArgumentsError
 type NotEnoughArgumentsError struct {
 }
 
