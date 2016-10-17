@@ -40,6 +40,9 @@ func init() {
 
 				key := strings.TrimSpace(strings.Join(ctx.Args(), " "))
 				if key == "" {
+					if publicKeyFile.Value == "" {
+						return ctx.Help("Please specify a key")
+					}
 					key = publicKeyFile.Value
 				}
 
