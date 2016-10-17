@@ -471,11 +471,11 @@ func (config *Config) Unset(name string) error {
 	return os.Remove(config.GetPath(name))
 }
 
-// PanelURL returns config's best guess at the correct URL for the bytemark panel for the cluster with the endpoint we're using. Basically it flips between panel-beta.bytemark and panel-int.
+// PanelURL returns config's best guess at the correct URL for the bytemark panel for the cluster with the endpoint we're using. Basically it flips between panel.bytemark and panel-int.
 func (config *Config) PanelURL() string {
 	endpoint := config.EndpointName()
 	if strings.EqualFold(endpoint, "uk0.bigv.io") {
-		return "https://panel-beta.bytemark.co.uk"
+		return "https://panel.bytemark.co.uk"
 	}
 	if strings.EqualFold(endpoint, "int.bigv.io") {
 		// am i leaking a secret?
