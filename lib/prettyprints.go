@@ -202,7 +202,7 @@ func FormatImageInstall(wr io.Writer, ii *brain.ImageInstall, tpl TemplateChoice
 	if ii.FirstbootScript != "" {
 		output = append(output, "With a firstboot script")
 	}
-	_, err := wr.Write([]byte(strings.Join(output, "\r\n")))
+	_, err := wr.Write([]byte(strings.Join(output, "\r\n") + "\r\n"))
 	return err
 }
 
