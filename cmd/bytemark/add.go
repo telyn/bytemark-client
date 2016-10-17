@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -40,16 +40,17 @@ func init() {
 
 				key := strings.TrimSpace(strings.Join(ctx.Args(), " "))
 				if key == "" {
+					if publicKeyFile.Value == "" {
+						return ctx.Help("Please specify a key")
+					}
 					key = publicKeyFile.Value
 				}
 
 				err = global.Client.AddUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key added successfully")
-					return
-				} else {
-					return
 				}
+				return
 			}),
 		}, {
 			Name:        "ips",
@@ -95,7 +96,7 @@ func init() {
 						reason = util.Prompt("Enter the purpose for these extra IPs: ")
 					}
 				}
-				ipcr := lib.IPCreateRequest{
+				ipcr := brain.IPCreateRequest{
 					Addresses:  addrs,
 					Family:     family,
 					Reason:     reason,

@@ -2,13 +2,14 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 	"strings"
 	"testing"
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -31,7 +32,7 @@ func TestAddKeyCommand(t *testing.T) {
 	c.Reset()
 }
 func TestAddIPCommand(t *testing.T) {
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -41,7 +42,7 @@ func TestAddIPCommand(t *testing.T) {
 	vm := lib.VirtualMachineName{VirtualMachine: "test-server"}
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vm, nil).Times(1)
 
-	ipcr := lib.IPCreateRequest{
+	ipcr := brain.IPCreateRequest{
 		Addresses:  1,
 		Family:     "ipv4",
 		Reason:     "testing",

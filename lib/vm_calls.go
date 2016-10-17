@@ -4,87 +4,45 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
-func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec VirtualMachineSpec) (vm *VirtualMachine, err error) {
+func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.VirtualMachineSpec) (vm *brain.VirtualMachine, err error) {
 	err = c.validateGroupName(group)
 	if err != nil {
 		return nil, err
 	}
-	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
 	if err != nil {
 		return nil, err
 	}
-
-	req := make(map[string]interface{})
-	rvm := make(map[string]interface{})
-	rvm["autoreboot_on"] = spec.VirtualMachine.Autoreboot
-	if spec.VirtualMachine.CdromURL != "" {
-		rvm["cdrom_url"] = spec.VirtualMachine.CdromURL
-	}
-	rvm["cores"] = spec.VirtualMachine.Cores
-	rvm["memory"] = spec.VirtualMachine.Memory
-	rvm["name"] = spec.VirtualMachine.Name
-	if spec.VirtualMachine.HardwareProfile != "" {
-		rvm["hardware_profile"] = spec.VirtualMachine.HardwareProfile
-	}
-	rvm["hardware_profile_locked"] = spec.VirtualMachine.HardwareProfileLocked
-	if spec.VirtualMachine.ZoneName != "" {
-		rvm["zone_name"] = spec.VirtualMachine.ZoneName
-	}
-
-	req["virtual_machine"] = rvm
-
-	labelDiscs(spec.Discs)
-
-	discs := make([]map[string]interface{}, 0, 4)
-
-	for _, d := range spec.Discs {
-		disc := make(map[string]interface{})
-		label := d.Label
-		disc["label"] = label
-		disc["size"] = d.Size
-		disc["storage_grade"] = d.StorageGrade
-
-		discs = append(discs, disc)
-	}
-
-	req["discs"] = discs
-
-	if spec.Reimage != nil {
-		reimage := make(map[string]interface{})
-
-		if spec.Reimage.Distribution != "" {
-			reimage["distribution"] = spec.Reimage.Distribution
-		}
-		if spec.Reimage.RootPassword != "" {
-			reimage["root_password"] = spec.Reimage.RootPassword
-		}
-		reimage["ssh_public_key"] = spec.Reimage.PublicKeys
-		reimage["firstboot_script"] = spec.Reimage.FirstbootScript
-
-		req["reimage"] = reimage
-	}
-
 	if spec.IPs != nil {
-		ips := make(map[string]interface{})
-		if spec.IPs.IPv4 != "" {
-			ips["ipv4"] = spec.IPs.IPv4
+		if spec.IPs.IPv4 == "" && spec.IPs.IPv6 == "" {
+			spec.IPs = nil
 		}
-		if spec.IPs.IPv6 != "" {
-			ips["ipv6"] = spec.IPs.IPv6
+	}
+	if spec.Discs != nil {
+		if len(spec.Discs) == 0 {
+			spec.Discs = nil
 		}
-		rvm["ips"] = ips
+		for i, disc := range spec.Discs {
+			newDisc, err := disc.Validate()
+			if err != nil {
+				return nil, err
+			}
+			spec.Discs[i] = *newDisc
+		}
+		labelDiscs(spec.Discs, 0)
 	}
 
-	js, err := json.Marshal(req)
+	js, err := json.Marshal(spec)
 	if err != nil {
 		return nil, err
 	}
 
-	vm = new(VirtualMachine)
+	vm = new(brain.VirtualMachine)
 	oldfile := log.LogFile
 	log.LogFile = nil
 	_, _, err = r.Run(bytes.NewBuffer(js), vm)
@@ -103,7 +61,7 @@ func (c *bytemarkClient) DeleteVirtualMachine(name *VirtualMachineName, purge bo
 	if purge {
 		purgePart = "?purge=true"
 	}
-	r, err := c.BuildRequest("DELETE", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s"+purgePart, name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s"+purgePart, name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -113,13 +71,13 @@ func (c *bytemarkClient) DeleteVirtualMachine(name *VirtualMachineName, purge bo
 }
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *VirtualMachine, err error) {
+func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *brain.VirtualMachine, err error) {
 	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return
 	}
-	vm = new(VirtualMachine)
-	r, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
+	vm = new(brain.VirtualMachine)
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return
 	}
@@ -143,7 +101,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 	}
 
 	// create the change we want to see in the server
-	change := VirtualMachine{Name: newName.VirtualMachine}
+	change := brain.VirtualMachine{Name: newName.VirtualMachine}
 	if newName.Group != "" || newName.Account != "" {
 		// get group
 		groupName := GroupName{Group: newName.Group, Account: newName.Account}
@@ -155,7 +113,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 	}
 
 	// PUT the change
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", oldName.Account, oldName.Group, oldName.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", oldName.Account, oldName.Group, oldName.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -171,12 +129,12 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 
 // ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 // Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
-func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *ImageInstall) (err error) {
+func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *brain.ImageInstall) (err error) {
 	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/reimage", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/reimage", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -200,7 +158,7 @@ func (c *bytemarkClient) ResetVirtualMachine(name *VirtualMachineName) (err erro
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -216,7 +174,7 @@ func (c *bytemarkClient) RestartVirtualMachine(name *VirtualMachineName) (err er
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -232,7 +190,7 @@ func (c *bytemarkClient) StartVirtualMachine(name *VirtualMachineName) (err erro
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -248,7 +206,7 @@ func (c *bytemarkClient) StopVirtualMachine(name *VirtualMachineName) (err error
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -266,7 +224,7 @@ func (c *bytemarkClient) ShutdownVirtualMachine(name *VirtualMachineName, stayof
 	}
 	var r *Request
 	if stayoff {
-		r, err = c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+		r, err = c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 		if err != nil {
 			return
 		}
@@ -276,7 +234,7 @@ func (c *bytemarkClient) ShutdownVirtualMachine(name *VirtualMachineName, stayof
 			return
 		}
 	}
-	r, err = c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	r, err = c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return
 	}
@@ -292,7 +250,7 @@ func (c *bytemarkClient) UndeleteVirtualMachine(name *VirtualMachineName) (err e
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -308,18 +266,18 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name *VirtualMachineNa
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
-	hwprofile_lock := ""
+	hwprofileLock := ""
 	if len(locked) > 0 {
-		hwprofile_lock = `, "hardware_profile_locked": false`
+		hwprofileLock = `, "hardware_profile_locked": false`
 		if locked[0] {
-			hwprofile_lock = `, "hardware_profile_locked": true`
+			hwprofileLock = `, "hardware_profile_locked": true`
 		}
 	}
-	profileJSON := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofile_lock)
+	profileJSON := fmt.Sprintf(`{"hardware_profile": "%s"%s}`, profile, hwprofileLock)
 
 	_, _, err = r.Run(bytes.NewBufferString(profileJSON), nil)
 	return err
@@ -332,7 +290,7 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfileLock(name *VirtualMachi
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -353,7 +311,7 @@ func (c *bytemarkClient) SetVirtualMachineMemory(name *VirtualMachineName, memor
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -371,7 +329,7 @@ func (c *bytemarkClient) SetVirtualMachineCores(name *VirtualMachineName, cores 
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}

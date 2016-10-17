@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
@@ -60,7 +61,10 @@ The root password will be the only thing output on stdout - good for scripts!
 			}
 
 			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", c.VirtualMachineName.String())
-			lib.FormatImageInstall(os.Stderr, imageInstall, "imageinstall")
+			err = lib.FormatImageInstall(os.Stderr, imageInstall, "imageinstall")
+			if err != nil {
+				return err
+			}
 
 			if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
 				log.Error("Exiting")
@@ -72,7 +76,7 @@ The root password will be the only thing output on stdout - good for scripts!
 	})
 }
 
-func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted bool, err error) {
+func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
 	firstbootScriptFile := c.FileContents("firstboot-script-file")
@@ -100,7 +104,7 @@ func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted 
 		rootPassword = util.GeneratePassword()
 	}
 
-	return &lib.ImageInstall{
+	return &brain.ImageInstall{
 		Distribution:    image,
 		FirstbootScript: firstbootScript,
 		PublicKeys:      pubkeys,

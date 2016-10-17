@@ -5,13 +5,18 @@ import (
 	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
+// Endpoint is an enum-style type to avoid people using endpoints like ints
 type Endpoint int
 
 const (
-	EP_AUTH Endpoint = iota
-	EP_BRAIN
-	EP_BILLING
-	EP_SPP
+	// AuthEndpoint means "make the connection to auth!"
+	AuthEndpoint Endpoint = iota
+	// BrainEndpoint means "make the connection to the brain!"
+	BrainEndpoint
+	// BillingEndpoint means "make the connection to bmbilling!"
+	BillingEndpoint
+	// SPPEndpoint means "make the connection to SPP!"
+	SPPEndpoint
 )
 
 // bytemarkClient is the main type in the Bytemark API client library
@@ -26,7 +31,7 @@ type bytemarkClient struct {
 }
 
 // New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
-func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient, err error) {
+func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c Client, err error) {
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
 		return nil, err
@@ -35,8 +40,8 @@ func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c *bytemarkClient,
 }
 
 // NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and github.com/BytemarkHosting/auth-client Client
-func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) (c *bytemarkClient) {
-	c = new(bytemarkClient)
+func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) Client {
+	c := new(bytemarkClient)
 	c.brainEndpoint = brainEndpoint
 	c.billingEndpoint = billingEndpoint
 	c.sppEndpoint = sppEndpoint
@@ -142,7 +147,7 @@ func (c *bytemarkClient) validateGroupName(group *GroupName) error {
 func (c *bytemarkClient) validateAccountName(account *string) error {
 	if *account == "" && c.authSession != nil {
 		billAcc, err := c.getDefaultBillingAccount()
-		if err == nil {
+		if err == nil && billAcc != nil {
 			*account = billAcc.Name
 		} else {
 			return err

@@ -2,19 +2,56 @@ package lib
 
 import (
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"reflect"
 	"testing"
 )
 
-func getFixtureVM() (vm VirtualMachine) {
+func getFixtureVMWithManyIPs() (vm brain.VirtualMachine, v4 []string, v6 []string) {
+	vm = getFixtureVM()
+	vm.NetworkInterfaces = make([]*brain.NetworkInterface, 1)
+	vm.NetworkInterfaces[0] = &brain.NetworkInterface{
+		Label: "test-nic",
+		Mac:   "FF:FE:FF:FF:FF",
+		IPs: []*net.IP{
+			&net.IP{192, 168, 1, 16},
+			&net.IP{192, 168, 1, 22},
+			&net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x10},
+			&net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x01, 0x00},
+		},
+		ExtraIPs: map[string]*net.IP{
+			"192.168.2.1":  &net.IP{192, 168, 1, 16},
+			"192.168.5.34": &net.IP{192, 168, 1, 22},
+			"fe80::1:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x01, 0x00},
+			"fe80::2:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x10},
+		},
+	}
+	v4 = []string{"192.168.1.16", "192.168.1.22", "192.168.2.1", "192.168.5.34"}
+	v6 = []string{"fe80::10", "fe80::100", "fe80::1:1", "fe80::2:1"}
+	return
+}
+func getFixtureVM() (vm brain.VirtualMachine) {
 	disc := getFixtureDisc()
 	nic := getFixtureNic()
 	ip := net.IPv4(127, 0, 0, 1)
 
-	return VirtualMachine{
+	return brain.VirtualMachine{
 		Name:    "valid-vm",
 		GroupID: 1,
 
@@ -26,7 +63,7 @@ func getFixtureVM() (vm VirtualMachine) {
 		HardwareProfile:       "fake-hardwareprofile",
 		HardwareProfileLocked: false,
 		ZoneName:              "default",
-		Discs: []*Disc{
+		Discs: []*brain.Disc{
 			&disc,
 		},
 		ID:                1,
@@ -34,7 +71,7 @@ func getFixtureVM() (vm VirtualMachine) {
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
-		NetworkInterfaces: []*NetworkInterface{
+		NetworkInterfaces: []*brain.NetworkInterface{
 			&nic,
 		},
 	}
@@ -45,7 +82,10 @@ func TestMoveVirtualMachine(t *testing.T) {
 
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/old-account/groups/old-group" {
-			w.Write([]byte(`{"id":101, "name": "old-group"}`))
+			_, err := w.Write([]byte(`{"id":101, "name": "old-group"}`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/rename-test" {
 			if req.Method == "PUT" {
 				decoded := make(map[string]interface{})
@@ -59,7 +99,10 @@ func TestMoveVirtualMachine(t *testing.T) {
 				}
 				is.Equal("new-name", decoded["name"])
 				is.Equal(101, decoded["group_id"])
-				w.Write(body)
+				_, err = w.Write(body)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
@@ -93,7 +136,10 @@ func TestMoveServerGroup(t *testing.T) {
 
 	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/accounts/old-account/groups/new-group" {
-			w.Write([]byte(`{"id":105, "name": "new-group"}`))
+			_, err := w.Write([]byte(`{"id":105, "name": "new-group"}`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/group-test" {
 			if req.Method == "PUT" {
 				decoded := make(map[string]interface{})
@@ -107,7 +153,10 @@ func TestMoveServerGroup(t *testing.T) {
 				}
 				is.Equal("new-name", decoded["name"])
 				is.Equal(105, decoded["group_id"])
-				w.Write(body)
+				_, err = w.Write(body)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
@@ -143,7 +192,10 @@ func TestGetVirtualMachine(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			w.Write(str)
+			_, err = w.Write(str)
+			if err != nil {
+				t.Fatal(err)
+			}
 		} else if req.URL.Path == "/accounts/account/groups/default/virtual_machines/invalid-vm" {
 			http.NotFound(w, req)
 		} else {
@@ -184,4 +236,116 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.Equal("127.0.0.1", vm.ManagementAddress.String())
 	is.Equal("127.0.0.2", vm.NetworkInterfaces[0].IPs[0].String())
 
+}
+
+func TestCreateVirtualMachine(t *testing.T) {
+
+	// TODO add more tests
+	tests := []struct {
+		Input     brain.VirtualMachineSpec
+		Expect    brain.VirtualMachineSpec
+		ExpectErr bool
+	}{
+		{
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{
+					Name: "new-vm",
+				},
+				Discs: []brain.Disc{},
+			},
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{
+					Name: "new-vm",
+				},
+				Discs: nil,
+			},
+			false,
+		},
+		{
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{},
+				Discs: []brain.Disc{
+					{},
+					{
+						Size:         25600,
+						StorageGrade: "archive",
+					},
+					{
+						Label: "gav",
+					},
+					{},
+				},
+			},
+			brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{},
+				Discs: []brain.Disc{
+					{
+						StorageGrade: "sata",
+						Label:        "vda",
+					},
+					{
+						Size:         25600,
+						StorageGrade: "archive",
+						Label:        "vdb",
+					},
+					{
+						Label:        "gav",
+						StorageGrade: "sata",
+					},
+					{
+						StorageGrade: "sata",
+						Label:        "vdd",
+					},
+				},
+			},
+			false,
+		},
+	}
+
+	for i, test := range tests {
+		client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/test-account/groups/test-group/vm_create" {
+				bytes, err := ioutil.ReadAll(req.Body)
+				if err != nil {
+					t.Fatalf("#%d - %v", i, err)
+				}
+				var spec brain.VirtualMachineSpec
+				err = json.Unmarshal(bytes, &spec)
+
+				if err != nil {
+					t.Fatalf("#%d - %v", i, err)
+				}
+				js, err := json.MarshalIndent(spec, "IN", "    ")
+				t.Log(string(js))
+				bytes, err = json.Marshal(test.Expect.VirtualMachine)
+				if !reflect.DeepEqual(test.Expect, spec) {
+					t.Error("spec did not deep-equal what was expected.")
+				} else {
+					_, err = w.Write(bytes)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
+
+		}), mkNilHandler(t))
+		defer authServer.Close()
+		defer brain.Close()
+		defer billing.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = client.AuthWithCredentials(map[string]string{})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		group := GroupName{Group: "test-group", Account: "test-account"}
+		_, err = client.CreateVirtualMachine(&group, test.Input)
+		if err != nil && !test.ExpectErr {
+			t.Fatal(err)
+		}
+	}
 }

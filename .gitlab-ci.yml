@@ -1,10 +1,58 @@
 image: golang:1.6
+
+variables:
+  GO15VENDOREXPERIMENT: "1"
+  GOPATH: /go
+
 before_script:
-  - go get -t -v -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-  - ls -l
-  - rm -rf $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+  # these two are needed for coverage stats
+  - go get github.com/modocache/gover golang.org/x/tools/cmd/cover github.com/BytemarkHosting/auth-client
+  - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+  # stick our code in the correct place.
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
-test:
+stages:
+  - test
+
+lint: &lint
+  stage: test
+  allow_failure: true # delete me once we've got the lintiness down to 0
+  script: |
+    go get github.com/alecthomas/gometalinter
+    gometalinter -i
+    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+
+lint-errcheck:
+  <<: *lint
+  script: |
+    go get github.com/alecthomas/gometalinter
+    gometalinter -i
+    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+  allow_failure: false
+
+
+vet:
+  stage: test
   script:
-    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client && make test
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - go vet $(go list ./... | grep -v vendor/)
+
+test:
+  stage: test
+  script:
+    - OLDPWD="$PWD"
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - |
+      for pkg in $(go list ./... | grep -v vendor/); do
+        shortpkg="${pkg##github.com/BytemarkHosting/}"
+        pkg_with_underscores="${shortpkg//\//_}"
+        go test -coverprofile="${pkg_with_underscores}.coverprofile" $pkg
+      done
+    - gover
+    - go tool cover -func gover.coverprofile | tail -n 1
+    - go tool cover -html gover.coverprofile -o "$OLDPWD/coverage.html"
+  artifacts:
+    paths:
+    - coverage.html

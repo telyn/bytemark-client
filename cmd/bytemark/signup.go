@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -68,16 +70,16 @@ If you have previously used the client, you'll have a login and will need to add
 
 			account := lib.Account{}
 
-			account.Owner = &lib.Person{
+			account.Owner = &billing.Person{
 				Username:             fields[util.FIELD_OWNER_NAME].Value(),
 				Password:             fields[util.FIELD_OWNER_PASS].Value(),
 				Email:                fields[util.FIELD_OWNER_EMAIL].Value(),
 				FirstName:            fields[util.FIELD_OWNER_FIRSTNAME].Value(),
 				LastName:             fields[util.FIELD_OWNER_LASTNAME].Value(),
-				Country:              fields[util.FIELD_OWNER_CC].Value(),
+				Address:              fields[util.FIELD_OWNER_ADDRESS].Value(),
 				City:                 fields[util.FIELD_OWNER_CITY].Value(),
 				Postcode:             fields[util.FIELD_OWNER_POSTCODE].Value(),
-				Address:              fields[util.FIELD_OWNER_ADDRESS].Value(),
+				Country:              fields[util.FIELD_OWNER_CC].Value(),
 				Phone:                fields[util.FIELD_OWNER_PHONE].Value(),
 				MobilePhone:          fields[util.FIELD_OWNER_MOBILE].Value(),
 				Organization:         fields[util.FIELD_OWNER_ORG_NAME].Value(),
@@ -86,7 +88,7 @@ If you have previously used the client, you'll have a login and will need to add
 			}
 
 			if creditCardForm {
-				card := lib.CreditCard{
+				card := spp.CreditCard{
 					Number: fields[util.FIELD_CC_NUMBER].Value(),
 					Name:   fields[util.FIELD_CC_NAME].Value(),
 					Expiry: fields[util.FIELD_CC_EXPIRY].Value(),
@@ -107,7 +109,7 @@ If you have previously used the client, you'll have a login and will need to add
 				log.Log("Couldn't create an account for you")
 				return err
 			}
-			log.Log("Account created successfully - you'll now be able to log in as '%s' and set up some servers! You should also be receiving a welcome email shortly.", createdAccount.Owner.Username)
+			log.Logf("Account created successfully - you'll now be able to log in as '%s' and set up some servers! You should also be receiving a welcome email shortly.\r\n", createdAccount.Owner.Username)
 			return nil
 
 		}),

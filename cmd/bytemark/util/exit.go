@@ -14,6 +14,7 @@ import (
 	"syscall"
 )
 
+// UserRequestedExit is returned when the user said 'No' to a 'yes/no' prompt.
 type UserRequestedExit struct{}
 
 func (e UserRequestedExit) Error() string {
@@ -78,7 +79,7 @@ const (
 	// E_BAD_REQUEST_API is the exit code returned when we send a bad request to API. (E.g. names being too short or having wrong characters in)
 	E_BAD_REQUEST_API = 157
 
-	// E_UNKNOWN_AUTH is the exit code returned when we get an unexpected error from the auth server.
+	// E_UNKNOWN_AUTH_ERROR is the exit code returned when we get an unexpected error from the auth server.
 	E_UNKNOWN_AUTH_ERROR = 149
 	// E_UNKNOWN_API_ERROR is the exit code returned when we get an unexpected error from the Bytemark API.
 	E_UNKNOWN_API_ERROR = 249
@@ -155,6 +156,7 @@ Exit code ranges:
 	return E_USAGE_DISPLAYED
 }
 
+// ProcessError processes the given error, outputs a message, and returns the relevant ExitCode for the given error.
 func ProcessError(err error, message ...string) ExitCode {
 	if err == nil {
 		return E_SUCCESS
@@ -163,7 +165,7 @@ func ProcessError(err error, message ...string) ExitCode {
 	trace := make([]byte, 4096, 4096)
 	runtime.Stack(trace, false)
 
-	log.Debug(log.DBG_OUTLINE, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
+	log.Debug(log.LvlOutline, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
 	if len(message) > 0 {
 		log.Error(message)
 	}
@@ -176,7 +178,7 @@ func ProcessError(err error, message ...string) ExitCode {
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)
-				if urlErr.Error != nil {
+				if urlErr.Err != nil {
 					if opError, ok := urlErr.Err.(*net.OpError); ok {
 						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", opError.Err)
 					} else {
@@ -191,7 +193,7 @@ func ProcessError(err error, message ...string) ExitCode {
 				exitCode = E_UNKNOWN_AUTH_ERROR
 			}
 		case *url.Error:
-			if e.Error != nil {
+			if e.Err != nil {
 				if opError, ok := e.Err.(*net.OpError); ok {
 					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", opError.Err)
 				} else {
@@ -243,9 +245,6 @@ func ProcessError(err error, message ...string) ExitCode {
 			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", e)
 			exitCode = E_UNKNOWN_ERROR
 		case lib.AmbiguousKeyError:
-			exitCode = E_PEBKAC
-			errorMessage = err.Error()
-		case NotEnoughArgumentsError:
 			exitCode = E_PEBKAC
 			errorMessage = err.Error()
 		case UsageDisplayedError:

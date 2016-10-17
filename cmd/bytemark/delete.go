@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -80,7 +81,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			Usage:       "deletes the specified key",
 			UsageText:   "bytemark delete key [--user <user>] <key>",
 			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
-			Action: With(func(c *Context) error {
+			Action: With(func(c *Context) (err error) {
 				user := global.Config.GetIgnoreErr("user")
 
 				key := strings.Join(c.Args(), " ")
@@ -88,18 +89,16 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					return c.Help("You must specify a key to delete.\r\n")
 				}
 
-				err := EnsureAuth()
+				err = EnsureAuth()
 				if err != nil {
-					return err
+					return
 				}
 
 				err = global.Client.DeleteUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key deleted successfullly")
-					return err
-				} else {
-					return err
 				}
+				return
 			}),
 		}, {
 			Name:        "server",
@@ -148,7 +147,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 	})
 }
 
-func recursiveDeleteGroup(name *lib.GroupName, group *lib.Group) error {
+func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("WARNING: The following servers will be permanently deleted, without any way to recover or un-delete them:")
 	for _, vm := range group.VirtualMachines {
 		log.Logf("\t%s\r\n", vm.Name)
@@ -160,9 +159,8 @@ func recursiveDeleteGroup(name *lib.GroupName, group *lib.Group) error {
 		err := global.Client.DeleteVirtualMachine(&vmn, true)
 		if err != nil {
 			return err
-		} else {
-			log.Logf("Server %s purged successfully.\r\n", name)
 		}
+		log.Logf("Server %s purged successfully.\r\n", name)
 
 	}
 	return nil

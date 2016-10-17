@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
@@ -11,7 +12,7 @@ import (
 )
 
 func init() {
-	createServer := cli.Command{
+	createServerCmd := cli.Command{
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,
 		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
@@ -35,7 +36,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			},
 			cli.GenericFlag{
 				Name:  "disc",
-				Usage: "One of more disc specifications. Defaults to a single 25GiB sata-grade disc",
+				Usage: "One or more disc specifications. Defaults to a single 25GiB sata-grade disc",
 				Value: new(util.DiscSpecFlag),
 			},
 			forceFlag,
@@ -79,13 +80,13 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			},
 		},
 
-		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createServer),
+		Action: With(VirtualMachineNameProvider, AuthProvider, createServer),
 	}
 	for _, flag := range imageInstallFlags {
-		createServer.Flags = append(createServer.Flags, flag)
+		createServerCmd.Flags = append(createServerCmd.Flags, flag)
 	}
 
-	createDiscs := cli.Command{
+	createDiscsCmd := cli.Command{
 		Name:    "discs",
 		Aliases: []string{"disc", "disk", "disks"},
 		Flags: []cli.Flag{
@@ -102,15 +103,15 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
-		Action: With(VirtualMachineNameProvider, AuthProvider, fn_createDisc),
+		Action: With(VirtualMachineNameProvider, AuthProvider, createDiscs),
 	}
 
-	createGroup := cli.Command{
+	createGroupCmd := cli.Command{
 		Name:        "group",
 		Usage:       "create a group for organising your servers",
 		UsageText:   "bytemark create group <group name>",
 		Description: `Groups are part of your server's fqdn`,
-		Action:      With(GroupNameProvider, AuthProvider, fn_createGroup),
+		Action:      With(GroupNameProvider, AuthProvider, createGroup),
 	}
 
 	commands = append(commands, cli.Command{
@@ -130,14 +131,14 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
-			createServer,
-			createDiscs,
-			createGroup,
+			createServerCmd,
+			createDiscsCmd,
+			createGroupCmd,
 		},
 	})
 }
 
-func fn_createDisc(c *Context) (err error) {
+func createDiscs(c *Context) (err error) {
 	discs := c.Discs("disc")
 
 	for i := range discs {
@@ -161,17 +162,15 @@ func fn_createDisc(c *Context) (err error) {
 	return
 }
 
-func fn_createGroup(c *Context) (err error) {
+func createGroup(c *Context) (err error) {
 	err = global.Client.CreateGroup(c.GroupName)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", c.GroupName.Group, c.GroupName.Account)
 	}
-	err = err
 	return
-
 }
 
-func fn_createServer(c *Context) (err error) {
+func createServer(c *Context) (err error) {
 	noImage := c.Bool("no-image")
 	if c.Bool("no-discs") {
 		noImage = true
@@ -199,7 +198,7 @@ func fn_createServer(c *Context) (err error) {
 				return err
 			}
 		case 2: // disc
-			discs = make([]lib.Disc, strings.Count(arg, ",")+1)
+			discs = make([]brain.Disc, strings.Count(arg, ",")+1)
 			for discNum, discSpec := range strings.Split(arg, ",") {
 				if tmpDisc, err := util.ParseDiscSpec(discSpec); err == nil {
 					discs[discNum] = *tmpDisc
@@ -214,7 +213,7 @@ func fn_createServer(c *Context) (err error) {
 	}
 
 	if len(discs) == 0 && !c.Context.Bool("no-discs") {
-		discs = append(discs, lib.Disc{Size: 25600})
+		discs = append(discs, brain.Disc{Size: 25600})
 	}
 
 	for i := range discs {
@@ -231,9 +230,9 @@ func fn_createServer(c *Context) (err error) {
 		return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
 	}
 
-	var ipspec *lib.IPSpec
+	var ipspec *brain.IPSpec
 	if len(ips) > 0 {
-		ipspec = &lib.IPSpec{}
+		ipspec = &brain.IPSpec{}
 
 		for _, ip := range ips {
 			if ip.To4() != nil {
@@ -266,8 +265,8 @@ func fn_createServer(c *Context) (err error) {
 	// if stopped isn't set and either cdrom or image are set, start the server
 	autoreboot := !stopped && ((imageInstall != nil) || (cdrom != ""))
 
-	spec := lib.VirtualMachineSpec{
-		VirtualMachine: &lib.VirtualMachine{
+	spec := brain.VirtualMachineSpec{
+		VirtualMachine: &brain.VirtualMachine{
 			Name:                  c.VirtualMachineName.VirtualMachine,
 			Autoreboot:            autoreboot,
 			Cores:                 cores,
@@ -285,7 +284,10 @@ func fn_createServer(c *Context) (err error) {
 	groupName := c.VirtualMachineName.GroupName()
 
 	log.Log("The following server will be created:")
-	lib.FormatVirtualMachineSpec(os.Stderr, groupName, &spec, "specfull")
+	err = lib.FormatVirtualMachineSpec(os.Stderr, groupName, &spec, "specfull")
+	if err != nil {
+		return err
+	}
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
 	if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
@@ -301,10 +303,12 @@ func fn_createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() error {
-
-		log.Log("cloud server created successfully", "")
-		lib.FormatVirtualMachine(os.Stderr, vm, "serverfull")
+	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
+		log.Log("cloud server created successfully")
+		err = lib.FormatVirtualMachine(os.Stderr, vm, "server_full")
+		if err != nil {
+			return
+		}
 		if imageInstall != nil {
 			log.Log()
 			log.Logf("Root password:") // logf so we don't get a tailing \r\n
@@ -312,6 +316,6 @@ func fn_createServer(c *Context) (err error) {
 		} else {
 			log.Log("Machine was not imaged")
 		}
-		return nil
+		return
 	})
 }

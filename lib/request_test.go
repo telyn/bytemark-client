@@ -12,7 +12,10 @@ func Test400BadRequestError(t *testing.T) {
 	client, auth, brain, billing, err := mkTestClientAndServers(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", 400)
-			w.Write([]byte(`{"something": "is not allowed"}`))
+			_, err := w.Write([]byte(`{"something": "is not allowed"}`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		}), mkNilHandler(t))
 
 	defer auth.Close()

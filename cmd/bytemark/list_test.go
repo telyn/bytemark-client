@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"strings"
 	"testing"
@@ -9,7 +10,7 @@ import (
 
 func TestListAccounts(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -28,7 +29,7 @@ func TestListAccounts(t *testing.T) {
 
 func TestListDiscs(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -42,12 +43,12 @@ func TestListDiscs(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("ParseVirtualMachineName", "spooky-vm", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 
-	vm := lib.VirtualMachine{
+	vm := brain.VirtualMachine{
 		ID:   4,
 		Name: "spooky-vm",
-		Discs: []*lib.Disc{
-			&lib.Disc{StorageGrade: "sata", Size: 25600, Label: "vda"},
-			&lib.Disc{StorageGrade: "archive", Size: 666666, Label: "vdb"},
+		Discs: []*brain.Disc{
+			&brain.Disc{StorageGrade: "sata", Size: 25600, Label: "vda"},
+			&brain.Disc{StorageGrade: "archive", Size: 666666, Label: "vdb"},
 		},
 	}
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
@@ -61,7 +62,7 @@ func TestListDiscs(t *testing.T) {
 
 func TestListGroups(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -71,9 +72,9 @@ func TestListGroups(t *testing.T) {
 	c.When("ParseAccountName", "spooky-steve", []string{"spooky-steve-other-account"}).Return("spooky-steve").Times(1)
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
-		Groups: []*lib.Group{
-			&lib.Group{ID: 1, Name: "halloween-vms"},
-			&lib.Group{ID: 200, Name: "gravediggers-biscuits"},
+		Groups: []*brain.Group{
+			&brain.Group{ID: 1, Name: "halloween-vms"},
+			&brain.Group{ID: 200, Name: "gravediggers-biscuits"},
 		},
 	}).Times(1)
 
@@ -87,7 +88,7 @@ func TestListGroups(t *testing.T) {
 
 func TestListServers(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -99,11 +100,11 @@ func TestListServers(t *testing.T) {
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Name: "spooky-steve",
-		Groups: []*lib.Group{{
+		Groups: []*brain.Group{{
 			Name: "default",
-			VirtualMachines: []*lib.VirtualMachine{
-				&lib.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
-				&lib.VirtualMachine{ID: 23, Name: "jack-skellington"},
+			VirtualMachines: []*brain.VirtualMachine{
+				&brain.VirtualMachine{ID: 1, Name: "old-man-crumbles"},
+				&brain.VirtualMachine{ID: 23, Name: "jack-skellington"},
 			},
 		}},
 	}).Times(1)

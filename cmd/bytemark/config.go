@@ -83,19 +83,19 @@ The set and unset subcommands can be used to set and unset such variables.
 				}),
 			},
 		},
-		Action: func(ctx *cli.Context) error {
+		Action: func(ctx *cli.Context) (err error) {
 			if ctx.Bool("help") {
-				cli.ShowSubcommandHelp(ctx)
-				return nil
+				err = cli.ShowSubcommandHelp(ctx)
+				return
 			}
 			vars, err := global.Config.GetAll()
 			if err != nil {
-				return err
+				return
 			}
 			for _, v := range vars {
 				log.Logf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
 			}
-			return nil
+			return
 		},
 	})
 }

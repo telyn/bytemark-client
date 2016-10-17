@@ -1,14 +1,16 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 	"strings"
 )
 
+// IPFlag is a flag.Value used to provide an array of net.IPs
 type IPFlag []net.IP
 
+// Set sets the IPFlag given the space-seperated string of IPs
 func (ips *IPFlag) Set(value string) error {
 	for _, val := range strings.Split(value, " ") {
 		ip := net.ParseIP(val)
@@ -25,8 +27,10 @@ func (ips *IPFlag) String() string {
 	return strings.Join(val, ", ")
 }
 
-type DiscSpecFlag []lib.Disc
+// DiscSpecFlag is a flag which reads its argument as a disc spec. It can be specified multiple times to add multiple discs.
+type DiscSpecFlag []brain.Disc
 
+// Set adds all the defined discs to this flag's value
 func (discsFlag *DiscSpecFlag) Set(value string) error {
 	for _, val := range strings.Split(value, " ") {
 		disc, err := ParseDiscSpec(val)
@@ -40,9 +44,9 @@ func (discsFlag *DiscSpecFlag) Set(value string) error {
 	return nil
 }
 
-func (discFlag *DiscSpecFlag) String() string {
+func (discsFlag *DiscSpecFlag) String() string {
 	var discs []string
-	for _, d := range *discFlag {
+	for _, d := range *discsFlag {
 		if d.Label == "" {
 			discs = append(discs, fmt.Sprintf("%s:%dGiB", d.StorageGrade, d.Size/1024))
 		} else {
@@ -52,8 +56,10 @@ func (discFlag *DiscSpecFlag) String() string {
 	return strings.Join(discs, ",")
 }
 
+// SizeSpecFlag represents a capacity as an integer number of megabytes.
 type SizeSpecFlag int
 
+// Set sets the value to the size specified. Users can add "M" or "G" as a suffix to specify that they are talking about megabytes/gigabytes. Gigabytes are assumed by default.
 func (ssf *SizeSpecFlag) Set(spec string) error {
 	sz, err := ParseSize(spec)
 	if err != nil {
@@ -64,5 +70,10 @@ func (ssf *SizeSpecFlag) Set(spec string) error {
 }
 
 func (ssf *SizeSpecFlag) String() string {
-	return fmt.Sprintf("%d", ssf)
+	// default value is 0, but is checked for in code that uses SizeSpecFlag and changed to 1
+	if *ssf == 0 {
+		return ""
+	} else {
+		return fmt.Sprintf("%d", *ssf)
+	}
 }

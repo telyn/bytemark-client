@@ -1,17 +1,16 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/BytemarkHosting/bytemark-client/lib"
-
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
+	"strings"
 	"testing"
 )
 
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -54,7 +53,7 @@ func TestDeleteServer(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -81,9 +80,9 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestDeleteKey(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
-	usr := lib.User{
+	usr := brain.User{
 		Username: "test-user",
 		Email:    "test-user@example.com",
 		AuthorizedKeys: []string{

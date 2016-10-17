@@ -9,7 +9,7 @@ import (
 
 func TestResetCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
@@ -29,7 +29,7 @@ func TestResetCommand(t *testing.T) {
 }
 func TestRestartCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
@@ -50,7 +50,7 @@ func TestRestartCommand(t *testing.T) {
 }
 func TestShutdownCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
@@ -70,7 +70,7 @@ func TestShutdownCommand(t *testing.T) {
 }
 func TestStartCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("Get", "token").Return("test-token")
@@ -90,7 +90,7 @@ func TestStartCommand(t *testing.T) {
 }
 func TestStopCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 

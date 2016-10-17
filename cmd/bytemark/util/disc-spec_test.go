@@ -1,23 +1,23 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"testing"
 )
 
 func TestParseDiscSpec(t *testing.T) {
 	type test struct {
 		Spec string
-		Disc lib.Disc
+		Disc brain.Disc
 	}
 	tests := []test{
-		test{"25", lib.Disc{StorageGrade: "", Size: 25 * 1024}},
-		test{"archive:200", lib.Disc{StorageGrade: "archive", Size: 200 * 1024}},
-		test{"archive:200M", lib.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200Mib", lib.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200mib", lib.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200mb", lib.Disc{StorageGrade: "archive", Size: 200}},
-		test{"archive:200MB", lib.Disc{StorageGrade: "archive", Size: 200}},
+		test{"25", brain.Disc{StorageGrade: "", Size: 25 * 1024}},
+		test{"archive:200", brain.Disc{StorageGrade: "archive", Size: 200 * 1024}},
+		test{"archive:200M", brain.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200Mib", brain.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200mib", brain.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200mb", brain.Disc{StorageGrade: "archive", Size: 200}},
+		test{"archive:200MB", brain.Disc{StorageGrade: "archive", Size: 200}},
 	}
 
 	for n, x := range tests {

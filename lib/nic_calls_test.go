@@ -1,10 +1,13 @@
 package lib
 
-import "net"
+import (
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"net"
+)
 
-func getFixtureNic() NetworkInterface {
+func getFixtureNic() brain.NetworkInterface {
 	ip := net.IPv4(127, 0, 0, 2)
-	return NetworkInterface{
+	return brain.NetworkInterface{
 		Label:            "",
 		Mac:              "00:00:00:00:00",
 		ID:               1,

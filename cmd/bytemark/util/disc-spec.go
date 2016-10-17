@@ -1,8 +1,8 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strings"
 )
 
@@ -16,7 +16,8 @@ func (e *DiscSpecError) Error() string {
 	return fmt.Sprintf("Disc spec error: Unexpected %c at character %d.", e.Character, e.Position)
 }
 
-func ParseDiscSpec(spec string) (*lib.Disc, error) {
+// ParseDiscSpec reads the given string and attempts to interpret it as a disc spec.
+func ParseDiscSpec(spec string) (*brain.Disc, error) {
 	bits := strings.Split(spec, ":")
 	size, err := ParseSize(bits[len(bits)-1])
 	if err != nil {
@@ -26,11 +27,11 @@ func ParseDiscSpec(spec string) (*lib.Disc, error) {
 	case len(bits) >= 4:
 		return nil, &DiscSpecError{}
 	case len(bits) == 3:
-		return &lib.Disc{Label: bits[0], StorageGrade: bits[1], Size: size}, nil
+		return &brain.Disc{Label: bits[0], StorageGrade: bits[1], Size: size}, nil
 	case len(bits) == 2:
-		return &lib.Disc{StorageGrade: bits[0], Size: size}, nil
+		return &brain.Disc{StorageGrade: bits[0], Size: size}, nil
 	case len(bits) == 1:
-		return &lib.Disc{Size: size}, nil
+		return &brain.Disc{Size: size}, nil
 	case len(bits) == 0:
 		return nil, &DiscSpecError{}
 	}
