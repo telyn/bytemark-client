@@ -1,5 +1,6 @@
 package brain
 
+// StoragePool represents a Bytemark Cloud Servers disk storage pool, as returned by the admin API.
 type StoragePool struct {
 	ID            int
 	Label         string

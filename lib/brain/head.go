@@ -4,6 +4,7 @@ import (
 	"net"
 )
 
+// Head represents a Bytemark Cloud Servers head server.
 type Head struct {
 	ID       int    `json:"id,omitempty"`
 	UUID     string `json:"uuid,omitempty"`
@@ -31,6 +32,7 @@ type Head struct {
 	VirtualMachines     []*VirtualMachine `json:"virtual_machines,omitempty"`
 }
 
+// CountVirtualMachines returns the number of virtual machines running on this head
 func (h *Head) CountVirtualMachines() int {
 	if h.VirtualMachines != nil {
 		return len(h.VirtualMachines)
