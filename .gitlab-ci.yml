@@ -21,7 +21,7 @@ lint-with-fail-allowed:
     go get github.com/alecthomas/gometalinter
     gometalinter -i
     cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-    gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+    gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --disable gotype --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
 
 lint-in-anger:
   stage: test
