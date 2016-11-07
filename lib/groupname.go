@@ -8,9 +8,12 @@ type GroupName struct {
 	Account string
 }
 
+// DefaultGroup is the default group name (just the group part - don't add dots!). Defaults to "default". Wow.
+var DefaultGroup = "default"
+
 func (g GroupName) String() string {
 	if g.Group == "" {
-		g.Group = "default"
+		g.Group = DefaultGroup
 	}
 	if g.Account == "" {
 		return g.Group
