@@ -92,6 +92,8 @@ func (r *Request) mkHTTPClient() (c *http.Client) {
 	c = new(http.Client)
 	if r.url.Host == "staging.bigv.io" {
 		c.Transport = &http.Transport{
+			// disable gas lint for this line (gas looks for insecure TLS settings, among other things)
+			/* #nosec */
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
