@@ -126,7 +126,7 @@ func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) erro
 	if vm.Group == "" {
 		vm.Group = DefaultGroup
 	}
-	v
+
 	if vm.VirtualMachine == "" {
 		return BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
 	}
