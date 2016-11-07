@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytes"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
 )
 
@@ -21,7 +22,13 @@ func (c *bytemarkClient) CreateCreditCard(cc *CreditCard) (ref string, err error
 		values.Add("postcode", cc.Postcode)
 		values.Add("country", cc.Country)
 	}
+	// prevent CC details and card reference being written to log
+	// this is a bit of a sledgehammer
+	// TODO make it not a sledgehammer somehow
+	oldfile := log.LogFile
+	log.LogFile = nil
 	_, response, err := req.Run(bytes.NewBufferString(values.Encode()), nil)
+	log.LogFile = oldfile
 
 	return string(response), err
 }
