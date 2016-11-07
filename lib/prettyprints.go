@@ -171,11 +171,8 @@ func FormatVirtualMachine(wr io.Writer, vm *brain.VirtualMachine, tpl TemplateCh
 	}
 
 	err = tmpl.ExecuteTemplate(wr, string(tpl), vm)
-	if err != nil {
-		return err
-	}
+	return err
 
-	return nil
 }
 
 // FormatImageInstall outputs the given image install using the named template to the given writer.
@@ -304,11 +301,7 @@ func FormatAccount(wr io.Writer, a *Account, def *Account, tpl string) error {
 	}
 
 	err = tmpl.ExecuteTemplate(wr, tpl, a)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // FormatOverview outputs the given overview using the named template to the given writer.
@@ -347,9 +340,5 @@ func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, 
 	}
 
 	err = tmpl.ExecuteTemplate(wr, "full_overview", data)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
