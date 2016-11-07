@@ -48,7 +48,7 @@ func main() {
 			// os.Exit is not actually graceful but WHATEVER I don't
 			// actually have a better way since bytemark-client has no
 			// main-loop or anything - it's just a one-shot
-			os.Exit(int(util.E_TRAPPED_INTERRUPT))
+			os.Exit(int(util.ExitCodeTrappedInterrupt))
 		}
 
 	}()
