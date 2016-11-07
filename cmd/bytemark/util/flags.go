@@ -73,7 +73,6 @@ func (ssf *SizeSpecFlag) String() string {
 	// default value is 0, but is checked for in code that uses SizeSpecFlag and changed to 1
 	if *ssf == 0 {
 		return ""
-	} else {
-		return fmt.Sprintf("%d", *ssf)
 	}
+	return fmt.Sprintf("%d", *ssf)
 }

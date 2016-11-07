@@ -43,7 +43,7 @@ func main() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt)
 	go func() {
-		for _ = range ch {
+		for range ch {
 			log.Error("\r\nCaught an interrupt - exiting.\r\n")
 			// os.Exit is not actually graceful but WHATEVER I don't
 			// actually have a better way since bytemark-client has no

@@ -16,7 +16,7 @@ func PromptYesNo(prompt string) bool {
 
 // ValidCreditCard is a credit-card-looking bunch of numbers. Doesn't check the check digit.
 func ValidCreditCard(input string) (bool, string) {
-	r := regexp.MustCompile("/^([0-9]{4} ?){4}$")
+	r := regexp.MustCompile(`/^([0-9]{4} ?){4}$`)
 	if r.MatchString(input) {
 		return true, strings.Replace(input, " ", "", -1)
 	}
@@ -37,7 +37,7 @@ func ValidExpiry(input string) (bool, string) {
 
 // ValidEmail checks that the input looks vaguely like an email address. It's very loose, relies on better validation elsewhere.
 func ValidEmail(input string) (bool, string) {
-	r := regexp.MustCompile("/^.*@([a-z0-9A-Z-]+\\.)+[a-z0-9A-Z-]$/")
+	r := regexp.MustCompile(`/^.*@([a-z0-9A-Z-]+\.)+[a-z0-9A-Z-]$/`)
 	if r.MatchString(input) {
 		return true, input
 	}

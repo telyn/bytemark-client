@@ -36,7 +36,7 @@ func ParseSize(spec string) (int, error) {
 	curSize := ""
 	curMultiplier := 1024
 	expecting := _num
-	for true {
+	for {
 		if pos >= len(spec) {
 			break
 		}

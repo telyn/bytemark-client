@@ -375,6 +375,7 @@ func TestConfigCorrectDefaultingAccountAndUserBug14038(t *testing.T) {
 	is.Nil(err)
 
 	v, err := config.GetV("account")
+	is.Nil(err)
 	is.Equal(v.Value, dirfixture["account"])
 
 	fmt.Printf("%v\r\n", hex.EncodeToString([]byte(v.Source)))

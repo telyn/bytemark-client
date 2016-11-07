@@ -13,7 +13,7 @@ type VirtualMachineName struct {
 
 func (vm VirtualMachineName) String() string {
 	if vm.Group == "" {
-		vm.Group = "default"
+		vm.Group = DefaultGroup
 	}
 	if vm.Account == "" {
 		return fmt.Sprintf("%s.%s", vm.VirtualMachine, vm.Group)

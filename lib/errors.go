@@ -181,10 +181,8 @@ func (e BadRequestError) Error() string {
 		return fmt.Sprintf("The request was bad:\r\n%s", e.ResponseBody)
 	}
 	out := make([]string, 0, len(e.Problems))
-	nProbs := 0
 	keys := make([]string, len(e.Problems))
-	for field, probs := range e.Problems {
-		nProbs += len(probs)
+	for field := range e.Problems {
 		keys = append(keys, field)
 	}
 	sort.Strings(keys)

@@ -101,7 +101,7 @@ func TestAllIPv4Addresses(t *testing.T) {
 		}
 	}
 	for ip, s := range seens {
-		if s == false {
+		if !s {
 			t.Error(ip + " was missing")
 		}
 	}
@@ -124,7 +124,7 @@ func TestAllIPv6Addresses(t *testing.T) {
 		}
 	}
 	for ip, s := range seens {
-		if s == false {
+		if !s {
 			t.Error(ip + " was missing")
 		}
 	}

@@ -124,8 +124,9 @@ func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) erro
 		}
 	}
 	if vm.Group == "" {
-		vm.Group = "default"
+		vm.Group = DefaultGroup
 	}
+
 	if vm.VirtualMachine == "" {
 		return BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
 	}
@@ -139,7 +140,7 @@ func (c *bytemarkClient) validateGroupName(group *GroupName) error {
 		}
 	}
 	if group.Group == "" {
-		group.Group = "default"
+		group.Group = DefaultGroup
 	}
 	return nil
 }
