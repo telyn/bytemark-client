@@ -170,15 +170,12 @@ func createGroup(c *Context) (err error) {
 	return
 }
 
-func createServer(c *Context) (err error) {
-	noImage := c.Bool("no-image")
-	if c.Bool("no-discs") {
-		noImage = true
-	}
+// createServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags, then reads in positional arguments for the command line.
+func createServerReadArgs(c *Context) (discs []brain.Disc, cores, memory int, err error) {
 
-	discs := c.Discs("disc")
-	cores := c.Int("cores")
-	memory := c.Size("memory")
+	discs = c.Discs("disc")
+	cores = c.Int("cores")
+	memory = c.Size("memory")
 	if memory == 0 {
 		memory = 1024
 	}
@@ -188,13 +185,15 @@ func createServer(c *Context) (err error) {
 		case 0: // cores
 			tmpCores, coresErr := strconv.Atoi(arg)
 			if coresErr != nil {
-				return coresErr
+				err = coresErr
+				return
 			}
 			cores = tmpCores
 		case 1: // memory
 			tmpMem, memErr := util.ParseSize(arg)
 			if memErr != nil {
-				return memErr
+				err = memErr
+				return
 			}
 			memory = tmpMem
 		case 2: // disc
@@ -202,13 +201,60 @@ func createServer(c *Context) (err error) {
 			for discNum, discSpec := range strings.Split(arg, ",") {
 				tmpDisc, discErr := util.ParseDiscSpec(discSpec)
 				if discErr != nil {
-					return err
+					err = discErr
+					return
 				}
 				discs[discNum] = *tmpDisc
 			}
 		case 3:
-			return c.Help("Too many arguments given.")
+			err = c.Help("Too many arguments given.")
+			return
 		}
+	}
+	return
+}
+
+// createServerReadIPs reads the IP flags and creates an IPSpec
+func createServerReadIPs(c *Context) (ipspec *brain.IPSpec, err error) {
+	ips := c.IPs("ip")
+
+	if len(ips) > 2 {
+		err = c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
+		return
+	}
+
+	if len(ips) > 0 {
+		ipspec = &brain.IPSpec{}
+
+		for _, ip := range ips {
+			if ip.To4() != nil {
+				if ipspec.IPv4 != "" {
+					err = c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
+					return
+				}
+				ipspec.IPv4 = ip.To4().String()
+			} else {
+				if ipspec.IPv6 != "" {
+					err = c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
+					return
+
+				}
+				ipspec.IPv6 = ip.String()
+			}
+		}
+	}
+	return
+}
+
+func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error) {
+	noImage := c.Bool("no-image")
+	if c.Bool("no-discs") {
+		noImage = true
+	}
+
+	discs, cores, memory, err := createServerReadArgs(c)
+	if err != nil {
+		return
 	}
 
 	if len(discs) == 0 && !c.Context.Bool("no-discs") {
@@ -218,35 +264,14 @@ func createServer(c *Context) (err error) {
 	for i := range discs {
 		d, discErr := discs[i].Validate()
 		if discErr != nil {
-			return discErr
+			return spec, discErr
 		}
 		discs[i] = *d
 	}
 
-	ips := c.IPs("ip")
-
-	if len(ips) > 2 {
-		return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
-	}
-
-	var ipspec *brain.IPSpec
-	if len(ips) > 0 {
-		ipspec = &brain.IPSpec{}
-
-		for _, ip := range ips {
-			if ip.To4() != nil {
-				if ipspec.IPv4 != "" {
-					return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
-				}
-				ipspec.IPv4 = ip.To4().String()
-			} else {
-				if ipspec.IPv6 != "" {
-					return c.Help("A maximum of one IPv4 and one IPv6 address may be specified")
-
-				}
-				ipspec.IPv6 = ip.String()
-			}
-		}
+	ipspec, err := createServerReadIPs(c)
+	if err != nil {
+		return
 	}
 
 	imageInstall, _, err := prepareImageInstall(c)
@@ -264,7 +289,7 @@ func createServer(c *Context) (err error) {
 	// if stopped isn't set and either cdrom or image are set, start the server
 	autoreboot := !stopped && ((imageInstall != nil) || (cdrom != ""))
 
-	spec := brain.VirtualMachineSpec{
+	spec = brain.VirtualMachineSpec{
 		VirtualMachine: &brain.VirtualMachine{
 			Name:                  c.VirtualMachineName.VirtualMachine,
 			Autoreboot:            autoreboot,
@@ -278,6 +303,14 @@ func createServer(c *Context) (err error) {
 		Discs:   discs,
 		IPs:     ipspec,
 		Reimage: imageInstall,
+	}
+	return
+}
+
+func createServer(c *Context) (err error) {
+	spec, err := createServerPrepSpec(c)
+	if err != nil {
+		return
 	}
 
 	groupName := c.VirtualMachineName.GroupName()
@@ -308,10 +341,10 @@ func createServer(c *Context) (err error) {
 		if err != nil {
 			return
 		}
-		if imageInstall != nil {
+		if spec.Reimage != nil {
 			log.Log()
-			log.Logf("Root password:") // logf so we don't get a tailing \r\n
-			log.Outputf("%s\r\n", imageInstall.RootPassword)
+			log.Logf("Root password: ") // logf so we don't get a tailing \r\n
+			log.Outputf("%s\r\n", spec.Reimage.RootPassword)
 		} else {
 			log.Log("Machine was not imaged")
 		}
