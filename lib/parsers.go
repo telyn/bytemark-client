@@ -14,8 +14,6 @@ func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (acco
 		account = defaults[0]
 	}
 
-	// there's a micro-optimisation to do here to not use Split,
-	// but really, who can be bothered to?
 	bits := strings.Split(name, ".")
 	if bits[0] != "" {
 		account = bits[0]
@@ -28,8 +26,6 @@ func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (acco
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
 func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (group *GroupName) {
 	group = new(GroupName)
-	// 1 or 2 pieces with optional extra cruft for the fqdn
-	bits := strings.Split(name, ".")
 	if len(defaults) == 0 {
 		group.Group = ""
 		group.Account = ""
@@ -38,7 +34,7 @@ func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (gr
 		group.Account = defaults[0].Account
 	}
 
-	bits = strings.SplitN(name, ".", 2)
+	bits := strings.SplitN(name, ".", 2)
 	if len(bits) >= 1 {
 		group.Group = bits[0]
 

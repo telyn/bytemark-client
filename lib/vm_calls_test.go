@@ -316,8 +316,14 @@ func TestCreateVirtualMachine(t *testing.T) {
 					t.Fatalf("#%d - %v", i, err)
 				}
 				js, err := json.MarshalIndent(spec, "IN", "    ")
+				if err != nil {
+					t.Fatal(err)
+				}
 				t.Log(string(js))
 				bytes, err = json.Marshal(test.Expect.VirtualMachine)
+				if err != nil {
+					t.Fatal(err)
+				}
 				if !reflect.DeepEqual(test.Expect, spec) {
 					t.Error("spec did not deep-equal what was expected.")
 				} else {
