@@ -33,8 +33,8 @@ func TestDeleteServer(t *testing.T) {
 
 	err := global.App.Run(strings.Split("bytemark delete server --force test-server", " "))
 	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 	c.Reset()
 
@@ -104,8 +104,8 @@ func TestDeleteKey(t *testing.T) {
 	err := global.App.Run(strings.Split("bytemark delete key ssh-rsa AAAAFakeKey test-key-one", " "))
 
 	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 	c.Reset()
 	config.Reset()

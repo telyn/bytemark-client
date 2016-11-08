@@ -19,8 +19,8 @@ func TestCommandConfigSet(t *testing.T) {
 	err := global.App.Run(strings.Split("bytemark config set user test-user", " "))
 	is.Nil(err)
 
-	if ok, err := config.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := config.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 
 	err = global.App.Run(strings.Split("bytemark config set flimflam test-user", " "))
