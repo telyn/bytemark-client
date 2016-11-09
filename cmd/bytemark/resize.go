@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -40,7 +41,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					mode = INCREASE
 				}
 
-				size, err := util.ParseSize(sizeStr)
+				size, err := sizespec.Parse(sizeStr)
 				if err != nil {
 					return err
 				}

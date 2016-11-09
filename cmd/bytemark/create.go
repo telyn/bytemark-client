@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -190,7 +191,7 @@ func createServerReadArgs(c *Context) (discs []brain.Disc, cores, memory int, er
 			}
 			cores = tmpCores
 		case 1: // memory
-			tmpMem, memErr := util.ParseSize(arg)
+			tmpMem, memErr := sizespec.Parse(arg)
 			if memErr != nil {
 				err = memErr
 				return

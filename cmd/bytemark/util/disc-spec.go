@@ -2,7 +2,9 @@ package util
 
 import (
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+
 	"strings"
 )
 
@@ -19,7 +21,7 @@ func (e *DiscSpecError) Error() string {
 // ParseDiscSpec reads the given string and attempts to interpret it as a disc spec.
 func ParseDiscSpec(spec string) (*brain.Disc, error) {
 	bits := strings.Split(spec, ":")
-	size, err := ParseSize(bits[len(bits)-1])
+	size, err := sizespec.Parse(bits[len(bits)-1])
 	if err != nil {
 		return nil, err
 	}
