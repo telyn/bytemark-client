@@ -123,8 +123,7 @@ func deleteServer(c *Context) (err error) {
 }
 
 func countRunning(group *brain.Group) (running int) {
-	running := 0
-	for _, vm := range servers {
+	for _, vm := range group.VirtualMachines {
 		if vm.PowerOn {
 			running++
 		}
@@ -136,7 +135,8 @@ func deleteGroup(c *Context) (err error) {
 	recursive := c.Bool("recursive")
 	if len(c.Group.VirtualMachines) > 0 && recursive {
 		prompt := fmt.Sprintf("The group '%s' has %d servers in it, these servers will be irrevocably deleted", c.GroupName.Group, len(c.Group.VirtualMachines))
-		if countRunning(c.Group) != 0 {
+		running := countRunning(c.Group)
+		if running != 0 {
 			prompt = fmt.Sprintf("The group '%s' has %d currently-running servers in it, these servers will be forcibly stopped and irrevocably deleted", c.GroupName.Group, running)
 		}
 
