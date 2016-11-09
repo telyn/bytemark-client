@@ -16,23 +16,30 @@ func TestParseVirtualMachineName(t *testing.T) {
 	vm, err = client.ParseVirtualMachineName("a..c")
 	is.Nil(err)
 	is.Equal("a.default.c", vm.String())
+
 	vm, err = client.ParseVirtualMachineName("a.b.c.")
 	is.Equal("a.b.c", vm.String())
 	is.Nil(err)
+
 	vm, err = client.ParseVirtualMachineName("a.b.c.endpoint.tld")
 	is.Equal("a.b.c", vm.String())
 	is.Nil(err)
+
 	vm, err = client.ParseVirtualMachineName("a.b.c.d.endpoint.tld")
 	is.Equal("a.b.c", vm.String())
 	is.Nil(err)
+
 	vm, err = client.ParseVirtualMachineName("endpoint.tld.a.endpoint.tld")
 	is.Equal("endpoint.tld.a", vm.String())
 	is.Nil(err)
+
 	vm, err = client.ParseVirtualMachineName("endpoint.tld.a.endpoint.tld.")
+	is.Nil(err)
 	is.Equal("endpoint.tld.a", vm.String())
 
 	_, err = client.ParseVirtualMachineName(".b.c")
 	is.NotNil(err)
+
 	_, err = client.ParseVirtualMachineName(".")
 	is.NotNil(err)
 

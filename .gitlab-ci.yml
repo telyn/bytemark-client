@@ -29,7 +29,7 @@ lint-in-anger:
     go get github.com/alecthomas/gometalinter
     gometalinter -i
     cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
   allow_failure: false
 
 

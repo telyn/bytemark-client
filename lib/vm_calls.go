@@ -28,9 +28,9 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.Virtu
 			spec.Discs = nil
 		}
 		for i, disc := range spec.Discs {
-			newDisc, err := disc.Validate()
-			if err != nil {
-				return nil, err
+			newDisc, discErr := disc.Validate()
+			if discErr != nil {
+				return nil, discErr
 			}
 			spec.Discs[i] = *newDisc
 		}
@@ -105,9 +105,9 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 	if newName.Group != "" || newName.Account != "" {
 		// get group
 		groupName := GroupName{Group: newName.Group, Account: newName.Account}
-		group, err := c.GetGroup(&groupName)
-		if err != nil {
-			return err
+		group, groupErr := c.GetGroup(&groupName)
+		if groupErr != nil {
+			return groupErr
 		}
 		change.GroupID = group.ID
 	}

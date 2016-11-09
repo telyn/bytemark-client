@@ -186,27 +186,26 @@ func createServer(c *Context) (err error) {
 	for argNum, arg := range c.Args() {
 		switch argNum {
 		case 0: // cores
-			if tmpCores, err := strconv.Atoi(arg); err == nil {
-				cores = tmpCores
-			} else {
-				return err
+			tmpCores, coresErr := strconv.Atoi(arg)
+			if coresErr != nil {
+				return coresErr
 			}
+			cores = tmpCores
 		case 1: // memory
-			if tmpMem, err := util.ParseSize(arg); err == nil {
-				memory = tmpMem
-			} else {
-				return err
+			tmpMem, memErr := util.ParseSize(arg)
+			if memErr != nil {
+				return memErr
 			}
+			memory = tmpMem
 		case 2: // disc
 			discs = make([]brain.Disc, strings.Count(arg, ",")+1)
 			for discNum, discSpec := range strings.Split(arg, ",") {
-				if tmpDisc, err := util.ParseDiscSpec(discSpec); err == nil {
-					discs[discNum] = *tmpDisc
-				} else {
+				tmpDisc, discErr := util.ParseDiscSpec(discSpec)
+				if discErr != nil {
 					return err
 				}
+				discs[discNum] = *tmpDisc
 			}
-
 		case 3:
 			return c.Help("Too many arguments given.")
 		}
@@ -217,9 +216,9 @@ func createServer(c *Context) (err error) {
 	}
 
 	for i := range discs {
-		d, err := discs[i].Validate()
-		if err != nil {
-			return err
+		d, discErr := discs[i].Validate()
+		if discErr != nil {
+			return discErr
 		}
 		discs[i] = *d
 	}

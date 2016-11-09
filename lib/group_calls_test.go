@@ -135,6 +135,7 @@ func TestGetGroup(t *testing.T) {
 
 	group, err := client.GetGroup(&GroupName{Group: "invalid-group", Account: "account"})
 	is.NotNil(err)
+	is.Equal("", group.Name)
 
 	group, err = client.GetGroup(&GroupName{Group: "default", Account: "account"})
 	is.NotNil(group)

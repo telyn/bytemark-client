@@ -81,6 +81,9 @@ func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) er
 	}
 
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/users/%s", username)
+	if err != nil {
+		return err
+	}
 	_, _, err = r.Run(bytes.NewBuffer(userjs), nil)
 	return err
 

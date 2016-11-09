@@ -53,6 +53,9 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 			switch method {
 			case "GET", "PUT", "POST", "DELETE":
 				url, err := c.NextArg()
+				if err != nil {
+					return err
+				}
 
 				if !strings.HasPrefix(url, "/") {
 					url = "/" + url

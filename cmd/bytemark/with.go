@@ -25,16 +25,16 @@ func With(providers ...ProviderFunc) func(c *cli.Context) error {
 // This is needed because the init() functions are only executed once during the testing cycle.
 // Outside of the tests, global.App.Run is only called once before the program closes.
 func cleanup(c *Context) {
-	ips := c.Context.Generic("ip")
-	if ips, ok := ips.(*util.IPFlag); ok {
+	ips, ok := c.Context.Generic("ip").(*util.IPFlag)
+	if ok {
 		*ips = make([]net.IP, 0)
 	}
-	disc := c.Context.Generic("disc")
-	if disc, ok := disc.(*util.DiscSpecFlag); ok {
+	disc, ok := c.Context.Generic("disc").(*util.DiscSpecFlag)
+	if ok {
 		*disc = make([]brain.Disc, 0)
 	}
-	size := c.Context.Generic("memory")
-	if size, ok := size.(*util.SizeSpecFlag); ok {
+	size, ok := c.Context.Generic("memory").(*util.SizeSpecFlag)
+	if ok {
 		*size = 0
 	}
 }
