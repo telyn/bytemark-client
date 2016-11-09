@@ -1,4 +1,4 @@
-// sizespec implements a parser for size specifications.
+// Package sizespec implements a parser for size specifications.
 // Yep, we could use regexes, but then we don't get to tell people where they failed.
 package sizespec
 
@@ -61,10 +61,10 @@ var parserFnMap = map[expectation]parserFn{
 		if c >= '0' && c <= '9' {
 			st.buf += st.spec[st.pos : st.pos+w]
 			st.expecting = _numGM
-		} else {
-			return st.err(c)
+			return nil
 		}
-		return nil
+
+		return st.err(c)
 	},
 	// once we have a digit, we expect a digit or a G or an M
 	_numGM: func(st *parserState, c rune, w int) (err error) {
@@ -88,21 +88,19 @@ var parserFnMap = map[expectation]parserFn{
 			// if we get an i, we expect the next to be a B.
 			// There's nothing stopping the sizespec from ending here though, so weird constructions like 14Gi are valid according to this parser.
 			st.expecting = _B
+			return nil
 		} else if c == 'b' || c == 'B' {
 			return nil
-		} else {
-			return st.err(c)
 		}
-		return nil
+		return st.err(c)
 
 	},
 	// if we get an i, we expect the next to be a B.
 	_B: func(st *parserState, c rune, w int) (err error) {
 		if c == 'b' || c == 'B' {
 			return nil
-		} else {
-			return st.err(c)
 		}
+		return st.err(c)
 
 	},
 }
