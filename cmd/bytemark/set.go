@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/urfave/cli"
 	"strconv"
 )
@@ -85,7 +86,7 @@ These commands set various hardware properties of Bytemark servers. Note that fo
 						return c.Help("No memory amount was specified")
 					}
 
-					memory, err := util.ParseSize(memoryStr)
+					memory, err := sizespec.Parse(memoryStr)
 					if err != nil || memory < 1 {
 						return c.Help(fmt.Sprintf("Invalid amount of memory \"%s\"\r\n", memoryStr))
 					}

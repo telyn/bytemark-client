@@ -1,4 +1,4 @@
-package util
+package sizespec
 
 import (
 	"testing"
@@ -22,7 +22,7 @@ func TestParseSize(t *testing.T) {
 		test{"200 mb", 200},
 	}
 	for n, x := range tests {
-		r, err := ParseSize(x.Spec)
+		r, err := Parse(x.Spec)
 		if err != nil {
 			t.Error(err)
 			continue

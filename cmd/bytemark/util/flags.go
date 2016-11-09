@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 	"strings"
@@ -61,7 +62,7 @@ type SizeSpecFlag int
 
 // Set sets the value to the size specified. Users can add "M" or "G" as a suffix to specify that they are talking about megabytes/gigabytes. Gigabytes are assumed by default.
 func (ssf *SizeSpecFlag) Set(spec string) error {
-	sz, err := ParseSize(spec)
+	sz, err := sizespec.Parse(spec)
 	if err != nil {
 		return err
 	}
