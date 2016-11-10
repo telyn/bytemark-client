@@ -344,7 +344,7 @@ func createServer(c *Context) (err error) {
 		}
 		if spec.Reimage != nil {
 			log.Log()
-			log.Logf("Root password: ") // logf so we don't get a tailing \r\n
+			log.Logf("Root password: ") // logf so we don't get a trailing \r\n
 			log.Outputf("%s\r\n", spec.Reimage.RootPassword)
 		} else {
 			log.Log("Machine was not imaged")

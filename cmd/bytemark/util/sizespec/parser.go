@@ -5,7 +5,6 @@ package sizespec
 import (
 	"fmt"
 	"strconv"
-	"unicode/utf8"
 )
 
 // Error indicates that the size spec could not be parsed.
@@ -40,7 +39,7 @@ const (
 
 type parserState struct {
 	pos        int
-	buf        string
+	buf        []rune
 	multiplier int
 	expecting  expectation
 	spec       string
@@ -52,14 +51,14 @@ func (st *parserState) err(c rune) error {
 }
 
 // the rune and int are the next char and its width in bytes, and are args rather than part of state because they should not be edited by the function
-type parserFn func(*parserState, rune, int) error
+type parserFn func(*parserState, rune) error
 
 // parserFnMap is where the main meat of the parser is - it maps expectations to which function to try, to continue parsing.
 var parserFnMap = map[expectation]parserFn{
 	// at the beginning, we expect a digit.
-	_num: func(st *parserState, c rune, w int) error {
+	_num: func(st *parserState, c rune) error {
 		if c >= '0' && c <= '9' {
-			st.buf += st.spec[st.pos : st.pos+w]
+			st.buf = append(st.buf, c)
 			st.expecting = _numGM
 			return nil
 		}
@@ -67,9 +66,9 @@ var parserFnMap = map[expectation]parserFn{
 		return st.err(c)
 	},
 	// once we have a digit, we expect a digit or a G or an M
-	_numGM: func(st *parserState, c rune, w int) (err error) {
+	_numGM: func(st *parserState, c rune) (err error) {
 		if c >= '0' && c <= '9' {
-			st.buf += st.spec[st.pos : st.pos+w]
+			st.buf = append(st.buf, c)
 			st.expecting = _numGM
 		} else if c == 'm' || c == 'M' {
 			st.multiplier = 1
@@ -83,7 +82,7 @@ var parserFnMap = map[expectation]parserFn{
 
 	},
 	// once we've had a G or an M, we expect the next thing to be an i or a B.
-	_iB: func(st *parserState, c rune, w int) (err error) {
+	_iB: func(st *parserState, c rune) (err error) {
 		if c == 'i' {
 			// if we get an i, we expect the next to be a B.
 			// There's nothing stopping the sizespec from ending here though, so weird constructions like 14Gi are valid according to this parser.
@@ -96,7 +95,7 @@ var parserFnMap = map[expectation]parserFn{
 
 	},
 	// if we get an i, we expect the next to be a B.
-	_B: func(st *parserState, c rune, w int) (err error) {
+	_B: func(st *parserState, c rune) (err error) {
 		if c == 'b' || c == 'B' {
 			return nil
 		}
@@ -106,9 +105,8 @@ var parserFnMap = map[expectation]parserFn{
 }
 
 // continueParse picks a function from parserFnMap to run, and runs it, then increments the state's position
-func continueParse(st *parserState, c rune, w int) (err error) {
-	err = parserFnMap[st.expecting](st, c, w)
-	st.pos += w
+func continueParse(st *parserState, c rune) (err error) {
+	err = parserFnMap[st.expecting](st, c)
 	return
 }
 
@@ -117,32 +115,26 @@ func continueParse(st *parserState, c rune, w int) (err error) {
 func Parse(spec string) (size int, err error) {
 	st := parserState{
 		pos:        0,
-		buf:        "",
+		buf:        []rune{},
 		multiplier: 1024,
 		expecting:  _num,
 		spec:       spec,
 	}
-	for {
-		// if we've read to the end, stop
-		if st.pos >= len(st.spec) {
-			break
-		}
-		// otherwise decode the next rune
-		c, w := utf8.DecodeRuneInString(spec[st.pos:])
+	for pos, c := range st.spec {
+		st.pos = pos
 		// ignore whitespace. TODO(telyn): why?
 		if c == ' ' {
-			st.pos += w
 			continue
 		}
 		// and continue parsing
-		err = continueParse(&st, c, w)
+		err = continueParse(&st, c)
 		if err != nil {
 			return
 		}
 
 	}
 
-	size64, err := strconv.ParseInt(st.buf, 10, 32)
+	size64, err := strconv.ParseInt(string(st.buf), 10, 32)
 	size = int(size64) * st.multiplier
 	return
 }
