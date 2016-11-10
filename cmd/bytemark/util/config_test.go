@@ -384,3 +384,34 @@ func TestConfigCorrectDefaultingAccountAndUserBug14038(t *testing.T) {
 	is.NotEqual(v.Value, envfixture["user"])
 
 }
+
+func TestConfigUnset(t *testing.T) {
+	is := is.New(t)
+
+	dir, fx, err := FixtureDir()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	is.NotEqual("", fx["endpoint"])
+
+	config, err := NewConfig(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	v, err := config.GetV("endpoint")
+	is.Nil(err)
+	is.Equal(fx["endpoint"], v.Value)
+	is.Equal("FILE", v.SourceType())
+
+	err = config.Unset("endpoint")
+	is.Nil(err)
+
+	v, err = config.GetV("endpoint")
+	is.Nil(err)
+	is.Equal("CODE", v.SourceType())
+
+	err = config.Unset("endpoint")
+	is.Nil(err)
+}

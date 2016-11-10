@@ -205,6 +205,7 @@ func FormatImageInstall(wr io.Writer, ii *brain.ImageInstall, tpl TemplateChoice
 
 // FormatVirtualMachineSpec outputs the given vm spec using the named template to the given writer.
 // TODO(telyn): make template choice not a string
+// TODO(telyn): rewrite
 func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *brain.VirtualMachineSpec, tpl TemplateChoice) error {
 	output := make([]string, 0, 10)
 	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
@@ -280,7 +281,7 @@ func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *brain.Virtua
 	} else {
 		output = append(output, "No discs specified")
 	}
-	_, err := wr.Write([]byte(strings.Join(output, "\r\n")))
+	_, err := wr.Write([]byte(strings.Join(output, "\r\n") + "\r\n"))
 	return err
 }
 

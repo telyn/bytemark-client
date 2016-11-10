@@ -457,7 +457,7 @@ func (config *Config) SetPersistent(name, value, source string) error {
 }
 
 // Unset removes the named key from both config's Memo and the user's config directory.
-func (config *Config) Unset(name string) error {
+func (config *Config) Unset(name string) (err error) {
 	found := false
 	for _, v := range configVars {
 		if v == name {
@@ -468,7 +468,18 @@ func (config *Config) Unset(name string) error {
 		return InvalidConfigVarError{name}
 	}
 	delete(config.Memo, name)
-	return os.Remove(config.GetPath(name))
+	err = os.Remove(config.GetPath(name))
+	if err != nil {
+		info, statErr := os.Stat(config.Dir)
+		if statErr != nil {
+			if !info.IsDir() {
+				return &ConfigDirInvalidError{config.Dir} // config dir is not a dir.
+			}
+			return nil // file didn't exist, so was already unset => success
+		}
+		return statErr // config dir couldn't be read for whatever reason
+	}
+	return // success
 }
 
 // PanelURL returns config's best guess at the correct URL for the bytemark panel for the cluster with the endpoint we're using. Basically it flips between panel.bytemark and panel-int.
