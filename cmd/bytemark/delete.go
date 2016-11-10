@@ -122,18 +122,27 @@ func deleteServer(c *Context) (err error) {
 	return
 }
 
+func countRunning(group *brain.Group) (running int) {
+	for _, vm := range group.VirtualMachines {
+		if vm.PowerOn {
+			running++
+		}
+	}
+	return running
+}
+
 func deleteGroup(c *Context) (err error) {
 	recursive := c.Bool("recursive")
 	if len(c.Group.VirtualMachines) > 0 && recursive {
-		running := 0
-		for _, vm := range c.Group.VirtualMachines {
-			if vm.PowerOn {
-				running++
-			}
-		}
-		prompt := fmt.Sprintf("The group '%s' has %d virtual machines in it", c.GroupName.Group, len(c.Group.VirtualMachines))
+		prompt := fmt.Sprintf("The group '%s' has %d servers in it which will be irrevocably deleted", c.GroupName.Group, len(c.Group.VirtualMachines))
+		running := countRunning(c.Group)
 		if running != 0 {
-			prompt = fmt.Sprintf("The group '%s' has %d running virtual machines in it", c.GroupName.Group, running)
+			stopped := len(c.Group.VirtualMachines) - running
+			andStopped := ""
+			if stopped > 0 {
+				andStopped = fmt.Sprintf("and %d stopped ", stopped)
+			}
+			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.GroupName.Group, running, andStopped)
 		}
 
 		if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
@@ -148,14 +157,13 @@ func deleteGroup(c *Context) (err error) {
 		return
 	}
 	err = global.Client.DeleteGroup(c.GroupName)
+	if err == nil {
+		log.Logf("Group %s deleted successfully.\r\n", c.GroupName.String())
+	}
 	return
 }
 
 func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
-	log.Log("WARNING: The following servers will be permanently deleted, without any way to recover or un-delete them:")
-	for _, vm := range group.VirtualMachines {
-		log.Logf("\t%s\r\n", vm.Name)
-	}
 	log.Log("", "")
 	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 	for _, vm := range group.VirtualMachines {
@@ -164,9 +172,10 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 		if err != nil {
 			return err
 		}
-		log.Logf("Server %s purged successfully.\r\n", name)
+		log.Logf("%s\r\n", vm.Name)
 
 	}
+	log.Log()
 	return nil
 }
 
