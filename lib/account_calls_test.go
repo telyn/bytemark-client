@@ -248,18 +248,19 @@ func TestRegisterNewAccount(t *testing.T) {
 					"division":null,
 					"vatnumber":null
 				}`
-			w.Write([]byte(`
-			{
-				"id":324567,
-				"owner": ` + person + `,
-				"tech": ` + person + `,
-				"invoice_terms":0,
-				"bigv_account_subscription":"test-user",
-				"payment_method":"Credit Card",
-				"card_reference":"testxq12e",
-				"earliest_activity":"2016-09-18"
+			_, err := w.Write([]byte(`{
+					"id":324567,
+					"owner": ` + person + `,
+					"tech": ` + person + `,
+					"invoice_terms":0,
+					"bigv_account_subscription":"test-user",
+					"payment_method":"Credit Card",
+					"card_reference":"testxq12e",
+					"earliest_activity":"2016-09-18"
+				}`))
+			if err != nil {
+				t.Fatal(err)
 			}
-			`))
 		} else {
 			t.Fatalf("Unexpected HTTP request to %s", req.URL.Path)
 		}
