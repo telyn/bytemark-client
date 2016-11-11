@@ -88,12 +88,17 @@ func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err 
 	oldfile := log.LogFile
 	log.LogFile = nil
 
-	status, _, err := req.Run(bytes.NewBuffer(js), newAcc)
+	outputBillingAcc := billing.Account{}
+
+	status, _, err := req.Run(bytes.NewBuffer(js), &outputBillingAcc)
 	if err != nil {
 		if _, ok := err.(*json.InvalidUnmarshalError); !ok {
 			return newAcc, err
 		}
 	}
+	newAcc = &Account{}
+	newAcc.fillBilling(&outputBillingAcc)
+
 	log.LogFile = oldfile
 	if status == 202 {
 		return newAcc, AccountCreationDeferredError{}
