@@ -1,3 +1,38 @@
+bytemark-client (2.0) UNRELEASED; urgency=low
+
+  New features:
+    * --admin flag to enable admin-mode, which adds more commands to the
+      client . Admin commands can only be used by cluster admins.
+    * admin command: show heads. this is only an initial version and will
+      change over time.
+
+  Changes:
+    * Input errors (not enough arguments, too many arguments, incorrect flags)
+      now output only one error and don't show the help for that command,
+      instead suggesting you look at the help for that command.
+    * add key now errors when no key is entered.
+    * Improve algorithm for figuring out which account is default, and make
+      list commands use the same algorithm as other commands.
+    * Reordered address fields in the signup form
+    * Stabilised the order of the IP address list on each server
+    * Improved output when the brain returns an HTTP 400 (Bad Request)
+  
+  Fixes:
+    * Numerous small code fixes
+    * Update panel URL to panel.bytemark.co.uk
+    * Fix address for bytemark-internal panel
+    * Recursive group delete now outputs correctly
+    * Confirmation prompts in reimage and create server commands now appears
+      on own line
+    * --ip flag on create server now works
+    * Numerous typo fixes
+    * Remove some unintended debug output
+    * Fix create server erroring out every time (despite success)
+    * --auth-endpoint now works.
+    * in show and overview, servers with no discs now display correctly
+
+ -- telyn <telyn@bytemark.co.uk>  Fri, 11 Nov 2016 13:24:40 +0000
+
 bytemark-client (1.1) UNRELEASED; urgency=low
 
   Prevent the following from being output to the log file during account
