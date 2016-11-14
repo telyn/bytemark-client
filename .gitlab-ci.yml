@@ -4,15 +4,17 @@ variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
 
+stages:
+  - test
+  - build
+  - package
+
 before_script:
   # these two are needed for coverage stats
-  - go get github.com/modocache/gover golang.org/x/tools/cmd/cover github.com/BytemarkHosting/auth-client
+  - go get github.com/BytemarkHosting/auth-client
   - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
   # stick our code in the correct place.
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-
-stages:
-  - test
 
 lint-with-fail-allowed:
   stage: test
@@ -32,6 +34,31 @@ lint-in-anger:
     gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
   allow_failure: false
 
+release-check:
+  stage: test
+  image: alpine
+  before_script: []
+  script:
+  - |
+    VERSION=${CI_BUILD_REF_NAME##release-}
+    if ! head -n 1 doc/changelog | grep "^bytemark-client ($VERSION)" > /dev/null; then
+      echo "Mismatch between branch name and changelog version"
+      exit 1
+    fi
+    if ! grep 'Version = "'$VERSION'"' lib/version.go > /dev/null; then
+      echo "Mismatch between branch name and lib/version.go version"
+      exit 1
+    fi
+    DATE="$(date +"%e %B %Y")"
+    REGEX='^.TH BYTEMARK 1 "'$DATE'" "Bytemark Client Version '"$VERSION"'"'
+    echo $DATE $VERSION
+    echo $REGEX
+    if ! grep "$REGEX" doc/bytemark.1 > /dev/null; then
+      echo "Mismatch between branch name and man page version"
+      exit 1
+    fi
+  only:
+  - /^release-\d+\.\d+$/
 
 vet:
   stage: test
@@ -42,6 +69,7 @@ vet:
 test:
   stage: test
   script:
+    - go get github.com/modocache/gover golang.org/x/tools/cmd/cover 
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - |
@@ -56,3 +84,108 @@ test:
   artifacts:
     paths:
     - coverage.html
+    expire_in: '1 week'
+    
+
+
+.build-job: &build
+  stage: build
+  script:
+  - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+  artifacts:
+    paths:
+    - bytemark-$GOARCH-$GOOS
+    expire_in: '1 month'
+
+build-amd64-linux:
+  <<: *build
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+
+build-amd64-freebsd:
+  <<: *build
+  variables:
+    GOOS: freebsd
+    GOARCH: amd64
+
+build-amd64-openbsd:
+  <<: *build
+  variables:
+    GOOS: openbsd
+    GOARCH: amd64
+
+build-amd64-darwin:
+  <<: *build
+  variables:
+    GOOS: darwin
+    GOARCH: amd64
+
+build-amd64-windows:
+  <<: *build
+  variables:
+    GOOS: windows
+    GOARCH: amd64
+
+.package-job: &package
+  stage: package
+  image: gitlab.bytemark.co.uk:8443/open-source/bytemark-client:latest
+  before_script: []
+  dependencies:
+  - build-amd64-linux
+  only:
+  - /^release-\d+\.\d+$/
+
+    #package-debian-amd64:
+    #  <<: *package
+    #package-fedora-amd64:
+    #  <<: *package
+    #
+    #package-windows-amd64:
+    #  <<: *package
+    #  dependencies:
+    #  - build-amd64-windows
+    #  chocolatey makes me sad
+    #  script:
+
+package-generic-amd64:
+  <<: *package
+  image: alpine:latest
+  script:
+  - apk update && apk add zip tar
+  - mkdir pkg
+  - |
+    for i in bytemark-amd64-*; do
+      cp $i bytemark
+      if echo "$i" | grep -- '-windows$'; then
+          mv bytemark bytemark.exe
+          zip pkg/$i.zip bytemark.exe doc/bytemark.1 doc/changelog doc/LICENSE.txt
+      else
+          tar cf pkg/$i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
+      fi
+    done
+  dependencies:
+  - build-amd64-linux
+  - build-amd64-darwin
+  - build-amd64-freebsd
+  - build-amd64-openbsd
+  - build-amd64-windows
+  artifacts:
+    paths:
+    - "pkg/*.zip"
+    - "pkg/*.tar.gz"
+    expire_in: '1 month'
+
+# TODO: i wish
+# upload-to-chocolatey:
+#   except:
+#   - tags
+#   - triggers
+#   - branches
+# # TODO: this one
+# upload-to-repo:
+#   except:
+#   - tags
+#   - triggers
+#  - branches
+
