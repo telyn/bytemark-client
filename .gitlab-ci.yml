@@ -192,6 +192,21 @@ package-debian-amd64:
   - build-amd64-linux
 
 
+# if desired, we can use mock to set up a cleanroom build using the cap-sys-admin runner.
+package-rpm-amd64:
+  <<: *package
+  image: nrechn/fedora-mock
+  script:
+  - mkdir -p ~/rpmbuild/SOURCES
+  - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
+  - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
+  - rpmbuild --define "version ${CI_BUILD_REF_NAME##release-}" --define "release $CI_BUILD_ID" -bb .gitlab-ci/bytemark-client.spec
+  - mv ~/rpmbuild/RPMS/*/bytemark*.rpm .
+  artifacts:
+    paths:
+    - "*.rpm"
+  dependencies:
+  - build-amd64-linux
 
 # TODO: i wish
 # upload-to-chocolatey:
