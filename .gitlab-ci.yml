@@ -152,15 +152,14 @@ package-generic-amd64:
   image: alpine:latest
   script:
   - apk update && apk add zip tar
-  - mkdir pkg
   - |
     for i in bytemark-amd64-*; do
       cp $i bytemark
       if echo "$i" | grep -- '-windows$'; then
           mv bytemark bytemark.exe
-          zip pkg/$i.zip bytemark.exe doc/bytemark.1 doc/changelog doc/LICENSE.txt
+          zip $i.zip bytemark.exe doc/bytemark.1 doc/changelog doc/LICENSE.txt
       else
-          tar cf pkg/$i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
+          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
       fi
     done
   dependencies:
@@ -171,8 +170,8 @@ package-generic-amd64:
   - build-amd64-windows
   artifacts:
     paths:
-    - "pkg/*.zip"
-    - "pkg/*.tar.gz"
+    - "*.zip"
+    - "*.tar.gz"
     expire_in: '1 month'
 
 package-debian-amd64:
