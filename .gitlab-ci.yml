@@ -243,16 +243,16 @@ package-windows-amd64:
 release-to-repo:
   <<: *release
   script:
-  - echo scp bytemark-amd64-linux-$VERSION.tar.gz $REPO/linux/bytemark-$VERSION.tar.gz
-  - echo scp bytemark-amd64-freebsd-$VERSION.tar.gz $REPO/freebsd/bytemark-$VERSION.tar.gz
-  - echo scp bytemark-amd64-openbsd-$VERSION.tar.gz $REPO/openbsd/bytemark-$VERSION.tar.gz
-  - echo scp bytemark-amd64-windows-$VERSION.zip $REPO/windows/bytemark-$VERSION.zip
-  - echo scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
-  - echo scp bytemark-client-$VERSION*.rpm $REPO/rpm
-  - echo ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && createrepo"
-  - echo ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && make"
-  - echo ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
-  - echo ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
+  - scp bytemark-amd64-linux-$VERSION.tar.gz $REPO/linux/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-freebsd-$VERSION.tar.gz $REPO/freebsd/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-openbsd-$VERSION.tar.gz $REPO/openbsd/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-windows-$VERSION.zip $REPO/windows/bytemark-$VERSION.zip
+  - scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
+  - scp bytemark-client-$VERSION*.rpm $REPO/rpm
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && createrepo"
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && make"
+  - ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
+  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
   dependencies:
   - package-generic-amd64
   - package-rpm-amd64
@@ -262,7 +262,7 @@ release-to-brew:
   <<: *release
   script:
   - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
-  - echo scp bytemark-amd64-darwin-$VERSION.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-darwin-$VERSION.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
   - mkdir ~/.ssh
   - echo -e "Host *\r\n    StrictHostKeyChecking no" > ~/.ssh/config
   - git clone git@github.com:BytemarkHosting/homebrew-tools
