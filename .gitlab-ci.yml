@@ -228,9 +228,8 @@ package-windows-amd64:
 
 .release-job: &release
   stage: release
-  image: debian:jessie
+  image: telyn/debian-git
   before_script:
-  - apt-get update && apt-get install -y openssh-client git
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$CD_SSH_KEY")
   - REPO=$REPO_SSH_HOST:$REPO_PATH
