@@ -286,7 +286,7 @@ release-to-brew:
   - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb 
   - git log HEAD^..HEAD
   - git diff HEAD^..HEAD
-  #- git push 
+  - git push 
   dependencies:
   - package-generic-amd64
 
@@ -296,7 +296,7 @@ release-to-chocolatey:
   - VERSION=${CI_BUILD_REF_NAME##release-}
   - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
-  #- mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y 
+  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y 
   image: telyn/chocolatey
   dependencies:
   - package-windows-amd64
