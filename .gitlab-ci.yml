@@ -208,6 +208,24 @@ package-rpm-amd64:
   dependencies:
   - build-amd64-linux
 
+
+package-windows-amd64:
+    <<: *package
+    image: telyn/chocolatey
+    script:
+    - mkdir -p choco/tools
+    - sed -e "s/VERSION/${CI_BUILD_REF_NAME##release-}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - mv bytemark-amd64-windows choco/tools/bytemark.exe
+    - cd choco
+    - mono /usr/bin/choco.exe pack bytemark-client.nuspec
+    - cd ..
+    - mv choco/*.nupkg .
+    artifacts:
+      paths:
+      - "*.nupkg"
+    dependencies:
+    - build-amd64-windows
+
 # TODO: i wish
 # upload-to-chocolatey:
 #   except:
