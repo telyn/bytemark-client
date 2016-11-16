@@ -230,11 +230,13 @@ package-windows-amd64:
   stage: release
   image: debian:jessie
   before_script:
-  - apt-get update && apt-get install -y openssh-client
+  - apt-get update && apt-get install -y openssh-client git
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$CD_SSH_KEY")
   - REPO=$REPO_SSH_HOST:$REPO_PATH
   - VERSION=${CI_BUILD_REF_NAME##release-}
+  - git config --global user.name Bytemark Automation
+  - git config --global user.email nobody@bytemark.co.uk
   only:
   - /^release-\d+\.\d+$/
 
@@ -242,13 +244,37 @@ package-windows-amd64:
 release-to-repo:
   <<: *release
   script:
-  - echo scp bytemark-amd64-linux-$VERSION.tar.gz $REPO/linux/bytemark-${CI_BUILD_REF_NAME##release-}.tar.gz
-  - echo scp bytemark-amd64-freebsd-$VERSION.tar.gz $REPO/freebsd/bytemark-${CI_BUILD_REF_NAME##release-}.tar.gz
-  - echo scp bytemark-amd64-openbsd-$VERSION.tar.gz $REPO/openbsd/bytemark-${CI_BUILD_REF_NAME##release-}.tar.gz
-  - echo scp bytemark-amd64-windows-$VERSION.zip $REPO/windows/bytemark-${CI_BUILD_REF_NAME##release-}.zip
-  - echo scp bytemark-client_$VERSION_amd64.deb $REPO/debian
+  - echo scp bytemark-amd64-linux-$VERSION.tar.gz $REPO/linux/bytemark-$VERSION.tar.gz
+  - echo scp bytemark-amd64-freebsd-$VERSION.tar.gz $REPO/freebsd/bytemark-$VERSION.tar.gz
+  - echo scp bytemark-amd64-openbsd-$VERSION.tar.gz $REPO/openbsd/bytemark-$VERSION.tar.gz
+  - echo scp bytemark-amd64-windows-$VERSION.zip $REPO/windows/bytemark-$VERSION.zip
+  - echo scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
   - echo scp bytemark-client-$VERSION*.rpm $REPO/rpm
   - echo ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && createrepo"
   - echo ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && make"
-  - echo ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/$OS/bytemark-latest.tar.gz; done"
+  - echo ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
   - echo ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
+  dependencies:
+  - package-generic-amd64
+  - package-rpm-amd64
+  - package-debian-amd64
+
+release-to-brew:
+  <<: *release
+  script:
+  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
+  - echo scp bytemark-amd64-darwin-$VERSION.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
+  - mkdir ~/.ssh
+  - echo -e "Host *\r\n    StrictHostKeyChecking no" > ~/.ssh/config
+  - git clone git@github.com:BytemarkHosting/homebrew-tools
+  - cd homebrew-tools
+  - URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/bytemark-client/mac/bytemark-$VERSION.tar.gz'"'!)
+  - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
+  - echo sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
+  - sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
+  - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb 
+  - git log HEAD^..HEAD
+  - git diff HEAD^..HEAD
+  #- git push 
+  dependencies:
+  - package-generic-amd64
