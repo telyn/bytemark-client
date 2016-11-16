@@ -8,6 +8,7 @@ stages:
   - test
   - build
   - package
+  - release
 
 before_script:
   # these two are needed for coverage stats
@@ -225,16 +226,29 @@ package-windows-amd64:
     dependencies:
     - build-amd64-windows
 
-# TODO: i wish
-# upload-to-chocolatey:
-#   except:
-#   - tags
-#   - triggers
-#   - branches
-# # TODO: this one
-# upload-to-repo:
-#   except:
-#   - tags
-#   - triggers
-#  - branches
+.release-job: &release
+  stage: release
+  image: debian:jessie
+  before_script:
+  - apt-get update && apt-get install -y openssh-client
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$CD_SSH_KEY")
+  - REPO=$REPO_SSH_HOST:$REPO_PATH
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  only:
+  - /^release-\d+\.\d+$/
 
+
+release-to-repo:
+  <<: *release
+  script:
+  - echo scp bytemark-amd64-linux-$VERSION.tar.gz $REPO/linux/bytemark-${CI_BUILD_REF_NAME##release-}.tar.gz
+  - echo scp bytemark-amd64-freebsd-$VERSION.tar.gz $REPO/freebsd/bytemark-${CI_BUILD_REF_NAME##release-}.tar.gz
+  - echo scp bytemark-amd64-openbsd-$VERSION.tar.gz $REPO/openbsd/bytemark-${CI_BUILD_REF_NAME##release-}.tar.gz
+  - echo scp bytemark-amd64-windows-$VERSION.zip $REPO/windows/bytemark-${CI_BUILD_REF_NAME##release-}.zip
+  - echo scp bytemark-client_$VERSION_amd64.deb $REPO/debian
+  - echo scp bytemark-client-$VERSION*.rpm $REPO/rpm
+  - echo ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && createrepo"
+  - echo ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && make"
+  - echo ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/$OS/bytemark-latest.tar.gz; done"
+  - echo ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
