@@ -4,15 +4,18 @@ variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
 
+stages:
+  - test
+  - build
+  - package
+  - release
+
 before_script:
   # these two are needed for coverage stats
-  - go get github.com/modocache/gover golang.org/x/tools/cmd/cover github.com/BytemarkHosting/auth-client
+  - go get github.com/BytemarkHosting/auth-client
   - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
   # stick our code in the correct place.
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-
-stages:
-  - test
 
 lint-with-fail-allowed:
   stage: test
@@ -32,6 +35,31 @@ lint-in-anger:
     gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
   allow_failure: false
 
+release-check:
+  stage: test
+  image: alpine
+  before_script: []
+  script:
+  - |
+    VERSION=${CI_BUILD_REF_NAME##release-}
+    if ! head -n 1 doc/changelog | grep "^bytemark-client ($VERSION)" > /dev/null; then
+      echo "Mismatch between branch name and changelog version"
+      exit 1
+    fi
+    if ! grep 'Version = "'$VERSION'"' lib/version.go > /dev/null; then
+      echo "Mismatch between branch name and lib/version.go version"
+      exit 1
+    fi
+    DATE="$(date +"%e %B %Y")"
+    REGEX='^.TH BYTEMARK 1 "'$DATE'" "Bytemark Client Version '"$VERSION"'"'
+    echo $DATE $VERSION
+    echo $REGEX
+    if ! grep "$REGEX" doc/bytemark.1 > /dev/null; then
+      echo "Mismatch between branch name and man page version"
+      exit 1
+    fi
+  only:
+  - /^release-\d+\.\d+$/
 
 vet:
   stage: test
@@ -42,6 +70,7 @@ vet:
 test:
   stage: test
   script:
+    - go get github.com/modocache/gover golang.org/x/tools/cmd/cover 
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - |
@@ -56,3 +85,219 @@ test:
   artifacts:
     paths:
     - coverage.html
+    expire_in: '1 week'
+    
+
+
+.build-job: &build
+  stage: build
+  script:
+  - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+  artifacts:
+    paths:
+    - bytemark-$GOARCH-$GOOS
+    expire_in: '1 month'
+
+build-amd64-linux:
+  <<: *build
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+
+build-amd64-freebsd:
+  <<: *build
+  variables:
+    GOOS: freebsd
+    GOARCH: amd64
+
+build-amd64-openbsd:
+  <<: *build
+  variables:
+    GOOS: openbsd
+    GOARCH: amd64
+
+build-amd64-darwin:
+  <<: *build
+  variables:
+    GOOS: darwin
+    GOARCH: amd64
+
+build-amd64-windows:
+  <<: *build
+  variables:
+    GOOS: windows
+    GOARCH: amd64
+
+.package-job: &package
+  stage: package
+  before_script: []
+  dependencies:
+  - build-amd64-linux
+  only:
+  - /^release-\d+\.\d+$/
+
+    #package-debian-amd64:
+    #  <<: *package
+    #package-fedora-amd64:
+    #  <<: *package
+    #
+    #package-windows-amd64:
+    #  <<: *package
+    #  dependencies:
+    #  - build-amd64-windows
+    #  chocolatey makes me sad
+    #  script:
+
+package-generic-amd64:
+  <<: *package
+  image: alpine:latest
+  script:
+  - apk update && apk add zip tar
+  - |
+    for i in bytemark-amd64-*; do
+      cp $i bytemark
+      if echo "$i" | grep -- '-windows$'; then
+          mv bytemark bytemark.exe
+          zip $i.zip bytemark.exe doc/bytemark.1 doc/changelog doc/LICENSE.txt
+      else
+          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
+      fi
+    done
+  dependencies:
+  - build-amd64-linux
+  - build-amd64-darwin
+  - build-amd64-freebsd
+  - build-amd64-openbsd
+  - build-amd64-windows
+  artifacts:
+    paths:
+    - "*.zip"
+    - "*.tar.gz"
+    expire_in: '1 month'
+
+package-debian-amd64:
+  <<: *package
+  image: telyn/debhelper:jessie
+  script:
+  - ln -s .gitlab-ci/debian
+  - mv bytemark-amd64-linux bytemark
+  - fakeroot debian/rules binary
+  - lintian -i ../bytemark-client*.deb
+  - mv ../bytemark-client*.deb .
+  artifacts:
+    paths:
+    - "*.deb"
+    expire_in: "1 month"
+  dependencies:
+  - build-amd64-linux
+
+
+# if desired, we can use mock to set up a cleanroom build using the cap-sys-admin runner.
+package-rpm-amd64:
+  <<: *package
+  image: nrechn/fedora-mock
+  script:
+  - mkdir -p ~/rpmbuild/SOURCES
+  - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
+  - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
+  - rpmbuild --define "version ${CI_BUILD_REF_NAME##release-}" --define "release $CI_BUILD_ID" -bb .gitlab-ci/bytemark-client.spec
+  - mv ~/rpmbuild/RPMS/*/bytemark*.rpm .
+  artifacts:
+    paths:
+    - "*.rpm"
+    expire_in: "1 month"
+  dependencies:
+  - build-amd64-linux
+
+
+package-windows-amd64:
+    <<: *package
+    image: telyn/chocolatey
+    script:
+    - mkdir -p choco/tools
+    - sed -e "s/VERSION/${CI_BUILD_REF_NAME##release-}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - mv bytemark-amd64-windows choco/tools/bytemark.exe
+    - cd choco
+    - mono /usr/bin/choco.exe pack bytemark-client.nuspec
+    - cd ..
+    - mv choco/*.nupkg .
+    artifacts:
+      paths:
+      - "*.nupkg"
+      expire_in: "1 month"
+    dependencies:
+    - build-amd64-windows
+
+.release-job: &release
+  stage: release
+  image: telyn/debian-git
+  before_script:
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$CD_SSH_KEY")
+  - mkdir ~/.ssh
+  - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+  - REPO=$REPO_SSH_HOST:$REPO_PATH
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - git config --global user.name Bytemark Automation
+  - git config --global user.email nobody@bytemark.co.uk
+  only:
+  - /^release-\d+\.\d+$/
+
+
+release-to-repo:
+  <<: *release
+  script:
+  # upload
+  - scp bytemark-amd64-linux.tar.gz $REPO/linux/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-freebsd.tar.gz $REPO/freebsd/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-openbsd.tar.gz $REPO/openbsd/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-windows.zip $REPO/windows/bytemark-$VERSION.zip
+  - scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
+  - scp bytemark-client-$VERSION*.rpm $REPO/rpm
+  # make rpm & debian repos
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && createrepo ."
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && rm -f Release.gpg InRelease && make"
+  # remove old -latest symlinks
+  - ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do rm -f $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
+    # add new -latest symlinks
+  - ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
+  - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/windows/bytemark-latest.zip"
+  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
+  dependencies:
+  - package-generic-amd64
+  - package-rpm-amd64
+  - package-debian-amd64
+
+release-to-brew:
+  <<: *release
+  script:
+  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
+  # upload to repo
+  - scp bytemark-amd64-darwin.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
+  - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/windows/bytemark-latest.zip"
+  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
+  # update the homebrew repo
+  - git clone git@github.com:BytemarkHosting/homebrew-tools.git
+  - cd homebrew-tools
+  - URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/bytemark-client/mac/bytemark-$VERSION.tar.gz'"'!)
+  - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
+  - echo sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
+  - sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
+  - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb 
+  - git log HEAD^..HEAD
+  - git diff HEAD^..HEAD
+  - git push origin master
+  dependencies:
+  - package-generic-amd64
+
+release-to-chocolatey:
+  <<: *release
+  before_script:
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
+  script:
+  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y 
+  image: telyn/chocolatey
+  dependencies:
+  - package-windows-amd64
+

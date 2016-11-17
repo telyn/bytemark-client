@@ -1,9 +1,0 @@
-#!/bin/bash
-
-PATH=`readlink /tmp/Bytemark.app`/Contents/Resources/bin:$PATH
-rm /tmp/Bytemark.app
-
-clear
-bytemark help
-
-bash

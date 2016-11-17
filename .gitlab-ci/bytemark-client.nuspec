@@ -7,7 +7,7 @@
     <title>Bytemark Client</title>
     <version>VERSION</version>
     <authors>Telyn Z.F., Matthew Bloch</authors>
-    <owners>Telyn Z.F></owners>
+    <owners>Telyn Z.F.</owners>
     <summary>Command-line client for Bytemark's self-service hosting.</summary>
     <description>Bytemark Client is a command-line client for interacting
     with Bytemark's self-service hosting.
@@ -30,6 +30,6 @@
     <!--<provides></provides>-->
   </metadata>
   <files>
-    <file src="tools/**" target="tools" />
+    <file src="tools/bytemark.exe" target="tools" />
   </files>
 </package>

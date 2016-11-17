@@ -1,4 +1,0 @@
-set folderPath to POSIX path of (path to me as text)
-do shell script "rm -f /tmp/Bytemark.app"
-do shell script "ln -s " & quoted form of folderPath & " /tmp/Bytemark.app"
-do shell script "open '" &folderPath & "Contents/Resources/Bytemark.terminal'"

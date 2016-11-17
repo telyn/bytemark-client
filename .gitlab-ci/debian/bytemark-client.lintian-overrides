@@ -1,0 +1,4 @@
+# go makes static binaries.
+bytemark-client: statically-linked-binary usr/bin/bytemark
+# The Go compiler is currently unable to produce read-only relocations
+bytemark-client: hardening-no-relro usr/bin/bytemark
