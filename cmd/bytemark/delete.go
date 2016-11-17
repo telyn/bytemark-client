@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -47,40 +48,13 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				},
 				forceFlag,
 			},
-			Action: With(GroupProvider, func(c *Context) (err error) {
-				recursive := c.Bool("recursive")
-				if len(c.Group.VirtualMachines) > 0 && recursive {
-					running := 0
-					for _, vm := range c.Group.VirtualMachines {
-						if vm.PowerOn {
-							running++
-						}
-					}
-					prompt := fmt.Sprintf("The group '%s' has %d virtual machines in it", c.GroupName.Group, len(c.Group.VirtualMachines))
-					if running != 0 {
-						prompt = fmt.Sprintf("The group '%s' has %d running virtual machines in it", c.GroupName.Group, running)
-					}
-
-					if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
-						return util.UserRequestedExit{}
-					}
-					err = recursiveDeleteGroup(c.GroupName, c.Group)
-					if err != nil {
-						return
-					}
-				} else if !recursive {
-					err = &util.WontDeleteNonEmptyGroupError{Group: c.GroupName}
-					return
-				}
-				err = global.Client.DeleteGroup(c.GroupName)
-				return
-			}),
+			Action: With(GroupProvider, deleteGroup),
 		}, {
 			Name:        "key",
 			Usage:       "deletes the specified key",
 			UsageText:   "bytemark delete key [--user <user>] <key>",
 			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
-			Action: With(func(c *Context) error {
+			Action: With(func(c *Context) (err error) {
 				user := global.Config.GetIgnoreErr("user")
 
 				key := strings.Join(c.Args(), " ")
@@ -88,18 +62,16 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					return c.Help("You must specify a key to delete.\r\n")
 				}
 
-				err := EnsureAuth()
+				err = EnsureAuth()
 				if err != nil {
-					return err
+					return
 				}
 
 				err = global.Client.DeleteUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key deleted successfullly")
-					return err
-				} else {
-					return err
 				}
+				return
 			}),
 		}, {
 			Name:        "server",
@@ -113,46 +85,85 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				},
 				forceFlag,
 			},
-			Action: With(VirtualMachineProvider, func(c *Context) (err error) {
-				purge := c.Bool("purge")
-				vm := c.VirtualMachine
-
-				if vm.Deleted && !purge {
-					log.Errorf("Server %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge\r\n", vm.Hostname)
-					// we don't return an error because we want a 0 exit code - the deletion request has happened, just not now.
-					return
-				}
-				fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
-				if purge {
-					fstr = fmt.Sprintf("Are you certain you wish to permanently delete %s? You will not be able to un-delete it.", vm.Hostname)
-
-				}
-
-				if !c.Bool("force") && !util.PromptYesNo(fstr) {
-					err = util.UserRequestedExit{}
-					return
-				}
-
-				err = global.Client.DeleteVirtualMachine(c.VirtualMachineName, purge)
-				if err != nil {
-					return
-				}
-				if purge {
-					log.Logf("Server %s purged successfully.\r\n", vm.Hostname)
-				} else {
-					log.Logf("Server %s deleted successfully.\r\n", vm.Hostname)
-				}
-				return
-			}),
+			Action: With(VirtualMachineProvider, deleteServer),
 		}},
 	})
 }
 
-func recursiveDeleteGroup(name *lib.GroupName, group *lib.Group) error {
-	log.Log("WARNING: The following servers will be permanently deleted, without any way to recover or un-delete them:")
-	for _, vm := range group.VirtualMachines {
-		log.Logf("\t%s\r\n", vm.Name)
+func deleteServer(c *Context) (err error) {
+	purge := c.Bool("purge")
+	vm := c.VirtualMachine
+
+	if vm.Deleted && !purge {
+		log.Errorf("Server %s has already been deleted.\r\nIf you wish to permanently delete it, add --purge\r\n", vm.Hostname)
+		// we don't return an error because we want a 0 exit code - the deletion request has happened, just not now.
+		return
 	}
+	fstr := fmt.Sprintf("Are you certain you wish to delete %s?", vm.Hostname)
+	if purge {
+		fstr = fmt.Sprintf("Are you certain you wish to permanently delete %s? You will not be able to un-delete it.", vm.Hostname)
+
+	}
+
+	if !c.Bool("force") && !util.PromptYesNo(fstr) {
+		err = util.UserRequestedExit{}
+		return
+	}
+
+	err = global.Client.DeleteVirtualMachine(c.VirtualMachineName, purge)
+	if err != nil {
+		return
+	}
+	if purge {
+		log.Logf("Server %s purged successfully.\r\n", vm.Hostname)
+	} else {
+		log.Logf("Server %s deleted successfully.\r\n", vm.Hostname)
+	}
+	return
+}
+
+func countRunning(group *brain.Group) (running int) {
+	for _, vm := range group.VirtualMachines {
+		if vm.PowerOn {
+			running++
+		}
+	}
+	return running
+}
+
+func deleteGroup(c *Context) (err error) {
+	recursive := c.Bool("recursive")
+	if len(c.Group.VirtualMachines) > 0 && recursive {
+		prompt := fmt.Sprintf("The group '%s' has %d servers in it which will be irrevocably deleted", c.GroupName.Group, len(c.Group.VirtualMachines))
+		running := countRunning(c.Group)
+		if running != 0 {
+			stopped := len(c.Group.VirtualMachines) - running
+			andStopped := ""
+			if stopped > 0 {
+				andStopped = fmt.Sprintf("and %d stopped ", stopped)
+			}
+			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.GroupName.Group, running, andStopped)
+		}
+
+		if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
+			return util.UserRequestedExit{}
+		}
+		err = recursiveDeleteGroup(c.GroupName, c.Group)
+		if err != nil {
+			return
+		}
+	} else if !recursive {
+		err = &util.WontDeleteNonEmptyGroupError{Group: c.GroupName}
+		return
+	}
+	err = global.Client.DeleteGroup(c.GroupName)
+	if err == nil {
+		log.Logf("Group %s deleted successfully.\r\n", c.GroupName.String())
+	}
+	return
+}
+
+func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("", "")
 	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 	for _, vm := range group.VirtualMachines {
@@ -160,11 +171,11 @@ func recursiveDeleteGroup(name *lib.GroupName, group *lib.Group) error {
 		err := global.Client.DeleteVirtualMachine(&vmn, true)
 		if err != nil {
 			return err
-		} else {
-			log.Logf("Server %s purged successfully.\r\n", name)
 		}
+		log.Logf("%s\r\n", vm.Name)
 
 	}
+	log.Log()
 	return nil
 }
 

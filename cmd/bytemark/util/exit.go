@@ -14,6 +14,7 @@ import (
 	"syscall"
 )
 
+// UserRequestedExit is returned when the user said 'No' to a 'yes/no' prompt.
 type UserRequestedExit struct{}
 
 func (e UserRequestedExit) Error() string {
@@ -24,64 +25,64 @@ func (e UserRequestedExit) Error() string {
 type ExitCode int
 
 const (
-	// E_USAGE_DISPLAYED is returned when some usage info / help page was displayed. Unsure whether it should == E_SUCCESS or not
-	E_USAGE_DISPLAYED ExitCode = 0
-	// E_SUCCESS is used to say everything went well
-	E_SUCCESS = 0
-	// E_TRAPPED_INTERRUPT is the exit code returned when an unexpected interrupt like SIGUSR1 was trapped
-	E_TRAPPED_INTERRUPT = -1
-	// E_CANT_READ_CONFIG is the exit code returned when we couldn't read a config variable from the disk for some reason
-	E_CANT_READ_CONFIG = 3
-	// E_CANT_WRITE_CONFIG is the exit code returned when we couldn't write a config variable to the disk for some reason
-	E_CANT_WRITE_CONFIG = 4
-	// E_USER_EXIT is the exit code returned when the user's action caused the program to terminate (usually by saying no to a prompt)
-	E_USER_EXIT = 5
-	// E_WONT_DELETE_NONEMPTY is the exit code returned when the user's requested that a group be deleted when it still had servers in
-	E_WONT_DELETE_NONEMPTY = 6
-	// E_PEBKAC is the exit code returned when the user entered a malformed command, name, or flag.
-	E_PEBKAC = 7
-	// E_SUBPROCESS_FAILED is the exit code returned when the client attempted to run a subprocess (e.g. ssh, a browser or a vpn client) but couldn't
-	E_SUBPROCESS_FAILED = 8
+	// ExitCodeUsageDisplayed is returned when some usage info / help page was displayed. Unsure whether it should == E_SUCCESS or not
+	ExitCodeUsageDisplayed ExitCode = 0
+	// ExitCodeSuccess is used to say everything went well
+	ExitCodeSuccess = 0
+	// ExitCodeTrappedInterrupt is the exit code returned when an unexpected interrupt like SIGUSR1 was trapped
+	ExitCodeTrappedInterrupt = -1
+	// ExitCodeCantReadConfig is the exit code returned when we couldn't read a config variable from the disk for some reason
+	ExitCodeCantReadConfig = 3
+	// ExitCodeCantWriteConfig is the exit code returned when we couldn't write a config variable to the disk for some reason
+	ExitCodeCantWriteConfig = 4
+	// ExitCodeUserExit is the exit code returned when the user's action caused the program to terminate (usually by saying no to a prompt)
+	ExitCodeUserExit = 5
+	// ExitCodeWontDeletePopulated is the exit code returned when the user's requested that a group be deleted when it still had servers in
+	ExitCodeWontDeletePopulated = 6
+	// ExitCodeBadInput is the exit code returned when the user entered a malformed command, name, or flag.
+	ExitCodeBadInput = 7
+	// ExitCodeSubprocessFailed is the exit code returned when the client attempted to run a subprocess (e.g. ssh, a browser or a vpn client) but couldn't
+	ExitCodeSubprocessFailed = 8
 
-	// E_NO_DEFAULT_ACCOUNT is the exit code returned when the client couldn't determine a default account. In this situation, the user should manually specify the account to use with the --account flag or using `bytemark config set account`
-	E_NO_DEFAULT_ACCOUNT = 9
+	// ExitCodeNoDefaultAccount is the exit code returned when the client couldn't determine a default account. In this situation, the user should manually specify the account to use with the --account flag or using `bytemark config set account`
+	ExitCodeNoDefaultAccount = 9
 
-	// E_UNKNOWN_ERROR is the exit code returned when we got an error we couldn't deal with.
-	E_UNKNOWN_ERROR = 49
+	// ExitCodeUnknownError is the exit code returned when we got an error we couldn't deal with.
+	ExitCodeUnknownError = 49
 
-	// E_CANT_CONNECT_AUTH is the exit code returned when we were unable to establish an HTTP connection to the auth endpoint.
-	E_CANT_CONNECT_AUTH = 50
-	// E_CANT_CONNECT_API is the exit code returned when we were unable to establish an HTTP connection to the API endpoint.
-	E_CANT_CONNECT_API = 150
+	// ExitCodeCantConnectAuth is the exit code returned when we were unable to establish an HTTP connection to the auth endpoint.
+	ExitCodeCantConnectAuth = 50
+	// ExitCodeCantConnectAPI is the exit code returned when we were unable to establish an HTTP connection to the API endpoint.
+	ExitCodeCantConnectAPI = 150
 
-	// E_AUTH_REPORTED_ERROR is the exit code returned when the auth server reported an internal error.
-	E_AUTH_REPORTED_ERROR = 51
-	// E_API_REPORTED_ERROR is the exit code returned when the API server reported an internal error.
-	E_API_REPORTED_ERROR = 152
+	// ExitCodeAuthInternalError is the exit code returned when the auth server reported an internal error.
+	ExitCodeAuthInternalError = 51
+	// ExitCodeAPIInternalError is the exit code returned when the API server reported an internal error.
+	ExitCodeAPIInternalError = 152
 
-	// E_CANT_PARSE_AUTH is the exit code returned when the auth server returned something we were unable to parse.
-	E_CANT_PARSE_AUTH = 52
-	// E_CANT_PARSE_API is the exit code returned when the API server returned something we were unable to parse.
-	E_CANT_PARSE_API = 152
+	// ExitCodeCantParseAuthResponse is the exit code returned when the auth server returned something we were unable to parse.
+	ExitCodeCantParseAuthResponse = 52
+	// ExitCodeCantParseAPIResponse is the exit code returned when the API server returned something we were unable to parse.
+	ExitCodeCantParseAPIResponse = 152
 
-	// E_CREDENTIALS_INVALID is the exit code returned when the auth server says your credentials contain invalid characters.
-	E_CREDENTIALS_INVALID = 53
-	// E_CREDENTIALS_WRONG is the exit code returned when the auth server says your credentials don't match a user in its database.
-	E_CREDENTIALS_WRONG = 54
+	// ExitCodeInvalidCredentials is the exit code returned when the auth server says your credentials contain invalid characters.
+	ExitCodeInvalidCredentials = 53
+	// ExitCodeBadCredentials is the exit code returned when the auth server says your credentials don't match a user in its database.
+	ExitCodeBadCredentials = 54
 
-	// E_NOT_AUTHORIZED_API is the exit code returned when the API server says you haven't got permission to do that.
-	E_NOT_AUTHORIZED_API = 155
+	// ExitCodeActionNotPermitted is the exit code returned when the API server says you haven't got permission to do that.
+	ExitCodeActionNotPermitted = 155
 
-	// E_NOT_FOUND_API is the exit code returned when the API server says you do not have permission to see the object you are trying to view, or that it does not exist.
-	E_NOT_FOUND_API = 156
+	// ExitCodeNotFound is the exit code returned when the API server says you do not have permission to see the object you are trying to view, or that it does not exist.
+	ExitCodeNotFound = 156
 
-	// E_BAD_REQUEST_API is the exit code returned when we send a bad request to API. (E.g. names being too short or having wrong characters in)
-	E_BAD_REQUEST_API = 157
+	// ExitCodeBadRequest is the exit code returned when we send a bad request to API. (E.g. names being too short or having wrong characters in)
+	ExitCodeBadRequest = 157
 
-	// E_UNKNOWN_AUTH is the exit code returned when we get an unexpected error from the auth server.
-	E_UNKNOWN_AUTH_ERROR = 149
-	// E_UNKNOWN_API_ERROR is the exit code returned when we get an unexpected error from the Bytemark API.
-	E_UNKNOWN_API_ERROR = 249
+	// ExitCodeUnknownAuthError is the exit code returned when we get an unexpected error from the auth server.
+	ExitCodeUnknownAuthError = 149
+	// ExitCodeUnknownAPIError is the exit code returned when we get an unexpected error from the Bytemark API.
+	ExitCodeUnknownAPIError = 249
 )
 
 // HelpForExitCodes prints readable information on what the various exit codes do.
@@ -152,23 +153,24 @@ Exit code ranges:
     255
 	Trapped an interrupt signal, so exited.
 `)
-	return E_USAGE_DISPLAYED
+	return ExitCodeUsageDisplayed
 }
 
+// ProcessError processes the given error, outputs a message, and returns the relevant ExitCode for the given error.
 func ProcessError(err error, message ...string) ExitCode {
 	if err == nil {
-		return E_SUCCESS
+		return ExitCodeSuccess
 	}
 
 	trace := make([]byte, 4096, 4096)
 	runtime.Stack(trace, false)
 
-	log.Debug(log.DBG_OUTLINE, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
+	log.Debug(log.LvlOutline, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))
 	if len(message) > 0 {
 		log.Error(message)
 	}
 	errorMessage := "Unknown error"
-	exitCode := ExitCode(E_UNKNOWN_ERROR)
+	exitCode := ExitCode(ExitCodeUnknownError)
 	if err != nil {
 		switch e := err.(type) {
 		case *auth3.Error:
@@ -176,7 +178,7 @@ func ProcessError(err error, message ...string) ExitCode {
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)
-				if urlErr.Error != nil {
+				if urlErr.Err != nil {
 					if opError, ok := urlErr.Err.(*net.OpError); ok {
 						errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", opError.Err)
 					} else {
@@ -185,13 +187,13 @@ func ProcessError(err error, message ...string) ExitCode {
 				} else {
 					errorMessage = fmt.Sprintf("Couldn't connect to the auth server: %v", urlErr)
 				}
-				exitCode = E_CANT_CONNECT_AUTH
+				exitCode = ExitCodeCantConnectAuth
 			default:
 				errorMessage = fmt.Sprintf("Couldn't create auth session - internal error of type %T: %v", e.Err, e.Err)
-				exitCode = E_UNKNOWN_AUTH_ERROR
+				exitCode = ExitCodeUnknownAuthError
 			}
 		case *url.Error:
-			if e.Error != nil {
+			if e.Err != nil {
 				if opError, ok := e.Err.(*net.OpError); ok {
 					errorMessage = fmt.Sprintf("Couldn't connect to the Bytemark API: %v", opError.Err)
 				} else {
@@ -211,68 +213,65 @@ func ProcessError(err error, message ...string) ExitCode {
 			} else {
 				errorMessage = fmt.Sprintf("Unable to find %s in your PATH.", e.Name)
 			}
-			exitCode = E_SUBPROCESS_FAILED
+			exitCode = ExitCodeSubprocessFailed
 		case SubprocessFailedError:
 			if e.Err == nil {
-				return E_SUCCESS
+				return ExitCodeSuccess
 			}
 			errorMessage = err.Error()
-			exitCode = E_SUBPROCESS_FAILED
+			exitCode = ExitCodeSubprocessFailed
 		case lib.NoDefaultAccountError:
 			errorMessage = err.Error()
-			exitCode = E_NO_DEFAULT_ACCOUNT
+			exitCode = ExitCodeNoDefaultAccount
 		case lib.NotAuthorizedError:
 			errorMessage = err.Error()
-			exitCode = E_NOT_AUTHORIZED_API
+			exitCode = ExitCodeActionNotPermitted
 		case lib.BadRequestError:
 			errorMessage = err.Error()
-			exitCode = E_BAD_REQUEST_API
+			exitCode = ExitCodeBadRequest
 		case lib.ServiceUnavailableError:
 			errorMessage = err.Error()
-			exitCode = E_CANT_CONNECT_API
+			exitCode = ExitCodeCantConnectAPI
 		case lib.InternalServerError:
 			errorMessage = err.Error()
-			exitCode = E_API_REPORTED_ERROR
+			exitCode = ExitCodeAPIInternalError
 		case lib.NotFoundError:
 			errorMessage = err.Error()
-			exitCode = E_NOT_FOUND_API
+			exitCode = ExitCodeNotFound
 		case UserRequestedExit:
 			errorMessage = ""
-			exitCode = E_USER_EXIT
+			exitCode = ExitCodeUserExit
 		case *syscall.Errno:
 			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", e)
-			exitCode = E_UNKNOWN_ERROR
+			exitCode = ExitCodeUnknownError
 		case lib.AmbiguousKeyError:
-			exitCode = E_PEBKAC
-			errorMessage = err.Error()
-		case NotEnoughArgumentsError:
-			exitCode = E_PEBKAC
+			exitCode = ExitCodeBadInput
 			errorMessage = err.Error()
 		case UsageDisplayedError:
-			exitCode = E_PEBKAC
+			exitCode = ExitCodeBadInput
 			errorMessage = err.Error()
 
 		default:
 			msg := err.Error()
 			if strings.Contains(msg, "Badly-formed parameters") {
-				exitCode = E_CREDENTIALS_INVALID
+				exitCode = ExitCodeInvalidCredentials
 				errorMessage = "The supplied credentials contained invalid characters - please try again"
 			} else if strings.Contains(msg, "Bad login credentials") {
-				exitCode = E_CREDENTIALS_WRONG
+				exitCode = ExitCodeBadCredentials
 				errorMessage = "A user account with those credentials could not be found. Check your details and try again"
 
 			}
 		}
 
-		if _, ok := err.(lib.APIError); ok && exitCode == E_UNKNOWN_ERROR {
+		if _, ok := err.(lib.APIError); ok && exitCode == ExitCodeUnknownError {
 			errorMessage = fmt.Sprintf("Unknown error from API client library. %s", err.Error())
-			exitCode = E_UNKNOWN_API_ERROR
+			exitCode = ExitCodeUnknownAPIError
 		}
 	} else {
 		exitCode = 0
 	}
 
-	if exitCode == E_UNKNOWN_ERROR {
+	if exitCode == ExitCodeUnknownError {
 		log.Errorf("Unknown error of type %T: %s.\r\nPlease send a bug report containing %s to support@bytemark.co.uk.\r\n", err, err, log.LogFile.Name())
 	} else if len(message) == 0 { // the message (passed as argument) is shadowed by errorMessage (made in this function)
 		log.Log(errorMessage)

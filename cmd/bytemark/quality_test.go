@@ -1,10 +1,7 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"github.com/urfave/cli"
-	"os"
 	"testing"
 )
 
@@ -27,27 +24,7 @@ type s struct {
 }
 
 // TODO(telyn): It would be lovely to write a test to ensure all destructiveCommands call PromptYesNo, but I don't see it happening any time soon. Callee data is only available from an AST, not via reflection. What we could do is try to mock all the functions that are called by all destructive commands so we can just loop over them.
-
-// TestMain is used to work around weirdness with urfave/cli. See the large comment inside for details.
-func TestMain(m *testing.M) {
-	flag.Parse()
-	for _, c := range commands {
-		config, _ := baseTestSetup()
-		config.When("Get", "token").Return("no-not-a-token")
-
-		// the issue is that Command.FullName() is dependent on Command.commandNamePath.
-		// Command.commandNamePath is filled in when the parent's Command.startApp is called
-		// and startApp is only called when you actually try to run that command or one of
-		// its subcommands. So we run "bytemark <command> help" on all commands that have
-		// subcommands in order to get every subcommand to have a correct Command.commandPath
-
-		if c.Subcommands != nil && len(c.Subcommands) > 0 {
-			fmt.Fprintf(os.Stderr, c.Name)
-			global.App.Run([]string{"bytemark.test", c.Name, "help"})
-		}
-	}
-	os.Exit(m.Run())
-}
+// Actually, just making PromptYesNo a variable in util will do. Set it to the actual impl of PromptYesNo by default, mock it in the test.
 
 // Ensure all destructive commands have a --force flag, to skip through prompting.
 func TestDestructiveCommandsHaveForceFlags(t *testing.T) {

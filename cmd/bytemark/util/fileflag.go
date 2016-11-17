@@ -21,6 +21,7 @@ func getPath(name string) string {
 	return name
 }
 
+// Set sets the value of FileFlag given the filename as an argument. This reads in the file synchronously.
 func (f *FileFlag) Set(name string) error {
 	f.FileName = getPath(name)
 	res, err := ioutil.ReadFile(f.FileName)

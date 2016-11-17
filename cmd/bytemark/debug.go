@@ -36,9 +36,9 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 		Action: With(func(c *Context) error {
 			shouldAuth := c.Bool("auth")
 
-			endpoint := lib.EP_BRAIN
+			endpoint := lib.BrainEndpoint
 			if c.Bool("use-billing") {
-				endpoint = lib.EP_BILLING
+				endpoint = lib.BillingEndpoint
 			}
 
 			if c.Bool("junk-token") {
@@ -53,6 +53,9 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 			switch method {
 			case "GET", "PUT", "POST", "DELETE":
 				url, err := c.NextArg()
+				if err != nil {
+					return err
+				}
 
 				if !strings.HasPrefix(url, "/") {
 					url = "/" + url
@@ -85,7 +88,10 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 				log.Logf("%s %s: %d\r\n", method, reqURL.String(), statusCode)
 
 				buf := new(bytes.Buffer)
-				json.Indent(buf, body, "", "    ")
+				err = json.Indent(buf, body, "", "    ")
+				if err != nil {
+					return err
+				}
 				log.Log(buf.String())
 				return nil
 			}

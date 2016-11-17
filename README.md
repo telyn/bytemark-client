@@ -21,7 +21,7 @@ Feel free to open issues & merge requests on the github repo at http://github.co
 Breaking API change
 ===================
 
-The following breaking API change to the 'lib' package will be arriving in master in October
+The following breaking API change to the 'lib' package occurred in version 2.0.
 
 * the packages lib/spp, lib/brain and lib/billing are being created.
 * lib.CreditCard is moving to lib/spp.CreditCard
@@ -44,4 +44,4 @@ The following breaking API change to the 'lib' package will be arriving in maste
 * lib.VirtualMachineName is being renamed to lib.ServerName
 * lib.ParseVirtualMachineName is being renamed to lib.ParseServerName
 
-If you require the old names for longer you can use gopkg.in/BytemarkHosting/bytemark-client.v1/lib to refer to the package as it currently stands. The next bytemark-client release will be 2.0.
+If you require the old API for longer you can use gopkg.in/BytemarkHosting/bytemark-client.v1/lib to refer to the package prior to this change.

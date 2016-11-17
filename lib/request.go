@@ -13,9 +13,12 @@ import (
 	"strings"
 )
 
+// RequestAlreadyRunError is returned if the Run method was already called for this Request.
 type RequestAlreadyRunError struct {
 	Request *Request
 }
+
+// InsecureConnectionError is returned if the endpoint isn't https but AllowInsecure was not called.
 type InsecureConnectionError struct {
 	Request *Request
 }
@@ -28,6 +31,7 @@ func (e InsecureConnectionError) Error() string {
 	return "A Request to an insecure endpoint was attempted when AllowInsecure had not been called."
 }
 
+// Request is the workhorse of the bytemark-client/lib - it builds up a request, then Run can be called to get its results.
 type Request struct {
 	authenticate  bool
 	client        Client
@@ -39,6 +43,7 @@ type Request struct {
 	hasRun        bool
 }
 
+// GetURL returns the URL that the Request is for.
 func (r *Request) GetURL() url.URL {
 	if r.url == nil {
 		return url.URL{}
@@ -46,6 +51,7 @@ func (r *Request) GetURL() url.URL {
 	return *r.url
 }
 
+// BuildRequestNoAuth creates a new Request with the intention of not authenticating.
 func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
 	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
@@ -60,6 +66,7 @@ func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, pa
 	}, nil
 }
 
+// BuildRequest builds a request that will be authenticated by the endpoint given.
 func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
 	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
@@ -75,14 +82,18 @@ func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path str
 	}, nil
 }
 
+// AllowInsecure tells the Request that it's ok if the endpoint isn't communicated with over HTTPS.
 func (r *Request) AllowInsecure() {
 	r.allowInsecure = true
 }
 
+// mkHTTPClient creates an http.Client for this request. If the staging endpoint is used, InsecureSkipVerify is used because I guess we don't have a good cert for that brain.
 func (r *Request) mkHTTPClient() (c *http.Client) {
 	c = new(http.Client)
 	if r.url.Host == "staging.bigv.io" {
 		c.Transport = &http.Transport{
+			// disable gas lint for this line (gas looks for insecure TLS settings, among other things)
+			/* #nosec */
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
@@ -91,6 +102,7 @@ func (r *Request) mkHTTPClient() (c *http.Client) {
 	return c
 }
 
+// mkHTTPRequest assembles an http.Request for this Request, adding Authorization headers as needed, setting the Content-Type correctly for whichever endpoint it's talking to.
 func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	req, err = http.NewRequest(r.method, r.url.String(), body)
 	if err != nil {
@@ -99,7 +111,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	req.Close = true
 	req.Header.Add("User-Agent", "bytemark-client-"+Version)
 
-	if r.endpoint == EP_SPP {
+	if r.endpoint == SPPEndpoint {
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	} else {
 		req.Header.Add("Accept", "application/json")
@@ -111,7 +123,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 		}
 		// if we could settle on a single standard
 		// rather than two basically-identical ones that'd be cool
-		if r.endpoint == EP_BILLING {
+		if r.endpoint == BillingEndpoint {
 			req.Header.Add("Authorization", "Token token="+r.client.GetSessionToken())
 		} else {
 			req.Header.Add("Authorization", "Bearer "+r.client.GetSessionToken())
@@ -120,6 +132,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	return
 }
 
+// Run performs the request with the given body, and attempts to unmarshal a successful response into responseObject
 func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode int, response []byte, err error) {
 	if r.hasRun {
 		err = RequestAlreadyRunError{r}
@@ -131,14 +144,14 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 		err = InsecureConnectionError{r}
 		return
 	}
-	rb := make([]byte, 0)
+	var rb []byte
 	if body != nil {
 
 		rb, err = ioutil.ReadAll(body)
 		if err != nil {
 			return 0, nil, err
 		}
-		log.Debugf(log.DBG_HTTPDATA, "request body: '%s'\r\n", string(rb))
+		log.Debugf(log.LvlHTTPData, "request body: '%s'\r\n", string(rb))
 	}
 
 	cli := r.mkHTTPClient()
@@ -157,7 +170,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 
 	statusCode = res.StatusCode
 
-	log.Debugf(log.DBG_OUTLINE, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
+	log.Debugf(log.LvlOutline, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
 
 	baseErr := APIError{
 		Method:      r.method,
@@ -167,7 +180,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	}
 
 	response, err = ioutil.ReadAll(res.Body)
-	log.Debugf(log.DBG_HTTPDATA, "response body: '%s'\r\n", response)
+	log.Debugf(log.LvlHTTPData, "response body: '%s'\r\n", response)
 	if err != nil {
 		return
 	}
@@ -176,13 +189,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	switch res.StatusCode {
 	case 400:
 		// because we need to reference fields specific to BadRequestError later
-		brErr := BadRequestError{APIError: baseErr, Problems: make(map[string][]string)}
-		jsonErr := json.Unmarshal(response, &brErr.Problems)
-		if jsonErr != nil {
-			log.Debug(log.DBG_OUTLINE, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
-			brErr.Problems["The problem"] = []string{baseErr.ResponseBody}
-		}
-		err = brErr
+		err = newBadRequestError(baseErr, response)
 	case 403:
 		err = NotAuthorizedError{baseErr}
 	case 404:
@@ -212,19 +219,19 @@ func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...stri
 	for i, str := range args {
 		arr[i] = url.QueryEscape(str)
 	}
-	endpointUrl := ""
+	endpointURL := ""
 	switch endpoint {
-	case EP_BRAIN:
-		endpointUrl = c.brainEndpoint
-	case EP_BILLING:
-		endpointUrl = c.billingEndpoint
-	case EP_SPP:
-		endpointUrl = c.sppEndpoint
+	case BrainEndpoint:
+		endpointURL = c.brainEndpoint
+	case BillingEndpoint:
+		endpointURL = c.billingEndpoint
+	case SPPEndpoint:
+		endpointURL = c.sppEndpoint
 	default:
 		return nil, UnsupportedEndpointError(endpoint)
 	}
 	if !strings.HasPrefix(format, "/") {
 		return nil, UnsupportedEndpointError(-1)
 	}
-	return url.Parse(endpointUrl + fmt.Sprintf(format, arr...))
+	return url.Parse(endpointURL + fmt.Sprintf(format, arr...))
 }

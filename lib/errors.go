@@ -1,17 +1,23 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
+	"sort"
 	"strings"
+	"unicode"
 )
 
+// UnsupportedEndpointError is returned when the Endpoint given was not valid.
 type UnsupportedEndpointError Endpoint
 
 func (e UnsupportedEndpointError) Error() string {
 	return fmt.Sprintf("%d was not a valid endpoint choice", e)
 }
 
+// NoDefaultAccountError is returned when the library couldn't figure out what account to use as a default.
 type NoDefaultAccountError struct {
 	InnerErr error
 }
@@ -79,18 +85,119 @@ type BadRequestError struct {
 	Problems map[string][]string
 }
 
+// friendlifyBadRequestPhrases makes the brain's validation messages
+// a bit more friendly. De-abbreviates, de-jargonises and removes redundancy
+// (no need to say something isn't a number if you're also saying it wasn't set)
+func friendlifyBadRequestPhrases(phrases []string) (newPhrases []string) {
+	replacer := strings.NewReplacer(
+		"can't", "cannot",
+		"doesn't", "does not",
+	)
+
+	newPhrases = make([]string, 0, len(phrases))
+
+	found := make(map[string]bool)
+	for _, p := range phrases {
+		found[p] = true
+	}
+	for _, p := range phrases {
+		switch p {
+		case "is not included in the list":
+			newPhrases = append(newPhrases, "is invalid")
+		case "is not a number":
+			if !found["is not included in the list"] {
+				newPhrases = append(newPhrases, replacer.Replace(p))
+			}
+		case "is invalid":
+			if len(phrases) == 0 {
+				newPhrases = append(newPhrases, replacer.Replace(p))
+			}
+		default:
+			if found["can't be blank"] && p != "can't be blank" {
+				continue
+			}
+			newPhrases = append(newPhrases, replacer.Replace(p))
+		}
+	}
+	return
+}
+
+func newBadRequestError(ctx APIError, response []byte) error {
+	problems := make(map[string][]string)
+	jsonProblems := make(map[string]json.RawMessage)
+	err := json.Unmarshal(response, &jsonProblems)
+	if err != nil {
+		log.Debug(log.LvlOutline, "Couldn't parse 400 response into JSON, so bunging it into a single Problem in the BadRequestError")
+		bytes, _ := json.Marshal([]string{string(response)})
+		jsonProblems[""] = bytes
+	}
+	for t, data := range jsonProblems {
+		switch t {
+		case "discs":
+			discProblems := make([]map[string][]string, 0, 1)
+			err = json.Unmarshal(data, &discProblems)
+			if err != nil {
+				return err
+			}
+			problems["disc"] = make([]string, 0)
+			for i, thisDiscProbs := range discProblems {
+				for field, fieldProbs := range thisDiscProbs {
+					fieldProbs = friendlifyBadRequestPhrases(fieldProbs)
+					for _, p := range fieldProbs {
+						problems["disc"] = append(problems[t], fmt.Sprintf("%d - %s %s", i+1, field, p))
+					}
+				}
+			}
+		case "memory":
+			thoseProblems := make([]string, 0, 1)
+			err := json.Unmarshal(data, &thoseProblems)
+			if err != nil {
+				return err
+			}
+			problems["memory_amount"] = friendlifyBadRequestPhrases(thoseProblems)
+		default:
+			thoseProblems := make([]string, 0, 1)
+			err := json.Unmarshal(data, &thoseProblems)
+			if err != nil {
+				return err
+			}
+			problems[t] = friendlifyBadRequestPhrases(thoseProblems)
+		}
+	}
+	return BadRequestError{
+		ctx,
+		problems}
+}
+
+func capitaliseJSON(s string) string {
+	rs := []rune(s)
+	rs[0] = unicode.ToUpper(rs[0])
+	s = string(rs)
+	return strings.Replace(s, "_", " ", -1)
+}
+
 func (e BadRequestError) Error() string {
 	if len(e.Problems) == 0 {
-		return fmt.Sprintf("The API told us our request was bad\r\n%s", e.ResponseBody)
+		return fmt.Sprintf("The request was bad:\r\n%s", e.ResponseBody)
 	}
-	out := make([]string, len(e.Problems))
-	out = append(out, "Our request had some problems:")
-	for k, probs := range e.Problems {
-		out = append(out, fmt.Sprintf("%s:\r\n    %s", k, strings.Join(probs, "\r\n    ")))
+	out := make([]string, 0, len(e.Problems))
+	keys := make([]string, len(e.Problems))
+	for field := range e.Problems {
+		keys = append(keys, field)
 	}
+	sort.Strings(keys)
+	for _, field := range keys {
+		probs := e.Problems[field]
+		for _, p := range probs {
+			out = append(out, "• "+capitaliseJSON(field)+" "+p)
+
+		}
+	}
+
 	return strings.Join(out, "\r\n")
 }
 
+// InternalServerError is returned when the endpoint responds with an HTTP 500 Internal Server Error.
 type InternalServerError struct {
 	APIError
 }
@@ -103,7 +210,7 @@ func (e InternalServerError) Error() string {
 	return strings.Join(out, "\r\n")
 }
 
-// ServiceUnavialableError is returned by anything that makes an HTTP request resulting in a 503
+// ServiceUnavailableError is returned by anything that makes an HTTP request resulting in a 503
 type ServiceUnavailableError struct {
 	APIError
 }
@@ -122,7 +229,6 @@ func (e NilAuthError) Error() string {
 }
 
 // AmbiguousKeyError is returned when a call to DeleteUserAuthorizedKey has an insufficiently unique
-
 type AmbiguousKeyError struct {
 	APIError
 }

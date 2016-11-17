@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"github.com/mattn/go-isatty"
 	"github.com/urfave/cli"
 	"os"
 )
@@ -46,13 +49,13 @@ func init() {
 If the --image flag is not specified, will prompt with a list.
 Specify --force to prevent prompting.
 
-The root password will be the only thing output on stdout - good for scripts!
+The root password will be output on stdout if the imaging succeeded, otherwise nothing will (and the exit code will be nonzero)
 	    `,
 		Flags: append(imageInstallFlags, forceFlag),
-		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
+		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
 			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {
-				return err
+				return
 			}
 
 			if defaulted {
@@ -60,19 +63,26 @@ The root password will be the only thing output on stdout - good for scripts!
 			}
 
 			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", c.VirtualMachineName.String())
-			lib.FormatImageInstall(os.Stderr, imageInstall, "imageinstall")
+			err = lib.FormatImageInstall(os.Stderr, imageInstall, "imageinstall")
+			if err != nil {
+				return
+			}
 
 			if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
 				log.Error("Exiting")
 				return util.UserRequestedExit{}
 			}
 
-			return global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)
+			err = global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)
+			if err != nil && !isatty.IsTerminal(os.Stdout.Fd()) {
+				fmt.Fprintf(os.Stdout, imageInstall.RootPassword)
+			}
+			return
 		}),
 	})
 }
 
-func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted bool, err error) {
+func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
 	firstbootScriptFile := c.FileContents("firstboot-script-file")
@@ -100,7 +110,7 @@ func prepareImageInstall(c *Context) (imageInstall *lib.ImageInstall, defaulted 
 		rootPassword = util.GeneratePassword()
 	}
 
-	return &lib.ImageInstall{
+	return &brain.ImageInstall{
 		Distribution:    image,
 		FirstbootScript: firstbootScript,
 		PublicKeys:      pubkeys,

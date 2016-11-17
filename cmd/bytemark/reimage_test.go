@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"os"
@@ -10,14 +11,14 @@ import (
 
 func TestReimage(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	image := &lib.ImageInstall{
+	image := &brain.ImageInstall{
 		Distribution:    "symbiosis",
 		FirstbootScript: "",
 		RootPassword:    "gNFgYYIgayyDOjkV",
@@ -43,14 +44,14 @@ func TestReimage(t *testing.T) {
 
 func TestReimageFileFlags(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	image := &lib.ImageInstall{
+	image := &brain.ImageInstall{
 		FirstbootScript: "i am the firstboot script! FEAR ME",
 		PublicKeys:      "i am the authorized keys",
 		Distribution:    "image",
@@ -61,12 +62,10 @@ func TestReimageFileFlags(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove("firstboot")
 	err = ioutil.WriteFile("authorized-keys", []byte("i am the authorized keys"), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove("authorized-keys")
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
@@ -83,4 +82,6 @@ func TestReimageFileFlags(t *testing.T) {
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
+	_ = os.Remove("firstboot")
+	_ = os.Remove("authorized-keys")
 }

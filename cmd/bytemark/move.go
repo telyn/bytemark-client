@@ -22,25 +22,24 @@ EXAMPLES
 		
 	bytemark move charata.chaco.argentina rennes.bretagne.france
 		This will move the server called charata in the chaco group in the argentina account, placing it in the bretagne group in the france account and rename it to rennes.`,
-		Action: With(VirtualMachineNameProvider, func(c *Context) error {
+		Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
 			nameStr, err := c.NextArg()
 			if err != nil {
-				return err
+				return
 			}
 
 			newName, err := global.Client.ParseVirtualMachineName(nameStr, global.Config.GetVirtualMachine())
 			if err != nil {
-				return err
+				return
 			}
 
 			err = global.Client.MoveVirtualMachine(c.VirtualMachineName, newName)
-			if err == nil {
-				log.Outputf("Successfully moved %v to %v\r\n", c.VirtualMachineName, newName)
-				return nil
-			} else {
+			if err != nil {
 				log.Output("Couldn't rename server.")
 				return err
 			}
+			log.Outputf("Successfully moved %v to %v\r\n", c.VirtualMachineName, newName)
+			return nil
 		}),
 	})
 }

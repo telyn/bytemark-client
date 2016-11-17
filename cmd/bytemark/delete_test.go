@@ -1,17 +1,16 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/BytemarkHosting/bytemark-client/lib"
-
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
+	"strings"
 	"testing"
 )
 
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -34,8 +33,8 @@ func TestDeleteServer(t *testing.T) {
 
 	err := global.App.Run(strings.Split("bytemark delete server --force test-server", " "))
 	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 	c.Reset()
 
@@ -54,7 +53,7 @@ func TestDeleteServer(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
@@ -81,9 +80,9 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestDeleteKey(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
-	usr := lib.User{
+	usr := brain.User{
 		Username: "test-user",
 		Email:    "test-user@example.com",
 		AuthorizedKeys: []string{
@@ -105,8 +104,8 @@ func TestDeleteKey(t *testing.T) {
 	err := global.App.Run(strings.Split("bytemark delete key ssh-rsa AAAAFakeKey test-key-one", " "))
 
 	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 	c.Reset()
 	config.Reset()

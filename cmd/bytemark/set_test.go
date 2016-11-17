@@ -9,7 +9,7 @@ import (
 
 func TestSetCores(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -29,14 +29,14 @@ func TestSetCores(t *testing.T) {
 	err := global.App.Run(strings.Split("bytemark set cores --force test-server.test-group.test-account 4", " "))
 	is.Nil(err)
 
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 }
 
 func TestSetMemory(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -56,8 +56,8 @@ func TestSetMemory(t *testing.T) {
 	err := global.App.Run(strings.Split("bytemark set memory --force test-server 4", " "))
 	is.Nil(err)
 
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 
 	config.Reset()
@@ -83,7 +83,7 @@ func TestSetMemory(t *testing.T) {
 
 func TestSetHWProfileCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup()
+	config, c := baseTestSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -102,8 +102,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	err := global.App.Run(strings.Split("bytemark set hwprofile test-server", " "))
 	is.NotNil(err) // TODO(telyn): actually check error type
 
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 
 	// test hardware profile only
@@ -121,8 +121,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	err = global.App.Run(strings.Split("bytemark set hwprofile test-server virtio123", " "))
 	is.Nil(err)
 
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 
 	// test --lock flag
@@ -134,8 +134,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	err = global.App.Run(strings.Split("bytemark set hwprofile --lock test-server virtio123", " "))
 	is.Nil(err)
 
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
 	}
 
 	// test --unlock flag

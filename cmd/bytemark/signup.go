@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"strings"
@@ -66,31 +68,32 @@ If you have previously used the client, you'll have a login and will need to add
 				return util.UserRequestedExit{}
 			}
 
+			// TODO(telyn): this whoole section should be moved into a function in util/form.go - CreateAPIObjectsFromSignupForm(*Form) (Account, CreditCard) or something.
 			account := lib.Account{}
 
-			account.Owner = &lib.Person{
-				Username:             fields[util.FIELD_OWNER_NAME].Value(),
-				Password:             fields[util.FIELD_OWNER_PASS].Value(),
-				Email:                fields[util.FIELD_OWNER_EMAIL].Value(),
-				FirstName:            fields[util.FIELD_OWNER_FIRSTNAME].Value(),
-				LastName:             fields[util.FIELD_OWNER_LASTNAME].Value(),
-				Country:              fields[util.FIELD_OWNER_CC].Value(),
-				City:                 fields[util.FIELD_OWNER_CITY].Value(),
-				Postcode:             fields[util.FIELD_OWNER_POSTCODE].Value(),
-				Address:              fields[util.FIELD_OWNER_ADDRESS].Value(),
-				Phone:                fields[util.FIELD_OWNER_PHONE].Value(),
-				MobilePhone:          fields[util.FIELD_OWNER_MOBILE].Value(),
-				Organization:         fields[util.FIELD_OWNER_ORG_NAME].Value(),
-				OrganizationDivision: fields[util.FIELD_OWNER_ORG_DIVISION].Value(),
-				VATNumber:            fields[util.FIELD_OWNER_ORG_VAT].Value(),
+			account.Owner = &billing.Person{
+				Username:             fields[util.FormFieldOwnerName].Value(),
+				Password:             fields[util.FormFieldOwnerPassword].Value(),
+				Email:                fields[util.FormFieldOwnerEmail].Value(),
+				FirstName:            fields[util.FormFieldOwnerFirstName].Value(),
+				LastName:             fields[util.FormFieldOwnerLastName].Value(),
+				Address:              fields[util.FormFieldOwnerAddress].Value(),
+				City:                 fields[util.FormFieldOwnerCity].Value(),
+				Postcode:             fields[util.FormFieldOwnerPostcode].Value(),
+				Country:              fields[util.FormFieldOwnerCountryCode].Value(),
+				Phone:                fields[util.FormFieldOwnerPhoneNumber].Value(),
+				MobilePhone:          fields[util.FormFieldOwnerMobileNumber].Value(),
+				Organization:         fields[util.FormFieldOwnerOrgName].Value(),
+				OrganizationDivision: fields[util.FormFieldOwnerOrgDivision].Value(),
+				VATNumber:            fields[util.FormFieldOwnerOrgVATNumber].Value(),
 			}
 
 			if creditCardForm {
-				card := lib.CreditCard{
-					Number: fields[util.FIELD_CC_NUMBER].Value(),
-					Name:   fields[util.FIELD_CC_NAME].Value(),
-					Expiry: fields[util.FIELD_CC_EXPIRY].Value(),
-					CVV:    fields[util.FIELD_CC_CVV].Value(),
+				card := spp.CreditCard{
+					Number: fields[util.FormFieldCreditCardNumber].Value(),
+					Name:   fields[util.FormFieldCreditCardName].Value(),
+					Expiry: fields[util.FormFieldCreditCardExpiry].Value(),
+					CVV:    fields[util.FormFieldCreditCardCVV].Value(),
 				}
 				cardRef, err = global.Client.CreateCreditCard(&card)
 				if err != nil {
@@ -107,7 +110,7 @@ If you have previously used the client, you'll have a login and will need to add
 				log.Log("Couldn't create an account for you")
 				return err
 			}
-			log.Log("Account created successfully - you'll now be able to log in as '%s' and set up some servers! You should also be receiving a welcome email shortly.", createdAccount.Owner.Username)
+			log.Logf("Account created successfully - you'll now be able to log in as '%s' and set up some servers! You should also be receiving a welcome email shortly.\r\n", createdAccount.Owner.Username)
 			return nil
 
 		}),

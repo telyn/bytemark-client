@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-func labelDiscs(discs []Disc, offset ...int) {
+func labelDiscs(discs []brain.Disc, offset ...int) {
 	realOffset := 0
 	if len(offset) >= 1 {
 		realOffset = offset[0]
@@ -19,16 +20,8 @@ func labelDiscs(discs []Disc, offset ...int) {
 
 }
 
-func (disc *Disc) Validate() (*Disc, error) {
-	if disc.StorageGrade == "" {
-		newDisc := *disc
-		newDisc.StorageGrade = "sata"
-		return &newDisc, nil
-	}
-	return disc, nil
-}
-
-func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc Disc) (err error) {
+// CreateDisc creates the given Disc and attaches it to the given virtual machine.
+func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc brain.Disc) (err error) {
 	err = c.validateVirtualMachineName(name)
 	if err != nil {
 		return
@@ -37,10 +30,10 @@ func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc Disc) (err er
 	if err != nil {
 		return
 	}
-	discs := []Disc{disc}
+	discs := []brain.Disc{disc}
 	labelDiscs(discs, len(vm.Discs))
 
-	r, err := c.BuildRequest("POST", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {
 		return
 	}
@@ -55,12 +48,13 @@ func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc Disc) (err er
 
 }
 
+// DeleteDisc removes the specified disc from the given virtual machine
 func (c *bytemarkClient) DeleteDisc(vm *VirtualMachineName, discLabelOrID string) (err error) {
 	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("DELETE", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 
 	if err != nil {
 		return
@@ -71,12 +65,13 @@ func (c *bytemarkClient) DeleteDisc(vm *VirtualMachineName, discLabelOrID string
 	return
 }
 
+// ResizeDisc resizes the specified disc to the given size in megabytes
 func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
 	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
@@ -88,13 +83,14 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 	return err
 }
 
-func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *Disc, err error) {
-	disc = new(Disc)
+// GetDisc returns the specified disc from the given virtual machine.
+func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *brain.Disc, err error) {
+	disc = new(brain.Disc)
 	err = c.validateVirtualMachineName(vm)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("GET", EP_BRAIN, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 
 	if err != nil {
 		return

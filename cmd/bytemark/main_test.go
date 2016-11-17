@@ -1,21 +1,44 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
+	"os"
+	"testing"
 )
 
 var defVM lib.VirtualMachineName
 var defGroup lib.GroupName
 
-func baseTestSetup() (config *mocks.Config, client *mocks.Client) {
+func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mocks.Client) {
 	config = new(mocks.Config)
 	client = new(mocks.Client)
+	config.When("GetBool", "admin").Return(admin, nil)
 	global.Client = client
 	global.Config = config
 
-	baseAppSetup()
+	app, err := baseAppSetup()
+	if err != nil {
+		t.Fatal(err)
+	}
+	global.App = app
+	for _, c := range commands {
+		//config.When("Get", "token").Return("no-not-a-token")
+
+		// the issue is that Command.FullName() is dependent on Command.commandNamePath.
+		// Command.commandNamePath is filled in when the parent's Command.startApp is called
+		// and startApp is only called when you actually try to run that command or one of
+		// its subcommands. So we run "bytemark <command> help" on all commands that have
+		// subcommands in order to get every subcommand to have a correct Command.commandPath
+
+		if c.Subcommands != nil && len(c.Subcommands) > 0 {
+			fmt.Fprintf(os.Stderr, c.Name)
+			_ = global.App.Run([]string{"bytemark.test", c.Name, "help"})
+		}
+	}
 	return
 }
 
@@ -29,20 +52,20 @@ func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	}
 }
 
-func getFixtureVM() lib.VirtualMachine {
-	return lib.VirtualMachine{
+func getFixtureVM() brain.VirtualMachine {
+	return brain.VirtualMachine{
 		Name:     "test-server",
 		Hostname: "test-server.test-group",
 		GroupID:  1,
 	}
 }
 
-func getFixtureGroup() lib.Group {
-	vms := make([]*lib.VirtualMachine, 1, 1)
+func getFixtureGroup() brain.Group {
+	vms := make([]*brain.VirtualMachine, 1, 1)
 	vm := getFixtureVM()
 	vms[0] = &vm
 
-	return lib.Group{
+	return brain.Group{
 		Name:            "test-group",
 		VirtualMachines: vms,
 	}

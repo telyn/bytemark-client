@@ -3,40 +3,28 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strings"
 )
 
-func (jsonUser *JSONUser) Process(into *User) {
-	into.Username = jsonUser.Username
-	into.Email = jsonUser.Email
-	into.AuthorizedKeys = strings.Split(jsonUser.AuthorizedKeys, "\n")
-}
-
-func (user *User) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&JSONUser{
-		Username:       user.Username,
-		Email:          user.Email,
-		AuthorizedKeys: strings.Join(user.AuthorizedKeys, "\n"),
-	})
-}
-
-func (c *bytemarkClient) GetUser(name string) (user *User, err error) {
-	r, err := c.BuildRequest("GET", EP_BRAIN, "/users/%s", name)
+// Getbigv.User grabs the named user from the brain
+func (c *bytemarkClient) GetUser(name string) (user *brain.User, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/users/%s", name)
 	if err != nil {
 		return
 	}
 
-	var jsUser JSONUser
+	var jsUser brain.JSONUser
 	_, _, err = r.Run(nil, &jsUser)
 	if err != nil {
 		return
 	}
-	user = new(User)
+	user = new(brain.User)
 	jsUser.Process(user)
 	return
 }
 
-// AddUserAuthorizedKey adds a key to the named user. These keys are used for logging into the management IPs for cloud servers
+// Addbigv.UserAuthorizedKey adds a key to the named user. These keys are used for logging into the management IPs for cloud servers
 func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error {
 	user, err := c.GetUser(username)
 	if err != nil {
@@ -50,7 +38,7 @@ func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error
 		return err
 	}
 
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/users/%s", username)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/users/%s", username)
 	if err != nil {
 		return err
 	}
@@ -59,14 +47,14 @@ func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error
 
 }
 
-// DeleteUserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part (as long as it's unique)
+// Deletebigv.UserAuthorizedKey removes a key from a user. The key may be specified in full or just the comment part (as long as it's unique)
 func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) error {
 	user, err := c.GetUser(username)
 	if err != nil {
 		return err
 	}
 	key = strings.TrimSpace(key)
-	newKeys := make([]string, 0)
+	var newKeys []string
 	potentiallyAmbiguous := false
 	for _, k := range user.AuthorizedKeys {
 		if strings.TrimSpace(k) == key {
@@ -92,7 +80,10 @@ func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) er
 		return err
 	}
 
-	r, err := c.BuildRequest("PUT", EP_BRAIN, "/users/%s", username)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/users/%s", username)
+	if err != nil {
+		return err
+	}
 	_, _, err = r.Run(bytes.NewBuffer(userjs), nil)
 	return err
 

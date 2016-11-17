@@ -1,31 +1,16 @@
 SHELL:=/bin/bash
-PKGBASE := github.com/BytemarkHosting/bytemark-client
-CHOCOBASE := ports/chocolatey/package
-	ALL_PACKAGES := $(PKGBASE)/lib $(PKGBASE)/cmd/bytemark/util $(PKGBASE)/cmd/bytemark
-ALL_SOURCE := lib/*.go mocks/*.go util/*/*.go cmd/**/*.go
-TAR_FILES := bytemark doc/bytemark.1
-ZIP_FILES := bytemark.exe doc/bytemark-client.pdf
-
-BUILD_NUMBER ?= 0
-
-LAUNCHER_APP:=ports/mac/launcher.app
 RGREP=grep -rn --color=always --exclude=.* --exclude-dir=Godeps --exclude-dir=vendor --exclude=Makefile
 
-.PHONY: test update-dependencies
-.PHONY: bytemark-client.nupkg
 .PHONY: find-uk0 find-bugs-todos find-exits
 
-all: bytemark 
-
-bytemark.zip: $(ZIP_FILES)
-	zip $@ $^
-
-bytemark.tar.gz: $(TAR_FILES)
-	tar czf $@ $^
-
-bytemark-client.nupkg: VERSION
-	cd ports/chocolatey && make VERSION=$(<VERSION)
-	mv $(CHOCOBASE)/bytemark.nupkg bytemark-client.nupkg
+all:
+	@echo "Don't try to use the makefile to compile bytemark-client! Set up"
+	@echo "your go environment as you would for any other project, then run"
+	@echo "this command to download, build and install bytemark-client"
+	@echo 
+	@echo "    go get github.com/BytemarkHosting/bytemark-client/cmd/bytemark"
+	@echo
+	@echo "To run all the tests, run go test ./..."
 
 %.pdf: %.ps
 	ps2pdf $< $@
@@ -33,70 +18,15 @@ bytemark-client.nupkg: VERSION
 doc/bytemark-client.ps: doc/bytemark.1
 	groff -mandoc -T ps $< > $@
 
-bytemark.exe: bytemark
-	cp bytemark bytemark.exe
-
-bytemark: $(ALL_SOURCE)
-	GO15VENDOREXPERIMENT=1 go build -o bytemark $(PKGBASE)/cmd/bytemark
-
-
-# make changelog opens vim to update the changelog
-# then generates a new version.go file.
-changelog:
-	gen/changelog.sh
-
-clean:
-	rm -rf Bytemark.app rm $(LAUNCHER_APP)
-	rm -f bytemark bytemark.exe
-	rm -f bytemark-client.zip bytemark-client.tar
-	rm -f main.coverage lib.coverage
-	rm -f main.coverage.html lib.coverage.html
-
-install: bytemark doc/bytemark.1
-	cp bytemark /usr/bin/bytemark
-	cp doc/bytemark.1 /usr/share/man/man1
-
-coverage: lib.coverage.html main.coverage.html
-ifeq (Darwin, $(shell uname -s))
-	open lib.coverage.html
-	open main.coverage.html
-	open cmds.coverage.html
-else
-	xdg-open lib.coverage.html
-	xdg-open main.coverage.html
-	xdg-open cmds.coverage.html
-endif
-
-main.coverage: cmd/bytemark/*.go
-	go test -coverprofile=$@ $(PKGBASE)/cmd/bytemark
-
-util.coverage: cmd/bytemark/util/*.go
-	go test -coverprofile=$@ $(PKGBASE)/cmd/bytemark/util
-
-%.coverage.html: %.coverage
-	go tool cover -html=$< -o $@
-
-%.coverage: % %/*
-	go test -coverprofile=$@ $(PKGBASE)/$<
-
-#docs: doc/*.md
-#	for file in doc/*.md; do \
-#	    pandoc --from markdown --to html $$file --output $${file%.*}.html; \
-#	done
-
-test: 
-ifdef $(VERBOSE)
-	GO15VENDOREXPERIMENT=1 go test -v $(ALL_PACKAGES)
-else 
-	GO15VENDOREXPERIMENT=1 go test $(ALL_PACKAGES)
-endif
-
+# find instances of uk0 in the code (to ensure that URLs aren't hardcoded in (too) many places
 find-uk0: 
 	$(RGREP) --exclude=bytemark "uk0" .
 
+# find instances of BUG and TODO comments.
 find-bugs-todos:
 	$(RGREP) -P "// BUG(.*):" . || echo ""
 	$(RGREP) -P "// TODO(.*):" .
 
+# find every line that calls panic or os.Exit (from when I was writing util.ProcessError
 find-exits:
 	$(RGREP) --exclude=exit.go --exclude=main.go -P "panic\(|os.Exit" .

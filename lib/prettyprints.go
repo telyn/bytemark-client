@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"io"
 	"math"
 	"strings"
@@ -79,22 +80,25 @@ It was not possible to determine your default account. Please set one using byte
 `
 
 const serverTemplate = `{{ define "server_summary" }} ▸ {{.ShortName }} ({{ if .Deleted }}deleted{{ else if .PowerOn }}powered on{{else}}powered off{{end}}) in {{capitalize .ZoneName}}{{ end }}
-{{ define "server_spec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ end }}
+{{ define "server_spec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{ if .Discs}}{{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ else }}no discs{{ end }}{{ end }}
 
-{{ define "discs" }}    discs:
+{{ define "discs" -}}
+{{- if .Discs }}    discs:
 {{- range .Discs }}
       • {{ .Label }} - {{ gibtib .Size }}, {{ .StorageGrade }} grade
 {{- end }}
+
+{{ end -}}
 {{ end }}
 
 {{ define "ips" }}    ips:
-{{- range .AllIPv4Addresses }}
+{{- range .AllIPv4Addresses.Sort }}
       • {{.}}
 {{- end}}
-{{- range .AllIPv6Addresses }}
+{{- range .AllIPv6Addresses.Sort }}
       • {{.}}
+{{- end -}}
 {{- end }}
-{{ end }}
 
 {{ define "server_twoline" }}{{ template "server_summary" . }}
 {{ template "server_spec" . }}{{ end }}
@@ -102,16 +106,20 @@ const serverTemplate = `{{ define "server_summary" }} ▸ {{.ShortName }} ({{ if
 {{ define "server_full" -}}
 {{ template "server_twoline" . }}
 
-{{ template "discs" . }}
-{{ template "ips" . }}
+{{ template "discs" . -}}
+{{- template "ips" . }}
 {{ end }}`
 
+// TemplateChoice is which template to use for a server.
 type TemplateChoice string
 
 const (
+	// OneLine means to use a one-line template for a server
 	OneLine TemplateChoice = "server_summary"
-	TwoLine                = "server_twoline"
-	All                    = "server_full"
+	// TwoLine means to use a two-line template for a server
+	TwoLine = "server_twoline"
+	// All means to display all details about a server.
+	All = "server_full"
 )
 
 var templateFuncMap = map[string]interface{}{
@@ -126,7 +134,7 @@ var templateFuncMap = map[string]interface{}{
 	"gibtib": func(size int) string {
 		// lt is a less than sign if < 1GiB
 		lt := ""
-		if size < 1024 {
+		if size < 1024 && size != 0 {
 			lt = "< "
 		}
 		size /= 1024
@@ -154,27 +162,28 @@ var templateFuncMap = map[string]interface{}{
 	},
 }
 
-func FormatVirtualMachine(wr io.Writer, vm *VirtualMachine, tpl TemplateChoice) error {
+// FormatVirtualMachine outputs the given vm using the named template to the given writer.
+// TODO(telyn): make template choice not a string
+func FormatVirtualMachine(wr io.Writer, vm *brain.VirtualMachine, tpl TemplateChoice) error {
 	tmpl, err := template.New("virtualmachine").Funcs(templateFuncMap).Parse(serverTemplate)
 	if err != nil {
 		return err
 	}
 
 	err = tmpl.ExecuteTemplate(wr, string(tpl), vm)
-	if err != nil {
-		return err
-	}
+	return err
 
-	return nil
 }
 
-func FormatImageInstall(wr io.Writer, ii *ImageInstall, tpl TemplateChoice) error {
-	output := make([]string, 0)
+// FormatImageInstall outputs the given image install using the named template to the given writer.
+// TODO(telyn): make template choice not a string
+func FormatImageInstall(wr io.Writer, ii *brain.ImageInstall, tpl TemplateChoice) error {
+	var output []string
 	if ii.Distribution != "" {
 		output = append(output, "Image: "+ii.Distribution)
 	}
 	if ii.PublicKeys != "" {
-		keynames := make([]string, 0)
+		var keynames []string
 		for _, k := range strings.Split(ii.PublicKeys, "\n") {
 			kbits := strings.SplitN(k, " ", 3)
 			if len(kbits) == 3 {
@@ -190,11 +199,14 @@ func FormatImageInstall(wr io.Writer, ii *ImageInstall, tpl TemplateChoice) erro
 	if ii.FirstbootScript != "" {
 		output = append(output, "With a firstboot script")
 	}
-	_, err := wr.Write([]byte(strings.Join(output, "\r\n")))
+	_, err := wr.Write([]byte(strings.Join(output, "\r\n") + "\r\n"))
 	return err
 }
 
-func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *VirtualMachineSpec, tpl TemplateChoice) error {
+// FormatVirtualMachineSpec outputs the given vm spec using the named template to the given writer.
+// TODO(telyn): make template choice not a string
+// TODO(telyn): rewrite
+func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *brain.VirtualMachineSpec, tpl TemplateChoice) error {
 	output := make([]string, 0, 10)
 	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
 	output = append(output, fmt.Sprintf("Group: '%s'", group.Group))
@@ -269,10 +281,12 @@ func FormatVirtualMachineSpec(wr io.Writer, group *GroupName, spec *VirtualMachi
 	} else {
 		output = append(output, "No discs specified")
 	}
-	_, err := wr.Write([]byte(strings.Join(output, "\r\n")))
+	_, err := wr.Write([]byte(strings.Join(output, "\r\n") + "\r\n"))
 	return err
 }
 
+// FormatAccount outputs the given account using the named template to the given writer.
+// TODO(telyn): make template choice not a string
 func FormatAccount(wr io.Writer, a *Account, def *Account, tpl string) error {
 	tmpl, err := template.New("accounts").Funcs(templateFuncMap).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {
@@ -288,13 +302,12 @@ func FormatAccount(wr io.Writer, a *Account, def *Account, tpl string) error {
 	}
 
 	err = tmpl.ExecuteTemplate(wr, tpl, a)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
+// FormatOverview outputs the given overview using the named template to the given writer.
+// TODO(telyn): make template choice not a string
+// TODO(telyn): use an actual Overview object?
 func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
 	tmpl, err := template.New("accounts").Funcs(templateFuncMap).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {
@@ -310,8 +323,8 @@ func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, 
 	if err != nil {
 		return err
 	}
-	ownedAccounts := make([]*Account, 0)
-	otherAccounts := make([]*Account, 0)
+	var ownedAccounts []*Account
+	var otherAccounts []*Account
 	for _, a := range accounts {
 		if a.Owner != nil && a.Owner.Username != "" && a.Owner.Username == username {
 			ownedAccounts = append(ownedAccounts, a)
@@ -328,9 +341,5 @@ func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, 
 	}
 
 	err = tmpl.ExecuteTemplate(wr, "full_overview", data)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

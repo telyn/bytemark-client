@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/urfave/cli"
 	"strconv"
 )
@@ -30,7 +31,7 @@ These commands set various hardware properties of Bytemark servers. Note that fo
 					}
 					cores, err := strconv.Atoi(coresStr)
 					if err != nil || cores < 1 {
-						c.Help(fmt.Sprintf("Invalid number of cores \"%s\"\r\n", coresStr))
+						return c.Help(fmt.Sprintf("Invalid number of cores \"%s\"\r\n", coresStr))
 					}
 					if c.VirtualMachine.Cores < cores {
 						if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
@@ -85,7 +86,7 @@ These commands set various hardware properties of Bytemark servers. Note that fo
 						return c.Help("No memory amount was specified")
 					}
 
-					memory, err := util.ParseSize(memoryStr)
+					memory, err := sizespec.Parse(memoryStr)
 					if err != nil || memory < 1 {
 						return c.Help(fmt.Sprintf("Invalid amount of memory \"%s\"\r\n", memoryStr))
 					}

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -18,6 +19,7 @@ var configVars = [...]string{
 	"billing-endpoint",
 	"auth-endpoint",
 	"spp-endpoint",
+	"admin",
 	"user",
 	"account",
 	"group",
@@ -26,6 +28,7 @@ var configVars = [...]string{
 	"yubikey",
 }
 
+// IsConfigVar checks to see if the named variable is actually one of the settable configVars.
 func IsConfigVar(name string) bool {
 	for _, v := range configVars {
 		if v == name {
@@ -35,6 +38,7 @@ func IsConfigVar(name string) bool {
 	return false
 }
 
+// InvalidConfigVarError is used to inform the user that they variable they attempted to set / get doesn't exist
 type InvalidConfigVarError struct {
 	ConfigVar string
 }
@@ -53,11 +57,19 @@ type ConfigVar struct {
 	Source string
 }
 
+// SourceType returns one of the following:
+// FLAG for a configVar whose value was set by passing a flag on the command line
+// ENV for a configVar whose value was set from an environment variable
+// DIR for a configVar whose value was set from a file in the config dir
+//
 func (v *ConfigVar) SourceType() string {
 	bits := strings.Fields(v.Source)
 
 	return bits[0]
 }
+
+// SourceBaseName returns the basename of the configVar's source.
+// it's a bit stupid and so its output is only valid for configVars with SourceType() of DIR
 func (v *ConfigVar) SourceBaseName() string {
 	bits := strings.Split(v.Source, "/")
 	return bits[len(bits)-1]
@@ -106,6 +118,7 @@ type Config struct {
 	Definitions map[string]string
 }
 
+// ConfigDirInvalidError is returned when the path specified as the config dir was not a directory.
 type ConfigDirInvalidError struct {
 	Path string
 }
@@ -114,6 +127,7 @@ func (e *ConfigDirInvalidError) Error() string {
 	return fmt.Sprintf("The config directory is '%s' but it doesn't seem to be a directory.", e.Path)
 }
 
+// CannotLoadDefinitionsError is unused. Planned to be used if bytemark-client starts caching definitions, but it doesn't at the moment.
 type CannotLoadDefinitionsError struct {
 	Err error
 }
@@ -122,6 +136,7 @@ func (e *CannotLoadDefinitionsError) Error() string {
 	return fmt.Sprintf("Unable to load the definitions file from the Bytemark API.")
 }
 
+// ConfigReadError is returned when a file containing a value for a configVar couldn't be read.
 type ConfigReadError struct {
 	Name string
 	Path string
@@ -135,6 +150,7 @@ func (e *ConfigReadError) Error() string {
 	return fmt.Sprintf("Unable to read config for %s from %s.", e.Name, e.Path)
 }
 
+// ConfigWriteError is returned when a file containing a value for a configVar couldn't be written to.
 type ConfigWriteError struct {
 	Name string
 	Path string
@@ -145,12 +161,8 @@ func (e *ConfigWriteError) Error() string {
 	if e.Err != nil {
 		return fmt.Sprintf("Unable to write config for %s to %s.", e.Name, e.Path)
 	}
-	return fmt.Sprintf("Unable to write config for %s to %s - ", e.Name, e.Path, e.Err)
+	return fmt.Sprintf("Unable to write config for %s to %s - %s", e.Name, e.Path, e.Err.Error())
 }
-
-// Do I really need to have the flags passed in here?
-// Yes. Doing commands will be sorted out in a different place, and I don't want to touch it here.
-// TODO(telyn): once urfave/cli has the idea of config providers (see codegansta/cli/issues/
 
 // NewConfig sets up a new config struct. Pass in an empty string to default to ~/.bytemark
 func NewConfig(configDir string) (config *Config, err error) {
@@ -187,13 +199,21 @@ func NewConfig(configDir string) (config *Config, err error) {
 	}
 
 	dbgLog := config.GetPath("debug.log")
+	// if there's already a debug.log, rename it debug.log.1
 	_, err = os.Stat(dbgLog)
 	if err == nil {
-		_, err1 := os.Stat(dbgLog + ".1")
-		if err1 == nil {
-			os.Remove(dbgLog + ".1")
+		_, err = os.Stat(dbgLog + ".1")
+		if err == nil {
+			// if debug.log.1 exists, remove it
+			err = os.Remove(dbgLog + ".1") // we don't truly care if we couldn't clean up
+			if err != nil {
+				return nil, errors.New("Couldn't remove debug.log.1: " + err.Error())
+			}
 		}
-		os.Rename(dbgLog, dbgLog+".1")
+		err = os.Rename(dbgLog, dbgLog+".1")
+		if err != nil {
+			return nil, errors.New("Couldn't rename debug.log to debug.log.1: " + err.Error())
+		}
 	}
 
 	log.LogFile, err = os.Create(dbgLog)
@@ -214,6 +234,7 @@ func NewConfig(configDir string) (config *Config, err error) {
 	return config, nil
 }
 
+// ImportFlags reads all the flags from the passed FlagSet that have the same name as a valid configVar, and sets the configVar to that.
 func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 	if flags != nil {
 		if flags.Parsed() {
@@ -278,6 +299,7 @@ func (config *Config) GetV(name string) (ConfigVar, error) {
 	return config.read(name)
 }
 
+// GetVirtualMachine returns a VirtualMachineName with the config's default group and account set, and a blank VirtualMachine field
 func (config *Config) GetVirtualMachine() (vm *lib.VirtualMachineName) {
 	vm = new(lib.VirtualMachineName)
 	vm.Account = config.GetIgnoreErr("account")
@@ -286,6 +308,7 @@ func (config *Config) GetVirtualMachine() (vm *lib.VirtualMachineName) {
 	return vm
 }
 
+// GetGroup returns a GroupName with the config's default group and account
 func (config *Config) GetGroup() (group *lib.GroupName) {
 	group = new(lib.GroupName)
 	group.Account = config.GetIgnoreErr("account")
@@ -324,6 +347,9 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		}
 		return v
 	case "billing-endpoint":
+		if config.GetIgnoreErr("endpoint") == "https://staging.bigv.io" {
+			return ConfigVar{"billing-endpoint", "", "CODE STAGING DEFAULT"}
+		}
 		v := ConfigVar{"billing-endpoint", "https://bmbilling.bytemark.co.uk", "CODE"}
 		if val := os.Getenv("BM_BILLING_ENDPOINT"); val != "" {
 			v.Value = val
@@ -382,6 +408,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 	return ConfigVar{name, "", "UNSET"}
 }
 
+// GetBool returns the given configvar as a bool - true if it is set, not blank, and not equal to "false". false otherwise.
 func (config *Config) GetBool(name string) (bool, error) {
 	v, err := config.Get(name)
 	if err != nil {
@@ -430,7 +457,7 @@ func (config *Config) SetPersistent(name, value, source string) error {
 }
 
 // Unset removes the named key from both config's Memo and the user's config directory.
-func (config *Config) Unset(name string) error {
+func (config *Config) Unset(name string) (err error) {
 	found := false
 	for _, v := range configVars {
 		if v == name {
@@ -441,25 +468,39 @@ func (config *Config) Unset(name string) error {
 		return InvalidConfigVarError{name}
 	}
 	delete(config.Memo, name)
-	return os.Remove(config.GetPath(name))
+	err = os.Remove(config.GetPath(name))
+	if err != nil {
+		info, statErr := os.Stat(config.Dir)
+		if statErr != nil {
+			if !info.IsDir() {
+				return &ConfigDirInvalidError{config.Dir} // config dir is not a dir.
+			}
+			return nil // file didn't exist, so was already unset => success
+		}
+		return statErr // config dir couldn't be read for whatever reason
+	}
+	return // success
 }
 
+// PanelURL returns config's best guess at the correct URL for the bytemark panel for the cluster with the endpoint we're using. Basically it flips between panel.bytemark and panel-int.
 func (config *Config) PanelURL() string {
 	endpoint := config.EndpointName()
 	if strings.EqualFold(endpoint, "uk0.bigv.io") {
-		return "https://panel-beta.bytemark.co.uk"
+		return "https://panel.bytemark.co.uk"
 	}
 	if strings.EqualFold(endpoint, "int.bigv.io") {
-		// worrying leaky code?
-		return "https://panel-int.vlan863.bytemark.uk0.bigv.io"
+		// am i leaking a secret?
+		return "https://panel-int.admin.bytemark.co.uk"
 	}
 	panel := config.GetIgnoreErr("panel-address")
 	if panel == "" {
-		panel = "https://your.panel.address"
+		panel = "https://your.panel.address.example.com"
 	}
 	return panel
 }
 
+// EndpointName trims the URL scheme off the beginning of the endpoint.
+// TODO(telyn): Why?
 func (config *Config) EndpointName() string {
 	endpoint := config.GetIgnoreErr("endpoint")
 	endpoint = strings.TrimPrefix(endpoint, "https://")
