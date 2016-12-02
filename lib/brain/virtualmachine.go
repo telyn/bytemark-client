@@ -2,6 +2,8 @@ package brain
 
 import (
 	"net"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -90,6 +92,25 @@ func (vm *VirtualMachine) AllIPv6Addresses() (ips IPs) {
 		}
 	}
 	return ips
+}
+
+// GetDiscLabelOffset gets the highest disc number for this VM, by looking for discs labelled disc-N and using N or the number of discs attached to the VM, whichever is higher
+func (vm VirtualMachine) GetDiscLabelOffset() (offset int) {
+	re := regexp.MustCompile(`^disc-(\d+)$`)
+	for _, d := range vm.Discs {
+		matches := re.FindStringSubmatch(d.Label)
+		discNum, err := strconv.ParseInt(matches[1], 10, 32)
+		if err != nil {
+			discNum = 0
+		}
+		if int(discNum) > offset {
+			offset = int(discNum)
+		}
+	}
+	if offset < len(vm.Discs) {
+		return len(vm.Discs)
+	}
+	return
 }
 
 // PrimaryIP returns the VM's primary IP - the (usually) IPv4 address that was created first.
