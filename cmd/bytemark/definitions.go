@@ -61,6 +61,7 @@ Generally bytemark provide two - virtio and compatibility. The virtio one has be
 		Action: With(DefinitionsProvider, func(c *Context) error {
 			return c.IfNotMarshalJSON(c.Definitions.StorageGradeDescriptions, func() error {
 				for _, grade := range c.Definitions.StorageGrades {
+					description := c.Definitions.StorageGradeDescriptions[grade]
 					log.Logf("'%s': %s\r\n", grade, description)
 				}
 				return nil
