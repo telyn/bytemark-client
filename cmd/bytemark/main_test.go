@@ -6,6 +6,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
+	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -25,6 +26,8 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 		t.Fatal(err)
 	}
 	global.App = app
+	oldWriter := global.App.Writer
+	global.App.Writer = ioutil.Discard
 	for _, c := range commands {
 		//config.When("Get", "token").Return("no-not-a-token")
 
@@ -39,6 +42,7 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 			_ = global.App.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
+	global.App.Writer = oldWriter
 	return
 }
 
