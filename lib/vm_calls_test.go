@@ -367,11 +367,14 @@ func TestSetVirtualMachineCDROM(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			vm_map := make(map[string]interface{})
-			err = json.Unmarshal(bytes, &vm_map)
+			unmarshalled := make(map[string]interface{})
+			err = json.Unmarshal(bytes, &unmarshalled)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-			if !reflect.DeepEqual(expected, vm_map) {
-				t.Error("vm_map did not deep-equal what was expected.")
+			if !reflect.DeepEqual(expected, unmarshalled) {
+				t.Error("unmarshalled map did not deep-equal what was expected.")
 			} else {
 				_, err = w.Write(bytes)
 				if err != nil {
@@ -399,4 +402,7 @@ func TestSetVirtualMachineCDROM(t *testing.T) {
 		Group:          "test-group",
 		Account:        "test-account",
 	}, testurl)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
