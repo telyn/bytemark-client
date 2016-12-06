@@ -68,10 +68,6 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Usage: "Specifies that the server should not be imaged.",
 			},
 			cli.BoolFlag{
-				Name:  "no-discs",
-				Usage: "Specifies that the server should not have discs.",
-			},
-			cli.BoolFlag{
 				Name:  "stopped",
 				Usage: "If set, the server will not be started, even to image it.",
 			},
@@ -249,16 +245,13 @@ func createServerReadIPs(c *Context) (ipspec *brain.IPSpec, err error) {
 
 func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error) {
 	noImage := c.Bool("no-image")
-	if c.Bool("no-discs") {
-		noImage = true
-	}
 
 	discs, cores, memory, err := createServerReadArgs(c)
 	if err != nil {
 		return
 	}
 
-	if len(discs) == 0 && !c.Context.Bool("no-discs") {
+	if len(discs) == 0 {
 		discs = append(discs, brain.Disc{Size: 25600})
 	}
 
