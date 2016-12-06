@@ -7,6 +7,30 @@ import (
 	"testing"
 )
 
+func TestSetCDROM(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, false)
+
+	vmname := lib.VirtualMachineName{
+		VirtualMachine: "test-server",
+		Group:          "test-group",
+		Account:        "test-account"}
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetVirtualMachine").Return(&defVM)
+
+	c.When("SetVirtualMachineCDROM", &vmname, "test-cdrom").Return(nil).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark set cdrom test-server.test-group.test-account test-cdrom", " "))
+	is.Nil(err)
+	if ok, vErr := c.Verify(); !ok {
+		t.Fatal(vErr)
+	}
+}
+
 func TestSetCores(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, false)

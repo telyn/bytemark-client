@@ -339,3 +339,24 @@ func (c *bytemarkClient) SetVirtualMachineCores(name *VirtualMachineName, cores 
 	_, _, err = r.Run(bytes.NewBufferString(coresJSON), nil)
 	return err
 }
+
+// SetVirtualMachineCDROM sets the URL of a CD to attach to a virtual machine. Set url to "" to remove the CD.
+// Returns nil on success, an error otherwise.
+func (c *bytemarkClient) SetVirtualMachineCDROM(name *VirtualMachineName, url string) (err error) {
+	err = c.validateVirtualMachineName(name)
+	if err != nil {
+		return err
+	}
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	if err != nil {
+		return err
+	}
+
+	cdromJSON, err := json.Marshal(brain.VirtualMachine{CdromURL: url})
+	if err != nil {
+		return err
+	}
+
+	_, _, err = r.Run(bytes.NewReader(cdromJSON), nil)
+	return err
+}

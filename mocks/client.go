@@ -242,6 +242,10 @@ func (c *Client) RestartVirtualMachine(name *lib.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+func (c *Client) SetVirtualMachineCDROM(name *lib.VirtualMachineName, url string) error {
+	r := c.Called(name, url)
+	return r.Error(0)
+}
 func (c *Client) SetVirtualMachineCores(name *lib.VirtualMachineName, cores int) error {
 	r := c.Called(name, cores)
 	return r.Error(0)
