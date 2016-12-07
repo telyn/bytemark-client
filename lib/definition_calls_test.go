@@ -45,8 +45,8 @@ func TestProcessDefinitions(t *testing.T) {
 func TestReadDefinitions(t *testing.T) {
 	is := is.New(t)
 
-	client, authServer, brain, billing, err := mkTestClientAndServers(
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == "/definitions" {
 				_, err := w.Write([]byte(fixtureDefinitionsJSON))
 				if err != nil {
@@ -55,10 +55,9 @@ func TestReadDefinitions(t *testing.T) {
 			} else {
 				http.NotFound(w, r)
 			}
-		}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

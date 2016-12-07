@@ -338,7 +338,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		}
 		return ConfigVar{"user", os.Getenv("BM_USER"), "ENV BM_USER"}
 	case "endpoint":
-		v := ConfigVar{"endpoint", "https://uk0.bigv.io", "CODE"}
+		v := ConfigVar{"endpoint", lib.DefaultURLs().Brain, "CODE"}
 
 		val := os.Getenv("BM_ENDPOINT")
 		if val != "" {
@@ -350,21 +350,21 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		if config.GetIgnoreErr("endpoint") == "https://staging.bigv.io" {
 			return ConfigVar{"billing-endpoint", "", "CODE STAGING DEFAULT"}
 		}
-		v := ConfigVar{"billing-endpoint", "https://bmbilling.bytemark.co.uk", "CODE"}
+		v := ConfigVar{"billing-endpoint", lib.DefaultURLs().Billing, "CODE"}
 		if val := os.Getenv("BM_BILLING_ENDPOINT"); val != "" {
 			v.Value = val
 			v.Source = "ENV BM_BILLING_ENDPOINT"
 		}
 		return v
 	case "spp-endpoint":
-		v := ConfigVar{"spp-endpoint", "https://spp-submissions.bytemark.co.uk", "CODE"}
+		v := ConfigVar{"spp-endpoint", lib.DefaultURLs().SPP, "CODE"}
 		if val := os.Getenv("BM_SPP_ENDPOINT"); val != "" {
 			v.Value = val
 			v.Source = "ENV BM_SPP_ENDPOINT"
 		}
 		return v
 	case "auth-endpoint":
-		v := ConfigVar{"auth-endpoint", "https://auth.bytemark.co.uk", "CODE"}
+		v := ConfigVar{"auth-endpoint", lib.DefaultURLs().Auth, "CODE"}
 
 		val := os.Getenv("BM_AUTH_ENDPOINT")
 		if val != "" {
@@ -372,6 +372,14 @@ func (config *Config) GetDefault(name string) ConfigVar {
 			v.Source = "ENV BM_AUTH_ENDPOINT"
 		}
 		return v
+	case "api-endpoint":
+		v := ConfigVar{"api-endpoint", lib.DefaultURLs().API, "CODE"}
+
+		val := os.Getenv("BM_API_ENDPOINT")
+		if val != "" {
+			v.Value = val
+			v.Source = "ENV BM_API_ENDPOINT"
+		}
 	case "account":
 		val := os.Getenv("BM_ACCOUNT")
 		if val != "" {
