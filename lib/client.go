@@ -5,6 +5,24 @@ import (
 	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
+type EndpointURLs struct {
+	API     string
+	Auth    string
+	Billing string
+	Brain   string
+	SPP     string
+}
+
+func DefaultURLs() EndpointURLs {
+	return EndpointURLs{
+		API:     "https://api.bytemark.co.uk",
+		Auth:    "https://auth.bytemark.co.uk",
+		Billing: "https://bmbilling.bytemark.co.uk",
+		Brain:   "https://uk0.bigv.io",
+		SPP:     "https://spp-submissions.bytemark.co.uk",
+	}
+}
+
 // Endpoint is an enum-style type to avoid people using endpoints like ints
 type Endpoint int
 
@@ -17,20 +35,44 @@ const (
 	BillingEndpoint
 	// SPPEndpoint means "make the connection to SPP!"
 	SPPEndpoint
+	// APIEndpoint means "make the connection to the general API endpoint!" (api.bytemark.co.uk - atm only used for domains?)
+	APIEndpoint
 )
 
 // bytemarkClient is the main type in the Bytemark API client library
 type bytemarkClient struct {
-	brainEndpoint   string
-	billingEndpoint string
-	sppEndpoint     string
-	allowInsecure   bool
-	auth            *auth3.Client
-	authSession     *auth3.SessionData
-	debugLevel      int
+	allowInsecure bool
+	auth          *auth3.Client
+	authSession   *auth3.SessionData
+	debugLevel    int
+	urls          EndpointURLs
+}
+
+// NewSimple creates a new Bytemark API client using the default bytemark endpoints.
+// This function will be renamed to New in 3.0
+func NewSimple() (Client, error) {
+	return NewWithURLs(DefaultURLs())
 }
 
 // New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
+func NewWithURLs(urls EndpointURLs) (c Client, err error) {
+	if urls.Auth == "" {
+		urls.Auth = "https://auth.bytemark.co.uk"
+	}
+	auth, err := auth3.New(urls.Auth)
+	if err != nil {
+		return nil, err
+	}
+	client := bytemarkClient{
+		urls:       urls,
+		auth:       auth,
+		debugLevel: 0,
+	}
+	return &client, nil
+}
+
+// New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint, and fills the rest in with defaults.
+// This function will be replaced with NewSimple in 3.0
 func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c Client, err error) {
 	auth, err := auth3.New("https://auth.bytemark.co.uk")
 	if err != nil {
@@ -40,14 +82,18 @@ func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c Client, err erro
 }
 
 // NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and github.com/BytemarkHosting/auth-client Client
+// This function is deprecated and will be removed in 3.0
 func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) Client {
-	c := new(bytemarkClient)
-	c.brainEndpoint = brainEndpoint
-	c.billingEndpoint = billingEndpoint
-	c.sppEndpoint = sppEndpoint
-	c.debugLevel = 0
-	c.auth = auth
-	return c
+	urls := DefaultURLs()
+	urls.Brain = brainEndpoint
+	urls.Billing = billingEndpoint
+	urls.SPP = sppEndpoint
+	client := bytemarkClient{
+		urls:       urls,
+		auth:       auth,
+		debugLevel: 0,
+	}
+	return &client
 }
 
 // AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
@@ -75,14 +121,14 @@ func (c *bytemarkClient) AuthWithToken(token string) error {
 
 // GetEndpoint returns the Bytemark API endpoint currently in use.
 func (c *bytemarkClient) GetEndpoint() string {
-	return c.brainEndpoint
+	return c.urls.Brain
 }
 
 // GetBillingEndpoint returns the Bytemark Billing API endpoint in use.
 // This function is deprecated and will be removed in a point release.
 // DO NOT DEPEND ON IT
 func (c *bytemarkClient) GetBillingEndpoint() string {
-	return c.billingEndpoint
+	return c.urls.Billing
 }
 
 // SetDebugLevel sets the debug level / verbosity of the Bytemark API client. 0 (default) is silent.

@@ -8,7 +8,7 @@ import (
 func TestParseVirtualMachineName(t *testing.T) {
 	is := is.New(t)
 
-	client, _ := New("endpoint.tld", "billing.endpoint.tld", "spp.endpoint.tld")
+	client, _ := NewWithURLs(EndpointURLs{})
 	vm, err := client.ParseVirtualMachineName("a.b.c")
 	is.Nil(err)
 	is.Equal("a.b.c", vm.String())
@@ -48,7 +48,7 @@ func TestParseVirtualMachineName(t *testing.T) {
 func TestParseGroupName(t *testing.T) {
 	is := is.New(t)
 
-	client, _ := New("endpoint.tld", "billing.endpoint.tld", "spp.endpoint.tld")
+	client, _ := NewWithURLs(EndpointURLs{})
 
 	is.Equal("halloween-vms.spooky-steve", client.ParseGroupName("halloween-vms.spooky-steve").String())
 	is.Equal("a.b", client.ParseGroupName("a.b").String())
@@ -63,7 +63,7 @@ func TestParseGroupName(t *testing.T) {
 func TestParseAccountName(t *testing.T) {
 	is := is.New(t)
 
-	client, _ := New("endpoint.tld", "billing.endpoint.tld", "spp.endpoint.tld")
+	client, _ := NewWithURLs(EndpointURLs{})
 
 	is.Equal("a", client.ParseAccountName("a.b.c"))
 	is.Equal("a", client.ParseAccountName("a.b.c."))
@@ -76,13 +76,11 @@ func TestParseAccountName(t *testing.T) {
 func TestParseAccountNameDefaulting(t *testing.T) {
 	is := is.New(t)
 
-	client, auth, brain, billing, err := mkTestClientAndServers(mkNilHandler(t), mkNilHandler(t))
+	client, servers, err := mkTestClientAndServers(t, Handlers{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer auth.Close()
-	defer brain.Close()
-	defer billing.Close()
+	defer servers.Close()
 
 	is.Equal("", client.ParseAccountName(""))
 	is.Equal("hey", client.ParseAccountName("hey"))
