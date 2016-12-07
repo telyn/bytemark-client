@@ -136,3 +136,36 @@ func TestNames(t *testing.T) {
 	is.Equal("valid-vm.default", vm.ShortName())
 	is.Equal("valid-vm.default.account", vm.FullName())
 }
+
+func TestDiscLabelOffset(t *testing.T) {
+	is := is.New(t)
+	vm := getFixtureVM()
+	vm.Discs = []*Disc{
+		{
+			Label: "lalalalalala",
+		},
+		{
+			Label: "disk-6",
+		},
+	}
+	is.Equal(6, vm.GetDiscLabelOffset())
+
+	vm.Discs = []*Disc{
+		{
+			Label: "lalalalalala",
+		},
+		{
+			Label: "disk-1",
+		},
+	}
+	is.Equal(2, vm.GetDiscLabelOffset())
+	vm.Discs = []*Disc{
+		{
+			Label: "disk-2",
+		},
+		{
+			Label: "disk-1",
+		},
+	}
+	is.Equal(2, vm.GetDiscLabelOffset())
+}
