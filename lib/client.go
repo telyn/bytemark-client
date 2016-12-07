@@ -5,6 +5,9 @@ import (
 	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
+// EndpointURLs are the URLs stored by the client for the various API endpoints the client touches.
+// The key endpoints that you may wish to alter are Auth and Brain. When using an auth server and brain
+// that doesn't have a matching bmbilling API, Billing should be set to ""
 type EndpointURLs struct {
 	API     string
 	Auth    string
@@ -13,6 +16,7 @@ type EndpointURLs struct {
 	SPP     string
 }
 
+// DefaultURLs returns an EndpointURLs for the usual customer-facing Bytemark APIs.
 func DefaultURLs() EndpointURLs {
 	return EndpointURLs{
 		API:     "https://api.bytemark.co.uk",
@@ -54,7 +58,7 @@ func NewSimple() (Client, error) {
 	return NewWithURLs(DefaultURLs())
 }
 
-// New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint
+// NewWithURLs creates a new Bytemark API client using the given endpoints.
 func NewWithURLs(urls EndpointURLs) (c Client, err error) {
 	if urls.Auth == "" {
 		urls.Auth = "https://auth.bytemark.co.uk"
