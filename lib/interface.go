@@ -180,4 +180,8 @@ type Client interface {
 	// SetVirtualMachineCores sets the number of CPUs available to a virtual machine
 	// Return nil on success, an error otherwise.
 	SetVirtualMachineCores(name *VirtualMachineName, cores int) (err error)
+
+	// SetVirtualMachineCDROM sets the URL of a CD to attach to a virtual machine. Set url to "" to remove the CD.
+	// Returns nil on success, an error otherwise.
+	SetVirtualMachineCDROM(name *VirtualMachineName, url string) (err error)
 }

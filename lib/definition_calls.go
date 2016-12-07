@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 )
 
 // Definitions represent all the possible things that can be returned as part of BigV's /definitions endpoint.
@@ -61,6 +62,10 @@ func (defs JSONDefinitions) Process() *Definitions {
 			fmt.Printf("WARN: %v\n", err)
 		}
 	}
+	sort.StringSlice(out.Distributions).Sort()
+	sort.StringSlice(out.StorageGrades).Sort()
+	sort.StringSlice(out.ZoneNames).Sort()
+	sort.StringSlice(out.HardwareProfiles).Sort()
 
 	return &out
 }

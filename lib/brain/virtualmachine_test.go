@@ -1,8 +1,10 @@
 package brain
 
 import (
+	"encoding/json"
 	"github.com/cheekybits/is"
 	"net"
+	"reflect"
 	"testing"
 )
 
@@ -168,4 +170,34 @@ func TestDiscLabelOffset(t *testing.T) {
 		},
 	}
 	is.Equal(2, vm.GetDiscLabelOffset())
+}
+
+func TestVMJSON(t *testing.T) {
+	// TODO add more tests as I convert SetVirtualMachine* functions
+	tests := []struct {
+		vm       VirtualMachine
+		expected map[string]interface{}
+	}{
+		{
+			vm: VirtualMachine{CdromURL: "testyo"},
+			expected: map[string]interface{}{
+				"cdrom_url": "testyo",
+			},
+		},
+	}
+
+	for i, test := range tests {
+		js, err := json.Marshal(test.vm)
+		if err != nil {
+			t.Fatalf("TestVMJSON #%d json.Marshal failed: %v\r\n", i, err.Error())
+		}
+		unmarshalled := make(map[string]interface{})
+		err = json.Unmarshal(js, &unmarshalled)
+		if err != nil {
+			t.Fatalf("TestVMJSON #%d json.Unmarshal failed: %v\r\n", i, err.Error())
+		}
+		if !reflect.DeepEqual(test.expected, unmarshalled) {
+			t.Fatalf("TestVMJSON #%d failed.\r\nEXPECTED\r\n%#v\r\nACTUAL\r\n%#v", i, test.expected, unmarshalled)
+		}
+	}
 }
