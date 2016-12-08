@@ -281,12 +281,12 @@ func TestCreateVirtualMachine(t *testing.T) {
 				Discs: []brain.Disc{
 					{
 						StorageGrade: "sata",
-						Label:        "vda",
+						Label:        "disc-1",
 					},
 					{
 						Size:         25600,
 						StorageGrade: "archive",
-						Label:        "vdb",
+						Label:        "disc-2",
 					},
 					{
 						Label:        "gav",
@@ -294,7 +294,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 					},
 					{
 						StorageGrade: "sata",
-						Label:        "vdd",
+						Label:        "disc-4",
 					},
 				},
 			},
