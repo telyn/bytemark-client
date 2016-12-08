@@ -23,25 +23,26 @@ func getFixtureUser() (user *brain.User) {
 // TestGetUser tests the behaviour of GetUser in a success case, as well as when the brain returns a 404
 func TestGetUser(t *testing.T) {
 	is := is.New(t)
-	client, auth, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/users/test-user" {
-			str, err := json.Marshal(getFixtureUser())
-			if err != nil {
-				t.Fatal(err)
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/users/test-user" {
+				str, err := json.Marshal(getFixtureUser())
+				if err != nil {
+					t.Fatal(err)
+				}
+				_, err = w.Write(str)
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else if req.URL.Path == "/users/nonexistent-user" {
+				http.NotFound(w, req)
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
-			_, err = w.Write(str)
-			if err != nil {
-				t.Fatal(err)
-			}
-		} else if req.URL.Path == "/users/nonexistent-user" {
-			http.NotFound(w, req)
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
-	}), mkNilHandler(t))
-	defer auth.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
+
 	log.DebugLevel = 9
 	if err != nil {
 		t.Fatal(err)

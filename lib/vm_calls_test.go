@@ -80,37 +80,37 @@ func getFixtureVM() (vm brain.VirtualMachine) {
 func TestMoveVirtualMachine(t *testing.T) {
 	is := is.New(t)
 
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/old-account/groups/old-group" {
-			_, err := w.Write([]byte(`{"id":101, "name": "old-group"}`))
-			if err != nil {
-				t.Fatal(err)
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/old-account/groups/old-group" {
+				_, err := w.Write([]byte(`{"id":101, "name": "old-group"}`))
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/rename-test" {
+				if req.Method == "PUT" {
+					decoded := make(map[string]interface{})
+					body, err := ioutil.ReadAll(req.Body)
+					if err != nil {
+						t.Fatal(err)
+					}
+					err = json.Unmarshal(body, &decoded)
+					if err != nil {
+						t.Fatal(err)
+					}
+					is.Equal("new-name", decoded["name"])
+					is.Equal(101, decoded["group_id"])
+					_, err = w.Write(body)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
-		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/rename-test" {
-			if req.Method == "PUT" {
-				decoded := make(map[string]interface{})
-				body, err := ioutil.ReadAll(req.Body)
-				if err != nil {
-					t.Fatal(err)
-				}
-				err = json.Unmarshal(body, &decoded)
-				if err != nil {
-					t.Fatal(err)
-				}
-				is.Equal("new-name", decoded["name"])
-				is.Equal(101, decoded["group_id"])
-				_, err = w.Write(body)
-				if err != nil {
-					t.Fatal(err)
-				}
-			}
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,37 +134,37 @@ func TestMoveVirtualMachine(t *testing.T) {
 func TestMoveServerGroup(t *testing.T) {
 	is := is.New(t)
 
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/old-account/groups/new-group" {
-			_, err := w.Write([]byte(`{"id":105, "name": "new-group"}`))
-			if err != nil {
-				t.Fatal(err)
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/old-account/groups/new-group" {
+				_, err := w.Write([]byte(`{"id":105, "name": "new-group"}`))
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/group-test" {
+				if req.Method == "PUT" {
+					decoded := make(map[string]interface{})
+					body, err := ioutil.ReadAll(req.Body)
+					if err != nil {
+						t.Fatal(err)
+					}
+					err = json.Unmarshal(body, &decoded)
+					if err != nil {
+						t.Fatal(err)
+					}
+					is.Equal("new-name", decoded["name"])
+					is.Equal(105, decoded["group_id"])
+					_, err = w.Write(body)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
-		} else if req.URL.Path == "/accounts/old-account/groups/old-group/virtual_machines/group-test" {
-			if req.Method == "PUT" {
-				decoded := make(map[string]interface{})
-				body, err := ioutil.ReadAll(req.Body)
-				if err != nil {
-					t.Fatal(err)
-				}
-				err = json.Unmarshal(body, &decoded)
-				if err != nil {
-					t.Fatal(err)
-				}
-				is.Equal("new-name", decoded["name"])
-				is.Equal(105, decoded["group_id"])
-				_, err = w.Write(body)
-				if err != nil {
-					t.Fatal(err)
-				}
-			}
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -186,26 +186,26 @@ func TestMoveServerGroup(t *testing.T) {
 }
 func TestGetVirtualMachine(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/account/groups/default/virtual_machines/valid-vm" {
-			str, err := json.Marshal(getFixtureVM())
-			if err != nil {
-				t.Fatal(err)
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/account/groups/default/virtual_machines/valid-vm" {
+				str, err := json.Marshal(getFixtureVM())
+				if err != nil {
+					t.Fatal(err)
+				}
+				_, err = w.Write(str)
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else if req.URL.Path == "/accounts/account/groups/default/virtual_machines/invalid-vm" {
+				http.NotFound(w, req)
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
-			_, err = w.Write(str)
-			if err != nil {
-				t.Fatal(err)
-			}
-		} else if req.URL.Path == "/accounts/account/groups/default/virtual_machines/invalid-vm" {
-			http.NotFound(w, req)
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
 
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -303,43 +303,44 @@ func TestCreateVirtualMachine(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path == "/accounts/test-account/groups/test-group/vm_create" {
-				bytes, err := ioutil.ReadAll(req.Body)
-				if err != nil {
-					t.Fatalf("#%d - %v", i, err)
-				}
-				var spec brain.VirtualMachineSpec
-				err = json.Unmarshal(bytes, &spec)
+		client, servers, err := mkTestClientAndServers(t, Handlers{
+			brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				if req.URL.Path == "/accounts/test-account/groups/test-group/vm_create" {
+					bytes, err := ioutil.ReadAll(req.Body)
+					if err != nil {
+						t.Fatalf("#%d - %v", i, err)
+					}
+					var spec brain.VirtualMachineSpec
+					err = json.Unmarshal(bytes, &spec)
 
-				if err != nil {
-					t.Fatalf("#%d - %v", i, err)
-				}
-				js, err := json.MarshalIndent(spec, "IN", "    ")
-				if err != nil {
-					t.Fatal(err)
-				}
-				t.Log(string(js))
-				bytes, err = json.Marshal(test.Expect.VirtualMachine)
-				if err != nil {
-					t.Fatal(err)
-				}
-				if !reflect.DeepEqual(test.Expect, spec) {
-					t.Error("spec did not deep-equal what was expected.")
-				} else {
-					_, err = w.Write(bytes)
+					if err != nil {
+						t.Fatalf("#%d - %v", i, err)
+					}
+					js, err := json.MarshalIndent(spec, "IN", "    ")
 					if err != nil {
 						t.Fatal(err)
 					}
+					t.Log(string(js))
+					bytes, err = json.Marshal(test.Expect.VirtualMachine)
+					if err != nil {
+						t.Fatal(err)
+					}
+					if !reflect.DeepEqual(test.Expect, spec) {
+						t.Error("spec did not deep-equal what was expected.")
+					} else {
+						_, err = w.Write(bytes)
+						if err != nil {
+							t.Fatal(err)
+						}
+					}
+				} else {
+					t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 				}
-			} else {
-				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-			}
 
-		}), mkNilHandler(t))
-		defer authServer.Close()
-		defer brain.Close()
-		defer billing.Close()
+			}),
+		})
+		defer servers.Close()
+
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -361,34 +362,34 @@ func TestSetVirtualMachineCDROM(t *testing.T) {
 	expected := map[string]interface{}{
 		"cdrom_url": testurl,
 	}
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/test-account/groups/test-group/virtual_machines/test-vm" {
-			bytes, err := ioutil.ReadAll(req.Body)
-			if err != nil {
-				t.Fatal(err)
-			}
-			unmarshalled := make(map[string]interface{})
-			err = json.Unmarshal(bytes, &unmarshalled)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if !reflect.DeepEqual(expected, unmarshalled) {
-				t.Error("unmarshalled map did not deep-equal what was expected.")
-			} else {
-				_, err = w.Write(bytes)
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/test-account/groups/test-group/virtual_machines/test-vm" {
+				bytes, err := ioutil.ReadAll(req.Body)
 				if err != nil {
 					t.Fatal(err)
 				}
-			}
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
+				unmarshalled := make(map[string]interface{})
+				err = json.Unmarshal(bytes, &unmarshalled)
+				if err != nil {
+					t.Fatal(err)
+				}
 
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+				if !reflect.DeepEqual(expected, unmarshalled) {
+					t.Error("unmarshalled map did not deep-equal what was expected.")
+				} else {
+					_, err = w.Write(bytes)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
+
+		}),
+	})
+	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
 	}

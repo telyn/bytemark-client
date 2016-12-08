@@ -221,12 +221,14 @@ func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...stri
 	}
 	endpointURL := ""
 	switch endpoint {
+	case APIEndpoint:
+		endpointURL = c.urls.API
 	case BrainEndpoint:
-		endpointURL = c.brainEndpoint
+		endpointURL = c.urls.Brain
 	case BillingEndpoint:
-		endpointURL = c.billingEndpoint
+		endpointURL = c.urls.Billing
 	case SPPEndpoint:
-		endpointURL = c.sppEndpoint
+		endpointURL = c.urls.SPP
 	default:
 		return nil, UnsupportedEndpointError(endpoint)
 	}
