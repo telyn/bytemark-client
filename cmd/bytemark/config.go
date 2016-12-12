@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"net/url"
@@ -29,7 +30,14 @@ func validateAccountForConfig(c *Context, name string) (err error) {
 	// we can't just use AccountProvider because it expects NextArg() to be the account name - there's no way to pass one in.
 	accName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
 	c.AccountName = &accName
-	return AccountProvider(true)(c)
+	err = AccountProvider(true)(c)
+	if err != nil {
+		if _, ok := err.(lib.NotFoundError); ok {
+			return errors.New(fmt.Sprintf("No such account %s - check your typing and specify --yubikey if necessary", *c.AccountName))
+		}
+		return err
+	}
+	return
 }
 
 func validateGroupForConfig(c *Context, name string) (err error) {
@@ -37,7 +45,14 @@ func validateGroupForConfig(c *Context, name string) (err error) {
 	groupName := global.Client.ParseGroupName(name, global.Config.GetGroup())
 	fmt.Printf("%#v\r\n", groupName)
 	c.GroupName = groupName
-	return GroupProvider(c)
+	err = GroupProvider(c)
+	if err != nil {
+		if _, ok := err.(lib.NotFoundError); ok {
+			return errors.New(fmt.Sprintf("No such group %v - check your typing and specify --yubikey if necessary", c.GroupName))
+		}
+		return err
+	}
+	return
 }
 
 func validateConfigValue(c *Context, varname string, value string) error {
