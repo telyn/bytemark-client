@@ -33,7 +33,7 @@ func validateAccountForConfig(c *Context, name string) (err error) {
 	err = AccountProvider(true)(c)
 	if err != nil {
 		if _, ok := err.(lib.NotFoundError); ok {
-			return errors.New(fmt.Sprintf("No such account %s - check your typing and specify --yubikey if necessary", *c.AccountName))
+			return fmt.Errorf("No such account %s - check your typing and specify --yubikey if necessary", *c.AccountName)
 		}
 		return err
 	}
@@ -48,7 +48,7 @@ func validateGroupForConfig(c *Context, name string) (err error) {
 	err = GroupProvider(c)
 	if err != nil {
 		if _, ok := err.(lib.NotFoundError); ok {
-			return errors.New(fmt.Sprintf("No such group %v - check your typing and specify --yubikey if necessary", c.GroupName))
+			return fmt.Errorf("No such group %v - check your typing and specify --yubikey if necessary", c.GroupName)
 		}
 		return err
 	}
