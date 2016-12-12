@@ -30,6 +30,13 @@ type Context struct {
 	currentArgIndex int
 }
 
+// Reset replaces the Context with a blank one (keeping the cli.Context)
+func (c *Context) Reset() {
+	*c = Context{
+		Context: c.Context,
+	}
+}
+
 // args returns all the args that were passed to the Context (i.e. all the args passed to this (sub)command)
 func (c *Context) args() cli.Args {
 	return c.Context.Args()
