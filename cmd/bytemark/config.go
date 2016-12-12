@@ -115,6 +115,13 @@ The set and unset subcommands can be used to set and unset such variables.
 						return err
 					}
 
+					if varname == "account" || varname == "group" {
+						err = AuthProvider(ctx)
+						if err != nil {
+							return err
+						}
+					}
+
 					err = validateConfigValue(ctx, varname, value)
 					if err != nil {
 						return err

@@ -131,6 +131,7 @@ func TestValidation(t *testing.T) {
 
 	config.When("GetGroup").Return(&lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
+	config.When("GetIgnoreErr", "token").Return("test-token")
 
 	flagset := flag.NewFlagSet("TestValidation", flag.ContinueOnError)
 	flagset.Bool("force", false, "")
@@ -162,6 +163,7 @@ func TestGroupValidation(t *testing.T) {
 
 	config.When("GetGroup").Return(&lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
+	config.When("GetIgnoreErr", "token").Return("test-token")
 
 	flagset := flag.NewFlagSet("TestValidation", flag.ContinueOnError)
 	flagset.Bool("force", false, "")
@@ -178,6 +180,7 @@ func TestAccountValidation(t *testing.T) {
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
+	config.When("GetIgnoreErr", "token").Return("test-token")
 
 	ctx := Context{}
 
