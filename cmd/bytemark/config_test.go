@@ -131,7 +131,7 @@ func TestCommandConfigSet(t *testing.T) {
 			case "group":
 				setupGroupTest(client, value, errSpec.err)
 			}
-			if errSpec.shouldErr == false {
+			if !errSpec.shouldErr {
 				config.When("GetIgnoreErr", varname).Return("")
 				config.When("SetPersistent", varname, value, "CMD set").Times(1)
 			}
