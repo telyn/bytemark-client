@@ -2,6 +2,8 @@ package brain
 
 import (
 	"net"
+	"strings"
+	"text/template"
 )
 
 // Tail represents a Bytemark Cloud Servers tail (disk storage machine), as returned by the admin API.
