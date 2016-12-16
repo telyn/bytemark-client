@@ -84,6 +84,30 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 	return err
 }
 
+// SetDiscIopsLimit resizes the specified disc to the given size in megabytes
+func (c *bytemarkClient) SetDiscIopsLimit(vm *VirtualMachineName, discLabelOrID string, iopsLimit int) (err error) {
+	err = c.validateVirtualMachineName(vm)
+	if err != nil {
+		return err
+	}
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	if err != nil {
+		return
+	}
+
+	data := map[string]int{
+		"iops_limit": iopsLimit,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = r.Run(bytes.NewBuffer(jsonData), nil)
+	return err
+}
+
 // GetDisc returns the specified disc from the given virtual machine.
 func (c *bytemarkClient) GetDisc(vm *VirtualMachineName, discLabelOrID string) (disc *brain.Disc, err error) {
 	disc = new(brain.Disc)
