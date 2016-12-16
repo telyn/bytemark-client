@@ -84,7 +84,7 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 	return err
 }
 
-// SetDiscIopsLimit resizes the specified disc to the given size in megabytes
+// SetDiscIopsLimit sets the IOPS limit of the specified disc
 func (c *bytemarkClient) SetDiscIopsLimit(vm *VirtualMachineName, discLabelOrID string, iopsLimit int) (err error) {
 	err = c.validateVirtualMachineName(vm)
 	if err != nil {
