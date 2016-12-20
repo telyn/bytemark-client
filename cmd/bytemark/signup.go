@@ -95,7 +95,13 @@ If you have previously used the client, you'll have a login and will need to add
 					Expiry: fields[util.FormFieldCreditCardExpiry].Value(),
 					CVV:    fields[util.FormFieldCreditCardCVV].Value(),
 				}
-				cardRef, err = global.Client.CreateCreditCard(&card)
+
+				token, err := global.Client.GetSPPTokenWithAccount(account)
+				if err != nil {
+					return err
+				}
+
+				cardRef, err = global.Client.CreateCreditCardWithToken(&card, token)
 				if err != nil {
 					return err
 				}
