@@ -3,20 +3,19 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
 )
 
 // GetSPPTokenWithAccount requests a token to use with bmbilling, passing an account object.
-func (c *bytemarkClient) GetSPPTokenWithAccount(account billing.Account) (token string, err error) {
+func (c *bytemarkClient) GetSPPTokenWithAccount(account Account) (token string, err error) {
 	r, err := c.BuildRequestNoAuth("POST", BillingEndpoint, "/accounts/spp_token")
 	if err != nil {
 		return
 	}
 
-	js, err := json.Marshal(account)
+	js, err := json.Marshal(account.billingAccount())
 	if err != nil {
 		return "", err
 	}

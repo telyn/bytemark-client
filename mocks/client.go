@@ -57,6 +57,14 @@ func (c *Client) GetSessionFactors() []string {
 	ar := r.Get(0)
 	return ar.([]string)
 }
+func (c *Client) GetSPPToken() (string, error) {
+	r := c.Called()
+	return r.String(0), r.Error(1)
+}
+func (c *Client) GetSPPTokenWithAccount(a lib.Account) (string, error) {
+	r := c.Called(a)
+	return r.String(0), r.Error(1)
+}
 func (c *Client) SetDebugLevel(level int) {
 	c.Called(level)
 }
@@ -120,6 +128,10 @@ func (c *Client) GetUser(name string) (*brain.User, error) {
 
 func (c *Client) CreateCreditCard(cc *spp.CreditCard) (string, error) {
 	r := c.Called(cc)
+	return r.String(0), r.Error(1)
+}
+func (c *Client) CreateCreditCardWithToken(cc *spp.CreditCard, token string) (string, error) {
+	r := c.Called(cc, token)
 	return r.String(0), r.Error(1)
 }
 func (c *Client) CreateAccount(acc *lib.Account) (*lib.Account, error) {
