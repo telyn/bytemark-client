@@ -2,15 +2,50 @@ package lib
 
 import (
 	"bytes"
+	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
 )
 
-func (c *bytemarkClient) CreateCreditCard(cc *spp.CreditCard) (ref string, err error) {
-	req, err := c.BuildRequestNoAuth("POST", SPPEndpoint, "/card.ref")
+// GetSPPTokenWithAccount requests a token to use with bmbilling, passing an account object.
+func (c *bytemarkClient) GetSPPTokenWithAccount(account billing.Account) (token string, err error) {
+	r, err := c.BuildRequestNoAuth("POST", BillingEndpoint, "/accounts/spp_token")
+	if err != nil {
+		return
+	}
+
+	js, err := json.Marshal(account)
 	if err != nil {
 		return "", err
+	}
+	_, res, err := r.Run(bytes.NewBuffer(js), nil)
+	token = string(res)
+	return
+}
+
+// GetSPPToken requests a token to use with SPP from bmbilling.
+// If account is nil, authenticates against bmbilling.
+func (c *bytemarkClient) GetSPPToken() (token string, err error) {
+	r, err := c.BuildRequest("POST", BillingEndpoint, "/accounts/spp_token")
+	if err != nil {
+		return
+	}
+	_, res, err := r.Run(nil, nil)
+	if err != nil {
+		return
+	}
+	token = string(res)
+	return
+}
+
+// CreateCreditCard creates a credit card on SPP using the given token. Tokens must be acquired by using GetSPPToken or GetSPPTokenWithAccount first.
+func (c *bytemarkClient) CreateCreditCardWithToken(cc *spp.CreditCard, token string) (ref string, err error) {
+	req, err := c.BuildRequestNoAuth("POST", SPPEndpoint, "/card.ref")
+	req.sppToken = token
+	if err != nil {
+		return
 	}
 	values := url.Values{}
 	values.Add("account_number", cc.Number)
@@ -32,4 +67,14 @@ func (c *bytemarkClient) CreateCreditCard(cc *spp.CreditCard) (ref string, err e
 	log.LogFile = oldfile
 
 	return string(response), err
+}
+
+// CreateCreditCard creates a credit card on SPP. It uses GetSPPToken to get a token.
+func (c *bytemarkClient) CreateCreditCard(cc *spp.CreditCard) (ref string, err error) {
+	token, err := c.GetSPPToken()
+	if err != nil {
+		return
+	}
+	return c.CreateCreditCardWithToken(cc, token)
+
 }
