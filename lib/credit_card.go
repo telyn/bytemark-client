@@ -3,38 +3,45 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
 )
 
-// GetSPPTokenWithAccount requests a token to use with bmbilling, passing an account object.
-func (c *bytemarkClient) GetSPPTokenWithAccount(account Account) (token string, err error) {
-	r, err := c.BuildRequestNoAuth("POST", BillingEndpoint, "/accounts/spp_token")
-	if err != nil {
-		return
-	}
-
-	js, err := json.Marshal(account.billingAccount())
-	if err != nil {
-		return "", err
-	}
-	_, res, err := r.Run(bytes.NewBuffer(js), nil)
-	token = string(res)
-	return
+type sppTokenRequest struct {
+	Owner      *billing.Person `json:"owner,omitempty"`
+	CardEnding string          `json:"card_ending"`
 }
 
 // GetSPPToken requests a token to use with SPP from bmbilling.
-// If account is nil, authenticates against bmbilling.
-func (c *bytemarkClient) GetSPPToken() (token string, err error) {
-	r, err := c.BuildRequest("POST", BillingEndpoint, "/accounts/spp_token")
+// If owner is nil, authenticates against bmbilling.
+func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner *billing.Person) (token string, err error) {
+	r, err := c.BuildRequestNoAuth("POST", BillingEndpoint, "/api/v1/accounts/spp_token")
 	if err != nil {
 		return
 	}
-	_, res, err := r.Run(nil, nil)
-	if err != nil {
-		return
+
+	// i'm not really interested in whether a card number is valid, just whether it's long enough to have a last 4 digits.
+	if len(cc.Number) < 4 {
+		return "", errors.New("credit card number too short")
 	}
+
+	tokenRequest := sppTokenRequest{
+		Owner:      owner,
+		CardEnding: cc.Number[len(cc.Number)-4:],
+	}
+	if owner == nil {
+		r.authenticate = true
+	}
+
+	js, err := json.Marshal(&tokenRequest)
+	if err != nil {
+		return "", err
+	}
+
+	_, res, err := r.Run(bytes.NewBuffer(js), nil)
 	token = string(res)
 	return
 }
@@ -70,7 +77,7 @@ func (c *bytemarkClient) CreateCreditCardWithToken(cc *spp.CreditCard, token str
 
 // CreateCreditCard creates a credit card on SPP. It uses GetSPPToken to get a token.
 func (c *bytemarkClient) CreateCreditCard(cc *spp.CreditCard) (ref string, err error) {
-	token, err := c.GetSPPToken()
+	token, err := c.GetSPPToken(*cc, nil)
 	if err != nil {
 		return
 	}

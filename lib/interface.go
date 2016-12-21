@@ -2,6 +2,7 @@ package lib
 
 import (
 	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 )
@@ -58,8 +59,7 @@ type Client interface {
 	///////////////////////
 
 	// CreateAccount(*Account) (*Account, error) // TODO(telyn): figure out if CreateAccount is needed/useful
-	GetSPPToken() (string, error)
-	GetSPPTokenWithAccount(acc Account) (string, error)
+	GetSPPToken(cc spp.CreditCard, owner *billing.Person) (string, error)
 	RegisterNewAccount(acc *Account) (*Account, error)
 
 	////////////////////
