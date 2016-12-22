@@ -59,7 +59,7 @@ release-check:
       exit 1
     fi
   only:
-  - /^release-\d+\.\d+$/
+  - /^release-\d+(\.\d+)+$/
 
 vet:
   stage: test
@@ -134,7 +134,7 @@ build-amd64-windows:
   dependencies:
   - build-amd64-linux
   only:
-  - /^release-\d+\.\d+$/
+  - /^release-\d+(\.\d+)+$/
 
     #package-debian-amd64:
     #  <<: *package
@@ -241,7 +241,7 @@ package-windows-amd64:
   - git config --global user.name Bytemark Automation
   - git config --global user.email nobody@bytemark.co.uk
   only:
-  - /^release-\d+\.\d+$/
+  - /^release-\d+(\.\d+)+$/
 
 
 release-to-repo:
