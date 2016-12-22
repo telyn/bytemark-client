@@ -189,7 +189,7 @@ func ProcessError(err error, message ...string) ExitCode {
 				}
 				exitCode = ExitCodeCantConnectAuth
 			default:
-				errorMessage = fmt.Sprintf("Couldn't create auth session - internal error of type %T: %v", e.Err, e.Err)
+				errorMessage = fmt.Sprintf("Couldn't create auth session: %v", e.Err)
 				exitCode = ExitCodeUnknownAuthError
 			}
 		case *url.Error:

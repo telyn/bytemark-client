@@ -14,7 +14,7 @@ func labelDiscs(discs []brain.Disc, offset ...int) {
 	}
 	for i := range discs {
 		if discs[i].Label == "" {
-			discs[i].Label = fmt.Sprintf("vd%c", 'a'+realOffset+i)
+			discs[i].Label = fmt.Sprintf("disc-%d", realOffset+i+1)
 		}
 	}
 
@@ -31,7 +31,8 @@ func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc brain.Disc) (
 		return
 	}
 	discs := []brain.Disc{disc}
-	labelDiscs(discs, len(vm.Discs))
+
+	labelDiscs(discs, vm.GetDiscLabelOffset())
 
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
 	if err != nil {

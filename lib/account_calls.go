@@ -30,7 +30,7 @@ func (c *bytemarkClient) getBillingAccount(name string) (account *billing.Accoun
 
 // getBillingAccounts returns all the billing accounts the currently logged in user can see.
 func (c *bytemarkClient) getBillingAccounts() (accounts []*billing.Account, err error) {
-	if c.billingEndpoint == "" {
+	if c.urls.Billing == "" {
 		return make([]*billing.Account, 0), nil
 	}
 	req, err := c.BuildRequest("GET", BillingEndpoint, "/api/v1/accounts")
@@ -146,7 +146,7 @@ func (c *bytemarkClient) getBrainAccounts() (accounts []*brain.Account, err erro
 // getDefaultBillingAccount gets the default billing account for this user.
 // DANGER DANGER the returned account can be nil when there's also no error. (this means there's no billing accounts at all)
 func (c *bytemarkClient) getDefaultBillingAccount() (*billing.Account, error) {
-	if c.brainEndpoint == "https://int.bigv.io" {
+	if c.urls.Billing == "https://int.bigv.io" {
 		return &billing.Account{Name: "bytemark"}, nil
 	}
 	billAccs, err := c.getBillingAccounts()

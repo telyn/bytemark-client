@@ -40,7 +40,8 @@ Generally bytemark provide two - virtio and compatibility. The virtio one has be
 		},
 		Action: With(DefinitionsProvider, func(c *Context) error {
 			return c.IfNotMarshalJSON(c.Definitions.DistributionDescriptions, func() error {
-				for distro, description := range c.Definitions.DistributionDescriptions {
+				for _, distro := range c.Definitions.Distributions {
+					description := c.Definitions.DistributionDescriptions[distro]
 					log.Logf("'%s': %s\r\n", distro, description)
 				}
 				return nil
@@ -59,7 +60,8 @@ Generally bytemark provide two - virtio and compatibility. The virtio one has be
 		},
 		Action: With(DefinitionsProvider, func(c *Context) error {
 			return c.IfNotMarshalJSON(c.Definitions.StorageGradeDescriptions, func() error {
-				for grade, description := range c.Definitions.StorageGradeDescriptions {
+				for _, grade := range c.Definitions.StorageGrades {
+					description := c.Definitions.StorageGradeDescriptions[grade]
 					log.Logf("'%s': %s\r\n", grade, description)
 				}
 				return nil

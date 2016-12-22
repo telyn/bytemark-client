@@ -2,6 +2,7 @@ package lib
 
 import (
 	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 )
@@ -51,12 +52,14 @@ type Client interface {
 	///////////////////////
 
 	CreateCreditCard(*spp.CreditCard) (string, error)
+	CreateCreditCardWithToken(*spp.CreditCard, string) (string, error)
 
 	///////////////////////
 	//// BILLING STUFF ////
 	///////////////////////
 
 	// CreateAccount(*Account) (*Account, error) // TODO(telyn): figure out if CreateAccount is needed/useful
+	GetSPPToken(cc spp.CreditCard, owner *billing.Person) (string, error)
 	RegisterNewAccount(acc *Account) (*Account, error)
 
 	////////////////////
@@ -180,4 +183,8 @@ type Client interface {
 	// SetVirtualMachineCores sets the number of CPUs available to a virtual machine
 	// Return nil on success, an error otherwise.
 	SetVirtualMachineCores(name *VirtualMachineName, cores int) (err error)
+
+	// SetVirtualMachineCDROM sets the URL of a CD to attach to a virtual machine. Set url to "" to remove the CD.
+	// Returns nil on success, an error otherwise.
+	SetVirtualMachineCDROM(name *VirtualMachineName, url string) (err error)
 }

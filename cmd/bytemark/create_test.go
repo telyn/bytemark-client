@@ -190,7 +190,7 @@ func TestCreateServerCommand(t *testing.T) {
 	}
 }
 
-func TestCreateServerNoImagesNoDiscs(t *testing.T) {
+func TestCreateServerNoImage(t *testing.T) {
 	config, c := baseTestSetup(t, false)
 
 	config.When("Get", "account").Return("test-account")
@@ -206,7 +206,12 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 			Cores:  1,
 			Memory: 1024,
 		},
-		Discs: []brain.Disc{},
+		Discs: []brain.Disc{
+			brain.Disc{
+				Size:         25600,
+				StorageGrade: "sata",
+			},
+		},
 	}
 
 	// TODO(telyn): refactor this getvm crap into a function someplace
@@ -233,8 +238,8 @@ func TestCreateServerNoImagesNoDiscs(t *testing.T) {
 		"bytemark", "create", "server",
 		"--cores", "1",
 		"--force",
-		"--no-discs",
 		"--memory", "1",
+		"--no-image",
 		"test-server",
 	})
 	if err != nil {

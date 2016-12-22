@@ -45,11 +45,11 @@ func TestLabelDisc(t *testing.T) {
 	for _, d := range discs {
 		switch d.ID {
 		case 1:
-			is.Equal("vda", d.Label)
+			is.Equal("disc-1", d.Label)
 		case 2:
 			is.Equal("arch", d.Label)
 		case 3:
-			is.Equal("vdc", d.Label)
+			is.Equal("disc-3", d.Label)
 		default:
 			fmt.Printf("Unexpected disc ID %d\r\n", d.ID)
 			t.Fail()
@@ -59,28 +59,28 @@ func TestLabelDisc(t *testing.T) {
 
 func TestCreateDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs" && req.Method == "POST" {
-			// TODO: unmarshal the disc
-			// then test for sanity, equality to disk put in
-			_, err := w.Write([]byte("{}"))
-			if err != nil {
-				t.Fatal(err)
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs" && req.Method == "POST" {
+				// TODO: unmarshal the disc
+				// then test for sanity, equality to disk put in
+				_, err := w.Write([]byte("{}"))
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm" {
+				// TODO: return a VM that has some discs
+				_, err := w.Write([]byte("{}"))
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
-		} else if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm" {
-			// TODO: return a VM that has some discs
-			_, err := w.Write([]byte("{}"))
-			if err != nil {
-				t.Fatal(err)
-			}
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
 
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 
 	is.Nil(err)
 	err = client.AuthWithCredentials(map[string]string{})
@@ -97,22 +97,22 @@ func TestCreateDisc(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
-			if req.URL.Query().Get("purge") != "true" {
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
+				if req.URL.Query().Get("purge") != "true" {
+					http.NotFound(w, req)
+				}
+
+			} else if req.URL.Path == "/accounts/invalid-account" {
 				http.NotFound(w, req)
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
 
-		} else if req.URL.Path == "/accounts/invalid-account" {
-			http.NotFound(w, req)
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
-
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 
 	if err != nil {
 		t.Fatal(err)
@@ -129,24 +129,24 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestResizeDisc(t *testing.T) {
 	is := is.New(t)
-	client, authServer, brainServer, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
-			bytes, err := ioutil.ReadAll(req.Body)
-			is.Nil(err)
-			var disc brain.Disc
-			err = json.Unmarshal(bytes, &disc)
-			is.Nil(err)
-			// TODO check that we send the right stuff
-		} else if req.URL.Path == "/accounts/invalid-account" {
-			http.NotFound(w, req)
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
+				bytes, err := ioutil.ReadAll(req.Body)
+				is.Nil(err)
+				var disc brain.Disc
+				err = json.Unmarshal(bytes, &disc)
+				is.Nil(err)
+				// TODO check that we send the right stuff
+			} else if req.URL.Path == "/accounts/invalid-account" {
+				http.NotFound(w, req)
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
 
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brainServer.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 
 	if err != nil {
 		t.Fatal(err)
@@ -164,24 +164,24 @@ func TestResizeDisc(t *testing.T) {
 func TestShowDisc(t *testing.T) {
 	is := is.New(t)
 
-	client, authServer, brain, billing, err := mkTestClientAndServers(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
-			bytes, err := json.Marshal(getFixtureDisc())
-			is.Nil(err)
-			_, err = w.Write(bytes)
-			if err != nil {
-				t.Fatal(err)
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
+				bytes, err := json.Marshal(getFixtureDisc())
+				is.Nil(err)
+				_, err = w.Write(bytes)
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else if req.URL.Path == "/accounts/invalid-account" {
+				http.NotFound(w, req)
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
-		} else if req.URL.Path == "/accounts/invalid-account" {
-			http.NotFound(w, req)
-		} else {
-			t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-		}
 
-	}), mkNilHandler(t))
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+		}),
+	})
+	defer servers.Close()
 
 	if err != nil {
 		t.Fatal(err)

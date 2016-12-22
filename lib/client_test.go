@@ -2,25 +2,103 @@ package lib
 
 import (
 	"fmt"
-	auth3 "github.com/BytemarkHosting/auth-client"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-// mkTestClientAndServers constructs httptest Servers for a pretend auth and API endpoint, then constructs a Client that uses those servers.
-// The http.Handler passed is for the API endpoint - see the definition of mkTestAuthServer for the auth handler.
-// Used to test that the right URLs are being requested and such.
-func mkTestClientAndServers(brainHandler http.Handler, billingHandler http.Handler) (c Client, authServer *httptest.Server, brain *httptest.Server, billing *httptest.Server, err error) {
-	authServer = mkTestAuthServer()
-	brain = mkTestServer(brainHandler)
-	billing = mkTestServer(billingHandler)
+type Handlers struct {
+	auth    http.Handler
+	brain   http.Handler
+	billing http.Handler
+	spp     http.Handler
+	api     http.Handler
+}
 
-	auth, err := auth3.New(authServer.URL)
-	//FIXME: the "" is the spp endpoint. at the moment there are no tests that hit it.
-	client := NewWithAuth(brain.URL, billing.URL, "", auth)
-	client.AllowInsecureRequests()
-	return client, authServer, brain, billing, err
+func (h *Handlers) Fill(t *testing.T) {
+	if h.brain == nil {
+		h.brain = mkNilHandler(t)
+	}
+	if h.billing == nil {
+		h.billing = mkNilHandler(t)
+	}
+	if h.spp == nil {
+		h.spp = mkNilHandler(t)
+	}
+	if h.api == nil {
+		h.api = mkNilHandler(t)
+	}
+}
+
+type Servers struct {
+	auth    *httptest.Server
+	brain   *httptest.Server
+	billing *httptest.Server
+	spp     *httptest.Server
+	api     *httptest.Server
+}
+
+func (s *Servers) Close() {
+	if s.auth != nil {
+		s.auth.Close()
+	}
+	if s.brain != nil {
+		s.brain.Close()
+	}
+	if s.billing != nil {
+		s.billing.Close()
+	}
+	if s.spp != nil {
+		s.spp.Close()
+	}
+	if s.api != nil {
+		s.api.Close()
+	}
+	s.auth = nil
+	s.brain = nil
+	s.billing = nil
+	s.spp = nil
+	s.api = nil
+}
+
+// URLs creates an EndpointURLs
+func (s Servers) URLs() (urls EndpointURLs) {
+	urls.API = s.api.URL
+	urls.Auth = s.auth.URL
+	urls.Billing = s.billing.URL
+	urls.Brain = s.brain.URL
+	urls.SPP = s.spp.URL
+	return
+}
+
+// Client makes a bytemarkClient for these Servers
+func (s Servers) Client() (c Client, err error) {
+	urls := s.URLs()
+	c, err = NewWithURLs(urls)
+	if err != nil {
+		return nil, err
+	}
+	c.AllowInsecureRequests()
+	return
+}
+
+// mkTestClientAndServers constructs httptest Servers for a pretend auth and API endpoint, then constructs a Client that uses those servers.
+// Used to test that the right URLs are being requested and such.
+func mkTestClientAndServers(t *testing.T, h Handlers) (c Client, s Servers, err error) {
+	h.Fill(t)
+
+	if h.auth != nil {
+		s.auth = mkTestServer(h.auth)
+	} else {
+		s.auth = mkTestAuthServer()
+	}
+	s.brain = mkTestServer(h.brain)
+	s.billing = mkTestServer(h.billing)
+	s.api = mkTestServer(h.api)
+	s.spp = mkTestServer(h.spp)
+
+	c, err = s.Client()
+	return
 }
 
 // mkTestServer creates an httptest.Server for the given http.Handler. It's basically an alias for httptest.NewServer. Why did I write it?
@@ -38,7 +116,7 @@ func mkTestAuthServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w,
 			`{
-    "token": "fffffffffffffff",
+    "token": "working-auth-token",
     "username": "account",
     "factors": []
 }`)
