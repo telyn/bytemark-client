@@ -116,7 +116,7 @@ func mkTestAuthServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w,
 			`{
-    "token": "fffffffffffffff",
+    "token": "working-auth-token",
     "username": "account",
     "factors": []
 }`)
