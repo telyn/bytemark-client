@@ -96,7 +96,7 @@ If you have previously used the client, you'll have a login and will need to add
 					CVV:    fields[util.FormFieldCreditCardCVV].Value(),
 				}
 
-				token, err := global.Client.GetSPPTokenWithAccount(account)
+				token, err := global.Client.GetSPPToken(card, account.Owner)
 				if err != nil {
 					return err
 				}

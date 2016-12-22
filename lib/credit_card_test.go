@@ -35,7 +35,7 @@ func TestGetSPPToken(t *testing.T) {
 				t.Errorf("GetSPPToken must be authed with a regular token, but got '%s'", arr[0])
 
 			} else {
-				_, err := w.Write([]byte("test-spp-token"))
+				_, err := w.Write([]byte(`{"token":"test-spp-token"}`))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -96,7 +96,7 @@ func TestGetSPPTokenWithAccount(t *testing.T) {
 				is.Equal("Ownersdottir", tr.Owner.LastName)
 				is.Equal("4343", tr.CardEnding)
 
-				_, err = w.Write([]byte("test-spp-token"))
+				_, err = w.Write([]byte(`{"token":"test-spp-token"}`))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -137,7 +137,7 @@ func TestCreateCreditCard(t *testing.T) {
 				t.Errorf("GetSPPToken must be authed with a regular token, but got '%s'", arr[0])
 
 			} else {
-				_, err := w.Write([]byte("test-spp-token"))
+				_, err := w.Write([]byte(`{"token":"test-spp-token"}`))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -148,35 +148,28 @@ func TestCreateCreditCard(t *testing.T) {
 
 				t.Fatalf("Unexpected HTTP request to spp%s", req.URL.Path)
 			}
-			arr := req.Header["Authorization"]
-			if arr == nil || len(arr) == 0 {
-				t.Errorf("Call to /card must be authed in GetSPPToken")
-			} else if arr[0] != "Token token=test-spp-token" {
-				t.Errorf("CreateCreditCard must be authed with an spp token, but got '%s'", arr[0])
-
-			} else {
-				if req.Body == nil {
-					t.Error("Request Body must not be nil in GetSPPTokenWithAccount")
-				}
-				body, err := ioutil.ReadAll(req.Body)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				values, err := url.ParseQuery(string(body))
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				is.Equal(testCard.Name, values["name"][0])
-				is.Equal(testCard.Number, values["account_number"][0])
-				is.Equal(testCard.Expiry, values["expiry"][0])
-				is.Equal(testCard.CVV, values["cvv"][0])
-				is.Equal(testCard.Street, values["street"][0])
-				is.Equal(testCard.City, values["city"][0])
-				is.Equal(testCard.Postcode, values["postcode"][0])
-				is.Equal(testCard.Country, values["country"][0])
+			if req.Body == nil {
+				t.Error("Request Body must not be nil in GetSPPTokenWithAccount")
 			}
+			body, err := ioutil.ReadAll(req.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			values, err := url.ParseQuery(string(body))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			is.Equal("test-spp-token", values["token"][0])
+			is.Equal(testCard.Name, values["name"][0])
+			is.Equal(testCard.Number, values["account_number"][0])
+			is.Equal(testCard.Expiry, values["expiry"][0])
+			is.Equal(testCard.CVV, values["cvv"][0])
+			is.Equal(testCard.Street, values["street"][0])
+			is.Equal(testCard.City, values["city"][0])
+			is.Equal(testCard.Postcode, values["postcode"][0])
+			is.Equal(testCard.Country, values["country"][0])
 		}),
 	})
 	defer servers.Close()

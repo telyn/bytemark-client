@@ -38,7 +38,6 @@ type Request struct {
 	endpoint      Endpoint
 	url           *url.URL
 	method        string
-	sppToken      string
 	body          []byte
 	allowInsecure bool
 	hasRun        bool
@@ -114,9 +113,6 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 
 	if r.endpoint == SPPEndpoint {
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		if r.sppToken != "" {
-			req.Header.Add("Authorization", "Token token="+r.sppToken)
-		}
 	} else {
 		req.Header.Add("Accept", "application/json")
 		req.Header.Add("Content-Type", "application/json")

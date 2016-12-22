@@ -4,6 +4,7 @@ import (
 	"fmt"
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	mock "github.com/maraino/go-mock"
@@ -57,12 +58,8 @@ func (c *Client) GetSessionFactors() []string {
 	ar := r.Get(0)
 	return ar.([]string)
 }
-func (c *Client) GetSPPToken() (string, error) {
-	r := c.Called()
-	return r.String(0), r.Error(1)
-}
-func (c *Client) GetSPPTokenWithAccount(a lib.Account) (string, error) {
-	r := c.Called(a)
+func (c *Client) GetSPPToken(cc spp.CreditCard, owner *billing.Person) (string, error) {
+	r := c.Called(cc, owner)
 	return r.String(0), r.Error(1)
 }
 func (c *Client) SetDebugLevel(level int) {

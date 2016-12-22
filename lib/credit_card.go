@@ -10,6 +10,9 @@ import (
 	"net/url"
 )
 
+type sppTokenResponse struct {
+	Token string `json:"token"`
+}
 type sppTokenRequest struct {
 	Owner      *billing.Person `json:"owner,omitempty"`
 	CardEnding string          `json:"card_ending"`
@@ -41,19 +44,21 @@ func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner *billing.Person) (
 		return "", err
 	}
 
-	_, res, err := r.Run(bytes.NewBuffer(js), nil)
-	token = string(res)
+	res := sppTokenResponse{}
+
+	_, _, err = r.Run(bytes.NewBuffer(js), &res)
+	token = res.Token
 	return
 }
 
 // CreateCreditCard creates a credit card on SPP using the given token. Tokens must be acquired by using GetSPPToken or GetSPPTokenWithAccount first.
 func (c *bytemarkClient) CreateCreditCardWithToken(cc *spp.CreditCard, token string) (ref string, err error) {
 	req, err := c.BuildRequestNoAuth("POST", SPPEndpoint, "/card.ref")
-	req.sppToken = token
 	if err != nil {
 		return
 	}
 	values := url.Values{}
+	values.Add("token", token)
 	values.Add("account_number", cc.Number)
 	values.Add("name", cc.Name)
 	values.Add("expiry", cc.Expiry)
