@@ -107,8 +107,8 @@ var fixtureDefinitions = &Definitions{
 		"ssd":     "Premium SSD",
 	},
 	HardwareProfiles: []string{
-		"virtio2013",
 		"compatibility2013",
+		"virtio2013",
 	},
 	ZoneNames: []string{
 		"manchester",
@@ -122,6 +122,7 @@ const fixtureDefinitionsJSON = `[
         "data": [
             "centos5",
             "centos6",
+            "winstd2012",
             "centos7",
             "jessie",
             "precise",
@@ -130,7 +131,6 @@ const fixtureDefinitionsJSON = `[
             "utopic",
             "vivid",
             "wheezy",
-            "winstd2012",
             "winweb2k8r2"
         ]
     },
@@ -153,11 +153,11 @@ const fixtureDefinitionsJSON = `[
         "id": "distribution_descriptions",
         "data": {
             "centos5": "CentOS 5 (64 bit)",
+            "symbiosis": "Symbiosis 7 (64 bit)",
             "centos6": "CentOS 6 (64 bit)",
             "centos7": "CentOS 7 (64 bit)",
             "jessie": "Debian 8 (64 bit)",
             "precise": "Ubuntu 12.04 (64 bit)",
-            "symbiosis": "Symbiosis 7 (64 bit)",
             "trusty": "Ubuntu 14.04 (64 bit)",
             "utopic": "Ubuntu 14.10 (64 bit)",
             "vivid": "Ubuntu 15.04 (64 bit)",
@@ -169,9 +169,9 @@ const fixtureDefinitionsJSON = `[
     {
         "id": "storage_grade_descriptions",
         "data": {
+            "ssd": "Premium SSD",
             "archive": "Archive storage",
-            "sata": "Standard SSD",
-            "ssd": "Premium SSD"
+            "sata": "Standard SSD"
         }
     },
     {

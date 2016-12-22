@@ -14,9 +14,18 @@ And if you want to work on the develop branch, probably the easiest way is to `g
 
 `cmd/bytemark` is where 'main' is, so `cd` into there to build or use the full import path, as with go get.
 
-IME `make test` is a bit better to use than `go test ./...` 'cause `go test` outputs about everything in the vendor dir. But if the code structure changes then `go test ./...` will always test everything, so maybe that's better.
-
 Feel free to open issues & merge requests on the github repo at http://github.com/BytemarkHosting/bytemark-client 
+
+Compatibility Guarantee
+=======================
+
+In go, semantic versioning is pretty hard. We guarantee that the following types of changes will not occur between minor versions within the lib package and all packages under its path (e.g. lib/brain)
+
+* Publicly-exported functions and methods will not be removed, renamed, nor will their prototypes change.
+* Publicly-exported struct-type fields will not be removed, renamed, nor will their types change.
+* Publicly-exported variables and constants will not be removed, renamed, nor will their types change.
+
+It's suggested that you avoid using struct embedding or interface composition with multiple types if any of those types are from bytemark-client/lib or any packages inside - bytemark-client's types are wont to have extra fields and methods added.
 
 Breaking API change
 ===================

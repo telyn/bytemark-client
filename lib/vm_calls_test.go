@@ -281,12 +281,12 @@ func TestCreateVirtualMachine(t *testing.T) {
 				Discs: []brain.Disc{
 					{
 						StorageGrade: "sata",
-						Label:        "vda",
+						Label:        "disc-1",
 					},
 					{
 						Size:         25600,
 						StorageGrade: "archive",
-						Label:        "vdb",
+						Label:        "disc-2",
 					},
 					{
 						Label:        "gav",
@@ -294,7 +294,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 					},
 					{
 						StorageGrade: "sata",
-						Label:        "vdd",
+						Label:        "disc-4",
 					},
 				},
 			},
@@ -354,5 +354,56 @@ func TestCreateVirtualMachine(t *testing.T) {
 		if err != nil && !test.ExpectErr {
 			t.Fatal(err)
 		}
+	}
+}
+
+func TestSetVirtualMachineCDROM(t *testing.T) {
+	testurl := "test-cdrom-url"
+	expected := map[string]interface{}{
+		"cdrom_url": testurl,
+	}
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/accounts/test-account/groups/test-group/virtual_machines/test-vm" {
+				bytes, err := ioutil.ReadAll(req.Body)
+				if err != nil {
+					t.Fatal(err)
+				}
+				unmarshalled := make(map[string]interface{})
+				err = json.Unmarshal(bytes, &unmarshalled)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if !reflect.DeepEqual(expected, unmarshalled) {
+					t.Error("unmarshalled map did not deep-equal what was expected.")
+				} else {
+					_, err = w.Write(bytes)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
+
+		}),
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = client.SetVirtualMachineCDROM(&VirtualMachineName{
+		VirtualMachine: "test-vm",
+		Group:          "test-group",
+		Account:        "test-account",
+	}, testurl)
+	if err != nil {
+		t.Fatal(err)
 	}
 }

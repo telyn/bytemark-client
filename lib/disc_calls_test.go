@@ -45,11 +45,11 @@ func TestLabelDisc(t *testing.T) {
 	for _, d := range discs {
 		switch d.ID {
 		case 1:
-			is.Equal("vda", d.Label)
+			is.Equal("disc-1", d.Label)
 		case 2:
 			is.Equal("arch", d.Label)
 		case 3:
-			is.Equal("vdc", d.Label)
+			is.Equal("disc-3", d.Label)
 		default:
 			fmt.Printf("Unexpected disc ID %d\r\n", d.ID)
 			t.Fail()

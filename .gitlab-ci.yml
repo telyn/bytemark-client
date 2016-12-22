@@ -177,7 +177,7 @@ package-generic-amd64:
 
 package-debian-amd64:
   <<: *package
-  image: telyn/debhelper:jessie
+  image: gitlab.bytemark.co.uk:8443/docker-images/debhelper:jessie
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
@@ -212,7 +212,7 @@ package-rpm-amd64:
 
 package-windows-amd64:
     <<: *package
-    image: telyn/chocolatey
+    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
     script:
     - mkdir -p choco/tools
     - sed -e "s/VERSION/${CI_BUILD_REF_NAME##release-}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
@@ -230,7 +230,7 @@ package-windows-amd64:
 
 .release-job: &release
   stage: release
-  image: telyn/debian-git
+  image: gitlab.bytemark.co.uk:8443/docker-images/debian-git
   before_script:
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$CD_SSH_KEY")
@@ -292,12 +292,12 @@ release-to-brew:
 
 release-to-chocolatey:
   <<: *release
+  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
   before_script:
   - VERSION=${CI_BUILD_REF_NAME##release-}
   - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
   - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y 
-  image: telyn/chocolatey
   dependencies:
   - package-windows-amd64
 

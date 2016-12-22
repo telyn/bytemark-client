@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
 	"strconv"
 )
@@ -18,6 +19,26 @@ func init() {
 These commands set various hardware properties of Bytemark servers. Note that for memory increases, cores and hwprofile to take effect you will need to restart the server.`,
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
+			{
+				Name:      "cdrom",
+				Usage:     "attach a cdrom to your Bytemark Cloud Server",
+				UsageText: "bytemark attach cdrom <server> <cdurl>",
+				Description: `attach a cdrom to your Bytemark Cloud Server
+
+This command allows you to add a cdrom to your Bytemark server. The CD must be publicly available over HTTP in order to be attached.`,
+				Action: With(VirtualMachineNameProvider, func(c *Context) error {
+					url, err := c.NextArg()
+					if err != nil {
+						return err
+					}
+					err = global.Client.SetVirtualMachineCDROM(c.VirtualMachineName, url)
+					if _, ok := err.(lib.InternalServerError); ok {
+						return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
+					}
+					return err
+
+				}),
+			},
 			{
 				Name:        "cores",
 				Usage:       "set the number of CPU cores on a Bytemark cloud server",
