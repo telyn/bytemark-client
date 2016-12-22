@@ -29,7 +29,7 @@ func TestGetSPPToken(t *testing.T) {
 				t.Fatalf("Unexpected HTTP request to billing%s", req.URL.Path)
 			}
 			arr := req.Header["Authorization"]
-			if arr == nil || len(arr) == 0 {
+			if len(arr) == 0 {
 				t.Errorf("Call to /accounts/spp_token must be authed in GetSPPToken")
 			} else if arr[0] != "Token token=working-auth-token" {
 				t.Errorf("GetSPPToken must be authed with a regular token, but got '%s'", arr[0])
@@ -131,7 +131,7 @@ func TestCreateCreditCard(t *testing.T) {
 				t.Fatalf("Unexpected HTTP request to billing%s", req.URL.Path)
 			}
 			arr := req.Header["Authorization"]
-			if arr == nil || len(arr) == 0 {
+			if len(arr) == 0 {
 				t.Errorf("Call to /accounts/spp_token must be authed in GetSPPToken")
 			} else if arr[0] != "Token token=working-auth-token" {
 				t.Errorf("GetSPPToken must be authed with a regular token, but got '%s'", arr[0])
