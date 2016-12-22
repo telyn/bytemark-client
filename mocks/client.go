@@ -4,6 +4,7 @@ import (
 	"fmt"
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	mock "github.com/maraino/go-mock"
@@ -56,6 +57,10 @@ func (c *Client) GetSessionFactors() []string {
 	r := c.Called()
 	ar := r.Get(0)
 	return ar.([]string)
+}
+func (c *Client) GetSPPToken(cc spp.CreditCard, owner *billing.Person) (string, error) {
+	r := c.Called(cc, owner)
+	return r.String(0), r.Error(1)
 }
 func (c *Client) SetDebugLevel(level int) {
 	c.Called(level)
@@ -120,6 +125,10 @@ func (c *Client) GetUser(name string) (*brain.User, error) {
 
 func (c *Client) CreateCreditCard(cc *spp.CreditCard) (string, error) {
 	r := c.Called(cc)
+	return r.String(0), r.Error(1)
+}
+func (c *Client) CreateCreditCardWithToken(cc *spp.CreditCard, token string) (string, error) {
+	r := c.Called(cc, token)
 	return r.String(0), r.Error(1)
 }
 func (c *Client) CreateAccount(acc *lib.Account) (*lib.Account, error) {

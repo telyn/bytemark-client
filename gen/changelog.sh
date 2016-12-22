@@ -5,12 +5,17 @@ CHANGELOG=$DIR/../doc/changelog
 VERSIONGO=$DIR/../lib/version.go
 MANFILE=$DIR/../doc/bytemark.1
 
+DATE=date
+if which gdate > /dev/null; then
+    DATE=gdate
+fi
+
 mv $CHANGELOG $CHANGELOG.bak
 head -n 1 $CHANGELOG.bak > $CHANGELOG
 echo "" >> $CHANGELOG
 git log --oneline master..develop | sed -e 's/^[a-f0-9]* /  * /' >> $CHANGELOG
 echo "" >> $CHANGELOG
-echo " -- `git config --get user.name` <`git config --get user.email`>  `gdate -R`" >> $CHANGELOG
+echo " -- `git config --get user.name` <`git config --get user.email`>  `$DATE -R`" >> $CHANGELOG
 echo "" >> $CHANGELOG
 cat $CHANGELOG.bak >> $CHANGELOG
 vim $CHANGELOG

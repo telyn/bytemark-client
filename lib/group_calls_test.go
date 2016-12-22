@@ -38,12 +38,11 @@ func TestCreateGroup(t *testing.T) {
 		}
 
 	}
-	client, authServer, brain, billing, err :=
-		mkTestClientAndServers(http.HandlerFunc(groupHandler), mkNilHandler(t))
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(groupHandler),
+	})
 
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
+	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,12 +74,11 @@ func TestDeleteGroup(t *testing.T) {
 		}
 
 	}
-	client, authServer, brain, billing, err :=
-		mkTestClientAndServers(http.HandlerFunc(groupHandler), mkNilHandler(t))
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(groupHandler),
+	})
+	defer servers.Close()
 
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,12 +117,12 @@ func TestGetGroup(t *testing.T) {
 			}
 		}
 	}
-	client, authServer, brain, billing, err :=
-		mkTestClientAndServers(http.HandlerFunc(groupHandler), mkNilHandler(t))
+	client, servers, err :=
+		mkTestClientAndServers(t, Handlers{
+			brain: http.HandlerFunc(groupHandler),
+		})
+	defer servers.Close()
 
-	defer authServer.Close()
-	defer brain.Close()
-	defer billing.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,12 +139,14 @@ func TestGetGroup(t *testing.T) {
 	is.NotNil(group)
 	is.Nil(err)
 
-	authServer.Close()
-	brain.Close()
-	billing.Close()
+	servers.Close()
 
-	client, authServer, brain, billing, err =
-		mkTestClientAndServers(http.HandlerFunc(groupHandler), http.HandlerFunc(billingHandler))
+	client, servers, err = mkTestClientAndServers(t, Handlers{
+		brain:   http.HandlerFunc(groupHandler),
+		billing: http.HandlerFunc(billingHandler),
+	})
+	// already used defer above
+
 	if err != nil {
 		t.Fatal(err)
 	}
