@@ -54,8 +54,14 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			Usage:       "deletes the specified key",
 			UsageText:   "bytemark delete key [--user <user>] <key>",
 			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "user",
+					Usage: "Which user to delete the key from. Defaults to the username you log in as.",
+				},
+			},
 			Action: With(func(c *Context) (err error) {
-				user := global.Config.GetIgnoreErr("user")
+				user := c.String("user")
 
 				key := strings.Join(c.Args(), " ")
 				if key == "" {
