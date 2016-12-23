@@ -252,6 +252,10 @@ func ProcessError(err error, message ...string) ExitCode {
 			errorMessage = err.Error()
 
 		default:
+			if fmt.Sprintf("%T", err) == "*errors.errorString" {
+				errorMessage = err.Error()
+				exitCode = ExitCodeBadInput // just going with BadInput because most errorStrings come from auth or validation functions.
+			}
 			msg := err.Error()
 			if strings.Contains(msg, "Badly-formed parameters") {
 				exitCode = ExitCodeInvalidCredentials
