@@ -43,7 +43,6 @@ func validateAccountForConfig(c *Context, name string) (err error) {
 func validateGroupForConfig(c *Context, name string) (err error) {
 	// we can't just use GroupProvider because it expects NextArg() to be the account name - there's no way to pass one in.
 	groupName := global.Client.ParseGroupName(name, global.Config.GetGroup())
-	fmt.Printf("%#v\r\n", groupName)
 	c.GroupName = groupName
 	err = GroupProvider(c)
 	if err != nil {
