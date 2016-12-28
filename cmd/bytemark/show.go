@@ -112,6 +112,11 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Description: `Currently the only details are what SSH keys are authorised for this user`,
 			Action: With(UserProvider, func(c *Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
+				err := EnsureAuth()
+				if err != nil {
+					return err
+				}
+
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
 				}
