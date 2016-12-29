@@ -94,7 +94,7 @@ build-manpage:
   stage: build
   image: debian:jessie
   before_script:
-  - apt-get update && apt-get install --no-install-recommends -y asciidoc docbook-xml libxml2-utils
+  - apt-get update && apt-get install --no-install-recommends -y asciidoc docbook-xml libxml2-utils xsltproc
   script:
   - cd doc
   - a2x --doctype manpage --format manpage bytemark.asciidoc
