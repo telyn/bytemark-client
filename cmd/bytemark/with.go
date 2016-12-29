@@ -178,12 +178,11 @@ func UserProvider(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	c.User, err = global.Client.GetUser(*c.UserName)
-	return
-
 	if err = AuthProvider(c); err != nil {
 		return
 	}
+	c.User, err = global.Client.GetUser(*c.UserName)
+	return
 }
 
 // VirtualMachineNameProvider reads the NextArg, parses it as a VirtualMachineName and attaches it to the Context
