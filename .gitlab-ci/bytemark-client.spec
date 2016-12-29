@@ -31,7 +31,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root)
 %{_bindir}/bytemark
-%{_mandir}/man1
+%{_mandir}/man1/bytemark.1*
 
 %changelog
 
