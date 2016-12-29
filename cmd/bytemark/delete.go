@@ -62,6 +62,9 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			},
 			Action: With(func(c *Context) (err error) {
 				user := c.String("user")
+				if user == "" {
+					user = global.Config.GetIgnoreErr("user")
+				}
 
 				key := strings.Join(c.Args(), " ")
 				if key == "" {
