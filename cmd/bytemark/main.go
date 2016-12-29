@@ -232,6 +232,8 @@ func prepConfig() (args []string) {
 	configDir := flags.String("config-dir", "", "")
 	help := flags.Bool("help", false, "")
 	h := flags.Bool("h", false, "")
+	version := flags.Bool("version", false, "")
+	v := flags.Bool("v", false, "")
 	flags.Bool("yubikey", false, "")
 	flags.Int("debug-level", 0, "")
 	flags.String("user", "", "")
@@ -266,6 +268,9 @@ func prepConfig() (args []string) {
 	if len(flargs) > 0 && flargs[0] == "help" {
 		copy(args[1:], flargs[1:])
 		args[len(args)-1] = "--help"
+	} else if len(flargs) > 0 && flargs[0] == "version" {
+		copy(args[1:], flargs[1:])
+		args[len(args)-1] = "--version"
 	} else {
 		copy(args[1:], flargs)
 	}
@@ -277,6 +282,11 @@ func prepConfig() (args []string) {
 		helpArgs[len(args)] = "--help"
 		copy(helpArgs, args)
 		args = helpArgs
+	} else if *version || *v {
+		versionArgs := make([]string, len(args)+1)
+		versionArgs[len(args)] = "--version"
+		copy(versionArgs, args)
+		args = versionArgs
 	}
 	return
 }
