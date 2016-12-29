@@ -1,4 +1,35 @@
-bytemark-client (2.0.1) UNRELEASED; urgency=low
+bytemark-client (2.1) UNRELEASED; urgency=low
+
+  New features:
+    * `bytemark set cdrom` has been added to set the URL of an ISO for a server.
+    * bytemark config set now validates values - account name typos should be
+      a thing of the past :-)
+
+  Changes:
+    * RPM packages are now signed
+    * man page has been made nicer.
+    * man page is the same on macOS as Linux now.
+    * Disc labels are now generated as 'disc-N', where N is the index of the
+      disc or one larger than the largest other disc with a 'disc-N' label,
+      whichever is larger. This matches the panel's behaviour.
+    * The --no-discs flag on create server has been removed due to the endpoint
+      no longer supporting it.
+    * The list of images in `bytemark images` and `bytemark storage grades` are
+      now sorted.
+
+  Fixes:
+    * bytemark delete key now accepts the --user flag instead of producing an
+      error
+    * bytemark show user now works instead of erroring.
+    * -v | --version now shows the current version instead of producing an error
+    * RPM package now contains the man page, instead of 2 copies of the client
+      itself.
+    * Users no longer get asked to file a bug report when they enter invalid
+      login details
+
+ -- telyn <telyn@bytemark.co.uk>  Thu, 29 Dec 2016 11:40:03 +0000
+
+bytemark-client (2.1) UNRELEASED; urgency=low
 
   Changes:
     * Registering a card (such as during signup) now sends a token to SPP.
