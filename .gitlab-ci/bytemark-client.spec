@@ -21,7 +21,7 @@ modify your account details.
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_mandir}/man1
 install -p -m 755 %{SOURCE0} %{buildroot}%{_bindir}
-install -p -m 644 %{SOURCE0} %{buildroot}%{_mandir}/man1
+install -p -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man1
 
 %check
 
