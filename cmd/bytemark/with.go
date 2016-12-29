@@ -171,10 +171,6 @@ func UserNameProvider(c *Context) (err error) {
 
 // UserProvider calls UserNameProvider, gets the User from the brain, and attaches it to the Context.
 func UserProvider(c *Context) (err error) {
-	if err = AuthProvider(c); err != nil {
-		return
-	}
-
 	if c.User != nil {
 		return
 	}
@@ -184,6 +180,10 @@ func UserProvider(c *Context) (err error) {
 	}
 	c.User, err = global.Client.GetUser(*c.UserName)
 	return
+
+	if err = AuthProvider(c); err != nil {
+		return
+	}
 }
 
 // VirtualMachineNameProvider reads the NextArg, parses it as a VirtualMachineName and attaches it to the Context
