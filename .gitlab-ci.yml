@@ -50,14 +50,6 @@ release-check:
       echo "Mismatch between branch name and lib/version.go version"
       exit 1
     fi
-    DATE="$(date +"%e %B %Y")"
-    REGEX='^.TH BYTEMARK 1 "'$DATE'" "Bytemark Client Version '"$VERSION"'"'
-    echo $DATE $VERSION
-    echo $REGEX
-    if ! grep "$REGEX" doc/bytemark.1 > /dev/null; then
-      echo "Mismatch between branch name and man page version"
-      exit 1
-    fi
   only:
   - /^release-\d+(\.\d+)+$/
 
@@ -96,6 +88,20 @@ test:
   artifacts:
     paths:
     - bytemark-$GOARCH-$GOOS
+    expire_in: '1 month'
+
+build-manpage:
+  stage: build
+  image: debian:jessie
+  before_script:
+  - apt-get update && apt-get install --no-install-recommends asciidoc
+  script:
+  - cd doc
+  - a2x --doctype manpage --format manpage bytemark.asciidoc
+  - sed -i -e "1 s/^'/./" bytemark.1
+  artifacts:
+    paths:
+    - doc/bytemark.1
     expire_in: '1 month'
 
 build-amd64-linux:
