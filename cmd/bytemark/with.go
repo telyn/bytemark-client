@@ -178,6 +178,9 @@ func UserProvider(c *Context) (err error) {
 	if err != nil {
 		return
 	}
+	if err = AuthProvider(c); err != nil {
+		return
+	}
 	c.User, err = global.Client.GetUser(*c.UserName)
 	return
 }
