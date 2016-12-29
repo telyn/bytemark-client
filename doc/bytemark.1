@@ -1,131 +1,166 @@
-.ig
-bytemark.man
-..
-.\" ---------------------------------------------------------------------------
-.\" Title
-.\" ---------------------------------------------------------------------------
-.TH BYTEMARK 1 "22 December 2016" "Bytemark Client Version 2.0.1"
-.SH NAME
+.\" t
+.\"     Title: bytemark
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 12/29/2016
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "BYTEMARK" "1" "12/29/2016" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
 bytemark \- command\-line client for managing services with Bytemark
-.\" ---------------------------------------------------------------------------
-.SH SYNOPSIS
-.\" ---------------------------------------------------------------------------
-.SY bytemark
-.OP global\ options
-.IR command
-.OP command\ options
-.OP command\ arguments
-.\" ---------------------------------------------------------------------------
-.SH DESCRIPTION
-.\" ---------------------------------------------------------------------------
-\fBbytemark\fR is a command\-line client you can use to interact with Bytemark
-services (\m[blue]\fB\%https://www.bytemark.co.uk/\fR\m[])\&.
+.SH "SYNOPSIS"
+.sp
+\fBbytemark\fR [\fBglobal options\fR] \fIcommand\fR [\fBcommand options\fR] [\fBcommand arguments\fR]
+.SH "DESCRIPTION"
+.sp
+\fBbytemark\fR is a command\-line client you can use to interact with Bytemark services (\fBhttps://www\&.bytemark\&.co\&.uk/\fR)\&.
+.sp
+You can use this software to signup for a new Bytemark account, or to use an existing account\&. You can perform a variety of tasks, such as create a Cloud Server, manage an existing Cloud Server, or connect to a Cloud Server via serial console\&. Get started straight away by running \fBbytemark help\fR\&.
+.sp
+If you\(cqre a programmer, you might also want to integrate with our API (\fBhttps://www\&.bytemark\&.co\&.uk/docs/api/\fR)\&.
+.SH "GLOBAL OPTIONS"
+.sp
+Global options apply to any subsequent command\&.
 .PP
-You can use this software to signup for a new Bytemark account, or to use an
-existing account. You can perform a variety of tasks, such as create a Cloud
-Server, manage an existing Cloud Server, or connect to a Cloud Server via
-serial console.
-.PP
-If you're a programmer, you might also want to integrate with our API
-(\m[blue]\fB\%https://www.bytemark.co.uk/docs/api/\fR\m[])\&.
-.\" ---------------------------------------------------------------------------
-.SH GLOBAL OPTIONS
-.\" ---------------------------------------------------------------------------
-Global options apply to any subsequent command.
-.TP
 \fB\-\-help\fR
-Show usage instructions, including a list of available commands.
-.TP
+.RS 4
+Show usage instructions, including a list of available commands\&.
+.RE
+.PP
 \fB\-\-help\fR \fIcommand\fR
-Show instructions on how to use a specific command.
-.TP
+.RS 4
+Show instructions on how to use a specific command\&.
+.RE
+.PP
 \fB\-\-yubikey\fR
-Use this option if you have a Bytemark-provided Yubikey that you use for
-authentication. You'll be prompted for the one\-time password.
-.TP
+.RS 4
+Use this option if you have a Bytemark\-provided Yubikey that you use for authentication\&. You\(cqll be prompted for the one\-time password\&.
+.RE
+.PP
 \fB\-\-yubikey\-otp\fR \fIstring\fR
-Use this option if you want enter the Yubikey one\-time password on the
-command\-line rather than be prompted for it.
-.TP
+.RS 4
+Use this option if you want enter the Yubikey one\-time password on the command\-line rather than be prompted for it\&.
+.RE
+.PP
 \fB\-\-debug\-level\fR \fInum\fR
-Set the verbosity of debugging information (for troubleshooting purposes).
-.TP
+.RS 4
+Set the verbosity of debugging information (for troubleshooting purposes)\&.
+.RE
+.PP
 \fB\-\-user\fR \fIusername\fR
-Specify the username to use for the subsequent command. This is the same
-username you would use to login to the Bytemark Panel
-(\m[blue]\fB\%https://panel.bytemark.co.uk/\fR\m[])\&.
-.TP
+.RS 4
+Specify the username to use for the subsequent command\&. This is the same username you would use to login to the Bytemark Panel (\fBhttps://panel\&.bytemark\&.co\&.uk/\fR)\&.
+.RE
+.PP
 \fB\-\-account\fR \fIaccount_name\fR
-Specify the account to use for the subsequent command. Most people have a
-single account with the same name as their username, so don't need to use this
-option. However, some people manage Cloud Servers on multiple accounts.
-.TP
-\fB\-\-endpoint\fR \fIURL\fR
-.PD 0
-.TP
-\fB\-\-billing\-endpoint\fR \fIURL\fR
-.PD 0
-.TP
-\fB\-\-auth\-endpoint\fR \fIURL\fR
-.PD
-The default endpoints shouldn't need to be changed, but if for some reason you
-need the client to communicate with different endpoints then you can use these
-options.
-.TP
+.RS 4
+Specify the account to use for the subsequent command\&. Most people have a single account with the same name as their username, so don\(cqt need to use this option\&. However, some people manage Cloud Servers on multiple accounts\&.
+.RE
+.PP
+\fB\-\-endpoint\fR \fIURL\fR, \fB\-\-billing\-endpoint\fR \fIURL\fR, \fB\-\-auth\-endpoint\fR \fIURL\fR
+.RS 4
+The default endpoints shouldn\(cqt need to be changed, but if for some reason you need the client to communicate with different endpoints then you can use these options\&.
+.RE
+.PP
 \fB\-\-config\-dir\fR \fIdir\fR
-The client stores its configuration in \fI$HOME/.bytemark\fR by default. You
-can specify a different directory with this option.
-.\" ---------------------------------------------------------------------------
-.SH COMMANDS
-.\" ---------------------------------------------------------------------------
-There are a variety of commands that let you easily manage your services with
-Bytemark. Get started by running \fBbytemark help\fR.
-.TP
+.RS 4
+The client stores its configuration in $HOME/\&.bytemark by default\&. You can specify a different directory with this option\&.
+.RE
+.SH "COMMANDS"
+.sp
+There are a variety of commands that let you easily manage your services with Bytemark\&. Get started by running \fBbytemark help\fR\&.
+.PP
 \fBhelp\fR
-Show usage instructions, including a list of available commands.
-.TP
-\fBhelp\fR \fICOMMAND\fR
-Show instructions on how to use a specific command.
-.\" ---------------------------------------------------------------------------
-.SH EXAMPLES
-.\" ---------------------------------------------------------------------------
-.TP
-\fBbytemark\fR \fIhelp create\fR
-Show instructions on how to use the \fIcreate\fR command.
-.TP
-\fBbytemark\fR \fIhelp create server\fR
-Show instructions on how to use the \fIcreate server\fR command.
-.TP
-\fBbytemark\fR \fIcreate server --authorized-keys-file\fR ~/.ssh/id_rsa.pub stoneboat.http
-Creates a new Cloud Server called \fIstoneboat\fR in the \fIhttp\fR group. The
-specified public key will be installed to the root user so that you can use it
-to login.
-.TP
-\fBbytemark\fR \fIshow server\fR stoneboat.http
-Show information about the Cloud Server \fIstoneboat\fR in the \fIhttp\fR group.
-.TP
-\fBbytemark\fR \fIshutdown\fR stoneboat.http
-Shutdown a Cloud Server.
-.\" ---------------------------------------------------------------------------
-.SH FILES
-.\" ---------------------------------------------------------------------------
-.TP
-\fI~/.bytemark\fR
-Configuration is stored in this directory by default.
-.TP
-\fI~/.bytemark/debug.log\fR
-This log holds debugging information. If you encounter a problem with this
-software, we might ask you to provide a copy of this file.
-.TP
-\fI~/.bytemark/token\fR
-This is where the time-limited authentication token is stored.
-.\" ---------------------------------------------------------------------------
-.SH AUTHORS
-.\" ---------------------------------------------------------------------------
-This software and associated documentation is developed and maintained by
-Bytemark, primarily by Telyn Z. Roat.
-.\" ---------------------------------------------------------------------------
-.SH REPORTING BUGS
-.\" ---------------------------------------------------------------------------
-Please send an email to \fBsupport@bytemark.co.uk\fR if you encounter any
-problems and we'll be more than happy to assist.
+.RS 4
+Show usage instructions, including a list of available commands\&.
+.RE
+.PP
+\fBhelp command\fR
+.RS 4
+Show instructions on how to use a specific command\&.
+.RE
+.SH "EXAMPLES"
+.PP
+\fBbytemark help create\fR
+.RS 4
+Show instructions on how to use the
+\fIcreate\fR
+command\&.
+.RE
+.PP
+\fBbytemark help create server\fR
+.RS 4
+Show instructions on how to use the
+\fIcreate server\fR
+command\&.
+.RE
+.PP
+\fBbytemark create server \-\-authorized\-keys\-file ~/\&.ssh/id_rsa\&.pub stoneboat\&.http\fR
+.RS 4
+Creates a new Cloud Server called
+\fIstoneboat\fR
+in the
+\fIhttp\fR
+group\&. The specified public key will be installed to the root user so that you can use it to login\&.
+.RE
+.PP
+\fBbytemark show server stoneboat\&.http\fR
+.RS 4
+Show information about the Cloud Server
+\fIstoneboat\fR
+in the
+\fIhttp\fR
+group\&.
+.RE
+.PP
+\fBbytemark shutdown stoneboat\&.http\fR
+.RS 4
+Shutdown the Cloud Server
+\fIstoneboat\fR
+in the
+\fIhttp\fR
+group\&.
+.RE
+.SH "FILES"
+.PP
+\fI~/\&.bytemark\fR
+.RS 4
+Configuration is stored in this directory by default\&.
+.RE
+.PP
+\fI~/\&.bytemark/debug\&.log\fR
+.RS 4
+This log holds debugging information\&. If you encounter a problem with this software, we might ask you to provide a copy of this file\&.
+.RE
+.PP
+\fI~/\&.bytemark/token\fR
+.RS 4
+This is where the time\-limited authentication token is stored\&.
+.RE
+.SH "BUGS"
+.sp
+Please send an email to \fB<\fR\fBsupport@bytemark\&.co\&.uk\fR\fB>\fR if you encounter any problems and we\(cqll be more than happy to assist\&.
+.SH "AUTHORS"
+.sp
+This software and associated documentation is developed and maintained by Bytemark, primarily by Telyn Z\&. Roat\&.

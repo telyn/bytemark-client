@@ -1,0 +1,129 @@
+BYTEMARK(1)
+===========
+:doctype: manpage
+
+
+NAME
+----
+bytemark - command-line client for managing services with Bytemark
+
+
+SYNOPSIS
+--------
+*bytemark* [*global options*] 'command' [*command options*] [*command arguments*]
+
+
+DESCRIPTION
+-----------
+
+*bytemark* is a command-line client you can use to interact with Bytemark
+services (*<https://www.bytemark.co.uk/>*).
+
+You can use this software to signup for a new Bytemark account, or to use an
+existing account. You can perform a variety of tasks, such as create a Cloud
+Server, manage an existing Cloud Server, or connect to a Cloud Server via
+serial console. Get started straight away by running *bytemark help*.
+
+If you're a programmer, you might also want to integrate with our API
+(*<https://www.bytemark.co.uk/docs/api/>*).
+
+
+GLOBAL OPTIONS
+--------------
+Global options apply to any subsequent command.
+
+*--help*::
+    Show usage instructions, including a list of available commands.
+
+*--help* 'command'::
+    Show instructions on how to use a specific command.
+
+*--yubikey*::
+    Use this option if you have a Bytemark-provided Yubikey that you use for
+    authentication. You'll be prompted for the one-time password.
+
+*--yubikey-otp* 'string'::
+    Use this option if you want enter the Yubikey one-time password on the
+    command-line rather than be prompted for it.
+
+*--debug-level* 'num'::
+    Set the verbosity of debugging information (for troubleshooting purposes).
+
+*--user* 'username'::
+    Specify the username to use for the subsequent command. This is the same
+    username you would use to login to the Bytemark Panel
+    (*<https://panel.bytemark.co.uk/>*).
+
+*--account* 'account_name'::
+    Specify the account to use for the subsequent command. Most people have a
+    single account with the same name as their username, so don't need to use
+    this option. However, some people manage Cloud Servers on multiple
+    accounts.
+
+*--endpoint* 'URL', *--billing-endpoint* 'URL', *--auth-endpoint* 'URL'::
+    The default endpoints shouldn't need to be changed, but if for some
+    reason you need the client to communicate with different endpoints then
+    you can use these options.
+
+*--config-dir* 'dir'::
+    The client stores its configuration in $HOME/.bytemark by default. You
+    can specify a different directory with this option.
+
+
+COMMANDS
+--------
+There are a variety of commands that let you easily manage your services with
+Bytemark. Get started by running *bytemark help*.
+
+*help*::
+    Show usage instructions, including a list of available commands.
+
+*help command*::
+    Show instructions on how to use a specific command.
+
+
+EXAMPLES
+---------
+*bytemark help create*::
+    Show instructions on how to use the 'create' command.
+
+*bytemark help create server*::
+    Show instructions on how to use the 'create server' command.
+
+*bytemark create server --authorized-keys-file ~/.ssh/id_rsa.pub stoneboat.http*::
+    Creates a new Cloud Server called 'stoneboat' in the 'http' group. The
+    specified public key will be installed to the root user so that you can
+    use it to login.
+
+*bytemark show server stoneboat.http*::
+    Show information about the Cloud Server 'stoneboat' in the 'http' group.
+
+*bytemark shutdown stoneboat.http*::
+    Shutdown the Cloud Server 'stoneboat' in the 'http' group.
+
+
+FILES
+-----
+'~/.bytemark'::
+    Configuration is stored in this directory by default.
+
+'~/.bytemark/debug.log'::
+    This log holds debugging information. If you encounter a problem with this
+    software, we might ask you to provide a copy of this file.
+
+'~/.bytemark/token'::
+    This is where the time-limited authentication token is stored.
+
+
+BUGS
+----
+Please send an email to *<support@bytemark.co.uk>* if you encounter any
+problems and we'll be more than happy to assist.
+
+
+AUTHORS
+-------
+This software and associated documentation is developed and maintained by
+Bytemark, primarily by Telyn Z. Roat.
+
+
