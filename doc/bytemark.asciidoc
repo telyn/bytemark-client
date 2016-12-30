@@ -60,7 +60,7 @@ Global options apply to any subsequent command.
     this option. However, some people manage Cloud Servers on multiple
     accounts.
 
-*--endpoint* 'URL', *--billing-endpoint* 'URL', *--auth-endpoint* 'URL'::
+*--endpoint* 'URL', *--api-endpoint* 'URL', *--auth-endpoint* 'URL', *--billing-endpoint* 'URL'::
     The default endpoints shouldn't need to be changed, but if for some
     reason you need the client to communicate with different endpoints then
     you can use these options.
