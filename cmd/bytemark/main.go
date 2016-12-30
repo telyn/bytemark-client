@@ -23,6 +23,10 @@ var forceFlag = cli.BoolFlag{
 
 //commands is assembled during init()
 var commands = make([]cli.Command, 0)
+
+//adminCommands is assembled during init() and has the commands that're only available when --admin is specified.
+// it gets merged in to commands
+var adminCommands = make([]cli.Command, 0)
 var global = struct {
 	Config util.ConfigManager
 	Client lib.Client
@@ -33,7 +37,16 @@ func baseAppSetup() (app *cli.App, err error) {
 	app = cli.NewApp()
 	app.Version = lib.Version
 
-	app.Commands = commands
+	// add admin commands if --admin is set
+	wantAdminCmds, err := global.Config.GetBool("admin")
+	if err != nil {
+		return app, err
+	}
+	if wantAdminCmds {
+		app.Commands = mergeCommands(commands, adminCommands)
+	} else {
+		app.Commands = commands
+	}
 	return
 
 }
@@ -235,6 +248,7 @@ func prepConfig() (args []string) {
 	version := flags.Bool("version", false, "")
 	v := flags.Bool("v", false, "")
 	flags.Bool("yubikey", false, "")
+	flags.Bool("admin", false, "")
 	flags.Int("debug-level", 0, "")
 	flags.String("user", "", "")
 	flags.String("account", "", "")
