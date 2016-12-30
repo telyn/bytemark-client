@@ -50,14 +50,6 @@ release-check:
       echo "Mismatch between branch name and lib/version.go version"
       exit 1
     fi
-    DATE="$(date +"%e %B %Y")"
-    REGEX='^.TH BYTEMARK 1 "'$DATE'" "Bytemark Client Version '"$VERSION"'"'
-    echo $DATE $VERSION
-    echo $REGEX
-    if ! grep "$REGEX" doc/bytemark.1 > /dev/null; then
-      echo "Mismatch between branch name and man page version"
-      exit 1
-    fi
   only:
   - /^release-\d+(\.\d+)+$/
 
@@ -98,6 +90,22 @@ test:
     - bytemark-$GOARCH-$GOOS
     expire_in: '1 month'
 
+build-manpage:
+  stage: build
+  image: debian:jessie
+  before_script:
+  - apt-get update && apt-get install -y asciidoc
+  script:
+  - cd doc
+  - a2x --doctype manpage --format manpage bytemark.asciidoc
+  - a2x --doctype manpage --format pdf bytemark.asciidoc
+  - sed -i -e "1 s/^'/./" bytemark.1
+  artifacts:
+    paths:
+    - doc/bytemark.1
+    - doc/bytemark.pdf
+    expire_in: '1 month'
+
 build-amd64-linux:
   <<: *build
   variables:
@@ -133,6 +141,7 @@ build-amd64-windows:
   before_script: []
   dependencies:
   - build-amd64-linux
+  - build-manpage
   only:
   - /^release-\d+(\.\d+)+$/
 
@@ -158,7 +167,7 @@ package-generic-amd64:
       cp $i bytemark
       if echo "$i" | grep -- '-windows$'; then
           mv bytemark bytemark.exe
-          zip $i.zip bytemark.exe doc/bytemark.1 doc/changelog doc/LICENSE.txt
+          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog doc/LICENSE.txt
       else
           tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
       fi
@@ -169,6 +178,7 @@ package-generic-amd64:
   - build-amd64-freebsd
   - build-amd64-openbsd
   - build-amd64-windows
+  - build-manpage
   artifacts:
     paths:
     - "*.zip"
@@ -190,6 +200,7 @@ package-debian-amd64:
     expire_in: "1 month"
   dependencies:
   - build-amd64-linux
+  - build-manpage
 
 
 # if desired, we can use mock to set up a cleanroom build using the cap-sys-admin runner.
@@ -208,6 +219,7 @@ package-rpm-amd64:
     expire_in: "1 month"
   dependencies:
   - build-amd64-linux
+  - build-manpage
 
 
 package-windows-amd64:
