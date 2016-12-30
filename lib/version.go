@@ -1,6 +1,6 @@
 package lib
 
 const (
-	// Version number for bytemark-client
-	Version = "2.0.1"
+	// Version is the version number the client believes it is
+	Version = "2.1"
 )
