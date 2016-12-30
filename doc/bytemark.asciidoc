@@ -38,6 +38,9 @@ Global options apply to any subsequent command.
 *--help* 'command'::
     Show instructions on how to use a specific command.
 
+*--version*::
+    Show the version of this software.
+
 *--yubikey*::
     Use this option if you have a Bytemark-provided Yubikey that you use for
     authentication. You'll be prompted for the one-time password.
