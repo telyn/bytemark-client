@@ -44,6 +44,11 @@ func init() {
 						return ctx.Help("Please specify a key")
 					}
 					key = publicKeyFile.Value
+				} else {
+					publicKeyFile = util.FileFlag{key, ""}
+					if err := publicKeyFile.Set(key); err == nil {
+						key = publicKeyFile.Value
+					}
 				}
 
 				err = global.Client.AddUserAuthorizedKey(user, key)
