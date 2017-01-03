@@ -45,7 +45,7 @@ func init() {
 					}
 					key = publicKeyFile.Value
 				} else {
-					publicKeyFile = util.FileFlag{key, ""}
+					publicKeyFile = util.FileFlag{FileName: key}
 					if err := publicKeyFile.Set(key); err == nil {
 						key = publicKeyFile.Value
 					}
