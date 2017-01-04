@@ -1,13 +1,8 @@
 package lib
 
 import (
-	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"io"
-	"math"
-	"strings"
 	"text/template"
-	"unicode"
 )
 
 const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
@@ -43,7 +38,7 @@ Accounts you can access:
 
 {{ define "group_overview" }}  • {{ .Name }} - {{  pluralize "server" "servers" ( len .VirtualMachines ) }}
 {{ if ( len .VirtualMachines ) le 5 -}}
-{{- range .VirtualMachines }}   {{ template "server_summary" . }}
+{{- range .VirtualMachines }}   {{ call .PrettyPrint $.Writer _medium }}
 {{ end -}}
 {{- end -}}
 {{- end -}}
@@ -61,7 +56,7 @@ Accounts you can access:
 {{- end }}
 
 {{ define "single_account_overview" }}
-{{ template "account_overview" .Account }}
+server_{{ template "account_overview" .Account }}
 {{ end }}
 
 {{ define "full_overview" -}}
@@ -338,6 +333,7 @@ func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, 
 		"Username":       username,
 		"OwnedAccounts":  ownedAccounts,
 		"OtherAccounts":  otherAccounts,
+		"Writer":         wr,
 	}
 
 	err = tmpl.ExecuteTemplate(wr, "full_overview", data)

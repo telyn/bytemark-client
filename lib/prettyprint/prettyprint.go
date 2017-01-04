@@ -1,5 +1,10 @@
 package prettyprint
 
+import (
+	"io"
+	"text/template"
+)
+
 // DetailLevel allows us to specify how much detail we want included when we call PrettyPrint
 type DetailLevel string
 
@@ -19,5 +24,15 @@ const (
 
 // PrettyPrinter is the common interface used to output different entities in a user friendly way
 type PrettyPrinter interface {
-	PrettyPrint(detail DetailLevel) (string, error)
+	PrettyPrint(wr io.Writer, detail DetailLevel) error
+}
+
+// Run is a convenience function for running templates with the standard prettyprint functions
+func Run(wr io.Writer, templates string, templateToExecute string, object interface{}) error {
+	tmpl, err := template.New("virtualmachine").Funcs(templateFuncMap).Parse(templates)
+	if err != nil {
+		return err
+	}
+
+	return tmpl.ExecuteTemplate(wr, templateToExecute, object)
 }
