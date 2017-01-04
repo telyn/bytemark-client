@@ -51,6 +51,10 @@ func init() {
 					}
 				}
 
+				if strings.Contains(key, "PRIVATE KEY") {
+					return ctx.Help("The key needs to be a public key, not a private key")
+				}
+
 				err = global.Client.AddUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key added successfully")
