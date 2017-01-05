@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/cheekybits/is"
 	"testing"
 )
@@ -27,15 +28,7 @@ func TestFormatAccount(t *testing.T) {
 		},
 	}
 
-	err := acc.PrettyPrint(b, "account_name")
-	if err != nil {
-		t.Error(err)
-	}
-	is.Equal(`2402 - test-account`, b.String())
-
-	b.Truncate(0)
-
-	err = FormatAccount(b, &acc, &Account{Name: ""}, "account_overview")
+	err := acc.PrettyPrint(b, prettyprint.Full)
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,19 +1,21 @@
 package prettyprint
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"unicode"
 )
 
 var templateFuncMap = map[string]interface{}{
-	"mibgib": func(size int) string {
-		mg := 'M'
-		if size >= 1024 {
-			size /= 1024
-			mg = 'G'
+	"capitalize": func(str string) string {
+		if len(str) == 0 {
+			return str
 		}
-		return fmt.Sprintf("%d%ciB", size, mg)
+
+		runes := []rune(str)
+		runes[0] = unicode.ToUpper(runes[0])
+		return string(runes)
 	},
 	"gibtib": func(size int) string {
 		// lt is a less than sign if < 1GiB
@@ -29,14 +31,16 @@ var templateFuncMap = map[string]interface{}{
 		}
 		return fmt.Sprintf("%s%d%ciB", lt, size, gt)
 	},
-	"capitalize": func(str string) string {
-		if len(str) == 0 {
-			return str
+	"mibgib": func(size int) string {
+		mg := 'M'
+		if size >= 1024 {
+			size /= 1024
+			mg = 'G'
 		}
-
-		runes := []rune(str)
-		runes[0] = unicode.ToUpper(runes[0])
-		return string(runes)
+		return fmt.Sprintf("%d%ciB", size, mg)
+	},
+	"percentage": func(num int, denom int) string {
+		return fmt.Sprintf("%d%%", int(100*float64(num)/float64(denom)))
 	},
 	"pluralize": func(single string, plural string, num int) string {
 		if num == 1 {
@@ -44,8 +48,13 @@ var templateFuncMap = map[string]interface{}{
 		}
 		return fmt.Sprintf("%d %s", num, plural)
 	},
-	"percentage": func(num int, denom int) string {
-		return fmt.Sprintf("%d%%", int(100*float64(num)/float64(denom)))
+	"prettysprint": func(pp PrettyPrinter, detail DetailLevel) string {
+		b := new(bytes.Buffer)
+		pp.PrettyPrint(b, detail)
+		return b.String()
 	},
 	"join": strings.Join,
 }
+
+// Funcs is not for general usage, only while in transition to PrettyPrint.
+var Funcs = templateFuncMap

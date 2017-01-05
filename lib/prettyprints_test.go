@@ -36,6 +36,7 @@ func TestFormatOverview(t *testing.T) {
 			Groups: []*brain.Group{
 				&gp,
 			},
+			IsDefaultAccount: true,
 		},
 		&Account{
 			BillingID: 2403,

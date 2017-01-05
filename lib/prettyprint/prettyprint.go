@@ -29,7 +29,7 @@ type PrettyPrinter interface {
 
 // Run is a convenience function for running templates with the standard prettyprint functions
 func Run(wr io.Writer, templates string, templateToExecute string, object interface{}) error {
-	tmpl, err := template.New("virtualmachine").Funcs(templateFuncMap).Parse(templates)
+	tmpl, err := template.New("prettyprint").Funcs(templateFuncMap).Parse(templates)
 	if err != nil {
 		return err
 	}

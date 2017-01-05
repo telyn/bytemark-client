@@ -1,8 +1,11 @@
 package lib
 
 import (
+	"io"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // Account represents both the BigV and bmbilling parts of an account.
@@ -15,6 +18,8 @@ type Account struct {
 	CardReference    string          `json:"card_reference"`
 	Groups           []*brain.Group  `json:"groups"`
 	Suspended        bool            `json:"suspended"`
+
+	IsDefaultAccount bool `json:"-"`
 }
 
 func (a *Account) fillBrain(b *brain.Account) {
@@ -36,7 +41,7 @@ func (a *Account) fillBilling(b *billing.Account) {
 }
 
 // CountVirtualMachines returns the number of virtual machines across all the Account's Groups.
-func (a *Account) CountVirtualMachines() (servers int) {
+func (a Account) CountVirtualMachines() (servers int) {
 	for _, g := range a.Groups {
 		servers += len(g.VirtualMachines)
 	}
@@ -44,7 +49,7 @@ func (a *Account) CountVirtualMachines() (servers int) {
 }
 
 // billingAccount copies all the billing parts of the account into a new billingAccount.
-func (a *Account) billingAccount() (b *billing.Account) {
+func (a Account) billingAccount() (b *billing.Account) {
 	b = new(billing.Account)
 	b.ID = a.BillingID
 	b.Owner = a.Owner
@@ -52,4 +57,8 @@ func (a *Account) billingAccount() (b *billing.Account) {
 	b.CardReference = a.CardReference
 	b.Name = a.Name
 	return
+}
+
+func (pp Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	return prettyprint.Run(wr, accountsTemplate, "account"+string(detail), pp)
 }
