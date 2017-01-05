@@ -8,7 +8,7 @@ import (
 
 const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
 
-{{ define "account_bullet" }}• {{ template "account_name" . -}}
+{{ define "account_sgl" }}• {{ template "account_name" . -}}
 {{- if .IsDefaultAccount }} (this is your default account){{ end -}}
 {{- end }}
 
@@ -18,7 +18,7 @@ const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .Bill
   {{- if .OwnedAccounts -}}
     Accounts you own: 
     {{- range .OwnedAccounts }}
-  {{ template "account_bullet" . -}}
+  {{ template "account_sgl" . -}}
     {{ end -}}
   {{- end -}}
 {{- end -}}
@@ -32,7 +32,7 @@ Other accounts you can access:
 Accounts you can access:
 {{- end -}}
 {{- range .OtherAccounts }}
-  {{template "account_bullet" . }}
+  {{template "account_sgl" . }}
 {{- end -}}
 {{- end -}}
 {{- end }}

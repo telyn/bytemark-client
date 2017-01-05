@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
@@ -35,7 +35,10 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					if err != nil {
 						return err
 					}
-					err = lib.FormatAccount(os.Stderr, c.Account, def, "account_overview")
+					if def.BrainID == c.Account.BrainID {
+						c.Account.IsDefaultAccount = true
+					}
+					err = c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
 					if err != nil {
 						return err
 					}
@@ -44,7 +47,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 
 					for _, g := range c.Account.Groups {
 						for _, vm := range g.VirtualMachines {
-							err := lib.FormatVirtualMachine(os.Stderr, vm, lib.TwoLine)
+							err := vm.PrettyPrint(os.Stderr, prettyprint.Medium)
 							log.Output()
 							log.Output()
 							if err != nil {
@@ -78,7 +81,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					log.Output()
 					for _, vm := range c.Group.VirtualMachines {
 
-						err := lib.FormatVirtualMachine(os.Stderr, vm, lib.TwoLine)
+						err := vm.PrettyPrint(os.Stderr, prettyprint.Medium)
 						log.Output()
 						log.Output()
 						if err != nil {
@@ -102,7 +105,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			},
 			Action: With(VirtualMachineProvider, func(c *Context) error {
 				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
-					return lib.FormatVirtualMachine(os.Stderr, c.VirtualMachine, lib.All)
+					return c.VirtualMachine.PrettyPrint(os.Stderr, prettyprint.Full)
 				})
 			}),
 		}, {
