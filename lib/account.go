@@ -60,5 +60,29 @@ func (a Account) billingAccount() (b *billing.Account) {
 }
 
 func (pp Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
+
+{{ define "account_sgl" }}• {{ template "account_name" . -}}
+{{- if .IsDefaultAccount }} (this is your default account){{ end -}}
+{{- end }}
+
+{{ define "group_overview" }}  • {{ .Name }} - {{  pluralize "server" "servers" ( len .VirtualMachines ) }}
+{{ if ( len .VirtualMachines ) le 5 -}}
+{{- range .VirtualMachines }}   {{ prettysprint . "_sgl" }}
+{{ end -}}
+{{- end -}}
+{{- end -}}
+
+{{/* account_overview needs $ to be defined, so use single_account_overview as entrypoint */}}
+{{ define "account_full" }}
+  {{- if .IsDefaultAccount -}}	
+    Your default account ({{ template "account_name" . }})
+  {{- else -}}
+    {{- template "account_name" . -}}
+  {{- end }}
+{{ range .Groups -}}
+    {{ template "group_overview" . -}}
+{{- end -}}
+{{- end }}`
 	return prettyprint.Run(wr, accountsTemplate, "account"+string(detail), pp)
 }

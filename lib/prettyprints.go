@@ -6,11 +6,11 @@ import (
 	"text/template"
 )
 
-const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
-
-{{ define "account_sgl" }}• {{ template "account_name" . -}}
-{{- if .IsDefaultAccount }} (this is your default account){{ end -}}
-{{- end }}
+// FormatOverview outputs the given overview using the named template to the given writer.
+// TODO(telyn): make template choice not a string
+// TODO(telyn): use an actual Overview object?
+func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
+	const overviewTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
 
 {{ define "whoami" }}You are '{{ .Username }}'{{ end }}
 
@@ -18,7 +18,7 @@ const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .Bill
   {{- if .OwnedAccounts -}}
     Accounts you own: 
     {{- range .OwnedAccounts }}
-  {{ template "account_sgl" . -}}
+  {{ prettysprint . "_sgl" -}}
     {{ end -}}
   {{- end -}}
 {{- end -}}
@@ -32,27 +32,8 @@ Other accounts you can access:
 Accounts you can access:
 {{- end -}}
 {{- range .OtherAccounts }}
-  {{template "account_sgl" . }}
+  {{ prettysprint . "_sgl" }}
 {{- end -}}
-{{- end -}}
-{{- end }}
-
-{{ define "group_overview" }}  • {{ .Name }} - {{  pluralize "server" "servers" ( len .VirtualMachines ) }}
-{{ if ( len .VirtualMachines ) le 5 -}}
-{{- range .VirtualMachines }}   {{ prettysprint . "_sgl" }}
-{{ end -}}
-{{- end -}}
-{{- end -}}
-
-{{/* account_overview needs $ to be defined, so use single_account_overview as entrypoint */}}
-{{ define "account_full" }}
-  {{- if .IsDefaultAccount -}}	
-    Your default account ({{ template "account_name" . }})
-  {{- else -}}
-    {{- template "account_name" . -}}
-  {{- end }}
-{{ range .Groups -}}
-    {{ template "group_overview" . -}}
 {{- end -}}
 {{- end }}
 
@@ -67,18 +48,13 @@ Accounts you can access:
 {{- template "extra_accounts" . }}
 
 {{ if .DefaultAccount -}}
-{{- template "account_full" .DefaultAccount }}
+{{- prettysprint .DefaultAccount "_full" }}
 {{ else -}}
 It was not possible to determine your default account. Please set one using bytemark config set account.
 
 {{ end -}}
 {{- end }}
 `
-
-// FormatOverview outputs the given overview using the named template to the given writer.
-// TODO(telyn): make template choice not a string
-// TODO(telyn): use an actual Overview object?
-func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
 	tmpl, err := template.New("accounts").Funcs(prettyprint.Funcs).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {
 			if a == nil || defaultAccount == nil {
@@ -89,7 +65,7 @@ func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, 
 			}
 			return a.Name != "" && a.Name == defaultAccount.Name
 		},
-	}).Parse(accountsTemplate)
+	}).Parse(overviewTemplate)
 	if err != nil {
 		return err
 	}

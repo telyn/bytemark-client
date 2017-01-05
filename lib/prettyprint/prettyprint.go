@@ -19,7 +19,7 @@ const (
 	Full = "_full"
 	// Ridiculous will include all the detail probably no one cares about.
 	// For example: What head a VM is on, what storage pool a disc is in, every note on a head
-	Ridiculous = "_ridiculous"
+	//Ridiculous = "_ridiculous"
 )
 
 // PrettyPrinter is the common interface used to output different entities in a user friendly way
