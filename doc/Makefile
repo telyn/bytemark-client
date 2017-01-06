@@ -1,3 +1,3 @@
-default: bytemark.asciidoc bytemark.1
+bytemark.1: bytemark.asciidoc
 	a2x --doctype manpage --format manpage bytemark.asciidoc
-	sed -i -e "1 s/^'/./" bytemark.1
+	sed -i -e 's/^.\\" t/.\\" t/' bytemark.1

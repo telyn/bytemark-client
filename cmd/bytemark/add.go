@@ -44,6 +44,15 @@ func init() {
 						return ctx.Help("Please specify a key")
 					}
 					key = publicKeyFile.Value
+				} else {
+					publicKeyFile = util.FileFlag{FileName: key}
+					if err := publicKeyFile.Set(key); err == nil {
+						key = publicKeyFile.Value
+					}
+				}
+
+				if strings.Contains(key, "PRIVATE KEY") {
+					return ctx.Help("The key needs to be a public key, not a private key")
 				}
 
 				err = global.Client.AddUserAuthorizedKey(user, key)
