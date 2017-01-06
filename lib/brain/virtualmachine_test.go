@@ -1,7 +1,9 @@
 package brain
 
 import (
+	"bytes"
 	"encoding/json"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/cheekybits/is"
 	"net"
 	"reflect"
@@ -199,5 +201,67 @@ func TestVMJSON(t *testing.T) {
 		if !reflect.DeepEqual(test.expected, unmarshalled) {
 			t.Fatalf("TestVMJSON #%d failed.\r\nEXPECTED\r\n%#v\r\nACTUAL\r\n%#v", i, test.expected, unmarshalled)
 		}
+	}
+}
+
+func TestFormatVM(t *testing.T) {
+	is := is.New(t)
+	b := new(bytes.Buffer)
+	vm, _, _ := getFixtureVMWithManyIPs()
+
+	tests := []struct {
+		in     VirtualMachine
+		detail prettyprint.DetailLevel
+		expt   string
+	}{
+		{
+			in:     vm,
+			detail: prettyprint.SingleLine,
+			expt:   " ▸ valid-vm.default (powered on) in Default",
+		},
+		{
+			in:     vm,
+			detail: prettyprint.Medium,
+			expt:   " ▸ valid-vm.default (powered on) in Default\n   192.168.1.16 - 1 core, 1MiB, 25GiB on 1 disc",
+		},
+		{
+			in:     vm,
+			detail: prettyprint.Full,
+			expt: ` ▸ valid-vm.default (powered on) in Default
+   192.168.1.16 - 1 core, 1MiB, 25GiB on 1 disc
+
+    discs:
+      •  - 25GiB, sata grade
+
+    ips:
+      • 192.168.1.16
+      • 192.168.1.22
+      • 192.168.2.1
+      • 192.168.5.34
+      • fe80::10
+      • fe80::100
+      • fe80::1:1
+      • fe80::2:1
+`,
+		},
+		{
+			in:     VirtualMachine{},
+			detail: "_discs",
+			expt:   "",
+		},
+		{
+			in:     VirtualMachine{},
+			detail: "_spec",
+			expt:   "   <nil> - 0 cores, 0MiB, no discs",
+		},
+	}
+
+	for _, test := range tests {
+		b.Truncate(0)
+		err := test.in.PrettyPrint(b, test.detail)
+		if err != nil {
+			t.Error(err)
+		}
+		is.Equal(test.expt, b.String())
 	}
 }

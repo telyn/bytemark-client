@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
@@ -310,7 +310,7 @@ func createServer(c *Context) (err error) {
 	groupName := c.VirtualMachineName.GroupName()
 
 	log.Log("The following server will be created:")
-	err = lib.FormatVirtualMachineSpec(os.Stderr, groupName, &spec, "specfull")
+	err = spec.PrettyPrint(os.Stderr, prettyprint.Full)
 	if err != nil {
 		return err
 	}
@@ -331,7 +331,7 @@ func createServer(c *Context) (err error) {
 	}
 	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
 		log.Log("cloud server created successfully")
-		err = lib.FormatVirtualMachine(os.Stderr, vm, "server_full")
+		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
 		if err != nil {
 			return
 		}

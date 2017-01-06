@@ -36,12 +36,21 @@ func init() {
 					return err
 				}
 			} else {
+
 				def, err = global.Client.GetDefaultAccount()
 				if err != nil {
 					return err
 				}
 			}
 
+			// TODO(telyn) refactor this to be somewhere else (ideally GetAccount/GetAccounts would fill in IsDefaultAccount automatically)
+			for _, acc := range allAccs {
+				if acc.Name != "" && def.Name != "" && acc.Name == def.Name {
+					acc.IsDefaultAccount = true
+				} else if acc.BillingID != 0 && def.BillingID != 0 && acc.BillingID == def.BillingID {
+					acc.IsDefaultAccount = true
+				}
+			}
 			return lib.FormatOverview(os.Stdout, allAccs, def, global.Client.GetSessionUser())
 
 		}),

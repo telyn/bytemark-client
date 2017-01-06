@@ -167,6 +167,7 @@ func (c *bytemarkClient) getDefaultBillingAccount() (*billing.Account, error) {
 // not a bigv_subscription_account on the billing account, and returns nil
 func (c *bytemarkClient) GetDefaultAccount() (acc *Account, err error) {
 	acc = new(Account)
+	acc.IsDefaultAccount = true
 	billAcc, err := c.getDefaultBillingAccount()
 	log.Debugf(log.LvlMisc, "billAcc: %#v, err: %v\r\n", billAcc, err)
 	if err != nil {
