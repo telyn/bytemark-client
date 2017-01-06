@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"io/ioutil"
 	"net"
+	"os"
 	"strings"
 	"testing"
 )
@@ -15,22 +17,61 @@ func TestAddKeyCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
-
-	err := global.App.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
+	err := ioutil.WriteFile("testkey.pub", []byte("ssh-rsa aaaaawhartevervAsde fake key"), 0600)
+	if err != nil {
+		t.Error(err)
+	}
+	err = ioutil.WriteFile("testkey", []byte("-----BEGIN RSA PRIVATE KEY-----\nfake key\n-----END RSA PRIVATE KEY-----"), 0600)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if ok, err := config.Verify(); !ok {
-		t.Fatal(err)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+	err = global.App.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
+	if err != nil {
+		t.Error(err)
 	}
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
+
 	c.Reset()
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+	err = global.App.Run([]string{"bytemark", "add", "key", "--user", "test-user", "testkey.pub"})
+	if err != nil {
+		t.Error(err)
+	}
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+
+	c.Reset()
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+	err = global.App.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey.pub"})
+	if err != nil {
+		t.Error(err)
+	}
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+
+	c.Reset()
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	err = global.App.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey"})
+	if err == nil {
+		t.Error("Expected an error")
+	}
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+
+	_ = os.Remove("testkey.pub")
+	_ = os.Remove("testkey")
 }
+
 func TestAddIPCommand(t *testing.T) {
 	config, c := baseTestSetup(t, false)
 
