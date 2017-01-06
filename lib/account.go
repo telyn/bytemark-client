@@ -59,7 +59,8 @@ func (a Account) billingAccount() (b *billing.Account) {
 	return
 }
 
-func (pp Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+// PrettyPrint writes an overview of this account out to the given writer.
+func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	const accountsTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
 
 {{ define "account_sgl" }}• {{ template "account_name" . -}}
@@ -84,5 +85,5 @@ func (pp Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) erro
     {{ template "group_overview" . -}}
 {{- end -}}
 {{- end }}`
-	return prettyprint.Run(wr, accountsTemplate, "account"+string(detail), pp)
+	return prettyprint.Run(wr, accountsTemplate, "account"+string(detail), a)
 }

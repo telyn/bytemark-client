@@ -16,9 +16,9 @@ type VirtualMachineSpec struct {
 	IPs            *IPSpec         `json:"ips,omitempty"`
 }
 
-// FormatVirtualMachineSpec outputs the given vm spec using the named template to the given writer.
+// PrettyPrint outputs a human-readable spec to the given writer.
 // TODO(telyn): rewrite using templates
-func (pp VirtualMachineSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+func (spec VirtualMachineSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	output := make([]string, 0, 10)
 	output = append(output, fmt.Sprintf("Name: '%s'", pp.VirtualMachine.Name))
 	s := ""

@@ -36,7 +36,8 @@ type VirtualMachine struct {
 	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
 }
 
-func (pp VirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+// PrettyPrint outputs a nice human-readable overview of the server to the given writer.
+func (vm VirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	const template = `{{ define "server_sgl" }} ▸ {{.ShortName }} ({{ if .Deleted }}deleted{{ else if .PowerOn }}powered on{{else}}powered off{{end}}) in {{capitalize .ZoneName}}{{ end }}
 {{ define "server_spec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{ if .Discs}}{{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ else }}no discs{{ end }}{{ end }}
 
@@ -67,7 +68,7 @@ func (pp VirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLeve
 {{ template "server_discs" . -}}
 {{- template "server_ips" . }}
 {{ end }}`
-	return prettyprint.Run(wr, template, "server"+string(detail), pp)
+	return prettyprint.Run(wr, template, "server"+string(detail), vm)
 
 }
 
