@@ -163,6 +163,7 @@ func connectSerialConsole(vm *brain.VirtualMachine, sshargs string) error {
 
 	log.Debugf(5, "%+v\r\n", args)
 
+	/* #nosec */
 	err = syscall.Exec(bin, args, os.Environ())
 	if err != nil {
 		if errno, ok := err.(syscall.Errno); ok {
