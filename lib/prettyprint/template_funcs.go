@@ -48,10 +48,13 @@ var templateFuncMap = map[string]interface{}{
 		}
 		return fmt.Sprintf("%d %s", num, plural)
 	},
-	"prettysprint": func(pp PrettyPrinter, detail DetailLevel) string {
+	"prettysprint": func(pp PrettyPrinter, detail DetailLevel) (string, error) {
 		b := new(bytes.Buffer)
-		pp.PrettyPrint(b, detail)
-		return b.String()
+		err := pp.PrettyPrint(b, detail)
+		if err != nil {
+			return "", err
+		}
+		return b.String(), nil
 	},
 	"join": strings.Join,
 }
