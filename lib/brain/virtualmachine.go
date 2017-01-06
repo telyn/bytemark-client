@@ -1,6 +1,8 @@
 package brain
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"io"
 	"net"
 	"regexp"
 	"strconv"
@@ -34,9 +36,45 @@ type VirtualMachine struct {
 	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
 }
 
+// PrettyPrint outputs a nice human-readable overview of the server to the given writer.
+func (vm VirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const template = `{{ define "server_sgl" }} ▸ {{.ShortName }} ({{ if .Deleted }}deleted{{ else if .PowerOn }}powered on{{else}}powered off{{end}}) in {{capitalize .ZoneName}}{{ end }}
+{{ define "server_spec" }}   {{ .PrimaryIP }} - {{ pluralize "core" "cores" .Cores }}, {{ mibgib .Memory }}, {{ if .Discs}}{{.TotalDiscSize "" | gibtib }} on {{ len .Discs | pluralize "disc" "discs"  }}{{ else }}no discs{{ end }}{{ end }}
+
+{{ define "server_discs" -}}
+{{- if .Discs }}    discs:
+{{- range .Discs }}
+      • {{ .Label }} - {{ gibtib .Size }}, {{ .StorageGrade }} grade
+{{- end }}
+
+{{ end -}}
+{{ end }}
+
+{{ define "server_ips" }}    ips:
+{{- range .AllIPv4Addresses.Sort }}
+      • {{.}}
+{{- end}}
+{{- range .AllIPv6Addresses.Sort }}
+      • {{.}}
+{{- end -}}
+{{- end }}
+
+{{ define "server_medium" }}{{ template "server_sgl" . }}
+{{ template "server_spec" . }}{{ end }}
+
+{{ define "server_full" -}}
+{{ template "server_medium" . }}
+
+{{ template "server_discs" . -}}
+{{- template "server_ips" . }}
+{{ end }}`
+	return prettyprint.Run(wr, template, "server"+string(detail), vm)
+
+}
+
 // TotalDiscSize returns the sum of all disc capacities in the VM for the given storage grade.
 // Provide the empty string to sum all discs regardless of storage grade.
-func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
+func (vm VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
 	total = 0
 	for _, disc := range vm.Discs {
 		if storageGrade == "" || storageGrade == disc.StorageGrade {
@@ -47,19 +85,19 @@ func (vm *VirtualMachine) TotalDiscSize(storageGrade string) (total int) {
 }
 
 // ShortName returns the first two parts of the hostname (i.e. name.group)
-func (vm *VirtualMachine) ShortName() string {
+func (vm VirtualMachine) ShortName() string {
 	bits := strings.SplitN(vm.Hostname, ".", 3)
 	return strings.Join(bits[0:2], ".")
 }
 
 // FullName returns the first three parts of the hostname (i.e. name.group.account)
-func (vm *VirtualMachine) FullName() string {
+func (vm VirtualMachine) FullName() string {
 	bits := strings.SplitN(vm.Hostname, ".", 4)
 	return strings.Join(bits[0:3], ".")
 }
 
 // AllIPv4Addresses flattens all the IPs for a VM into a single IPs (a []*net.IP with some convenience methods)
-func (vm *VirtualMachine) AllIPv4Addresses() (ips IPs) {
+func (vm VirtualMachine) AllIPv4Addresses() (ips IPs) {
 	for _, nic := range vm.NetworkInterfaces {
 		for _, ip := range nic.IPs {
 			if ip != nil && ip.To4() != nil {
@@ -77,7 +115,7 @@ func (vm *VirtualMachine) AllIPv4Addresses() (ips IPs) {
 }
 
 // AllIPv6Addresses flattens all the v6 IPs for a VM into a single IPs (a []*net.IP with some convenience methods)
-func (vm *VirtualMachine) AllIPv6Addresses() (ips IPs) {
+func (vm VirtualMachine) AllIPv6Addresses() (ips IPs) {
 	for _, nic := range vm.NetworkInterfaces {
 		for _, ip := range nic.IPs {
 			if ip != nil && ip.To4() == nil {
@@ -117,7 +155,7 @@ func (vm VirtualMachine) GetDiscLabelOffset() (offset int) {
 }
 
 // PrimaryIP returns the VM's primary IP - the (usually) IPv4 address that was created first.
-func (vm *VirtualMachine) PrimaryIP() net.IP {
+func (vm VirtualMachine) PrimaryIP() net.IP {
 	for _, nic := range vm.NetworkInterfaces {
 		if len(nic.IPs) > 0 {
 			return *nic.IPs[0]

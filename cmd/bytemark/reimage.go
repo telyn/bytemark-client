@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/mattn/go-isatty"
 	"github.com/urfave/cli"
@@ -63,7 +63,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 			}
 
 			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", c.VirtualMachineName.String())
-			err = lib.FormatImageInstall(os.Stderr, imageInstall, "imageinstall")
+			err = imageInstall.PrettyPrint(os.Stderr, prettyprint.Full)
 			if err != nil {
 				return
 			}
