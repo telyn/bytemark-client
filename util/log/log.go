@@ -30,9 +30,9 @@ func Error(stuff ...interface{}) {
 		Error("")
 	}
 	for _, v := range stuff {
-		fmt.Fprintln(os.Stderr, v)
+		_, _ = fmt.Fprintln(os.Stderr, v)
 		if LogFile != nil {
-			fmt.Fprintln(LogFile, v)
+			_, _ = fmt.Fprintln(LogFile, v)
 		}
 	}
 
@@ -40,9 +40,9 @@ func Error(stuff ...interface{}) {
 
 // Errorf formats the string and outputs it to Stderr and Logfile.
 func Errorf(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, format, args...)
+	_, _ = fmt.Fprintf(os.Stderr, format, args...)
 	if LogFile != nil {
-		fmt.Fprintf(LogFile, format, args...)
+		_, _ = fmt.Fprintf(LogFile, format, args...)
 	}
 }
 
@@ -52,18 +52,18 @@ func Log(stuff ...interface{}) {
 		Log("")
 	}
 	for _, v := range stuff {
-		fmt.Fprintln(os.Stderr, v)
+		_, _ = fmt.Fprintln(os.Stderr, v)
 		if LogFile != nil {
-			fmt.Fprintln(LogFile, v)
+			_, _ = fmt.Fprintln(LogFile, v)
 		}
 	}
 }
 
 // Logf formats the string and outputs it to Stderr and Logfile.
 func Logf(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, format, args...)
+	_, _ = fmt.Fprintf(os.Stderr, format, args...)
 	if LogFile != nil {
-		fmt.Fprintf(LogFile, format, args...)
+		_, _ = fmt.Fprintf(LogFile, format, args...)
 	}
 }
 
@@ -76,7 +76,7 @@ func Output(stuff ...interface{}) {
 	for _, v := range stuff {
 		fmt.Println(v)
 		if LogFile != nil {
-			fmt.Fprintln(LogFile, v)
+			_, _ = fmt.Fprintln(LogFile, v)
 		}
 	}
 }
@@ -85,7 +85,7 @@ func Output(stuff ...interface{}) {
 func Outputf(format string, args ...interface{}) {
 	fmt.Printf(format, args...)
 	if LogFile != nil {
-		fmt.Fprintf(LogFile, format, args...)
+		_, _ = fmt.Fprintf(LogFile, format, args...)
 	}
 }
 
@@ -93,10 +93,10 @@ func Outputf(format string, args ...interface{}) {
 func Debug(level int, stuff ...interface{}) {
 	for _, v := range stuff {
 		if level <= DebugLevel {
-			fmt.Fprintln(os.Stderr, v)
+			_, _ = fmt.Fprintln(os.Stderr, v)
 		}
 		if LogFile != nil {
-			fmt.Fprintln(LogFile, v)
+			_, _ = fmt.Fprintln(LogFile, v)
 		}
 	}
 }
@@ -104,9 +104,9 @@ func Debug(level int, stuff ...interface{}) {
 // Debugf formats the string and outputs it to LogFile, and to Stderr if DebugLevel >= level.
 func Debugf(level int, format string, args ...interface{}) {
 	if level <= DebugLevel {
-		fmt.Fprintf(os.Stderr, format, args...)
+		_, _ = fmt.Fprintf(os.Stderr, format, args...)
 	}
 	if LogFile != nil {
-		fmt.Fprintf(LogFile, format, args...)
+		_, _ = fmt.Fprintf(LogFile, format, args...)
 	}
 }
