@@ -247,6 +247,11 @@ func (c *Client) ResizeDisc(name *lib.VirtualMachineName, id string, size int) e
 	return r.Error(0)
 }
 
+func (c *Client) SetDiscIopsLimit(name *lib.VirtualMachineName, id string, size int) error {
+	r := c.Called(name, id, size)
+	return r.Error(0)
+}
+
 func (c *Client) RestartVirtualMachine(name *lib.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)

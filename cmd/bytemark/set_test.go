@@ -175,3 +175,28 @@ func TestSetHWProfileCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestSetDiskIOPSLimit(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "account").Return("test-account")
+	config.When("Get", "token").Return("test-token")
+	config.When("Force").Return(true)
+	config.When("GetIgnoreErr", "yubikey").Return("")
+
+	config.When("GetVirtualMachine").Return(&defVM)
+
+	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	c.When("SetDiscIopsLimit", &name, "disc-label", 100).Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark set disc iops_limit test-server disc-label 100", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
