@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-// PrettyPrintTest represents a test that can be used with RunPrettyPrintTest - it's not for general use outside of testing.
+// Test represents a test that can be used with RunPrettyPrintTest - it's not for general use outside of testing.
 type Test struct {
 	Object   PrettyPrinter
 	Detail   DetailLevel
 	Expected string
 }
-type Tests []Test
 
-func RunTests(t *testing.T, testName string, tests Tests) {
+// RunTests runs the prettyprint tests provided. testName should be the name of the calling function (TestSomethingSomethingPrettyPrint normally)
+func RunTests(t *testing.T, testName string, tests []Test) {
 	var seenFull, seenMedium, seenSingleLine bool
 	for i, test := range tests {
 		var b bytes.Buffer

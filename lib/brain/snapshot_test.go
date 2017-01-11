@@ -9,8 +9,8 @@ import (
 // TODO(telyn): all the prettyprint tests could be replaced with
 
 func TestSnapshotPrettyPrint(t *testing.T) {
-	prettyprint.RunTests(t, "TestSnapshotPrettyPrint", prettyprint.Tests{
-		prettyprint.Test{
+	prettyprint.RunTests(t, "TestSnapshotPrettyPrint", []prettyprint.Test{
+		{
 			Object: brain.Snapshot{
 				Disc: brain.Disc{
 					Label:        "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
@@ -21,7 +21,7 @@ func TestSnapshotPrettyPrint(t *testing.T) {
 			Detail:   prettyprint.SingleLine,
 			Expected: "taylorswift-1989-this-sick-beat-trademark-violations-20170101 (in progress)",
 		},
-		prettyprint.Test{
+		{
 			Object: brain.Snapshot{
 				Disc: brain.Disc{
 					Label:        "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
@@ -32,7 +32,7 @@ func TestSnapshotPrettyPrint(t *testing.T) {
 			Detail:   prettyprint.Medium,
 			Expected: "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
 		},
-		prettyprint.Test{
+		{
 			Object: brain.Snapshot{
 				Disc: brain.Disc{
 					Label:        "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
