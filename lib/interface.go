@@ -118,6 +118,9 @@ type Client interface {
 	//
 
 	CreateSnapshot(server VirtualMachineName, discLabelOrID string) (brain.Snapshot, error)
+	DeleteSnapshot(server VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) error
+	GetSnapshots(server VirtualMachineName, discLabelOrID string) (brain.Snapshots, error)
+	RestoreSnapshot(server VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (brain.Snapshot, error)
 
 	//
 	// USERS
