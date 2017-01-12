@@ -40,7 +40,7 @@ func TestCreateSnapshot(t *testing.T) {
 			if req.Method != "POST" {
 				t.Fatalf("Wrong method %s", req.Method)
 			}
-			w.Write([]byte(`
+			_, err := w.Write([]byte(`
 			{
 				"id": 506,
 				"label": "philtesting-snapshot-20161122134250",
@@ -52,6 +52,9 @@ func TestCreateSnapshot(t *testing.T) {
 				"type": "application/vnd.bigv.disc",
 				"virtual_machine_id": 9
 			}`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		}),
 	})
 	defer servers.Close()
@@ -122,7 +125,7 @@ func TestGetSnapshots(t *testing.T) {
 			if req.Method != "GET" {
 				t.Fatalf("Wrong method %s", req.Method)
 			}
-			w.Write([]byte(`[
+			_, err := w.Write([]byte(`[
 			{
 				"id": 509,
 				"label": "snapshot-509"
@@ -132,6 +135,9 @@ func TestGetSnapshots(t *testing.T) {
 			}
 			]
 			`))
+			if err != nil {
+				t.Fatal(err)
+			}
 		}),
 	})
 	defer servers.Close()
@@ -180,7 +186,10 @@ func TestRestoreSnapshot(t *testing.T) {
 			if restore, ok := obj["restore"]; !ok || !restore {
 				t.Error("Restore not found or was not true")
 			}
-			w.Write([]byte(``)) // TODO(telyn): in the future asking for a restore will return a snapshot (disc state prior to the restore), but not yet
+			_, err = w.Write([]byte(``)) // TODO(telyn): in the future asking for a restore will return a snapshot (disc state prior to the restore), but not yet
+			if err != nil {
+				t.Fatal(err)
+			}
 		}),
 	})
 	defer servers.Close()
