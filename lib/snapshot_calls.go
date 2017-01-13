@@ -26,7 +26,7 @@ func (c *bytemarkClient) DeleteSnapshot(vm VirtualMachineName, discLabelOrID str
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/snapshots/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID, snapshotLabelOrID)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/snapshots/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID, snapshotLabelOrID)
 	if err != nil {
 		return
 	}

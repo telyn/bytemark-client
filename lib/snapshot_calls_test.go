@@ -92,6 +92,9 @@ func TestDeleteSnapshot(t *testing.T) {
 			if req.Method != "DELETE" {
 				t.Fatalf("Wrong method %s", req.Method)
 			}
+			if req.URL.Query().Get("purge") != "true" { // TODO(telyn): should really be parsing this with url.Values and checking that "purge" == "true"
+				t.Errorf("Didn't incude the purge parameter")
+			}
 		}),
 	})
 	defer servers.Close()
