@@ -187,12 +187,3 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log()
 	return nil
 }
-
-/*log.Log("usage: bytemark delete account <account>")
-	log.Log("       bytemark delete disc <server> <label>")
-	log.Log("       bytemark delete group [--recursive] <group>")
-	//log.Log("       bytemark delete user <user>")
-	log.Log("       bytemark delete key [--user=<user>] <public key identifier>")
-	log.Log("       bytemark delete server [--force] [---purge] <server>")
-	log.Log("       bytemark undelete server <server>")
-}*/
