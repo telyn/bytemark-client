@@ -40,7 +40,7 @@ func (ss Snapshots) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (e
 	snapshotsTpl := `
 {{ define "snapshots_full" }}{{ template "snapshots_medium" . }}{{ end }}
 {{ define "snapshots_medium" -}}
-{{- for range . -}}
+{{- range . -}}
 {{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}

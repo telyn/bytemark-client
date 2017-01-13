@@ -18,7 +18,7 @@ func RunTests(t *testing.T, testName string, tests []Test) {
 	for i, test := range tests {
 		var b bytes.Buffer
 
-		err := test.Object.PrettyPrint(&b, SingleLine)
+		err := test.Object.PrettyPrint(&b, test.Detail)
 		if err != nil {
 			t.Errorf("%s %d ERROR: %s", testName, i, err.Error())
 		}

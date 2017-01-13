@@ -9,7 +9,7 @@ import (
 // TODO(telyn): all the prettyprint tests could be replaced with
 
 func TestSnapshotPrettyPrint(t *testing.T) {
-	prettyprint.RunTests(t, "TestSnapshotPrettyPrint", []prettyprint.Test{
+	tests := []prettyprint.Test{
 		{
 			Object: brain.Snapshot{
 				Disc: brain.Disc{
@@ -42,6 +42,49 @@ func TestSnapshotPrettyPrint(t *testing.T) {
 			},
 			Detail:   prettyprint.Full,
 			Expected: "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
+		},
+	}
+	prettyprint.RunTests(t, "TestSnapshotPrettyPrint", tests)
+}
+
+func TestSnapshotsPrettyPrint(t *testing.T) {
+	snapshots := brain.Snapshots{
+		{
+			Disc: brain.Disc{
+				Label:        "kendrick-lamarr-to-pimp-a-butterfly",
+				StorageGrade: "sata",
+			},
+		}, {
+			Disc: brain.Disc{
+				Label:        "kel-valhaal-new-introductory-lectures-on-transcendental-qabala",
+				StorageGrade: "iceberg",
+			},
+		}, {
+			Disc: brain.Disc{
+				Label:        "dimmu-borgir-stormblåst",
+				StorageGrade: "iceberg",
+			},
+		},
+	}
+	prettyprint.RunTests(t, "TestSnapshotsPrettyPrint", []prettyprint.Test{
+		{
+			Object: snapshots,
+			Detail: prettyprint.Full,
+			Expected: `kendrick-lamarr-to-pimp-a-butterfly (in progress)
+kel-valhaal-new-introductory-lectures-on-transcendental-qabala
+dimmu-borgir-stormblåst
+`,
+		}, {
+			Object:   snapshots,
+			Detail:   prettyprint.SingleLine,
+			Expected: "3 snapshots",
+		}, {
+			Object: snapshots,
+			Detail: prettyprint.Medium,
+			Expected: `kendrick-lamarr-to-pimp-a-butterfly (in progress)
+kel-valhaal-new-introductory-lectures-on-transcendental-qabala
+dimmu-borgir-stormblåst
+`,
 		},
 	})
 }
