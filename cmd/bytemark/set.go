@@ -10,6 +10,39 @@ import (
 )
 
 func init() {
+	adminCommands = append(adminCommands, cli.Command{
+		Name:   "set",
+		Action: cli.ShowSubcommandHelp,
+		Subcommands: []cli.Command{
+			{
+				Name:      "disc",
+				Usage:     "disc related admin operations",
+				UsageText: "bytemark --admin set disc command [command options] [arguments...]",
+				Action:    cli.ShowSubcommandHelp,
+				Subcommands: []cli.Command{
+					{
+						Name:      "iops_limit",
+						Usage:     "set the IOPS limit of a disc",
+						UsageText: "bytemark --admin set disc iops_limit <server> <disc> <limit>",
+						Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) error {
+							iopsLimitStr, err := c.NextArg()
+							if err != nil {
+								return err
+							}
+
+							iopsLimit, err := strconv.Atoi(iopsLimitStr)
+							if err != nil || iopsLimit < 1 {
+								return c.Help(fmt.Sprintf("Invalid number for IOPS limit \"%s\"\r\n", iopsLimitStr))
+							}
+
+							return global.Client.SetDiscIopsLimit(c.VirtualMachineName, *c.DiscLabel, iopsLimit)
+						}),
+					},
+				},
+			},
+		},
+	})
+
 	commands = append(commands, cli.Command{
 		Name:      "set",
 		Usage:     "change hardware properties of Bytemark servers",

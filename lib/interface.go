@@ -97,6 +97,7 @@ type Client interface {
 	DeleteDisc(vm *VirtualMachineName, idOrLabel string) error
 	GetDisc(vm *VirtualMachineName, idOrLabel string) (*brain.Disc, error)
 	ResizeDisc(vm *VirtualMachineName, idOrLabel string, size int) error
+	SetDiscIopsLimit(vm *VirtualMachineName, idOrLabel string, iopsLimit int) error
 
 	//
 	// GROUPS
@@ -112,6 +113,15 @@ type Client interface {
 	//
 
 	AddIP(name *VirtualMachineName, ipcr *brain.IPCreateRequest) (brain.IPs, error)
+
+	//
+	// SNAPSHOTS
+	//
+
+	CreateSnapshot(server VirtualMachineName, discLabelOrID string) (brain.Snapshot, error)
+	DeleteSnapshot(server VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) error
+	GetSnapshots(server VirtualMachineName, discLabelOrID string) (brain.Snapshots, error)
+	RestoreSnapshot(server VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (brain.Snapshot, error)
 
 	//
 	// USERS

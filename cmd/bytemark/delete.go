@@ -95,6 +95,12 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				forceFlag,
 			},
 			Action: With(VirtualMachineProvider, deleteServer),
+		}, {
+			Name:        "snapshot",
+			Usage:       "delete the given snapshot",
+			UsageText:   `bytemark delete snapshot <server name> <disc label> <snapshot label>`,
+			Description: "Deletes the given snapshot. Snapshots cannot be recovered after deletion.",
+			Action:      With(VirtualMachineNameProvider, DiscLabelProvider, deleteSnapshot),
 		}},
 	})
 }
@@ -186,4 +192,25 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	}
 	log.Log()
 	return nil
+}
+
+/*log.Log("usage: bytemark delete account <account>")
+	log.Log("       bytemark delete disc <server> <label>")
+	log.Log("       bytemark delete group [--recursive] <group>")
+	//log.Log("       bytemark delete user <user>")
+	log.Log("       bytemark delete key [--user=<user>] <public key identifier>")
+	log.Log("       bytemark delete server [--force] [---purge] <server>")
+	log.Log("       bytemark undelete server <server>")
+}*/
+func deleteSnapshot(c *Context) (err error) {
+	snapshot, err := c.NextArg()
+	if err != nil {
+		return
+	}
+	err = global.Client.DeleteSnapshot(*c.VirtualMachineName, *c.DiscLabel, snapshot)
+	if err != nil {
+		return
+	}
+	log.Logf("Snapshot '%s' deleted successfully", snapshot)
+	return
 }

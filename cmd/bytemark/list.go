@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -112,6 +113,36 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 					listServersInGroup(g)
 				}
 				return
+			}),
+		}, {
+			Name:        "snapshots",
+			Usage:       "list all the snapshots of a server or disc",
+			UsageText:   "bytemark list snapshots <server name> [disc label]",
+			Description: "Lists all the snapshots of all the discs in the given server, or if you also give a disc label, just the snapshots of that disc.",
+			Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
+				label, _ := c.NextArg()
+				var snapshots brain.Snapshots
+
+				if label != "" {
+					snapshots, err = global.Client.GetSnapshots(*c.VirtualMachineName, label)
+					if err != nil {
+						return
+					}
+				} else {
+					err = VirtualMachineProvider(c)
+					if err != nil {
+						return
+					}
+					for _, disc := range c.VirtualMachine.Discs {
+						snaps, err := global.Client.GetSnapshots(*c.VirtualMachineName, disc.Label)
+						if err != nil {
+							return err
+						}
+						// TODO(telyn): loop over snaps, attach disc as ParentDisc
+						snapshots = append(snapshots, snaps...)
+					}
+				}
+				return snapshots.PrettyPrint(global.App.Writer, prettyprint.Full)
 			}),
 		}},
 	})
