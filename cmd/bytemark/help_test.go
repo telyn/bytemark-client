@@ -37,61 +37,67 @@ func TestCommandsComplete(t *testing.T) {
 
 }
 
+type stringPredicate func(string) bool
+
+func checkFlagUsage(f cli.Flag, predicate stringPredicate) bool {
+	switch f := f.(type) {
+	case cli.BoolFlag:
+		return predicate(f.Usage)
+	case cli.BoolTFlag:
+		return predicate(f.Usage)
+	case cli.DurationFlag:
+		return predicate(f.Usage)
+	case cli.Float64Flag:
+		return predicate(f.Usage)
+	case cli.GenericFlag:
+		return predicate(f.Usage)
+	case cli.StringFlag:
+		return predicate(f.Usage)
+	case cli.StringSliceFlag:
+		return predicate(f.Usage)
+	}
+	return false
+}
+
+func isEmpty(s string) bool {
+	return s == ""
+}
+func notEmpty(s string) bool {
+	return s != ""
+}
+
+func firstIsUpper(s string) bool {
+	runes := []rune(s)
+	return unicode.IsUpper(runes[0])
+}
+
+func hasFullStop(s string) bool {
+	return strings.Contains(s, ".")
+}
+
 func TestFlagsHaveUsage(t *testing.T) {
 	traverseAllCommands(commands, func(c cli.Command) {
 		for _, f := range c.Flags {
-			switch f := f.(type) {
-			case cli.BoolFlag:
-				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
-					t.Fail()
-				}
-			case cli.BoolTFlag:
-				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
-					t.Fail()
-				}
-			case cli.DurationFlag:
-				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
-					t.Fail()
-				}
-			case cli.Float64Flag:
-				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
-					t.Fail()
-				}
-			case cli.GenericFlag:
-				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
-					t.Fail()
-				}
-			case cli.StringFlag:
-				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
-					t.Fail()
-				}
-			case cli.StringSliceFlag:
-				if f.Usage == "" {
-					log.Logf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.Name)
-					t.Fail()
-				}
+			if checkFlagUsage(f, isEmpty) {
+				t.Errorf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.GetName())
 			}
 		}
 	})
+	for _, flag := range globalFlags() {
+		if checkFlagUsage(flag, isEmpty) {
+			t.Errorf("Global flag %s doesn't have usage.", flag.GetName())
+		}
+	}
 }
 
 func TestUsageStyleConformance(t *testing.T) {
 	traverseAllCommands(commands, func(c cli.Command) {
-		usage := []rune(c.Usage)
-		if unicode.IsUpper(usage[0]) {
-			log.Logf("Command %s's Usage begins with an uppercase letter. Please change it - Usages should be lowercase.\r\n", c.FullName())
-			t.Fail()
+		if firstIsUpper(c.Usage) {
+			t.Errorf("Command %s's Usage begins with an uppercase letter. Please change it - Usages should be lowercase.\r\n", c.FullName())
 		}
 
-		if strings.Contains(c.Usage, ".") {
-			log.Logf("Command %s's Usage has a full-stop. Get rid of it.\r\n", c.FullName())
-			t.Fail()
+		if hasFullStop(c.Usage) {
+			t.Errorf("Command %s's Usage has a full-stop. Get rid of it.\r\n", c.FullName())
 		}
 	})
 }
