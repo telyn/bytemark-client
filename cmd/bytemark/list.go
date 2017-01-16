@@ -132,11 +132,9 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 			UsageText:   "bytemark list snapshots <server name> [disc label]",
 			Description: "Lists all the snapshots of all the discs in the given server, or if you also give a disc label, just the snapshots of that disc.",
 			Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
-				label, err := c.NextArg()
-				if err != nil {
-					return
-				}
+				label, _ := c.NextArg()
 				var snapshots brain.Snapshots
+
 				if label != "" {
 					snapshots, err = global.Client.GetSnapshots(*c.VirtualMachineName, label)
 					if err != nil {
@@ -152,6 +150,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						if err != nil {
 							return err
 						}
+						// TODO(telyn): loop over snaps, attach disc as ParentDisc
 						snapshots = append(snapshots, snaps...)
 					}
 				}
