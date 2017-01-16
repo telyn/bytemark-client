@@ -6,15 +6,18 @@ import (
 )
 
 var destructiveCommands = [...]string{
-	"create server", // can increase cost
 	"create discs",  // can increase cost
+	"create server", // can increase cost
+	// TODO(telyn): "create snapshot",  // can increase cost
 	"delete server", // can destroy data
-	"delete group",  // can destroy data
-	"delete disc",   // can destroy data
-	"reimage",       // can destroy data
-	"resize disc",   // can increase cost
-	"set memory",    // can increase cost
-	"set cores",     // can increase cost
+	// TODO(telyn): "delete snapshot", // can destroy data
+	"delete group", // can destroy data
+	"delete disc",  // can destroy data
+	"reimage",      // can destroy data
+	"resize disc",  // can increase cost
+	// TODO(telyn):  "restore snapshot", // can increase cost
+	"set memory", // can increase cost
+	"set cores",  // can increase cost
 
 }
 
