@@ -7,18 +7,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-/*
-func (cmds *CommandSet) HelpForList() util.ExitCode {
-	log.Log("bytemark list")
-	log.Log("")
-	log.Log("usage: bytemark list servers [group | account]")
-	log.Log("       bytemark list groups [account]")
-	log.Log("       bytemark list accounts")
-	log.Log("       bytemark list keys [user]")
-	log.Log("       bytemark list discs <server>")
-	return util.E_USAGE_DISPLAYED
-}*/
-
 func listServersInGroup(g *brain.Group) {
 	for _, vm := range g.VirtualMachines {
 		if vm.Deleted {
