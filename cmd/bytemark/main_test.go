@@ -21,7 +21,7 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 	global.Client = client
 	global.Config = config
 
-	app, err := baseAppSetup()
+	app, err := baseAppSetup(globalFlags())
 	if err != nil {
 		t.Fatal(err)
 	}
