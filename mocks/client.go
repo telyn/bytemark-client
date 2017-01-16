@@ -293,3 +293,24 @@ func (c *Client) UndeleteVirtualMachine(name *lib.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
+
+func (c *Client) CreateSnapshot(server lib.VirtualMachineName, discLabelOrID string) (brain.Snapshot, error) {
+	r := c.Called(server, discLabelOrID)
+	snap, _ := r.Get(0).(brain.Snapshot)
+	return snap, r.Error(1)
+}
+func (c *Client) DeleteSnapshot(server lib.VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) error {
+	r := c.Called(server, discLabelOrID, snapshotLabelOrID)
+	return r.Error(0)
+}
+func (c *Client) GetSnapshots(server lib.VirtualMachineName, discLabelOrID string) (brain.Snapshots, error) {
+	r := c.Called(server, discLabelOrID)
+	snaps, _ := r.Get(0).(brain.Snapshots)
+	return snaps, r.Error(1)
+}
+func (c *Client) RestoreSnapshot(server lib.VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (brain.Snapshot, error) {
+	r := c.Called(server, discLabelOrID, snapshotLabelOrID)
+	snap, _ := r.Get(0).(brain.Snapshot)
+
+	return snap, r.Error(1)
+}

@@ -300,3 +300,31 @@ func TestCreateServer(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCreateSnapshot(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, false)
+
+	config.When("Get", "account").Return("test-account")
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+
+	vmname := lib.VirtualMachineName{
+		VirtualMachine: "test-server",
+		Group:          "",
+		Account:        "",
+	}
+	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	c.When("CreateSnapshot", vmname, "test-disc").Return(brain.Snapshot{}, nil).Times(1)
+
+	err := global.App.Run([]string{
+		"bytemark", "create", "snapshot", "test-server", "test-disc",
+	})
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
