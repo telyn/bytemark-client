@@ -94,6 +94,18 @@ func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulte
 		image = "symbiosis"
 		defaulted = true
 	}
+
+	if !c.Bool("force") {
+		var exists bool
+		exists, err = imageExists(image)
+		if err != nil {
+			return
+		}
+		if !exists {
+			err = fmt.Errorf("No visible image '%s' - check your spelling or use --force if certain", image)
+		}
+	}
+
 	if pubkeysFile != "" {
 		if pubkeys != "" {
 			pubkeys += "\r\n" + pubkeysFile
@@ -115,5 +127,19 @@ func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulte
 		FirstbootScript: firstbootScript,
 		PublicKeys:      pubkeys,
 		RootPassword:    rootPassword,
-	}, defaulted, nil
+	}, defaulted, err
+}
+
+func imageExists(name string) (exists bool, err error) {
+	defs, err := global.Client.ReadDefinitions()
+	if err != nil {
+		return
+	}
+	for _, image := range defs.Distributions {
+		if image == name {
+			exists = true
+			return
+		}
+	}
+	return
 }
