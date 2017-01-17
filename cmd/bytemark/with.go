@@ -197,7 +197,6 @@ func VirtualMachineNameProvider(c *Context) (err error) {
 	}
 	name, err := c.NextArg()
 	if err != nil {
-		log.Log(err)
 		return err
 	}
 
