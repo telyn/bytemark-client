@@ -225,7 +225,7 @@ type NilAuthError struct {
 }
 
 func (e NilAuthError) Error() string {
-	return fmt.Sprintf("Authorisation wasn't set up. Please file a bug report!")
+	return fmt.Sprintf("Authorisation wasn't set up.")
 }
 
 // AmbiguousKeyError is returned when a call to DeleteUserAuthorizedKey has an insufficiently unique
