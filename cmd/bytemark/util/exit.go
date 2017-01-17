@@ -31,6 +31,8 @@ const (
 	ExitCodeSuccess = 0
 	// ExitCodeTrappedInterrupt is the exit code returned when an unexpected interrupt like SIGUSR1 was trapped
 	ExitCodeTrappedInterrupt = -1
+	// ExitCodeClientBug is the exit code returned when bytemark-client knows it's faulty
+	ExitCodeClientBug = 1
 	// ExitCodeCantReadConfig is the exit code returned when we couldn't read a config variable from the disk for some reason
 	ExitCodeCantReadConfig = 3
 	// ExitCodeCantWriteConfig is the exit code returned when we couldn't write a config variable to the disk for some reason
@@ -103,10 +105,10 @@ Exit code ranges:
 
     0
 	Nothing went wrong and I feel great!
-
+    1
+    	Problem with the client itself
     3
 	Couldn't read a file from config directory
-
     4
 	Couldn't write a file to config directory
     5
@@ -223,6 +225,9 @@ func ProcessError(err error, message ...string) ExitCode {
 		case lib.NoDefaultAccountError:
 			errorMessage = err.Error()
 			exitCode = ExitCodeNoDefaultAccount
+		case lib.NilAuthError:
+			errorMessage = "Authorization wasn't set up in the client - please file a bug report containing the name of the command you tried to run."
+			exitCode = ExitCodeClientBug
 		case lib.NotAuthorizedError:
 			errorMessage = err.Error()
 			exitCode = ExitCodeActionNotPermitted
