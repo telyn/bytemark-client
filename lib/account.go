@@ -67,12 +67,13 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{- if .IsDefaultAccount }} (this is your default account){{ end -}}
 {{- end }}
 
-{{ define "group_overview" }}  • {{ .Name }} - {{  pluralize "server" "servers" ( len .VirtualMachines ) }}
-{{ if ( len .VirtualMachines ) le 5 -}}
-{{- range .VirtualMachines }}   {{ prettysprint . "_sgl" }}
+{{ define "group_overview" }}  • {{ .Name }} - {{  pluralize "server" "servers" ( len .VirtualMachines ) -}}
+{{- if len .VirtualMachines | gt 6 -}}
+{{- range .VirtualMachines }}
+   {{ prettysprint . "_sgl" -}}
+{{- end -}}
+{{- end }}
 {{ end -}}
-{{- end -}}
-{{- end -}}
 
 {{/* account_overview needs $ to be defined, so use single_account_overview as entrypoint */}}
 {{ define "account_full" }}

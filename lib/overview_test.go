@@ -4,17 +4,16 @@ import (
 	"bytes"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"testing"
 )
 
 func TestFormatOverview(t *testing.T) {
-	is := is.New(t)
 	b := new(bytes.Buffer)
 
 	gp := getFixtureGroup()
 	vm := getFixtureVM()
 	megaGroup := &brain.Group{
+		Name: "mega-group",
 		VirtualMachines: []*brain.VirtualMachine{
 			&vm, &vm, &vm, &vm,
 			&vm, &vm, &vm, &vm,
@@ -23,51 +22,51 @@ func TestFormatOverview(t *testing.T) {
 			&vm, &vm, &vm, &vm,
 		},
 	}
-	accs := []*Account{
-		&Account{
-			BillingID: 2402,
-			Name:      "test-account",
-			Owner: &billing.Person{
-				Username: "test-user",
+	tests := []struct {
+		Accounts       []*Account
+		DefaultAccount *Account
+		Expected       string
+	}{
+		{
+			Accounts: []*Account{
+				&Account{
+					BillingID: 2402,
+					Name:      "test-account",
+					Owner: &billing.Person{
+						Username: "test-user",
+					},
+					TechnicalContact: &billing.Person{
+						Username: "test-user",
+					},
+					Groups: []*brain.Group{
+						&gp,
+					},
+					IsDefaultAccount: true,
+				},
+				&Account{
+					BillingID: 2403,
+					Name:      "test-account-2",
+					Owner: &billing.Person{
+						Username: "test-user",
+					},
+					TechnicalContact: &billing.Person{
+						Username: "test-user",
+					},
+					Groups: []*brain.Group{
+						megaGroup,
+					},
+				},
+				&Account{
+					Name: "test-unowned-account",
+					Groups: []*brain.Group{
+						&gp,
+					},
+				},
+				&Account{
+					BillingID: 2406,
+				},
 			},
-			TechnicalContact: &billing.Person{
-				Username: "test-user",
-			},
-			Groups: []*brain.Group{
-				&gp,
-			},
-			IsDefaultAccount: true,
-		},
-		&Account{
-			BillingID: 2403,
-			Name:      "test-account-2",
-			Owner: &billing.Person{
-				Username: "test-user",
-			},
-			TechnicalContact: &billing.Person{
-				Username: "test-user",
-			},
-			Groups: []*brain.Group{
-				megaGroup,
-			},
-		},
-		&Account{
-			Name: "test-unowned-account",
-			Groups: []*brain.Group{
-				&gp,
-			},
-		},
-		&Account{
-			BillingID: 2406,
-		},
-	}
-
-	err := FormatOverview(b, accs, accs[0], "test-user")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	expctd := `You are 'test-user'
+			Expected: `You are 'test-user'
 
 Accounts you own:
   • 2402 - test-account (this is your default account)
@@ -81,30 +80,20 @@ Your default account (2402 - test-account)
   • default - 1 server
     ▸ valid-vm.default (powered on) in Default
 
-`
-	actual := b.String()
-
-	is.Equal(expctd, actual)
-
-	b.Reset()
-	accs = []*Account{
-		&Account{
-			Name: "test-unowned-account",
-			Groups: []*brain.Group{
-				&gp,
+`,
+		}, {
+			Accounts: []*Account{
+				&Account{
+					Name: "test-unowned-account",
+					Groups: []*brain.Group{
+						&gp,
+					},
+				},
+				&Account{
+					BillingID: 2406,
+				},
 			},
-		},
-		&Account{
-			BillingID: 2406,
-		},
-	}
-
-	err = FormatOverview(b, accs, nil, "test-user")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	expctd = `You are 'test-user'
+			Expected: `You are 'test-user'
 
 Accounts you can access:
   • test-unowned-account
@@ -112,7 +101,52 @@ Accounts you can access:
 
 It was not possible to determine your default account. Please set one using bytemark config set account.
 
-`
-	actual = b.String()
-	IsEqualString(t, expctd, actual)
+`,
+		}, {
+			Accounts: []*Account{
+				&Account{
+					Name: "test-account",
+					Groups: []*brain.Group{
+						&brain.Group{
+							Name: "default",
+							VirtualMachines: []*brain.VirtualMachine{
+								&vm, &vm, &vm, &vm, &vm,
+							},
+						},
+						megaGroup,
+					},
+					IsDefaultAccount: true,
+				},
+			},
+			Expected: `You are 'test-user'
+
+Accounts you can access:
+  • test-account (this is your default account)
+
+Your default account (test-account)
+  • default - 5 servers
+    ▸ valid-vm.default (powered on) in Default
+    ▸ valid-vm.default (powered on) in Default
+    ▸ valid-vm.default (powered on) in Default
+    ▸ valid-vm.default (powered on) in Default
+    ▸ valid-vm.default (powered on) in Default
+  • mega-group - 20 servers
+
+`,
+		},
+	}
+
+	for i, test := range tests {
+		err := FormatOverview(b, test.Accounts, nil, "test-user")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		actual := b.String()
+		if test.Expected != actual {
+			t.Errorf("TestFormatOverview %d FAIL\r\nexpected %s\r\nreceived %s", i, test.Expected, actual)
+		}
+
+		b.Reset()
+	}
 }
