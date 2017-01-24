@@ -60,13 +60,13 @@ func (p Privilege) targetType() string {
 func (p Privilege) String() string {
 	switch p.targetType() {
 	case "vm":
-		return fmt.Sprintf("%s on VM #%d for %s")
+		return fmt.Sprintf("%s on VM #%d for %s", p.Level, p.VirtualMachineID, p.Username)
 	case "group":
-		return fmt.Sprintf("%s on group #%d for %s")
+		return fmt.Sprintf("%s on group #%d for %s", p.Level, p.GroupID, p.Username)
 	case "account":
-		return fmt.Sprintf("%s on account #%d for %s")
+		return fmt.Sprintf("%s on account #%d for %s", p.Level, p.AccountID, p.Username)
 	}
-	return fmt.Sprintf("%s on the whole cluster for %s")
+	return fmt.Sprintf("%s on the whole cluster for %s", p.Level, p.Username)
 }
 
 // PrettyPretty nicely formats the Privilege and sends it to the given writer.

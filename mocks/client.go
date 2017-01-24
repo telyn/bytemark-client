@@ -314,3 +314,17 @@ func (c *Client) RestoreSnapshot(server lib.VirtualMachineName, discLabelOrID st
 
 	return snap, r.Error(1)
 }
+
+func (c *Client) GetPrivileges(username string) (privs brain.Privileges, err error) {
+	r := c.Called(username)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GrantPrivilege(priv brain.Privilege) (err error) {
+	r := c.Called(priv)
+	return r.Error(0)
+}
+func (c *Client) RevokePrivilege(priv brain.Privilege) (err error) {
+	r := c.Called(priv)
+	return r.Error(0)
+}
