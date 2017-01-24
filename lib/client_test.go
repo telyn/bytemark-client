@@ -7,6 +7,37 @@ import (
 	"testing"
 )
 
+type Mux map[string]func(wr http.ResponseWriter, r *http.Request)
+
+func (m Mux) ToHandler() (h http.Handler) {
+
+	serveMux := http.NewServeMux()
+	for p, f := range m {
+		serveMux.HandleFunc(p, f)
+	}
+	return serveMux
+}
+
+type MuxHandlers struct {
+	auth    Mux
+	brain   Mux
+	billing Mux
+	spp     Mux
+	api     Mux
+}
+
+func (mh MuxHandlers) ToHandlers() (h Handlers) {
+	h.auth = mh.auth.ToHandler()
+	if mh.auth == nil {
+		h.auth = nil
+	}
+	h.brain = mh.brain.ToHandler()
+	h.billing = mh.billing.ToHandler()
+	h.spp = mh.spp.ToHandler()
+	h.api = mh.api.ToHandler()
+	return
+}
+
 type Handlers struct {
 	auth    http.Handler
 	brain   http.Handler
