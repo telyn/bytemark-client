@@ -12,7 +12,7 @@ import (
 type PrivilegeLevel string
 
 const (
-	// ClusterAdminPrivile allows a user to administer the cluster managed by the brain, and do things like create/delete VMs on accounts they have no explicit right on, grant others AccountAdminPrivilege, and set disc iops_limit
+	// ClusterAdminPrivilege allows a user to administer the cluster managed by the brain, and do things like create/delete VMs on accounts they have no explicit right on, grant others AccountAdminPrivilege, and set disc iops_limit
 	ClusterAdminPrivilege PrivilegeLevel = "cluster_admin"
 	// AccountAdminPrivilege allows a user to create, modify & delete groups and servers in an account.
 	AccountAdminPrivilege = "account_admin"
@@ -69,15 +69,17 @@ func (p Privilege) String() string {
 	return fmt.Sprintf("%s on the whole cluster for %s", p.Level, p.Username)
 }
 
-// PrettyPretty nicely formats the Privilege and sends it to the given writer.
+// PrettyPrint nicely formats the Privilege and sends it to the given writer.
 // At the moment, the detail parameter is ignored.
 func (p Privilege) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (err error) {
 	_, err = wr.Write([]byte(p.String()))
 	return
 }
 
+// Privileges is used to allow API consumers to use IndexOf on the array of privileges.
 type Privileges []*Privilege
 
+// IndexOf finds the privilege given in the list of privileges, ignoring the Privilege ID and returns the index. If it couldn't find it, returns -1.
 func (ps Privileges) IndexOf(priv Privilege) int {
 	if priv.Username == "" || priv.Level == "" {
 		return -1
