@@ -58,15 +58,19 @@ func (p Privilege) targetType() string {
 // String returns a string representation of the Privilege in English.
 // Privileges are a little tricky to represent in English because the Privilege itself doesn't know if it exists on a user or if it has just been removed from a user, nor does it now anything about the target it's been granted on/revoked from other than a numerical ID. So we do the best we can.
 func (p Privilege) String() string {
+	requiresYubikey := ""
+	if p.YubikeyRequired {
+		requiresYubikey = " (requires yubikey)"
+	}
 	switch p.targetType() {
 	case "vm":
-		return fmt.Sprintf("%s on VM #%d for %s", p.Level, p.VirtualMachineID, p.Username)
+		return fmt.Sprintf("%s on VM #%d for %s%s", p.Level, p.VirtualMachineID, p.Username, requiresYubikey)
 	case "group":
-		return fmt.Sprintf("%s on group #%d for %s", p.Level, p.GroupID, p.Username)
+		return fmt.Sprintf("%s on group #%d for %s%s", p.Level, p.GroupID, p.Username, requiresYubikey)
 	case "account":
-		return fmt.Sprintf("%s on account #%d for %s", p.Level, p.AccountID, p.Username)
+		return fmt.Sprintf("%s on account #%d for %s%s", p.Level, p.AccountID, p.Username, requiresYubikey)
 	}
-	return fmt.Sprintf("%s on the whole cluster for %s", p.Level, p.Username)
+	return fmt.Sprintf("%s for %s%s", p.Level, p.Username, requiresYubikey)
 }
 
 // PrettyPrint nicely formats the Privilege and sends it to the given writer.
