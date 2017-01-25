@@ -8,10 +8,10 @@ import (
 
 // TODO(telyn): all the prettyprint tests could be replaced with
 
-func TestSnapshotPrettyPrint(t *testing.T) {
+func TestBackupPrettyPrint(t *testing.T) {
 	tests := []prettyprint.Test{
 		{
-			Object: brain.Snapshot{
+			Object: brain.Backup{
 				Disc: brain.Disc{
 					Label:        "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
 					Size:         25600,
@@ -22,7 +22,7 @@ func TestSnapshotPrettyPrint(t *testing.T) {
 			Expected: "taylorswift-1989-this-sick-beat-trademark-violations-20170101 (in progress)",
 		},
 		{
-			Object: brain.Snapshot{
+			Object: brain.Backup{
 				Disc: brain.Disc{
 					Label:        "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
 					Size:         25600,
@@ -33,7 +33,7 @@ func TestSnapshotPrettyPrint(t *testing.T) {
 			Expected: "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
 		},
 		{
-			Object: brain.Snapshot{
+			Object: brain.Backup{
 				Disc: brain.Disc{
 					Label:        "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
 					Size:         25600,
@@ -44,11 +44,11 @@ func TestSnapshotPrettyPrint(t *testing.T) {
 			Expected: "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
 		},
 	}
-	prettyprint.RunTests(t, "TestSnapshotPrettyPrint", tests)
+	prettyprint.RunTests(t, "TestBackupPrettyPrint", tests)
 }
 
-func TestSnapshotsPrettyPrint(t *testing.T) {
-	snapshots := brain.Snapshots{
+func TestBackupsPrettyPrint(t *testing.T) {
+	backups := brain.Backups{
 		{
 			Disc: brain.Disc{
 				Label:        "kendrick-lamarr-to-pimp-a-butterfly",
@@ -66,20 +66,20 @@ func TestSnapshotsPrettyPrint(t *testing.T) {
 			},
 		},
 	}
-	prettyprint.RunTests(t, "TestSnapshotsPrettyPrint", []prettyprint.Test{
+	prettyprint.RunTests(t, "TestBackupsPrettyPrint", []prettyprint.Test{
 		{
-			Object: snapshots,
+			Object: backups,
 			Detail: prettyprint.Full,
 			Expected: `kendrick-lamarr-to-pimp-a-butterfly (in progress)
 kel-valhaal-new-introductory-lectures-on-transcendental-qabala
 dimmu-borgir-stormblåst
 `,
 		}, {
-			Object:   snapshots,
+			Object:   backups,
 			Detail:   prettyprint.SingleLine,
-			Expected: "3 snapshots",
+			Expected: "3 backups",
 		}, {
-			Object: snapshots,
+			Object: backups,
 			Detail: prettyprint.Medium,
 			Expected: `kendrick-lamarr-to-pimp-a-butterfly (in progress)
 kel-valhaal-new-introductory-lectures-on-transcendental-qabala

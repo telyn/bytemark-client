@@ -115,16 +115,16 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 				return
 			}),
 		}, {
-			Name:        "snapshots",
-			Usage:       "list all the snapshots of a server or disc",
-			UsageText:   "bytemark list snapshots <server name> [disc label]",
-			Description: "Lists all the snapshots of all the discs in the given server, or if you also give a disc label, just the snapshots of that disc.",
+			Name:        "backups",
+			Usage:       "list all the backups of a server or disc",
+			UsageText:   "bytemark list backups <server name> [disc label]",
+			Description: "Lists all the backups of all the discs in the given server, or if you also give a disc label, just the backups of that disc.",
 			Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
 				label, _ := c.NextArg()
-				var snapshots brain.Snapshots
+				var backups brain.Backups
 
 				if label != "" {
-					snapshots, err = global.Client.GetSnapshots(*c.VirtualMachineName, label)
+					backups, err = global.Client.GetBackups(*c.VirtualMachineName, label)
 					if err != nil {
 						return
 					}
@@ -134,15 +134,15 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						return
 					}
 					for _, disc := range c.VirtualMachine.Discs {
-						snaps, err := global.Client.GetSnapshots(*c.VirtualMachineName, disc.Label)
+						snaps, err := global.Client.GetBackups(*c.VirtualMachineName, disc.Label)
 						if err != nil {
 							return err
 						}
 						// TODO(telyn): loop over snaps, attach disc as ParentDisc
-						snapshots = append(snapshots, snaps...)
+						backups = append(backups, snaps...)
 					}
 				}
-				return snapshots.PrettyPrint(global.App.Writer, prettyprint.Full)
+				return backups.PrettyPrint(global.App.Writer, prettyprint.Full)
 			}),
 		}},
 	})

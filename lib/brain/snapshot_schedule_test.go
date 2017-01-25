@@ -6,10 +6,10 @@ import (
 	"testing"
 )
 
-func TestSnapshotSchedulePrettyPrint(t *testing.T) {
-	prettyprint.RunTests(t, "TestSnapshotSchedulePrettyPrint", []prettyprint.Test{
+func TestBackupSchedulePrettyPrint(t *testing.T) {
+	prettyprint.RunTests(t, "TestBackupSchedulePrettyPrint", []prettyprint.Test{
 		{
-			Object: brain.SnapshotSchedule{
+			Object: brain.BackupSchedule{
 				StartDate: "2017-01-11 10:00:00",
 				Interval:  86400,
 			},
@@ -17,7 +17,7 @@ func TestSnapshotSchedulePrettyPrint(t *testing.T) {
 			Expected: "Every 86400 seconds starting from 2017-01-11 10:00:00",
 		},
 		{
-			Object: brain.SnapshotSchedule{
+			Object: brain.BackupSchedule{
 				StartDate: "2017-01-11 10:00:00",
 				Interval:  86400,
 			},
@@ -25,7 +25,7 @@ func TestSnapshotSchedulePrettyPrint(t *testing.T) {
 			Expected: "Every 86400 seconds starting from 2017-01-11 10:00:00",
 		},
 		{
-			Object: brain.SnapshotSchedule{
+			Object: brain.BackupSchedule{
 				StartDate: "2017-01-11 10:00:00",
 				Interval:  86400,
 			},

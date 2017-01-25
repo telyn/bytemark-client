@@ -6,27 +6,27 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// CreateSnapshot creates a snapshot of the given disc, returning the snapshot if it was successful.
-func (c *bytemarkClient) CreateSnapshot(vm VirtualMachineName, discLabelOrID string) (snapshot brain.Snapshot, err error) {
+// CreateBackup creates a backup of the given disc, returning the backup if it was successful.
+func (c *bytemarkClient) CreateBackup(vm VirtualMachineName, discLabelOrID string) (backup brain.Backup, err error) {
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/snapshots", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
 
-	_, _, err = r.Run(nil, &snapshot)
+	_, _, err = r.Run(nil, &backup)
 	return
 }
 
-func (c *bytemarkClient) DeleteSnapshot(vm VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (err error) {
+func (c *bytemarkClient) DeleteBackup(vm VirtualMachineName, discLabelOrID string, backupLabelOrID string) (err error) {
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/snapshots/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID, snapshotLabelOrID)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID, backupLabelOrID)
 	if err != nil {
 		return
 	}
@@ -35,26 +35,26 @@ func (c *bytemarkClient) DeleteSnapshot(vm VirtualMachineName, discLabelOrID str
 	return
 }
 
-func (c *bytemarkClient) GetSnapshots(vm VirtualMachineName, discLabelOrID string) (snapshots brain.Snapshots, err error) {
+func (c *bytemarkClient) GetBackups(vm VirtualMachineName, discLabelOrID string) (backups brain.Backups, err error) {
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/snapshots", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
 
-	_, _, err = r.Run(nil, &snapshots)
+	_, _, err = r.Run(nil, &backups)
 	return
 }
 
-func (c *bytemarkClient) RestoreSnapshot(vm VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (snapshot brain.Snapshot, err error) {
+func (c *bytemarkClient) RestoreBackup(vm VirtualMachineName, discLabelOrID string, backupLabelOrID string) (backup brain.Backup, err error) {
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/snapshots", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
