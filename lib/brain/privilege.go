@@ -46,7 +46,7 @@ type Privilege struct {
 	// Level is the PrivilegeLevel they have
 	Level PrivilegeLevel `json:"level,omitempty"`
 	// YubikeyRequired is true if the user should have to authenticate with a yubikey in order to use this privilege. Only set it to true if you're sure the user has a yubikey set up on their account, and that they know where it is!
-	YubikeyRequired bool `json:"yubikey_required,omitempty"`
+	YubikeyRequired bool `json:"yubikey_required"`
 	// YubikeyOTPMaxAge should set how long (in seconds) a yubikey one-time-password would be accepted for, but it might not be used?
 	YubikeyOTPMaxAge int `json:"yubikey_otp_max_age,omitempty"`
 }

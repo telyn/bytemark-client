@@ -24,6 +24,12 @@ func init() {
 		Usage:       "grant privileges on bytemark self-service objects to other users",
 		UsageText:   "bytemark grant <privilege> [on] <object> [from|to] <user>\r\nbytemark grant cluster_admin [to] <user>",
 		Description: "Grant a privilege to a user for a particular bytemark object\r\n\r\n" + privilegeText,
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "yubikey-required",
+				Usage: "Set if the privilege should require a yubikey.",
+			},
+		},
 		Action: With(func(c *Context) (err error) {
 			priv, _, err := parsePrivilege(c)
 			if err != nil {
@@ -83,6 +89,7 @@ func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err
 
 // creates a Privilege from the arguments in the Context.
 func parsePrivilege(c *Context) (p brain.Privilege, targetName string, err error) {
+	p.YubikeyRequired = c.Bool("yubikey-required")
 	var level string
 	level, err = c.NextArg()
 	p.Level = brain.PrivilegeLevel(level)
@@ -102,7 +109,7 @@ func parsePrivilege(c *Context) (p brain.Privilege, targetName string, err error
 	if err != nil {
 		return
 	}
-	if c.Args()[0] == "to" {
+	if c.Args()[0] == "to" || c.Args()[0] == "from" {
 		_, _ = c.NextArg()
 	}
 	p.Username, err = c.NextArg()
