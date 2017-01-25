@@ -8,7 +8,9 @@ import (
 	"testing"
 )
 
-func setupGrantPrivilegeTest(t *testing.T) (config *mocks.Config, c *mocks.Client) {
+// baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
+// user is test-user
+func baseTestAuthSetup(t *testing.T) (config *mocks.Config, c *mocks.Client) {
 	config, c = baseTestSetup(t, false)
 
 	config.When("Get", "token").Return("test-token")
@@ -51,7 +53,7 @@ func TestGrantPrivilege(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		config, c := setupGrantPrivilegeTest(t)
+		config, c := baseTestAuthSetup(t)
 		test.Setup(config, c)
 
 		err := global.App.Run(strings.Split(test.Input, " "))
