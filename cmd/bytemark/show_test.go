@@ -63,13 +63,13 @@ func TestShowPrivileges(t *testing.T) {
 		{
 			privs:     brain.Privileges{{VirtualMachineID: 643, Username: "satan", Level: brain.VMConsolePrivilege}},
 			user:      "",
-			args:      "bytemark show privileges",
+			args:      "bytemark --admin show privileges",
 			shouldErr: false,
 		},
 	}
 
 	for i, test := range tests {
-		_, c := baseTestAuthSetup(t)
+		_, c := baseTestAuthSetup(t, true)
 		c.When("GetPrivileges", test.user).Return(test.privs, nil)
 
 		err := global.App.Run(strings.Split(test.args, " "))

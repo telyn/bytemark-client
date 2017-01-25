@@ -39,7 +39,7 @@ func TestRevokePrivilege(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		config, c := baseTestAuthSetup(t)
+		config, c := baseTestAuthSetup(t, true)
 		test.Setup(config, c)
 
 		err := global.App.Run(strings.Split(test.Input, " "))

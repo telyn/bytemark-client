@@ -19,7 +19,7 @@ vm_admin - modify & administer a single server
 vm_console - access to a server's console`
 
 func init() {
-	commands = append(commands, cli.Command{
+	adminCommands = append(adminCommands, cli.Command{
 		Name:        "grant",
 		Usage:       "grant privileges on bytemark self-service objects to other users",
 		UsageText:   "bytemark grant <privilege> [on] <object> [from|to] <user>\r\nbytemark grant cluster_admin [to] <user>",
