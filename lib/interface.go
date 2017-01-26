@@ -115,7 +115,7 @@ type Client interface {
 	AddIP(name *VirtualMachineName, ipcr *brain.IPCreateRequest) (brain.IPs, error)
 
 	//
-	// SNAPSHOTS
+	// BACKUPS
 	//
 
 	CreateBackup(server VirtualMachineName, discLabelOrID string) (brain.Backup, error)
