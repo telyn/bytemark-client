@@ -16,6 +16,7 @@ type Disc struct {
 	StoragePool      string `json:"storage_pool,omitempty"`
 }
 
+// PrettyPrint outputs the disc nicely-formatted to the writer.
 func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	tmpl := `{{ define "disc_sgl" }}{{ .Label }} - {{ gibtib .Size }}, {{ .StorageGrade }} grade{{ end }}
 {{ define "disc_medium" }}{{ template "_sgl" . }}{{ end }}
@@ -24,11 +25,11 @@ func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 }
 
 // Validate makes sure the disc has a storage grade. Doesn't modify the origin disc.
-func (disc Disc) Validate() (*Disc, error) {
-	if disc.StorageGrade == "" {
-		newDisc := disc
+func (d Disc) Validate() (*Disc, error) {
+	if d.StorageGrade == "" {
+		newDisc := d
 		newDisc.StorageGrade = "sata"
 		return &newDisc, nil
 	}
-	return &disc, nil
+	return &d, nil
 }
