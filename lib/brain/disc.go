@@ -24,12 +24,10 @@ func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, tmpl, "disc"+string(detail), d)
 }
 
-// Validate makes sure the disc has a storage grade. Doesn't modify the origin disc.
+// Validate makes sure the disc has a storage grade.
 func (d Disc) Validate() (*Disc, error) {
 	if d.StorageGrade == "" {
-		newDisc := d
-		newDisc.StorageGrade = "sata"
-		return &newDisc, nil
+		d.StorageGrade = "sata"
 	}
 	return &d, nil
 }
