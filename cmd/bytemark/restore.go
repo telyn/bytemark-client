@@ -34,21 +34,21 @@ Note that it cannot be used to restore a server that has been permanently delete
 				return
 			}),
 		}, {
-			Name:        "snapshot",
-			Usage:       "restore the given snapshot",
-			UsageText:   `bytemark restore snapshot <server name> <disc label> <snapshot label>`,
-			Description: "Restores the given snapshot. Before doing this, a new snapshot is made of the disc's current state.",
+			Name:        "backup",
+			Usage:       "restore the given backup",
+			UsageText:   `bytemark restore backup <server name> <disc label> <backup label>`,
+			Description: "Restores the given backup. Before doing this, a new backup is made of the disc's current state.",
 			Action: With(VirtualMachineNameProvider, DiscLabelProvider, func(c *Context) (err error) {
-				snapshot, err := c.NextArg()
+				backup, err := c.NextArg()
 				if err != nil {
 					return
 				}
-				// TODO(telyn): eventually RestoreSnapshot will return snapshots as the first argument. We should process that and output info :)
-				_, err = global.Client.RestoreSnapshot(*c.VirtualMachineName, *c.DiscLabel, snapshot)
+				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
+				_, err = global.Client.RestoreBackup(*c.VirtualMachineName, *c.DiscLabel, backup)
 				if err != nil {
 					return
 				}
-				log.Logf("Disc '%s' is now being restored from snapshot '%s'", *c.DiscLabel, snapshot)
+				log.Logf("Disc '%s' is now being restored from backup '%s'", *c.DiscLabel, backup)
 				return
 			}),
 		}},

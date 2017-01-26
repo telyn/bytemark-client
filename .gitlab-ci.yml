@@ -267,7 +267,7 @@ release-to-repo:
   - scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
   - scp bytemark-client-$VERSION*.rpm $REPO/rpm
   # make rpm & debian repos
-  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && createrepo . && /srv/bin/rpm-addsign-unattended.sh bytemark-client-$VERSION*.rpm"
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && /srv/bin/rpm-addsign-unattended.sh bytemark-client-$VERSION*.rpm && createrepo ."
   - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && rm -f Release.gpg InRelease && make"
   # remove old -latest symlinks
   - ssh $REPO_SSH_HOST -- "for OS in linux openbsd freebsd; do rm -f $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"

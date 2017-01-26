@@ -301,7 +301,7 @@ func TestCreateServer(t *testing.T) {
 	}
 }
 
-func TestCreateSnapshot(t *testing.T) {
+func TestCreateBackup(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, false)
 
@@ -318,10 +318,10 @@ func TestCreateSnapshot(t *testing.T) {
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("CreateSnapshot", vmname, "test-disc").Return(brain.Snapshot{}, nil).Times(1)
+	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)
 
 	err := global.App.Run([]string{
-		"bytemark", "create", "snapshot", "test-server", "test-disc",
+		"bytemark", "create", "backup", "test-server", "test-disc",
 	})
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {

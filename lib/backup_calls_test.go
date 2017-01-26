@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestCreateSnapshot(t *testing.T) {
+func TestCreateBackup(t *testing.T) {
 
 	vm := VirtualMachineName{
 		VirtualMachine: "test-vm",
@@ -19,10 +19,10 @@ func TestCreateSnapshot(t *testing.T) {
 
 	disc := "test-disc"
 
-	testSnapshot := brain.Snapshot{
+	testBackup := brain.Backup{
 		Disc: brain.Disc{
 			ID:               506,
-			Label:            "philtesting-snapshot-20161122134250",
+			Label:            "philtesting-backup-20161122134250",
 			Size:             50,
 			StorageGrade:     "sata",
 			StoragePool:      "t5-sata1",
@@ -34,7 +34,7 @@ func TestCreateSnapshot(t *testing.T) {
 
 	client, servers, err := mkTestClientAndServers(t, Handlers{
 		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/snapshots" {
+			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups" {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
 			if req.Method != "POST" {
@@ -43,7 +43,7 @@ func TestCreateSnapshot(t *testing.T) {
 			_, err := w.Write([]byte(`
 			{
 				"id": 506,
-				"label": "philtesting-snapshot-20161122134250",
+				"label": "philtesting-backup-20161122134250",
 				"manual": true,
 				"parent_disc_id": 503,
 				"size": 50,
@@ -65,16 +65,16 @@ func TestCreateSnapshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	snapshot, err := client.CreateSnapshot(vm, disc)
+	backup, err := client.CreateBackup(vm, disc)
 	if err != nil {
-		t.Errorf("TestCreateSnapshot ERR: %s", err)
+		t.Errorf("TestCreateBackup ERR: %s", err)
 	}
-	if !reflect.DeepEqual(snapshot, testSnapshot) {
-		t.Errorf("TestCreateSnapshot FAIL: expected %#v but got %#v", testSnapshot, snapshot)
+	if !reflect.DeepEqual(backup, testBackup) {
+		t.Errorf("TestCreateBackup FAIL: expected %#v but got %#v", testBackup, backup)
 	}
 }
 
-func TestDeleteSnapshot(t *testing.T) {
+func TestDeleteBackup(t *testing.T) {
 
 	vm := VirtualMachineName{
 		VirtualMachine: "test-vm",
@@ -86,7 +86,7 @@ func TestDeleteSnapshot(t *testing.T) {
 
 	client, servers, err := mkTestClientAndServers(t, Handlers{
 		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/snapshots/test-snapshot" {
+			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups/test-backup" {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
 			if req.Method != "DELETE" {
@@ -105,13 +105,13 @@ func TestDeleteSnapshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = client.DeleteSnapshot(vm, disc, "test-snapshot")
+	err = client.DeleteBackup(vm, disc, "test-backup")
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func TestGetSnapshots(t *testing.T) {
+func TestGetBackups(t *testing.T) {
 	vm := VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
@@ -122,7 +122,7 @@ func TestGetSnapshots(t *testing.T) {
 
 	client, servers, err := mkTestClientAndServers(t, Handlers{
 		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/snapshots" {
+			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups" {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
 			if req.Method != "GET" {
@@ -131,10 +131,10 @@ func TestGetSnapshots(t *testing.T) {
 			_, err := w.Write([]byte(`[
 			{
 				"id": 509,
-				"label": "snapshot-509"
+				"label": "backup-509"
 			}, {
 				"id": 533,
-				"label": "snapshot-533"
+				"label": "backup-533"
 			}
 			]
 			`))
@@ -151,16 +151,16 @@ func TestGetSnapshots(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	snapshots, err := client.GetSnapshots(vm, disc)
+	backups, err := client.GetBackups(vm, disc)
 	if err != nil {
 		t.Error(err)
 	}
-	if len(snapshots) != 2 {
-		t.Errorf("Wrong number of snapshots - %d expected, got %d", 2, len(snapshots))
+	if len(backups) != 2 {
+		t.Errorf("Wrong number of backups - %d expected, got %d", 2, len(backups))
 	}
 }
 
-func TestRestoreSnapshot(t *testing.T) {
+func TestRestoreBackup(t *testing.T) {
 	vm := VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
@@ -171,7 +171,7 @@ func TestRestoreSnapshot(t *testing.T) {
 
 	client, servers, err := mkTestClientAndServers(t, Handlers{
 		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/snapshots" {
+			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups" {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
 			if req.Method != "PUT" {
@@ -189,7 +189,7 @@ func TestRestoreSnapshot(t *testing.T) {
 			if restore, ok := obj["restore"]; !ok || !restore {
 				t.Error("Restore not found or was not true")
 			}
-			_, err = w.Write([]byte(``)) // TODO(telyn): in the future asking for a restore will return a snapshot (disc state prior to the restore), but not yet
+			_, err = w.Write([]byte(``)) // TODO(telyn): in the future asking for a restore will return a backup (disc state prior to the restore), but not yet
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -203,9 +203,9 @@ func TestRestoreSnapshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = client.RestoreSnapshot(vm, disc, "test-snapshot")
+	_, err = client.RestoreBackup(vm, disc, "test-backup")
 	if err != nil {
 		t.Error(err)
 	}
-	// TODO(telyn): no tests for the first return value of RestoreSnapshot because it's always nil until we get back a snapshot
+	// TODO(telyn): no tests for the first return value of RestoreBackup because it's always nil until we get back a backup
 }

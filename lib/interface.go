@@ -123,13 +123,13 @@ type Client interface {
 	RevokePrivilege(p brain.Privilege) error
 
 	//
-	// SNAPSHOTS
+	// BACKUPS
 	//
 
-	CreateSnapshot(server VirtualMachineName, discLabelOrID string) (brain.Snapshot, error)
-	DeleteSnapshot(server VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) error
-	GetSnapshots(server VirtualMachineName, discLabelOrID string) (brain.Snapshots, error)
-	RestoreSnapshot(server VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (brain.Snapshot, error)
+	CreateBackup(server VirtualMachineName, discLabelOrID string) (brain.Backup, error)
+	DeleteBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) error
+	GetBackups(server VirtualMachineName, discLabelOrID string) (brain.Backups, error)
+	RestoreBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
 
 	//
 	// USERS

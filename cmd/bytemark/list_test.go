@@ -117,7 +117,7 @@ func TestListServers(t *testing.T) {
 	}
 }
 
-func TestListSnapshots(t *testing.T) {
+func TestListBackups(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, false)
 
@@ -133,10 +133,10 @@ func TestListSnapshots(t *testing.T) {
 
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetSnapshots", vmname, "test-disc").Return(nil).Times(1)
+	c.When("GetBackups", vmname, "test-disc").Return(nil).Times(1)
 
 	err := global.App.Run([]string{
-		"bytemark", "list", "snapshots", "test-server", "test-disc",
+		"bytemark", "list", "backups", "test-server", "test-disc",
 	})
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {

@@ -294,23 +294,23 @@ func (c *Client) UndeleteVirtualMachine(name *lib.VirtualMachineName) error {
 	return r.Error(0)
 }
 
-func (c *Client) CreateSnapshot(server lib.VirtualMachineName, discLabelOrID string) (brain.Snapshot, error) {
+func (c *Client) CreateBackup(server lib.VirtualMachineName, discLabelOrID string) (brain.Backup, error) {
 	r := c.Called(server, discLabelOrID)
-	snap, _ := r.Get(0).(brain.Snapshot)
+	snap, _ := r.Get(0).(brain.Backup)
 	return snap, r.Error(1)
 }
-func (c *Client) DeleteSnapshot(server lib.VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) error {
-	r := c.Called(server, discLabelOrID, snapshotLabelOrID)
+func (c *Client) DeleteBackup(server lib.VirtualMachineName, discLabelOrID string, backupLabelOrID string) error {
+	r := c.Called(server, discLabelOrID, backupLabelOrID)
 	return r.Error(0)
 }
-func (c *Client) GetSnapshots(server lib.VirtualMachineName, discLabelOrID string) (brain.Snapshots, error) {
+func (c *Client) GetBackups(server lib.VirtualMachineName, discLabelOrID string) (brain.Backups, error) {
 	r := c.Called(server, discLabelOrID)
-	snaps, _ := r.Get(0).(brain.Snapshots)
+	snaps, _ := r.Get(0).(brain.Backups)
 	return snaps, r.Error(1)
 }
-func (c *Client) RestoreSnapshot(server lib.VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (brain.Snapshot, error) {
-	r := c.Called(server, discLabelOrID, snapshotLabelOrID)
-	snap, _ := r.Get(0).(brain.Snapshot)
+func (c *Client) RestoreBackup(server lib.VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error) {
+	r := c.Called(server, discLabelOrID, backupLabelOrID)
+	snap, _ := r.Get(0).(brain.Backup)
 
 	return snap, r.Error(1)
 }
