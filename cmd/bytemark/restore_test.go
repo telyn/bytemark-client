@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestRestoreSnapshot(t *testing.T) {
+func TestRestoreBackup(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, false)
 
@@ -22,10 +22,10 @@ func TestRestoreSnapshot(t *testing.T) {
 
 	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("RestoreSnapshot", vmname, "test-disc", "test-snapshot").Return(nil).Times(1)
+	c.When("RestoreBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
 
 	err := global.App.Run([]string{
-		"bytemark", "restore", "snapshot", "test-server", "test-disc", "test-snapshot",
+		"bytemark", "restore", "backup", "test-server", "test-disc", "test-backup",
 	})
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {

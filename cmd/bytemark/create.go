@@ -111,17 +111,17 @@ Multiple --disc flags can be used to create multiple discs`,
 		Action:      With(GroupNameProvider, AuthProvider, createGroup),
 	}
 
-	createSnapshotCmd := cli.Command{
-		Name:        "snapshot",
-		Usage:       "create a snapshot of a disc's current state",
-		UsageText:   "bytemark create snapshot <server name> <disc label>",
-		Description: `Creates a snapshot of the disc's current state. The snapshot is moved to another tail in the "we haven't settled on a name yet" storage grade.`,
+	createBackupCmd := cli.Command{
+		Name:        "backup",
+		Usage:       "create a backup of a disc's current state",
+		UsageText:   "bytemark create backup <server name> <disc label>",
+		Description: `Creates a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
 		Action: With(VirtualMachineNameProvider, DiscLabelProvider, func(c *Context) error {
-			snapshot, err := global.Client.CreateSnapshot(*c.VirtualMachineName, *c.DiscLabel)
+			backup, err := global.Client.CreateBackup(*c.VirtualMachineName, *c.DiscLabel)
 			if err != nil {
 				return err
 			}
-			log.Errorf("Snapshot '%s' taken successfully!", snapshot.Label)
+			log.Errorf("Backup '%s' taken successfully!", backup.Label)
 			return nil
 		}),
 	}
@@ -146,7 +146,7 @@ Multiple --disc flags can be used to create multiple discs`,
 			createServerCmd,
 			createDiscsCmd,
 			createGroupCmd,
-			createSnapshotCmd,
+			createBackupCmd,
 		},
 	})
 }
