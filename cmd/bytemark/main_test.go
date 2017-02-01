@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 	"io/ioutil"
-	"os"
 	"testing"
 )
 
@@ -38,7 +36,6 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 		// subcommands in order to get every subcommand to have a correct Command.commandPath
 
 		if c.Subcommands != nil && len(c.Subcommands) > 0 {
-			fmt.Fprintf(os.Stderr, c.Name)
 			_ = global.App.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
