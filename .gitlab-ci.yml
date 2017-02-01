@@ -103,7 +103,7 @@ test:
 
 build-manpage:
   stage: build
-  image: gitlab.bytemark.co.uk:8443/docker-images/layers:jessie-asciidoc
+  image: gitlab.bytemark.co.uk:8443/docker-images/layers:jessie-asciidoc-asciidoc-recommends
   script:
   - cd doc
   - a2x --doctype manpage --format manpage bytemark.asciidoc
