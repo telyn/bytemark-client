@@ -1,8 +1,8 @@
-image: golang:1.6
 
 variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
+  GOVERSION: 1.6
 
 stages:
   - test
@@ -17,8 +17,12 @@ before_script:
   # stick our code in the correct place.
   - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
-lint-with-fail-allowed:
+.test-job: &test
+  image: golang:$GOVERSION
   stage: test
+
+lint-with-fail-allowed:
+  <<: *test
   allow_failure: true # delete me once we've got the lintiness down to 0
   script: |
     go get github.com/alecthomas/gometalinter
@@ -27,7 +31,7 @@ lint-with-fail-allowed:
     gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --disable gotype --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
 
 lint-in-anger:
-  stage: test
+  <<: *test
   script: |
     go get github.com/alecthomas/gometalinter
     gometalinter -i
@@ -53,14 +57,15 @@ release-check:
   only:
   - /^release-\d+(\.\d+)+$/
 
+# the vet linter in gometalinter doesn't seem as reliable, so we keep it as a separate job
 vet:
-  stage: test
+  <<: *test
   script:
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - go vet $(go list ./... | grep -v vendor/)
 
 test:
-  stage: test
+  <<: *test
   script:
     - go get github.com/modocache/gover golang.org/x/tools/cmd/cover 
     - OLDPWD="$PWD"
@@ -83,6 +88,7 @@ test:
 
 .build-job: &build
   stage: build
+  image: golang:$GOVERSION
   script:
   - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
   artifacts:
