@@ -10,16 +10,15 @@ stages:
   - package
   - release
 
-before_script:
-  # these two are needed for coverage stats
-  - go get github.com/BytemarkHosting/auth-client
-  - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-  # stick our code in the correct place.
-  - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-
 .test-job: &test
   image: golang:$GOVERSION
   stage: test
+  before_script:
+    # these two are needed for coverage stats
+    - go get github.com/BytemarkHosting/auth-client
+    - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+      # stick our code in the correct place.
+    - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
 lint-with-fail-allowed:
   <<: *test
@@ -89,6 +88,12 @@ test:
 .build-job: &build
   stage: build
   image: golang:$GOVERSION
+  before_script:
+    # these two are needed for coverage stats
+    - go get github.com/BytemarkHosting/auth-client
+    - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+      # stick our code in the correct place.
+    - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
   script:
   - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
   artifacts:
