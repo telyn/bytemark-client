@@ -98,9 +98,7 @@ test:
 
 build-manpage:
   stage: build
-  image: debian:jessie
-  before_script:
-  - apt-get update && apt-get install -y asciidoc
+  image: gitlab.bytemark.co.uk:8443/docker-images/layers:jessie-asciidoc
   script:
   - cd doc
   - a2x --doctype manpage --format manpage bytemark.asciidoc
