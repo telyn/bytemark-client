@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"strings"
 	"testing"
@@ -51,3 +52,34 @@ func TestShowServerCommand(t *testing.T) {
 }
 
 // TODO(telyn): show account? show user?
+func TestShowPrivileges(t *testing.T) {
+
+	tests := []struct {
+		privs     brain.Privileges
+		args      string
+		user      string
+		shouldErr bool
+	}{
+		{
+			privs:     brain.Privileges{{VirtualMachineID: 643, Username: "satan", Level: brain.VMConsolePrivilege}},
+			user:      "",
+			args:      "bytemark --admin show privileges",
+			shouldErr: false,
+		},
+	}
+
+	for i, test := range tests {
+		_, c := baseTestAuthSetup(t, true)
+		c.When("GetPrivileges", test.user).Return(test.privs, nil)
+
+		err := global.App.Run(strings.Split(test.args, " "))
+		if test.shouldErr && err == nil {
+			t.Errorf("TestShowPrivilege %d should err and didn't", i)
+		} else if !test.shouldErr && err != nil {
+			t.Errorf("TestShowPrivilege %d shouldn't err, but: %s", i, err)
+		}
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	}
+}

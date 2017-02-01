@@ -122,4 +122,35 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			}),
 		}},
 	})
+	adminCommands = append(adminCommands, cli.Command{
+		Name: "show",
+		Subcommands: []cli.Command{{
+			Name:        "privileges",
+			Usage:       "shows privileges for a given user",
+			UsageText:   "bytemark show privileges [user]",
+			Description: `Displays a list of all the privileges for a given user, or all the privileges you are able to see.`,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "json",
+					Usage: "Output privileges as a JSON array.",
+				},
+			},
+			Action: With(AuthProvider, func(c *Context) error {
+				user, err := c.NextArg()
+				if err != nil {
+					user = ""
+				}
+				privs, err := global.Client.GetPrivileges(user)
+				if err != nil {
+					return err
+				}
+				return c.IfNotMarshalJSON(privs, func() error {
+					for _, p := range privs {
+						log.Outputf("%s\r\n", p.String())
+					}
+					return nil
+				})
+			}),
+		}},
+	})
 }

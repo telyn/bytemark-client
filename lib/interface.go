@@ -115,6 +115,14 @@ type Client interface {
 	AddIP(name *VirtualMachineName, ipcr *brain.IPCreateRequest) (brain.IPs, error)
 
 	//
+	// PRIVILEGES
+	//
+	// username is allowed to be empty
+	GetPrivileges(username string) (brain.Privileges, error)
+	GrantPrivilege(p brain.Privilege) error
+	RevokePrivilege(p brain.Privilege) error
+
+	//
 	// BACKUPS
 	//
 
