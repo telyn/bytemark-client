@@ -7,8 +7,8 @@ import (
 
 // BackupSchedule represents a schedule to take backups on. It is represented as a start date in YYYY-MM-DD hh:mm:ss format (and assuming UK timezones of some kind.)
 type BackupSchedule struct {
-	StartDate string
-	Interval  int
+	StartDate string `json:"start_at"`
+	Interval  int    `json:"interval_seconds"`
 }
 
 // PrettyPrint outputs a nicely-formatted human-readable version of the schedule to the given writer.
