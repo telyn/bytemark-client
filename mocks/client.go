@@ -303,6 +303,14 @@ func (c *Client) DeleteBackup(server lib.VirtualMachineName, discLabelOrID strin
 	r := c.Called(server, discLabelOrID, backupLabelOrID)
 	return r.Error(0)
 }
+func (c *Client) CreateBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, start string, interval int) error {
+	r := c.Called(server, discLabelOrID, start, interval)
+	return r.Error(0)
+}
+func (c *Client) DeleteBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, id int) error {
+	r := c.Called(server, discLabelOrID, id)
+	return r.Error(0)
+}
 func (c *Client) GetBackups(server lib.VirtualMachineName, discLabelOrID string) (brain.Backups, error) {
 	r := c.Called(server, discLabelOrID)
 	snaps, _ := r.Get(0).(brain.Backups)

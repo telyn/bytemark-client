@@ -1,7 +1,9 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -153,4 +155,14 @@ func mkTestAuthServer() *httptest.Server {
 }`)
 	}))
 
+}
+
+// JSON unmarshals the contents of r.Body into obj.
+func unmarshalRequestObject(r *http.Request, obj interface{}) (err error) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(body, obj)
+	return
 }

@@ -57,7 +57,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 						return
 					}
 
-					err = global.Client.CreateBackupSchedule(start, interval)
+					err = global.Client.CreateBackupSchedule(*c.VirtualMachineName, *c.DiscLabel, start, interval)
 					if err == nil {
 						log.Log("Schedule set.")
 					}

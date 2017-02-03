@@ -132,6 +132,13 @@ type Client interface {
 	RestoreBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
 
 	//
+	// BACKUP SCHEDULES
+	//
+
+	CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, intervalSeconds int) error
+	DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) error
+
+	//
 	// USERS
 	//
 

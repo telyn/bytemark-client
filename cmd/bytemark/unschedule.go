@@ -31,12 +31,12 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 						return
 					}
 
-					id, err := strconv.Atoi(intervalStr)
+					id, err := strconv.Atoi(idStr)
 					if err != nil {
 						return
 					}
 
-					err = global.Client.DeleteBackupSchedule(id)
+					err = global.Client.DeleteBackupSchedule(*c.VirtualMachineName, *c.DiscLabel, id)
 					if err == nil {
 						log.Log("Backups unscheduled.")
 					}
