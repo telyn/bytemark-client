@@ -8,20 +8,20 @@ import (
 )
 
 // CreateBackupSchedule creates a new backup schedule starting at the given date, with backups occuring every interval seconds
-func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, interval int) (err error) {
+func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, interval int) (sched brain.BackupSchedule, err error) {
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backup_schedules", server.Account, server.Group, server.VirtualMachine, discLabel)
 	if err != nil {
 		return
 	}
-	sched := brain.BackupSchedule{
+	inputSchedule := brain.BackupSchedule{
 		StartDate: startDate,
 		Interval:  interval,
 	}
-	js, err := json.Marshal(sched)
+	js, err := json.Marshal(inputSchedule)
 	if err != nil {
 		return
 	}
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.Run(bytes.NewBuffer(js), &sched)
 	return
 }
 

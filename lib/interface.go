@@ -135,7 +135,7 @@ type Client interface {
 	// BACKUP SCHEDULES
 	//
 
-	CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, intervalSeconds int) error
+	CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, intervalSeconds int) (brain.BackupSchedule, error)
 	DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) error
 
 	//

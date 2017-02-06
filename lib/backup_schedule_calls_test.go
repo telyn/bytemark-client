@@ -52,7 +52,7 @@ func TestCreateBackupSchedule(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = client.CreateBackupSchedule(name, "disc-label", testSchedule.StartDate, testSchedule.Interval)
+	_, err = client.CreateBackupSchedule(name, "disc-label", testSchedule.StartDate, testSchedule.Interval)
 	if err != nil {
 		t.Errorf("TestCreateBackupSchedule ERR: %v", err)
 	}

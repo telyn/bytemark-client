@@ -7,6 +7,10 @@ import (
 	"unicode"
 )
 
+type TemplateFragmentMapper interface {
+	MapTemplateFragment(templateFrag string) (strs []string, err error)
+}
+
 var templateFuncMap = map[string]interface{}{
 	// capitalize the first letter of str
 	"capitalize": func(str string) string {
@@ -63,8 +67,24 @@ var templateFuncMap = map[string]interface{}{
 		}
 		return b.String(), nil
 	},
+	// map ... see TemplateFragmentMapper and brain.BackupSchedules
+	"map": func(mapper TemplateFragmentMapper, fragment string) ([]string, error) {
+		return mapper.MapTemplateFragment(fragment)
+	},
 	// join joins multiple strings together with a seperator
 	"join": strings.Join,
+	"joinWithSpecialLast": func(sep string, fin string, strs []string) string {
+		switch len(strs) {
+		case 0:
+			return ""
+		case 1:
+			return strs[0]
+		case 2:
+			return strs[0] + fin + strs[1]
+		}
+		most := strings.Join(strs[0:len(strs)-1], sep)
+		return most + fin + strs[len(strs)-1]
+	},
 }
 
 // Funcs is not for general usage, only while in transition to PrettyPrint.
