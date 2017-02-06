@@ -7,6 +7,7 @@ import (
 	"unicode"
 )
 
+// TemplateFragmentMapper is an interface that requires MapTemplateFragment to exist. The implementation of MapTemplateFragment should add "{{" and "}}" to the beginning and end of template fragment, and run it for each element in the receiver, collecting the output up into an array of strings.
 type TemplateFragmentMapper interface {
 	MapTemplateFragment(templateFrag string) (strs []string, err error)
 }

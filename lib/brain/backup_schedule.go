@@ -25,6 +25,7 @@ func (sched BackupSchedule) PrettyPrint(wr io.Writer, detail prettyprint.DetailL
 	return prettyprint.Run(wr, scheduleTpl, "schedule"+string(detail), sched)
 }
 
+// BackupSchedules represents multiple backup schedules
 type BackupSchedules []*BackupSchedule
 
 // MapTemplateFragment takes a template fragment (as if it was starting within a {{ }}) and executes it against every schedule in scheds, returning all the results as a slice of strings, or an error if one occurred.
@@ -47,6 +48,11 @@ func (scheds BackupSchedules) MapTemplateFragment(templateFrag string) (strs []s
 	return
 }
 
+// PrettyPrint outputs a nicely-formatted human-readable version of the schedules to the given writer.
+// detail levels:
+// SingleLine - outputs one line "Backups are taken every m, n, o, & p seconds" or "No backups scheduled"
+// Medium - same
+// Full - outputs one line per schedule, "• #ID - " followed by the SingleLine PrettyPrint of the schedule
 func (scheds BackupSchedules) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	tmpl := `{{ define "backupschedules_sgl" }}{{ if len . | ne 0 }}Backups are taken every {{ map . ".Interval" | joinWithSpecialLast ", " " & "}} seconds{{ else }}No backups scheduled{{ end }}{{ end }}
 {{ define "backupschedules_medium" }}{{ template "backupschedules_sgl" .}}{{ end }}
