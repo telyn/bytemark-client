@@ -9,7 +9,7 @@ import (
 
 // BackupSchedule represents a schedule to take backups on. It is represented as a start date in YYYY-MM-DD hh:mm:ss format (and assuming UK timezones of some kind.)
 type BackupSchedule struct {
-	ID        int    `json:"id"`
+	ID        int    `json:"id,omitempty"`
 	StartDate string `json:"start_at"`
 	Interval  int    `json:"interval_seconds"`
 }

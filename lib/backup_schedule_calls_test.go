@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net/http"
 	"testing"
@@ -27,15 +28,19 @@ func TestCreateBackupSchedule(t *testing.T) {
 					t.Errorf("Wrong request method %s", r.Method)
 				}
 				var sched brain.BackupSchedule
-				err := unmarshalRequestObject(r, &sched)
+				err := json.NewDecoder(r.Body).Decode(&sched)
 				if err != nil {
-					t.Errorf("Couldn't unmarshal")
+					t.Errorf("Couldn't unmarshal - %v", err)
 				}
 				if sched.StartDate != testSchedule.StartDate {
 					t.Errorf("Incorrect Start - expected %s, got %s", testSchedule.StartDate, sched.StartDate)
 				}
 				if sched.Interval != testSchedule.Interval {
 					t.Errorf("Incorrect Interval - expected %d, got %d", testSchedule.Interval, sched.Interval)
+				}
+				_, err = wr.Write([]byte(`{"start_date": "2017-02-06T11:29:35+00:00", "interval_seconds": 3540, "id": 9}`))
+				if err != nil {
+					t.Errorf("error writing json %v", err)
 				}
 			},
 		},
