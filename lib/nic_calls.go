@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
@@ -18,12 +16,8 @@ func (c *bytemarkClient) AddIP(name *VirtualMachineName, spec *brain.IPCreateReq
 		return nil, err
 	}
 
-	js, err := json.Marshal(spec)
-	if err != nil {
-		return nil, err
-	}
 	var newSpec *brain.IPCreateRequest
-	_, _, err = r.Run(bytes.NewBuffer(js), newSpec)
+	_, _, err = r.MarshalAndRun(spec, newSpec)
 	if err != nil {
 		return nil, err
 	}

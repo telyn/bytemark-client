@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"bytes"
 	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -77,11 +76,6 @@ func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err 
 		return nil, err
 	}
 
-	js, err := json.Marshal(acc.billingAccount())
-	if err != nil {
-		return nil, err
-	}
-
 	// prevent password & card reference from being written to debug log
 	// this is a bit of a sledgehammer
 	// TODO make it not a sledgehammer somehow
@@ -90,7 +84,7 @@ func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err 
 
 	outputBillingAcc := billing.Account{}
 
-	status, _, err := req.Run(bytes.NewBuffer(js), &outputBillingAcc)
+	status, _, err := req.MarshalAndRun(acc.billingAccount(), &outputBillingAcc)
 	if err != nil {
 		if _, ok := err.(*json.InvalidUnmarshalError); !ok {
 			return newAcc, err
