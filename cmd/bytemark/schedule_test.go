@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"testing"
 )
 
@@ -71,10 +72,15 @@ func TestScheduleBackups(t *testing.T) {
 		client.When("AuthWithToken", "test-token").Return(nil)
 		client.When("ParseVirtualMachineName", "vm-name", []*lib.VirtualMachineName{&defVM}).Return(&test.Name)
 
+		retSched := brain.BackupSchedule{
+			StartDate: test.Start,
+			Interval:  test.Interval,
+			ID:        3442,
+		}
 		if test.ShouldCall {
-			client.When("CreateBackupSchedule", test.Name, test.DiscLabel, test.Start, test.Interval).Return(test.CreateErr).Times(1)
+			client.When("CreateBackupSchedule", test.Name, test.DiscLabel, test.Start, test.Interval).Return(retSched, test.CreateErr).Times(1)
 		} else {
-			client.When("CreateBackupSchedule", test.Name, test.DiscLabel, test.Start, test.Interval).Return(test.CreateErr).Times(0)
+			client.When("CreateBackupSchedule", test.Name, test.DiscLabel, test.Start, test.Interval).Return(retSched, test.CreateErr).Times(0)
 		}
 		err := global.App.Run(append([]string{"bytemark", "schedule", "backups"}, test.Args...))
 		checkErr(t, "TestScheduleBackups", i, test.ShouldErr, err)
