@@ -204,8 +204,8 @@ type InternalServerError struct {
 
 func (e InternalServerError) Error() string {
 	out := []string{"The API server returned an error"}
-	if e.RequestBody != "" {
-		out = append(out, fmt.Sprintf("It had this to say: %s", e.RequestBody))
+	if e.ResponseBody != "" {
+		out = append(out, e.ResponseBody)
 	}
 	return strings.Join(out, "\r\n")
 }
