@@ -4,6 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
 	"io/ioutil"
 	"testing"
@@ -70,4 +71,30 @@ func getFixtureGroup() brain.Group {
 		Name:            "test-group",
 		VirtualMachines: vms,
 	}
+}
+
+func assertEqual(t *testing.T, test string, testNum int, name string, expected interface{}, actual interface{}) {
+	if expected != actual {
+		t.Errorf("%s %d: wrong %s: expected %#v, got %#v", test, testNum, name, expected, actual)
+	}
+}
+
+func checkErr(t *testing.T, name string, testNum int, shouldErr bool, err error) {
+	if err == nil && shouldErr {
+		t.Errorf("%s %d should error but didn't.", name, testNum)
+	} else if err != nil && !shouldErr {
+		t.Errorf("%s %d returned unexpected error: %s", name, testNum, err.Error())
+	}
+}
+
+type Verifyer interface {
+	Verify() (bool, error)
+	Reset() *mock.Mock
+}
+
+func verifyAndReset(t *testing.T, name string, testNum int, v Verifyer) {
+	if ok, err := v.Verify(); !ok {
+		t.Errorf("%s %d %v", name, testNum, err)
+	}
+	v.Reset()
 }

@@ -2,6 +2,8 @@ package prettyprint
 
 import (
 	"bytes"
+	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -12,8 +14,23 @@ type Test struct {
 	Expected string
 }
 
+// returns the name of the function that called the function that called findCallerName, or def if it was not possible to determine
+func findCallerName(def string) string {
+	pc, _, _, ok := runtime.Caller(2)
+	if ok {
+		fn := runtime.FuncForPC(pc)
+		if fn != nil {
+			nameBits := strings.Split(fn.Name(), ".")
+			return nameBits[len(nameBits)-1]
+		}
+
+	}
+	return def
+}
+
 // RunTests runs the prettyprint tests provided. testName should be the name of the calling function (TestSomethingSomethingPrettyPrint normally)
-func RunTests(t *testing.T, testName string, tests []Test) {
+func RunTests(t *testing.T, tests []Test) {
+	testName := findCallerName("UnknownTestPrettyPrint")
 	var seenFull, seenMedium, seenSingleLine bool
 	for i, test := range tests {
 		var b bytes.Buffer

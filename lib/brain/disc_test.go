@@ -1,7 +1,9 @@
 package brain
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/cheekybits/is"
+
 	"testing"
 )
 
@@ -52,4 +54,44 @@ func TestValidateDisc(t *testing.T) {
 			is.Equal("archive", d2.StorageGrade)
 		}
 	}
+}
+
+func TestDiscPrettyPrint(t *testing.T) {
+	prettyprint.RunTests(t, []prettyprint.Test{
+		{
+			Object: Disc{
+				Label:          "important-stuff",
+				Size:           25500,
+				BackupCount:    4,
+				BackupsEnabled: true,
+				StorageGrade:   "sata",
+			},
+			Detail:   prettyprint.SingleLine,
+			Expected: "important-stuff - 24GiB, sata grade (has 4 backups)",
+		},
+		{
+			Object: Disc{
+				Label:          "important-stuff",
+				Size:           22500,
+				BackupCount:    4,
+				BackupsEnabled: true,
+				StorageGrade:   "sata",
+			},
+			Detail: prettyprint.Medium,
+			Expected: `important-stuff - 21GiB, sata grade (has 4 backups)
+No backups scheduled`,
+		},
+		{
+			Object: Disc{
+				Label:          "important-stuff",
+				Size:           25500,
+				BackupCount:    4,
+				BackupsEnabled: true,
+				StorageGrade:   "iceberg",
+			},
+			Detail: prettyprint.Full,
+			Expected: `important-stuff - 24GiB, iceberg grade (has 4 backups) (restore in progress)
+No backups scheduled`,
+		},
+	})
 }
