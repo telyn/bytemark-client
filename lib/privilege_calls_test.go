@@ -47,12 +47,11 @@ func mkGetPrivilegesHandler(t *testing.T, user string) func(http.ResponseWriter,
 }
 
 func TestGetPrivileges(t *testing.T) {
-	handlers := MuxHandlers{
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/privileges": mkGetPrivilegesHandler(t, ""),
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -73,7 +72,7 @@ func TestGetPrivileges(t *testing.T) {
 
 func TestGrantPrivilege(t *testing.T) {
 	done := false
-	handlers := MuxHandlers{
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/users/satan/privileges": func(wr http.ResponseWriter, r *http.Request) {
 				if r.Method != "POST" {
@@ -83,8 +82,7 @@ func TestGrantPrivilege(t *testing.T) {
 				done = true
 			},
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +107,7 @@ func TestGrantPrivilege(t *testing.T) {
 
 func TestRevokePrivilegeWithID(t *testing.T) {
 	done := false
-	handlers := MuxHandlers{
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/privileges/999": func(wr http.ResponseWriter, r *http.Request) {
 				if r.Method != "DELETE" {
@@ -118,8 +116,7 @@ func TestRevokePrivilegeWithID(t *testing.T) {
 				done = true
 			},
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -145,7 +142,8 @@ func TestRevokePrivilegeWithID(t *testing.T) {
 
 func TestRevokePrivilegeWithoutID(t *testing.T) {
 	done := false
-	handlers := MuxHandlers{
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/users/satan/privileges": mkGetPrivilegesHandler(t, "satan"),
 			"/privileges/999": func(wr http.ResponseWriter, r *http.Request) {
@@ -155,8 +153,7 @@ func TestRevokePrivilegeWithoutID(t *testing.T) {
 				done = true
 			},
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)

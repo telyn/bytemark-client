@@ -20,7 +20,8 @@ func TestCreateBackupSchedule(t *testing.T) {
 	}
 
 	seenRequest := false
-	handlers := MuxHandlers{
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/accounts/wonka/groups/chocolatefactory/virtual_machines/labelmaker/discs/disc-label/backup_schedules": func(wr http.ResponseWriter, r *http.Request) {
 				seenRequest = true
@@ -44,9 +45,7 @@ func TestCreateBackupSchedule(t *testing.T) {
 				}
 			},
 		},
-	}
-
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 
 	defer servers.Close()
 	if err != nil {
@@ -73,7 +72,8 @@ func TestDeleteBackupSchedule(t *testing.T) {
 		Account:        "wonka",
 	}
 	seenRequest := false
-	handlers := MuxHandlers{
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/accounts/wonka/groups/chocolatefactory/virtual_machines/labelmaker/discs/disc-label/backup_schedules/324": func(wr http.ResponseWriter, r *http.Request) {
 				seenRequest = true
@@ -84,9 +84,7 @@ func TestDeleteBackupSchedule(t *testing.T) {
 
 			},
 		},
-	}
-
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 
 	if err != nil {
