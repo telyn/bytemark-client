@@ -24,7 +24,13 @@ func init() {
 						Name:      "iops_limit",
 						Usage:     "set the IOPS limit of a disc",
 						UsageText: "bytemark --admin set disc iops_limit <server> <disc> <limit>",
-						Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) error {
+						Flags: []cli.Flag{
+							cli.StringFlag{
+								Name:  "disc",
+								Usage: "the name of the disc to alter the iops_limit of",
+							},
+						},
+						Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), AuthProvider, func(c *Context) error {
 							iopsLimitStr, err := c.NextArg()
 							if err != nil {
 								return err
@@ -35,7 +41,7 @@ func init() {
 								return c.Help(fmt.Sprintf("Invalid number for IOPS limit \"%s\"\r\n", iopsLimitStr))
 							}
 
-							return global.Client.SetDiscIopsLimit(c.VirtualMachineName, *c.DiscLabel, iopsLimit)
+							return global.Client.SetDiscIopsLimit(c.VirtualMachineName, c.String("disc"), iopsLimit)
 						}),
 					},
 				},

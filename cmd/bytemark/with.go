@@ -50,6 +50,23 @@ func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
 	return
 }
 
+// OptionalArgs takes a list of flag names. For each flag name it attempts to read the next arg and set the flag with the corresponding name.
+// for instance:
+// OptionalArgs("server", "disc", "size")
+// will attempt to read 3 arguments, setting the "server" flag to the first, "disc" to the 2nd, "size" to the third.
+func OptionalArgs(args ...string) ProviderFunc {
+	return func(c *Context) error {
+		for _, name := range args {
+			value, err := c.NextArg()
+			if err != nil {
+				return nil
+			}
+			return c.Context.Set(name, value)
+		}
+		return nil
+	}
+}
+
 // AccountNameProvider stitches the next argument to the context as AccountName
 func AccountNameProvider(required bool) ProviderFunc {
 	return func(c *Context) (err error) {
@@ -102,19 +119,6 @@ func DefinitionsProvider(c *Context) (err error) {
 		return
 	}
 	c.Definitions, err = global.Client.ReadDefinitions()
-	return
-}
-
-// DiscLabelProvider reads the NextArg, parses it as a DiscLabel and attaches it to the Context
-func DiscLabelProvider(c *Context) (err error) {
-	if c.DiscLabel != nil {
-		return
-	}
-	discLabel, err := c.NextArg()
-	if err != nil {
-		return err
-	}
-	c.DiscLabel = &discLabel
 	return
 }
 

@@ -24,8 +24,14 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 			Usage:       "resize a cloud server's disc",
 			UsageText:   "bytemark resize disc <server> <disc label> <size>",
 			Description: "Resizes the given server's disc to the given size. Sizes may be specified with a + in front, in which case they are interpreted as relative. For example, '+2GB' is parsed as 'increase the disc size by 2GiB', where '2GB' is parsed as 'set the size of the disc to 2GiB'",
-			Flags:       []cli.Flag{forceFlag},
-			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				forceFlag,
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "the disc to resize",
+				},
+			},
+			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), AuthProvider, func(c *Context) (err error) {
 				const (
 					SET = iota
 					INCREASE
@@ -46,7 +52,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					return err
 				}
 
-				oldDisc, err := global.Client.GetDisc(c.VirtualMachineName, *c.DiscLabel)
+				oldDisc, err := global.Client.GetDisc(c.VirtualMachineName, c.String("disc"))
 				if err != nil {
 					return err
 				}
@@ -60,7 +66,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					return util.UserRequestedExit{}
 				}
 
-				err = global.Client.ResizeDisc(c.VirtualMachineName, *c.DiscLabel, size)
+				err = global.Client.ResizeDisc(c.VirtualMachineName, c.String("disc"), size)
 				if err != nil {
 					log.Logf("Failed!\r\n")
 					return

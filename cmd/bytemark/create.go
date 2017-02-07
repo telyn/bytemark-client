@@ -116,8 +116,14 @@ Multiple --disc flags can be used to create multiple discs`,
 		Usage:       "create a backup of a disc's current state",
 		UsageText:   "bytemark create backup <server name> <disc label>",
 		Description: `Creates a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
-		Action: With(VirtualMachineNameProvider, DiscLabelProvider, func(c *Context) error {
-			backup, err := global.Client.CreateBackup(*c.VirtualMachineName, *c.DiscLabel)
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "disc",
+				Usage: "the disc to create a backup of",
+			},
+		},
+		Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), func(c *Context) error {
+			backup, err := global.Client.CreateBackup(*c.VirtualMachineName, c.String("disc"))
 			if err != nil {
 				return err
 			}
