@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
@@ -12,6 +10,7 @@ func (c *bytemarkClient) CreateBackup(vm VirtualMachineName, discLabelOrID strin
 	if err != nil {
 		return
 	}
+
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
@@ -61,11 +60,7 @@ func (c *bytemarkClient) RestoreBackup(vm VirtualMachineName, discLabelOrID stri
 	restore := map[string]bool{
 		"restore": true,
 	}
-	restoreJSON, err := json.Marshal(restore)
-	if err != nil {
-		return
-	}
 
-	_, _, err = r.Run(bytes.NewBuffer(restoreJSON), nil)
+	_, _, err = r.MarshalAndRun(restore, nil)
 	return
 }

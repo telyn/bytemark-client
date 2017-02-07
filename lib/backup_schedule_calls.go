@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strconv"
 )
@@ -17,11 +15,7 @@ func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLab
 		StartDate: startDate,
 		Interval:  interval,
 	}
-	js, err := json.Marshal(inputSchedule)
-	if err != nil {
-		return
-	}
-	_, _, err = r.Run(bytes.NewBuffer(js), &sched)
+	_, _, err = r.MarshalAndRun(inputSchedule, &sched)
 	return
 }
 
