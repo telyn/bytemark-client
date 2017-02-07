@@ -132,6 +132,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	return
 }
 
+// MarshalAndRun marshals the 'in' object and passes that and 'out' to Run as the body and responseObject, respectively.
 func (r *Request) MarshalAndRun(in interface{}, out interface{}) (statusCode int, responseBody []byte, err error) {
 	var b bytes.Buffer
 	err = json.NewEncoder(&b).Encode(in)
