@@ -171,7 +171,7 @@ func TestRestoreBackup(t *testing.T) {
 
 	client, servers, err := mkTestClientAndServers(t, Handlers{
 		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups" {
+			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups/test-backup" {
 				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
 			}
 			if req.Method != "PUT" {

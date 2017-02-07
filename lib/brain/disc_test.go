@@ -83,14 +83,15 @@ No backups scheduled`,
 		},
 		{
 			Object: Disc{
-				Label:          "important-stuff",
-				Size:           25500,
-				BackupCount:    4,
-				BackupsEnabled: true,
-				StorageGrade:   "iceberg",
+				Label:           "important-stuff",
+				Size:            25500,
+				BackupCount:     4,
+				BackupsEnabled:  true,
+				StorageGrade:    "iceberg",
+				NewStorageGrade: "sata",
 			},
 			Detail: prettyprint.Full,
-			Expected: `important-stuff - 24GiB, iceberg grade (has 4 backups) (restore in progress)
+			Expected: `important-stuff - 24GiB, sata grade (restore in progress) (has 4 backups)
 No backups scheduled`,
 		},
 	})

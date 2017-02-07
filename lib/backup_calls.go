@@ -54,7 +54,7 @@ func (c *bytemarkClient) RestoreBackup(vm VirtualMachineName, discLabelOrID stri
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID, backupLabelOrID)
 	if err != nil {
 		return
 	}
