@@ -77,7 +77,7 @@ func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err
 		targetName = c.GroupName.String()
 		p.GroupID = c.Group.ID
 	} else if strings.HasPrefix(string(p.Level), "account") {
-		err = AccountProvider(true)(c)
+		err = AccountProvider("account")(c)
 		if err != nil {
 			return
 		}

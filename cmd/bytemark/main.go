@@ -242,9 +242,10 @@ OPTIONS:
 
 func globalFlags() (flags []cli.Flag) {
 	return []cli.Flag{
-		cli.StringFlag{
+		cli.GenericFlag{
 			Name:  "account",
 			Usage: "account name to use when no other accounts are specified",
+			Value: new(AccountNameFlag),
 		},
 		cli.StringFlag{
 			Name:  "api-endpoint",

@@ -69,7 +69,14 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the groups in an account",
 			UsageText:   "bytemark list groups [account]",
 			Description: `This command lists all the groups in the given account, or in your default account if not specified.`,
-			Action: With(AccountProvider(false), AuthProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "account",
+					Usage: "the account to list the groups of",
+					Value: new(AccountNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("account"), AccountProvider("account"), AuthProvider, func(c *Context) (err error) {
 				for _, group := range c.Account.Groups {
 					log.Output(group.Name)
 				}
@@ -108,7 +115,14 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if not specified.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			Action: With(AccountProvider(false), AuthProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "account",
+					Usage: "the account to list the groups of",
+					Value: new(AccountNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("account"), AccountProvider("account"), AuthProvider, func(c *Context) (err error) {
 				for _, g := range c.Account.Groups {
 					listServersInGroup(g)
 				}

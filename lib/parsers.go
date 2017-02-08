@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// ParseAccountName parses a group name given in .account[.extrabits] format.
+// ParseAccountName parses a group name given in account[.extrabits] format.
 // If there is a blank account name, tries to figure out the best possible account name to use.
 // If authentication has already happened, this also involves asking bmbilling.
 func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (account string) {

@@ -67,36 +67,10 @@ func OptionalArgs(args ...string) ProviderFunc {
 	}
 }
 
-// AccountNameProvider stitches the next argument to the context as AccountName
-func AccountNameProvider(required bool) ProviderFunc {
-	return func(c *Context) (err error) {
-		if c.AccountName != nil {
-			return
-		}
-
-		if err = AuthProvider(c); err != nil {
-			return
-		}
-		name, err := c.NextArg()
-		if err != nil {
-			if required {
-				return err
-			}
-		}
-		accName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
-		c.AccountName = &accName
-		return nil
-	}
-}
-
 // AccountProvider uses AccountNameProvider and then gets the named account details from the API, then stitches it to the context
-func AccountProvider(required bool) ProviderFunc {
+func AccountProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
-		err = AccountNameProvider(required)(c)
-		if err != nil {
-			return
-		}
-		c.Account, err = global.Client.GetAccount(*c.AccountName)
+		c.Account, err = global.Client.GetAccount(c.String(flagName))
 		return
 	}
 }
