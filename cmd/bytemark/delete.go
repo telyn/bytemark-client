@@ -26,14 +26,20 @@ func init() {
 			Usage:       "delete the given disc",
 			UsageText:   "bytemark delete disc <virtual machine name> <disc label>",
 			Description: "Deletes the given disc. To find out a disc's label you can use the `bytemark show server` command or `bytemark list discs` command.",
-			Flags:       []cli.Flag{forceFlag},
-			Aliases:     []string{"disk"},
-			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				forceFlag,
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "the disc to delete",
+				},
+			},
+			Aliases: []string{"disk"},
+			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), AuthProvider, func(c *Context) (err error) {
 				if !c.Bool("force") && !util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.") {
 					return util.UserRequestedExit{}
 				}
 
-				return global.Client.DeleteDisc(c.VirtualMachineName, *c.DiscLabel)
+				return global.Client.DeleteDisc(c.VirtualMachineName, c.String("disc"))
 			}),
 		}, {
 			Name:      "group",
@@ -100,7 +106,13 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			Usage:       "delete the given backup",
 			UsageText:   `bytemark delete backup <server name> <disc label> <backup label>`,
 			Description: "Deletes the given backup. Backups cannot be recovered after deletion.",
-			Action:      With(VirtualMachineNameProvider, DiscLabelProvider, deleteBackup),
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "the disc to delete a backup of",
+				},
+			},
+			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), deleteBackup),
 		}},
 	})
 }
@@ -207,7 +219,7 @@ func deleteBackup(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	err = global.Client.DeleteBackup(*c.VirtualMachineName, *c.DiscLabel, backup)
+	err = global.Client.DeleteBackup(*c.VirtualMachineName, c.String("disc"), backup)
 	if err != nil {
 		return
 	}

@@ -38,17 +38,23 @@ Note that it cannot be used to restore a server that has been permanently delete
 			Usage:       "restore the given backup",
 			UsageText:   `bytemark restore backup <server name> <disc label> <backup label>`,
 			Description: "Restores the given backup. Before doing this, a new backup is made of the disc's current state.",
-			Action: With(VirtualMachineNameProvider, DiscLabelProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "the name of the disc to restore to",
+				},
+			},
+			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), func(c *Context) (err error) {
 				backup, err := c.NextArg()
 				if err != nil {
 					return
 				}
 				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
-				_, err = global.Client.RestoreBackup(*c.VirtualMachineName, *c.DiscLabel, backup)
+				_, err = global.Client.RestoreBackup(*c.VirtualMachineName, c.String("disc"), backup)
 				if err != nil {
 					return
 				}
-				log.Logf("Disc '%s' is now being restored from backup '%s'", *c.DiscLabel, backup)
+				log.Logf("Disc '%s' is now being restored from backup '%s'", c.String("disc"), backup)
 				return
 			}),
 		}},

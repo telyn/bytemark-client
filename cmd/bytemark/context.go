@@ -19,7 +19,6 @@ type Context struct {
 	Account            *lib.Account
 	Authed             bool
 	Definitions        *lib.Definitions
-	DiscLabel          *string
 	GroupName          *lib.GroupName
 	Group              *brain.Group
 	User               *brain.User
