@@ -26,7 +26,6 @@ type GroupNameFlag lib.GroupName
 func (name *GroupNameFlag) Set(value string) error {
 	gp := global.Client.ParseGroupName(value, global.Config.GetGroup())
 	*name = GroupNameFlag(*gp)
-	fmt.Printf("Setting GroupNameFlag to %s: parsed as %#v\r\n", value, gp)
 	return nil
 }
 
