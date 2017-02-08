@@ -69,8 +69,13 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Name:  "json",
 					Usage: "Output group details as a JSON object",
 				},
+				cli.GenericFlag{
+					Name:  "group",
+					Usage: "The name of the group to show",
+					Value: new(GroupNameFlag),
+				},
 			},
-			Action: With(GroupProvider, func(c *Context) error {
+			Action: With(OptionalArgs("group"), GroupProvider("group"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Group, func() error {
 					s := ""
 					if len(c.Group.VirtualMachines) != 1 {
