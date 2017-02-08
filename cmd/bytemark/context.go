@@ -15,7 +15,6 @@ import (
 // in order to keep code DRY
 type Context struct {
 	Context            *cli.Context
-	AccountName        *string
 	Account            *lib.Account
 	Authed             bool
 	Definitions        *lib.Definitions

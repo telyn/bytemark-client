@@ -29,7 +29,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					Usage: "Output account details as a JSON object",
 				},
 			},
-			Action: With(AccountProvider(false), func(c *Context) error {
+			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
 					def, err := global.Client.GetDefaultAccount()
 					if err != nil {
