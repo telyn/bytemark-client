@@ -118,7 +118,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 			Flags: []cli.Flag{
 				cli.GenericFlag{
 					Name:  "account",
-					Usage: "the account to list the groups of",
+					Usage: "the account to list the servers of",
 					Value: new(AccountNameFlag),
 				},
 			},
