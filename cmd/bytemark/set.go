@@ -29,8 +29,13 @@ func init() {
 								Name:  "disc",
 								Usage: "the name of the disc to alter the iops_limit of",
 							},
+							cli.GenericFlag{
+								Name:  "server",
+								Usage: "the server the disc belongs to",
+								Value: new(VirtualMachineNameFlag),
+							},
 						},
-						Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), AuthProvider, func(c *Context) error {
+						Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) error {
 							iopsLimitStr, err := c.NextArg()
 							if err != nil {
 								return err
@@ -40,8 +45,9 @@ func init() {
 							if err != nil || iopsLimit < 1 {
 								return c.Help(fmt.Sprintf("Invalid number for IOPS limit \"%s\"\r\n", iopsLimitStr))
 							}
+							vmName := c.VirtualMachineName("server")
 
-							return global.Client.SetDiscIopsLimit(c.VirtualMachineName, c.String("disc"), iopsLimit)
+							return global.Client.SetDiscIopsLimit(&vmName, c.String("disc"), iopsLimit)
 						}),
 					},
 				},
@@ -65,12 +71,21 @@ These commands set various hardware properties of Bytemark servers. Note that fo
 				Description: `attach a cdrom to your Bytemark Cloud Server
 
 This command allows you to add a cdrom to your Bytemark server. The CD must be publicly available over HTTP in order to be attached.`,
-				Action: With(VirtualMachineNameProvider, func(c *Context) error {
+				Flags: []cli.Flag{
+					cli.GenericFlag{
+						Name:  "server",
+						Usage: "the server to attach the CD to",
+						Value: new(VirtualMachineNameFlag),
+					},
+				},
+				Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) error {
+					// url should be a flag
 					url, err := c.NextArg()
 					if err != nil {
 						return err
 					}
-					err = global.Client.SetVirtualMachineCDROM(c.VirtualMachineName, url)
+					vmName := c.VirtualMachineName("server")
+					err = global.Client.SetVirtualMachineCDROM(&vmName, url)
 					if _, ok := err.(lib.InternalServerError); ok {
 						return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
 					}
@@ -83,8 +98,17 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 				Usage:       "set the number of CPU cores on a Bytemark cloud server",
 				UsageText:   "bytemark set cores <server name> <cores>",
 				Description: "This command sets the number of CPU cores used by the cloud server. This will usually require a restart of the server to take effect.",
-				Flags:       []cli.Flag{forceFlag},
-				Action: With(VirtualMachineProvider, func(c *Context) error {
+				Flags: []cli.Flag{
+					forceFlag,
+					cli.GenericFlag{
+						Name:  "server",
+						Usage: "the server to alter",
+						Value: new(VirtualMachineNameFlag),
+					},
+				},
+				Action: With(OptionalArgs("server"), VirtualMachineProvider("server"), func(c *Context) error {
+					// cores should be a flag
+					vmName := c.VirtualMachineName("server")
 					coresStr, err := c.NextArg()
 					if err != nil {
 						return err
@@ -98,7 +122,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 							return util.UserRequestedExit{}
 						}
 					}
-					return global.Client.SetVirtualMachineCores(c.VirtualMachineName, cores)
+					return global.Client.SetVirtualMachineCores(&vmName, cores)
 
 				}),
 			}, {
@@ -115,8 +139,13 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						Name:  "unlock",
 						Usage: "Unlocks the hardware profile (allows it to be automatically upgraded when we release a newer version)",
 					},
+					cli.GenericFlag{
+						Name:  "server",
+						Usage: "the server whose hardware profile you wish to alter",
+						Value: new(VirtualMachineNameFlag),
+					},
 				},
-				Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
+				Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) error {
 					if c.Bool("lock") && c.Bool("unlock") {
 						return c.Help("Ambiguous command, both lock and unlock specified")
 					}
@@ -125,12 +154,13 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					if err != nil {
 						return c.Help("No hardware profile name was specified")
 					}
+					vmName := c.VirtualMachineName("server")
 					if c.Bool("lock") {
-						return global.Client.SetVirtualMachineHardwareProfile(c.VirtualMachineName, profileStr, true)
+						return global.Client.SetVirtualMachineHardwareProfile(&vmName, profileStr, true)
 					} else if c.Bool("unlock") {
-						return global.Client.SetVirtualMachineHardwareProfile(c.VirtualMachineName, profileStr, false)
+						return global.Client.SetVirtualMachineHardwareProfile(&vmName, profileStr, false)
 					} else {
-						return global.Client.SetVirtualMachineHardwareProfile(c.VirtualMachineName, profileStr)
+						return global.Client.SetVirtualMachineHardwareProfile(&vmName, profileStr)
 					}
 				}),
 			}, {
@@ -138,8 +168,15 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 				Usage:       "sets the amount of memory the server has",
 				UsageText:   "bytemark set memory <server> <memory size>",
 				Description: "Memory is specified in GiB by default, but can be suffixed with an M to indicate that it is provided in MiB",
-				Flags:       []cli.Flag{forceFlag},
-				Action: With(VirtualMachineProvider, func(c *Context) error {
+				Flags: []cli.Flag{
+					forceFlag,
+					cli.GenericFlag{
+						Name:  "server",
+						Usage: "the server to alter",
+						Value: new(VirtualMachineNameFlag),
+					},
+				},
+				Action: With(OptionalArgs("server"), VirtualMachineProvider("server"), func(c *Context) error {
 
 					memoryStr, err := c.NextArg()
 					if err != nil {
@@ -157,7 +194,8 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						}
 					}
 
-					return global.Client.SetVirtualMachineMemory(c.VirtualMachineName, memory)
+					vmName := c.VirtualMachineName("server")
+					return global.Client.SetVirtualMachineMemory(&vmName, memory)
 				}),
 			}},
 	})

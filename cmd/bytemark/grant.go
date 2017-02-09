@@ -30,7 +30,7 @@ func init() {
 				Usage: "Set if the privilege should require a yubikey.",
 			},
 		},
-		Action: With(func(c *Context) (err error) {
+		Action: With(AuthProvider, func(c *Context) (err error) {
 			priv, _, err := parsePrivilege(c)
 			if err != nil {
 				return
@@ -62,28 +62,37 @@ func normalisePrivilegeLevel(l brain.PrivilegeLevel) (level brain.PrivilegeLevel
 
 // fillPrivilegeTarget adds the object to the privilege, trying to use it as a VM, Group or Account name depending on what PrivilegeLevel the Privilege is for. The target is expected to be the NextArg at this point in the Context
 func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err error) {
+	name, err := c.NextArg()
+	if err != nil {
+		return
+	}
 	if strings.HasPrefix(string(p.Level), "vm") {
-		err = VirtualMachineProvider(c)
+		vmName, err := global.Client.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
 		if err != nil {
-			return
+			return "", err
 		}
-		targetName = c.VirtualMachine.Hostname
-		p.VirtualMachineID = c.VirtualMachine.ID
+		vm, err := global.Client.GetVirtualMachine(vmName)
+		if err != nil {
+			return "", err
+		}
+		targetName = vm.Hostname
+		p.VirtualMachineID = vm.ID
 	} else if strings.HasPrefix(string(p.Level), "group") {
-		groupName := c.GroupName("group")
-		group, err := global.Client.GetGroup(&groupName)
+		groupName := global.Client.ParseGroupName(name, global.Config.GetGroup())
+		group, err := global.Client.GetGroup(groupName)
 		if err != nil {
 			return "", err
 		}
 		targetName = groupName.String()
 		p.GroupID = group.ID
 	} else if strings.HasPrefix(string(p.Level), "account") {
-		err = AccountProvider("account")(c)
+		accountName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
+		account, err := global.Client.GetAccount(accountName)
 		if err != nil {
-			return
+			return "", err
 		}
-		targetName = c.Account.Name
-		p.AccountID = c.Account.BrainID
+		targetName = account.Name
+		p.AccountID = account.BrainID
 	}
 	return
 }

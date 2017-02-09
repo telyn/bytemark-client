@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 )
 
@@ -26,11 +25,28 @@ type GroupNameFlag lib.GroupName
 func (name *GroupNameFlag) Set(value string) error {
 	gp := global.Client.ParseGroupName(value, global.Config.GetGroup())
 	*name = GroupNameFlag(*gp)
-	fmt.Printf("Setting GroupNameFlag to %s: parsed as %#v\r\n", value, gp)
 	return nil
 }
 
 // String returns the GroupNameFlag as a string.
-func (name *GroupNameFlag) String() string {
-	return lib.GroupName(*name).String()
+func (name GroupNameFlag) String() string {
+	return lib.GroupName(name).String()
+}
+
+// VirtualMachineNameFlag is used for all --account flags, including the global one.
+type VirtualMachineNameFlag lib.VirtualMachineName
+
+// Set runs lib.Client.ParseVirtualMachineName using the global.Client to make sure we have a valid group name
+func (name *VirtualMachineNameFlag) Set(value string) error {
+	vm, err := global.Client.ParseVirtualMachineName(value, global.Config.GetVirtualMachine())
+	if err != nil {
+		return err
+	}
+	*name = VirtualMachineNameFlag(*vm)
+	return nil
+}
+
+// String returns the VirtualMachineNameFlag as a string.
+func (name VirtualMachineNameFlag) String() string {
+	return lib.VirtualMachineName(name).String()
 }

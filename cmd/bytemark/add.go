@@ -70,11 +70,11 @@ func init() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "ipv4",
-					Usage: "Add an IPv4 address. This is the default",
+					Usage: "If set, requests IPv4 addresses. This is the default",
 				},
 				cli.BoolFlag{
 					Name:  "ipv6",
-					Usage: "Add an IPv6 address.",
+					Usage: "If set, requests IPv6 addresses.",
 				},
 				cli.IntFlag{
 					Name:  "ips",
@@ -84,8 +84,13 @@ func init() {
 					Name:  "reason",
 					Usage: "Reason for adding the IP. If not set, will prompt.",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "The server to add IPs to",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
+			Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) error {
 				addrs := c.Int("ips")
 				if addrs < 1 {
 					addrs = 1
@@ -111,7 +116,8 @@ func init() {
 					Reason:     reason,
 					Contiguous: c.Bool("contiguous"),
 				}
-				ips, err := global.Client.AddIP(c.VirtualMachineName, &ipcr)
+				vmName := c.VirtualMachineName("server")
+				ips, err := global.Client.AddIP(&vmName, &ipcr)
 				if err != nil {
 					return err
 				}

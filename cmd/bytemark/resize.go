@@ -30,8 +30,14 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					Name:  "disc",
 					Usage: "the disc to resize",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server that the disc is attached to",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), AuthProvider, func(c *Context) (err error) {
+			Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) (err error) {
+				// TODO(telyn): replace all this with a flag
 				const (
 					SET = iota
 					INCREASE
@@ -52,7 +58,9 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					return err
 				}
 
-				oldDisc, err := global.Client.GetDisc(c.VirtualMachineName, c.String("disc"))
+				vmName := c.VirtualMachineName("server")
+
+				oldDisc, err := global.Client.GetDisc(&vmName, c.String("disc"))
 				if err != nil {
 					return err
 				}
@@ -66,7 +74,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					return util.UserRequestedExit{}
 				}
 
-				err = global.Client.ResizeDisc(c.VirtualMachineName, c.String("disc"), size)
+				err = global.Client.ResizeDisc(&vmName, c.String("disc"), size)
 				if err != nil {
 					log.Logf("Failed!\r\n")
 					return

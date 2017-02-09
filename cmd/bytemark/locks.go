@@ -18,8 +18,16 @@ This command locks the given server's hardware profile in place, preventing it f
 			Usage:       "lock hardware profiles to prevent upgrading",
 			UsageText:   "bytemark lock hwprofile <server>",
 			Description: `This command locks the given server's hardware profile in place, preventing it from being automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
-			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
-				return global.Client.SetVirtualMachineHardwareProfileLock(c.VirtualMachineName, true)
+			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server to lock",
+					Value: new(VirtualMachineNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) error {
+				vmName := c.VirtualMachineName("server")
+				return global.Client.SetVirtualMachineHardwareProfileLock(&vmName, true)
 			}),
 		}},
 	}, cli.Command{
@@ -35,8 +43,16 @@ This command locks the given server's hardware profile in place, preventing it f
 			Usage:       "unlock hardware profiles to allow upgrading",
 			UsageText:   "bytemark unlock hwprofile <server>",
 			Description: `This command unlocks the given server's hardware profile, allowing it to be automatically upgraded if a new is released. 'compatibility' hardware profiles are never automatically upgraded.`,
-			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
-				return global.Client.SetVirtualMachineHardwareProfileLock(c.VirtualMachineName, false)
+			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server to unlock",
+					Value: new(VirtualMachineNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) error {
+				vmName := c.VirtualMachineName("server")
+				return global.Client.SetVirtualMachineHardwareProfileLock(&vmName, false)
 			}),
 		}},
 	})

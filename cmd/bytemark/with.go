@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"net"
 )
@@ -61,7 +60,10 @@ func OptionalArgs(args ...string) ProviderFunc {
 			if err != nil {
 				return nil
 			}
-			return c.Context.Set(name, value)
+			err = c.Context.Set(name, value)
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	}
@@ -148,34 +150,18 @@ func UserProvider(c *Context) (err error) {
 	return
 }
 
-// VirtualMachineNameProvider reads the NextArg, parses it as a VirtualMachineName and attaches it to the Context
-func VirtualMachineNameProvider(c *Context) (err error) {
-	if err = AuthProvider(c); err != nil {
-		return
-	}
-
-	if c.VirtualMachineName != nil {
-		log.Log("VMNameProvider: VirtualMachineName already defined")
-		return
-	}
-	name, err := c.NextArg()
-	if err != nil {
-		return err
-	}
-
-	c.VirtualMachineName, err = global.Client.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
-	return
-}
-
 // VirtualMachineProvider calls VirtualMachineNameProvider then gets the named VirtualMachine from the brain and attaches it to the Context.
-func VirtualMachineProvider(c *Context) (err error) {
-	if c.VirtualMachine != nil {
+func VirtualMachineProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.VirtualMachine != nil {
+			return
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
+		vmName := c.VirtualMachineName(flagName)
+		c.VirtualMachine, err = global.Client.GetVirtualMachine(&vmName)
 		return
 	}
-	err = VirtualMachineNameProvider(c)
-	if err != nil {
-		return
-	}
-	c.VirtualMachine, err = global.Client.GetVirtualMachine(c.VirtualMachineName)
-	return
 }

@@ -2,14 +2,11 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"os"
-	"strconv"
-	"strings"
 )
 
 func init() {
@@ -63,6 +60,11 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Value: new(util.SizeSpecFlag),
 				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units. Defaults to 1GiB.",
 			},
+			cli.GenericFlag{
+				Name:  "name",
+				Usage: "The new server's name",
+				Value: new(VirtualMachineNameFlag),
+			},
 			cli.BoolFlag{
 				Name:  "no-image",
 				Usage: "Specifies that the server should not be imaged.",
@@ -77,7 +79,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			},
 		},
 
-		Action: With(VirtualMachineNameProvider, AuthProvider, createServer),
+		Action: With(OptionalArgs("name", "cores", "memory", "disc"), AuthProvider, createServer),
 	}
 	for _, flag := range imageInstallFlags {
 		createServerCmd.Flags = append(createServerCmd.Flags, flag)
@@ -93,6 +95,11 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Value: new(util.DiscSpecFlag),
 			},
 			forceFlag,
+			cli.GenericFlag{
+				Name:  "server",
+				Usage: "the server to add the disc to",
+				Value: new(VirtualMachineNameFlag),
+			},
 		},
 		Usage:     "create virtual discs attached to one of your cloud servers",
 		UsageText: "bytemark create discs [--disc <disc spec>]... <cloud server>",
@@ -100,7 +107,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
-		Action: With(VirtualMachineNameProvider, AuthProvider, createDiscs),
+		Action: With(OptionalArgs("server", "cores", "memory", "disc"), AuthProvider, createDiscs),
 	}
 
 	createGroupCmd := cli.Command{
@@ -128,9 +135,14 @@ Multiple --disc flags can be used to create multiple discs`,
 				Name:  "disc",
 				Usage: "the disc to create a backup of",
 			},
+			cli.GenericFlag{
+				Name:  "server",
+				Usage: "the server whose disk you wish to backup",
+				Value: new(VirtualMachineNameFlag),
+			},
 		},
-		Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), func(c *Context) error {
-			backup, err := global.Client.CreateBackup(*c.VirtualMachineName, c.String("disc"))
+		Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) error {
+			backup, err := global.Client.CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
 			if err != nil {
 				return err
 			}
@@ -174,11 +186,12 @@ func createDiscs(c *Context) (err error) {
 		}
 		discs[i] = *d
 	}
+	vmName := c.VirtualMachineName("server")
 
-	log.Logf("Adding %d discs to %s:\r\n", len(discs), c.VirtualMachineName)
+	log.Logf("Adding %d discs to %s:\r\n", len(discs), vmName)
 	for _, d := range discs {
 		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
-		err := global.Client.CreateDisc(c.VirtualMachineName, d)
+		err := global.Client.CreateDisc(&vmName, d)
 		if err != nil {
 			log.Errorf("failure! %v\r\n", err.Error())
 		} else {
@@ -199,44 +212,11 @@ func createGroup(c *Context) (err error) {
 
 // createServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags, then reads in positional arguments for the command line.
 func createServerReadArgs(c *Context) (discs []brain.Disc, cores, memory int, err error) {
-
 	discs = c.Discs("disc")
 	cores = c.Int("cores")
 	memory = c.Size("memory")
 	if memory == 0 {
 		memory = 1024
-	}
-
-	for argNum, arg := range c.Args() {
-		switch argNum {
-		case 0: // cores
-			tmpCores, coresErr := strconv.Atoi(arg)
-			if coresErr != nil {
-				err = coresErr
-				return
-			}
-			cores = tmpCores
-		case 1: // memory
-			tmpMem, memErr := sizespec.Parse(arg)
-			if memErr != nil {
-				err = memErr
-				return
-			}
-			memory = tmpMem
-		case 2: // disc
-			discs = make([]brain.Disc, strings.Count(arg, ",")+1)
-			for discNum, discSpec := range strings.Split(arg, ",") {
-				tmpDisc, discErr := util.ParseDiscSpec(discSpec)
-				if discErr != nil {
-					err = discErr
-					return
-				}
-				discs[discNum] = *tmpDisc
-			}
-		case 3:
-			err = c.Help("Too many arguments given.")
-			return
-		}
 	}
 	return
 }
@@ -315,7 +295,7 @@ func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error)
 
 	spec = brain.VirtualMachineSpec{
 		VirtualMachine: &brain.VirtualMachine{
-			Name:                  c.VirtualMachineName.VirtualMachine,
+			Name:                  c.VirtualMachineName("name").VirtualMachine,
 			Autoreboot:            autoreboot,
 			Cores:                 cores,
 			Memory:                memory,
@@ -332,12 +312,13 @@ func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error)
 }
 
 func createServer(c *Context) (err error) {
+	name := c.VirtualMachineName("name")
 	spec, err := createServerPrepSpec(c)
 	if err != nil {
 		return
 	}
 
-	groupName := c.VirtualMachineName.GroupName()
+	groupName := name.GroupName()
 
 	log.Log("The following server will be created:")
 	err = spec.PrettyPrint(os.Stderr, prettyprint.Full)
@@ -355,7 +336,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return err
 	}
-	vm, err := global.Client.GetVirtualMachine(c.VirtualMachineName)
+	vm, err := global.Client.GetVirtualMachine(&name)
 	if err != nil {
 		return
 	}

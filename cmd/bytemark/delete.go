@@ -32,14 +32,19 @@ func init() {
 					Name:  "disc",
 					Usage: "the disc to delete",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server whose disc you wish to delete",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
 			Aliases: []string{"disk"},
-			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), AuthProvider, func(c *Context) (err error) {
+			Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) (err error) {
 				if !c.Bool("force") && !util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.") {
 					return util.UserRequestedExit{}
 				}
-
-				return global.Client.DeleteDisc(c.VirtualMachineName, c.String("disc"))
+				vmName := c.VirtualMachineName("server")
+				return global.Client.DeleteDisc(&vmName, c.String("disc"))
 			}),
 		}, {
 			Name:      "group",
@@ -104,8 +109,13 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Usage: "If set, the server will be irrevocably deleted.",
 				},
 				forceFlag,
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server to delete",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineProvider, deleteServer),
+			Action: With(OptionalArgs("server"), AuthProvider, VirtualMachineProvider("server"), deleteServer),
 		}, {
 			Name:        "backup",
 			Usage:       "delete the given backup",
@@ -116,8 +126,13 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Name:  "disc",
 					Usage: "the disc to delete a backup of",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server to delete a backup from",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), deleteBackup),
+			Action: With(OptionalArgs("server", "disc"), AuthProvider, deleteBackup),
 		}},
 	})
 }
@@ -142,7 +157,8 @@ func deleteServer(c *Context) (err error) {
 		return
 	}
 
-	err = global.Client.DeleteVirtualMachine(c.VirtualMachineName, purge)
+	vmName := c.VirtualMachineName("server")
+	err = global.Client.DeleteVirtualMachine(&vmName, purge)
 	if err != nil {
 		return
 	}
@@ -225,7 +241,7 @@ func deleteBackup(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	err = global.Client.DeleteBackup(*c.VirtualMachineName, c.String("disc"), backup)
+	err = global.Client.DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), backup)
 	if err != nil {
 		return
 	}

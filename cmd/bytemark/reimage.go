@@ -51,8 +51,13 @@ Specify --force to prevent prompting.
 
 The root password will be output on stdout if the imaging succeeded, otherwise nothing will (and the exit code will be nonzero)
 	    `,
-		Flags: append(imageInstallFlags, forceFlag),
-		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
+		Flags: append(imageInstallFlags, forceFlag, cli.GenericFlag{
+			Name:  "server",
+			Usage: "the server to reimage",
+			Value: new(VirtualMachineNameFlag),
+		}),
+		Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) (err error) {
+			vmName := c.VirtualMachineName("server")
 			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {
 				return
@@ -62,7 +67,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 				return c.Help("No image was specified")
 			}
 
-			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", c.VirtualMachineName.String())
+			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", vmName)
 			err = imageInstall.PrettyPrint(os.Stderr, prettyprint.Full)
 			if err != nil {
 				return
@@ -73,7 +78,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 				return util.UserRequestedExit{}
 			}
 
-			err = global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)
+			err = global.Client.ReimageVirtualMachine(&vmName, imageInstall)
 			if err != nil && !isatty.IsTerminal(os.Stdout.Fd()) {
 				fmt.Fprintf(os.Stdout, imageInstall.RootPassword)
 			}
