@@ -93,6 +93,7 @@ func (c *Context) FileContents(flagname string) string {
 	return ""
 }
 
+// GroupName returns the named flag as a lib.Groupname
 func (c *Context) GroupName(flagname string) lib.GroupName {
 	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
 	if !ok {
@@ -128,6 +129,8 @@ func (c *Context) Size(flagname string) int {
 	}
 	return 0
 }
+
+// VirtualMachineName returns the named flag as a lib.VirtualMachineName
 func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
 	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
 	if !ok {
