@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
@@ -31,11 +29,7 @@ func (c *bytemarkClient) GrantPrivilege(privilege brain.Privilege) (err error) {
 	}
 	privilege.Username = ""
 
-	js, err := json.Marshal(privilege)
-	if err != nil {
-		return
-	}
-	_, _, err = req.Run(bytes.NewBuffer(js), nil)
+	_, _, err = req.MarshalAndRun(privilege, nil)
 	return
 }
 

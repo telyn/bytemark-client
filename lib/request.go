@@ -132,8 +132,19 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	return
 }
 
+// MarshalAndRun marshals the 'in' object and passes that and 'out' to Run as the body and responseObject, respectively.
+func (r *Request) MarshalAndRun(in interface{}, out interface{}) (statusCode int, responseBody []byte, err error) {
+	var b bytes.Buffer
+	err = json.NewEncoder(&b).Encode(in)
+	if err != nil {
+		return
+	}
+
+	return r.Run(&b, out)
+}
+
 // Run performs the request with the given body, and attempts to unmarshal a successful response into responseObject
-func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode int, response []byte, err error) {
+func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode int, responseBody []byte, err error) {
 	if r.hasRun {
 		err = RequestAlreadyRunError{r}
 		return
@@ -172,24 +183,31 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 
 	log.Debugf(log.LvlOutline, "%s %s: %d\r\n", r.method, req.URL, res.StatusCode)
 
+	responseBody, err = r.handleResponse(req, rb, res, responseObject)
+	return
+}
+
+// handleResponse deals with the response coming back from the request - creating an error if required, unmarshalling responseObject if necessary
+func (r *Request) handleResponse(req *http.Request, requestBody []byte, res *http.Response, responseObject interface{}) (body []byte, err error) {
+	body, err = ioutil.ReadAll(res.Body)
+	log.Debugf(log.LvlHTTPData, "response body: '%s'\r\n", body)
+	if err != nil {
+		return
+	}
+
 	baseErr := APIError{
 		Method:      r.method,
 		URL:         req.URL,
 		StatusCode:  res.StatusCode,
-		RequestBody: string(rb),
+		RequestBody: string(requestBody),
 	}
 
-	response, err = ioutil.ReadAll(res.Body)
-	log.Debugf(log.LvlHTTPData, "response body: '%s'\r\n", response)
-	if err != nil {
-		return
-	}
-	baseErr.ResponseBody = string(response)
+	baseErr.ResponseBody = string(body)
 
 	switch res.StatusCode {
 	case 400:
 		// because we need to reference fields specific to BadRequestError later
-		err = newBadRequestError(baseErr, response)
+		err = newBadRequestError(baseErr, body)
 	case 403:
 		err = NotAuthorizedError{baseErr}
 	case 404:
@@ -201,14 +219,14 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 	default:
 		if 200 <= res.StatusCode && res.StatusCode <= 299 {
 			if responseObject != nil {
-				jsonErr := json.Unmarshal(response, responseObject)
+				jsonErr := json.Unmarshal(body, responseObject)
 				if jsonErr != nil {
-					return statusCode, response, jsonErr
+					return body, jsonErr
 				}
 			}
-			break
+		} else {
+			err = UnknownStatusCodeError{baseErr}
 		}
-		err = UnknownStatusCodeError{baseErr}
 	}
 	return
 }

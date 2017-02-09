@@ -44,7 +44,7 @@ func (vm VirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLeve
 {{ define "server_discs"  }}
 {{- if .Discs }}    discs:
 {{- range .Discs }}
-      • {{ prettysprint . "_sgl" -}}
+      • {{ prettysprint . "_sgl" }}
 {{- end }}
 
 {{ end -}}
