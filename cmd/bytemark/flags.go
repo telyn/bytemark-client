@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/BytemarkHosting/bytemark-client/lib"
+)
+
 // AccountNameFlag is used for all --account flags, including the global one.
 type AccountNameFlag string
 
@@ -12,4 +16,19 @@ func (name *AccountNameFlag) Set(value string) error {
 // String returns the AccountNameFlag as a string.
 func (name *AccountNameFlag) String() string {
 	return string(*name)
+}
+
+// GroupNameFlag is used for all --account flags, including the global one.
+type GroupNameFlag lib.GroupName
+
+// Set runs lib.Client.ParseGroupName using the global.Client to make sure we have a valid group name
+func (name *GroupNameFlag) Set(value string) error {
+	gp := global.Client.ParseGroupName(value, global.Config.GetGroup())
+	*name = GroupNameFlag(*gp)
+	return nil
+}
+
+// String returns the GroupNameFlag as a string.
+func (name *GroupNameFlag) String() string {
+	return lib.GroupName(*name).String()
 }

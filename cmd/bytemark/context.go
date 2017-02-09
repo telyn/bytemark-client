@@ -18,7 +18,6 @@ type Context struct {
 	Account            *lib.Account
 	Authed             bool
 	Definitions        *lib.Definitions
-	GroupName          *lib.GroupName
 	Group              *brain.Group
 	User               *brain.User
 	UserName           *string
@@ -93,6 +92,15 @@ func (c *Context) FileContents(flagname string) string {
 		return file.Value
 	}
 	return ""
+}
+
+// GroupName returns the named flag as a lib.GroupName
+func (c *Context) GroupName(flagname string) lib.GroupName {
+	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
+	if !ok {
+		return lib.GroupName{}
+	}
+	return lib.GroupName(*gpNameFlag)
 }
 
 // Int returns the value of the named flag as an int

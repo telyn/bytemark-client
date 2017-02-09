@@ -108,7 +108,14 @@ Multiple --disc flags can be used to create multiple discs`,
 		Usage:       "create a group for organising your servers",
 		UsageText:   "bytemark create group <group name>",
 		Description: `Groups are part of your server's fqdn`,
-		Action:      With(GroupNameProvider, AuthProvider, createGroup),
+		Flags: []cli.Flag{
+			cli.GenericFlag{
+				Name:  "group",
+				Usage: "the name of the group to create",
+				Value: new(GroupNameFlag),
+			},
+		},
+		Action: With(OptionalArgs("group"), AuthProvider, createGroup),
 	}
 
 	createBackupCmd := cli.Command{
@@ -182,9 +189,10 @@ func createDiscs(c *Context) (err error) {
 }
 
 func createGroup(c *Context) (err error) {
-	err = global.Client.CreateGroup(c.GroupName)
+	gp := c.GroupName("group")
+	err = global.Client.CreateGroup(&gp)
 	if err == nil {
-		log.Logf("Group %s was created under account %s\r\n", c.GroupName.Group, c.GroupName.Account)
+		log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
 	}
 	return
 }

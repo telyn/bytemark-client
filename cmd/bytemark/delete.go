@@ -52,9 +52,14 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Name:  "recursive",
 					Usage: "If set, all servers in the group will be irrevocably deleted.",
 				},
+				cli.GenericFlag{
+					Name:  "group",
+					Usage: "the name of the group to delete",
+					Value: new(GroupNameFlag),
+				},
 				forceFlag,
 			},
-			Action: With(GroupProvider, deleteGroup),
+			Action: With(OptionalArgs("group"), GroupProvider("group"), deleteGroup),
 		}, {
 			Name:        "key",
 			Usage:       "deletes the specified key",
@@ -160,8 +165,9 @@ func countRunning(group *brain.Group) (running int) {
 
 func deleteGroup(c *Context) (err error) {
 	recursive := c.Bool("recursive")
+	groupName := c.GroupName("group")
 	if len(c.Group.VirtualMachines) > 0 && recursive {
-		prompt := fmt.Sprintf("The group '%s' has %d servers in it which will be irrevocably deleted", c.GroupName.Group, len(c.Group.VirtualMachines))
+		prompt := fmt.Sprintf("The group '%s' has %d servers in it which will be irrevocably deleted", c.Group.Name, len(c.Group.VirtualMachines))
 		running := countRunning(c.Group)
 		if running != 0 {
 			stopped := len(c.Group.VirtualMachines) - running
@@ -169,23 +175,23 @@ func deleteGroup(c *Context) (err error) {
 			if stopped > 0 {
 				andStopped = fmt.Sprintf("and %d stopped ", stopped)
 			}
-			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.GroupName.Group, running, andStopped)
+			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.Group.Name, running, andStopped)
 		}
 
 		if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
 			return util.UserRequestedExit{}
 		}
-		err = recursiveDeleteGroup(c.GroupName, c.Group)
+		err = recursiveDeleteGroup(&groupName, c.Group)
 		if err != nil {
 			return
 		}
 	} else if !recursive {
-		err = &util.WontDeleteNonEmptyGroupError{Group: c.GroupName}
+		err = &util.WontDeleteNonEmptyGroupError{Group: &groupName}
 		return
 	}
-	err = global.Client.DeleteGroup(c.GroupName)
+	err = global.Client.DeleteGroup(&groupName)
 	if err == nil {
-		log.Logf("Group %s deleted successfully.\r\n", c.GroupName.String())
+		log.Logf("Group %s deleted successfully.\r\n", groupName.String())
 	}
 	return
 }

@@ -70,12 +70,13 @@ func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err
 		targetName = c.VirtualMachine.Hostname
 		p.VirtualMachineID = c.VirtualMachine.ID
 	} else if strings.HasPrefix(string(p.Level), "group") {
-		err = GroupProvider(c)
+		groupName := c.GroupName("group")
+		group, err := global.Client.GetGroup(&groupName)
 		if err != nil {
-			return
+			return "", err
 		}
-		targetName = c.GroupName.String()
-		p.GroupID = c.Group.ID
+		targetName = groupName.String()
+		p.GroupID = group.ID
 	} else if strings.HasPrefix(string(p.Level), "account") {
 		err = AccountProvider("account")(c)
 		if err != nil {

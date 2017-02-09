@@ -96,36 +96,21 @@ func DefinitionsProvider(c *Context) (err error) {
 	return
 }
 
-// GroupNameProvider reads the NextArg, parses it as a GroupName and attaches it to the Context
-func GroupNameProvider(c *Context) (err error) {
-	if c.GroupName != nil {
-		return
-	}
-
-	if err = AuthProvider(c); err != nil {
-		return
-	}
-
-	name, err := c.NextArg()
-	if err != nil {
-		return err
-	}
-	c.GroupName = global.Client.ParseGroupName(name, global.Config.GetGroup())
-	return
-}
-
 // GroupProvider calls GroupNameProvider then gets the named Group from the brain and attaches it to the Context.
-func GroupProvider(c *Context) (err error) {
-	if c.Group != nil {
-		return
-	}
-	err = GroupNameProvider(c)
-	if err != nil {
-		return
-	}
+func GroupProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.Group != nil {
+			return
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
 
-	c.Group, err = global.Client.GetGroup(c.GroupName)
-	return
+		groupName := c.GroupName(flagName)
+		c.Group, err = global.Client.GetGroup(&groupName)
+		return
+	}
 }
 
 // UserNameProvider reads the NextArg and attaches it to the Context as UserName
