@@ -26,12 +26,17 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 The <schedule id> is a number that can be found out using 'bytemark show disc <server> <disc>'
 `,
 				Flags: []cli.Flag{
+					cli.GenericFlag{
+						Name:  "server",
+						Usage: "the server to unschedule backups on",
+						Value: new(VirtualMachineNameFlag),
+					},
 					cli.StringFlag{
 						Name:  "disc",
 						Usage: "the disc to unschedule some backups of",
 					},
 				},
-				Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), func(c *Context) (err error) {
+				Action: With(OptionalArgs("server", "disc"), func(c *Context) (err error) {
 					idStr, err := c.NextArg()
 					if err != nil {
 						return
@@ -42,7 +47,8 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 						return
 					}
 
-					err = global.Client.DeleteBackupSchedule(*c.VirtualMachineName, c.String("disc"), id)
+					vmName := c.VirtualMachineName("server")
+					err = global.Client.DeleteBackupSchedule(vmName, c.String("disc"), id)
 					if err == nil {
 						log.Log("Backups unscheduled.")
 					}

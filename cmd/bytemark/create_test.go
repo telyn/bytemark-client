@@ -274,8 +274,7 @@ func TestCreateServer(t *testing.T) {
 		Discs: []brain.Disc{{
 			Size:         34 * 1024,
 			StorageGrade: "archive",
-		},
-		},
+		}},
 	}
 	getvm := new(brain.VirtualMachine)
 	*getvm = *vm.VirtualMachine

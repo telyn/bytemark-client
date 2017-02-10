@@ -17,7 +17,7 @@ func init() {
 				Usage: "Set if the privilege should require a yubikey.",
 			},
 		},
-		Action: With(func(c *Context) (err error) {
+		Action: With(AuthProvider, func(c *Context) (err error) {
 			priv, _, err := parsePrivilege(c)
 
 			if err != nil {

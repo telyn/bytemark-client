@@ -14,15 +14,14 @@ import (
 // the next unused argument and can have various bytemarky types attached to it
 // in order to keep code DRY
 type Context struct {
-	Context            *cli.Context
-	Account            *lib.Account
-	Authed             bool
-	Definitions        *lib.Definitions
-	Group              *brain.Group
-	User               *brain.User
-	UserName           *string
-	VirtualMachine     *brain.VirtualMachine
-	VirtualMachineName *lib.VirtualMachineName
+	Context        *cli.Context
+	Account        *lib.Account
+	Authed         bool
+	Definitions    *lib.Definitions
+	Group          *brain.Group
+	User           *brain.User
+	UserName       *string
+	VirtualMachine *brain.VirtualMachine
 
 	currentArgIndex int
 }
@@ -129,6 +128,15 @@ func (c *Context) Size(flagname string) int {
 		return int(*size)
 	}
 	return 0
+}
+
+// VirtualMachineName returns the named flag as a lib.VirtualMachineName
+func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
+	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
+	if !ok {
+		return *global.Config.GetVirtualMachine()
+	}
+	return lib.VirtualMachineName(*vmNameFlag)
 }
 
 // IfNotMarshalJSON checks to see if the json flag was set, and outputs obj as a JSON object if so.

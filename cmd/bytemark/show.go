@@ -107,8 +107,13 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Name:  "json",
 					Usage: "Output server details as a JSON object.",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server to display",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineProvider, func(c *Context) error {
+			Action: With(OptionalArgs("server"), VirtualMachineProvider("server"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
 					return c.VirtualMachine.PrettyPrint(os.Stderr, prettyprint.Full)
 				})

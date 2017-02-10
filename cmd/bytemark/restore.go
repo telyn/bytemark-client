@@ -19,13 +19,21 @@ func init() {
 			UsageText: "bytemark restore server <name>",
 			Description: `This command restores a previously deleted cloud server to its non-deleted state.
 Note that it cannot be used to restore a server that has been permanently deleted (purged).`,
-			Action: With(VirtualMachineProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server that the disc is attached to",
+					Value: new(VirtualMachineNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("server"), VirtualMachineProvider("server"), func(c *Context) (err error) {
+				vmName := c.VirtualMachineName("server")
 				if !c.VirtualMachine.Deleted {
 					log.Errorf("%s was already restored\r\n", c.VirtualMachine.Hostname)
 					return
 				}
 
-				err = global.Client.UndeleteVirtualMachine(c.VirtualMachineName)
+				err = global.Client.UndeleteVirtualMachine(&vmName)
 
 				if err != nil {
 					return
@@ -43,14 +51,19 @@ Note that it cannot be used to restore a server that has been permanently delete
 					Name:  "disc",
 					Usage: "the name of the disc to restore to",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server that the disc is attached to",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), func(c *Context) (err error) {
+			Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) (err error) {
 				backup, err := c.NextArg()
 				if err != nil {
 					return
 				}
 				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
-				_, err = global.Client.RestoreBackup(*c.VirtualMachineName, c.String("disc"), backup)
+				_, err = global.Client.RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), backup)
 				if err != nil {
 					return
 				}

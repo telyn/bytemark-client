@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+//TODO(telyn): add test for restore server
+
 func TestRestoreBackup(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, false)
