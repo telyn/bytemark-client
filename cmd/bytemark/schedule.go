@@ -31,6 +31,10 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 						Name:  "start",
 						Usage: "date & time the schedule starts. Assumes BST/GMT (depending on time of year) if not specified - defaults to 00:00",
 					},
+					cli.StringFlag{
+						Name:  "disc",
+						Usage: "the disc to schedule backups of",
+					},
 				},
 				Description: `schedule backups to occur at a regular interval (defined in seconds)
 		
@@ -41,7 +45,7 @@ bytemark schedule backups --start 00:00 fileserver very-important-data 86400
 
 To have hourly backups starting at 14:37 (Central European Summer Time) on the 5th of April, 2017:
 bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-important-data 3600`,
-				Action: With(VirtualMachineNameProvider, DiscLabelProvider, func(c *Context) (err error) {
+				Action: With(VirtualMachineNameProvider, OptionalArgs("disc"), func(c *Context) (err error) {
 					start := c.String("start")
 					if start == "" {
 						start = "00:00"
@@ -57,7 +61,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 						return
 					}
 
-					_, err = global.Client.CreateBackupSchedule(*c.VirtualMachineName, *c.DiscLabel, start, interval)
+					_, err = global.Client.CreateBackupSchedule(*c.VirtualMachineName, c.String("disc"), start, interval)
 					if err == nil {
 						log.Log("Schedule set.")
 					}
