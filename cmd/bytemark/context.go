@@ -93,7 +93,7 @@ func (c *Context) FileContents(flagname string) string {
 	return ""
 }
 
-// GroupName returns the named flag as a lib.Groupname
+// GroupName returns the named flag as a lib.GroupName
 func (c *Context) GroupName(flagname string) lib.GroupName {
 	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
 	if !ok {

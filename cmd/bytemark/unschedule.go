@@ -33,7 +33,7 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 					},
 					cli.StringFlag{
 						Name:  "disc",
-						Usage: "the disc to unschedule backups of",
+						Usage: "the disc to unschedule some backups of",
 					},
 				},
 				Action: With(OptionalArgs("server", "disc"), func(c *Context) (err error) {
