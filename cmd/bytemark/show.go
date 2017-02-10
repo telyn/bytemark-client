@@ -109,7 +109,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				},
 				cli.GenericFlag{
 					Name:  "server",
-					Usage: "the server to alter",
+					Usage: "the server to display",
 					Value: new(VirtualMachineNameFlag),
 				},
 			},
