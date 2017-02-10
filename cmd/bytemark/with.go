@@ -58,6 +58,8 @@ func OptionalArgs(args ...string) ProviderFunc {
 		for _, name := range args {
 			value, err := c.NextArg()
 			if err != nil {
+				// if c.NextArg errors that means there aren't more arguments
+				// so we just return nil - returning an error would stop the execution of the action.
 				return nil
 			}
 			err = c.Context.Set(name, value)
