@@ -111,7 +111,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					vmName := c.VirtualMachineName("server")
 					cores := c.Int("cores")
 					if cores < 1 {
-						return fmt.Errorf("cores must be at least 1.")
+						return fmt.Errorf("cores must be at least 1")
 					}
 					if c.VirtualMachine.Cores < cores {
 						if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
