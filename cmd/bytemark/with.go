@@ -118,6 +118,10 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 // AccountProvider gets an account name from a flag, then the account details from the API, then stitches it to the context
 func AccountProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
 		c.Account, err = global.Client.GetAccount(c.String(flagName))
 		return
 	}
