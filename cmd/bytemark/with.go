@@ -5,6 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
 	"net"
+	"strings"
 )
 
 // ProviderFunc is the function type that can be passed to With()
@@ -96,20 +97,16 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 			toRead = n[0]
 		}
 
-		value := ""
+		value := make([]string, 0, toRead)
 		for i := 0; i < toRead; i++ {
 			arg, err := c.NextArg()
 			if err != nil {
 				// don't return the error - just means we ran out of arguments to slurp
 				break
 			}
-			if i == 0 {
-				value += arg
-			} else {
-				value += " " + arg
-			}
+			value = append(value, arg)
 		}
-		err = c.Context.Set(flagName, value)
+		err = c.Context.Set(flagName, strings.Join(value, " "))
 		return
 
 	}
