@@ -56,18 +56,18 @@ Note that it cannot be used to restore a server that has been permanently delete
 					Usage: "the server that the disc is attached to",
 					Value: new(VirtualMachineNameFlag),
 				},
+				cli.StringFlag{
+					Name:  "backup",
+					Usage: "the name or ID of the backup to restore",
+				},
 			},
-			Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) (err error) {
-				backup, err := c.NextArg()
-				if err != nil {
-					return
-				}
+			Action: With(OptionalArgs("server", "disc", "backup"), AuthProvider, func(c *Context) (err error) {
 				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
-				_, err = global.Client.RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), backup)
+				_, err = global.Client.RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 				if err != nil {
 					return
 				}
-				log.Logf("Disc '%s' is now being restored from backup '%s'", c.String("disc"), backup)
+				log.Logf("Disc '%s' is now being restored from backup '%s'", c.String("disc"), c.String("backup"))
 				return
 			}),
 		}},

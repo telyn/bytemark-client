@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"strings"
 )
 
 // AccountNameFlag is used for all --account flags, including the global one.
@@ -49,4 +52,46 @@ func (name *VirtualMachineNameFlag) Set(value string) error {
 // String returns the VirtualMachineNameFlag as a string.
 func (name VirtualMachineNameFlag) String() string {
 	return lib.VirtualMachineName(name).String()
+}
+
+type ResizeMode int
+
+const (
+	ResizeModeSet = iota
+	ResizeModeIncrease
+)
+
+type ResizeFlag struct {
+	Mode ResizeMode
+	Size int
+}
+
+func (rf *ResizeFlag) Set(value string) (err error) {
+	rf.Mode = ResizeModeSet
+	if strings.HasPrefix(value, "+") {
+		rf.Mode = ResizeModeIncrease
+		value = value[1:]
+	}
+
+	sz, err := sizespec.Parse(value)
+	if err != nil {
+		return
+	}
+	rf.Size = sz
+	return
+}
+
+func (rf ResizeFlag) String() string {
+	plus := ""
+	if rf.Mode == ResizeModeIncrease {
+		plus += "+"
+	}
+	sz := rf.Size
+	units := "GiB"
+	sz /= 1024
+	if sz > 1024 {
+		sz /= 1024
+		units = "TiB"
+	}
+	return fmt.Sprintf("%s%d%s", plus, sz, units)
 }

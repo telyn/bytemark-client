@@ -139,6 +139,24 @@ func AuthProvider(c *Context) (err error) {
 	return
 }
 
+// DiscProvider gets a VirtualMachineName from a flag and a disc from another, then gets the named Disc from the brain and attaches it to the Context.
+func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.Group != nil {
+			return
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
+
+		vmName := c.VirtualMachineName(vmFlagName)
+		discLabel := c.String(discFlagName)
+		c.Disc, err = global.Client.GetDisc(&vmName, discLabel)
+		return
+	}
+}
+
 // DefinitionsProvider gets the Definitions from the brain and attaches them to the Context.
 func DefinitionsProvider(c *Context) (err error) {
 	if c.Definitions != nil {

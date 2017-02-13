@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"strconv"
 )
 
 func init() {
@@ -35,20 +35,17 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 						Name:  "disc",
 						Usage: "the disc to unschedule some backups of",
 					},
+					cli.IntFlag{
+						Name:  "schedule-id",
+						Usage: "the ID of the schedule to remove. See the output of `show disc` to find out schedule IDs.",
+					},
 				},
-				Action: With(OptionalArgs("server", "disc"), func(c *Context) (err error) {
-					idStr, err := c.NextArg()
-					if err != nil {
-						return
+				Action: With(OptionalArgs("server", "disc", "schedule-id"), func(c *Context) (err error) {
+					if c.Int("schedule-id") < 1 {
+						return fmt.Errorf("schedule-id not specified or invalid")
 					}
-
-					id, err := strconv.Atoi(idStr)
-					if err != nil {
-						return
-					}
-
 					vmName := c.VirtualMachineName("server")
-					err = global.Client.DeleteBackupSchedule(vmName, c.String("disc"), id)
+					err = global.Client.DeleteBackupSchedule(vmName, c.String("disc"), c.Int("schedule-id"))
 					if err == nil {
 						log.Log("Backups unscheduled.")
 					}

@@ -144,13 +144,13 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Name:  "json",
 					Usage: "Output privileges as a JSON array.",
 				},
+				cli.StringFlag{
+					Name:  "user",
+					Usage: "The user whose privileges you wish to see",
+				},
 			},
-			Action: With(AuthProvider, func(c *Context) error {
-				user, err := c.NextArg()
-				if err != nil {
-					user = ""
-				}
-				privs, err := global.Client.GetPrivileges(user)
+			Action: With(OptionalArgs("user"), AuthProvider, func(c *Context) error {
+				privs, err := global.Client.GetPrivileges(c.String("user"))
 				if err != nil {
 					return err
 				}
