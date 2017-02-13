@@ -91,10 +91,8 @@ func OptionalArgs(args ...string) ProviderFunc {
 // if n is not set, reads all the remaining arguments.
 func JoinArgs(flagName string, n ...int) ProviderFunc {
 	return func(c *Context) (err error) {
-		toRead := 0
-		if len(n) == 0 {
-			toRead = len(c.Args())
-		} else {
+		toRead := len(c.Args())
+		if len(n) > 0 {
 			toRead = n[0]
 		}
 
