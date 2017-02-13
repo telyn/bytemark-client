@@ -130,7 +130,7 @@ func UserProvider(flagName string) ProviderFunc {
 		if err = AuthProvider(c); err != nil {
 			return
 		}
-		c.User, err = global.Client.GetUser(*c.UserName)
+		c.User, err = global.Client.GetUser(user)
 		return
 	}
 }
