@@ -26,25 +26,31 @@ func init() {
 					Name:  "user",
 					Usage: "Which user to add the key to. Defaults to the username you log in as.",
 				},
+				cli.StringFlag{
+					Name:  "public-key",
+					Usage: "the text of a public key to add. If set, is used in preference to --public-key-file",
+				},
 				cli.GenericFlag{
 					Name:  "public-key-file",
 					Usage: "The public key file to add to the account",
 					Value: &publicKeyFile,
 				},
 			},
-			Action: With(AuthProvider, func(ctx *Context) (err error) {
+			Action: With(JoinArgs("public-key"), AuthProvider, func(ctx *Context) (err error) {
 				user := ctx.String("user")
 				if user == "" {
 					user = global.Config.GetIgnoreErr("user")
 				}
 
-				key := strings.TrimSpace(strings.Join(ctx.Args(), " "))
+				key := strings.TrimSpace(ctx.String("public-key"))
 				if key == "" {
 					if publicKeyFile.Value == "" {
 						return ctx.Help("Please specify a key")
 					}
 					key = publicKeyFile.Value
 				} else {
+					// if public-key is not blank, try to use it as a filename
+					// FileFlag does some nice ~-substitution which is why we use it rather than the infinitely more normal-looking ioutil.ReadFile
 					publicKeyFile = util.FileFlag{FileName: key}
 					if err := publicKeyFile.Set(key); err == nil {
 						key = publicKeyFile.Value
