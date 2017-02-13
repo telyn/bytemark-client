@@ -123,7 +123,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Usage:       "displays info about a user",
 			UsageText:   "bytemark show user <name>",
 			Description: `Currently the only details are what SSH keys are authorised for this user`,
-			Action: With(UserProvider, func(c *Context) error {
+			Action: With(OptionalArgs("user"), UserProvider("user"), func(c *Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)

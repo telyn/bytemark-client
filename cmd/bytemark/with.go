@@ -117,39 +117,22 @@ func GroupProvider(flagName string) ProviderFunc {
 	}
 }
 
-// UserNameProvider reads the NextArg and attaches it to the Context as UserName
-func UserNameProvider(c *Context) (err error) {
-	if c.UserName != nil {
-		return
-	}
-	var username string
-	username, err = c.NextArg()
-	if err != nil {
-		username, err = global.Config.Get("user")
-		if username == "" {
-			username = global.Client.GetSessionUser()
-			err = nil
-		}
-	}
-	c.UserName = &username
-	return
-
-}
-
 // UserProvider calls UserNameProvider, gets the User from the brain, and attaches it to the Context.
-func UserProvider(c *Context) (err error) {
-	if c.User != nil {
+func UserProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.User != nil {
+			return
+		}
+		user := c.String(flagName)
+		if user != "" {
+			user = global.Config.GetIgnoreErr("user")
+		}
+		if err = AuthProvider(c); err != nil {
+			return
+		}
+		c.User, err = global.Client.GetUser(*c.UserName)
 		return
 	}
-	err = UserNameProvider(c)
-	if err != nil {
-		return
-	}
-	if err = AuthProvider(c); err != nil {
-		return
-	}
-	c.User, err = global.Client.GetUser(*c.UserName)
-	return
 }
 
 // VirtualMachineProvider calls VirtualMachineNameProvider then gets the named VirtualMachine from the brain and attaches it to the Context.
