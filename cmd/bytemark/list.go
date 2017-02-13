@@ -81,7 +81,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 					Value: new(AccountNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("account"), AccountProvider("account"), AuthProvider, func(c *Context) (err error) {
+			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) (err error) {
 				for _, group := range c.Account.Groups {
 					log.Output(group.Name)
 				}
@@ -92,28 +92,13 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the SSH public keys associated with a user",
 			UsageText:   "bytemark list keys [user]",
 			Description: "Lists all the SSH public keys associated with a user, defaulting to your log-in user.",
-			Action: func(c *cli.Context) error {
-				username := global.Config.GetIgnoreErr("user")
-				if len(c.Args()) == 1 {
-					username = c.Args().First()
-				}
-
-				err := EnsureAuth()
-				if err != nil {
-					return err
-				}
-
-				user, err := global.Client.GetUser(username)
-				if err != nil {
-					return err
-				}
-
-				for _, k := range user.AuthorizedKeys {
+			Action: With(OptionalArgs("user"), UserProvider("user"), func(c *Context) error {
+				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
 				}
 
 				return nil
-			},
+			}),
 		}, {
 			Name:      "servers",
 			Usage:     "list all the servers in an account",

@@ -115,6 +115,10 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 // AccountProvider gets an account name from a flag, then the account details from the API, then stitches it to the context
 func AccountProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
 		c.Account, err = global.Client.GetAccount(c.String(flagName))
 		return
 	}
@@ -130,6 +134,24 @@ func AuthProvider(c *Context) (err error) {
 	}
 	c.Authed = true
 	return
+}
+
+// DiscProvider gets a VirtualMachineName from a flag and a disc from another, then gets the named Disc from the brain and attaches it to the Context.
+func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.Group != nil {
+			return
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
+
+		vmName := c.VirtualMachineName(vmFlagName)
+		discLabel := c.String(discFlagName)
+		c.Disc, err = global.Client.GetDisc(&vmName, discLabel)
+		return
+	}
 }
 
 // DefinitionsProvider gets the Definitions from the brain and attaches them to the Context.

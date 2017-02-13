@@ -18,6 +18,7 @@ type Context struct {
 	Account        *lib.Account
 	Authed         bool
 	Definitions    *lib.Definitions
+	Disc           *brain.Disc
 	Group          *brain.Group
 	User           *brain.User
 	VirtualMachine *brain.VirtualMachine
@@ -127,6 +128,15 @@ func (c *Context) Size(flagname string) int {
 		return int(*size)
 	}
 	return 0
+}
+
+// ResizeFlag returns the named ResizeFlag
+func (c *Context) ResizeFlag(flagname string) ResizeFlag {
+	size, ok := c.Context.Generic(flagname).(*ResizeFlag)
+	if ok {
+		return *size
+	}
+	return ResizeFlag{}
 }
 
 // VirtualMachineName returns the named flag as a lib.VirtualMachineName

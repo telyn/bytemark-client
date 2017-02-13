@@ -7,7 +7,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"strings"
 )
 
 func init() {
@@ -75,21 +74,20 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Name:  "user",
 					Usage: "Which user to delete the key from. Defaults to the username you log in as.",
 				},
+				cli.StringFlag{
+					Name:  "public-key",
+					Usage: "The public key to delete. Can be the comment part or the whole public key",
+				},
 			},
-			Action: With(func(c *Context) (err error) {
+			Action: With(JoinArgs("public-key"), AuthProvider, func(c *Context) (err error) {
 				user := c.String("user")
 				if user == "" {
 					user = global.Config.GetIgnoreErr("user")
 				}
 
-				key := strings.Join(c.Args(), " ")
+				key := c.String("public-key")
 				if key == "" {
 					return c.Help("You must specify a key to delete.\r\n")
-				}
-
-				err = EnsureAuth()
-				if err != nil {
-					return
 				}
 
 				err = global.Client.DeleteUserAuthorizedKey(user, key)
@@ -131,8 +129,12 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Usage: "the server to delete a backup from",
 					Value: new(VirtualMachineNameFlag),
 				},
+				cli.StringFlag{
+					Name:  "backup",
+					Usage: "the name or ID of the backup to delete",
+				},
 			},
-			Action: With(OptionalArgs("server", "disc"), AuthProvider, deleteBackup),
+			Action: With(OptionalArgs("server", "disc", "backup"), AuthProvider, deleteBackup),
 		}},
 	})
 }
@@ -237,14 +239,10 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("       bytemark undelete server <server>")
 }*/
 func deleteBackup(c *Context) (err error) {
-	backup, err := c.NextArg()
+	err = global.Client.DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 	if err != nil {
 		return
 	}
-	err = global.Client.DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), backup)
-	if err != nil {
-		return
-	}
-	log.Logf("Backup '%s' deleted successfully", backup)
+	log.Logf("Backup '%s' deleted successfully", c.String("backup"))
 	return
 }

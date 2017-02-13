@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"strings"
 )
 
 func init() {
@@ -35,46 +33,27 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					Usage: "the server that the disc is attached to",
 					Value: new(VirtualMachineNameFlag),
 				},
+				cli.GenericFlag{
+					Name:  "new-size",
+					Usage: "the new size for the disc. Prefix with + to indicate 'increase by'",
+					Value: new(ResizeFlag),
+				},
 			},
-			Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) (err error) {
-				// TODO(telyn): replace all this with a flag
-				const (
-					SET = iota
-					INCREASE
-				)
-				mode := SET
-				sizeStr, err := c.NextArg()
-				if err != nil {
-					log.Error("No size specified")
-					return err
-				}
-				if strings.HasPrefix(sizeStr, "+") {
-					sizeStr = sizeStr[1:]
-					mode = INCREASE
-				}
-
-				size, err := sizespec.Parse(sizeStr)
-				if err != nil {
-					return err
-				}
-
+			Action: With(OptionalArgs("server", "disc", "new-size"), DiscProvider("server", "disc"), func(c *Context) (err error) {
 				vmName := c.VirtualMachineName("server")
+				size := c.ResizeFlag("new-size")
+				newSize := size.Size
 
-				oldDisc, err := global.Client.GetDisc(&vmName, c.String("disc"))
-				if err != nil {
-					return err
+				if size.Mode == ResizeModeIncrease {
+					newSize += c.Disc.Size
 				}
-
-				if mode == INCREASE {
-					size = oldDisc.Size + size
-				}
-				log.Logf("Resizing %s from %dGiB to %dGiB...", oldDisc.Label, oldDisc.Size/1024, size/1024)
+				log.Logf("Resizing %s from %dGiB to %dGiB...", c.Disc.Label, c.Disc.Size/1024, newSize/1024)
 
 				if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("Are you certain you wish to perform this resize?")) {
 					return util.UserRequestedExit{}
 				}
 
-				err = global.Client.ResizeDisc(&vmName, c.String("disc"), size)
+				err = global.Client.ResizeDisc(&vmName, c.String("disc"), newSize)
 				if err != nil {
 					log.Logf("Failed!\r\n")
 					return
