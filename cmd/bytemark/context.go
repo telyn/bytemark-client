@@ -20,7 +20,6 @@ type Context struct {
 	Definitions    *lib.Definitions
 	Group          *brain.Group
 	User           *brain.User
-	UserName       *string
 	VirtualMachine *brain.VirtualMachine
 
 	currentArgIndex int
