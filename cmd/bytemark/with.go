@@ -5,6 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
 	"net"
+	"strings"
 )
 
 // ProviderFunc is the function type that can be passed to With()
@@ -35,6 +36,22 @@ func cleanup(c *Context) {
 	size, ok := c.Context.Generic("memory").(*util.SizeSpecFlag)
 	if ok {
 		*size = 0
+	}
+	server, ok := c.Context.Generic("server").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
+	server, ok = c.Context.Generic("from").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
+	server, ok = c.Context.Generic("to").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
+	group, ok := c.Context.Generic("group").(*GroupNameFlag)
+	if ok {
+		*group = GroupNameFlag{}
 	}
 }
 
@@ -71,7 +88,31 @@ func OptionalArgs(args ...string) ProviderFunc {
 	}
 }
 
-// AccountProvider uses AccountNameProvider and then gets the named account details from the API, then stitches it to the context
+// JoinArgs is like OptionalArgs, but reads up to n arguments joined with spaces and sets the one named flag.
+// if n is not set, reads all the remaining arguments.
+func JoinArgs(flagName string, n ...int) ProviderFunc {
+	return func(c *Context) (err error) {
+		toRead := len(c.Args())
+		if len(n) > 0 {
+			toRead = n[0]
+		}
+
+		value := make([]string, 0, toRead)
+		for i := 0; i < toRead; i++ {
+			arg, err := c.NextArg()
+			if err != nil {
+				// don't return the error - just means we ran out of arguments to slurp
+				break
+			}
+			value = append(value, arg)
+		}
+		err = c.Context.Set(flagName, strings.Join(value, " "))
+		return
+
+	}
+}
+
+// AccountProvider gets an account name from a flag, then the account details from the API, then stitches it to the context
 func AccountProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
 		c.Account, err = global.Client.GetAccount(c.String(flagName))
@@ -100,7 +141,7 @@ func DefinitionsProvider(c *Context) (err error) {
 	return
 }
 
-// GroupProvider calls GroupNameProvider then gets the named Group from the brain and attaches it to the Context.
+// GroupProvider gets a GroupName from a flag, then gets the named Group from the brain and attaches it to the Context.
 func GroupProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
 		if c.Group != nil {
@@ -135,7 +176,7 @@ func UserProvider(flagName string) ProviderFunc {
 	}
 }
 
-// VirtualMachineProvider calls VirtualMachineNameProvider then gets the named VirtualMachine from the brain and attaches it to the Context.
+// VirtualMachineProvider gets a VirtualMachineName from a flag, then gets the named VirtualMachine from the brain and attaches it to the Context.
 func VirtualMachineProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
 		if c.VirtualMachine != nil {
