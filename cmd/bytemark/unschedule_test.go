@@ -29,19 +29,20 @@ func TestUnscheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"vm-name"},
+			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
+			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
 		},
 		{
 			ShouldCall: true,
 			Args:       []string{"vm-name", "disc-label", "324"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
+			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			DiscLabel:  "disc-label",
 			ID:         324,
 		},
@@ -50,7 +51,6 @@ func TestUnscheduleBackups(t *testing.T) {
 	for i, test := range tests {
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 		client.When("AuthWithToken", "test-token").Return(nil)
-		client.When("ParseVirtualMachineName", "vm-name", []*lib.VirtualMachineName{&defVM}).Return(&test.Name)
 
 		if test.ShouldCall {
 			client.When("DeleteBackupSchedule", test.Name, test.DiscLabel, test.ID).Return(test.CreateErr).Times(1)

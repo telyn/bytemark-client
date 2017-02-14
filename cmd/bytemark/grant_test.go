@@ -38,7 +38,6 @@ func TestGrantPrivilege(t *testing.T) {
 					Account: "test-account",
 				}
 
-				c.When("ParseGroupName", "test-group.test-account", []*lib.GroupName{&defGroup}).Return(&group, nil)
 
 				c.When("GetGroup", &group).Return(&brain.Group{
 					ID: 303,
@@ -63,7 +62,6 @@ func TestGrantPrivilege(t *testing.T) {
 					Account:        "test-account",
 				}
 
-				c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []*lib.VirtualMachineName{{}}).Return(&vm, nil)
 				c.When("GetVirtualMachine", &vm).Return(&brain.VirtualMachine{ID: 333}, nil).Times(1)
 
 				c.When("GrantPrivilege", brain.Privilege{
@@ -80,7 +78,6 @@ func TestGrantPrivilege(t *testing.T) {
 				// specific to vm_admin/vm_console
 				config.When("GetIgnoreErr", "account").Return("default-account")
 
-				c.When("ParseAccountName", "test-account", []string{"default-account"}).Return("test-account")
 
 				c.When("GetAccount", "test-account").Return(&lib.Account{
 					BrainID: 32310,

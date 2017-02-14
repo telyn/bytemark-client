@@ -18,10 +18,9 @@ func TestCreateDiskCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
+	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", &name).Return(&brain.VirtualMachine{Hostname: "test-server.default.test-user.endpoint"})
+	c.When("GetVirtualMachine", &name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
 
 	disc := brain.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
@@ -44,9 +43,9 @@ func TestCreateGroupCommand(t *testing.T) {
 	config.When("GetGroup").Return(&defGroup)
 
 	group := lib.GroupName{
-		Group: "test-group",
+		Group:   "test-group",
+		Account: "default-account",
 	}
-	c.When("ParseGroupName", "test-group", []*lib.GroupName{&defGroup}).Return(&group).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("CreateGroup", &group).Return(nil).Times(1)
 
@@ -106,7 +105,6 @@ func TestCreateServerCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&lib.VirtualMachineName{VirtualMachine: "test-server"})
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := brain.VirtualMachineSpec{
@@ -149,18 +147,13 @@ func TestCreateServerCommand(t *testing.T) {
 	getvm.Discs[1] = &vm.Discs[1]
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
-	group := lib.GroupName{
-		Group:   "",
-		Account: "",
-	}
-
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
-	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
+	c.When("CreateVirtualMachine", &defGroup, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
@@ -230,7 +223,6 @@ func TestCreateServerNoImage(t *testing.T) {
 		Account:        "",
 	}
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
@@ -282,7 +274,6 @@ func TestCreateServer(t *testing.T) {
 
 	group := lib.GroupName{}
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("CreateVirtualMachine", &group, vm).Return(vm.VirtualMachine, nil).Times(1)
@@ -314,7 +305,6 @@ func TestCreateBackup(t *testing.T) {
 		Group:          "",
 		Account:        "",
 	}
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)

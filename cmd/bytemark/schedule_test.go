@@ -36,16 +36,16 @@ func TestScheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"vm-name"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
+			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
+			DiscLabel:  "",
 			Interval:   86400,
 			Start:      "00:00",
 			ShouldCall: true,
-			ShouldErr:  true,
-			CreateErr:  fmt.Errorf("bad disc label"),
+			ShouldErr:  false,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
+			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   86400,
@@ -54,15 +54,15 @@ func TestScheduleBackups(t *testing.T) {
 		},
 		{
 			ShouldCall: true,
-			Args:       []string{"vm-name", "disc-label", "3600"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
+			Args:       []string{"vm-name.group.account", "disc-label", "3600"},
+			Name:       lib.VirtualMachineName{"vm-name", "group", "account"},
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   3600,
 		},
 		{
 			Args:       []string{"--start", "thursday", "vm-name", "disc-label", "3235"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
+			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			DiscLabel:  "disc-label",
 			Start:      "thursday",
 			Interval:   3235,
@@ -83,7 +83,6 @@ func TestScheduleBackups(t *testing.T) {
 	for i, test = range tests {
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 		client.When("AuthWithToken", "test-token").Return(nil)
-		client.When("ParseVirtualMachineName", "vm-name", []*lib.VirtualMachineName{&defVM}).Return(&test.Name)
 
 		retSched := brain.BackupSchedule{
 			StartDate: test.Start,

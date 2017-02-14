@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -67,7 +68,7 @@ func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err
 		return
 	}
 	if strings.HasPrefix(string(p.Level), "vm") {
-		vmName, err := global.Client.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
+		vmName, err := lib.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
 		if err != nil {
 			return "", err
 		}
@@ -78,7 +79,7 @@ func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err
 		targetName = vm.Hostname
 		p.VirtualMachineID = vm.ID
 	} else if strings.HasPrefix(string(p.Level), "group") {
-		groupName := global.Client.ParseGroupName(name, global.Config.GetGroup())
+		groupName := lib.ParseGroupName(name, global.Config.GetGroup())
 		group, err := global.Client.GetGroup(groupName)
 		if err != nil {
 			return "", err
@@ -86,7 +87,7 @@ func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err
 		targetName = groupName.String()
 		p.GroupID = group.ID
 	} else if strings.HasPrefix(string(p.Level), "account") {
-		accountName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
+		accountName := lib.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
 		account, err := global.Client.GetAccount(accountName)
 		if err != nil {
 			return "", err
