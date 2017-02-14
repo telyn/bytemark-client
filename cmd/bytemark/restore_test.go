@@ -22,7 +22,6 @@ func TestRestoreBackup(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("RestoreBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
 

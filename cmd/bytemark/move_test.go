@@ -25,8 +25,6 @@ func TestMove(t *testing.T) {
 	config.When("GetVirtualMachine").Return(&defVM)
 	config.When("Force").Return(true)
 
-	c.When("ParseVirtualMachineName", "old-name.old-group.old-account", []*lib.VirtualMachineName{&defVM}).Return(&oldName).Times(1)
-	c.When("ParseVirtualMachineName", "new-name.new-group.new-account", []*lib.VirtualMachineName{&defVM}).Return(&newName).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("MoveVirtualMachine", &oldName, &newName).Return(nil).Times(1)

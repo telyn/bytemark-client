@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -67,7 +68,7 @@ func fillPrivilegeTarget(c *Context, p *brain.Privilege) (targetName string, err
 		return
 	}
 	if strings.HasPrefix(string(p.Level), "vm") {
-		vmName, err := global.Client.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
+		vmName, err := lib.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
 		if err != nil {
 			return "", err
 		}

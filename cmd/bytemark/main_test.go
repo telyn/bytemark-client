@@ -10,8 +10,8 @@ import (
 	"testing"
 )
 
-var defVM lib.VirtualMachineName
-var defGroup lib.GroupName
+var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
+var defGroup = lib.GroupName{Group: "default", Account: "default-account"}
 
 func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mocks.Client) {
 	config = new(mocks.Config)

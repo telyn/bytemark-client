@@ -80,8 +80,7 @@ func TestAddIPCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	vm := lib.VirtualMachineName{VirtualMachine: "test-server"}
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vm, nil).Times(1)
+	vm := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
 
 	ipcr := brain.IPCreateRequest{
 		Addresses:  1,
