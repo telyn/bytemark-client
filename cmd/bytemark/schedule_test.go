@@ -13,7 +13,7 @@ func TestScheduleBackups(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	tests := []struct {
+	type ScheduleTest struct {
 		Args []string
 
 		Name      lib.VirtualMachineName
@@ -24,21 +24,33 @@ func TestScheduleBackups(t *testing.T) {
 		ShouldErr  bool
 		ShouldCall bool
 		CreateErr  error
-	}{
+	}
+
+	tests := []ScheduleTest{
 		{
-			ShouldCall: false,
+			Start:      "00:00",
+			Interval:   86400,
+			ShouldCall: true,
 			ShouldErr:  true,
+			CreateErr:  fmt.Errorf("bad server name"),
 		},
 		{
 			Args:       []string{"vm-name"},
-			ShouldCall: false,
+			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
+			Interval:   86400,
+			Start:      "00:00",
+			ShouldCall: true,
 			ShouldErr:  true,
+			CreateErr:  fmt.Errorf("bad disc label"),
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
 			Name:       lib.VirtualMachineName{"vm-name", "default", "test-account"},
-			ShouldCall: false,
-			ShouldErr:  true,
+			DiscLabel:  "disc-label",
+			Start:      "00:00",
+			Interval:   86400,
+			ShouldCall: true,
+			ShouldErr:  false,
 		},
 		{
 			ShouldCall: true,
@@ -61,13 +73,14 @@ func TestScheduleBackups(t *testing.T) {
 	}
 
 	var i int
+	var test ScheduleTest
 	defer func() {
 		if r := recover(); r != nil {
 			t.Errorf("TestScheduleBackups #%d panicked.\r\n%v", i, r)
 		}
 	}()
 
-	for i, test := range tests {
+	for i, test = range tests {
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 		client.When("AuthWithToken", "test-token").Return(nil)
 		client.When("ParseVirtualMachineName", "vm-name", []*lib.VirtualMachineName{&defVM}).Return(&test.Name)
