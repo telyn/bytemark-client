@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
@@ -112,6 +113,49 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 		err = c.Context.Set(flagName, value)
 		return
 
+	}
+}
+
+func isIn(needle string, haystack []string) bool {
+	for _, str := range haystack {
+		if needle == str {
+			return true
+		}
+	}
+	return false
+}
+
+func flagValueIsOK(flag cli.Flag) bool {
+	switch realFlag := flag.(type) {
+	case cli.GenericFlag:
+		switch value := realFlag.Value.(type) {
+		case *VirtualMachineNameFlag:
+			return value.VirtualMachine != "" && value.Group != "" && value.Account != ""
+		case *GroupNameFlag:
+			return value.Group != "" && value.Account != ""
+		case *AccountNameFlag:
+			return *value != ""
+		case *util.SizeSpecFlag:
+			return *value != 0
+		}
+	case cli.StringFlag:
+		return realFlag.Value != ""
+	case cli.IntFlag:
+		return realFlag.Value != 0
+	}
+	return true
+}
+
+// RequiredFlags makes sure that the named flags are not their zero-values.
+// (or that VirtualMachineName / GroupName flags have the full complement of values needed)
+func RequiredFlags(flagNames ...string) ProviderFunc {
+	return func(c *Context) (err error) {
+		for _, flag := range c.Context.Command.Flags {
+			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(flag) {
+				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
+			}
+		}
+		return nil
 	}
 }
 

@@ -18,7 +18,7 @@ func init() {
 				Value: new(VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) (err error) {
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to reset %v...\r\n", vmName)
 			err = global.Client.ResetVirtualMachine(&vmName)
@@ -41,7 +41,7 @@ func init() {
 				Value: new(VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) (err error) {
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to restart %v...\r\n", vmName)
 			err = global.Client.RestartVirtualMachine(&vmName)
@@ -64,7 +64,7 @@ func init() {
 				Value: new(VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) (err error) {
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to shutdown %v...\r\n", vmName)
 			err = global.Client.ShutdownVirtualMachine(&vmName, true)
@@ -87,7 +87,7 @@ func init() {
 				Value: new(VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) (err error) {
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to start %s...\r\n", vmName)
 			err = global.Client.StartVirtualMachine(&vmName)
@@ -110,7 +110,7 @@ func init() {
 				Value: new(VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) (err error) {
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to stop %s...\r\n", vmName)
 			err = global.Client.StopVirtualMachine(&vmName)

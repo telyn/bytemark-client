@@ -79,7 +79,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			},
 		},
 
-		Action: With(OptionalArgs("name", "cores", "memory", "disc"), AuthProvider, createServer),
+		Action: With(OptionalArgs("name", "cores", "memory", "disc"), RequiredFlags("name"), AuthProvider, createServer),
 	}
 	for _, flag := range imageInstallFlags {
 		createServerCmd.Flags = append(createServerCmd.Flags, flag)
@@ -122,7 +122,7 @@ Multiple --disc flags can be used to create multiple discs`,
 				Value: new(GroupNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("group"), AuthProvider, createGroup),
+		Action: With(OptionalArgs("group"), RequiredFlags("group"), AuthProvider, createGroup),
 	}
 
 	createBackupCmd := cli.Command{
@@ -141,7 +141,7 @@ Multiple --disc flags can be used to create multiple discs`,
 				Value: new(VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) error {
+		Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) error {
 			backup, err := global.Client.CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
 			if err != nil {
 				return err

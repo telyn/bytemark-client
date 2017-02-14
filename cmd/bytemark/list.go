@@ -59,7 +59,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 					Value: new(VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), VirtualMachineProvider("server"), func(c *Context) (err error) {
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) (err error) {
 				for _, disc := range c.VirtualMachine.Discs {
 					if c.Bool("human") {
 						log.Outputf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
@@ -81,7 +81,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 					Value: new(AccountNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) (err error) {
+			Action: With(OptionalArgs("account"), RequiredFlags("account"), AccountProvider("account"), func(c *Context) (err error) {
 				for _, group := range c.Account.Groups {
 					log.Output(group.Name)
 				}
@@ -134,7 +134,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 					Value: new(VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) (err error) {
+			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
 				vmName := c.VirtualMachineName("server")
 				label := c.String("disc")
 				var backups brain.Backups

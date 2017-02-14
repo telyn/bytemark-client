@@ -61,7 +61,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 		}, {
 			Name:      "group",
 			Usage:     "outputs info about a group",
-			UsageText: "bytemark show group [--json] <name>",
+			UsageText: "bytemark show group [--json] [name]",
 			Description: `This command displays information about how many servers are in the given group.
 If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
 			Flags: []cli.Flag{
@@ -113,7 +113,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Value: new(VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), VirtualMachineProvider("server"), func(c *Context) error {
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
 					return c.VirtualMachine.PrettyPrint(os.Stderr, prettyprint.Full)
 				})
@@ -123,7 +123,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Usage:       "displays info about a user",
 			UsageText:   "bytemark show user <name>",
 			Description: `Currently the only details are what SSH keys are authorised for this user`,
-			Action: With(OptionalArgs("user"), UserProvider("user"), func(c *Context) error {
+			Action: With(OptionalArgs("user"), RequiredFlags("user"), UserProvider("user"), func(c *Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
