@@ -169,7 +169,6 @@ func TestCommandConfigSet(t *testing.T) {
 }
 
 func setupAccountTest(c *mocks.Client, name string, err error) {
-	c.When("ParseAccountName", name, []string{""}).Return(name)
 
 	if err != nil {
 		c.When("GetAccount", name).Return(nil, err)

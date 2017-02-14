@@ -78,7 +78,6 @@ func TestGrantPrivilege(t *testing.T) {
 				// specific to vm_admin/vm_console
 				config.When("GetIgnoreErr", "account").Return("default-account")
 
-				c.When("ParseAccountName", "test-account", []string{"default-account"}).Return("test-account")
 
 				c.When("GetAccount", "test-account").Return(&lib.Account{
 					BrainID: 32310,
