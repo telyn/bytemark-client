@@ -16,7 +16,6 @@ func TestShowGroupCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetGroup").Return(&defGroup)
 	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
-	c.When("ParseGroupName", "test-group.test-account", []*lib.GroupName{&defGroup}).Return(&gpname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	group := getFixtureGroup()

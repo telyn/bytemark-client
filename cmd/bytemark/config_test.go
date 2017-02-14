@@ -15,7 +15,7 @@ import (
 func TestConfigAccountValidation(t *testing.T) {
 	config, client := baseTestSetup(t, false)
 
-	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
+	config.When("GetGroup").Return(&lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
@@ -180,7 +180,6 @@ func setupAccountTest(c *mocks.Client, name string, err error) {
 
 func setupGroupTest(c *mocks.Client, name string, err error) {
 	groupName := lib.GroupName{Group: name}
-	c.When("ParseGroupName", name, []*lib.GroupName{{}}).Return(&groupName)
 	if err != nil {
 		c.When("GetGroup", &groupName).Return(nil, err).Times(1)
 	} else {

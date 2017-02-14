@@ -10,7 +10,7 @@ import (
 // AccountNameFlag is used for all --account flags, including the global one.
 type AccountNameFlag string
 
-// Set runs lib.Client.ParseAccountName using the global.Client to make sure we get just the 'pure' account name; no cluster / endpoint details
+// Set runs lib.ParseAccountName to make sure we get just the 'pure' account name; no cluster / endpoint details
 func (name *AccountNameFlag) Set(value string) error {
 	*name = AccountNameFlag(lib.ParseAccountName(value, global.Config.GetIgnoreErr("account")))
 	return nil
@@ -24,7 +24,7 @@ func (name *AccountNameFlag) String() string {
 // GroupNameFlag is used for all --account flags, including the global one.
 type GroupNameFlag lib.GroupName
 
-// Set runs lib.Client.ParseGroupName using the global.Client to make sure we have a valid group name
+// Set runs lib.ParseGroupName to make sure we have a valid group name
 func (name *GroupNameFlag) Set(value string) error {
 	gp := lib.ParseGroupName(value, global.Config.GetGroup())
 	*name = GroupNameFlag(*gp)

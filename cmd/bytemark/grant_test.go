@@ -38,7 +38,6 @@ func TestGrantPrivilege(t *testing.T) {
 					Account: "test-account",
 				}
 
-				c.When("ParseGroupName", "test-group.test-account", []*lib.GroupName{&defGroup}).Return(&group, nil)
 
 				c.When("GetGroup", &group).Return(&brain.Group{
 					ID: 303,
