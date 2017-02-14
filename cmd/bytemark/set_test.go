@@ -108,21 +108,22 @@ func TestSetHWProfileCommand(t *testing.T) {
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "default",
-		Account:        "default-account"}
+		Account:        "default-account",
+	}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	// test no arguments, nothing should happen
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", &vmname).Return(nil).Times(0) // don't do anything
+	c.When("AuthWithToken", "test-token").Return(nil).Times(0)
 
 	err := global.App.Run(strings.Split("bytemark set hwprofile test-server", " "))
 	is.NotNil(err) // TODO(telyn): actually check error type
 
 	if ok, vErr := c.Verify(); !ok {
-		t.Fatal(vErr)
+		t.Error(vErr)
 	}
 
 	// test hardware profile only

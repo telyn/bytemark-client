@@ -122,7 +122,7 @@ func isIn(needle string, haystack []string) bool {
 	return false
 }
 
-func flagValueIsOK(flag cli.Flag) bool {
+func flagValueIsOK(c *Context, flag cli.Flag) bool {
 	switch realFlag := flag.(type) {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
@@ -136,9 +136,9 @@ func flagValueIsOK(flag cli.Flag) bool {
 			return *value != 0
 		}
 	case cli.StringFlag:
-		return realFlag.Value != ""
+		return c.String(realFlag.Name) != ""
 	case cli.IntFlag:
-		return realFlag.Value != 0
+		return c.Int(realFlag.Name) != 0
 	}
 	return true
 }
@@ -148,7 +148,7 @@ func flagValueIsOK(flag cli.Flag) bool {
 func RequiredFlags(flagNames ...string) ProviderFunc {
 	return func(c *Context) (err error) {
 		for _, flag := range c.Context.Command.Flags {
-			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(flag) {
+			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(c, flag) {
 				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
 			}
 		}

@@ -120,13 +120,13 @@ func TestListBackups(t *testing.T) {
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetBackups", vmname, "test-disc").Return(nil).Times(1)
