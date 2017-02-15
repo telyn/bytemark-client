@@ -38,6 +38,27 @@ func TestGrantPrivilege(t *testing.T) {
 					Account: "test-account",
 				}
 
+				c.When("GetGroup", &group).Return(&brain.Group{
+					ID: 303,
+				}).Times(1)
+				c.When("GrantPrivilege", brain.Privilege{
+					Username: "test-user",
+					Level:    brain.GroupAdminPrivilege,
+					GroupID:  303,
+				}).Return(nil).Times(1)
+			},
+			ShouldErr: false,
+			Input:     "bytemark grant group_admin test-group.test-account test-user",
+		},
+		{
+			Setup: func(config *mocks.Config, c *mocks.Client) {
+				// specific to vm_admin/vm_console
+
+				config.When("GetGroup").Return(&defGroup)
+				group := lib.GroupName{
+					Group:   "test-group",
+					Account: "test-account",
+				}
 
 				c.When("GetGroup", &group).Return(&brain.Group{
 					ID: 303,
@@ -77,7 +98,6 @@ func TestGrantPrivilege(t *testing.T) {
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 				config.When("GetIgnoreErr", "account").Return("default-account")
-
 
 				c.When("GetAccount", "test-account").Return(&lib.Account{
 					BrainID: 32310,

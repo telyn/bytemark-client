@@ -115,6 +115,7 @@ func (args *privArgs) shift() (arg string, err error) {
 	return
 }
 
+// PrivilegeFlag is an un-realised brain.Privilege - where the target name has been parsed but hasn't been turned into IDs yet
 type PrivilegeFlag struct {
 	AccountName        string
 	GroupName          *lib.GroupName
@@ -131,9 +132,11 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 		if err != nil {
 			return
 		}
-		target, err = args.shift()
-		if err != nil {
-			return
+		if target == "on" {
+			target, err = args.shift()
+			if err != nil {
+				return
+			}
 		}
 		switch strings.SplitN(string(pf.Level), "_", 2)[0] {
 		case "vm":
@@ -147,6 +150,7 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 	return
 }
 
+// Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from] <user>"
 func (pf *PrivilegeFlag) Set(value string) (err error) {
 	args := privArgs(strings.Split(value, " "))
 
