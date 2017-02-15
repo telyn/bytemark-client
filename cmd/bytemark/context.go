@@ -20,6 +20,7 @@ type Context struct {
 	Definitions    *lib.Definitions
 	Disc           *brain.Disc
 	Group          *brain.Group
+	Privilege      brain.Privilege
 	User           *brain.User
 	VirtualMachine *brain.VirtualMachine
 
@@ -114,6 +115,14 @@ func (c *Context) IPs(flagname string) []net.IP {
 		return []net.IP(*ips)
 	}
 	return []net.IP{}
+}
+
+func (c *Context) PrivilegeSpec(flagname string) PrivilegeFlag {
+	priv, ok := c.Context.Generic(flagname).(*PrivilegeFlag)
+	if ok {
+		return *priv
+	}
+	return PrivilegeFlag{}
 }
 
 // String returns the value of the named flag as a string
