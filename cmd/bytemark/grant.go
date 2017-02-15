@@ -41,7 +41,7 @@ func init() {
 
 			err = global.Client.GrantPrivilege(c.Privilege)
 			if err == nil {
-				log.Outputf("Granted %s\r\n", c.PrivilegeSpec("privilege").String())
+				log.Outputf("Granted %s\r\n", c.PrivilegeFlag("privilege").String())
 			}
 			return
 		}),

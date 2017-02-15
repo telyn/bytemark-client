@@ -117,7 +117,8 @@ func (c *Context) IPs(flagname string) []net.IP {
 	return []net.IP{}
 }
 
-func (c *Context) PrivilegeSpec(flagname string) PrivilegeFlag {
+// PrivilegeFlag returns the named flag as a PrivilegeFlag
+func (c *Context) PrivilegeFlag(flagname string) PrivilegeFlag {
 	priv, ok := c.Context.Generic(flagname).(*PrivilegeFlag)
 	if ok {
 		return *priv

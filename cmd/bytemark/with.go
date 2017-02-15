@@ -246,7 +246,7 @@ func normalisePrivilegeLevel(l brain.PrivilegeLevel) (level brain.PrivilegeLevel
 // PrivilegeProvider gets the named PrivilegeFlag from the context, then resolves its target to an ID if needed to create a brain.Privilege, then attaches that to the context
 func PrivilegeProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
-		pf := c.PrivilegeSpec(flagName)
+		pf := c.PrivilegeFlag(flagName)
 		level, ok := normalisePrivilegeLevel(pf.Level)
 		if !ok && !c.Bool("force") {
 			return fmt.Errorf("Unexpected privilege level '%s' - expecting account_admin, group_admin, vm_admin or vm_console")
