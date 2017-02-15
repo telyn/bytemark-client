@@ -26,7 +26,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 					Value: new(VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), VirtualMachineProvider("server"), func(c *Context) (err error) {
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) (err error) {
 				vmName := c.VirtualMachineName("server")
 				if !c.VirtualMachine.Deleted {
 					log.Errorf("%s was already restored\r\n", c.VirtualMachine.Hostname)
@@ -61,7 +61,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 					Usage: "the name or ID of the backup to restore",
 				},
 			},
-			Action: With(OptionalArgs("server", "disc", "backup"), AuthProvider, func(c *Context) (err error) {
+			Action: With(OptionalArgs("server", "disc", "backup"), RequiredFlags("server", "disc", "backup"), AuthProvider, func(c *Context) (err error) {
 				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
 				_, err = global.Client.RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 				if err != nil {

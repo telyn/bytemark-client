@@ -11,7 +11,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "overview",
 		Usage:     `overview of your Bytemark hosting`,
-		UsageText: "bytemark show account [--json] [name]",
+		UsageText: "bytemark show account [--json]",
 		Description: `This command displays an overview of the hosting you have with Bytemark.
 
 		If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,

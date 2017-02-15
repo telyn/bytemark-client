@@ -25,7 +25,6 @@ func TestRevokePrivilege(t *testing.T) {
 					Account:        "test-account",
 				}
 
-				c.When("ParseVirtualMachineName", "test-vm.test-group.test-account", []*lib.VirtualMachineName{{}}).Return(&vm, nil)
 				c.When("GetVirtualMachine", &vm).Return(&brain.VirtualMachine{ID: 333}, nil).Times(1)
 
 				c.When("RevokePrivilege", brain.Privilege{

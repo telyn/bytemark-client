@@ -34,7 +34,7 @@ EXAMPLES
 				Value: new(VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("from", "to"), AuthProvider, func(c *Context) (err error) {
+		Action: With(OptionalArgs("from", "to"), RequiredFlags("from", "to"), AuthProvider, func(c *Context) (err error) {
 			from := c.VirtualMachineName("from")
 			to := c.VirtualMachineName("to")
 

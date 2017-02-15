@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"strconv"
 )
 
 func init() {
@@ -25,7 +24,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 			{
 				Name:      "backups",
 				Usage:     "schedule backups to occur at a regular frequency",
-				UsageText: "bytemark schedule backups [--start <date>] <server> <disc> <interval>",
+				UsageText: "bytemark schedule backups [--start <date>] <server> <disc> [<interval>]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "start",
@@ -40,6 +39,11 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 						Usage: "the server the disc belongs to",
 						Value: new(VirtualMachineNameFlag),
 					},
+					cli.IntFlag{
+						Name:  "interval",
+						Usage: "the interval between backups, in seconds. Defaults to 86400 (daily).",
+						Value: 86400,
+					},
 				},
 				Description: `schedule backups to occur at a regular interval (defined in seconds)
 		
@@ -50,26 +54,16 @@ bytemark schedule backups --start 00:00 fileserver very-important-data 86400
 
 To have hourly backups starting at 14:37 (Central European Summer Time) on the 5th of April, 2017:
 bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-important-data 3600`,
-				Action: With(OptionalArgs("server", "disc"), func(c *Context) (err error) {
+				Action: With(OptionalArgs("server", "disc", "interval"), RequiredFlags("server", "disc"), func(c *Context) (err error) {
 					start := c.String("start")
 					if start == "" {
 						start = "00:00"
 					}
 
-					intervalStr, err := c.NextArg()
-					if err != nil {
-						return
-					}
-
-					interval, err := strconv.Atoi(intervalStr)
-					if err != nil {
-						return
-					}
-
 					vmName := c.VirtualMachineName("server")
-					_, err = global.Client.CreateBackupSchedule(vmName, c.String("disc"), start, interval)
+					sched, err := global.Client.CreateBackupSchedule(vmName, c.String("disc"), start, c.Int("interval"))
 					if err == nil {
-						log.Log("Schedule set.")
+						log.Logf("Schedule set. Backups will be taken every %d seconds.", sched.Interval)
 					}
 					return
 				}),

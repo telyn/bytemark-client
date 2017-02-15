@@ -20,13 +20,12 @@ func TestDeleteServer(t *testing.T) {
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "test-group",
-		Account:        "test-account",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
 	vm := getFixtureVM()
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, false).Return(nil).Times(1)
@@ -38,7 +37,6 @@ func TestDeleteServer(t *testing.T) {
 	}
 	c.Reset()
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, true).Return(nil).Times(1)
@@ -66,7 +64,6 @@ func TestDeleteDisc(t *testing.T) {
 		Group:          "test-group",
 		Account:        "test-account",
 	}
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteDisc", &name, "666").Return(nil).Times(1)
 
@@ -134,15 +131,14 @@ func TestDeleteBackup(t *testing.T) {
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
 

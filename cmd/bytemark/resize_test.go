@@ -24,8 +24,11 @@ func TestResizeDisk(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
+	name := lib.VirtualMachineName{
+		VirtualMachine: "test-server",
+		Group:          "default",
+		Account:        "default-account",
+	}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetDisc", &name, "disc-label").Return(&disc).Times(1)
 
