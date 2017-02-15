@@ -189,7 +189,7 @@ func TestCreateServerNoImage(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
@@ -213,14 +213,14 @@ func TestCreateServerNoImage(t *testing.T) {
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	group := lib.GroupName{
-		Group:   "",
-		Account: "",
+		Group:   "default",
+		Account: "default-account",
 	}
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
 	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
@@ -249,12 +249,12 @@ func TestCreateServer(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
 	vm := brain.VirtualMachineSpec{
@@ -272,11 +272,9 @@ func TestCreateServer(t *testing.T) {
 	*getvm = *vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
-	group := lib.GroupName{}
-
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("CreateVirtualMachine", &group, vm).Return(vm.VirtualMachine, nil).Times(1)
+	c.When("CreateVirtualMachine", &defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
@@ -298,12 +296,12 @@ func TestCreateBackup(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 

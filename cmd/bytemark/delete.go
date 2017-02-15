@@ -38,7 +38,7 @@ func init() {
 				},
 			},
 			Aliases: []string{"disk"},
-			Action: With(OptionalArgs("server", "disc"), AuthProvider, func(c *Context) (err error) {
+			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
 				if !c.Bool("force") && !util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.") {
 					return util.UserRequestedExit{}
 				}
@@ -63,7 +63,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				},
 				forceFlag,
 			},
-			Action: With(OptionalArgs("group"), GroupProvider("group"), deleteGroup),
+			Action: With(OptionalArgs("group"), RequiredFlags("group"), GroupProvider("group"), deleteGroup),
 		}, {
 			Name:        "key",
 			Usage:       "deletes the specified key",
@@ -79,7 +79,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Usage: "The public key to delete. Can be the comment part or the whole public key",
 				},
 			},
-			Action: With(JoinArgs("public-key"), AuthProvider, func(c *Context) (err error) {
+			Action: With(JoinArgs("public-key"), RequiredFlags("public-key"), AuthProvider, func(c *Context) (err error) {
 				user := c.String("user")
 				if user == "" {
 					user = global.Config.GetIgnoreErr("user")
@@ -113,7 +113,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Value: new(VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), AuthProvider, VirtualMachineProvider("server"), deleteServer),
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), deleteServer),
 		}, {
 			Name:        "backup",
 			Usage:       "delete the given backup",
@@ -134,7 +134,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Usage: "the name or ID of the backup to delete",
 				},
 			},
-			Action: With(OptionalArgs("server", "disc", "backup"), AuthProvider, deleteBackup),
+			Action: With(OptionalArgs("server", "disc", "backup"), RequiredFlags("server", "disc", "backup"), AuthProvider, deleteBackup),
 		}},
 	})
 }

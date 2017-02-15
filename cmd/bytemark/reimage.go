@@ -46,7 +46,6 @@ func init() {
 		Usage:     "install a fresh operating system on a server from bytemark's images",
 		UsageText: "bytemark reimage [flags] <server>",
 		Description: `Image the given server with the specified image, prompting for confirmation.
-If the --image flag is not specified, will prompt with a list.
 Specify --force to prevent prompting.
 
 The root password will be output on stdout if the imaging succeeded, otherwise nothing will (and the exit code will be nonzero)
@@ -56,7 +55,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 			Usage: "the server to reimage",
 			Value: new(VirtualMachineNameFlag),
 		}),
-		Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) (err error) {
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {

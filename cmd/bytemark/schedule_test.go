@@ -28,20 +28,13 @@ func TestScheduleBackups(t *testing.T) {
 
 	tests := []ScheduleTest{
 		{
-			Start:      "00:00",
-			Interval:   86400,
-			ShouldCall: true,
+			ShouldCall: false,
 			ShouldErr:  true,
-			CreateErr:  fmt.Errorf("bad server name"),
 		},
 		{
 			Args:       []string{"vm-name"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
-			DiscLabel:  "",
-			Interval:   86400,
-			Start:      "00:00",
-			ShouldCall: true,
-			ShouldErr:  false,
+			ShouldCall: false,
+			ShouldErr:  true,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},

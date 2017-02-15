@@ -96,7 +96,7 @@ func init() {
 					Value: new(VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), AuthProvider, func(c *Context) error {
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
 				addrs := c.Int("ips")
 				if addrs < 1 {
 					addrs = 1
@@ -127,7 +127,7 @@ func init() {
 				if err != nil {
 					return err
 				}
-				log.Log("IPs addded:")
+				log.Log("IPs added:")
 				log.Output(ips.String(), "\r\n")
 				return nil
 			}),
