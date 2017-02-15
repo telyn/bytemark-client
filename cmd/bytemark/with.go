@@ -249,7 +249,7 @@ func PrivilegeProvider(flagName string) ProviderFunc {
 		pf := c.PrivilegeFlag(flagName)
 		level, ok := normalisePrivilegeLevel(pf.Level)
 		if !ok && !c.Bool("force") {
-			return fmt.Errorf("Unexpected privilege level '%s' - expecting account_admin, group_admin, vm_admin or vm_console")
+			return fmt.Errorf("Unexpected privilege level '%s' - expecting account_admin, group_admin, vm_admin or vm_console", pf.Level)
 		}
 		c.Privilege = brain.Privilege{
 			Username: pf.Username,
