@@ -36,7 +36,7 @@ func init() {
 				Value: new(PrivilegeFlag),
 			},
 		},
-		Action: With(AuthProvider, JoinArgs("privilege"), PrivilegeProvider("privilege"), func(c *Context) (err error) {
+		Action: With(JoinArgs("privilege"), RequiredFlags("privilege"), PrivilegeProvider("privilege"), func(c *Context) (err error) {
 			c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 
 			err = global.Client.GrantPrivilege(c.Privilege)

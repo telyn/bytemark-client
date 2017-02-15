@@ -137,11 +137,11 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 		}
 		switch strings.SplitN(string(pf.Level), "_", 2)[0] {
 		case "vm":
-			pf.VirtualMachineName, err = global.Client.ParseVirtualMachineName(target, global.Config.GetVirtualMachine())
+			pf.VirtualMachineName, err = lib.ParseVirtualMachineName(target, global.Config.GetVirtualMachine())
 		case "group":
-			pf.GroupName = global.Client.ParseGroupName(target, global.Config.GetGroup())
+			pf.GroupName = lib.ParseGroupName(target, global.Config.GetGroup())
 		case "account":
-			pf.AccountName = global.Client.ParseAccountName(target, global.Config.GetIgnoreErr("account"))
+			pf.AccountName = lib.ParseAccountName(target, global.Config.GetIgnoreErr("account"))
 		}
 	}
 	return

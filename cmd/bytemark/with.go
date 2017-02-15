@@ -135,6 +135,8 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 			return *value != ""
 		case *util.SizeSpecFlag:
 			return *value != 0
+		case *PrivilegeFlag:
+			return value.Username != "" && value.Level != ""
 		}
 	case cli.StringFlag:
 		return c.String(realFlag.Name) != ""

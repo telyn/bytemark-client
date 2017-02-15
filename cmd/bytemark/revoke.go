@@ -16,17 +16,18 @@ func init() {
 				Name:  "yubikey-required",
 				Usage: "Set if the privilege should require a yubikey.",
 			},
+			cli.GenericFlag{
+				Name:  "privilege",
+				Usage: "the privilege to revoke",
+				Value: new(PrivilegeFlag),
+			},
 		},
-		Action: With(AuthProvider, func(c *Context) (err error) {
-			priv, _, err := parsePrivilege(c)
+		Action: With(JoinArgs("privilege"), RequiredFlags("privilege"), PrivilegeProvider("privilege"), func(c *Context) (err error) {
+			c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 
-			if err != nil {
-				return
-			}
-
-			err = global.Client.RevokePrivilege(priv)
+			err = global.Client.RevokePrivilege(c.Privilege)
 			if err == nil {
-				log.Outputf("Revoked %s from %s\r\n", priv.Level, priv.Username)
+				log.Outputf("Revoked %s\r\n", c.PrivilegeSpec("privilege"))
 
 			}
 			return
