@@ -49,6 +49,7 @@ func mkGetPrivilegesHandler(t *testing.T, user string) func(http.ResponseWriter,
 func TestGetPrivileges(t *testing.T) {
 	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
+			// simple test of getting all privileges - hence the empty string
 			"/privileges": mkGetPrivilegesHandler(t, ""),
 		},
 	})
@@ -60,6 +61,7 @@ func TestGetPrivileges(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// simple test of getting all privileges - hence the empty string
 	privileges, err := client.GetPrivileges("")
 	if err != nil {
 		t.Error(err)
@@ -68,6 +70,79 @@ func TestGetPrivileges(t *testing.T) {
 		t.Errorf("Wrong number of privileges: %d", len(privileges))
 	}
 
+}
+
+func TestGetPrivilegesForAccount(t *testing.T) {
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/accounts/mycoolaccount/privileges": mkGetPrivilegesHandler(t, ""),
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	privileges, err := client.GetPrivilegesForAccount("mycoolaccount")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(privileges) != 2 {
+		t.Errorf("Wrong number of privileges: %d", len(privileges))
+	}
+}
+
+func TestGetPrivilegesForGroup(t *testing.T) {
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/accounts/test-account/groups/test-group/privileges": mkGetPrivilegesHandler(t, ""),
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	privileges, err := client.GetPrivilegesForGroup(GroupName{Group: "test-group", Account: "test-account"})
+	if err != nil {
+		t.Error(err)
+	}
+	if len(privileges) != 2 {
+		t.Errorf("Wrong number of privileges: %d", len(privileges))
+	}
+}
+
+func TestGetPrivilegesForServer(t *testing.T) {
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/accounts/test-account/groups/test-group/virtual_machines/test-vm/privileges": mkGetPrivilegesHandler(t, ""),
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	privileges, err := client.GetPrivilegesForVirtualMachine(VirtualMachineName{
+		Account:        "test-account",
+		Group:          "test-group",
+		VirtualMachine: "test-vm",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	if len(privileges) != 2 {
+		t.Errorf("Wrong number of privileges: %d", len(privileges))
+	}
 }
 
 func TestGrantPrivilege(t *testing.T) {
