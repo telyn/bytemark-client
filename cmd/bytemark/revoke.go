@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
+	"strings"
 )
 
 func init() {
@@ -23,9 +26,38 @@ func init() {
 			},
 		},
 		Action: With(JoinArgs("privilege"), RequiredFlags("privilege"), PrivilegeProvider("privilege"), func(c *Context) (err error) {
+			pf := c.PrivilegeFlag("privilege")
 			c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 
-			err = global.Client.RevokePrivilege(c.Privilege)
+			var privs brain.Privileges
+			switch strings.SplitN(string(c.Privilege.Level), "_", 2)[0] {
+			case "vm":
+				privs, err = global.Client.GetPrivilegesForVirtualMachine(*pf.VirtualMachineName)
+				if err != nil {
+					return
+				}
+			case "group":
+				privs, err = global.Client.GetPrivilegesForGroup(*pf.GroupName)
+				if err != nil {
+					return
+				}
+			case "account":
+				privs, err = global.Client.GetPrivilegesForAccount(pf.AccountName)
+				if err != nil {
+					return
+				}
+			default:
+				privs, err = global.Client.GetPrivileges(pf.Username)
+				if err != nil {
+					return
+				}
+			}
+			i := privs.IndexOf(c.Privilege)
+			if i == -1 {
+				return fmt.Errorf("Couldn't find such a privilege to revoke")
+			}
+
+			err = global.Client.RevokePrivilege(*privs[i])
 			if err == nil {
 				log.Outputf("Revoked %s\r\n", c.PrivilegeFlag("privilege"))
 
