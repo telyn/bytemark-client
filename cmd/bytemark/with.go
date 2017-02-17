@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
 	"net"
@@ -134,6 +135,8 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 			return *value != ""
 		case *util.SizeSpecFlag:
 			return *value != 0
+		case *PrivilegeFlag:
+			return value.Username != "" && value.Level != ""
 		}
 	case cli.StringFlag:
 		return c.String(realFlag.Name) != ""
@@ -224,7 +227,57 @@ func GroupProvider(flagName string) ProviderFunc {
 	}
 }
 
-// UserProvider calls UserNameProvider, gets the User from the brain, and attaches it to the Context.
+// normalisePrivilegeLevel makes sure the level provided is actually a valid PrivilegeLevel and provides a couple of aliases.
+func normalisePrivilegeLevel(l brain.PrivilegeLevel) (level brain.PrivilegeLevel, ok bool) {
+	level = brain.PrivilegeLevel(strings.ToLower(string(l)))
+	switch level {
+	case "cluster_admin", "account_admin", "group_admin", "vm_admin", "vm_console":
+		ok = true
+	case "server_admin", "server_console":
+		level = brain.PrivilegeLevel(strings.Replace(string(level), "server", "vm", 1))
+		ok = true
+	case "console":
+		level = "vm_console"
+		ok = true
+	}
+	return
+}
+
+// PrivilegeProvider gets the named PrivilegeFlag from the context, then resolves its target to an ID if needed to create a brain.Privilege, then attaches that to the context
+func PrivilegeProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		pf := c.PrivilegeFlag(flagName)
+		level, ok := normalisePrivilegeLevel(pf.Level)
+		if !ok && !c.Bool("force") {
+			return fmt.Errorf("Unexpected privilege level '%s' - expecting account_admin, group_admin, vm_admin or vm_console", pf.Level)
+		}
+		c.Privilege = brain.Privilege{
+			Username: pf.Username,
+			Level:    level,
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
+		switch strings.SplitN(string(c.Privilege.Level), "_", 2)[0] {
+		case "vm":
+			var vm *brain.VirtualMachine
+			vm, err = global.Client.GetVirtualMachine(pf.VirtualMachineName)
+			c.Privilege.VirtualMachineID = vm.ID
+		case "group":
+			var group *brain.Group
+			group, err = global.Client.GetGroup(pf.GroupName)
+			c.Privilege.GroupID = group.ID
+		case "account":
+			var acc *lib.Account
+			acc, err = global.Client.GetAccount(pf.AccountName)
+			c.Privilege.AccountID = acc.BrainID
+		}
+		return
+	}
+}
+
+// UserProvider gets a username from the given flag, then gets the corresponding User from the brain, and attaches it to the Context.
 func UserProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
 		if c.User != nil {

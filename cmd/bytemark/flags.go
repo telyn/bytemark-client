@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strings"
 )
 
@@ -100,4 +101,90 @@ func (rf ResizeFlag) String() string {
 		units = "TiB"
 	}
 	return fmt.Sprintf("%s%d%s", plus, sz, units)
+}
+
+type privArgs []string
+
+func (args *privArgs) shift() (arg string, err error) {
+	if len(*args) > 0 {
+		arg = (*args)[0]
+		*args = (*args)[1:]
+	} else {
+		err = fmt.Errorf("privileges require 3 parts - level, target and user")
+	}
+	return
+}
+
+// PrivilegeFlag is an un-realised brain.Privilege - where the target name has been parsed but hasn't been turned into IDs yet
+type PrivilegeFlag struct {
+	AccountName        string
+	GroupName          *lib.GroupName
+	VirtualMachineName *lib.VirtualMachineName
+	Username           string
+	Level              brain.PrivilegeLevel
+}
+
+// fillPrivilegeTarget adds the object to the privilege, trying to use it as a VM, Group or Account name depending on what PrivilegeLevel the Privilege is for. The target is expected to be the NextArg at this point in the Context
+func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
+	if !strings.HasPrefix(string(pf.Level), "cluster") {
+		var target string
+		target, err = args.shift()
+		if err != nil {
+			return
+		}
+		if target == "on" {
+			target, err = args.shift()
+			if err != nil {
+				return
+			}
+		}
+		switch strings.SplitN(string(pf.Level), "_", 2)[0] {
+		case "vm":
+			pf.VirtualMachineName, err = lib.ParseVirtualMachineName(target, global.Config.GetVirtualMachine())
+		case "group":
+			pf.GroupName = lib.ParseGroupName(target, global.Config.GetGroup())
+		case "account":
+			pf.AccountName = lib.ParseAccountName(target, global.Config.GetIgnoreErr("account"))
+		}
+	}
+	return
+}
+
+// Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from] <user>"
+func (pf *PrivilegeFlag) Set(value string) (err error) {
+	args := privArgs(strings.Split(value, " "))
+
+	level, err := args.shift()
+	if err != nil {
+		return
+	}
+	pf.Level = brain.PrivilegeLevel(level)
+
+	err = pf.fillPrivilegeTarget(&args)
+	if err != nil {
+		return
+	}
+
+	user, err := args.shift()
+	if err != nil {
+		return
+	}
+	if user == "to" || user == "from" {
+		user, err = args.shift()
+	}
+	pf.Username = user
+
+	return
+}
+
+func (pf PrivilegeFlag) String() string {
+	switch strings.SplitN(string(pf.Level), "_", 2)[0] {
+	case "vm":
+		return fmt.Sprintf("%s on %s for %s", pf.Level, pf.VirtualMachineName, pf.Username)
+	case "group":
+		return fmt.Sprintf("%s on %s for %s", pf.Level, pf.GroupName, pf.Username)
+	case "account":
+		return fmt.Sprintf("%s on %s for %s", pf.Level, pf.AccountName, pf.Username)
+	}
+	return fmt.Sprintf("%s for %s", pf.Level, pf.Username)
 }
