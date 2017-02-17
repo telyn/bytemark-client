@@ -179,6 +179,10 @@ func (pf *PrivilegeFlag) Set(value string) (err error) {
 	}
 	pf.Username = user
 
+	if arg, err := args.shift(); err == nil {
+		return fmt.Errorf("Unexpected '%s' after username '%s'", arg, pf.Username)
+	}
+
 	return
 }
 

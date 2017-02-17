@@ -17,6 +17,27 @@ func TestRevokePrivilege(t *testing.T) {
 	}{
 		{
 			Setup: func(config *mocks.Config, c *mocks.Client) {
+				// reset to get rid of the default AuthWithToken expectation
+				c.Reset()
+			},
+			ShouldErr: true,
+			Input:     "bytemark revoke",
+		}, {
+			Setup: func(config *mocks.Config, c *mocks.Client) {
+				// reset to get rid of the default AuthWithToken expectation
+				c.Reset()
+			},
+			ShouldErr: true,
+			Input:     "bytemark revoke smedly",
+		}, {
+			Setup: func(config *mocks.Config, c *mocks.Client) {
+				// reset to get rid of the default AuthWithToken expectation
+				c.Reset()
+			},
+			ShouldErr: true,
+			Input:     "bytemark revoke cluster_admin on bucholic to no-one",
+		}, {
+			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 
 				config.When("GetVirtualMachine").Return(&defVM)
