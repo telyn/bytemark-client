@@ -124,6 +124,7 @@ type PrivilegeFlag struct {
 	Level              brain.PrivilegeLevel
 }
 
+// TargetType returns the prefix of the PrivilegeFlag's Level. Use the brain.PrivilegeTargetType* constants for comparison
 func (pf PrivilegeFlag) TargetType() string {
 	return strings.SplitN(string(pf.Level), "_", 2)[0]
 }
