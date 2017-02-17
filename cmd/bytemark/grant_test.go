@@ -114,7 +114,7 @@ func TestGrantPrivilege(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		config, c := baseTestAuthSetup(t, true)
+		config, c := baseTestAuthSetup(t, false)
 		test.Setup(config, c)
 
 		err := global.App.Run(strings.Split(test.Input, " "))
