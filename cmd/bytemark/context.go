@@ -14,18 +14,15 @@ import (
 // the next unused argument and can have various bytemarky types attached to it
 // in order to keep code DRY
 type Context struct {
-	Context            *cli.Context
-	AccountName        *string
-	Account            *lib.Account
-	Authed             bool
-	Definitions        *lib.Definitions
-	DiscLabel          *string
-	GroupName          *lib.GroupName
-	Group              *brain.Group
-	User               *brain.User
-	UserName           *string
-	VirtualMachine     *brain.VirtualMachine
-	VirtualMachineName *lib.VirtualMachineName
+	Context        *cli.Context
+	Account        *lib.Account
+	Authed         bool
+	Definitions    *lib.Definitions
+	Disc           *brain.Disc
+	Group          *brain.Group
+	Privilege      brain.Privilege
+	User           *brain.User
+	VirtualMachine *brain.VirtualMachine
 
 	currentArgIndex int
 }
@@ -97,6 +94,15 @@ func (c *Context) FileContents(flagname string) string {
 	return ""
 }
 
+// GroupName returns the named flag as a lib.GroupName
+func (c *Context) GroupName(flagname string) lib.GroupName {
+	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
+	if !ok {
+		return lib.GroupName{}
+	}
+	return lib.GroupName(*gpNameFlag)
+}
+
 // Int returns the value of the named flag as an int
 func (c *Context) Int(flagname string) int {
 	return c.Context.Int(flagname)
@@ -111,6 +117,15 @@ func (c *Context) IPs(flagname string) []net.IP {
 	return []net.IP{}
 }
 
+// PrivilegeFlag returns the named flag as a PrivilegeFlag
+func (c *Context) PrivilegeFlag(flagname string) PrivilegeFlag {
+	priv, ok := c.Context.Generic(flagname).(*PrivilegeFlag)
+	if ok {
+		return *priv
+	}
+	return PrivilegeFlag{}
+}
+
 // String returns the value of the named flag as a string
 func (c *Context) String(flagname string) string {
 	return c.Context.String(flagname)
@@ -123,6 +138,24 @@ func (c *Context) Size(flagname string) int {
 		return int(*size)
 	}
 	return 0
+}
+
+// ResizeFlag returns the named ResizeFlag
+func (c *Context) ResizeFlag(flagname string) ResizeFlag {
+	size, ok := c.Context.Generic(flagname).(*ResizeFlag)
+	if ok {
+		return *size
+	}
+	return ResizeFlag{}
+}
+
+// VirtualMachineName returns the named flag as a lib.VirtualMachineName
+func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
+	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
+	if !ok {
+		return *global.Config.GetVirtualMachine()
+	}
+	return lib.VirtualMachineName(*vmNameFlag)
 }
 
 // IfNotMarshalJSON checks to see if the json flag was set, and outputs obj as a JSON object if so.

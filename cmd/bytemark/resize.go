@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"strings"
 )
 
 func init() {
@@ -24,43 +22,38 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 			Usage:       "resize a cloud server's disc",
 			UsageText:   "bytemark resize disc <server> <disc label> <size>",
 			Description: "Resizes the given server's disc to the given size. Sizes may be specified with a + in front, in which case they are interpreted as relative. For example, '+2GB' is parsed as 'increase the disc size by 2GiB', where '2GB' is parsed as 'set the size of the disc to 2GiB'",
-			Flags:       []cli.Flag{forceFlag},
-			Action: With(VirtualMachineNameProvider, DiscLabelProvider, AuthProvider, func(c *Context) (err error) {
-				const (
-					SET = iota
-					INCREASE
-				)
-				mode := SET
-				sizeStr, err := c.NextArg()
-				if err != nil {
-					log.Error("No size specified")
-					return err
-				}
-				if strings.HasPrefix(sizeStr, "+") {
-					sizeStr = sizeStr[1:]
-					mode = INCREASE
-				}
+			Flags: []cli.Flag{
+				forceFlag,
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "the disc to resize",
+				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server that the disc is attached to",
+					Value: new(VirtualMachineNameFlag),
+				},
+				cli.GenericFlag{
+					Name:  "new-size",
+					Usage: "the new size for the disc. Prefix with + to indicate 'increase by'",
+					Value: new(ResizeFlag),
+				},
+			},
+			Action: With(OptionalArgs("server", "disc", "new-size"), RequiredFlags("server", "disc", "new-size"), DiscProvider("server", "disc"), func(c *Context) (err error) {
+				vmName := c.VirtualMachineName("server")
+				size := c.ResizeFlag("new-size")
+				newSize := size.Size
 
-				size, err := sizespec.Parse(sizeStr)
-				if err != nil {
-					return err
+				if size.Mode == ResizeModeIncrease {
+					newSize += c.Disc.Size
 				}
-
-				oldDisc, err := global.Client.GetDisc(c.VirtualMachineName, *c.DiscLabel)
-				if err != nil {
-					return err
-				}
-
-				if mode == INCREASE {
-					size = oldDisc.Size + size
-				}
-				log.Logf("Resizing %s from %dGiB to %dGiB...", oldDisc.Label, oldDisc.Size/1024, size/1024)
+				log.Logf("Resizing %s from %dGiB to %dGiB...", c.Disc.Label, c.Disc.Size/1024, newSize/1024)
 
 				if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("Are you certain you wish to perform this resize?")) {
 					return util.UserRequestedExit{}
 				}
 
-				err = global.Client.ResizeDisc(c.VirtualMachineName, *c.DiscLabel, size)
+				err = global.Client.ResizeDisc(&vmName, c.String("disc"), newSize)
 				if err != nil {
 					log.Logf("Failed!\r\n")
 					return

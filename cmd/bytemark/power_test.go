@@ -16,7 +16,6 @@ func TestResetCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("ResetVirtualMachine", &vmn).Times(1)
@@ -37,7 +36,6 @@ func TestRestartCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("RestartVirtualMachine", &vmn).Times(1)
@@ -57,7 +55,6 @@ func TestShutdownCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("ShutdownVirtualMachine", &vmn, true).Times(1)
@@ -77,7 +74,6 @@ func TestStartCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("StartVirtualMachine", &vmn).Times(1)
@@ -98,7 +94,6 @@ func TestStopCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmn)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("StopVirtualMachine", &vmn).Times(1)

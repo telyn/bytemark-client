@@ -29,7 +29,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					Usage: "Output account details as a JSON object",
 				},
 			},
-			Action: With(AccountProvider(false), func(c *Context) error {
+			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
 					def, err := global.Client.GetDefaultAccount()
 					if err != nil {
@@ -61,7 +61,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 		}, {
 			Name:      "group",
 			Usage:     "outputs info about a group",
-			UsageText: "bytemark show group [--json] <name>",
+			UsageText: "bytemark show group [--json] [name]",
 			Description: `This command displays information about how many servers are in the given group.
 If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
 			Flags: []cli.Flag{
@@ -69,8 +69,13 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Name:  "json",
 					Usage: "Output group details as a JSON object",
 				},
+				cli.GenericFlag{
+					Name:  "group",
+					Usage: "The name of the group to show",
+					Value: new(GroupNameFlag),
+				},
 			},
-			Action: With(GroupProvider, func(c *Context) error {
+			Action: With(OptionalArgs("group"), GroupProvider("group"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Group, func() error {
 					s := ""
 					if len(c.Group.VirtualMachines) != 1 {
@@ -102,8 +107,13 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Name:  "json",
 					Usage: "Output server details as a JSON object.",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server to display",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineProvider, func(c *Context) error {
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
 					return c.VirtualMachine.PrettyPrint(os.Stderr, prettyprint.Full)
 				})
@@ -113,7 +123,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Usage:       "displays info about a user",
 			UsageText:   "bytemark show user <name>",
 			Description: `Currently the only details are what SSH keys are authorised for this user`,
-			Action: With(UserProvider, func(c *Context) error {
+			Action: With(OptionalArgs("user"), RequiredFlags("user"), UserProvider("user"), func(c *Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
@@ -134,13 +144,13 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Name:  "json",
 					Usage: "Output privileges as a JSON array.",
 				},
+				cli.StringFlag{
+					Name:  "user",
+					Usage: "The user whose privileges you wish to see",
+				},
 			},
-			Action: With(AuthProvider, func(c *Context) error {
-				user, err := c.NextArg()
-				if err != nil {
-					user = ""
-				}
-				privs, err := global.Client.GetPrivileges(user)
+			Action: With(OptionalArgs("user"), AuthProvider, func(c *Context) error {
+				privs, err := global.Client.GetPrivileges(c.String("user"))
 				if err != nil {
 					return err
 				}
