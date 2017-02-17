@@ -27,7 +27,7 @@ func init() {
 
 			err = global.Client.RevokePrivilege(c.Privilege)
 			if err == nil {
-				log.Outputf("Revoked %s\r\n", c.PrivilegeFlag("privilege"))
+				log.Outputf("Revoked %s\r\n", c.PrivilegeFlag("privilege").String())
 
 			}
 			return
