@@ -155,7 +155,7 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 	return
 }
 
-// Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from] <user>"
+// Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from|for] <user>"
 func (pf *PrivilegeFlag) Set(value string) (err error) {
 	args := privArgs(strings.Split(value, " "))
 
@@ -174,7 +174,7 @@ func (pf *PrivilegeFlag) Set(value string) (err error) {
 	if err != nil {
 		return
 	}
-	if user == "to" || user == "from" {
+	if user == "to" || user == "from" || user == "for" {
 		user, err = args.shift()
 	}
 	pf.Username = user

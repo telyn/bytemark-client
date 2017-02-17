@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	adminCommands = append(adminCommands, cli.Command{
+	commands = append(commands, cli.Command{
 		Name:        "revoke",
 		Usage:       "revoke privileges on bytemark self-service objects from other users",
 		UsageText:   "bytemark revoke <privilege> [on] <object> [from|to] <user>\r\nbytemark grant cluster_admin [to] <user>",
