@@ -170,41 +170,25 @@ Privileges will be output in no particular order.`,
 				},
 			},
 			Action: With(AuthProvider, func(c *Context) (err error) {
-				acc := c.String("account")
+				account := c.String("account")
 				group := c.GroupName("group")
 				server := c.VirtualMachineName("server")
 
 				privs := make(brain.Privileges, 0)
-				if acc != "" {
-					if c.Bool("recursive") {
-						newPrivs, err := recursiveFindPrivilegesForAccount(acc)
-						if err != nil {
-							return err
-						}
-						privs = append(privs, newPrivs...)
-					} else {
-						newPrivs, err := global.Client.GetPrivilegesForAccount(acc)
-						if err != nil {
-							return err
-						}
-						privs = append(privs, newPrivs...)
+				if account != "" {
+					newPrivs, err := findPrivilegesForAccount(account, c.Bool("recursive"))
+					if err != nil {
+						return err
 					}
+					privs = append(privs, newPrivs...)
 				}
 
 				if group.Group != "" {
-					if c.Bool("recursive") {
-						newPrivs, err := recursiveFindPrivilegesForGroup(group)
-						if err != nil {
-							return err
-						}
-						privs = append(privs, newPrivs...)
-					} else {
-						newPrivs, err := global.Client.GetPrivilegesForGroup(group)
-						if err != nil {
-							return err
-						}
-						privs = append(privs, newPrivs...)
+					newPrivs, err := findPrivilegesForGroup(group, c.Bool("recursive"))
+					if err != nil {
+						return err
 					}
+					privs = append(privs, newPrivs...)
 				}
 
 				if server.VirtualMachine != "" {
@@ -214,7 +198,7 @@ Privileges will be output in no particular order.`,
 					}
 					privs = append(privs, newPrivs...)
 				}
-				if len(privs) == 0 {
+				if c.String("user") != "" || (server.VirtualMachine == "" && group.Group == "" && account == "") {
 
 					privs, err = global.Client.GetPrivileges(c.String("user"))
 					if err != nil {
@@ -233,9 +217,9 @@ Privileges will be output in no particular order.`,
 	})
 }
 
-func recursiveFindPrivilegesForAccount(account string) (privs brain.Privileges, err error) {
+func findPrivilegesForAccount(account string, recurse bool) (privs brain.Privileges, err error) {
 	privs, err = global.Client.GetPrivilegesForAccount(account)
-	if err != nil {
+	if !recurse || err != nil {
 		return
 	}
 	acc, err := global.Client.GetAccount(account)
@@ -244,10 +228,10 @@ func recursiveFindPrivilegesForAccount(account string) (privs brain.Privileges, 
 	}
 
 	for _, group := range acc.Groups {
-		newPrivs, err := recursiveFindPrivilegesForGroup(lib.GroupName{
+		newPrivs, err := findPrivilegesForGroup(lib.GroupName{
 			Group:   group.Name,
 			Account: account,
-		})
+		}, recurse) // recurse is always true at this point but maybe I'd like to make two flags? recurse-account and recurse-group?
 		if err != nil {
 			return privs, err
 		}
@@ -256,9 +240,9 @@ func recursiveFindPrivilegesForAccount(account string) (privs brain.Privileges, 
 	return
 }
 
-func recursiveFindPrivilegesForGroup(name lib.GroupName) (privs brain.Privileges, err error) {
+func findPrivilegesForGroup(name lib.GroupName, recurse bool) (privs brain.Privileges, err error) {
 	privs, err = global.Client.GetPrivilegesForGroup(name)
-	if err != nil {
+	if !recurse || err != nil {
 		return
 	}
 	group, err := global.Client.GetGroup(&name)
