@@ -142,8 +142,7 @@ func TestRevokePrivilege(t *testing.T) {
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
-			// secret feature: '.' as alias for default account
-			Input: "bytemark revoke --yubikey-required cluster_admin to test-user",
+			Input:     "bytemark revoke --yubikey-required cluster_admin to test-user",
 		},
 	}
 	for i, test := range tests {
