@@ -29,6 +29,13 @@ func (pl PrivilegeLevel) String() string {
 	return string(pl)
 }
 
+const (
+	PrivilegeTargetTypeVM      = "vm"
+	PrivilegeTargetTypeGroup   = "group"
+	PrivilegeTargetTypeAccount = "account"
+	PrivilegeTargetTypeCluster = "cluster"
+)
+
 // Privilege represents a privilege on the brain.
 // A user may have multiple privileges, and multiple privileges may be granted on the same object.
 // At the moment we're not worried about the extra fields that privileges have on the brain (IP restrictions) because they're unused
@@ -51,7 +58,7 @@ type Privilege struct {
 	YubikeyOTPMaxAge int `json:"yubikey_otp_max_age,omitempty"`
 }
 
-func (p Privilege) targetType() string {
+func (p Privilege) TargetType() string {
 	return strings.Split(string(p.Level), "_")[0]
 }
 
@@ -62,12 +69,12 @@ func (p Privilege) String() string {
 	if p.YubikeyRequired {
 		requiresYubikey = " (requires yubikey)"
 	}
-	switch p.targetType() {
-	case "vm":
+	switch p.TargetType() {
+	case PrivilegeTargetTypeVM:
 		return fmt.Sprintf("%s on VM #%d for %s%s", p.Level, p.VirtualMachineID, p.Username, requiresYubikey)
-	case "group":
+	case PrivilegeTargetTypeGroup:
 		return fmt.Sprintf("%s on group #%d for %s%s", p.Level, p.GroupID, p.Username, requiresYubikey)
-	case "account":
+	case PrivilegeTargetTypeAccount:
 		return fmt.Sprintf("%s on account #%d for %s%s", p.Level, p.AccountID, p.Username, requiresYubikey)
 	}
 	return fmt.Sprintf("%s for %s%s", p.Level, p.Username, requiresYubikey)

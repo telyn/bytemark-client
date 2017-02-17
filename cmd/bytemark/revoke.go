@@ -5,7 +5,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"strings"
 )
 
 func init() {
@@ -30,18 +29,18 @@ func init() {
 			c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 
 			var privs brain.Privileges
-			switch strings.SplitN(string(c.Privilege.Level), "_", 2)[0] {
-			case "vm":
+			switch c.Privilege.TargetType() {
+			case brain.PrivilegeTargetTypeVM:
 				privs, err = global.Client.GetPrivilegesForVirtualMachine(*pf.VirtualMachineName)
 				if err != nil {
 					return
 				}
-			case "group":
+			case brain.PrivilegeTargetTypeGroup:
 				privs, err = global.Client.GetPrivilegesForGroup(*pf.GroupName)
 				if err != nil {
 					return
 				}
-			case "account":
+			case brain.PrivilegeTargetTypeAccount:
 				privs, err = global.Client.GetPrivilegesForAccount(pf.AccountName)
 				if err != nil {
 					return
