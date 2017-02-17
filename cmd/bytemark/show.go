@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -130,30 +132,80 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				}
 				return nil
 			}),
-		}},
-	})
-	adminCommands = append(adminCommands, cli.Command{
-		Name: "show",
-		Subcommands: []cli.Command{{
-			Name:        "privileges",
-			Usage:       "shows privileges for a given user",
-			UsageText:   "bytemark show privileges [user]",
-			Description: `Displays a list of all the privileges for a given user, or all the privileges you are able to see.`,
+		}, {
+			Name:      "privileges",
+			Usage:     "shows privileges for a given account, group, server, or user",
+			UsageText: "bytemark show privileges",
+			Description: `Displays a list of all the privileges for a given account, group, server or user. If none are specified, shows the privileges for your user.
+
+Setting --recursive will cause a lot of extra requests to be made and may take a long time to run.
+
+Privileges will be output in no particular order.`,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "json",
 					Usage: "Output privileges as a JSON array.",
 				},
+				cli.BoolFlag{
+					Name:  "recursive",
+					Usage: "for account & group, will also find all privileges for all groups in the account and virtual machines in the group",
+				},
 				cli.StringFlag{
 					Name:  "user",
-					Usage: "The user whose privileges you wish to see",
+					Usage: "The user to show the privileges of",
+				},
+				cli.StringFlag{
+					Name:  "account",
+					Usage: "The account to show the privileges of",
+				},
+				cli.GenericFlag{
+					Name:  "group",
+					Usage: "The group to show the privileges of",
+					Value: new(GroupNameFlag),
+				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "The server to show the privileges of",
+					Value: new(VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("user"), AuthProvider, func(c *Context) error {
-				privs, err := global.Client.GetPrivileges(c.String("user"))
-				if err != nil {
-					return err
+			Action: With(AuthProvider, func(c *Context) (err error) {
+				account := c.String("account")
+				group := c.GroupName("group")
+				server := c.VirtualMachineName("server")
+
+				privs := make(brain.Privileges, 0)
+				if account != "" {
+					newPrivs, err := findPrivilegesForAccount(account, c.Bool("recursive"))
+					if err != nil {
+						return err
+					}
+					privs = append(privs, newPrivs...)
 				}
+
+				if group.Group != "" {
+					newPrivs, err := findPrivilegesForGroup(group, c.Bool("recursive"))
+					if err != nil {
+						return err
+					}
+					privs = append(privs, newPrivs...)
+				}
+
+				if server.VirtualMachine != "" {
+					newPrivs, err := global.Client.GetPrivilegesForVirtualMachine(server)
+					if err != nil {
+						return err
+					}
+					privs = append(privs, newPrivs...)
+				}
+				if c.String("user") != "" || (server.VirtualMachine == "" && group.Group == "" && account == "") {
+
+					privs, err = global.Client.GetPrivileges(c.String("user"))
+					if err != nil {
+						return
+					}
+				}
+
 				return c.IfNotMarshalJSON(privs, func() error {
 					for _, p := range privs {
 						log.Outputf("%s\r\n", p.String())
@@ -163,4 +215,51 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			}),
 		}},
 	})
+}
+
+func findPrivilegesForAccount(account string, recurse bool) (privs brain.Privileges, err error) {
+	privs, err = global.Client.GetPrivilegesForAccount(account)
+	if !recurse || err != nil {
+		return
+	}
+	acc, err := global.Client.GetAccount(account)
+	if err != nil {
+		return
+	}
+
+	for _, group := range acc.Groups {
+		newPrivs, err := findPrivilegesForGroup(lib.GroupName{
+			Group:   group.Name,
+			Account: account,
+		}, recurse) // recurse is always true at this point but maybe I'd like to make two flags? recurse-account and recurse-group?
+		if err != nil {
+			return privs, err
+		}
+		privs = append(privs, newPrivs...)
+	}
+	return
+}
+
+func findPrivilegesForGroup(name lib.GroupName, recurse bool) (privs brain.Privileges, err error) {
+	privs, err = global.Client.GetPrivilegesForGroup(name)
+	if !recurse || err != nil {
+		return
+	}
+	group, err := global.Client.GetGroup(&name)
+	if err != nil {
+		return
+	}
+	for _, vm := range group.VirtualMachines {
+		vmName := lib.VirtualMachineName{
+			VirtualMachine: vm.Name,
+			Group:          name.Group,
+			Account:        name.Account,
+		}
+		newPrivs, err := global.Client.GetPrivilegesForVirtualMachine(vmName)
+		if err != nil {
+			return privs, err
+		}
+		privs = append(privs, newPrivs...)
+	}
+	return
 }

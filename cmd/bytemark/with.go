@@ -259,16 +259,16 @@ func PrivilegeProvider(flagName string) ProviderFunc {
 		if err != nil {
 			return
 		}
-		switch strings.SplitN(string(c.Privilege.Level), "_", 2)[0] {
-		case "vm":
+		switch c.Privilege.TargetType() {
+		case brain.PrivilegeTargetTypeVM:
 			var vm *brain.VirtualMachine
 			vm, err = global.Client.GetVirtualMachine(pf.VirtualMachineName)
 			c.Privilege.VirtualMachineID = vm.ID
-		case "group":
+		case brain.PrivilegeTargetTypeGroup:
 			var group *brain.Group
 			group, err = global.Client.GetGroup(pf.GroupName)
 			c.Privilege.GroupID = group.ID
-		case "account":
+		case brain.PrivilegeTargetTypeAccount:
 			var acc *lib.Account
 			acc, err = global.Client.GetAccount(pf.AccountName)
 			c.Privilege.AccountID = acc.BrainID

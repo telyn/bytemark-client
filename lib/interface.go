@@ -119,6 +119,9 @@ type Client interface {
 	//
 	// username is allowed to be empty
 	GetPrivileges(username string) (brain.Privileges, error)
+	GetPrivilegesForAccount(account string) (brain.Privileges, error)
+	GetPrivilegesForGroup(group GroupName) (brain.Privileges, error)
+	GetPrivilegesForVirtualMachine(vm VirtualMachineName) (brain.Privileges, error)
 	GrantPrivilege(p brain.Privilege) error
 	RevokePrivilege(p brain.Privilege) error
 

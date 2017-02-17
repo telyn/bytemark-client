@@ -124,9 +124,14 @@ type PrivilegeFlag struct {
 	Level              brain.PrivilegeLevel
 }
 
+// TargetType returns the prefix of the PrivilegeFlag's Level. Use the brain.PrivilegeTargetType* constants for comparison
+func (pf PrivilegeFlag) TargetType() string {
+	return strings.SplitN(string(pf.Level), "_", 2)[0]
+}
+
 // fillPrivilegeTarget adds the object to the privilege, trying to use it as a VM, Group or Account name depending on what PrivilegeLevel the Privilege is for. The target is expected to be the NextArg at this point in the Context
 func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
-	if !strings.HasPrefix(string(pf.Level), "cluster") {
+	if pf.TargetType() != brain.PrivilegeTargetTypeCluster {
 		var target string
 		target, err = args.shift()
 		if err != nil {
@@ -138,19 +143,19 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 				return
 			}
 		}
-		switch strings.SplitN(string(pf.Level), "_", 2)[0] {
-		case "vm":
+		switch pf.TargetType() {
+		case brain.PrivilegeTargetTypeVM:
 			pf.VirtualMachineName, err = lib.ParseVirtualMachineName(target, global.Config.GetVirtualMachine())
-		case "group":
+		case brain.PrivilegeTargetTypeGroup:
 			pf.GroupName = lib.ParseGroupName(target, global.Config.GetGroup())
-		case "account":
+		case brain.PrivilegeTargetTypeAccount:
 			pf.AccountName = lib.ParseAccountName(target, global.Config.GetIgnoreErr("account"))
 		}
 	}
 	return
 }
 
-// Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from] <user>"
+// Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from|for] <user>"
 func (pf *PrivilegeFlag) Set(value string) (err error) {
 	args := privArgs(strings.Split(value, " "))
 
@@ -169,21 +174,25 @@ func (pf *PrivilegeFlag) Set(value string) (err error) {
 	if err != nil {
 		return
 	}
-	if user == "to" || user == "from" {
+	if user == "to" || user == "from" || user == "for" {
 		user, err = args.shift()
 	}
 	pf.Username = user
+
+	if arg, err := args.shift(); err == nil {
+		return fmt.Errorf("Unexpected '%s' after username '%s'", arg, pf.Username)
+	}
 
 	return
 }
 
 func (pf PrivilegeFlag) String() string {
-	switch strings.SplitN(string(pf.Level), "_", 2)[0] {
-	case "vm":
+	switch pf.TargetType() {
+	case brain.PrivilegeTargetTypeVM:
 		return fmt.Sprintf("%s on %s for %s", pf.Level, pf.VirtualMachineName, pf.Username)
-	case "group":
+	case brain.PrivilegeTargetTypeGroup:
 		return fmt.Sprintf("%s on %s for %s", pf.Level, pf.GroupName, pf.Username)
-	case "account":
+	case brain.PrivilegeTargetTypeAccount:
 		return fmt.Sprintf("%s on %s for %s", pf.Level, pf.AccountName, pf.Username)
 	}
 	return fmt.Sprintf("%s for %s", pf.Level, pf.Username)

@@ -329,6 +329,21 @@ func (c *Client) GetPrivileges(username string) (privs brain.Privileges, err err
 	privs, _ = r.Get(0).(brain.Privileges)
 	return privs, r.Error(1)
 }
+func (c *Client) GetPrivilegesForAccount(accountName string) (privs brain.Privileges, err error) {
+	r := c.Called(accountName)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForGroup(group lib.GroupName) (privs brain.Privileges, err error) {
+	r := c.Called(group)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForVirtualMachine(vm lib.VirtualMachineName) (privs brain.Privileges, err error) {
+	r := c.Called(vm)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
 func (c *Client) GrantPrivilege(priv brain.Privilege) (err error) {
 	r := c.Called(priv)
 	return r.Error(0)
