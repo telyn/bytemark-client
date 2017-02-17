@@ -30,9 +30,13 @@ func (pl PrivilegeLevel) String() string {
 }
 
 const (
-	PrivilegeTargetTypeVM      = "vm"
-	PrivilegeTargetTypeGroup   = "group"
+	// PrivilegeTargetTypeVM is the prefix for all privilege levels that affect VMs
+	PrivilegeTargetTypeVM = "vm"
+	// PrivilegeTargetTypeGroup is the prefix for all privilege levels that affect Groups
+	PrivilegeTargetTypeGroup = "group"
+	// PrivilegeTargetTypeAccount is the prefix for all privilege levels that affect Accounts
 	PrivilegeTargetTypeAccount = "account"
+	// PrivilegeTargetTypeCluster is the prefix for all privilege levels that affect the whole cluster.
 	PrivilegeTargetTypeCluster = "cluster"
 )
 
@@ -58,6 +62,7 @@ type Privilege struct {
 	YubikeyOTPMaxAge int `json:"yubikey_otp_max_age,omitempty"`
 }
 
+// TargetType returns the prefix of the PrivilegeLevel, which should be one of the PrivilegeTargetType* constants.
 func (p Privilege) TargetType() string {
 	return strings.Split(string(p.Level), "_")[0]
 }
