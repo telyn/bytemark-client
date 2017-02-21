@@ -215,4 +215,10 @@ type Client interface {
 	// SetVirtualMachineCDROM sets the URL of a CD to attach to a virtual machine. Set url to "" to remove the CD.
 	// Returns nil on success, an error otherwise.
 	SetVirtualMachineCDROM(name *VirtualMachineName, url string) (err error)
+
+	//
+	// ADMIN
+	//
+
+	GetVLANs() ([]*brain.VLAN, error)
 }

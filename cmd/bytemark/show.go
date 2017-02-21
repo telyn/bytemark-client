@@ -215,6 +215,30 @@ Privileges will be output in no particular order.`,
 			}),
 		}},
 	})
+
+	adminCommands = append(adminCommands, cli.Command{
+		Name:   "show",
+		Action: cli.ShowSubcommandHelp,
+		Subcommands: []cli.Command{
+			{
+				Name:      "vlans",
+				Usage:     "shows available VLANs",
+				UsageText: "bytemark --admin show vlans",
+				Action: With(AuthProvider, func(c *Context) error {
+					vlans, err := global.Client.GetVLANs()
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(vlans, func() error {
+						for _, vlan := range vlans {
+							log.Outputf("%s\r\n", vlan.String())
+						}
+						return nil
+					})
+				}),
+			},
+		},
+	})
 }
 
 func findPrivilegesForAccount(account string, recurse bool) (privs brain.Privileges, err error) {
