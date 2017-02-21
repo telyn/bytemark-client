@@ -352,3 +352,8 @@ func (c *Client) RevokePrivilege(priv brain.Privilege) (err error) {
 	r := c.Called(priv)
 	return r.Error(0)
 }
+func (c *Client) GetVLANs() ([]*brain.VLAN, error) {
+	r := c.Called()
+	vlans, _ := r.Get(0).([]*brain.VLAN)
+	return vlans, r.Error(1)
+}
