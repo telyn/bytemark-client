@@ -367,3 +367,8 @@ func (c *Client) GetHeads() ([]*brain.Head, error) {
 	heads, _ := r.Get(0).([]*brain.Head)
 	return heads, r.Error(1)
 }
+func (c *Client) GetHead(id int) (*brain.Head, error) {
+	r := c.Called(id)
+	head, _ := r.Get(0).(*brain.Head)
+	return head, r.Error(1)
+}
