@@ -11,5 +11,5 @@ type VLAN struct {
 
 // String serialises a VLAN to easily be output
 func (v *VLAN) String() string {
-	return fmt.Sprintf("%d: %s (Num: %d)", v.ID, v.UsageType, v.ID)
+	return fmt.Sprintf("%d: %s (Num: %d)", v.ID, v.UsageType, v.Num)
 }
