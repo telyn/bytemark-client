@@ -1,6 +1,8 @@
 package brain
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"io"
 	"net"
 )
 
@@ -13,8 +15,8 @@ type Head struct {
 
 	// descriptive information that can be modified
 
-	Architecture  string   `json:"architecture"`
-	CCAddress     *net.IP  `json:"c_and_c_address"`
+	Architecture  string   `json:"arch"`
+	CCAddress     *net.IP  `json:"cnc_address"`
 	Note          string   `json:"note"`
 	Memory        int      `json:"memory,omitempty"`
 	UsageStrategy string   `json:"usage_strategy,omitempty"`
@@ -28,8 +30,8 @@ type Head struct {
 
 	// You may have one or the other.
 
-	VirtualMachineCount int               `json:"virtual_machines_count,omitempty"`
-	VirtualMachines     []*VirtualMachine `json:"virtual_machines,omitempty"`
+	VirtualMachineCount int      `json:"virtual_machines_count,omitempty"`
+	VirtualMachines     []string `json:"virtual_machines,omitempty"`
 }
 
 // CountVirtualMachines returns the number of virtual machines running on this head
@@ -38,4 +40,17 @@ func (h *Head) CountVirtualMachines() int {
 		return len(h.VirtualMachines)
 	}
 	return h.VirtualMachineCount
+}
+
+// PrettyPrint writes an overview of this account out to the given writer.
+func (h Head) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const t = `
+{{ define "head_sgl" -}}
+• {{ .Label }} (ID: {{ .ID }}), Online: {{ .IsOnline }}, VM Count: {{ len .VirtualMachines }}
+{{ end }}
+
+{{ define "head_full" -}}
+{{ template "head_sgl" . }}
+{{- end }}`
+	return prettyprint.Run(wr, t, "head"+string(detail), h)
 }

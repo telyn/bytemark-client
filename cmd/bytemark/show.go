@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
@@ -255,22 +254,64 @@ Privileges will be output in no particular order.`,
 					},
 					cli.IntFlag{
 						Name:  "ip_range",
-						Usage: "the IP range to display",
+						Usage: "the ID of the IP range to display",
 					},
 				}, Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
-					ipRangeID := c.Int("ip_range")
-
-					if ipRangeID < 1 {
-						return fmt.Errorf("You need to specify an IP range ID")
-					}
-
-					ipRange, err := global.Client.GetIPRange(ipRangeID)
+					ipRange, err := global.Client.GetIPRange(c.Int("ip_range"))
 					if err != nil {
 						return err
 					}
 					return c.IfNotMarshalJSON(ipRange, func() error {
 						log.Outputf("%s\r\n", ipRange.String())
 						return nil
+					})
+				}),
+			},
+			{
+				Name:      "heads",
+				Usage:     "shows the details of all heads",
+				UsageText: "bytemark --admin show heads [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the head as a JSON array.",
+					},
+				}, Action: With(AuthProvider, func(c *Context) error {
+					heads, err := global.Client.GetHeads()
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(heads, func() error {
+						for _, head := range heads {
+							if err := head.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+
+						return nil
+					})
+				}),
+			},
+			{
+				Name:      "head",
+				Usage:     "shows the details of the specified head",
+				UsageText: "bytemark --admin show head <head> [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the head as a JSON array.",
+					},
+					cli.IntFlag{
+						Name:  "head",
+						Usage: "the ID of the head to display",
+					},
+				}, Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
+					head, err := global.Client.GetHead(c.Int("head"))
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(head, func() error {
+						return head.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
 			},

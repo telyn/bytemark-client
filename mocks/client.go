@@ -362,3 +362,8 @@ func (c *Client) GetIPRange(id int) (*brain.IPRange, error) {
 	ipRange, _ := r.Get(0).(*brain.IPRange)
 	return ipRange, r.Error(1)
 }
+func (c *Client) GetHeads() ([]*brain.Head, error) {
+	r := c.Called()
+	heads, _ := r.Get(0).([]*brain.Head)
+	return heads, r.Error(1)
+}
