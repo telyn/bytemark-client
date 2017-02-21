@@ -223,7 +223,13 @@ Privileges will be output in no particular order.`,
 			{
 				Name:      "vlans",
 				Usage:     "shows available VLANs",
-				UsageText: "bytemark --admin show vlans",
+				UsageText: "bytemark --admin show vlans [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output server details as a JSON object.",
+					},
+				},
 				Action: With(AuthProvider, func(c *Context) error {
 					vlans, err := global.Client.GetVLANs()
 					if err != nil {
