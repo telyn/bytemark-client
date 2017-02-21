@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
@@ -239,6 +240,36 @@ Privileges will be output in no particular order.`,
 						for _, vlan := range vlans {
 							log.Outputf("%s\r\n", vlan.String())
 						}
+						return nil
+					})
+				}),
+			},
+			{
+				Name:      "ip_range",
+				Usage:     "shows the details of an IP range",
+				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output IP range details as a JSON object.",
+					},
+					cli.IntFlag{
+						Name:  "ip_range",
+						Usage: "the IP range to display",
+					},
+				}, Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
+					ipRangeID := c.Int("ip_range")
+
+					if ipRangeID < 1 {
+						return fmt.Errorf("You need to specify an IP range ID")
+					}
+
+					ipRange, err := global.Client.GetIPRange(ipRangeID)
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(ipRange, func() error {
+						log.Outputf("%s\r\n", ipRange.String())
 						return nil
 					})
 				}),
