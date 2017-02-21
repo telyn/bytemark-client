@@ -227,7 +227,7 @@ Privileges will be output in no particular order.`,
 				Flags: []cli.Flag{
 					cli.BoolFlag{
 						Name:  "json",
-						Usage: "Output server details as a JSON object.",
+						Usage: "Output the VLANs as a JSON array.",
 					},
 				},
 				Action: With(AuthProvider, func(c *Context) error {
