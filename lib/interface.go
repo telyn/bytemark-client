@@ -225,4 +225,6 @@ type Client interface {
 	GetIPRange(id int) (*brain.IPRange, error)
 	GetHeads() ([]*brain.Head, error)
 	GetHead(id int) (*brain.Head, error)
+	GetStoragePools() ([]*brain.StoragePool, error)
+	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
 }

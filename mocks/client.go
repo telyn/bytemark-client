@@ -377,3 +377,13 @@ func (c *Client) GetHead(id int) (*brain.Head, error) {
 	head, _ := r.Get(0).(*brain.Head)
 	return head, r.Error(1)
 }
+func (c *Client) GetStoragePools() ([]*brain.StoragePool, error) {
+	r := c.Called()
+	storagePools, _ := r.Get(0).([]*brain.StoragePool)
+	return storagePools, r.Error(1)
+}
+func (c *Client) GetStoragePool(idOrLabel string) (*brain.StoragePool, error) {
+	r := c.Called(id)
+	storagePool, _ := r.Get(0).(*brain.StoragePool)
+	return storagePool, r.Error(1)
+}

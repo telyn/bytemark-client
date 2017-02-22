@@ -337,6 +337,54 @@ Privileges will be output in no particular order.`,
 					})
 				}),
 			},
+			{
+				Name:      "storage_pools",
+				Usage:     "shows the details of all storage pools",
+				UsageText: "bytemark --admin show storage_pools [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the storage pools as a JSON array.",
+					},
+				}, Action: With(AuthProvider, func(c *Context) error {
+					storagePools, err := global.Client.GetStoragePools()
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(storagePools, func() error {
+						for _, storagePool := range storagePools {
+							if err := storagePool.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+
+						return nil
+					})
+				}),
+			},
+			{
+				Name:      "storage_pool",
+				Usage:     "shows the details of the specified storage pool",
+				UsageText: "bytemark --admin show storage_pools [--json] <storage_pool>",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the storage pools as a JSON array.",
+					},
+					cli.StringFlag{
+						Name:  "storage_pool",
+						Usage: "The ID or label of the storage pool to display",
+					},
+				}, Action: With(OptionalArgs("storage_pool"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
+					storagePool, err := global.Client.GetStoragePool(c.String("storage_pool"))
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(storagePool, func() error {
+						return storagePool.PrettyPrint(os.Stderr, prettyprint.SingleLine)
+					})
+				}),
+			},
 		},
 	})
 }

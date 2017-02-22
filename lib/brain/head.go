@@ -1,9 +1,10 @@
 package brain
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
 	"net"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // Head represents a Bytemark Cloud Servers head server.
