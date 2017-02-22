@@ -56,6 +56,26 @@ func (c *bytemarkClient) GetHead(idOrLabel string) (head *brain.Head, err error)
 	return
 }
 
+func (c *bytemarkClient) GetTails() (tails []*brain.Tail, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/tails")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &tails)
+	return
+}
+
+func (c *bytemarkClient) GetTail(idOrLabel string) (tail *brain.Tail, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/tails/%s", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &tail)
+	return
+}
+
 func (c *bytemarkClient) GetStoragePools() (storagePools []*brain.StoragePool, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/storage_pools")
 	if err != nil {

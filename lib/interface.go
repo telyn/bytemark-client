@@ -225,6 +225,8 @@ type Client interface {
 	GetIPRange(id int) (*brain.IPRange, error)
 	GetHeads() ([]*brain.Head, error)
 	GetHead(idOrLabel string) (*brain.Head, error)
+	GetTails() ([]*brain.Tail, error)
+	GetTail(idOrLabel string) (*brain.Tail, error)
 	GetStoragePools() ([]*brain.StoragePool, error)
 	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
 	GetMigratingVMs() ([]*brain.VirtualMachine, error)

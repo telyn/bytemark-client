@@ -338,6 +338,54 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
+				Name:      "tails",
+				Usage:     "shows the details of all tails",
+				UsageText: "bytemark --admin show tails [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the tails as a JSON array.",
+					},
+				}, Action: With(AuthProvider, func(c *Context) error {
+					tails, err := global.Client.GetTails()
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(tails, func() error {
+						for _, tail := range tails {
+							if err := tail.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+
+						return nil
+					})
+				}),
+			},
+			{
+				Name:      "tail",
+				Usage:     "shows the details of the specified tail",
+				UsageText: "bytemark --admin show tail <tail> [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the tail as a JSON object.",
+					},
+					cli.StringFlag{
+						Name:  "tail",
+						Usage: "the ID of the tail to display",
+					},
+				}, Action: With(OptionalArgs("tail"), RequiredFlags("tail"), AuthProvider, func(c *Context) error {
+					tail, err := global.Client.GetTail(c.String("tail"))
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(tail, func() error {
+						return tail.PrettyPrint(os.Stderr, prettyprint.Full)
+					})
+				}),
+			},
+			{
 				Name:      "storage_pools",
 				Usage:     "shows the details of all storage pools",
 				UsageText: "bytemark --admin show storage_pools [--json]",
