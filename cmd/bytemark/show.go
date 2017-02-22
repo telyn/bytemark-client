@@ -458,6 +458,31 @@ Privileges will be output in no particular order.`,
 					})
 				}),
 			},
+			{
+				Name:      "stopped_eligible_vms",
+				Usage:     "shows a list of stopped VMs that should be running",
+				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the VMs as a JSON array.",
+					},
+				}, Action: With(AuthProvider, func(c *Context) error {
+					vms, err := global.Client.GetStoppedEligibleVMs()
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(vms, func() error {
+						for _, vm := range vms {
+							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+
+						return nil
+					})
+				}),
+			},
 		},
 	})
 }

@@ -401,5 +401,9 @@ func (c *Client) GetMigratingVMs() ([]*brain.VirtualMachine, error) {
 	r := c.Called()
 	vms, _ := r.Get(0).([]*brain.VirtualMachine)
 	return vms, r.Error(1)
-
+}
+func (c *Client) GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
 }

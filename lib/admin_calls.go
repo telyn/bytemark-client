@@ -105,3 +105,13 @@ func (c *bytemarkClient) GetMigratingVMs() (vms []*brain.VirtualMachine, err err
 	_, _, err = r.Run(nil, &vms)
 	return
 }
+
+func (c *bytemarkClient) GetStoppedEligibleVMs() (vms []*brain.VirtualMachine, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/stopped_eligible_vms")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &vms)
+	return
+}

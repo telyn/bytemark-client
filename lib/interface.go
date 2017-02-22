@@ -230,4 +230,5 @@ type Client interface {
 	GetStoragePools() ([]*brain.StoragePool, error)
 	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
 	GetMigratingVMs() ([]*brain.VirtualMachine, error)
+	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
 }
