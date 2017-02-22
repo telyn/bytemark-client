@@ -323,12 +323,12 @@ Privileges will be output in no particular order.`,
 						Name:  "json",
 						Usage: "Output the head as a JSON object.",
 					},
-					cli.IntFlag{
+					cli.StringFlag{
 						Name:  "head",
 						Usage: "the ID of the head to display",
 					},
 				}, Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
-					head, err := global.Client.GetHead(c.Int("head"))
+					head, err := global.Client.GetHead(c.String("head"))
 					if err != nil {
 						return err
 					}

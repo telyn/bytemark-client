@@ -46,8 +46,8 @@ func (c *bytemarkClient) GetHeads() (heads []*brain.Head, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetHead(id int) (head *brain.Head, err error) {
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/heads/%s", strconv.Itoa(id))
+func (c *bytemarkClient) GetHead(idOrLabel string) (head *brain.Head, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/heads/%s", idOrLabel)
 	if err != nil {
 		return
 	}
