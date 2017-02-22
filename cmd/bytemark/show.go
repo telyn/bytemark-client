@@ -250,7 +250,7 @@ Privileges will be output in no particular order.`,
 				Flags: []cli.Flag{
 					cli.BoolFlag{
 						Name:  "json",
-						Usage: "Output IP range details as a JSON object.",
+						Usage: "Output IP ranges as a JSON array.",
 					},
 				}, Action: With(AuthProvider, func(c *Context) error {
 					ipRanges, err := global.Client.GetIPRanges()
@@ -272,7 +272,7 @@ Privileges will be output in no particular order.`,
 				Flags: []cli.Flag{
 					cli.BoolFlag{
 						Name:  "json",
-						Usage: "Output IP range details as a JSON object.",
+						Usage: "Output the IP range as a JSON object.",
 					},
 					cli.IntFlag{
 						Name:  "ip_range",
@@ -296,7 +296,7 @@ Privileges will be output in no particular order.`,
 				Flags: []cli.Flag{
 					cli.BoolFlag{
 						Name:  "json",
-						Usage: "Output the head as a JSON array.",
+						Usage: "Output the heads as a JSON array.",
 					},
 				}, Action: With(AuthProvider, func(c *Context) error {
 					heads, err := global.Client.GetHeads()
@@ -321,7 +321,7 @@ Privileges will be output in no particular order.`,
 				Flags: []cli.Flag{
 					cli.BoolFlag{
 						Name:  "json",
-						Usage: "Output the head as a JSON array.",
+						Usage: "Output the head as a JSON object.",
 					},
 					cli.IntFlag{
 						Name:  "head",
