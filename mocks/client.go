@@ -407,3 +407,8 @@ func (c *Client) GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error) {
 	vms, _ := r.Get(0).([]*brain.VirtualMachine)
 	return vms, r.Error(1)
 }
+func (c *Client) GetRecentVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+}

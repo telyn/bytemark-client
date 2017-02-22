@@ -115,3 +115,13 @@ func (c *bytemarkClient) GetStoppedEligibleVMs() (vms []*brain.VirtualMachine, e
 	_, _, err = r.Run(nil, &vms)
 	return
 }
+
+func (c *bytemarkClient) GetRecentVMs() (vms []*brain.VirtualMachine, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/recent_vms")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &vms)
+	return
+}
