@@ -244,6 +244,28 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
+				Name:      "ip_ranges",
+				Usage:     "shows all IP ranges",
+				UsageText: "bytemark --admin show ip_ranges [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output IP range details as a JSON object.",
+					},
+				}, Action: With(AuthProvider, func(c *Context) error {
+					ipRanges, err := global.Client.GetIPRanges()
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(ipRanges, func() error {
+						for _, ipRange := range ipRanges {
+							log.Outputf("%s\r\n", ipRange.String())
+						}
+						return nil
+					})
+				}),
+			},
+			{
 				Name:      "ip_range",
 				Usage:     "shows the details of an IP range",
 				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",

@@ -357,6 +357,11 @@ func (c *Client) GetVLANs() ([]*brain.VLAN, error) {
 	vlans, _ := r.Get(0).([]*brain.VLAN)
 	return vlans, r.Error(1)
 }
+func (c *Client) GetIPRanges() ([]*brain.IPRange, error) {
+	r := c.Called()
+	ipRanges, _ := r.Get(0).([]*brain.IPRange)
+	return ipRanges, r.Error(1)
+}
 func (c *Client) GetIPRange(id int) (*brain.IPRange, error) {
 	r := c.Called(id)
 	ipRange, _ := r.Get(0).(*brain.IPRange)

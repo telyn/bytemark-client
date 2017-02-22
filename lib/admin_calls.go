@@ -16,6 +16,16 @@ func (c *bytemarkClient) GetVLANs() (vlans []*brain.VLAN, err error) {
 	return
 }
 
+func (c *bytemarkClient) GetIPRanges() (ipRanges []*brain.IPRange, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &ipRanges)
+	return
+}
+
 func (c *bytemarkClient) GetIPRange(id int) (ipRange *brain.IPRange, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", strconv.Itoa(id))
 	if err != nil {
