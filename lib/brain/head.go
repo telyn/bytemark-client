@@ -43,7 +43,7 @@ func (h *Head) CountVirtualMachines() int {
 	return h.VirtualMachineCount
 }
 
-// PrettyPrint writes an overview of this account out to the given writer.
+// PrettyPrint writes an overview of this head out to the given writer.
 func (h Head) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	const t = `
 {{ define "head_sgl" -}}

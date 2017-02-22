@@ -31,7 +31,7 @@ func (sp StoragePool) PercentFull() int {
 	return sp.AllocatedSpace * 100 / sp.Size
 }
 
-// PrettyPrint writes an overview of this account out to the given writer.
+// PrettyPrint writes an overview of this storage pool out to the given writer.
 func (sp StoragePool) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	const t = `
 {{ define "storage_pool_sgl" -}}

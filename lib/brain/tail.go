@@ -20,7 +20,7 @@ type Tail struct {
 	StoragePools []string `json:"pools"`
 }
 
-// PrettyPrint writes an overview of this account out to the given writer.
+// PrettyPrint writes an overview of this tail out to the given writer.
 func (t Tail) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	const tpl = `
 {{ define "tail_sgl" -}}
