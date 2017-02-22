@@ -387,3 +387,9 @@ func (c *Client) GetStoragePool(idOrLabel string) (*brain.StoragePool, error) {
 	storagePool, _ := r.Get(0).(*brain.StoragePool)
 	return storagePool, r.Error(1)
 }
+func (c *Client) GetMigratingVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+
+}

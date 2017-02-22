@@ -385,6 +385,31 @@ Privileges will be output in no particular order.`,
 					})
 				}),
 			},
+			{
+				Name:      "migrating_vms",
+				Usage:     "shows a list of migrating VMs",
+				UsageText: "bytemark --admin show migrating_vms [--json]",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the VMs as a JSON array.",
+					},
+				}, Action: With(AuthProvider, func(c *Context) error {
+					vms, err := global.Client.GetMigratingVMs()
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(vms, func() error {
+						for _, vm := range vms {
+							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+
+						return nil
+					})
+				}),
+			},
 		},
 	})
 }

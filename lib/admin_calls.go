@@ -75,3 +75,13 @@ func (c *bytemarkClient) GetStoragePool(idOrLabel string) (storagePool *brain.St
 	_, _, err = r.Run(nil, &storagePool)
 	return
 }
+
+func (c *bytemarkClient) GetMigratingVMs() (vms []*brain.VirtualMachine, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/migrating_vms")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &vms)
+	return
+}

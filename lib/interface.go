@@ -227,4 +227,5 @@ type Client interface {
 	GetHead(id int) (*brain.Head, error)
 	GetStoragePools() ([]*brain.StoragePool, error)
 	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
+	GetMigratingVMs() ([]*brain.VirtualMachine, error)
 }
