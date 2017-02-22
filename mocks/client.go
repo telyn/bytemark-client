@@ -383,7 +383,7 @@ func (c *Client) GetStoragePools() ([]*brain.StoragePool, error) {
 	return storagePools, r.Error(1)
 }
 func (c *Client) GetStoragePool(idOrLabel string) (*brain.StoragePool, error) {
-	r := c.Called(id)
+	r := c.Called(idOrLabel)
 	storagePool, _ := r.Get(0).(*brain.StoragePool)
 	return storagePool, r.Error(1)
 }
