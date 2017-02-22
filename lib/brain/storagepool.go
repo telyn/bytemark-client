@@ -26,7 +26,7 @@ type StoragePool struct {
 	// IOPSLimit int
 }
 
-// Percent full gives us the (numeric) percentage of how full the disc is
+// PercentFull gives us the (numeric) percentage of how full the disc is
 func (sp StoragePool) PercentFull() int {
 	return sp.AllocatedSpace * 100 / sp.Size
 }
