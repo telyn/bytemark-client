@@ -7,7 +7,7 @@ Installation
 ------------
 
 If you're just looking to get started you can find the most recent stable
-release upon our [download page](https://github.com/BytemarkHosting/bytemark-client/releases).
+release on our [download page](https://github.com/BytemarkHosting/bytemark-client/releases).
 
 If you wish to build, and install, the latest stable-release from source you can do so with:
 
