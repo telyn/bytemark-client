@@ -23,7 +23,7 @@ If you prefer to track our in-development branch you can do that via:
     cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client/
     git checkout develop
     cd cmd/bytemark
-    go build .
+    go build
 
 
 If you have problems to report, or contributions to make, feel free to [use the issue-tracker](https://github.com/BytemarkHosting/bytemark-client/issues)
