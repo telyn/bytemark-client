@@ -1,20 +1,32 @@
 Bytemark command-line client
 ============================
 
-[![Build Status](https://travis-ci.org/BytemarkHosting/bytemark-client.svg)](https://travis-ci.org/BytemarkHosting/bytemark-client) [![Coverage Status](https://coveralls.io/repos/github/BytemarkHosting/bytemark-client/badge.svg?branch=develop)](https://coveralls.io/github/BytemarkHosting/bytemark-client?branch=develop) 
+[![Build Status](https://travis-ci.org/BytemarkHosting/bytemark-client.svg)](https://travis-ci.org/BytemarkHosting/bytemark-client) [![Coverage Status](https://coveralls.io/repos/github/BytemarkHosting/bytemark-client/badge.svg?branch=develop)](https://coveralls.io/github/BytemarkHosting/bytemark-client?branch=develop)
 
 Installation
 ------------
 
-If you have a binary then it's easy - just run it!
+If you're just looking to get started you can find the most recent stable
+release on our [download page](https://github.com/BytemarkHosting/bytemark-client/releases).
 
-If you have a go workspace you can also just `go get github.com/BytemarkHosting/bytemark-client/cmd/bytemark` if you like, to get the latest stable.
+If you wish to build, and install, the latest stable-release from source you can do so with:
 
-And if you want to work on the develop branch, probably the easiest way is to `go get` it and then wipe it out and clone it by hand.
+    go get github.com/BytemarkHosting/bytemark-client/cmd/bytemark
 
-`cmd/bytemark` is where 'main' is, so `cd` into there to build or use the full import path, as with go get.
 
-Feel free to open issues & merge requests on the github repo at http://github.com/BytemarkHosting/bytemark-client 
+Tracking Development
+====================
+
+If you prefer to track our in-development branch you can do that via:
+
+    go get -d github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client/
+    git checkout develop
+    cd cmd/bytemark
+    go build
+
+
+If you have problems to report, or contributions to make, feel free to [use the issue-tracker](https://github.com/BytemarkHosting/bytemark-client/issues)
 
 Compatibility Guarantee
 =======================
