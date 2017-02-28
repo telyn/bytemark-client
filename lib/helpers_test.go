@@ -22,7 +22,7 @@ func writeJSON(t *testing.T, wr io.Writer, object interface{}) {
 	}
 	_, err = wr.Write(js)
 	if err != nil {
-		t.Fatal("Couldn't write JSON out: %s", err.Error())
+		t.Fatalf("Couldn't write JSON out: %s", err.Error())
 	}
 }
 
