@@ -2,6 +2,7 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"net"
 	"net/http"
 	"reflect"
 	"testing"
@@ -123,5 +124,81 @@ func TestGetIPRange(t *testing.T) {
 	}
 	if !reflect.DeepEqual(iprange, &testIPRange) {
 		t.Errorf("IPRange returned from GetIPRange was not what was expected.\r\nExpected: %#v\r\nActual:%#v", testIPRange, iprange)
+	}
+}
+func TestGetHeads(t *testing.T) {
+	testHeads := []*brain.Head{
+		{
+			ID:       315,
+			UUID:     "234833-2493-3423-324235",
+			Label:    "test-head315",
+			ZoneName: "awesomecoolguyzone",
+
+			Architecture:  "x86_64",
+			CCAddress:     &net.IP{214, 233, 32, 31},
+			Note:          "melons",
+			Memory:        241000,
+			UsageStrategy: "",
+			Models:        []string{"generic", "intel"},
+
+			MemoryFree:          123400,
+			IsOnline:            true,
+			UsedCores:           9,
+			VirtualMachineCount: 3,
+		}, {
+			ID:       239,
+			UUID:     "235670-2493-3423-324235",
+			Label:    "test-head239",
+			ZoneName: "awesomecoolguyzone",
+
+			Architecture:  "x86_64",
+			CCAddress:     &net.IP{24, 43, 32, 49},
+			Note:          "more than a hundred years old",
+			Memory:        241000,
+			UsageStrategy: "",
+			Models:        []string{"generic", "intel"},
+
+			MemoryFree:          234000,
+			IsOnline:            true,
+			UsedCores:           1,
+			VirtualMachineCount: 1,
+		},
+	}
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/admin/heads": func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "GET")
+				writeJSON(t, wr, testHeads)
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	heads, err := client.GetHeads()
+	if err != nil {
+		t.Error(err)
+	}
+	seenFirst := false
+	seenSecond := false
+	for _, h := range heads {
+		if h.Label == testHeads[0].Label {
+			seenFirst = true
+		}
+		if h.Label == testHeads[1].Label {
+			seenSecond = true
+		}
+	}
+	if !seenFirst {
+		t.Errorf("didn't see %s", testHeads[0].Label)
+	} else if !seenSecond {
+		t.Errorf("didn't see %s", testHeads[1].Label)
 	}
 }
