@@ -3,8 +3,28 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"testing"
 )
+
+func assertMethod(t *testing.T, r *http.Request, expected string) {
+	if r.Method != expected {
+		t.Errorf("Wrong method %s", r.Method)
+	}
+}
+
+// writeJSON marshals the object as JSON and writes it to the writer
+func writeJSON(t *testing.T, wr io.Writer, object interface{}) {
+	js, err := json.Marshal(object)
+	if err != nil {
+		t.Fatalf("Couldn't marshal. %s", err.Error())
+	}
+	_, err = wr.Write(js)
+	if err != nil {
+		t.Fatal("Couldn't write JSON out: %s", err.Error())
+	}
+}
 
 // IsEqualString checks strings for equalities and outputs the difference between them if not.
 func IsEqualString(t *testing.T, expected string, actual string) {
