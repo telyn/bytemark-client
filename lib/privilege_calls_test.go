@@ -47,12 +47,12 @@ func mkGetPrivilegesHandler(t *testing.T, user string) func(http.ResponseWriter,
 }
 
 func TestGetPrivileges(t *testing.T) {
-	handlers := MuxHandlers{
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
+			// simple test of getting all privileges - hence the empty string
 			"/privileges": mkGetPrivilegesHandler(t, ""),
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -61,6 +61,7 @@ func TestGetPrivileges(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// simple test of getting all privileges - hence the empty string
 	privileges, err := client.GetPrivileges("")
 	if err != nil {
 		t.Error(err)
@@ -71,9 +72,82 @@ func TestGetPrivileges(t *testing.T) {
 
 }
 
+func TestGetPrivilegesForAccount(t *testing.T) {
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/accounts/mycoolaccount/privileges": mkGetPrivilegesHandler(t, ""),
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	privileges, err := client.GetPrivilegesForAccount("mycoolaccount")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(privileges) != 2 {
+		t.Errorf("Wrong number of privileges: %d", len(privileges))
+	}
+}
+
+func TestGetPrivilegesForGroup(t *testing.T) {
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/accounts/test-account/groups/test-group/privileges": mkGetPrivilegesHandler(t, ""),
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	privileges, err := client.GetPrivilegesForGroup(GroupName{Group: "test-group", Account: "test-account"})
+	if err != nil {
+		t.Error(err)
+	}
+	if len(privileges) != 2 {
+		t.Errorf("Wrong number of privileges: %d", len(privileges))
+	}
+}
+
+func TestGetPrivilegesForServer(t *testing.T) {
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/accounts/test-account/groups/test-group/virtual_machines/test-vm/privileges": mkGetPrivilegesHandler(t, ""),
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	privileges, err := client.GetPrivilegesForVirtualMachine(VirtualMachineName{
+		Account:        "test-account",
+		Group:          "test-group",
+		VirtualMachine: "test-vm",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	if len(privileges) != 2 {
+		t.Errorf("Wrong number of privileges: %d", len(privileges))
+	}
+}
+
 func TestGrantPrivilege(t *testing.T) {
 	done := false
-	handlers := MuxHandlers{
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/users/satan/privileges": func(wr http.ResponseWriter, r *http.Request) {
 				if r.Method != "POST" {
@@ -83,8 +157,7 @@ func TestGrantPrivilege(t *testing.T) {
 				done = true
 			},
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +182,7 @@ func TestGrantPrivilege(t *testing.T) {
 
 func TestRevokePrivilegeWithID(t *testing.T) {
 	done := false
-	handlers := MuxHandlers{
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/privileges/999": func(wr http.ResponseWriter, r *http.Request) {
 				if r.Method != "DELETE" {
@@ -118,8 +191,7 @@ func TestRevokePrivilegeWithID(t *testing.T) {
 				done = true
 			},
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -145,7 +217,8 @@ func TestRevokePrivilegeWithID(t *testing.T) {
 
 func TestRevokePrivilegeWithoutID(t *testing.T) {
 	done := false
-	handlers := MuxHandlers{
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
 		brain: Mux{
 			"/users/satan/privileges": mkGetPrivilegesHandler(t, "satan"),
 			"/privileges/999": func(wr http.ResponseWriter, r *http.Request) {
@@ -155,8 +228,7 @@ func TestRevokePrivilegeWithoutID(t *testing.T) {
 				done = true
 			},
 		},
-	}
-	client, servers, err := mkTestClientAndServers(t, handlers.ToHandlers())
+	})
 	defer servers.Close()
 	if err != nil {
 		t.Fatal(err)

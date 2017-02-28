@@ -2,7 +2,6 @@ package lib
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -37,15 +36,10 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.Virtu
 		labelDiscs(spec.Discs, 0)
 	}
 
-	js, err := json.Marshal(spec)
-	if err != nil {
-		return nil, err
-	}
-
 	vm = new(brain.VirtualMachine)
 	oldfile := log.LogFile
 	log.LogFile = nil
-	_, _, err = r.Run(bytes.NewBuffer(js), vm)
+	_, _, err = r.MarshalAndRun(spec, vm)
 	log.LogFile = oldfile
 	return vm, err
 }
@@ -118,11 +112,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 		return err
 	}
 
-	js, err := json.Marshal(change)
-	if err != nil {
-		return err
-	}
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.MarshalAndRun(change, nil)
 	return err
 
 }
@@ -139,13 +129,9 @@ func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *
 		return err
 	}
 
-	js, err := json.Marshal(image)
-	if err != nil {
-		return err
-	}
 	oldfile := log.LogFile
 	log.LogFile = nil
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.MarshalAndRun(image, nil)
 	log.LogFile = oldfile
 	return err
 }
@@ -352,11 +338,6 @@ func (c *bytemarkClient) SetVirtualMachineCDROM(name *VirtualMachineName, url st
 		return err
 	}
 
-	cdromJSON, err := json.Marshal(brain.VirtualMachine{CdromURL: url})
-	if err != nil {
-		return err
-	}
-
-	_, _, err = r.Run(bytes.NewReader(cdromJSON), nil)
+	_, _, err = r.MarshalAndRun(brain.VirtualMachine{CdromURL: url}, nil)
 	return err
 }

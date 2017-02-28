@@ -303,6 +303,15 @@ func (c *Client) DeleteBackup(server lib.VirtualMachineName, discLabelOrID strin
 	r := c.Called(server, discLabelOrID, backupLabelOrID)
 	return r.Error(0)
 }
+func (c *Client) CreateBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, start string, interval int) (brain.BackupSchedule, error) {
+	r := c.Called(server, discLabelOrID, start, interval)
+	sched, _ := r.Get(0).(brain.BackupSchedule)
+	return sched, r.Error(1)
+}
+func (c *Client) DeleteBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, id int) error {
+	r := c.Called(server, discLabelOrID, id)
+	return r.Error(0)
+}
 func (c *Client) GetBackups(server lib.VirtualMachineName, discLabelOrID string) (brain.Backups, error) {
 	r := c.Called(server, discLabelOrID)
 	snaps, _ := r.Get(0).(brain.Backups)
@@ -317,6 +326,21 @@ func (c *Client) RestoreBackup(server lib.VirtualMachineName, discLabelOrID stri
 
 func (c *Client) GetPrivileges(username string) (privs brain.Privileges, err error) {
 	r := c.Called(username)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForAccount(accountName string) (privs brain.Privileges, err error) {
+	r := c.Called(accountName)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForGroup(group lib.GroupName) (privs brain.Privileges, err error) {
+	r := c.Called(group)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForVirtualMachine(vm lib.VirtualMachineName) (privs brain.Privileges, err error) {
+	r := c.Called(vm)
 	privs, _ = r.Get(0).(brain.Privileges)
 	return privs, r.Error(1)
 }

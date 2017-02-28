@@ -37,11 +37,10 @@ func TestListDiscs(t *testing.T) {
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "spooky-vm",
-		Group:          "halloween-vms",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("ParseVirtualMachineName", "spooky-vm", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
 
 	vm := brain.VirtualMachine{
 		ID:   4,
@@ -69,7 +68,6 @@ func TestListGroups(t *testing.T) {
 	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("ParseAccountName", "spooky-steve", []string{"spooky-steve-other-account"}).Return("spooky-steve").Times(1)
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Groups: []*brain.Group{
@@ -96,7 +94,6 @@ func TestListServers(t *testing.T) {
 	config.When("GetGroup").Return(&defGroup)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("ParseAccountName", "spooky-steve", []string{"spokny-stevn"}).Return("spooky-steve").Times(1)
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Name: "spooky-steve",
@@ -123,15 +120,14 @@ func TestListBackups(t *testing.T) {
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetBackups", vmname, "test-disc").Return(nil).Times(1)
 

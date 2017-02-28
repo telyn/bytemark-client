@@ -119,6 +119,9 @@ type Client interface {
 	//
 	// username is allowed to be empty
 	GetPrivileges(username string) (brain.Privileges, error)
+	GetPrivilegesForAccount(account string) (brain.Privileges, error)
+	GetPrivilegesForGroup(group GroupName) (brain.Privileges, error)
+	GetPrivilegesForVirtualMachine(vm VirtualMachineName) (brain.Privileges, error)
 	GrantPrivilege(p brain.Privilege) error
 	RevokePrivilege(p brain.Privilege) error
 
@@ -130,6 +133,13 @@ type Client interface {
 	DeleteBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) error
 	GetBackups(server VirtualMachineName, discLabelOrID string) (brain.Backups, error)
 	RestoreBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
+
+	//
+	// BACKUP SCHEDULES
+	//
+
+	CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, intervalSeconds int) (brain.BackupSchedule, error)
+	DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) error
 
 	//
 	// USERS

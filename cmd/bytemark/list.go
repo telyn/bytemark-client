@@ -53,8 +53,13 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 					Name:  "human",
 					Usage: "output disc size in GiB, suffixed",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server whose discs you wish to list",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineProvider, AuthProvider, func(c *Context) (err error) {
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) (err error) {
 				for _, disc := range c.VirtualMachine.Discs {
 					if c.Bool("human") {
 						log.Outputf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
@@ -69,7 +74,14 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the groups in an account",
 			UsageText:   "bytemark list groups [account]",
 			Description: `This command lists all the groups in the given account, or in your default account if not specified.`,
-			Action: With(AccountProvider(false), AuthProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "account",
+					Usage: "the account to list the groups of",
+					Value: new(AccountNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("account"), RequiredFlags("account"), AccountProvider("account"), func(c *Context) (err error) {
 				for _, group := range c.Account.Groups {
 					log.Output(group.Name)
 				}
@@ -80,35 +92,27 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the SSH public keys associated with a user",
 			UsageText:   "bytemark list keys [user]",
 			Description: "Lists all the SSH public keys associated with a user, defaulting to your log-in user.",
-			Action: func(c *cli.Context) error {
-				username := global.Config.GetIgnoreErr("user")
-				if len(c.Args()) == 1 {
-					username = c.Args().First()
-				}
-
-				err := EnsureAuth()
-				if err != nil {
-					return err
-				}
-
-				user, err := global.Client.GetUser(username)
-				if err != nil {
-					return err
-				}
-
-				for _, k := range user.AuthorizedKeys {
+			Action: With(OptionalArgs("user"), UserProvider("user"), func(c *Context) error {
+				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
 				}
 
 				return nil
-			},
+			}),
 		}, {
 			Name:      "servers",
 			Usage:     "list all the servers in an account",
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if not specified.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			Action: With(AccountProvider(false), AuthProvider, func(c *Context) (err error) {
+			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "account",
+					Usage: "the account to list the servers of",
+					Value: new(AccountNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("account"), AccountProvider("account"), AuthProvider, func(c *Context) (err error) {
 				for _, g := range c.Account.Groups {
 					listServersInGroup(g)
 				}
@@ -119,22 +123,34 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 			Usage:       "list all the backups of a server or disc",
 			UsageText:   "bytemark list backups <server name> [disc label]",
 			Description: "Lists all the backups of all the discs in the given server, or if you also give a disc label, just the backups of that disc.",
-			Action: With(VirtualMachineNameProvider, func(c *Context) (err error) {
-				label, _ := c.NextArg()
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "the disc you wish to list the backups of",
+				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server you wish to list the backups of",
+					Value: new(VirtualMachineNameFlag),
+				},
+			},
+			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
+				vmName := c.VirtualMachineName("server")
+				label := c.String("disc")
 				var backups brain.Backups
 
 				if label != "" {
-					backups, err = global.Client.GetBackups(*c.VirtualMachineName, label)
+					backups, err = global.Client.GetBackups(vmName, label)
 					if err != nil {
 						return
 					}
 				} else {
-					err = VirtualMachineProvider(c)
+					err = VirtualMachineProvider("server")(c)
 					if err != nil {
 						return
 					}
 					for _, disc := range c.VirtualMachine.Discs {
-						snaps, err := global.Client.GetBackups(*c.VirtualMachineName, disc.Label)
+						snaps, err := global.Client.GetBackups(vmName, disc.Label)
 						if err != nil {
 							return err
 						}
