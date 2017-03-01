@@ -204,3 +204,52 @@ func TestGetTail(t *testing.T) {
 		return client.GetTail("1345")
 	})
 }
+
+func TestGetStoragePools(t *testing.T) {
+	testStoragePools := []*brain.StoragePool{
+		{
+			Label:           "swimming-pool",
+			Zone:            "frozone",
+			Size:            244500,
+			FreeSpace:       43355,
+			AllocatedSpace:  20000,
+			Discs:           []string{"daves-disc", "steves-disc", "philomenas-disc", "celestes-disc"},
+			OvercommitRatio: 9000,
+			UsageStrategy:   "arsony",
+			StorageGrade:    "wet",
+			Note:            "probably best to avoid using this one",
+		}, {
+			Label:           "useful-pool",
+			Zone:            "serious-zone",
+			Size:            244500000,
+			FreeSpace:       43355000,
+			AllocatedSpace:  20000000,
+			Discs:           []string{"daves-disc", "steves-disc", "philomenas-disc", "celestes-disc"},
+			OvercommitRatio: 100,
+			UsageStrategy:   "",
+			StorageGrade:    "sata",
+			Note:            "this note is a test",
+		},
+	}
+	simpleGetTest(t, "/admin/storage_pools", testStoragePools, func(client Client) (interface{}, error) {
+		return client.GetStoragePools()
+	})
+}
+
+func TestGetStoragePool(t *testing.T) {
+	testStoragePool := brain.StoragePool{
+		Label:           "useful-pool",
+		Zone:            "serious-zone",
+		Size:            244500000,
+		FreeSpace:       43355000,
+		AllocatedSpace:  20000000,
+		Discs:           []string{"daves-disc", "steves-disc", "philomenas-disc", "celestes-disc"},
+		OvercommitRatio: 100,
+		UsageStrategy:   "",
+		StorageGrade:    "sata",
+		Note:            "this note is a test",
+	}
+	simpleGetTest(t, "/admin/storage_pools/useful-pool", &testStoragePool, func(client Client) (interface{}, error) {
+		return client.GetStoragePool("useful-pool")
+	})
+}
