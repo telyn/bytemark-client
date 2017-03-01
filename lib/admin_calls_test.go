@@ -190,3 +190,17 @@ func TestGetTails(t *testing.T) {
 		return client.GetTails()
 	})
 }
+
+func TestGetTail(t *testing.T) {
+	testTail := brain.Tail{
+		ID:           1345,
+		UUID:         "idont-reallyknowwhat-uuids-looklike",
+		Label:        "coolTailForCoolDiscs",
+		ZoneName:     "frozone",
+		IsOnline:     false,
+		StoragePools: []string{"swimming", "paddling"},
+	}
+	simpleGetTest(t, "/admin/tails/1345", &testTail, func(client Client) (interface{}, error) {
+		return client.GetTail("1345")
+	})
+}
