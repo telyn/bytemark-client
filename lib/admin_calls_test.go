@@ -4,8 +4,42 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net/http"
 	"reflect"
+	"runtime"
 	"testing"
 )
+
+type simpleGetTestFn func(Client) (interface{}, error)
+
+func simpleGetTest(t *testing.T, url string, testObject interface{}, runTest simpleGetTestFn) {
+	callerPC, _, _, _ := runtime.Caller(1)
+	testName := runtime.FuncForPC(callerPC).Name()
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			url: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "GET")
+				writeJSON(t, wr, testObject)
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	object, err := runTest(client)
+	if err != nil {
+		t.Errorf("%s errored: %s", testName, err.Error())
+	}
+
+	if !reflect.DeepEqual(testObject, object) {
+		t.Errorf("%s didn't get expected object.\r\nExpected: %#v\r\nActual:   %#v", testName, testObject, object)
+	}
+
+}
 
 func TestGetVLANS(t *testing.T) {
 	testVLANs := []*brain.VLAN{
@@ -26,30 +60,9 @@ func TestGetVLANS(t *testing.T) {
 			},
 		},
 	}
-	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
-		brain: Mux{
-			"/admin/vlans": func(wr http.ResponseWriter, r *http.Request) {
-				assertMethod(t, r, "GET")
-				writeJSON(t, wr, testVLANs)
-			},
-		},
+	simpleGetTest(t, "/admin/vlans", testVLANs, func(client Client) (interface{}, error) {
+		return client.GetVLANs()
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	vlans, err := client.GetVLANs()
-	if err != nil {
-		t.Error(err)
-	}
-	if !reflect.DeepEqual(vlans, testVLANs) {
-		t.Errorf("VLANs returned from GetVLANs were not what was expected.\r\nExpected: %#v\r\nActual:%#v", testVLANs, vlans)
-	}
 }
 
 func TestGetIPRanges(t *testing.T) {
@@ -64,30 +77,10 @@ func TestGetIPRanges(t *testing.T) {
 			Available: 200.0,
 		},
 	}
-	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
-		brain: Mux{
-			"/admin/ip_ranges": func(wr http.ResponseWriter, r *http.Request) {
-				assertMethod(t, r, "GET")
-				writeJSON(t, wr, testIPRanges)
-			},
-		},
+	simpleGetTest(t, "/admin/ip_ranges", testIPRanges, func(client Client) (interface{}, error) {
+		return client.GetIPRanges()
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	ipranges, err := client.GetIPRanges()
-	if err != nil {
-		t.Error(err)
-	}
-	if !reflect.DeepEqual(ipranges, testIPRanges) {
-		t.Errorf("IPRanges returned from GetIPRanges were not what was expected.\r\nExpected: %#v\r\nActual:%#v", testIPRanges, ipranges)
-	}
 }
 
 func TestGetIPRange(t *testing.T) {
@@ -100,30 +93,9 @@ func TestGetIPRange(t *testing.T) {
 		},
 		Available: 200.0,
 	}
-	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
-		brain: Mux{
-			"/admin/ip_ranges/1234": func(wr http.ResponseWriter, r *http.Request) {
-				assertMethod(t, r, "GET")
-				writeJSON(t, wr, testIPRange)
-			},
-		},
+	simpleGetTest(t, "/admin/ip_ranges/1234", &testIPRange, func(client Client) (interface{}, error) {
+		return client.GetIPRange(1234)
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	iprange, err := client.GetIPRange(1234)
-	if err != nil {
-		t.Error(err)
-	}
-	if !reflect.DeepEqual(iprange, &testIPRange) {
-		t.Errorf("IPRange returned from GetIPRange was not what was expected.\r\nExpected: %#v\r\nActual:%#v", testIPRange, iprange)
-	}
 }
 func TestGetHeads(t *testing.T) {
 	testHeads := []*brain.Head{
@@ -165,31 +137,10 @@ func TestGetHeads(t *testing.T) {
 			VirtualMachineCount: 1,
 		},
 	}
-	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
-		brain: Mux{
-			"/admin/heads": func(wr http.ResponseWriter, r *http.Request) {
-				assertMethod(t, r, "GET")
-				writeJSON(t, wr, testHeads)
-			},
-		},
+	simpleGetTest(t, "/admin/heads", testHeads, func(client Client) (interface{}, error) {
+		return client.GetHeads()
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	heads, err := client.GetHeads()
-	if err != nil {
-		t.Error(err)
-	}
-	if !reflect.DeepEqual(heads, testHeads) {
-		t.Errorf("Heads returned from GetHeads was not what was expected.\r\nExpected: %#v\r\nActual:   %#v", testHeads, heads)
-	}
 }
 
 func TestGetHead(t *testing.T) {
@@ -212,31 +163,9 @@ func TestGetHead(t *testing.T) {
 		UsedCores:           1,
 		VirtualMachineCount: 1,
 	}
-	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
-		brain: Mux{
-			"/admin/heads/239": func(wr http.ResponseWriter, r *http.Request) {
-				assertMethod(t, r, "GET")
-				writeJSON(t, wr, testHead)
-			},
-		},
+	simpleGetTest(t, "/admin/heads/239", &testHead, func(client Client) (interface{}, error) {
+		return client.GetHead("239")
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	head, err := client.GetHead("239")
-	if err != nil {
-		t.Error(err)
-	}
-
-	if !reflect.DeepEqual(head, &testHead) {
-		t.Errorf("Head returned from GetHead was not what was expected.\r\nExpected: %#v\r\nActual: %#v", &testHead, head)
-	}
+}
 
 }
