@@ -253,3 +253,43 @@ func TestGetStoragePool(t *testing.T) {
 		return client.GetStoragePool("useful-pool")
 	})
 }
+
+func TestGetMigratingVMs(t *testing.T) {
+	testVMs := []*brain.VirtualMachine{
+		&brain.VirtualMachine{
+			Name: "coolvm",
+		},
+		&brain.VirtualMachine{
+			Name: "uncoolvm",
+		},
+	}
+	simpleGetTest(t, "/admin/migrating_vms", testVMs, func(client Client) (interface{}, error) {
+		return client.GetMigratingVMs()
+	})
+}
+
+func TestGetStoppedEligibleVMs(t *testing.T) {
+	testVMs := []*brain.VirtualMachine{
+		{
+			Name: "eligible-vm",
+		}, {
+			Name: "ultra-eligible-vm",
+		},
+	}
+	simpleGetTest(t, "/admin/stopped_eligible_vms", testVMs, func(client Client) (interface{}, error) {
+		return client.GetStoppedEligibleVMs()
+	})
+}
+
+func TestGetRecentVMs(t *testing.T) {
+	testVMs := []*brain.VirtualMachine{
+		{
+			Name: "the-most-recent-vm",
+		}, {
+			Name: "slightly-less-recent-vm",
+		},
+	}
+	simpleGetTest(t, "/admin/recent_vms", testVMs, func(client Client) (interface{}, error) {
+		return client.GetRecentVMs()
+	})
+}
