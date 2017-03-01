@@ -168,4 +168,25 @@ func TestGetHead(t *testing.T) {
 	})
 }
 
+func TestGetTails(t *testing.T) {
+	testTails := []*brain.Tail{
+		{
+			ID:           1345,
+			UUID:         "idont-reallyknowwhat-uuids-looklike",
+			Label:        "coolTailForCoolDiscs",
+			ZoneName:     "frozone",
+			IsOnline:     false,
+			StoragePools: []string{"swimming", "paddling"},
+		}, {
+			ID:           1235,
+			UUID:         "888888-8888-8888-888888",
+			Label:        "eight",
+			ZoneName:     "eighth zone",
+			IsOnline:     true,
+			StoragePools: []string{"pool-eight"},
+		},
+	}
+	simpleGetTest(t, "/admin/tails", testTails, func(client Client) (interface{}, error) {
+		return client.GetTails()
+	})
 }
