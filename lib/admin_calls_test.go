@@ -191,3 +191,52 @@ func TestGetHeads(t *testing.T) {
 		t.Errorf("Heads returned from GetHeads was not what was expected.\r\nExpected: %#v\r\nActual:   %#v", testHeads, heads)
 	}
 }
+
+func TestGetHead(t *testing.T) {
+	testHead := brain.Head{
+		ID:       239,
+		UUID:     "235670-2493-3423-324235",
+		Label:    "test-head239",
+		ZoneName: "awesomecoolguyzone",
+
+		Architecture: "x86_64",
+		// because of the way json Unmarshals net.IPs different to specifying them in this way this line is commented out
+		// CCAddress:     &net.IP{24, 43, 32, 49},
+		Note:          "more than a hundred years old",
+		Memory:        241000,
+		UsageStrategy: "",
+		Models:        []string{"generic", "intel"},
+
+		MemoryFree:          234000,
+		IsOnline:            true,
+		UsedCores:           1,
+		VirtualMachineCount: 1,
+	}
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/admin/heads/239": func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "GET")
+				writeJSON(t, wr, testHead)
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	head, err := client.GetHead("239")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !reflect.DeepEqual(head, &testHead) {
+		t.Errorf("Head returned from GetHead was not what was expected.\r\nExpected: %#v\r\nActual: %#v", &testHead, head)
+	}
+
+}
