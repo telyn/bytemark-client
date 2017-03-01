@@ -2,7 +2,6 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"net"
 	"net/http"
 	"reflect"
 	"testing"
@@ -134,8 +133,9 @@ func TestGetHeads(t *testing.T) {
 			Label:    "test-head315",
 			ZoneName: "awesomecoolguyzone",
 
-			Architecture:  "x86_64",
-			CCAddress:     &net.IP{214, 233, 32, 31},
+			Architecture: "x86_64",
+			// because of the way json Unmarshals net.IPs different to specifying them in this way this line is commented out
+			// CCAddress:     &net.IP{214, 233, 32, 31},
 			Note:          "melons",
 			Memory:        241000,
 			UsageStrategy: "",
@@ -151,8 +151,9 @@ func TestGetHeads(t *testing.T) {
 			Label:    "test-head239",
 			ZoneName: "awesomecoolguyzone",
 
-			Architecture:  "x86_64",
-			CCAddress:     &net.IP{24, 43, 32, 49},
+			Architecture: "x86_64",
+			// because of the way json Unmarshals net.IPs different to specifying them in this way this line is commented out
+			// CCAddress:     &net.IP{24, 43, 32, 49},
 			Note:          "more than a hundred years old",
 			Memory:        241000,
 			UsageStrategy: "",
@@ -186,19 +187,7 @@ func TestGetHeads(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	seenFirst := false
-	seenSecond := false
-	for _, h := range heads {
-		if h.Label == testHeads[0].Label {
-			seenFirst = true
-		}
-		if h.Label == testHeads[1].Label {
-			seenSecond = true
-		}
-	}
-	if !seenFirst {
-		t.Errorf("didn't see %s", testHeads[0].Label)
-	} else if !seenSecond {
-		t.Errorf("didn't see %s", testHeads[1].Label)
+	if !reflect.DeepEqual(heads, testHeads) {
+		t.Errorf("Heads returned from GetHeads was not what was expected.\r\nExpected: %#v\r\nActual:   %#v", testHeads, heads)
 	}
 }
