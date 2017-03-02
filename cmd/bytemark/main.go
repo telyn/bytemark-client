@@ -16,6 +16,7 @@ import (
 	"strings"
 )
 
+// forceFlag is common to a bunch of commands and can have a generic Usage.
 var forceFlag = cli.BoolFlag{
 	Name:  "force",
 	Usage: "Do not prompt for confirmation when destroying data or increasing costs.",
@@ -87,6 +88,8 @@ func main() {
 	}
 	global.Client = cli
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
+
+	log.Debugf(log.LvlOutline, "bytemark-client %s\r\n\r\n", lib.Version)
 
 	err = global.App.Run(args)
 
@@ -206,6 +209,7 @@ func mergeCommands(base []cli.Command, extras []cli.Command) (result []cli.Comma
 	return
 }
 
+// overrideHelp writes our own help templates into urfave/cli
 func overrideHelp() {
 	cli.SubcommandHelpTemplate = `NAME:
    {{.HelpName}} - {{.Usage}}
@@ -338,7 +342,6 @@ func prepConfig() (flags []cli.Flag, args []string) {
 		copy(args[1:], flargs)
 	}
 	args[0] = os.Args[0]
-	log.Debugf(log.LvlFlags, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, args)
 
 	if *help || *h {
 		helpArgs := make([]string, len(args)+1)
