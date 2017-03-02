@@ -89,11 +89,33 @@ func main() {
 	global.Client = cli
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
 
-	log.Debugf(log.LvlOutline, "bytemark-client %s\r\n\r\n", lib.Version)
+	outputDebugInfo()
 
 	err = global.App.Run(args)
 
 	os.Exit(int(util.ProcessError(err)))
+}
+
+func outputDebugInfo() {
+	log.Debugf(log.LvlOutline, "bytemark-client %s\r\n\r\n", lib.Version)
+	// assemble a string of config vars (excluding token)
+	vars, err := global.Config.GetAll()
+	if err != nil {
+		log.Debugf(log.LvlFlags, "(not a real problem maybe): had trouble getting all config vars: %s\r\n", err.Error())
+	}
+
+	log.Debugf(log.LvlFlags, "reading config from %s\r\n\r\n", global.Config.ConfigDir())
+	log.Debug(log.LvlFlags, "config vars:")
+	for _, v := range vars {
+		if v.Name == "token" {
+			log.Debugf(log.LvlFlags, "  %s (%s): not printed for security\r\n", v.Name, v.Source)
+			continue
+		}
+		log.Debugf(log.LvlFlags, "  %s (%s): '%s'\r\n", v.Name, v.Source, v.Value)
+	}
+	log.Debug(log.LvlFlags, "")
+
+	log.Debugf(log.LvlFlags, "invocation: %s\r\n\r\n", strings.Join(os.Args, " "))
 }
 
 // EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.
