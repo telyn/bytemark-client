@@ -198,9 +198,6 @@ package-generic-amd64:
 package-debian-amd64:
   <<: *package
   image: gitlab.bytemark.co.uk:8443/docker-images/debhelper:jessie
-  variables:
-    DEBEMAIL: telyn@bytemark.co.uk
-    DEBFULLNAME: Telyn
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
