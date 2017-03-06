@@ -10,19 +10,11 @@ export DH_VERBOSE = 1
 override_dh_auto_clean:
 	exit 0
 
-override_dh_auto_build:
-	cp doc/bytemark.1 doc/changelog debian
-
 override_dh_auto_test:
 	exit 0
 
 override_dh_auto_configure:
 	exit 0
-
-override_dh_auto_install:
-	cp bytemark debian/tmp
-	mkdir -p debian/bytemark-client/usr/share/man/man1
-	cp doc/bytemark.1 debian/bytemark-client/usr/share/man/man1
 
 # debmake generated override targets
 # This is example for Cmake (See http://bugs.debian.org/641051 )
