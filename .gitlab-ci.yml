@@ -200,7 +200,6 @@ package-debian-amd64:
   image: gitlab.bytemark.co.uk:8443/docker-images/debhelper:jessie
   script:
   - ln -s .gitlab-ci/debian
-  - ln -s doc/changelog debian/changelog
   - mv bytemark-amd64-linux bytemark
   - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || dch -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" "Snapshot build"'
   - fakeroot debian/rules binary
