@@ -249,6 +249,13 @@ package-windows-amd64:
     dependencies:
     - build-amd64-windows
 
+publish:
+  stage: release
+  tags:
+    - shell
+  script:
+    - publish
+
 .release-job: &release
   stage: release
   image: gitlab.bytemark.co.uk:8443/docker-images/debian-git
