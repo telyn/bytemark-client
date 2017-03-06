@@ -198,10 +198,13 @@ package-generic-amd64:
 package-debian-amd64:
   <<: *package
   image: gitlab.bytemark.co.uk:8443/docker-images/debhelper:jessie
+  variables:
+    DEBEMAIL: telyn@bytemark.co.uk
+    DEBFULLNAME: Telyn
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
-  - '[ "$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
+  - '[ "$VERSION" = "$CI_BUILD_REF_NAME" ] || DEBFULLNAME="Gitlab-CI" DEBEMAIL=$GITLAB_USER_EMAIL CHANGELOG=doc/changelog dch -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
   - mv ../bytemark-client*.deb .
