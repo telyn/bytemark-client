@@ -1,3 +1,11 @@
+bytemark-client (2.2) UNRELEASED; urgency=low
+
+  New features:
+    * First release of admin interface.
+    * First release of backups interface.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 06 Mar 2017 16:48:31 +0000
+
 bytemark-client (2.1) UNRELEASED; urgency=low
 
   New features:
@@ -29,7 +37,7 @@ bytemark-client (2.1) UNRELEASED; urgency=low
 
  -- telyn <telyn@bytemark.co.uk>  Thu, 29 Dec 2016 11:40:03 +0000
 
-bytemark-client (2.1) UNRELEASED; urgency=low
+bytemark-client (2.0.1) UNRELEASED; urgency=low
 
   Changes:
     * Registering a card (such as during signup) now sends a token to SPP.
