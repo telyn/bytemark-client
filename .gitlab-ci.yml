@@ -197,7 +197,7 @@ package-generic-amd64:
 
 package-debian-amd64:
   <<: *package
-  image: gitlab.bytemark.co.uk:8443/docker-images/layers:jessie+deb
+  image: gitlab.bytemark.co.uk:8443/docker-images/layers:jessie-deb
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
