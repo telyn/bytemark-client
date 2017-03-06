@@ -43,6 +43,9 @@ release-check:
   image: alpine
   before_script: &version_script
   - VERSION=${CI_BUILD_REF_NAME##release-}
+  # If the CI_BUILD_REF_NAME is not prefixed with release- (e.g. for a branch)
+  # then VERSION will be equal to CI_BUILD_REF_NAME.
+  - VERSION=${VERSION##CI_BUILD_REF_NAME}
   - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
   - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
   script:
