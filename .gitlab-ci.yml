@@ -268,6 +268,12 @@ publish:
   - cp bytemark-client_*_amd64.deb pkg/debian
   - cp bytemark-client-*.rpm pkg/rpm
   - publish
+  dependencies:
+  - package-generic-amd64
+  - package-rpm-amd64
+  - package-debian-amd64
+
+release-to-brew:
 
 .release-job: &release
   stage: release
@@ -308,6 +314,7 @@ release-to-repo:
   - package-generic-amd64
   - package-rpm-amd64
   - package-debian-amd64
+  - package-windows-amd64
 
 release-to-brew:
   <<: *release
