@@ -254,19 +254,19 @@ publish:
   stage: release
   tags:
   - shell
-  variables:
-    PKGS: pkgs
   before_script: *version_script
   script:
-  - mkdir -p $PKGS/{linux,freebsd,openbsd,windows,debian,rpm}
+  - mkdir -p pkg/{linux,mac,freebsd,openbsd,windows,debian,rpm}
   - VERSION=${VERSION:-$CHANGELOG_VERSION~$SNAPSHOT_VERSION}
-  - cp bytemark-amd64-linux.tar.gz $PKGS/linux/bytemark-$VERSION.tar.gz
-  - cp bytemark-amd64-freebsd.tar.gz $PKGS/freebsd/bytemark-$VERSION.tar.gz
-  - cp bytemark-amd64-openbsd.tar.gz $PKGS/openbsd/bytemark-$VERSION.tar.gz
-  - cp bytemark-amd64-windows.zip $PKGS/windows/bytemark-$VERSION.zip
-  # The debian and rpm versions have their numbers set already.
-  - cp bytemark-client_*_amd64.deb $PKGS/debian
-  - cp bytemark-client-*.rpm $PKGS/rpm
+  - cp bytemark-amd64-linux.tar.gz pkg/linux/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-freebsd.tar.gz pkg/freebsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-openbsd.tar.gz pkg/openbsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-darwin.tar.gz pkg/mac/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-windows.zip pkg/windows/bytemark-$VERSION.zip
+  # The debian, rpm, and chocolatey versions have their numbers set already.
+  - cp bytemark.*.nupkg pkg/windows
+  - cp bytemark-client_*_amd64.deb pkg/debian
+  - cp bytemark-client-*.rpm pkg/rpm
   - publish
 
 .release-job: &release
