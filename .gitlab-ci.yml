@@ -41,11 +41,13 @@ lint-in-anger:
 release-check:
   stage: test
   image: alpine
-  before_script: []
+  before_script: &version_script
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
   script:
   - |
-    VERSION=${CI_BUILD_REF_NAME##release-}
-    if ! head -n 1 doc/changelog | grep "^bytemark-client ($VERSION)" > /dev/null; then
+    if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ;
       echo "Mismatch between branch name and changelog version"
       exit 1
     fi
@@ -145,6 +147,7 @@ build-amd64-windows:
 
 .package-job: &package
   stage: package
+  before_script: *version_script
   dependencies:
   - build-amd64-linux
   - build-manpage
@@ -215,7 +218,7 @@ package-rpm-amd64:
   - mkdir -p ~/rpmbuild/SOURCES
   - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
   - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
-  - rpmbuild --define "version ${CI_BUILD_REF_NAME##release-}" --define "release $CI_BUILD_ID" -bb .gitlab-ci/bytemark-client.spec
+  - rpmbuild --define "version ${VERSION:-$CHANGELOG_VERSION}" --define "release ${SNAPSHOT_VERSION}" -bb .gitlab-ci/bytemark-client.spec
   - mv ~/rpmbuild/RPMS/*/bytemark*.rpm .
   artifacts:
     paths:
@@ -231,7 +234,7 @@ package-windows-amd64:
     image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
     script:
     - mkdir -p choco/tools
-    - sed -e "s/VERSION/${CI_BUILD_REF_NAME##release-}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - sed -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
     - mv bytemark-amd64-windows choco/tools/bytemark.exe
     - cd choco
     - mono /usr/bin/choco.exe pack bytemark-client.nuspec
@@ -250,9 +253,9 @@ publish:
   - shell
   variables:
     PKGS: pkgs
+  before_script: *version_script
   script:
-  - VERSION=${CI_BUILD_REF_NAME##release-}
-  - VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)~$CI_PIPELINE_ID.${CI_BUILD_REF:0:5}
+  - VERSION=${VERSION:-$CHANGELOG_VERSION~$SNAPSHOT_VERSION}
   - cp bytemark-amd64-linux.tar.gz $PKGS/linux/bytemark-$VERSION.tar.gz
   - cp bytemark-amd64-freebsd.tar.gz $PKGS/freebsd/bytemark-$VERSION.tar.gz
   - cp bytemark-amd64-openbsd.tar.gz $PKGS/openbsd/bytemark-$VERSION.tar.gz
