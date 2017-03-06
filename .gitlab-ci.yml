@@ -249,7 +249,7 @@ publish:
   tags:
   - shell
   variables:
-  - PKGS: pkgs
+    PKGS: pkgs
   script:
   - VERSION=${CI_BUILD_REF_NAME##release-}
   - VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)~$CI_PIPELINE_ID.${CI_BUILD_REF:0:5}
