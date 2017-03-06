@@ -199,8 +199,10 @@ package-debian-amd64:
   <<: *package
   image: gitlab.bytemark.co.uk:8443/docker-images/debhelper:jessie
   script:
+  - set +ex
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
+  - cp doc/bytemark-client.1 doc/bytemark.1
   - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || dch -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
