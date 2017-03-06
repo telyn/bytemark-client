@@ -41,11 +41,16 @@ lint-in-anger:
 release-check:
   stage: test
   image: alpine
-  before_script: []
+  before_script: &version_script
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  # If the CI_BUILD_REF_NAME is not prefixed with release- (e.g. for a branch)
+  # then VERSION will be equal to CI_BUILD_REF_NAME.
+  - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || VERSION=""'
+  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
   script:
   - |
-    VERSION=${CI_BUILD_REF_NAME##release-}
-    if ! head -n 1 doc/changelog | grep "^bytemark-client ($VERSION)" > /dev/null; then
+    if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ;
       echo "Mismatch between branch name and changelog version"
       exit 1
     fi
@@ -66,7 +71,7 @@ vet:
 test:
   <<: *test
   script:
-    - go get github.com/modocache/gover golang.org/x/tools/cmd/cover 
+    - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - |
@@ -82,8 +87,6 @@ test:
     paths:
     - coverage.html
     expire_in: '1 week'
-    
-
 
 .build-job: &build
   stage: build
@@ -147,12 +150,10 @@ build-amd64-windows:
 
 .package-job: &package
   stage: package
-  before_script: []
+  before_script: *version_script
   dependencies:
   - build-amd64-linux
   - build-manpage
-  only:
-  - /^release-\d+(\.\d+)+$/
 
     #package-debian-amd64:
     #  <<: *package
@@ -220,7 +221,7 @@ package-rpm-amd64:
   - mkdir -p ~/rpmbuild/SOURCES
   - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
   - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
-  - rpmbuild --define "version ${CI_BUILD_REF_NAME##release-}" --define "release $CI_BUILD_ID" -bb .gitlab-ci/bytemark-client.spec
+  - rpmbuild --define "version ${VERSION:-$CHANGELOG_VERSION}" --define "release ${SNAPSHOT_VERSION}" -bb .gitlab-ci/bytemark-client.spec
   - mv ~/rpmbuild/RPMS/*/bytemark*.rpm .
   artifacts:
     paths:
@@ -236,7 +237,7 @@ package-windows-amd64:
     image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
     script:
     - mkdir -p choco/tools
-    - sed -e "s/VERSION/${CI_BUILD_REF_NAME##release-}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - sed -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
     - mv bytemark-amd64-windows choco/tools/bytemark.exe
     - cd choco
     - mono /usr/bin/choco.exe pack bytemark-client.nuspec
@@ -248,6 +249,30 @@ package-windows-amd64:
       expire_in: "1 month"
     dependencies:
     - build-amd64-windows
+
+publish:
+  stage: release
+  tags:
+  - shell
+  before_script: *version_script
+  script:
+  - mkdir -p pkg/{linux,mac,freebsd,openbsd,windows,debian,rpm}
+  - VERSION=${VERSION:-$CHANGELOG_VERSION~$SNAPSHOT_VERSION}
+  - cp bytemark-amd64-linux.tar.gz pkg/linux/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-freebsd.tar.gz pkg/freebsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-openbsd.tar.gz pkg/openbsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-darwin.tar.gz pkg/mac/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-windows.zip pkg/windows/bytemark-$VERSION.zip
+  # The debian, rpm, and chocolatey versions have their numbers set already.
+  - cp bytemark.*.nupkg pkg/windows
+  - cp bytemark-client_*_amd64.deb pkg/debian
+  - cp bytemark-client-*.rpm pkg/rpm
+  - publish
+  dependencies:
+  - package-generic-amd64
+  - package-rpm-amd64
+  - package-debian-amd64
+  - package-windows-amd64
 
 .release-job: &release
   stage: release
@@ -304,7 +329,7 @@ release-to-brew:
   - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
   - echo sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
   - sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
-  - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb 
+  - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb
   - git log HEAD^..HEAD
   - git diff HEAD^..HEAD
   - git push origin master
@@ -318,7 +343,7 @@ release-to-chocolatey:
   - VERSION=${CI_BUILD_REF_NAME##release-}
   - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
-  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y 
+  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
   dependencies:
   - package-windows-amd64
 
