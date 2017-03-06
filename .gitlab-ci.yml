@@ -258,7 +258,7 @@ publish:
     PKGS: pkgs
   before_script: *version_script
   script:
-  - mkdir -p $PKGS
+  - mkdir -p $PKGS/{linux,freebsd,openbsd,windows,debian,rpm}
   - VERSION=${VERSION:-$CHANGELOG_VERSION~$SNAPSHOT_VERSION}
   - cp bytemark-amd64-linux.tar.gz $PKGS/linux/bytemark-$VERSION.tar.gz
   - cp bytemark-amd64-freebsd.tar.gz $PKGS/freebsd/bytemark-$VERSION.tar.gz
