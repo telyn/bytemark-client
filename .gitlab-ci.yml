@@ -66,7 +66,7 @@ vet:
 test:
   <<: *test
   script:
-    - go get github.com/modocache/gover golang.org/x/tools/cmd/cover 
+    - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - |
@@ -82,8 +82,6 @@ test:
     paths:
     - coverage.html
     expire_in: '1 week'
-    
-
 
 .build-job: &build
   stage: build
@@ -147,12 +145,9 @@ build-amd64-windows:
 
 .package-job: &package
   stage: package
-  before_script: []
   dependencies:
   - build-amd64-linux
   - build-manpage
-  only:
-  - /^release-\d+(\.\d+)+$/
 
     #package-debian-amd64:
     #  <<: *package
@@ -252,9 +247,20 @@ package-windows-amd64:
 publish:
   stage: release
   tags:
-    - shell
+  - shell
+  variables:
+  - PKGS: pkgs
   script:
-    - publish
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)~$CI_PIPELINE_ID.${CI_BUILD_REF:0:5}
+  - cp bytemark-amd64-linux.tar.gz $PKGS/linux/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-freebsd.tar.gz $PKGS/freebsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-openbsd.tar.gz $PKGS/openbsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-windows.zip $PKGS/windows/bytemark-$VERSION.zip
+  # The debian and rpm versions have their numbers set already.
+  - cp bytemark-client_*_amd64.deb $PKGS/debian
+  - cp bytemark-client-*.rpm $PKGS/rpm
+  - publish
 
 .release-job: &release
   stage: release
@@ -311,7 +317,7 @@ release-to-brew:
   - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
   - echo sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
   - sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
-  - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb 
+  - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb
   - git log HEAD^..HEAD
   - git diff HEAD^..HEAD
   - git push origin master
@@ -325,7 +331,7 @@ release-to-chocolatey:
   - VERSION=${CI_BUILD_REF_NAME##release-}
   - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
-  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y 
+  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
   dependencies:
   - package-windows-amd64
 
