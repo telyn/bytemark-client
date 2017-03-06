@@ -272,8 +272,7 @@ publish:
   - package-generic-amd64
   - package-rpm-amd64
   - package-debian-amd64
-
-release-to-brew:
+  - package-windows-amd64
 
 .release-job: &release
   stage: release
@@ -314,7 +313,6 @@ release-to-repo:
   - package-generic-amd64
   - package-rpm-amd64
   - package-debian-amd64
-  - package-windows-amd64
 
 release-to-brew:
   <<: *release
