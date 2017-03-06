@@ -202,7 +202,7 @@ package-debian-amd64:
   - ln -s .gitlab-ci/debian
   - ln -s doc/changelog debian/changelog
   - mv bytemark-amd64-linux bytemark
-  - ! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || dch -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" "Snapshot build"
+  - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || dch -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
   - mv ../bytemark-client*.deb .
