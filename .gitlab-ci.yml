@@ -286,7 +286,7 @@ publish:
   - mkdir ~/.ssh
   - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
   - REPO=$REPO_SSH_HOST:$REPO_PATH
-  - VERSION=$(grep -o '".*"' lib/version.go | tr -d '"')
+  - VERSION=${CI_BUILD_REF_NAME##release-}
   - git config --global user.name Bytemark Automation
   - git config --global user.email nobody@bytemark.co.uk
   only:
@@ -343,7 +343,9 @@ update-homebrew:
       HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
     else
       NAME="bytemark-client-beta"
-      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_BUILD_ID/mac/bytemark-$VERSION.tar.gz'"'!)
+      CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+      SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
+      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_BUILD_ID/mac/bytemark-$CHANGELOG_VERSION~$SNAPSHOT_VERSION.tar.gz'"'!)
       HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
     fi
   - echo sed -e "$URLRULE" -e "$HASHRULE" -i "$NAME.rb"
