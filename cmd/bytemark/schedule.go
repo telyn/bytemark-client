@@ -54,7 +54,7 @@ bytemark schedule backups --start 00:00 fileserver very-important-data 86400
 
 To have hourly backups starting at 14:37 (Central European Summer Time) on the 5th of April, 2017:
 bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-important-data 3600`,
-				Action: With(OptionalArgs("server", "disc", "interval"), RequiredFlags("server", "disc"), func(c *Context) (err error) {
+				Action: With(OptionalArgs("server", "disc", "interval"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
 					start := c.String("start")
 					if start == "" {
 						start = "00:00"
