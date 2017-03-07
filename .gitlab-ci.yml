@@ -91,14 +91,13 @@ test:
 .build-job: &build
   stage: build
   image: golang:$GOVERSION
-  before_script:
-    # these two are needed for coverage stats
-    - go get github.com/BytemarkHosting/auth-client
+  before_script: *version_script
+  script:
+    - sed -i 's/".*"/"'"$VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-  script:
-  - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+    - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
   artifacts:
     paths:
     - bytemark-$GOARCH-$GOOS
@@ -201,7 +200,7 @@ package-debian-amd64:
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
-  - '[ "$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
+  - '[ "release-$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
   - mv ../bytemark-client*.deb .
