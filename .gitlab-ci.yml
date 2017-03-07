@@ -335,7 +335,7 @@ update-homebrew:
   # update the homebrew repo
   - git clone git@github.com:BytemarkHosting/homebrew-tools.git
   - cd homebrew-tools
-  -|
+  - |
     if [ "${CI_BUILD_REF_NAME%%-*}" = "release" ]; then
       NAME="bytemark-client"
       URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/bytemark-client/mac/bytemark-$VERSION.tar.gz'"'!)
