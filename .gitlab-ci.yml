@@ -94,7 +94,7 @@ test:
   image: golang:$GOVERSION
   before_script: *version_script
   script:
-    - sed -i 's/".*"/"'"$VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
+    - sed -i 's/".*"/"'"$CHANGELOG_VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
     - go get github.com/BytemarkHosting/auth-client
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
