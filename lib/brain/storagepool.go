@@ -40,6 +40,17 @@ func (sp StoragePool) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) 
 
 {{ define "storage_pool_full" -}}
 {{ template "storage_pool_sgl" . }}
-{{- end }}`
+{{ template "discs" . }}
+{{- end }}
+
+{{ define "discs"  }}
+{{- if .Discs }}    discs:
+{{- range .Discs }}
+      • {{ . }}
+{{- end }}
+
+{{ end -}}
+{{ end }}
+`
 	return prettyprint.Run(wr, t, "storage_pool"+string(detail), sp)
 }

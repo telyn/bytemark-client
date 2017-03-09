@@ -29,6 +29,17 @@ func (t Tail) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 
 {{ define "tail_full" -}}
 {{ template "tail_sgl" . }}
-{{- end }}`
+{{ template "storage_pools" . -}}
+{{- end }}
+
+{{ define "storage_pools"  }}
+{{- if .StoragePools }}    storage pools:
+{{- range .StoragePools }}
+      • {{ . }}
+{{- end }}
+
+{{ end -}}
+{{ end }}
+`
 	return prettyprint.Run(wr, tpl, "tail"+string(detail), t)
 }

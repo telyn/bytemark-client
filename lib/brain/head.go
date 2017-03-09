@@ -52,6 +52,17 @@ func (h Head) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 
 {{ define "head_full" -}}
 {{ template "head_sgl" . }}
-{{- end }}`
+{{ template "virtual_machines" . }}
+{{- end }}
+
+{{ define "virtual_machines"  }}
+{{- if .VirtualMachines }}    VMs:
+{{- range .VirtualMachines }}
+      • {{ . }}
+{{- end }}
+
+{{ end -}}
+{{ end }}
+`
 	return prettyprint.Run(wr, t, "head"+string(detail), h)
 }

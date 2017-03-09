@@ -429,7 +429,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.IfNotMarshalJSON(storagePool, func() error {
-						return storagePool.PrettyPrint(os.Stderr, prettyprint.SingleLine)
+						return storagePool.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
 			},
