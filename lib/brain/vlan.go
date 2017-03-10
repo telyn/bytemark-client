@@ -20,7 +20,7 @@ func (v VLAN) String() string {
 	return fmt.Sprintf("%d: %s (Num: %d). Contains %d IP ranges.", v.ID, v.UsageType, v.Num, len(v.IPRanges))
 }
 
-// PrettyPrint writes an overview of this storage pool out to the given writer.
+// PrettyPrint writes an overview of this VLAN out to the given writer.
 func (v VLAN) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	const t = `
 {{ define "vlan_sgl" -}}
