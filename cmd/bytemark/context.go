@@ -128,7 +128,10 @@ func (c *Context) PrivilegeFlag(flagname string) PrivilegeFlag {
 
 // String returns the value of the named flag as a string
 func (c *Context) String(flagname string) string {
-	return c.Context.String(flagname)
+	if c.Context.IsSet(flagname) {
+		return c.Context.String(flagname)
+	}
+	return c.Context.GlobalString(flagname)
 }
 
 // Size returns the value of the named SizeSpecFlag as an int in megabytes

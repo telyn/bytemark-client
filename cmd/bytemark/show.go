@@ -26,6 +26,11 @@ If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
 			Flags: []cli.Flag{
+				cli.GenericFlag{
+					Name:  "account",
+					Usage: "The account to view",
+					Value: new(AccountNameFlag),
+				},
 				cli.BoolFlag{
 					Name:  "json",
 					Usage: "Output account details as a JSON object",
@@ -33,14 +38,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			},
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
-					def, err := global.Client.GetDefaultAccount()
-					if err != nil {
-						return err
-					}
-					if def.BrainID == c.Account.BrainID {
-						c.Account.IsDefaultAccount = true
-					}
-					err = c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
+					err := c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
 					if err != nil {
 						return err
 					}
