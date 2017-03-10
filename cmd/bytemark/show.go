@@ -265,10 +265,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.IfNotMarshalJSON(vlan, func() error {
-						if err := vlan.PrettyPrint(os.Stderr, prettyprint.Full); err != nil {
-							return err
-						}
-						return nil
+						return vlan.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
 			},
@@ -315,8 +312,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.IfNotMarshalJSON(ipRange, func() error {
-						log.Outputf("%s\r\n", ipRange.String())
-						return nil
+						return ipRange.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
 			},
