@@ -27,9 +27,10 @@ If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
+					Value: new(AccountNameFlag),
 				},
 				cli.BoolFlag{
 					Name:  "json",
