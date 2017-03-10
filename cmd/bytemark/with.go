@@ -166,7 +166,15 @@ func AccountProvider(flagName string) ProviderFunc {
 		if err != nil {
 			return
 		}
-		c.Account, err = global.Client.GetAccount(c.String(flagName))
+		accName := c.String(flagName)
+		if accName == "" {
+			accName = global.Config.GetIgnoreErr("account")
+		}
+
+		c.Account, err = global.Client.GetAccount(accName)
+		if err == nil && c.Account == nil {
+			err = fmt.Errorf("no account was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -197,6 +205,9 @@ func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
 		vmName := c.VirtualMachineName(vmFlagName)
 		discLabel := c.String(discFlagName)
 		c.Disc, err = global.Client.GetDisc(&vmName, discLabel)
+		if err == nil && c.Disc == nil {
+			err = fmt.Errorf("no disc was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -207,6 +218,9 @@ func DefinitionsProvider(c *Context) (err error) {
 		return
 	}
 	c.Definitions, err = global.Client.ReadDefinitions()
+	if err == nil && c.Definitions == nil {
+		err = fmt.Errorf("no definitions were returned - please report a bug")
+	}
 	return
 }
 
@@ -223,6 +237,9 @@ func GroupProvider(flagName string) ProviderFunc {
 
 		groupName := c.GroupName(flagName)
 		c.Group, err = global.Client.GetGroup(&groupName)
+		if err == nil && c.Group == nil {
+			err = fmt.Errorf("no group was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -291,6 +308,9 @@ func UserProvider(flagName string) ProviderFunc {
 			return
 		}
 		c.User, err = global.Client.GetUser(user)
+		if err == nil && c.User == nil {
+			err = fmt.Errorf("no user was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -307,6 +327,9 @@ func VirtualMachineProvider(flagName string) ProviderFunc {
 		}
 		vmName := c.VirtualMachineName(flagName)
 		c.VirtualMachine, err = global.Client.GetVirtualMachine(&vmName)
+		if err == nil && c.VirtualMachine == nil {
+			err = fmt.Errorf("no server was returned - please report a bug")
+		}
 		return
 	}
 }
