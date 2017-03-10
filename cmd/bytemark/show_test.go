@@ -160,6 +160,45 @@ func TestShowServerCommand(t *testing.T) {
 	}
 }
 
+func TestAdminShowVLANsCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	vlans := []brain.VLAN{getFixtureVLAN()}
+	c.When("GetVLANs").Return(&vlans, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show vlans", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowVLANCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	vlanID := 1
+	vlan := getFixtureVLAN()
+	c.When("GetVLAN", &vlanID).Return(&vlan, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show vlan 1", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 // TODO(telyn): show account? show user?
 func TestShowPrivileges(t *testing.T) {
 
