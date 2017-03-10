@@ -237,7 +237,36 @@ Privileges will be output in no particular order.`,
 					}
 					return c.IfNotMarshalJSON(vlans, func() error {
 						for _, vlan := range vlans {
-							log.Outputf("%s\r\n", vlan.String())
+							if err := vlan.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+						return nil
+					})
+				}),
+			},
+			{
+				Name:      "vlan",
+				Usage:     "shows the details of a VLAN",
+				UsageText: "bytemark --admin show vlan [--json] <num>",
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  "json",
+						Usage: "Output the VLANs as a JSON object.",
+					},
+					cli.IntFlag{
+						Name:  "num",
+						Usage: "the num of the VLAN to display",
+					},
+				},
+				Action: With(OptionalArgs("num"), RequiredFlags("num"), AuthProvider, func(c *Context) error {
+					vlan, err := global.Client.GetVLAN(c.Int("num"))
+					if err != nil {
+						return err
+					}
+					return c.IfNotMarshalJSON(vlan, func() error {
+						if err := vlan.PrettyPrint(os.Stderr, prettyprint.Full); err != nil {
+							return err
 						}
 						return nil
 					})
@@ -259,7 +288,9 @@ Privileges will be output in no particular order.`,
 					}
 					return c.IfNotMarshalJSON(ipRanges, func() error {
 						for _, ipRange := range ipRanges {
-							log.Outputf("%s\r\n", ipRange.String())
+							if err := ipRange.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+								return err
+							}
 						}
 						return nil
 					})
