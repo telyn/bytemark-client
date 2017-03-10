@@ -166,7 +166,12 @@ func AccountProvider(flagName string) ProviderFunc {
 		if err != nil {
 			return
 		}
-		c.Account, err = global.Client.GetAccount(c.String(flagName))
+		accName := c.String(flagName)
+		if accName == "" {
+			accName = global.Config.GetIgnoreErr("account")
+		}
+
+		c.Account, err = global.Client.GetAccount(accName)
 		return
 	}
 }

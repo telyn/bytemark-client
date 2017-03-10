@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
@@ -26,6 +27,10 @@ If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "account",
+					Usage: "The account to view",
+				},
 				cli.BoolFlag{
 					Name:  "json",
 					Usage: "Output account details as a JSON object",
@@ -33,14 +38,10 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			},
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
-					def, err := global.Client.GetDefaultAccount()
-					if err != nil {
-						return err
+					if c.Account == nil {
+						return fmt.Errorf("No account found WHAT")
 					}
-					if def.BrainID == c.Account.BrainID {
-						c.Account.IsDefaultAccount = true
-					}
-					err = c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
+					err := c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
 					if err != nil {
 						return err
 					}
