@@ -40,7 +40,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
 				return c.IfNotMarshalJSON(c.Account, func() error {
 					if c.Account == nil {
-						return fmt.Errorf("No account found WHAT")
+						return fmt.Errorf("Couldn't figure out an account name nor find a default account. Please report this as a bug.")
 					}
 					err := c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
 					if err != nil {
