@@ -81,6 +81,27 @@ func getFixtureIPRange() brain.IPRange {
 	}
 }
 
+func getFixtureHead() brain.Head {
+	return brain.Head{
+		ID:    1,
+		Label: "h1",
+	}
+}
+
+func getFixtureTail() brain.Tail {
+	return brain.Tail{
+		ID:    1,
+		Label: "t1",
+	}
+}
+
+func getFixtureStoragePool() brain.StoragePool {
+	return brain.StoragePool{
+		Name:  "sata1",
+		Label: "t1-sata1",
+	}
+}
+
 func getFixtureGroup() brain.Group {
 	vms := make([]*brain.VirtualMachine, 1, 1)
 	vm := getFixtureVM()

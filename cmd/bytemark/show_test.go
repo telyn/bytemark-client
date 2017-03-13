@@ -238,6 +238,123 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 	}
 }
 
+func TestAdminShowHeadsCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	heads := []brain.Head{getFixtureHead()}
+	c.When("GetHeads").Return(&heads, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show heads", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowHeadCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	headID := "1"
+	head := getFixtureHead()
+	c.When("GetHead", headID).Return(&head, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show head 1", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowTailsCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	tails := []brain.Tail{getFixtureTail()}
+	c.When("GetTails").Return(&tails, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show tails", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowTailCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	tailID := "1"
+	tail := getFixtureTail()
+	c.When("GetTail", tailID).Return(&tail, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show tail 1", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowStoragePoolsCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	storagePool := []brain.StoragePool{getFixtureStoragePool()}
+	c.When("GetStoragePools").Return(&storagePool, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show storage_pools", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowStoragePoolCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	storagePoolID := "1"
+	storagePool := getFixtureStoragePool()
+	c.When("GetStoragePool", storagePoolID).Return(&storagePool, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show storage_pool 1", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 // TODO(telyn): show account? show user?
 func TestShowPrivileges(t *testing.T) {
 
