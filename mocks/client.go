@@ -352,3 +352,68 @@ func (c *Client) RevokePrivilege(priv brain.Privilege) (err error) {
 	r := c.Called(priv)
 	return r.Error(0)
 }
+func (c *Client) GetVLANs() ([]*brain.VLAN, error) {
+	r := c.Called()
+	vlans, _ := r.Get(0).([]*brain.VLAN)
+	return vlans, r.Error(1)
+}
+func (c *Client) GetVLAN(num int) (*brain.VLAN, error) {
+	r := c.Called(num)
+	vlans, _ := r.Get(0).(*brain.VLAN)
+	return vlans, r.Error(1)
+}
+func (c *Client) GetIPRanges() ([]*brain.IPRange, error) {
+	r := c.Called()
+	ipRanges, _ := r.Get(0).([]*brain.IPRange)
+	return ipRanges, r.Error(1)
+}
+func (c *Client) GetIPRange(id int) (*brain.IPRange, error) {
+	r := c.Called(id)
+	ipRange, _ := r.Get(0).(*brain.IPRange)
+	return ipRange, r.Error(1)
+}
+func (c *Client) GetHeads() ([]*brain.Head, error) {
+	r := c.Called()
+	heads, _ := r.Get(0).([]*brain.Head)
+	return heads, r.Error(1)
+}
+func (c *Client) GetHead(idOrLabel string) (*brain.Head, error) {
+	r := c.Called(idOrLabel)
+	head, _ := r.Get(0).(*brain.Head)
+	return head, r.Error(1)
+}
+func (c *Client) GetTails() ([]*brain.Tail, error) {
+	r := c.Called()
+	tails, _ := r.Get(0).([]*brain.Tail)
+	return tails, r.Error(1)
+}
+func (c *Client) GetTail(idOrLabel string) (*brain.Tail, error) {
+	r := c.Called(idOrLabel)
+	tail, _ := r.Get(0).(*brain.Tail)
+	return tail, r.Error(1)
+}
+func (c *Client) GetStoragePools() ([]*brain.StoragePool, error) {
+	r := c.Called()
+	storagePools, _ := r.Get(0).([]*brain.StoragePool)
+	return storagePools, r.Error(1)
+}
+func (c *Client) GetStoragePool(idOrLabel string) (*brain.StoragePool, error) {
+	r := c.Called(idOrLabel)
+	storagePool, _ := r.Get(0).(*brain.StoragePool)
+	return storagePool, r.Error(1)
+}
+func (c *Client) GetMigratingVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+}
+func (c *Client) GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+}
+func (c *Client) GetRecentVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+}

@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net/http"
 	"testing"
@@ -23,9 +22,7 @@ var testPrivileges = brain.Privileges{
 
 func mkGetPrivilegesHandler(t *testing.T, user string) func(http.ResponseWriter, *http.Request) {
 	return func(wr http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			t.Errorf("Wrong method %s", r.Method)
-		}
+		assertMethod(t, r, "GET")
 		privs := testPrivileges
 		if user != "" {
 			privs = brain.Privileges{}
@@ -35,14 +32,7 @@ func mkGetPrivilegesHandler(t *testing.T, user string) func(http.ResponseWriter,
 				}
 			}
 		}
-		js, err := json.Marshal(privs)
-		if err != nil {
-			t.Fatalf("couldn't marshal testPrivileges: %s", err.Error())
-		}
-		_, err = wr.Write(js)
-		if err != nil {
-			t.Fatal(err)
-		}
+		writeJSON(t, wr, privs)
 	}
 }
 
