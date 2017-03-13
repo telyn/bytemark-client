@@ -355,6 +355,63 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 	}
 }
 
+func TestAdminShowMigratingVMsCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	vms := []brain.VirtualMachine{getFixtureVM()}
+	c.When("GetMigratingVMs").Return(&vms, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show migrating_vms", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	vms := []brain.VirtualMachine{getFixtureVM()}
+	c.When("GetStoppedEligibleVMs").Return(&vms, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show stopped_eligible_vms", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowRecentVMsCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	vms := []brain.VirtualMachine{getFixtureVM()}
+	c.When("GetRecentVMs").Return(&vms, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show recent_vms", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 // TODO(telyn): show account? show user?
 func TestShowPrivileges(t *testing.T) {
 
