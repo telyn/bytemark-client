@@ -233,4 +233,6 @@ type Client interface {
 	GetMigratingVMs() ([]*brain.VirtualMachine, error)
 	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
 	GetRecentVMs() ([]*brain.VirtualMachine, error)
+	MigrateDisc(disc int, newStoragePool string) error
+	MigrateVM(vm int, newHead string) error
 }

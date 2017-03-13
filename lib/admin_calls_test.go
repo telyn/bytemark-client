@@ -2,9 +2,12 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -38,7 +41,41 @@ func simpleGetTest(t *testing.T, url string, testObject interface{}, runTest sim
 	if !reflect.DeepEqual(testObject, object) {
 		t.Errorf("%s didn't get expected object.\r\nExpected: %#v\r\nActual:   %#v", testName, testObject, object)
 	}
+}
 
+type simplePostTestFn func(Client) error
+
+func simplePostTest(t *testing.T, url string, testBody string, runTest simplePostTestFn) {
+	is := is.New(t)
+
+	callerPC, _, _, _ := runtime.Caller(1)
+	testName := runtime.FuncForPC(callerPC).Name()
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			url: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "POST")
+
+				body, err := ioutil.ReadAll(r.Body)
+				is.Nil(err)
+				defer r.Body.Close()
+
+				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = runTest(client)
+	if err != nil {
+		t.Errorf("%s errored: %s", testName, err.Error())
+	}
 }
 
 func TestGetVLANS(t *testing.T) {
@@ -301,5 +338,29 @@ func TestGetRecentVMs(t *testing.T) {
 	}
 	simpleGetTest(t, "/admin/recent_vms", testVMs, func(client Client) (interface{}, error) {
 		return client.GetRecentVMs()
+	})
+}
+
+func TestPostMigrateDiscWithNewStoragePool(t *testing.T) {
+	simplePostTest(t, "/admin/discs/124/migrate", `{"new_pool_spec":"t6-sata1"}`, func(client Client) error {
+		return client.MigrateDisc(124, "t6-sata1")
+	})
+}
+
+func TestPostMigrateDiscWithoutNewStoragePool(t *testing.T) {
+	simplePostTest(t, "/admin/discs/123/migrate", `{}`, func(client Client) error {
+		return client.MigrateDisc(123, "")
+	})
+}
+
+func TestPostMigrateVMWithNewHead(t *testing.T) {
+	simplePostTest(t, "/admin/vms/122/migrate", `{"new_head_spec":"stg-h2"}`, func(client Client) error {
+		return client.MigrateVM(122, "stg-h2")
+	})
+}
+
+func TestPostMigrateDiscWithoutHead(t *testing.T) {
+	simplePostTest(t, "/admin/vms/121/migrate", `{}`, func(client Client) error {
+		return client.MigrateVM(121, "")
 	})
 }

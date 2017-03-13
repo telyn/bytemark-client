@@ -135,3 +135,33 @@ func (c *bytemarkClient) GetRecentVMs() (vms []*brain.VirtualMachine, err error)
 	_, _, err = r.Run(nil, &vms)
 	return
 }
+
+func (c *bytemarkClient) MigrateDisc(disc int, newStoragePool string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/discs/%s/migrate", strconv.Itoa(disc))
+	if err != nil {
+		return
+	}
+
+	params := map[string]string{}
+	if newStoragePool != "" {
+		params["new_pool_spec"] = newStoragePool
+	}
+
+	_, _, err = r.MarshalAndRun(params, nil)
+	return
+}
+
+func (c *bytemarkClient) MigrateVM(vm int, newHead string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/migrate", strconv.Itoa(vm))
+	if err != nil {
+		return
+	}
+
+	params := map[string]string{}
+	if newHead != "" {
+		params["new_head_spec"] = newHead
+	}
+
+	_, _, err = r.MarshalAndRun(params, nil)
+	return
+}
