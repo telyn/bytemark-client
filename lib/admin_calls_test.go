@@ -58,7 +58,7 @@ func simplePostTest(t *testing.T, url string, testBody string, runTest simplePos
 
 				body, err := ioutil.ReadAll(r.Body)
 				is.Nil(err)
-				defer r.Body.Close()
+				r.Body.Close()
 
 				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
 			},
