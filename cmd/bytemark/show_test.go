@@ -187,11 +187,50 @@ func TestAdminShowVLANCommand(t *testing.T) {
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	vlanID := 1
+	vlanNum := 1
 	vlan := getFixtureVLAN()
-	c.When("GetVLAN", &vlanID).Return(&vlan, nil).Times(1)
+	c.When("GetVLAN", vlanNum).Return(&vlan, nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark --admin show vlan 1", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowIPRangesCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	ipRanges := []brain.IPRange{getFixtureIPRange()}
+	c.When("GetIPRanges").Return(&ipRanges, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show ip_ranges", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowIPRangeCommand(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestSetup(t, true)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+
+	ipRangeID := 1
+	ipRange := getFixtureIPRange()
+	c.When("GetIPRange", ipRangeID).Return(&ipRange, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show ip_range 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

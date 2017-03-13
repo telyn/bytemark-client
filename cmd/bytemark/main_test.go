@@ -71,6 +71,16 @@ func getFixtureVLAN() brain.VLAN {
 	}
 }
 
+func getFixtureIPRange() brain.IPRange {
+	return brain.IPRange{
+		ID:        1,
+		Spec:      "192.168.1.1/28",
+		VLANNum:   1,
+		Zones:     make([]string, 0),
+		Available: 11,
+	}
+}
+
 func getFixtureGroup() brain.Group {
 	vms := make([]*brain.VirtualMachine, 1, 1)
 	vm := getFixtureVM()

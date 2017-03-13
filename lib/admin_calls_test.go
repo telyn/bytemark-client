@@ -65,6 +65,16 @@ func TestGetVLANS(t *testing.T) {
 	})
 }
 
+func TestGetVLAN(t *testing.T) {
+	testVLAN := brain.VLAN{
+		ID:  1234,
+		Num: 123,
+	}
+	simpleGetTest(t, "/admin/vlan/123", &testVLAN, func(client Client) (interface{}, error) {
+		return client.GetVLAN(123)
+	})
+}
+
 func TestGetIPRanges(t *testing.T) {
 	testIPRanges := []*brain.IPRange{
 		{
@@ -97,6 +107,7 @@ func TestGetIPRange(t *testing.T) {
 		return client.GetIPRange(1234)
 	})
 }
+
 func TestGetHeads(t *testing.T) {
 	testHeads := []*brain.Head{
 		{
