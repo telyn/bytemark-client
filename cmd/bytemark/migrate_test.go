@@ -67,7 +67,7 @@ func TestMigrateDiscError(t *testing.T) {
 	}
 }
 
-func TestMigrateVMWithNewHead(t *testing.T) {
+func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, true)
 
@@ -76,7 +76,7 @@ func TestMigrateVMWithNewHead(t *testing.T) {
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("MigrateVM", 123, "stg-h1").Return(nil).Times(1)
+	c.When("MigrateVirtualMachine", 123, "stg-h1").Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123", "stg-h1"})
 
@@ -87,7 +87,7 @@ func TestMigrateVMWithNewHead(t *testing.T) {
 	}
 }
 
-func TestMigrateVMWithoutNewHead(t *testing.T) {
+func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, true)
 
@@ -96,7 +96,7 @@ func TestMigrateVMWithoutNewHead(t *testing.T) {
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("MigrateVM", 123, "").Return(nil).Times(1)
+	c.When("MigrateVirtualMachine", 123, "").Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123"})
 
@@ -107,7 +107,7 @@ func TestMigrateVMWithoutNewHead(t *testing.T) {
 	}
 }
 
-func TestMigrateVMError(t *testing.T) {
+func TestMigrateVirtualMachineError(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestSetup(t, true)
 
@@ -117,7 +117,7 @@ func TestMigrateVMError(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	migrateErr := fmt.Errorf("Error migrating")
-	c.When("MigrateVM", 123, "stg-h2").Return(migrateErr).Times(1)
+	c.When("MigrateVirtualMachine", 123, "stg-h2").Return(migrateErr).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123", "stg-h2"})
 

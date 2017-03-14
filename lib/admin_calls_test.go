@@ -353,14 +353,14 @@ func TestPostMigrateDiscWithoutNewStoragePool(t *testing.T) {
 	})
 }
 
-func TestPostMigrateVMWithNewHead(t *testing.T) {
+func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
 	simplePostTest(t, "/admin/vms/122/migrate", `{"new_head_spec":"stg-h2"}`, func(client Client) error {
-		return client.MigrateVM(122, "stg-h2")
+		return client.MigrateVirtualMachine(122, "stg-h2")
 	})
 }
 
-func TestPostMigrateDiscWithoutHead(t *testing.T) {
+func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
 	simplePostTest(t, "/admin/vms/121/migrate", `{}`, func(client Client) error {
-		return client.MigrateVM(121, "")
+		return client.MigrateVirtualMachine(121, "")
 	})
 }

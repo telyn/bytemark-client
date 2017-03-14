@@ -39,25 +39,26 @@ func init() {
 				}),
 			},
 			{
-				Name:        "vm",
-				Usage:       "migrate a VM to a new head",
-				UsageText:   "bytemark --admin migrate vm <server> [new_head]",
-				Description: `This command migrates a VM to a new head. If a new head isn't supplied, a new one is picked automatically.`,
+				Name:        "server",
+				Aliases:     []string{"vm"},
+				Usage:       "migrate a server to a new head",
+				UsageText:   "bytemark --admin migrate server <server> [new_head]",
+				Description: `This command migrates a server to a new head. If a new head isn't supplied, a new one is picked automatically.`,
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "server",
-						Usage: "the ID of the VM to migrate",
+						Usage: "the ID of the server to migrate",
 					},
 					cli.StringFlag{
 						Name:  "new_head",
-						Usage: "the head to move the VM to",
+						Usage: "the head to move the server to",
 					},
 				},
 				Action: With(OptionalArgs("server", "new_head"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 					vm := c.Int("server")
 					head := c.String("new_head")
 
-					if err := global.Client.MigrateVM(vm, head); err != nil {
+					if err := global.Client.MigrateVirtualMachine(vm, head); err != nil {
 						return err
 					}
 

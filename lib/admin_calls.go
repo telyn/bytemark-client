@@ -151,7 +151,7 @@ func (c *bytemarkClient) MigrateDisc(disc int, newStoragePool string) (err error
 	return
 }
 
-func (c *bytemarkClient) MigrateVM(vm int, newHead string) (err error) {
+func (c *bytemarkClient) MigrateVirtualMachine(vm int, newHead string) (err error) {
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/migrate", strconv.Itoa(vm))
 	if err != nil {
 		return
