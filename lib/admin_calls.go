@@ -151,8 +151,13 @@ func (c *bytemarkClient) MigrateDisc(disc int, newStoragePool string) (err error
 	return
 }
 
-func (c *bytemarkClient) MigrateVirtualMachine(vm int, newHead string) (err error) {
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/migrate", strconv.Itoa(vm))
+func (c *bytemarkClient) MigrateVirtualMachine(vmName *VirtualMachineName, newHead string) (err error) {
+	vm, err := c.GetVirtualMachine(vmName)
+	if err != nil {
+		return err
+	}
+
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/migrate", strconv.Itoa(vm.ID))
 	if err != nil {
 		return
 	}

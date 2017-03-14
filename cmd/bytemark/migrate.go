@@ -33,7 +33,7 @@ func init() {
 						return err
 					}
 
-					log.Outputf("%d migration initiated\n", disc)
+					log.Outputf("Migration for disc %d initiated\n", disc)
 
 					return nil
 				}),
@@ -42,12 +42,13 @@ func init() {
 				Name:        "server",
 				Aliases:     []string{"vm"},
 				Usage:       "migrate a server to a new head",
-				UsageText:   "bytemark --admin migrate server <server> [new_head]",
+				UsageText:   "bytemark --admin migrate server <name> [new_head]",
 				Description: `This command migrates a server to a new head. If a new head isn't supplied, a new one is picked automatically.`,
 				Flags: []cli.Flag{
-					cli.IntFlag{
+					cli.GenericFlag{
 						Name:  "server",
-						Usage: "the ID of the server to migrate",
+						Usage: "the server to migrate",
+						Value: new(VirtualMachineNameFlag),
 					},
 					cli.StringFlag{
 						Name:  "new_head",
@@ -55,14 +56,14 @@ func init() {
 					},
 				},
 				Action: With(OptionalArgs("server", "new_head"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
-					vm := c.Int("server")
+					vm := c.VirtualMachineName("server")
 					head := c.String("new_head")
 
-					if err := global.Client.MigrateVirtualMachine(vm, head); err != nil {
+					if err := global.Client.MigrateVirtualMachine(&vm, head); err != nil {
 						return err
 					}
 
-					log.Outputf("%d migration initiated\n", vm)
+					log.Outputf("Migration for server %s initiated\n", vm.String())
 
 					return nil
 				}),

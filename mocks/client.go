@@ -421,7 +421,7 @@ func (c *Client) MigrateDisc(disc int, newStoragePool string) error {
 	r := c.Called(disc, newStoragePool)
 	return r.Error(0)
 }
-func (c *Client) MigrateVirtualMachine(vm int, newHead string) error {
-	r := c.Called(vm, newHead)
+func (c *Client) MigrateVirtualMachine(vmName *lib.VirtualMachineName, newHead string) error {
+	r := c.Called(vmName, newHead)
 	return r.Error(0)
 }

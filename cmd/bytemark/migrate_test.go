@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/cheekybits/is"
+	mock "github.com/maraino/go-mock"
 	"testing"
 )
 
@@ -73,10 +74,11 @@ func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("MigrateVirtualMachine", 123, "stg-h1").Return(nil).Times(1)
+	c.When("MigrateVirtualMachine", mock.Any, "stg-h1").Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123", "stg-h1"})
 
@@ -93,10 +95,11 @@ func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("MigrateVirtualMachine", 123, "").Return(nil).Times(1)
+	c.When("MigrateVirtualMachine", mock.Any, "").Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123"})
 
@@ -113,11 +116,12 @@ func TestMigrateVirtualMachineError(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	migrateErr := fmt.Errorf("Error migrating")
-	c.When("MigrateVirtualMachine", 123, "stg-h2").Return(migrateErr).Times(1)
+	c.When("MigrateVirtualMachine", mock.Any, "stg-h2").Return(migrateErr).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123", "stg-h2"})
 
