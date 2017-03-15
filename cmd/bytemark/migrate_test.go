@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
-	mock "github.com/maraino/go-mock"
 	"testing"
 )
 
@@ -78,9 +78,10 @@ func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("MigrateVirtualMachine", mock.Any, "stg-h1").Return(nil).Times(1)
+	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
+	c.When("MigrateVirtualMachine", &vmName, "stg-h1").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123", "stg-h1"})
+	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm123.group.account", "stg-h1"})
 
 	is.Nil(err)
 
@@ -99,9 +100,10 @@ func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
-	c.When("MigrateVirtualMachine", mock.Any, "").Return(nil).Times(1)
+	vmName := lib.VirtualMachineName{VirtualMachine: "vm122", Group: "group", Account: "account"}
+	c.When("MigrateVirtualMachine", &vmName, "").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123"})
+	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm122.group.account"})
 
 	is.Nil(err)
 
@@ -121,9 +123,10 @@ func TestMigrateVirtualMachineError(t *testing.T) {
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	migrateErr := fmt.Errorf("Error migrating")
-	c.When("MigrateVirtualMachine", mock.Any, "stg-h2").Return(migrateErr).Times(1)
+	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}
+	c.When("MigrateVirtualMachine", &vmName, "stg-h2").Return(migrateErr).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "vm", "123", "stg-h2"})
+	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm121.group.account", "stg-h2"})
 
 	is.Equal(err, migrateErr)
 
