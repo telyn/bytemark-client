@@ -49,6 +49,13 @@ func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 	} else {
 		app.Commands = commands
 	}
+	// last minute alterations to commands
+	// used for modifying help descriptions, mostly.
+	for idx, cmd := range app.Commands {
+		if cmd.Name == "admin" {
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateAdminCommandsHelp()
+		}
+	}
 	return
 
 }
