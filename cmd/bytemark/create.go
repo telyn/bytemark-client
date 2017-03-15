@@ -125,32 +125,6 @@ Multiple --disc flags can be used to create multiple discs`,
 		Action: With(OptionalArgs("group"), RequiredFlags("group"), AuthProvider, createGroup),
 	}
 
-	createBackupCmd := cli.Command{
-		Name:        "backup",
-		Usage:       "create a backup of a disc's current state",
-		UsageText:   "bytemark create backup <server name> <disc label>",
-		Description: `Creates a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
-		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:  "disc",
-				Usage: "the disc to create a backup of",
-			},
-			cli.GenericFlag{
-				Name:  "server",
-				Usage: "the server whose disk you wish to backup",
-				Value: new(VirtualMachineNameFlag),
-			},
-		},
-		Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) error {
-			backup, err := global.Client.CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
-			if err != nil {
-				return err
-			}
-			log.Errorf("Backup '%s' taken successfully!", backup.Label)
-			return nil
-		}),
-	}
-
 	commands = append(commands, cli.Command{
 		Name:      "create",
 		Usage:     "creates servers, discs, etc - see `bytemark create <kind of thing> help`",
@@ -171,7 +145,6 @@ Multiple --disc flags can be used to create multiple discs`,
 			createServerCmd,
 			createDiscsCmd,
 			createGroupCmd,
-			createBackupCmd,
 		},
 	})
 }
