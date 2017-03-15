@@ -103,7 +103,7 @@ func getFixtureStoragePool() brain.StoragePool {
 }
 
 func getFixtureGroup() brain.Group {
-	vms := make([]*brain.VirtualMachine, 1, 1)
+	vms := make([]*brain.VirtualMachine, 1)
 	vm := getFixtureVM()
 	vms[0] = &vm
 

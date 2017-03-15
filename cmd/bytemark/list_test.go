@@ -113,29 +113,3 @@ func TestListServers(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-
-func TestListBackups(t *testing.T) {
-	is := is.New(t)
-	config, c := baseTestSetup(t, false)
-
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
-	}
-
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&defVM)
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetBackups", vmname, "test-disc").Return(nil).Times(1)
-
-	err := global.App.Run([]string{
-		"bytemark", "list", "backups", "test-server", "test-disc",
-	})
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
