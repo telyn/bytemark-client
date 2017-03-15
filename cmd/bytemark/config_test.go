@@ -100,6 +100,7 @@ func TestCommandConfigSet(t *testing.T) {
 		config.When("Get", "token").Return("test-token", nil)
 		config.When("GetIgnoreErr", "user").Return("old-test-user")
 		config.When("GetIgnoreErr", "yubikey").Return("")
+		config.When("GetIgnoreErr", "2fa").Return("")
 		config.When("GetIgnoreErr", "account").Return("")
 		config.When("GetGroup").Return(&lib.GroupName{})
 		client.When("AuthWithToken", "test-token").Return(nil)

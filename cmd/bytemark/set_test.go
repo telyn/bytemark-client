@@ -18,6 +18,7 @@ func TestSetCDROM(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("SetVirtualMachineCDROM", &vmname, "test-cdrom").Return(nil).Times(1)
@@ -41,6 +42,7 @@ func TestSetCores(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	vm := getFixtureVM()
@@ -67,6 +69,7 @@ func TestSetMemory(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	vm := getFixtureVM()
@@ -84,6 +87,7 @@ func TestSetMemory(t *testing.T) {
 	config.Reset()
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.Reset()
@@ -113,6 +117,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	// test no arguments, nothing should happen
@@ -131,6 +136,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	config.Reset()
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.Reset()
@@ -177,6 +183,7 @@ func TestSetDiscIOPSLimit(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 
 	config.When("GetVirtualMachine").Return(&defVM)
 

@@ -146,10 +146,13 @@ func EnsureAuth() error {
 			if useKey, _ := global.Config.GetBool("yubikey"); useKey {
 				credents["yubikey"] = global.Config.GetIgnoreErr("yubikey-otp")
 			}
+			if useKey, _ := global.Config.GetBool("2fa"); useKey {
+				credents["2fa"] = global.Config.GetIgnoreErr("2fa-otp")
+			}
 
 			err = global.Client.AuthWithCredentials(credents)
 			if err == nil {
-				// sucess!
+				// success!
 				// it doesn't _really_ matter if we can't write the token to the token place, right?
 				_ = global.Config.SetPersistent("token", global.Client.GetSessionToken(), "AUTH")
 				break
@@ -160,6 +163,7 @@ func EnsureAuth() error {
 						global.Config.Set("user", global.Config.GetIgnoreErr("user"), "PRIOR INTERACTION")
 						global.Config.Set("pass", "", "INVALID")
 						global.Config.Set("yubikey-otp", "", "INVALID")
+						global.Config.Set("2fa-otp", "", "INVALID")
 					} else {
 						return err
 					}
@@ -179,6 +183,17 @@ func EnsureAuth() error {
 		}
 		// if still executing, we didn't have yubikey factor
 		global.Config.Set("token", "", "FLAG yubikey")
+		return EnsureAuth()
+	}
+	if global.Config.GetIgnoreErr("2fa") != "" {
+		factors := global.Client.GetSessionFactors()
+		for _, f := range factors {
+			if f == "2fa" {
+				return nil
+			}
+		}
+		// if still executing, we didn't have 2fa factor
+		global.Config.Set("token", "", "FLAG 2fa")
 		return EnsureAuth()
 	}
 	return nil
@@ -290,6 +305,10 @@ func globalFlags() (flags []cli.Flag) {
 		cli.BoolFlag{
 			Name:  "yubikey",
 			Usage: "use a yubikey to authenticate",
+		},
+		cli.BoolFlag{
+			Name:  "2fa",
+			Usage: "use a 2FA token to authenticate",
 		},
 		cli.IntFlag{
 			Name:  "debug-level",
@@ -410,6 +429,13 @@ func PromptForCredentials() error {
 		for global.Config.GetIgnoreErr("yubikey-otp") == "" {
 			yubikey := util.Prompt("Press yubikey: ")
 			global.Config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
+		}
+	}
+
+	if global.Config.GetIgnoreErr("2fa") != "" {
+		for global.Config.GetIgnoreErr("2fa-otp") == "" {
+			token := util.Prompt("Enter 2FA token: ")
+			global.Config.Set("2fa-otp", strings.TrimSpace(token), "INTERACTION")
 		}
 	}
 	log.Log("")

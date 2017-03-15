@@ -15,6 +15,7 @@ func TestAddKeyCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	err := ioutil.WriteFile("testkey.pub", []byte("ssh-rsa aaaaawhartevervAsde fake key"), 0600)
@@ -77,6 +78,7 @@ func TestAddIPCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	config.When("GetVirtualMachine").Return(&defVM)
 

@@ -16,6 +16,7 @@ func TestDeleteServer(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
@@ -57,6 +58,7 @@ func TestDeleteDisc(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
@@ -92,6 +94,7 @@ func TestDeleteKey(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	c.When("AuthWithToken", "test-token").Return(nil)
 	c.When("GetUser", usr.Username).Return(&usr)
@@ -109,6 +112,7 @@ func TestDeleteKey(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil)

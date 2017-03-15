@@ -14,6 +14,7 @@ func TestListAccounts(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
@@ -33,6 +34,7 @@ func TestListDiscs(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
@@ -65,6 +67,7 @@ func TestListGroups(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -90,6 +93,7 @@ func TestListServers(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 	config.When("GetGroup").Return(&defGroup)
 

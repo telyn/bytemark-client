@@ -16,6 +16,7 @@ func TestResizeDisk(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa").Return("")
 
 	disc := brain.Disc{
 		Size:         25600,
