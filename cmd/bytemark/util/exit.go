@@ -164,7 +164,7 @@ func ProcessError(err error, message ...string) ExitCode {
 		return ExitCodeSuccess
 	}
 
-	trace := make([]byte, 4096, 4096)
+	trace := make([]byte, 4096)
 	runtime.Stack(trace, false)
 
 	log.Debug(log.LvlOutline, "ProcessError called. Dumping arguments and stacktrace", os.Args, string(trace))

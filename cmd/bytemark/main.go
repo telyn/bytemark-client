@@ -49,6 +49,13 @@ func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 	} else {
 		app.Commands = commands
 	}
+	// last minute alterations to commands
+	// used for modifying help descriptions, mostly.
+	for idx, cmd := range app.Commands {
+		if cmd.Name == "admin" {
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateAdminCommandsHelp()
+		}
+	}
 	return
 
 }
@@ -201,9 +208,7 @@ func mergeCommand(dst *cli.Command, src cli.Command) {
 		dst.Action = src.Action
 	}
 	if src.Flags != nil {
-		for _, f := range src.Flags {
-			dst.Flags = append(dst.Flags, f)
-		}
+		dst.Flags = append(dst.Flags, src.Flags...)
 	}
 	if src.Subcommands != nil {
 		dst.Subcommands = mergeCommands(dst.Subcommands, src.Subcommands)
@@ -252,7 +257,7 @@ OPTIONS:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-{{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
+   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
 
 CATEGORY:
    {{.Category}}{{end}}{{if .Description}}
