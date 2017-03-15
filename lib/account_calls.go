@@ -122,7 +122,7 @@ func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
 }
 
 func (c *bytemarkClient) getBrainAccounts() (accounts []*brain.Account, err error) {
-	accounts = make([]*brain.Account, 1, 1)
+	accounts = make([]*brain.Account, 1)
 
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts")
 	if err != nil {
