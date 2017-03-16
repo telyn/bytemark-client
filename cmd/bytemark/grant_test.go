@@ -15,7 +15,6 @@ func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)

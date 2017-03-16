@@ -18,7 +18,6 @@ func TestLockHWProfileCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -43,7 +42,6 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)

@@ -146,11 +146,21 @@ func EnsureAuth() error {
 			if useKey, _ := global.Config.GetBool("yubikey"); useKey {
 				credents["yubikey"] = global.Config.GetIgnoreErr("yubikey-otp")
 			}
-			if useKey, _ := global.Config.GetBool("2fa"); useKey {
-				credents["2fa"] = global.Config.GetIgnoreErr("2fa-otp")
-			}
 
 			err = global.Client.AuthWithCredentials(credents)
+
+			// Handle the special case here where we just need to prompt for 2FA and try again
+			if err != nil && strings.Contains(err.Error(), "Missing 2FA") {
+				for global.Config.GetIgnoreErr("2fa-otp") == "" {
+					token := util.Prompt("Enter 2FA token: ")
+					global.Config.Set("2fa-otp", strings.TrimSpace(token), "INTERACTION")
+				}
+
+				credents["2fa"] = global.Config.GetIgnoreErr("2fa-otp")
+
+				err = global.Client.AuthWithCredentials(credents)
+			}
+
 			if err == nil {
 				// success!
 				// it doesn't _really_ matter if we can't write the token to the token place, right?
@@ -306,10 +316,6 @@ func globalFlags() (flags []cli.Flag) {
 			Name:  "yubikey",
 			Usage: "use a yubikey to authenticate",
 		},
-		cli.BoolFlag{
-			Name:  "2fa",
-			Usage: "use a 2FA token to authenticate",
-		},
 		cli.IntFlag{
 			Name:  "debug-level",
 			Usage: "how much debug output to print to the terminal",
@@ -429,13 +435,6 @@ func PromptForCredentials() error {
 		for global.Config.GetIgnoreErr("yubikey-otp") == "" {
 			yubikey := util.Prompt("Press yubikey: ")
 			global.Config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
-		}
-	}
-
-	if global.Config.GetIgnoreErr("2fa") != "" {
-		for global.Config.GetIgnoreErr("2fa-otp") == "" {
-			token := util.Prompt("Enter 2FA token: ")
-			global.Config.Set("2fa-otp", strings.TrimSpace(token), "INTERACTION")
 		}
 	}
 	log.Log("")

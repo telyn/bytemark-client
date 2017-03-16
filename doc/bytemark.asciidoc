@@ -49,10 +49,6 @@ Global options apply to any subsequent command.
     Use this option if you want enter the Yubikey one-time password on the
     command-line rather than be prompted for it.
 
-*--2fa*::
-    Use this option if you have 2 Factor Authentication enabled on your
-    account. You'll be prompted for the one-time password.
-
 *--2fa-otp* 'string'::
     Use this option if you want enter the 2 Factor Authentication one-time
     password on the command-line rather than be prompted for it.

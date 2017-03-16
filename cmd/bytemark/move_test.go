@@ -22,7 +22,6 @@ func TestMove(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 	config.When("Force").Return(true)
 

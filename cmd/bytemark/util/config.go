@@ -26,7 +26,6 @@ var configVars = [...]string{
 	"token",
 	"debug-level",
 	"yubikey",
-	"2fa",
 }
 
 // IsConfigVar checks to see if the named variable is actually one of the settable configVars.

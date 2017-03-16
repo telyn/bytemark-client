@@ -16,7 +16,6 @@ func TestCreateDiskCommand(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
@@ -41,7 +40,6 @@ func TestCreateGroupCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetGroup").Return(&defGroup)
 
 	group := lib.GroupName{
@@ -105,7 +103,6 @@ func TestCreateServerCommand(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -192,7 +189,6 @@ func TestCreateServerNoImage(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -253,7 +249,6 @@ func TestCreateServer(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	vmname := lib.VirtualMachineName{

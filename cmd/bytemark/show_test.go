@@ -26,7 +26,6 @@ func TestShowAccountCommand(t *testing.T) {
 		config.When("Get", "token").Return("test-token")
 		config.When("GetIgnoreErr", "account").Return(configAccount)
 		config.When("GetIgnoreErr", "yubikey").Return("")
-		config.When("GetIgnoreErr", "2fa").Return("")
 		c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	}
 	tests := []showAccountTest{
@@ -126,7 +125,6 @@ func TestShowGroupCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetGroup").Return(&defGroup)
 	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -148,7 +146,6 @@ func TestShowServerCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
@@ -169,7 +166,6 @@ func TestAdminShowVLANsCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vlans := []brain.VLAN{getFixtureVLAN()}
@@ -189,7 +185,6 @@ func TestAdminShowVLANCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vlanNum := 1
@@ -210,7 +205,6 @@ func TestAdminShowIPRangesCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	ipRanges := []brain.IPRange{getFixtureIPRange()}
@@ -230,7 +224,6 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	ipRangeID := 1
@@ -251,7 +244,6 @@ func TestAdminShowHeadsCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	heads := []brain.Head{getFixtureHead()}
@@ -271,7 +263,6 @@ func TestAdminShowHeadCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	headID := "1"
@@ -292,7 +283,6 @@ func TestAdminShowTailsCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	tails := []brain.Tail{getFixtureTail()}
@@ -312,7 +302,6 @@ func TestAdminShowTailCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	tailID := "1"
@@ -333,7 +322,6 @@ func TestAdminShowStoragePoolsCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	storagePool := []brain.StoragePool{getFixtureStoragePool()}
@@ -353,7 +341,6 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	storagePoolID := "1"
@@ -374,7 +361,6 @@ func TestAdminShowMigratingVMsCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
@@ -394,7 +380,6 @@ func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
@@ -414,7 +399,6 @@ func TestAdminShowRecentVMsCommand(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa").Return("")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
