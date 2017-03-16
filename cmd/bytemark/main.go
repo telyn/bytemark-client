@@ -195,7 +195,7 @@ func EnsureAuth() error {
 		global.Config.Set("token", "", "FLAG yubikey")
 		return EnsureAuth()
 	}
-	if global.Config.GetIgnoreErr("2fa") != "" {
+	if global.Config.GetIgnoreErr("2fa-otp") != "" {
 		factors := global.Client.GetSessionFactors()
 		for _, f := range factors {
 			if f == "2fa" {

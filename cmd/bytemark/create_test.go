@@ -11,15 +11,11 @@ import (
 
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", &name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
 
 	disc := brain.Disc{Size: 35 * 1024, StorageGrade: "archive"}
@@ -36,17 +32,14 @@ func TestCreateDiskCommand(t *testing.T) {
 
 func TestCreateGroupCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetGroup").Return(&defGroup)
 
 	group := lib.GroupName{
 		Group:   "test-group",
 		Account: "default-account",
 	}
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("CreateGroup", &group).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark create group test-group", " "))
@@ -98,14 +91,9 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 }
 
 func TestCreateServerCommand(t *testing.T) {
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := brain.VirtualMachineSpec{
 		Discs: []brain.Disc{
@@ -184,14 +172,9 @@ func TestCreateServerCommand(t *testing.T) {
 }
 
 func TestCreateServerNoImage(t *testing.T) {
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := brain.VirtualMachineSpec{
 		VirtualMachine: &brain.VirtualMachine{
@@ -244,11 +227,8 @@ func TestCreateServerNoImage(t *testing.T) {
 
 func TestCreateServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	vmname := lib.VirtualMachineName{
@@ -271,8 +251,6 @@ func TestCreateServer(t *testing.T) {
 	getvm := new(brain.VirtualMachine)
 	*getvm = *vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("CreateVirtualMachine", &defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)

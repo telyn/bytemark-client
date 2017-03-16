@@ -44,6 +44,21 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 	return
 }
 
+// baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
+// user is test-user
+func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks.Client) {
+	config, c = baseTestSetup(t, admin)
+
+	config.When("Get", "token").Return("test-token")
+	config.When("Get", "account").Return("test-account")
+	config.When("GetIgnoreErr", "user").Return("test-user")
+	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa-otp").Return("")
+
+	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	return config, c
+}
+
 func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	if cmds == nil {
 		return
