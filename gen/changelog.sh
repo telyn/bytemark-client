@@ -19,11 +19,6 @@ echo " -- `git config --get user.name` <`git config --get user.email`>  `$DATE -
 echo "" >> $CHANGELOG
 cat $CHANGELOG.bak >> $CHANGELOG
 vim $CHANGELOG
-if [ "`head -n 1 $CHANGELOG`" == "`head -n 1 $CHANGELOG.bak`" ]; then
-    mv $CHANGELOG.bak $CHANGELOG
-else
-    rm $CHANGELOG.bak
-fi
 
 VERSION=$(head -n 1 $CHANGELOG | grep -o '(.*)' | grep -oP '[^()]+')
 
