@@ -1,10 +1,14 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -38,7 +42,41 @@ func simpleGetTest(t *testing.T, url string, testObject interface{}, runTest sim
 	if !reflect.DeepEqual(testObject, object) {
 		t.Errorf("%s didn't get expected object.\r\nExpected: %#v\r\nActual:   %#v", testName, testObject, object)
 	}
+}
 
+type simplePostTestFn func(Client) error
+
+func simplePostTest(t *testing.T, url string, testBody string, runTest simplePostTestFn) {
+	is := is.New(t)
+
+	callerPC, _, _, _ := runtime.Caller(1)
+	testName := runtime.FuncForPC(callerPC).Name()
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			url: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "POST")
+
+				body, err := ioutil.ReadAll(r.Body)
+				is.Nil(err)
+				is.Nil(r.Body.Close())
+
+				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = runTest(client)
+	if err != nil {
+		t.Errorf("%s errored: %s", testName, err.Error())
+	}
 }
 
 func TestGetVLANS(t *testing.T) {
@@ -302,4 +340,95 @@ func TestGetRecentVMs(t *testing.T) {
 	simpleGetTest(t, "/admin/recent_vms", testVMs, func(client Client) (interface{}, error) {
 		return client.GetRecentVMs()
 	})
+}
+
+func TestPostMigrateDiscWithNewStoragePool(t *testing.T) {
+	simplePostTest(t, "/admin/discs/124/migrate", `{"new_pool_spec":"t6-sata1"}`, func(client Client) error {
+		return client.MigrateDisc(124, "t6-sata1")
+	})
+}
+
+func TestPostMigrateDiscWithoutNewStoragePool(t *testing.T) {
+	simplePostTest(t, "/admin/discs/123/migrate", `{}`, func(client Client) error {
+		return client.MigrateDisc(123, "")
+	})
+}
+
+func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
+	err := testPostMigrateVirtualMachine(t, &brain.VirtualMachine{ID: 122}, `{"new_head_spec":"stg-h2"}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		return client.MigrateVirtualMachine(&vmName, "stg-h2")
+	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPostMigrateVirtualMachineWithNewHead")
+	}
+}
+
+func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
+	err := testPostMigrateVirtualMachine(t, &brain.VirtualMachine{ID: 121}, `{}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		return client.MigrateVirtualMachine(&vmName, "")
+	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPostMigrateVirtualMachineWithoutHead")
+	}
+}
+
+func TestPostMigrateVirtualMachineInvalidVirtualMachineName(t *testing.T) {
+	err := testPostMigrateVirtualMachine(t, nil, `{}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		return client.MigrateVirtualMachine(&vmName, "")
+	})
+
+	if err == nil {
+		t.Errorf("Expecting an error in TestPostMigrateVirtualMachineInvalidVirtualMachineName but didn't get one")
+	}
+}
+
+func testPostMigrateVirtualMachine(t *testing.T, vm *brain.VirtualMachine, testBody string, runTest simplePostTestFn) error {
+	is := is.New(t)
+
+	getVMEndpoint := "/accounts/def-account/groups/def-group/virtual_machines/def-name"
+
+	var postMigrateEndpoint string
+	if vm != nil {
+		postMigrateEndpoint = fmt.Sprintf("/admin/vms/%d/migrate", vm.ID)
+	} else {
+		// Doesn't really matter, won't get called
+		postMigrateEndpoint = "/admin/vms/0/migrate"
+	}
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			getVMEndpoint: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "GET")
+
+				if vm != nil {
+					writeJSON(t, wr, vm)
+				} else {
+					wr.WriteHeader(http.StatusNotFound)
+				}
+			},
+			postMigrateEndpoint: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "POST")
+
+				body, err := ioutil.ReadAll(r.Body)
+				is.Nil(err)
+				is.Nil(r.Body.Close())
+
+				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return runTest(client)
 }

@@ -417,3 +417,11 @@ func (c *Client) GetRecentVMs() ([]*brain.VirtualMachine, error) {
 	vms, _ := r.Get(0).([]*brain.VirtualMachine)
 	return vms, r.Error(1)
 }
+func (c *Client) MigrateDisc(disc int, newStoragePool string) error {
+	r := c.Called(disc, newStoragePool)
+	return r.Error(0)
+}
+func (c *Client) MigrateVirtualMachine(vmName *lib.VirtualMachineName, newHead string) error {
+	r := c.Called(vmName, newHead)
+	return r.Error(0)
+}
