@@ -3,7 +3,6 @@ set -x
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CHANGELOG=$DIR/../doc/changelog
 VERSIONGO=$DIR/../lib/version.go
-MANFILE=$DIR/../doc/bytemark.1
 
 DATE=date
 if which gdate > /dev/null; then
@@ -20,7 +19,7 @@ echo "" >> $CHANGELOG
 cat $CHANGELOG.bak >> $CHANGELOG
 vim $CHANGELOG
 
-VERSION=$(head -n 1 $CHANGELOG | grep -o '(.*)' | grep -oP '[^()]+')
+VERSION=$(head -n 1 $CHANGELOG | grep -o '(.*)' | grep -oE '[^()]+')
 
 cat > $VERSIONGO <<VERS 
 package lib
@@ -30,4 +29,3 @@ const (
 )
 VERS
 
-sed -i .bak -e 's/Bytemark Client Version .*"/Version '$VERSION'"/' $MANFILE 
