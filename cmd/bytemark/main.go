@@ -206,6 +206,10 @@ func EnsureAuth() error {
 				// Current auth token doesn't have a yubikey,
 				// so prompt the user to login again with yubikey
 
+				// This happens when someone has logged in already,
+				// but then tries to run a command with the
+				// "yubikey" flag set
+
 				global.Config.Set("token", "", "FLAG yubikey")
 
 				return EnsureAuth()
