@@ -71,9 +71,9 @@ func TestEnsureAuth(t *testing.T) {
 			t.Errorf("Unexpected error when setting up config temp directory: %v", err)
 		}
 		defer func() {
-			err := os.RemoveAll(configDir)
-			if err != nil {
-				t.Errorf("Could not clean up config dir: %v", err)
+			removeErr := os.RemoveAll(configDir)
+			if removeErr != nil {
+				t.Errorf("Could not clean up config dir: %v", removeErr)
 			}
 		}()
 
