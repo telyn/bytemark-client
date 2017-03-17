@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/mattn/go-isatty"
 	"github.com/urfave/cli"
@@ -46,13 +46,17 @@ func init() {
 		Usage:     "install a fresh operating system on a server from bytemark's images",
 		UsageText: "bytemark reimage [flags] <server>",
 		Description: `Image the given server with the specified image, prompting for confirmation.
-If the --image flag is not specified, will prompt with a list.
 Specify --force to prevent prompting.
 
 The root password will be output on stdout if the imaging succeeded, otherwise nothing will (and the exit code will be nonzero)
 	    `,
-		Flags: append(imageInstallFlags, forceFlag),
-		Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) (err error) {
+		Flags: append(imageInstallFlags, forceFlag, cli.GenericFlag{
+			Name:  "server",
+			Usage: "the server to reimage",
+			Value: new(VirtualMachineNameFlag),
+		}),
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+			vmName := c.VirtualMachineName("server")
 			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {
 				return
@@ -62,8 +66,8 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 				return c.Help("No image was specified")
 			}
 
-			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", c.VirtualMachineName.String())
-			err = lib.FormatImageInstall(os.Stderr, imageInstall, "imageinstall")
+			log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", vmName)
+			err = imageInstall.PrettyPrint(os.Stderr, prettyprint.Full)
 			if err != nil {
 				return
 			}
@@ -73,7 +77,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 				return util.UserRequestedExit{}
 			}
 
-			err = global.Client.ReimageVirtualMachine(c.VirtualMachineName, imageInstall)
+			err = global.Client.ReimageVirtualMachine(&vmName, imageInstall)
 			if err != nil && !isatty.IsTerminal(os.Stdout.Fd()) {
 				fmt.Fprintf(os.Stdout, imageInstall.RootPassword)
 			}
@@ -94,6 +98,18 @@ func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulte
 		image = "symbiosis"
 		defaulted = true
 	}
+
+	if !c.Bool("force") {
+		var exists bool
+		exists, err = imageExists(image)
+		if err != nil {
+			return
+		}
+		if !exists {
+			err = fmt.Errorf("No visible image '%s' - check your spelling or use --force if certain", image)
+		}
+	}
+
 	if pubkeysFile != "" {
 		if pubkeys != "" {
 			pubkeys += "\r\n" + pubkeysFile
@@ -115,5 +131,19 @@ func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulte
 		FirstbootScript: firstbootScript,
 		PublicKeys:      pubkeys,
 		RootPassword:    rootPassword,
-	}, defaulted, nil
+	}, defaulted, err
+}
+
+func imageExists(name string) (exists bool, err error) {
+	defs, err := global.Client.ReadDefinitions()
+	if err != nil {
+		return
+	}
+	for _, image := range defs.Distributions {
+		if image == name {
+			exists = true
+			return
+		}
+	}
+	return
 }

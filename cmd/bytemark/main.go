@@ -16,6 +16,7 @@ import (
 	"strings"
 )
 
+// forceFlag is common to a bunch of commands and can have a generic Usage.
 var forceFlag = cli.BoolFlag{
 	Name:  "force",
 	Usage: "Do not prompt for confirmation when destroying data or increasing costs.",
@@ -23,17 +24,38 @@ var forceFlag = cli.BoolFlag{
 
 //commands is assembled during init()
 var commands = make([]cli.Command, 0)
+
+//adminCommands is assembled during init() and has the commands that're only available when --admin is specified.
+// it gets merged in to commands
+var adminCommands = make([]cli.Command, 0)
 var global = struct {
 	Config util.ConfigManager
 	Client lib.Client
 	App    *cli.App
 }{}
 
-func baseAppSetup() (app *cli.App, err error) {
+func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 	app = cli.NewApp()
 	app.Version = lib.Version
+	app.Flags = flags
 
-	app.Commands = commands
+	// add admin commands if --admin is set
+	wantAdminCmds, err := global.Config.GetBool("admin")
+	if err != nil {
+		return app, err
+	}
+	if wantAdminCmds {
+		app.Commands = mergeCommands(commands, adminCommands)
+	} else {
+		app.Commands = commands
+	}
+	// last minute alterations to commands
+	// used for modifying help descriptions, mostly.
+	for idx, cmd := range app.Commands {
+		if cmd.Name == "admin" {
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateAdminCommandsHelp()
+		}
+	}
 	return
 
 }
@@ -54,8 +76,8 @@ func main() {
 	}()
 
 	overrideHelp()
-	args := prepConfig()
-	app, err := baseAppSetup()
+	flags, args := prepConfig()
+	app, err := baseAppSetup(flags)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
@@ -74,9 +96,33 @@ func main() {
 	global.Client = cli
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
 
+	outputDebugInfo()
+
 	err = global.App.Run(args)
 
 	os.Exit(int(util.ProcessError(err)))
+}
+
+func outputDebugInfo() {
+	log.Debugf(log.LvlOutline, "bytemark-client %s\r\n\r\n", lib.Version)
+	// assemble a string of config vars (excluding token)
+	vars, err := global.Config.GetAll()
+	if err != nil {
+		log.Debugf(log.LvlFlags, "(not a real problem maybe): had trouble getting all config vars: %s\r\n", err.Error())
+	}
+
+	log.Debugf(log.LvlFlags, "reading config from %s\r\n\r\n", global.Config.ConfigDir())
+	log.Debug(log.LvlFlags, "config vars:")
+	for _, v := range vars {
+		if v.Name == "token" {
+			log.Debugf(log.LvlFlags, "  %s (%s): not printed for security\r\n", v.Name, v.Source)
+			continue
+		}
+		log.Debugf(log.LvlFlags, "  %s (%s): '%s'\r\n", v.Name, v.Source, v.Value)
+	}
+	log.Debug(log.LvlFlags, "")
+
+	log.Debugf(log.LvlFlags, "invocation: %s\r\n\r\n", strings.Join(os.Args, " "))
 }
 
 // EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.
@@ -162,9 +208,7 @@ func mergeCommand(dst *cli.Command, src cli.Command) {
 		dst.Action = src.Action
 	}
 	if src.Flags != nil {
-		for _, f := range src.Flags {
-			dst.Flags = append(dst.Flags, f)
-		}
+		dst.Flags = append(dst.Flags, src.Flags...)
 	}
 	if src.Subcommands != nil {
 		dst.Subcommands = mergeCommands(dst.Subcommands, src.Subcommands)
@@ -192,6 +236,7 @@ func mergeCommands(base []cli.Command, extras []cli.Command) (result []cli.Comma
 	return
 }
 
+// overrideHelp writes our own help templates into urfave/cli
 func overrideHelp() {
 	cli.SubcommandHelpTemplate = `NAME:
    {{.HelpName}} - {{.Usage}}
@@ -212,7 +257,7 @@ OPTIONS:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-{{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
+   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
 
 CATEGORY:
    {{.Category}}{{end}}{{if .Description}}
@@ -226,37 +271,86 @@ OPTIONS:
 `
 }
 
-func prepConfig() (args []string) {
+func globalFlags() (flags []cli.Flag) {
+	return []cli.Flag{
+		cli.GenericFlag{
+			Name:  "account",
+			Usage: "account name to use when no other accounts are specified",
+			Value: new(AccountNameFlag),
+		},
+		cli.StringFlag{
+			Name:  "api-endpoint",
+			Usage: "URL where the domains service can be found. Set to blank in environments without a domains service.",
+		},
+		cli.StringFlag{
+			Name:  "auth-endpoint",
+			Usage: "URL where the auth service can be found",
+		},
+		cli.StringFlag{
+			Name:  "billing-endpoint",
+			Usage: "URL where bmbilling can be found. Set to blank in environments without bmbilling",
+		},
+		cli.BoolFlag{
+			Name:  "admin",
+			Usage: "allows admin commands in the client. see bytemark --admin --help",
+		},
+		cli.BoolFlag{
+			Name:  "yubikey",
+			Usage: "use a yubikey to authenticate",
+		},
+		cli.IntFlag{
+			Name:  "debug-level",
+			Usage: "how much debug output to print to the terminal",
+		},
+		cli.StringFlag{
+			Name:  "endpoint",
+			Usage: "URL of the brain",
+		},
+		cli.StringFlag{
+			Name:  "config-dir",
+			Usage: "directory in which bytemark-client's configuration resides. see bytemark help config, bytemark help profiles",
+		},
+		cli.StringFlag{
+			Name:  "spp-endpoint",
+			Usage: "URL of SPP. set to blank in environments without an SPP.",
+		},
+		cli.StringFlag{
+			Name:  "user",
+			Usage: "user you wish to log in as",
+		},
+		cli.StringFlag{
+			Name:  "yubikey-otp",
+			Usage: "one-time password from your yubikey to use to login",
+		},
+	}
+}
+
+func prepConfig() (flags []cli.Flag, args []string) {
 	// set up our global flags because we need some config before we can set up our App
-	flags := flag.NewFlagSet("flags", flag.ContinueOnError)
-	configDir := flags.String("config-dir", "", "")
-	help := flags.Bool("help", false, "")
-	h := flags.Bool("h", false, "")
-	version := flags.Bool("version", false, "")
-	v := flags.Bool("v", false, "")
-	flags.Bool("yubikey", false, "")
-	flags.Int("debug-level", 0, "")
-	flags.String("user", "", "")
-	flags.String("account", "", "")
-	flags.String("endpoint", "", "")
-	flags.String("api-endpoint", "", "")
-	flags.String("billing-endpoint", "", "")
-	flags.String("spp-endpoint", "", "")
-	flags.String("auth-endpoint", "", "")
-	flags.String("yubikey-otp", "", "")
+	flagset := flag.NewFlagSet("flags", flag.ContinueOnError)
+	help := flagset.Bool("help", false, "")
+	h := flagset.Bool("h", false, "")
+	version := flagset.Bool("version", false, "")
+	v := flagset.Bool("v", false, "")
 
-	flags.SetOutput(ioutil.Discard)
+	flags = globalFlags()
+	for _, f := range flags {
+		f.Apply(flagset)
+	}
 
-	err := flags.Parse(os.Args[1:])
+	flagset.SetOutput(ioutil.Discard)
+
+	err := flagset.Parse(os.Args[1:])
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
-	config, err := util.NewConfig(*configDir)
+	configDir := flagset.Lookup("config-dir").Value.String()
+	config, err := util.NewConfig(configDir)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
 	// import the flags into config
-	flargs := config.ImportFlags(flags)
+	flargs := config.ImportFlags(flagset)
 	if config.GetIgnoreErr("endpoint") == "https://int.bigv.io" {
 		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using bigv-int")
 		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using bigv-int")
@@ -275,7 +369,6 @@ func prepConfig() (args []string) {
 		copy(args[1:], flargs)
 	}
 	args[0] = os.Args[0]
-	log.Debugf(log.LvlFlags, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, args)
 
 	if *help || *h {
 		helpArgs := make([]string, len(args)+1)

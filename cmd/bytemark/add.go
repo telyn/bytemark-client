@@ -26,24 +26,39 @@ func init() {
 					Name:  "user",
 					Usage: "Which user to add the key to. Defaults to the username you log in as.",
 				},
+				cli.StringFlag{
+					Name:  "public-key",
+					Usage: "the text of a public key to add. If set, is used in preference to --public-key-file",
+				},
 				cli.GenericFlag{
 					Name:  "public-key-file",
 					Usage: "The public key file to add to the account",
 					Value: &publicKeyFile,
 				},
 			},
-			Action: With(AuthProvider, func(ctx *Context) (err error) {
+			Action: With(JoinArgs("public-key"), AuthProvider, func(ctx *Context) (err error) {
 				user := ctx.String("user")
 				if user == "" {
 					user = global.Config.GetIgnoreErr("user")
 				}
 
-				key := strings.TrimSpace(strings.Join(ctx.Args(), " "))
+				key := strings.TrimSpace(ctx.String("public-key"))
 				if key == "" {
 					if publicKeyFile.Value == "" {
 						return ctx.Help("Please specify a key")
 					}
 					key = publicKeyFile.Value
+				} else {
+					// if public-key is not blank, try to use it as a filename
+					// FileFlag does some nice ~-substitution which is why we use it rather than the infinitely more normal-looking ioutil.ReadFile
+					publicKeyFile = util.FileFlag{FileName: key}
+					if err := publicKeyFile.Set(key); err == nil {
+						key = publicKeyFile.Value
+					}
+				}
+
+				if strings.Contains(key, "PRIVATE KEY") {
+					return ctx.Help("The key needs to be a public key, not a private key")
 				}
 
 				err = global.Client.AddUserAuthorizedKey(user, key)
@@ -61,11 +76,11 @@ func init() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "ipv4",
-					Usage: "Add an IPv4 address. This is the default",
+					Usage: "If set, requests IPv4 addresses. This is the default",
 				},
 				cli.BoolFlag{
 					Name:  "ipv6",
-					Usage: "Add an IPv6 address.",
+					Usage: "If set, requests IPv6 addresses.",
 				},
 				cli.IntFlag{
 					Name:  "ips",
@@ -75,8 +90,13 @@ func init() {
 					Name:  "reason",
 					Usage: "Reason for adding the IP. If not set, will prompt.",
 				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "The server to add IPs to",
+					Value: new(VirtualMachineNameFlag),
+				},
 			},
-			Action: With(VirtualMachineNameProvider, AuthProvider, func(c *Context) error {
+			Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
 				addrs := c.Int("ips")
 				if addrs < 1 {
 					addrs = 1
@@ -102,11 +122,12 @@ func init() {
 					Reason:     reason,
 					Contiguous: c.Bool("contiguous"),
 				}
-				ips, err := global.Client.AddIP(c.VirtualMachineName, &ipcr)
+				vmName := c.VirtualMachineName("server")
+				ips, err := global.Client.AddIP(&vmName, &ipcr)
 				if err != nil {
 					return err
 				}
-				log.Log("IPs addded:")
+				log.Log("IPs added:")
 				log.Output(ips.String(), "\r\n")
 				return nil
 			}),

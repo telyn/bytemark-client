@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"net"
+	"strings"
 )
 
 // ProviderFunc is the function type that can be passed to With()
@@ -37,6 +39,22 @@ func cleanup(c *Context) {
 	if ok {
 		*size = 0
 	}
+	server, ok := c.Context.Generic("server").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
+	server, ok = c.Context.Generic("from").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
+	server, ok = c.Context.Generic("to").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
+	group, ok := c.Context.Generic("group").(*GroupNameFlag)
+	if ok {
+		*group = GroupNameFlag{}
+	}
 }
 
 // foldProviders runs all the providers with the given context, stopping if there's an error
@@ -50,36 +68,113 @@ func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
 	return
 }
 
-// AccountNameProvider stitches the next argument to the context as AccountName
-func AccountNameProvider(required bool) ProviderFunc {
-	return func(c *Context) (err error) {
-		if c.AccountName != nil {
-			return
-		}
-
-		if err = AuthProvider(c); err != nil {
-			return
-		}
-		name, err := c.NextArg()
-		if err != nil {
-			if required {
+// OptionalArgs takes a list of flag names. For each flag name it attempts to read the next arg and set the flag with the corresponding name.
+// for instance:
+// OptionalArgs("server", "disc", "size")
+// will attempt to read 3 arguments, setting the "server" flag to the first, "disc" to the 2nd, "size" to the third.
+func OptionalArgs(args ...string) ProviderFunc {
+	return func(c *Context) error {
+		for _, name := range args {
+			value, err := c.NextArg()
+			if err != nil {
+				// if c.NextArg errors that means there aren't more arguments
+				// so we just return nil - returning an error would stop the execution of the action.
+				return nil
+			}
+			err = c.Context.Set(name, value)
+			if err != nil {
 				return err
 			}
 		}
-		accName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
-		c.AccountName = &accName
 		return nil
 	}
 }
 
-// AccountProvider uses AccountNameProvider and then gets the named account details from the API, then stitches it to the context
-func AccountProvider(required bool) ProviderFunc {
+// JoinArgs is like OptionalArgs, but reads up to n arguments joined with spaces and sets the one named flag.
+// if n is not set, reads all the remaining arguments.
+func JoinArgs(flagName string, n ...int) ProviderFunc {
 	return func(c *Context) (err error) {
-		err = AccountNameProvider(required)(c)
+		toRead := len(c.Args())
+		if len(n) > 0 {
+			toRead = n[0]
+		}
+
+		value := make([]string, 0, toRead)
+		for i := 0; i < toRead; i++ {
+			arg, err := c.NextArg()
+			if err != nil {
+				// don't return the error - just means we ran out of arguments to slurp
+				break
+			}
+			value = append(value, arg)
+		}
+		err = c.Context.Set(flagName, strings.Join(value, " "))
+		return
+
+	}
+}
+
+func isIn(needle string, haystack []string) bool {
+	for _, str := range haystack {
+		if needle == str {
+			return true
+		}
+	}
+	return false
+}
+
+func flagValueIsOK(c *Context, flag cli.Flag) bool {
+	switch realFlag := flag.(type) {
+	case cli.GenericFlag:
+		switch value := realFlag.Value.(type) {
+		case *VirtualMachineNameFlag:
+			return value.VirtualMachine != "" && value.Group != "" && value.Account != ""
+		case *GroupNameFlag:
+			return value.Group != "" && value.Account != ""
+		case *AccountNameFlag:
+			return *value != ""
+		case *util.SizeSpecFlag:
+			return *value != 0
+		case *PrivilegeFlag:
+			return value.Username != "" && value.Level != ""
+		}
+	case cli.StringFlag:
+		return c.String(realFlag.Name) != ""
+	case cli.IntFlag:
+		return c.Int(realFlag.Name) != 0
+	}
+	return true
+}
+
+// RequiredFlags makes sure that the named flags are not their zero-values.
+// (or that VirtualMachineName / GroupName flags have the full complement of values needed)
+func RequiredFlags(flagNames ...string) ProviderFunc {
+	return func(c *Context) (err error) {
+		for _, flag := range c.Context.Command.Flags {
+			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(c, flag) {
+				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
+			}
+		}
+		return nil
+	}
+}
+
+// AccountProvider gets an account name from a flag, then the account details from the API, then stitches it to the context
+func AccountProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		err = AuthProvider(c)
 		if err != nil {
 			return
 		}
-		c.Account, err = global.Client.GetAccount(*c.AccountName)
+		accName := c.String(flagName)
+		if accName == "" {
+			accName = global.Config.GetIgnoreErr("account")
+		}
+
+		c.Account, err = global.Client.GetAccount(accName)
+		if err == nil && c.Account == nil {
+			err = fmt.Errorf("no account was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -96,124 +191,145 @@ func AuthProvider(c *Context) (err error) {
 	return
 }
 
+// DiscProvider gets a VirtualMachineName from a flag and a disc from another, then gets the named Disc from the brain and attaches it to the Context.
+func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.Group != nil {
+			return
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
+
+		vmName := c.VirtualMachineName(vmFlagName)
+		discLabel := c.String(discFlagName)
+		c.Disc, err = global.Client.GetDisc(&vmName, discLabel)
+		if err == nil && c.Disc == nil {
+			err = fmt.Errorf("no disc was returned - please report a bug")
+		}
+		return
+	}
+}
+
 // DefinitionsProvider gets the Definitions from the brain and attaches them to the Context.
 func DefinitionsProvider(c *Context) (err error) {
 	if c.Definitions != nil {
 		return
 	}
 	c.Definitions, err = global.Client.ReadDefinitions()
+	if err == nil && c.Definitions == nil {
+		err = fmt.Errorf("no definitions were returned - please report a bug")
+	}
 	return
 }
 
-// DiscLabelProvider reads the NextArg, parses it as a DiscLabel and attaches it to the Context
-func DiscLabelProvider(c *Context) (err error) {
-	if c.DiscLabel != nil {
-		return
-	}
-	discLabel, err := c.NextArg()
-	if err != nil {
-		return err
-	}
-	c.DiscLabel = &discLabel
-	return
-}
-
-// GroupNameProvider reads the NextArg, parses it as a GroupName and attaches it to the Context
-func GroupNameProvider(c *Context) (err error) {
-	if c.GroupName != nil {
-		return
-	}
-
-	if err = AuthProvider(c); err != nil {
-		return
-	}
-
-	name, err := c.NextArg()
-	if err != nil {
-		return err
-	}
-	c.GroupName = global.Client.ParseGroupName(name, global.Config.GetGroup())
-	return
-}
-
-// GroupProvider calls GroupNameProvider then gets the named Group from the brain and attaches it to the Context.
-func GroupProvider(c *Context) (err error) {
-	if c.Group != nil {
-		return
-	}
-	err = GroupNameProvider(c)
-	if err != nil {
-		return
-	}
-
-	c.Group, err = global.Client.GetGroup(c.GroupName)
-	return
-}
-
-// UserNameProvider reads the NextArg and attaches it to the Context as UserName
-func UserNameProvider(c *Context) (err error) {
-	if c.UserName != nil {
-		return
-	}
-	var username string
-	username, err = c.NextArg()
-	if err != nil {
-		username, err = global.Config.Get("user")
-		if username == "" {
-			username = global.Client.GetSessionUser()
-			err = nil
+// GroupProvider gets a GroupName from a flag, then gets the named Group from the brain and attaches it to the Context.
+func GroupProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.Group != nil {
+			return
 		}
-	}
-	c.UserName = &username
-	return
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
 
+		groupName := c.GroupName(flagName)
+		c.Group, err = global.Client.GetGroup(&groupName)
+		if err == nil && c.Group == nil {
+			err = fmt.Errorf("no group was returned - please report a bug")
+		}
+		return
+	}
 }
 
-// UserProvider calls UserNameProvider, gets the User from the brain, and attaches it to the Context.
-func UserProvider(c *Context) (err error) {
-	if c.User != nil {
-		return
+// normalisePrivilegeLevel makes sure the level provided is actually a valid PrivilegeLevel and provides a couple of aliases.
+func normalisePrivilegeLevel(l brain.PrivilegeLevel) (level brain.PrivilegeLevel, ok bool) {
+	level = brain.PrivilegeLevel(strings.ToLower(string(l)))
+	switch level {
+	case "cluster_admin", "account_admin", "group_admin", "vm_admin", "vm_console":
+		ok = true
+	case "server_admin", "server_console":
+		level = brain.PrivilegeLevel(strings.Replace(string(level), "server", "vm", 1))
+		ok = true
+	case "console":
+		level = "vm_console"
+		ok = true
 	}
-	err = UserNameProvider(c)
-	if err != nil {
-		return
-	}
-	if err = AuthProvider(c); err != nil {
-		return
-	}
-	c.User, err = global.Client.GetUser(*c.UserName)
-	return
-}
-
-// VirtualMachineNameProvider reads the NextArg, parses it as a VirtualMachineName and attaches it to the Context
-func VirtualMachineNameProvider(c *Context) (err error) {
-	if err = AuthProvider(c); err != nil {
-		return
-	}
-
-	if c.VirtualMachineName != nil {
-		log.Log("VMNameProvider: VirtualMachineName already defined")
-		return
-	}
-	name, err := c.NextArg()
-	if err != nil {
-		log.Log(err)
-		return err
-	}
-
-	c.VirtualMachineName, err = global.Client.ParseVirtualMachineName(name, global.Config.GetVirtualMachine())
 	return
 }
 
-// VirtualMachineProvider calls VirtualMachineNameProvider then gets the named VirtualMachine from the brain and attaches it to the Context.
-func VirtualMachineProvider(c *Context) (err error) {
-	if c.VirtualMachine != nil {
+// PrivilegeProvider gets the named PrivilegeFlag from the context, then resolves its target to an ID if needed to create a brain.Privilege, then attaches that to the context
+func PrivilegeProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		pf := c.PrivilegeFlag(flagName)
+		level, ok := normalisePrivilegeLevel(pf.Level)
+		if !ok && !c.Bool("force") {
+			return fmt.Errorf("Unexpected privilege level '%s' - expecting account_admin, group_admin, vm_admin or vm_console", pf.Level)
+		}
+		c.Privilege = brain.Privilege{
+			Username: pf.Username,
+			Level:    level,
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
+		switch c.Privilege.TargetType() {
+		case brain.PrivilegeTargetTypeVM:
+			var vm *brain.VirtualMachine
+			vm, err = global.Client.GetVirtualMachine(pf.VirtualMachineName)
+			c.Privilege.VirtualMachineID = vm.ID
+		case brain.PrivilegeTargetTypeGroup:
+			var group *brain.Group
+			group, err = global.Client.GetGroup(pf.GroupName)
+			c.Privilege.GroupID = group.ID
+		case brain.PrivilegeTargetTypeAccount:
+			var acc *lib.Account
+			acc, err = global.Client.GetAccount(pf.AccountName)
+			c.Privilege.AccountID = acc.BrainID
+		}
 		return
 	}
-	err = VirtualMachineNameProvider(c)
-	if err != nil {
+}
+
+// UserProvider gets a username from the given flag, then gets the corresponding User from the brain, and attaches it to the Context.
+func UserProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.User != nil {
+			return
+		}
+		user := c.String(flagName)
+		if user != "" {
+			user = global.Config.GetIgnoreErr("user")
+		}
+		if err = AuthProvider(c); err != nil {
+			return
+		}
+		c.User, err = global.Client.GetUser(user)
+		if err == nil && c.User == nil {
+			err = fmt.Errorf("no user was returned - please report a bug")
+		}
 		return
 	}
-	c.VirtualMachine, err = global.Client.GetVirtualMachine(c.VirtualMachineName)
-	return
+}
+
+// VirtualMachineProvider gets a VirtualMachineName from a flag, then gets the named VirtualMachine from the brain and attaches it to the Context.
+func VirtualMachineProvider(flagName string) ProviderFunc {
+	return func(c *Context) (err error) {
+		if c.VirtualMachine != nil {
+			return
+		}
+		err = AuthProvider(c)
+		if err != nil {
+			return
+		}
+		vmName := c.VirtualMachineName(flagName)
+		c.VirtualMachine, err = global.Client.GetVirtualMachine(&vmName)
+		if err == nil && c.VirtualMachine == nil {
+			err = fmt.Errorf("no server was returned - please report a bug")
+		}
+		return
+	}
 }

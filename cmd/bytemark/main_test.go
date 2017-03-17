@@ -1,18 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
 	"io/ioutil"
-	"os"
 	"testing"
 )
 
-var defVM lib.VirtualMachineName
-var defGroup lib.GroupName
+var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
+var defGroup = lib.GroupName{Group: "default", Account: "default-account"}
 
 func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mocks.Client) {
 	config = new(mocks.Config)
@@ -21,7 +20,7 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 	global.Client = client
 	global.Config = config
 
-	app, err := baseAppSetup()
+	app, err := baseAppSetup(globalFlags())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +37,6 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 		// subcommands in order to get every subcommand to have a correct Command.commandPath
 
 		if c.Subcommands != nil && len(c.Subcommands) > 0 {
-			fmt.Fprintf(os.Stderr, c.Name)
 			_ = global.App.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
@@ -64,8 +62,48 @@ func getFixtureVM() brain.VirtualMachine {
 	}
 }
 
+func getFixtureVLAN() brain.VLAN {
+	return brain.VLAN{
+		ID:        1,
+		Num:       1,
+		UsageType: "",
+		IPRanges:  make([]*brain.IPRange, 0),
+	}
+}
+
+func getFixtureIPRange() brain.IPRange {
+	return brain.IPRange{
+		ID:        1,
+		Spec:      "192.168.1.1/28",
+		VLANNum:   1,
+		Zones:     make([]string, 0),
+		Available: 11,
+	}
+}
+
+func getFixtureHead() brain.Head {
+	return brain.Head{
+		ID:    1,
+		Label: "h1",
+	}
+}
+
+func getFixtureTail() brain.Tail {
+	return brain.Tail{
+		ID:    1,
+		Label: "t1",
+	}
+}
+
+func getFixtureStoragePool() brain.StoragePool {
+	return brain.StoragePool{
+		Name:  "sata1",
+		Label: "t1-sata1",
+	}
+}
+
 func getFixtureGroup() brain.Group {
-	vms := make([]*brain.VirtualMachine, 1, 1)
+	vms := make([]*brain.VirtualMachine, 1)
 	vm := getFixtureVM()
 	vms[0] = &vm
 
@@ -73,4 +111,30 @@ func getFixtureGroup() brain.Group {
 		Name:            "test-group",
 		VirtualMachines: vms,
 	}
+}
+
+func assertEqual(t *testing.T, test string, testNum int, name string, expected interface{}, actual interface{}) {
+	if expected != actual {
+		t.Errorf("%s %d: wrong %s: expected %#v, got %#v", test, testNum, name, expected, actual)
+	}
+}
+
+func checkErr(t *testing.T, name string, testNum int, shouldErr bool, err error) {
+	if err == nil && shouldErr {
+		t.Errorf("%s %d should error but didn't.", name, testNum)
+	} else if err != nil && !shouldErr {
+		t.Errorf("%s %d returned unexpected error: %s", name, testNum, err.Error())
+	}
+}
+
+type Verifyer interface {
+	Verify() (bool, error)
+	Reset() *mock.Mock
+}
+
+func verifyAndReset(t *testing.T, name string, testNum int, v Verifyer) {
+	if ok, err := v.Verify(); !ok {
+		t.Errorf("%s %d %v", name, testNum, err)
+	}
+	v.Reset()
 }

@@ -53,6 +53,7 @@ If you have previously used the client, you'll have a login and will need to add
 			}
 
 			fields, frm, signup := util.MakeSignupForm(creditCardForm)
+			frm.SetMaxWidth(120)
 
 			err = frm.Run()
 			if err != nil {

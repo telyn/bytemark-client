@@ -41,13 +41,19 @@ Defaults to connecting to the serial console for the given server.`,
 				Name:  "ssh-args",
 				Usage: "Arguments that will be passed to SSH (only applies to --serial).",
 			},
+			cli.GenericFlag{
+				Name:  "server",
+				Usage: "The server whose console will be connected to",
+				Value: new(VirtualMachineNameFlag),
+			},
 		},
-		Action: With(VirtualMachineNameProvider, AuthProvider, func(ctx *Context) (err error) {
+		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(ctx *Context) (err error) {
+			vmName := ctx.VirtualMachineName("server")
 			if ctx.Context.Bool("serial") && ctx.Context.Bool("panel") {
 				return ctx.Help("You must only specify one of --serial and --panel!")
 			}
 
-			vm, err := global.Client.GetVirtualMachine(ctx.VirtualMachineName)
+			vm, err := global.Client.GetVirtualMachine(&vmName)
 			if err != nil {
 				return
 			}
@@ -163,6 +169,7 @@ func connectSerialConsole(vm *brain.VirtualMachine, sshargs string) error {
 
 	log.Debugf(5, "%+v\r\n", args)
 
+	/* #nosec */
 	err = syscall.Exec(bin, args, os.Environ())
 	if err != nil {
 		if errno, ok := err.(syscall.Errno); ok {

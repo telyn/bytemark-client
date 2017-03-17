@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
@@ -39,12 +37,7 @@ func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc brain.Disc) (
 		return
 	}
 
-	js, err := json.Marshal(discs[0])
-	if err != nil {
-		return
-	}
-
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.MarshalAndRun(discs[0], nil)
 	return
 
 }
@@ -78,9 +71,30 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 	}
 
 	// TODO(telyn): marshal json instead of sprintf
-	disc := fmt.Sprintf(`{"size":%d}`, sizeMB)
+	disc := brain.Disc{
+		Size: sizeMB,
+	}
 
-	_, _, err = r.Run(bytes.NewBufferString(disc), nil)
+	_, _, err = r.MarshalAndRun(disc, nil)
+	return err
+}
+
+// SetDiscIopsLimit sets the IOPS limit of the specified disc
+func (c *bytemarkClient) SetDiscIopsLimit(vm *VirtualMachineName, discLabelOrID string, iopsLimit int) (err error) {
+	err = c.validateVirtualMachineName(vm)
+	if err != nil {
+		return err
+	}
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	if err != nil {
+		return
+	}
+
+	limitPatch := map[string]int{
+		"iops_limit": iopsLimit,
+	}
+
+	_, _, err = r.MarshalAndRun(limitPatch, nil)
 	return err
 }
 

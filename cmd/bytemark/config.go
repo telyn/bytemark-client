@@ -27,13 +27,10 @@ func validateEndpointForConfig(endpoint string) error {
 }
 
 func validateAccountForConfig(c *Context, name string) (err error) {
-	// we can't just use AccountProvider because it expects NextArg() to be the account name - there's no way to pass one in.
-	accName := global.Client.ParseAccountName(name, global.Config.GetIgnoreErr("account"))
-	c.AccountName = &accName
-	err = AccountProvider(true)(c)
+	_, err = global.Client.GetAccount(name)
 	if err != nil {
 		if _, ok := err.(lib.NotFoundError); ok {
-			return fmt.Errorf("No such account %s - check your typing and specify --yubikey if necessary", *c.AccountName)
+			return fmt.Errorf("No such account %s - check your typing and specify --yubikey if necessary", name)
 		}
 		return err
 	}
@@ -42,12 +39,11 @@ func validateAccountForConfig(c *Context, name string) (err error) {
 
 func validateGroupForConfig(c *Context, name string) (err error) {
 	// we can't just use GroupProvider because it expects NextArg() to be the account name - there's no way to pass one in.
-	groupName := global.Client.ParseGroupName(name, global.Config.GetGroup())
-	c.GroupName = groupName
-	err = GroupProvider(c)
+	groupName := lib.ParseGroupName(name, global.Config.GetGroup())
+	_, err = global.Client.GetGroup(groupName)
 	if err != nil {
 		if _, ok := err.(lib.NotFoundError); ok {
-			return fmt.Errorf("No such group %v - check your typing and specify --yubikey if necessary", c.GroupName)
+			return fmt.Errorf("No such group %v - check your typing and specify --yubikey if necessary", groupName)
 		}
 		return err
 	}
