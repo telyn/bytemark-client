@@ -165,6 +165,20 @@ func EnsureAuth() error {
 				// success!
 				// it doesn't _really_ matter if we can't write the token to the token place, right?
 				_ = global.Config.SetPersistent("token", global.Client.GetSessionToken(), "AUTH")
+
+				// Check this here, as it is only relevant the initial login,
+				// not subsequent validations of the token (as opposed to yubikey)
+				if global.Config.GetIgnoreErr("2fa-otp") != "" {
+					factors := global.Client.GetSessionFactors()
+
+					if global.Config.GetIgnoreErr("2fa-otp") != "" {
+						if !factorExists(factors, "2fa") {
+							// Should never happen, as long as auth correctly returns the factors
+							return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
+						}
+					}
+				}
+
 				break
 			} else {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
@@ -184,20 +198,17 @@ func EnsureAuth() error {
 			}
 		}
 	}
-	if global.Config.GetIgnoreErr("yubikey") != "" || global.Config.GetIgnoreErr("2fa-otp") != "" {
+	if global.Config.GetIgnoreErr("yubikey") != "" {
 		factors := global.Client.GetSessionFactors()
 
 		if global.Config.GetIgnoreErr("yubikey") != "" {
 			if !factorExists(factors, "yubikey") {
-				// Should never happen, as long as auth correctly returns the factors
-				return fmt.Errorf("Unexpected error with yubikey login. Please report this as a bug")
-			}
-		}
+				// Current auth token doesn't have a yubikey,
+				// so prompt the user to login again with yubikey
 
-		if global.Config.GetIgnoreErr("2fa-otp") != "" {
-			if !factorExists(factors, "2fa") {
-				// Should never happen, as long as auth correctly returns the factors
-				return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
+				global.Config.Set("token", "", "FLAG yubikey")
+
+				return EnsureAuth()
 			}
 		}
 	}
