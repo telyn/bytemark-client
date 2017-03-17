@@ -201,7 +201,7 @@ package-debian-amd64:
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
-  - '[ "release-$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+${CI_BUILD_REF_SLUG%%-*}.$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
+  - '[ "release-$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
   - mv ../bytemark-client*.deb .
@@ -258,7 +258,7 @@ publish:
   before_script: *version_script
   script:
   - mkdir -p pkg/{linux,mac,freebsd,openbsd,windows,debian,rpm}
-  - VERSION=${VERSION:-$CHANGELOG_VERSION~$SNAPSHOT_VERSION}
+  - VERSION=${VERSION:-$CHANGELOG_VERSION+$SNAPSHOT_VERSION}
   - cp bytemark-amd64-linux.tar.gz pkg/linux/bytemark-$VERSION.tar.gz
   - cp bytemark-amd64-freebsd.tar.gz pkg/freebsd/bytemark-$VERSION.tar.gz
   - cp bytemark-amd64-openbsd.tar.gz pkg/openbsd/bytemark-$VERSION.tar.gz
