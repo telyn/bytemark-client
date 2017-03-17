@@ -184,29 +184,34 @@ func EnsureAuth() error {
 			}
 		}
 	}
-	if global.Config.GetIgnoreErr("yubikey") != "" {
+	if global.Config.GetIgnoreErr("yubikey") != "" || global.Config.GetIgnoreErr("2fa-otp") != "" {
 		factors := global.Client.GetSessionFactors()
-		for _, f := range factors {
-			if f == "yubikey" {
-				return nil
+
+		if global.Config.GetIgnoreErr("yubikey") != "" {
+			if !factorExists(factors, "yubikey") {
+				// Should never happen, as long as auth correctly returns the factors
+				return fmt.Errorf("Unexpected error with yubikey login. Please report this as a bug")
 			}
 		}
-		// if still executing, we didn't have yubikey factor
-		global.Config.Set("token", "", "FLAG yubikey")
-		return EnsureAuth()
-	}
-	if global.Config.GetIgnoreErr("2fa-otp") != "" {
-		factors := global.Client.GetSessionFactors()
-		for _, f := range factors {
-			if f == "2fa" {
-				return nil
+
+		if global.Config.GetIgnoreErr("2fa-otp") != "" {
+			if !factorExists(factors, "2fa") {
+				// Should never happen, as long as auth correctly returns the factors
+				return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
 			}
 		}
-		// if still executing, we didn't have 2fa factor
-		global.Config.Set("token", "", "FLAG 2fa")
-		return EnsureAuth()
 	}
 	return nil
+}
+
+func factorExists(factors []string, factor string) bool {
+	for _, f := range factors {
+		if f == factor {
+			return true
+		}
+	}
+
+	return false
 }
 
 // mergeCommand merges src into dst, only copying non-nil fields of src,
