@@ -93,7 +93,8 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 func TestCreateServerCommand(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	// where most commands use &defVM to make sure the VirtualMachineName has all three components (and to avoid calls to GetDefaultAccount, presumably), I have singled out TestCreateServerCommand to also test that unqualified server names will work in practice without account & group set in the config.
+	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{Group: "default"})
 
 	vm := brain.VirtualMachineSpec{
 		Discs: []brain.Disc{
@@ -138,10 +139,9 @@ func TestCreateServerCommand(t *testing.T) {
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "default",
-		Account:        "default-account",
 	}
 
-	c.When("CreateVirtualMachine", &defGroup, vm).Return(vm, nil).Times(1)
+	c.When("CreateVirtualMachine", &lib.GroupName{Group: "default"}, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{

@@ -128,9 +128,9 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
 		case *VirtualMachineNameFlag:
-			return value.VirtualMachine != "" && value.Group != "" && value.Account != ""
+			return value.VirtualMachine != ""
 		case *GroupNameFlag:
-			return value.Group != "" && value.Account != ""
+			return value.Group != ""
 		case *AccountNameFlag:
 			return *value != ""
 		case *util.SizeSpecFlag:
