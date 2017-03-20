@@ -429,3 +429,7 @@ func (c *Client) ReapVMs() error {
 	r := c.Called()
 	return r.Error(0)
 }
+func (c *Client) DeleteVLAN(id int) error {
+	r := c.Called()
+	return r.Error(0)
+}

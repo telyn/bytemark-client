@@ -180,3 +180,13 @@ func (c *bytemarkClient) ReapVMs() (err error) {
 	_, _, err = r.Run(nil, nil)
 	return
 }
+
+func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/admin/vlans/%s", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}

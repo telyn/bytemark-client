@@ -44,6 +44,33 @@ func simpleGetTest(t *testing.T, url string, testObject interface{}, runTest sim
 	}
 }
 
+type simpleDeleteTestFn func(Client) error
+
+func simpleDeleteTest(t *testing.T, url string, runTest simpleDeleteTestFn) {
+	callerPC, _, _, _ := runtime.Caller(1)
+	testName := runtime.FuncForPC(callerPC).Name()
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			url: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "DELETE")
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = runTest(client)
+	if err != nil {
+		t.Errorf("%s errored: %s", testName, err.Error())
+	}
+}
+
 type simplePostTestFn func(Client) error
 
 func simplePostTest(t *testing.T, url string, testBody string, runTest simplePostTestFn) {
@@ -436,5 +463,11 @@ func testPostMigrateVirtualMachine(t *testing.T, vm *brain.VirtualMachine, testB
 func TestPostReapVMs(t *testing.T) {
 	simplePostTest(t, "/admin/reap_vms", "", func(client Client) error {
 		return client.ReapVMs()
+	})
+}
+
+func TestDeleteVLAN(t *testing.T) {
+	simpleDeleteTest(t, "/admin/vlans/123", func(client Client) error {
+		return client.DeleteVLAN(123)
 	})
 }

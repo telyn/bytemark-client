@@ -220,4 +220,5 @@ type Client interface {
 	MigrateDisc(disc int, newStoragePool string) error
 	MigrateVirtualMachine(vmName *VirtualMachineName, newHead string) error
 	ReapVMs() error
+	DeleteVLAN(id int) error
 }
