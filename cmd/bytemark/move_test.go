@@ -8,7 +8,7 @@ import (
 
 func TestMove(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	oldName := lib.VirtualMachineName{
 		VirtualMachine: "old-name",
@@ -20,12 +20,8 @@ func TestMove(t *testing.T) {
 		Group:          "new-group",
 		Account:        "new-account"}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 	config.When("Force").Return(true)
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("MoveVirtualMachine", &oldName, &newName).Return(nil).Times(1)
 
