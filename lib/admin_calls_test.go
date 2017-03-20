@@ -432,3 +432,9 @@ func testPostMigrateVirtualMachine(t *testing.T, vm *brain.VirtualMachine, testB
 	}
 	return runTest(client)
 }
+
+func TestPostReapVMs(t *testing.T) {
+	simplePostTest(t, "/admin/reap_vms", "", func(client Client) error {
+		return client.ReapVMs()
+	})
+}

@@ -170,3 +170,13 @@ func (c *bytemarkClient) MigrateVirtualMachine(vmName *VirtualMachineName, newHe
 	_, _, err = r.MarshalAndRun(params, nil)
 	return
 }
+
+func (c *bytemarkClient) ReapVMs() (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/reap_vms")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}

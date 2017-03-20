@@ -219,4 +219,5 @@ type Client interface {
 	GetRecentVMs() ([]*brain.VirtualMachine, error)
 	MigrateDisc(disc int, newStoragePool string) error
 	MigrateVirtualMachine(vmName *VirtualMachineName, newHead string) error
+	ReapVMs() error
 }

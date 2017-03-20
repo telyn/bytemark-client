@@ -425,3 +425,7 @@ func (c *Client) MigrateVirtualMachine(vmName *lib.VirtualMachineName, newHead s
 	r := c.Called(vmName, newHead)
 	return r.Error(0)
 }
+func (c *Client) ReapVMs() error {
+	r := c.Called()
+	return r.Error(0)
+}
