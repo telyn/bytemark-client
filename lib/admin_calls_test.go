@@ -471,3 +471,15 @@ func TestDeleteVLAN(t *testing.T) {
 		return client.DeleteVLAN(123)
 	})
 }
+
+func TestPostAdminCreateGroup(t *testing.T) {
+	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group"}`, func(client Client) error {
+		return client.AdminCreateGroup(&GroupName{Account: "test-account", Group: "test-group"}, 0)
+	})
+}
+
+func TestPostAdminCreateGroupWithVLANNum(t *testing.T) {
+	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group","vlan_num":12}`, func(client Client) error {
+		return client.AdminCreateGroup(&GroupName{Account: "test-account", Group: "test-group"}, 12)
+	})
+}

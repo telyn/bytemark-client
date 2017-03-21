@@ -221,4 +221,5 @@ type Client interface {
 	MigrateVirtualMachine(vmName *VirtualMachineName, newHead string) error
 	ReapVMs() error
 	DeleteVLAN(id int) error
+	AdminCreateGroup(name *GroupName, vlanNum int) error
 }

@@ -10,6 +10,40 @@ import (
 )
 
 func init() {
+	adminCommands = append(adminCommands, cli.Command{
+		Name:   "create",
+		Action: cli.ShowSubcommandHelp,
+		Subcommands: []cli.Command{
+			cli.Command{
+				Name:      "vlan_group",
+				Usage:     "creates groups for private VLANs",
+				UsageText: "bytemark create vlan_group",
+				Description: `Create a group in the specified account, with an optional VLAN specified.
+
+Used when setting up a private VLAN for a customer.`,
+				Flags: []cli.Flag{
+					cli.GenericFlag{
+						Name:  "group",
+						Usage: "the name of the group to create",
+						Value: new(GroupNameFlag),
+					},
+					cli.IntFlag{
+						Name:  "vlan_num",
+						Usage: "The VLAN number to add the group to",
+					},
+				},
+				Action: With(OptionalArgs("group", "vlan_num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
+					gp := c.GroupName("group")
+					if err := global.Client.AdminCreateGroup(&gp, c.Int("vlan_num")); err != nil {
+						return err
+					}
+					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
+					return nil
+				}),
+			},
+		},
+	})
+
 	createServerCmd := cli.Command{
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,

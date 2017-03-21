@@ -190,3 +190,27 @@ func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
 	_, _, err = r.Run(nil, nil)
 	return
 }
+
+func (c *bytemarkClient) AdminCreateGroup(name *GroupName, vlanNum int) (err error) {
+	err = c.validateGroupName(name)
+	if err != nil {
+		return
+	}
+
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/groups")
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{
+		"account_spec": name.Account,
+		"group_name":   name.Group,
+	}
+
+	if vlanNum != 0 {
+		obj["vlan_num"] = vlanNum
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}

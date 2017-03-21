@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -262,6 +263,63 @@ func TestCreateServer(t *testing.T) {
 		"test-server", "3", "6565m", "archive:34",
 	})
 	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateVLANGroup(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestAuthSetup(t, true)
+
+	config.When("GetGroup").Return(&defGroup)
+
+	group := lib.GroupName{
+		Group:   "test-group",
+		Account: "test-account",
+	}
+	c.When("AdminCreateGroup", &group, 0).Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateVLANGroupWithVLANNum(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestAuthSetup(t, true)
+
+	config.When("GetGroup").Return(&defGroup)
+
+	group := lib.GroupName{
+		Group:   "test-group",
+		Account: "test-account",
+	}
+	c.When("AdminCreateGroup", &group, 19).Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account 19", " "))
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateVLANGroupError(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestAuthSetup(t, true)
+
+	config.When("GetGroup").Return(&defGroup)
+
+	group := lib.GroupName{
+		Group:   "test-group",
+		Account: "test-account",
+	}
+	c.When("AdminCreateGroup", &group, 0).Return(fmt.Errorf("Group name already used")).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
+	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

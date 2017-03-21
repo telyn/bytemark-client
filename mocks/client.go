@@ -433,3 +433,7 @@ func (c *Client) DeleteVLAN(id int) error {
 	r := c.Called()
 	return r.Error(0)
 }
+func (c *Client) AdminCreateGroup(name *lib.GroupName, vlanNum int) error {
+	r := c.Called(name, vlanNum)
+	return r.Error(0)
+}
