@@ -132,7 +132,7 @@ Multiple --disc flags can be used to create multiple discs`,
 	create disc[s] [--disc <disc spec>]... <cloud server>
 	create group [--account <name>] <name>
 	create ip [--reason reason] <cloud server>
-	create server (see bytemark create server help)
+	create server (see bytemark help create server)
 
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
