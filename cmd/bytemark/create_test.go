@@ -272,7 +272,7 @@ func TestCreateVLANGroup(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetGroup").Return(&defGroup)
+	config.When("GetGroup").Return(&defGroup).Times(1)
 
 	group := lib.GroupName{
 		Group:   "test-group",
@@ -291,7 +291,7 @@ func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetGroup").Return(&defGroup)
+	config.When("GetGroup").Return(&defGroup).Times(1)
 
 	group := lib.GroupName{
 		Group:   "test-group",
@@ -310,7 +310,7 @@ func TestCreateVLANGroupError(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetGroup").Return(&defGroup)
+	config.When("GetGroup").Return(&defGroup).Times(1)
 
 	group := lib.GroupName{
 		Group:   "test-group",
