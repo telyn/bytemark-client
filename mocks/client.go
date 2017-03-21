@@ -437,3 +437,7 @@ func (c *Client) AdminCreateGroup(name *lib.GroupName, vlanNum int) error {
 	r := c.Called(name, vlanNum)
 	return r.Error(0)
 }
+func (c *Client) CreateIPRange(ipRange string, vlanNum int) error {
+	r := c.Called(ipRange, vlanNum)
+	return r.Error(0)
+}

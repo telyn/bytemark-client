@@ -324,3 +324,29 @@ func TestCreateVLANGroupError(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCreateIPRange(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateIPRange", "192.168.3.0/28", 14).Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 14", " "))
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateIPRangeError(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateIPRange", "192.168.3.0/28", 18).Return(fmt.Errorf("Error creating IP range")).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 18", " "))
+	is.NotNil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}

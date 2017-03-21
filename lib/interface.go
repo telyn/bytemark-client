@@ -222,4 +222,5 @@ type Client interface {
 	ReapVMs() error
 	DeleteVLAN(id int) error
 	AdminCreateGroup(name *GroupName, vlanNum int) error
+	CreateIPRange(ipRange string, vlanNum int) error
 }

@@ -41,6 +41,28 @@ Used when setting up a private VLAN for a customer.`,
 					return nil
 				}),
 			},
+			cli.Command{
+				Name:      "ip_range",
+				Usage:     "create a new IP range in a VLAN",
+				UsageText: "bytemark create ip_range <ip_range> <vlan_num>",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "ip_range",
+						Usage: "the IP range to add",
+					},
+					cli.IntFlag{
+						Name:  "vlan_num",
+						Usage: "The VLAN number to add the IP range to",
+					},
+				},
+				Action: With(OptionalArgs("ip_range", "vlan_num"), RequiredFlags("ip_range", "vlan_num"), AuthProvider, func(c *Context) error {
+					if err := global.Client.CreateIPRange(c.String("ip_range"), c.Int("vlan_num")); err != nil {
+						return err
+					}
+					log.Logf("IP range created\r\n")
+					return nil
+				}),
+			},
 		},
 	})
 

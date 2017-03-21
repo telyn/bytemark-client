@@ -214,3 +214,18 @@ func (c *bytemarkClient) AdminCreateGroup(name *GroupName, vlanNum int) (err err
 	_, _, err = r.MarshalAndRun(obj, nil)
 	return
 }
+
+func (c *bytemarkClient) CreateIPRange(ipRange string, vlanNum int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/ip_ranges")
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{
+		"ip_range": ipRange,
+		"vlan_num": vlanNum,
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}

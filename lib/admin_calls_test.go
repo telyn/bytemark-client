@@ -483,3 +483,9 @@ func TestPostAdminCreateGroupWithVLANNum(t *testing.T) {
 		return client.AdminCreateGroup(&GroupName{Account: "test-account", Group: "test-group"}, 12)
 	})
 }
+
+func TestPostCreateIPRange(t *testing.T) {
+	simplePostTest(t, "/admin/ip_ranges", `{"ip_range":"192.168.1.1/24","vlan_num":123}`, func(client Client) error {
+		return client.CreateIPRange("192.168.1.1/24", 123)
+	})
+}
