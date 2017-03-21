@@ -17,7 +17,7 @@ func init() {
 			cli.Command{
 				Name:      "vlan_group",
 				Usage:     "creates groups for private VLANs",
-				UsageText: "bytemark create vlan_group",
+				UsageText: "bytemark create vlan_group <group> [vlan_num]",
 				Description: `Create a group in the specified account, with an optional VLAN specified.
 
 Used when setting up a private VLAN for a customer.`,
