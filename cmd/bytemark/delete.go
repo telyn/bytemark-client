@@ -16,7 +16,7 @@ func init() {
 		Subcommands: []cli.Command{
 			{
 				Name:      "vlan",
-				Usage:     "triggers server reaping, purging all deleted servers and discs.",
+				Usage:     "delete a given VLAN",
 				UsageText: "bytemark --admin delete vlan <id>",
 				Flags: []cli.Flag{
 					cli.IntFlag{

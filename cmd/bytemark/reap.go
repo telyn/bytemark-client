@@ -13,7 +13,7 @@ func init() {
 			{
 				Name:      "servers",
 				Aliases:   []string{"vm", "vms"},
-				Usage:     "triggers server reaping, purging all deleted servers and discs.",
+				Usage:     "triggers server reaping, purging all deleted servers and discs",
 				UsageText: "bytemark --admin reap servers",
 				Action: With(AuthProvider, func(c *Context) error {
 					if err := global.Client.ReapVMs(); err != nil {
