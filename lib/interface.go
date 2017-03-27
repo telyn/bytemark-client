@@ -227,4 +227,5 @@ type Client interface {
 	CancelVMMigration(id int) error
 	EmptyStoragePool(idOrLabel string) error
 	EmptyHead(idOrLabel string) error
+	ReifyDisc(id int) error
 }

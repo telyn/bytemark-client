@@ -269,3 +269,13 @@ func (c *bytemarkClient) EmptyHead(idOrLabel string) (err error) {
 	_, _, err = r.Run(nil, nil)
 	return
 }
+
+func (c *bytemarkClient) ReifyDisc(id int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/discs/%s/reify", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}

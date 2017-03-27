@@ -457,3 +457,7 @@ func (c *Client) EmptyHead(idOrLabel string) error {
 	r := c.Called(idOrLabel)
 	return r.Error(0)
 }
+func (c *Client) ReifyDisc(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}

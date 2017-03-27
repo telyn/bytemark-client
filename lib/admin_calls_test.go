@@ -513,3 +513,9 @@ func TestPostEmptyHead(t *testing.T) {
 		return client.EmptyHead("head1")
 	})
 }
+
+func TestPostReifyDisc(t *testing.T) {
+	simplePostTest(t, "/admin/discs/1231/reify", ``, func(client Client) error {
+		return client.ReifyDisc(1231)
+	})
+}
