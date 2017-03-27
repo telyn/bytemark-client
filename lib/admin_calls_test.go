@@ -489,3 +489,15 @@ func TestPostCreateIPRange(t *testing.T) {
 		return client.CreateIPRange("192.168.1.1/24", 123)
 	})
 }
+
+func TestPostCancelDiscMigration(t *testing.T) {
+	simplePostTest(t, "/admin/discs/1234/cancel_migration", ``, func(client Client) error {
+		return client.CancelDiscMigration(1234)
+	})
+}
+
+func TestPostCancelVMMigration(t *testing.T) {
+	simplePostTest(t, "/admin/vms/1235/cancel_migration", ``, func(client Client) error {
+		return client.CancelVMMigration(1235)
+	})
+}

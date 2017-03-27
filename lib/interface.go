@@ -223,4 +223,6 @@ type Client interface {
 	DeleteVLAN(id int) error
 	AdminCreateGroup(name *GroupName, vlanNum int) error
 	CreateIPRange(ipRange string, vlanNum int) error
+	CancelDiscMigration(id int) error
+	CancelVMMigration(id int) error
 }

@@ -441,3 +441,11 @@ func (c *Client) CreateIPRange(ipRange string, vlanNum int) error {
 	r := c.Called(ipRange, vlanNum)
 	return r.Error(0)
 }
+func (c *Client) CancelDiscMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) CancelVMMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}

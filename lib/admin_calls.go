@@ -229,3 +229,23 @@ func (c *bytemarkClient) CreateIPRange(ipRange string, vlanNum int) (err error) 
 	_, _, err = r.MarshalAndRun(obj, nil)
 	return
 }
+
+func (c *bytemarkClient) CancelDiscMigration(id int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/discs/%s/cancel_migration", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) CancelVMMigration(id int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/cancel_migration", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
