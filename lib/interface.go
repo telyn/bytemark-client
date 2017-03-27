@@ -225,4 +225,6 @@ type Client interface {
 	CreateIPRange(ipRange string, vlanNum int) error
 	CancelDiscMigration(id int) error
 	CancelVMMigration(id int) error
+	EmptyStoragePool(idOrLabel string) error
+	EmptyHead(idOrLabel string) error
 }

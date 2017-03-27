@@ -249,3 +249,23 @@ func (c *bytemarkClient) CancelVMMigration(id int) (err error) {
 	_, _, err = r.Run(nil, nil)
 	return
 }
+
+func (c *bytemarkClient) EmptyStoragePool(idOrLabel string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/storage_pools/%s/empty", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) EmptyHead(idOrLabel string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/heads/%s/empty", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}

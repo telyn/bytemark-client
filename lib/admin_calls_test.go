@@ -501,3 +501,15 @@ func TestPostCancelVMMigration(t *testing.T) {
 		return client.CancelVMMigration(1235)
 	})
 }
+
+func TestPostEmptyStoragePool(t *testing.T) {
+	simplePostTest(t, "/admin/storage_pools/pool1/empty", ``, func(client Client) error {
+		return client.EmptyStoragePool("pool1")
+	})
+}
+
+func TestPostEmptyHead(t *testing.T) {
+	simplePostTest(t, "/admin/heads/head1/empty", ``, func(client Client) error {
+		return client.EmptyHead("head1")
+	})
+}
