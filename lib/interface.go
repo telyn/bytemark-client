@@ -219,4 +219,13 @@ type Client interface {
 	GetRecentVMs() ([]*brain.VirtualMachine, error)
 	MigrateDisc(disc int, newStoragePool string) error
 	MigrateVirtualMachine(vmName *VirtualMachineName, newHead string) error
+	ReapVMs() error
+	DeleteVLAN(id int) error
+	AdminCreateGroup(name *GroupName, vlanNum int) error
+	CreateIPRange(ipRange string, vlanNum int) error
+	CancelDiscMigration(id int) error
+	CancelVMMigration(id int) error
+	EmptyStoragePool(idOrLabel string) error
+	EmptyHead(idOrLabel string) error
+	ReifyDisc(id int) error
 }

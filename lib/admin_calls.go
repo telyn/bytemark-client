@@ -170,3 +170,112 @@ func (c *bytemarkClient) MigrateVirtualMachine(vmName *VirtualMachineName, newHe
 	_, _, err = r.MarshalAndRun(params, nil)
 	return
 }
+
+func (c *bytemarkClient) ReapVMs() (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/reap_vms")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/admin/vlans/%s", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) AdminCreateGroup(name *GroupName, vlanNum int) (err error) {
+	err = c.validateGroupName(name)
+	if err != nil {
+		return
+	}
+
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/groups")
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{
+		"account_spec": name.Account,
+		"group_name":   name.Group,
+	}
+
+	if vlanNum != 0 {
+		obj["vlan_num"] = vlanNum
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}
+
+func (c *bytemarkClient) CreateIPRange(ipRange string, vlanNum int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/ip_ranges")
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{
+		"ip_range": ipRange,
+		"vlan_num": vlanNum,
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}
+
+func (c *bytemarkClient) CancelDiscMigration(id int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/discs/%s/cancel_migration", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) CancelVMMigration(id int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/cancel_migration", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) EmptyStoragePool(idOrLabel string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/storage_pools/%s/empty", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) EmptyHead(idOrLabel string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/heads/%s/empty", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}
+
+func (c *bytemarkClient) ReifyDisc(id int) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/discs/%s/reify", strconv.Itoa(id))
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, nil)
+	return
+}

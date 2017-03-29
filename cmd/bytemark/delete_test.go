@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -112,4 +113,34 @@ func TestDeleteKey(t *testing.T) {
 		t.Fatal(err)
 	}
 	c.Reset()
+}
+
+func TestDeleteVLAN(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("ReapVMs").Return(nil).Times(1)
+
+	err := global.App.Run([]string{"bytemark", "reap", "servers"})
+
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteVLANError(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("ReapVMs").Return(fmt.Errorf("Could not delete VLAN")).Times(1)
+
+	err := global.App.Run([]string{"bytemark", "reap", "servers"})
+
+	is.NotNil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
 }

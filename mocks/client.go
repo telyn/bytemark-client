@@ -425,3 +425,39 @@ func (c *Client) MigrateVirtualMachine(vmName *lib.VirtualMachineName, newHead s
 	r := c.Called(vmName, newHead)
 	return r.Error(0)
 }
+func (c *Client) ReapVMs() error {
+	r := c.Called()
+	return r.Error(0)
+}
+func (c *Client) DeleteVLAN(id int) error {
+	r := c.Called()
+	return r.Error(0)
+}
+func (c *Client) AdminCreateGroup(name *lib.GroupName, vlanNum int) error {
+	r := c.Called(name, vlanNum)
+	return r.Error(0)
+}
+func (c *Client) CreateIPRange(ipRange string, vlanNum int) error {
+	r := c.Called(ipRange, vlanNum)
+	return r.Error(0)
+}
+func (c *Client) CancelDiscMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) CancelVMMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) EmptyStoragePool(idOrLabel string) error {
+	r := c.Called(idOrLabel)
+	return r.Error(0)
+}
+func (c *Client) EmptyHead(idOrLabel string) error {
+	r := c.Called(idOrLabel)
+	return r.Error(0)
+}
+func (c *Client) ReifyDisc(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}

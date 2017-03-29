@@ -10,6 +10,33 @@ import (
 )
 
 func init() {
+	adminCommands = append(adminCommands, cli.Command{
+		Name:   "delete",
+		Action: cli.ShowSubcommandHelp,
+		Subcommands: []cli.Command{
+			{
+				Name:      "vlan",
+				Usage:     "delete a given VLAN",
+				UsageText: "bytemark --admin delete vlan <id>",
+				Flags: []cli.Flag{
+					cli.IntFlag{
+						Name:  "id",
+						Usage: "the ID of the VLAN to delete",
+					},
+				},
+				Action: With(OptionalArgs("id"), RequiredFlags("id"), AuthProvider, func(c *Context) error {
+					if err := global.Client.DeleteVLAN(c.Int("id")); err != nil {
+						return err
+					}
+
+					log.Output("VLAN deleted")
+
+					return nil
+				}),
+			},
+		},
+	})
+
 	commands = append(commands, cli.Command{
 		Name:      "delete",
 		Usage:     "delete a given server, disc, group, account or key",

@@ -44,6 +44,33 @@ func simpleGetTest(t *testing.T, url string, testObject interface{}, runTest sim
 	}
 }
 
+type simpleDeleteTestFn func(Client) error
+
+func simpleDeleteTest(t *testing.T, url string, runTest simpleDeleteTestFn) {
+	callerPC, _, _, _ := runtime.Caller(1)
+	testName := runtime.FuncForPC(callerPC).Name()
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			url: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "DELETE")
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = runTest(client)
+	if err != nil {
+		t.Errorf("%s errored: %s", testName, err.Error())
+	}
+}
+
 type simplePostTestFn func(Client) error
 
 func simplePostTest(t *testing.T, url string, testBody string, runTest simplePostTestFn) {
@@ -431,4 +458,64 @@ func testPostMigrateVirtualMachine(t *testing.T, vm *brain.VirtualMachine, testB
 		t.Fatal(err)
 	}
 	return runTest(client)
+}
+
+func TestPostReapVMs(t *testing.T) {
+	simplePostTest(t, "/admin/reap_vms", "", func(client Client) error {
+		return client.ReapVMs()
+	})
+}
+
+func TestDeleteVLAN(t *testing.T) {
+	simpleDeleteTest(t, "/admin/vlans/123", func(client Client) error {
+		return client.DeleteVLAN(123)
+	})
+}
+
+func TestPostAdminCreateGroup(t *testing.T) {
+	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group"}`, func(client Client) error {
+		return client.AdminCreateGroup(&GroupName{Account: "test-account", Group: "test-group"}, 0)
+	})
+}
+
+func TestPostAdminCreateGroupWithVLANNum(t *testing.T) {
+	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group","vlan_num":12}`, func(client Client) error {
+		return client.AdminCreateGroup(&GroupName{Account: "test-account", Group: "test-group"}, 12)
+	})
+}
+
+func TestPostCreateIPRange(t *testing.T) {
+	simplePostTest(t, "/admin/ip_ranges", `{"ip_range":"192.168.1.1/24","vlan_num":123}`, func(client Client) error {
+		return client.CreateIPRange("192.168.1.1/24", 123)
+	})
+}
+
+func TestPostCancelDiscMigration(t *testing.T) {
+	simplePostTest(t, "/admin/discs/1234/cancel_migration", ``, func(client Client) error {
+		return client.CancelDiscMigration(1234)
+	})
+}
+
+func TestPostCancelVMMigration(t *testing.T) {
+	simplePostTest(t, "/admin/vms/1235/cancel_migration", ``, func(client Client) error {
+		return client.CancelVMMigration(1235)
+	})
+}
+
+func TestPostEmptyStoragePool(t *testing.T) {
+	simplePostTest(t, "/admin/storage_pools/pool1/empty", ``, func(client Client) error {
+		return client.EmptyStoragePool("pool1")
+	})
+}
+
+func TestPostEmptyHead(t *testing.T) {
+	simplePostTest(t, "/admin/heads/head1/empty", ``, func(client Client) error {
+		return client.EmptyHead("head1")
+	})
+}
+
+func TestPostReifyDisc(t *testing.T) {
+	simplePostTest(t, "/admin/discs/1231/reify", ``, func(client Client) error {
+		return client.ReifyDisc(1231)
+	})
 }
