@@ -17,7 +17,7 @@ func init() {
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "disc",
-						Usage: "the ID of the disc to migrate",
+						Usage: "the ID of the disc to reify",
 					},
 				},
 				Action: With(OptionalArgs("disc"), RequiredFlags("disc"), AuthProvider, func(c *Context) (err error) {
