@@ -512,22 +512,34 @@ func TestPostReifyDisc(t *testing.T) {
 }
 
 func TestPostApproveVM(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/134/approve", &brain.VirtualMachine{ID: 134}, `{}`, func(client Client) error {
+	err := testPostVirtualMachine(t, "/admin/vms/134/approve", &brain.VirtualMachine{ID: 134}, `{}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		return client.ApproveVM(&vmName, false)
 	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPostApproveVM")
+	}
 }
 
 func TestPostApproveVMAndPowerOn(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/145/approve", &brain.VirtualMachine{ID: 145}, `{"power_on":true}`, func(client Client) error {
+	err := testPostVirtualMachine(t, "/admin/vms/145/approve", &brain.VirtualMachine{ID: 145}, `{"power_on":true}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		return client.ApproveVM(&vmName, true)
 	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPostApproveVMAndPowerOn")
+	}
 }
 
 func TestPostRejectVM(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/139/reject", &brain.VirtualMachine{ID: 139}, `{"reason":"do not like the name"}`, func(client Client) error {
+	err := testPostVirtualMachine(t, "/admin/vms/139/reject", &brain.VirtualMachine{ID: 139}, `{"reason":"do not like the name"}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		return client.RejectVM(&vmName, "do not like the name")
 	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPostRejectVM")
+	}
 }
