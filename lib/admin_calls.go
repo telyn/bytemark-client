@@ -279,3 +279,42 @@ func (c *bytemarkClient) ReifyDisc(id int) (err error) {
 	_, _, err = r.Run(nil, nil)
 	return
 }
+
+func (c *bytemarkClient) ApproveVM(name *VirtualMachineName, powerOn bool) (err error) {
+	vm, err := c.GetVirtualMachine(name)
+	if err != nil {
+		return err
+	}
+
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/approve", strconv.Itoa(vm.ID))
+	if err != nil {
+		return
+	}
+
+	obj := map[string]bool{}
+	if powerOn {
+		obj["power_on"] = powerOn
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}
+
+func (c *bytemarkClient) RejectVM(name *VirtualMachineName, reason string) (err error) {
+	vm, err := c.GetVirtualMachine(name)
+	if err != nil {
+		return err
+	}
+
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/reject", strconv.Itoa(vm.ID))
+	if err != nil {
+		return
+	}
+
+	obj := map[string]string{
+		"reason": reason,
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}

@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
@@ -104,6 +103,44 @@ func simplePostTest(t *testing.T, url string, testBody string, runTest simplePos
 	if err != nil {
 		t.Errorf("%s errored: %s", testName, err.Error())
 	}
+}
+
+func testPostVirtualMachine(t *testing.T, endpoint string, vm *brain.VirtualMachine, testBody string, runTest simplePostTestFn) error {
+	is := is.New(t)
+
+	getVMEndpoint := "/accounts/def-account/groups/def-group/virtual_machines/def-name"
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			getVMEndpoint: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "GET")
+
+				if vm != nil {
+					writeJSON(t, wr, vm)
+				} else {
+					wr.WriteHeader(http.StatusNotFound)
+				}
+			},
+			endpoint: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "POST")
+
+				body, err := ioutil.ReadAll(r.Body)
+				is.Nil(err)
+				is.Nil(r.Body.Close())
+
+				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return runTest(client)
 }
 
 func TestGetVLANS(t *testing.T) {
@@ -382,7 +419,7 @@ func TestPostMigrateDiscWithoutNewStoragePool(t *testing.T) {
 }
 
 func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
-	err := testPostMigrateVirtualMachine(t, &brain.VirtualMachine{ID: 122}, `{"new_head_spec":"stg-h2"}`, func(client Client) error {
+	err := testPostVirtualMachine(t, "/admin/vms/122/migrate", &brain.VirtualMachine{ID: 122}, `{"new_head_spec":"stg-h2"}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		return client.MigrateVirtualMachine(&vmName, "stg-h2")
 	})
@@ -393,7 +430,7 @@ func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
 }
 
 func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
-	err := testPostMigrateVirtualMachine(t, &brain.VirtualMachine{ID: 121}, `{}`, func(client Client) error {
+	err := testPostVirtualMachine(t, "/admin/vms/121/migrate", &brain.VirtualMachine{ID: 121}, `{}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		return client.MigrateVirtualMachine(&vmName, "")
 	})
@@ -404,7 +441,7 @@ func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
 }
 
 func TestPostMigrateVirtualMachineInvalidVirtualMachineName(t *testing.T) {
-	err := testPostMigrateVirtualMachine(t, nil, `{}`, func(client Client) error {
+	err := testPostVirtualMachine(t, "/will-not-be-called", nil, `{}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		return client.MigrateVirtualMachine(&vmName, "")
 	})
@@ -412,52 +449,6 @@ func TestPostMigrateVirtualMachineInvalidVirtualMachineName(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expecting an error in TestPostMigrateVirtualMachineInvalidVirtualMachineName but didn't get one")
 	}
-}
-
-func testPostMigrateVirtualMachine(t *testing.T, vm *brain.VirtualMachine, testBody string, runTest simplePostTestFn) error {
-	is := is.New(t)
-
-	getVMEndpoint := "/accounts/def-account/groups/def-group/virtual_machines/def-name"
-
-	var postMigrateEndpoint string
-	if vm != nil {
-		postMigrateEndpoint = fmt.Sprintf("/admin/vms/%d/migrate", vm.ID)
-	} else {
-		// Doesn't really matter, won't get called
-		postMigrateEndpoint = "/admin/vms/0/migrate"
-	}
-
-	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
-		brain: Mux{
-			getVMEndpoint: func(wr http.ResponseWriter, r *http.Request) {
-				assertMethod(t, r, "GET")
-
-				if vm != nil {
-					writeJSON(t, wr, vm)
-				} else {
-					wr.WriteHeader(http.StatusNotFound)
-				}
-			},
-			postMigrateEndpoint: func(wr http.ResponseWriter, r *http.Request) {
-				assertMethod(t, r, "POST")
-
-				body, err := ioutil.ReadAll(r.Body)
-				is.Nil(err)
-				is.Nil(r.Body.Close())
-
-				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
-			},
-		},
-	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return runTest(client)
 }
 
 func TestPostReapVMs(t *testing.T) {
@@ -517,5 +508,26 @@ func TestPostEmptyHead(t *testing.T) {
 func TestPostReifyDisc(t *testing.T) {
 	simplePostTest(t, "/admin/discs/1231/reify", ``, func(client Client) error {
 		return client.ReifyDisc(1231)
+	})
+}
+
+func TestPostApproveVM(t *testing.T) {
+	testPostVirtualMachine(t, "/admin/vms/134/approve", &brain.VirtualMachine{ID: 134}, `{}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		return client.ApproveVM(&vmName, false)
+	})
+}
+
+func TestPostApproveVMAndPowerOn(t *testing.T) {
+	testPostVirtualMachine(t, "/admin/vms/145/approve", &brain.VirtualMachine{ID: 145}, `{"power_on":true}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		return client.ApproveVM(&vmName, true)
+	})
+}
+
+func TestPostRejectVM(t *testing.T) {
+	testPostVirtualMachine(t, "/admin/vms/139/reject", &brain.VirtualMachine{ID: 139}, `{"reason":"do not like the name"}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		return client.RejectVM(&vmName, "do not like the name")
 	})
 }

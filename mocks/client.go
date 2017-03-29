@@ -461,3 +461,11 @@ func (c *Client) ReifyDisc(id int) error {
 	r := c.Called(id)
 	return r.Error(0)
 }
+func (c *Client) ApproveVM(name *lib.VirtualMachineName, powerOn bool) error {
+	r := c.Called(name, powerOn)
+	return r.Error(0)
+}
+func (c *Client) RejectVM(name *lib.VirtualMachineName, reason string) error {
+	r := c.Called(name, reason)
+	return r.Error(0)
+}

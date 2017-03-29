@@ -228,4 +228,6 @@ type Client interface {
 	EmptyStoragePool(idOrLabel string) error
 	EmptyHead(idOrLabel string) error
 	ReifyDisc(id int) error
+	ApproveVM(name *VirtualMachineName, powerOn bool) error
+	RejectVM(name *VirtualMachineName, reason string) error
 }
