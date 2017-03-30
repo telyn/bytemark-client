@@ -26,7 +26,7 @@ func init() {
 						Usage: "The reason why the server is being rejected.",
 					},
 				},
-				Action: With(OptionalArgs("server", "reason"), RequiredFlags("server", "reason"), AuthProvider, func(c *Context) (err error) {
+				Action: With(OptionalArgs("server", "reason"), RequiredFlags("server", "reason"), AuthProvider, func(c *Context) error {
 					vm := c.VirtualMachineName("server")
 
 					if err := global.Client.RejectVM(&vm, c.String("reason")); err != nil {

@@ -17,6 +17,12 @@ import (
 var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
 var defGroup = lib.GroupName{Group: "default", Account: "default-account"}
 
+func init() {
+	// If we are testing, we want to override the OsExiter,
+	// so we can actually test errors returned from actions
+	cli.OsExiter = func(c int) {}
+}
+
 func TestEnsureAuth(t *testing.T) {
 	tt := []struct {
 		InputUsername             string

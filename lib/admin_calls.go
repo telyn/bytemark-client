@@ -332,3 +332,26 @@ func (c *bytemarkClient) RegradeDisc(disc int, newGrade string) (err error) {
 	_, _, err = r.MarshalAndRun(obj, nil)
 	return
 }
+
+func (c *bytemarkClient) UpdateVMMigration(name *VirtualMachineName, speed *int64, downtime *int) (err error) {
+	vm, err := c.GetVirtualMachine(name)
+	if err != nil {
+		return err
+	}
+
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/vms/%s/migrate", strconv.Itoa(vm.ID))
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{}
+	if speed != nil {
+		obj["migration_speed"] = *speed
+	}
+	if downtime != nil {
+		obj["migration_downtime"] = *downtime
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}

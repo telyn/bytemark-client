@@ -26,7 +26,7 @@ func init() {
 						Usage: "If set, powers on the server.",
 					},
 				},
-				Action: With(OptionalArgs("server", "power_on"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+				Action: With(OptionalArgs("server", "power_on"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
 					vm := c.VirtualMachineName("server")
 
 					if err := global.Client.ApproveVM(&vm, c.Bool("power_on")); err != nil {

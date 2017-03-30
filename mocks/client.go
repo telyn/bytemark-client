@@ -473,3 +473,7 @@ func (c *Client) RegradeDisc(disc int, newGrade string) error {
 	r := c.Called(disc, newGrade)
 	return r.Error(0)
 }
+func (c *Client) UpdateVMMigration(name *lib.VirtualMachineName, speed *int64, downtime *int) error {
+	r := c.Called(name, speed, downtime)
+	return r.Error(0)
+}

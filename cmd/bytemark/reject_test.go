@@ -31,7 +31,7 @@ func TestRejectVMError(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	rejectErr := fmt.Errorf("Error approving")
+	rejectErr := fmt.Errorf("Error rejecting")
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}
 	c.When("RejectVM", &vmName, "reason text").Return(rejectErr).Times(1)
 

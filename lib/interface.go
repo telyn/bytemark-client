@@ -231,4 +231,5 @@ type Client interface {
 	ApproveVM(name *VirtualMachineName, powerOn bool) error
 	RejectVM(name *VirtualMachineName, reason string) error
 	RegradeDisc(disc int, newGrade string) error
+	UpdateVMMigration(name *VirtualMachineName, speed *int64, downtime *int) error
 }

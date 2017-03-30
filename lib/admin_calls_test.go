@@ -105,6 +105,41 @@ func simplePostTest(t *testing.T, url string, testBody string, runTest simplePos
 	}
 }
 
+type simplePutTestFn func(Client) error
+
+func simplePutTest(t *testing.T, url string, testBody string, runTest simplePutTestFn) {
+	is := is.New(t)
+
+	callerPC, _, _, _ := runtime.Caller(1)
+	testName := runtime.FuncForPC(callerPC).Name()
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			url: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "PUT")
+
+				body, err := ioutil.ReadAll(r.Body)
+				is.Nil(err)
+				is.Nil(r.Body.Close())
+
+				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = runTest(client)
+	if err != nil {
+		t.Errorf("%s errored: %s", testName, err.Error())
+	}
+}
+
 func testPostVirtualMachine(t *testing.T, endpoint string, vm *brain.VirtualMachine, testBody string, runTest simplePostTestFn) error {
 	is := is.New(t)
 
@@ -123,6 +158,44 @@ func testPostVirtualMachine(t *testing.T, endpoint string, vm *brain.VirtualMach
 			},
 			endpoint: func(wr http.ResponseWriter, r *http.Request) {
 				assertMethod(t, r, "POST")
+
+				body, err := ioutil.ReadAll(r.Body)
+				is.Nil(err)
+				is.Nil(r.Body.Close())
+
+				is.Equal(strings.TrimSpace(string(body)), strings.TrimSpace(testBody))
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return runTest(client)
+}
+
+func testPutVirtualMachine(t *testing.T, endpoint string, vm *brain.VirtualMachine, testBody string, runTest simplePostTestFn) error {
+	is := is.New(t)
+
+	getVMEndpoint := "/accounts/def-account/groups/def-group/virtual_machines/def-name"
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			getVMEndpoint: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "GET")
+
+				if vm != nil {
+					writeJSON(t, wr, vm)
+				} else {
+					wr.WriteHeader(http.StatusNotFound)
+				}
+			},
+			endpoint: func(wr http.ResponseWriter, r *http.Request) {
+				assertMethod(t, r, "PUT")
 
 				body, err := ioutil.ReadAll(r.Body)
 				is.Nil(err)
@@ -518,7 +591,7 @@ func TestPostApproveVM(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Errorf("Not expecting an error in TestPostApproveVM")
+		t.Errorf("Not expecting an error in TestPostApproveVM: %v", err)
 	}
 }
 
@@ -529,7 +602,7 @@ func TestPostApproveVMAndPowerOn(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Errorf("Not expecting an error in TestPostApproveVMAndPowerOn")
+		t.Errorf("Not expecting an error in TestPostApproveVMAndPowerOn: %v", err)
 	}
 }
 
@@ -540,7 +613,7 @@ func TestPostRejectVM(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Errorf("Not expecting an error in TestPostRejectVM")
+		t.Errorf("Not expecting an error in TestPostRejectVM: %v", err)
 	}
 }
 
@@ -548,4 +621,56 @@ func TestPostRegradeDisc(t *testing.T) {
 	simplePostTest(t, "/admin/discs/1238/regrade", `{"new_grade":"newgrade"}`, func(client Client) error {
 		return client.RegradeDisc(1238, "newgrade")
 	})
+}
+
+func TestPutUpdateVMMigration(t *testing.T) {
+	err := testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+
+		return client.UpdateVMMigration(&vmName, nil, nil)
+	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPutUpdateVMMigration: %v", err)
+	}
+}
+
+func TestPutUpdateVMMigrationWithSpeed(t *testing.T) {
+	err := testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{"migration_speed":8500000000000}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		speed := int64(8500000000000)
+
+		return client.UpdateVMMigration(&vmName, &speed, nil)
+	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPutUpdateVMMigrationWithSpeed: %v", err)
+	}
+}
+
+func TestPutUpdateVMMigrationWithDowntime(t *testing.T) {
+	err := testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{"migration_downtime":15}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		downtime := 15
+
+		return client.UpdateVMMigration(&vmName, nil, &downtime)
+	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPutUpdateVMMigrationWithDowntime: %v", err)
+	}
+}
+
+func TestPutUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
+	err := testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{"migration_downtime":15,"migration_speed":8500000000000}`, func(client Client) error {
+		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		speed := int64(8500000000000)
+		downtime := 15
+
+		return client.UpdateVMMigration(&vmName, &speed, &downtime)
+	})
+
+	if err != nil {
+		t.Errorf("Not expecting an error in TestPutUpdateVMMigrationWithSpeedAndDowntime: %v", err)
+	}
 }
