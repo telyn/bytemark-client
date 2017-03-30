@@ -543,3 +543,9 @@ func TestPostRejectVM(t *testing.T) {
 		t.Errorf("Not expecting an error in TestPostRejectVM")
 	}
 }
+
+func TestPostRegradeDisc(t *testing.T) {
+	simplePostTest(t, "/admin/discs/1238/regrade", `{"new_grade":"newgrade"}`, func(client Client) error {
+		return client.RegradeDisc(1238, "newgrade")
+	})
+}

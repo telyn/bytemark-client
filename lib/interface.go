@@ -230,4 +230,5 @@ type Client interface {
 	ReifyDisc(id int) error
 	ApproveVM(name *VirtualMachineName, powerOn bool) error
 	RejectVM(name *VirtualMachineName, reason string) error
+	RegradeDisc(disc int, newGrade string) error
 }

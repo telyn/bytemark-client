@@ -318,3 +318,17 @@ func (c *bytemarkClient) RejectVM(name *VirtualMachineName, reason string) (err 
 	_, _, err = r.MarshalAndRun(obj, nil)
 	return
 }
+
+func (c *bytemarkClient) RegradeDisc(disc int, newGrade string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/discs/%s/regrade", strconv.Itoa(disc))
+	if err != nil {
+		return
+	}
+
+	obj := map[string]string{
+		"new_grade": newGrade,
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}

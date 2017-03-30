@@ -469,3 +469,7 @@ func (c *Client) RejectVM(name *lib.VirtualMachineName, reason string) error {
 	r := c.Called(name, reason)
 	return r.Error(0)
 }
+func (c *Client) RegradeDisc(disc int, newGrade string) error {
+	r := c.Called(disc, newGrade)
+	return r.Error(0)
+}
