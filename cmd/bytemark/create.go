@@ -14,7 +14,7 @@ func init() {
 		Name:   "create",
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
-			cli.Command{
+			{
 				Name:      "user",
 				Usage:     "creates a new cluster admin or cluster superuser",
 				UsageText: "bytemark --admin create user <username> <privilege>",
@@ -39,7 +39,7 @@ func init() {
 			{
 				Name:      "vlan_group",
 				Usage:     "creates groups for private VLANs",
-				UsageText: "bytemark create vlan_group <group> [vlan_num]",
+				UsageText: "bytemark --admin create vlan_group <group> [vlan_num]",
 				Description: `Create a group in the specified account, with an optional VLAN specified.
 
 Used when setting up a private VLAN for a customer.`,
@@ -63,10 +63,10 @@ Used when setting up a private VLAN for a customer.`,
 					return nil
 				}),
 			},
-			cli.Command{
+			{
 				Name:      "ip_range",
 				Usage:     "create a new IP range in a VLAN",
-				UsageText: "bytemark create ip_range <ip_range> <vlan_num>",
+				UsageText: "bytemark --admin create ip_range <ip_range> <vlan_num>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "ip_range",
