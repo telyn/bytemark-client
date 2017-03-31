@@ -481,3 +481,15 @@ func (c *Client) CreateUser(username string, privilege string) error {
 	r := c.Called(username, privilege)
 	return r.Error(0)
 }
+func (c *Client) UpdateHead(idOrLabel string, options *lib.UpdateHead) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateTail(idOrLabel string, options *lib.UpdateTail) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateStoragePool(idOrLabel string, options *lib.UpdateStoragePool) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}

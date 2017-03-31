@@ -6,6 +6,24 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+type UpdateHead struct {
+	UsageStrategy   *string
+	OvercommitRatio *int
+	Label           *string
+}
+
+type UpdateTail struct {
+	UsageStrategy   *string
+	OvercommitRatio *int
+	Label           *string
+}
+
+type UpdateStoragePool struct {
+	UsageStrategy   *string
+	OvercommitRatio *int
+	Label           *string
+}
+
 func (c *bytemarkClient) GetVLANs() (vlans []*brain.VLAN, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/vlans")
 	if err != nil {
@@ -365,6 +383,87 @@ func (c *bytemarkClient) CreateUser(username string, privilege string) (err erro
 	obj := map[string]string{
 		"username":  username,
 		"priv_spec": privilege,
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}
+
+func (c *bytemarkClient) UpdateHead(idOrLabel string, options *UpdateHead) (err error) {
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/heads/%s", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{}
+
+	if options.OvercommitRatio != nil {
+		obj["overcommit_ratio"] = *options.OvercommitRatio
+	}
+	if options.Label != nil {
+		obj["label"] = *options.Label
+	}
+	if options.UsageStrategy != nil {
+		// It is set, but we need to translate an empty string to nil
+		if *options.UsageStrategy == "" {
+			obj["usage_strategy"] = nil
+		} else {
+			obj["usage_strategy"] = *options.UsageStrategy
+		}
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}
+
+func (c *bytemarkClient) UpdateTail(idOrLabel string, options *UpdateTail) (err error) {
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/tails/%s", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{}
+
+	if options.OvercommitRatio != nil {
+		obj["overcommit_ratio"] = *options.OvercommitRatio
+	}
+	if options.Label != nil {
+		obj["label"] = *options.Label
+	}
+	if options.UsageStrategy != nil {
+		// It is set, but we need to translate an empty string to nil
+		if *options.UsageStrategy == "" {
+			obj["usage_strategy"] = nil
+		} else {
+			obj["usage_strategy"] = *options.UsageStrategy
+		}
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}
+
+func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options *UpdateStoragePool) (err error) {
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/storage_pools/%s", idOrLabel)
+	if err != nil {
+		return
+	}
+
+	obj := map[string]interface{}{}
+
+	if options.OvercommitRatio != nil {
+		obj["overcommit_ratio"] = *options.OvercommitRatio
+	}
+	if options.Label != nil {
+		obj["label"] = *options.Label
+	}
+	if options.UsageStrategy != nil {
+		// It is set, but we need to translate an empty string to nil
+		if *options.UsageStrategy == "" {
+			obj["usage_strategy"] = nil
+		} else {
+			obj["usage_strategy"] = *options.UsageStrategy
+		}
 	}
 
 	_, _, err = r.MarshalAndRun(obj, nil)

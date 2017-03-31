@@ -680,3 +680,69 @@ func TestPostCreateUser(t *testing.T) {
 		return client.CreateUser("user", "cluster_su")
 	})
 }
+
+func TestPostUpdateHead(t *testing.T) {
+	simplePutTest(t, "/admin/heads/stg-h1", `{"usage_strategy":"empty"}`, func(client Client) error {
+		v := "empty"
+		return client.UpdateHead("stg-h1", &UpdateHead{UsageStrategy: &v})
+	})
+
+	simplePutTest(t, "/admin/heads/stg-h1", `{"usage_strategy":null}`, func(client Client) error {
+		v := ""
+		return client.UpdateHead("stg-h1", &UpdateHead{UsageStrategy: &v})
+	})
+
+	simplePutTest(t, "/admin/heads/stg-h1", `{"overcommit_ratio":150}`, func(client Client) error {
+		v := 150
+		return client.UpdateHead("stg-h1", &UpdateHead{OvercommitRatio: &v})
+	})
+
+	simplePutTest(t, "/admin/heads/stg-h1", `{"label":"new-label"}`, func(client Client) error {
+		v := "new-label"
+		return client.UpdateHead("stg-h1", &UpdateHead{Label: &v})
+	})
+}
+
+func TestPostUpdateTail(t *testing.T) {
+	simplePutTest(t, "/admin/tails/stg-t2", `{"usage_strategy":"empty"}`, func(client Client) error {
+		v := "empty"
+		return client.UpdateTail("stg-t2", &UpdateTail{UsageStrategy: &v})
+	})
+
+	simplePutTest(t, "/admin/tails/stg-t2", `{"usage_strategy":null}`, func(client Client) error {
+		v := ""
+		return client.UpdateTail("stg-t2", &UpdateTail{UsageStrategy: &v})
+	})
+
+	simplePutTest(t, "/admin/tails/stg-t2", `{"overcommit_ratio":125}`, func(client Client) error {
+		v := 125
+		return client.UpdateTail("stg-t2", &UpdateTail{OvercommitRatio: &v})
+	})
+
+	simplePutTest(t, "/admin/tails/stg-t2", `{"label":"new-tail-label"}`, func(client Client) error {
+		v := "new-tail-label"
+		return client.UpdateTail("stg-t2", &UpdateTail{Label: &v})
+	})
+}
+
+func TestPostUpdateStoragePool(t *testing.T) {
+	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":"empty"}`, func(client Client) error {
+		v := "empty"
+		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{UsageStrategy: &v})
+	})
+
+	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":null}`, func(client Client) error {
+		v := ""
+		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{UsageStrategy: &v})
+	})
+
+	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"overcommit_ratio":115}`, func(client Client) error {
+		v := 115
+		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{OvercommitRatio: &v})
+	})
+
+	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"label":"t3-sata2"}`, func(client Client) error {
+		v := "t3-sata2"
+		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{Label: &v})
+	})
+}
