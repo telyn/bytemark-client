@@ -6,18 +6,21 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+// UpdateHead is a struct with all the possible settings that can be updated on a head
 type UpdateHead struct {
 	UsageStrategy   *string
 	OvercommitRatio *int
 	Label           *string
 }
 
+// UpdateTail is a struct with all the possible settings that can be updated on a tail
 type UpdateTail struct {
 	UsageStrategy   *string
 	OvercommitRatio *int
 	Label           *string
 }
 
+// UpdateStoragePool is a struct with all the possible settings that can be updated on a storage pool
 type UpdateStoragePool struct {
 	UsageStrategy   *string
 	OvercommitRatio *int
