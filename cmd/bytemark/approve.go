@@ -14,7 +14,7 @@ func init() {
 				Name:      "server",
 				Aliases:   []string{"vm"},
 				Usage:     "approve a server, and optionally power it on",
-				UsageText: "bytemark --admin approve server <name> [power_on]",
+				UsageText: "bytemark --admin approve server <name> [--power-on]",
 				Flags: []cli.Flag{
 					cli.GenericFlag{
 						Name:  "server",
@@ -22,14 +22,14 @@ func init() {
 						Value: new(VirtualMachineNameFlag),
 					},
 					cli.BoolFlag{
-						Name:  "power_on",
+						Name:  "power-on",
 						Usage: "If set, powers on the server.",
 					},
 				},
-				Action: With(OptionalArgs("server", "power_on"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+				Action: With(OptionalArgs("server", "power-on"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
 					vm := c.VirtualMachineName("server")
 
-					if err := global.Client.ApproveVM(&vm, c.Bool("power_on")); err != nil {
+					if err := global.Client.ApproveVM(&vm, c.Bool("power-on")); err != nil {
 						return err
 					}
 
