@@ -15,6 +15,28 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			cli.Command{
+				Name:      "user",
+				Usage:     "creates a new cluster admin or cluster superuser",
+				UsageText: "bytemark --admin create user <username> <privilege>",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "username",
+						Usage: "The username of the new user",
+					},
+					cli.StringFlag{
+						Name:  "privilege",
+						Usage: "The privilege to grant to the new user",
+					},
+				},
+				Action: With(OptionalArgs("username", "privilege"), RequiredFlags("username", "privilege"), AuthProvider, func(c *Context) error {
+					if err := global.Client.CreateUser(c.String("username"), c.String("privilege")); err != nil {
+						return err
+					}
+					log.Logf("User %s has been created with %s privileges\r\n", c.String("username"), c.String("privilege"))
+					return nil
+				}),
+			},
+			{
 				Name:      "vlan_group",
 				Usage:     "creates groups for private VLANs",
 				UsageText: "bytemark create vlan_group <group> [vlan_num]",

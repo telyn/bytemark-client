@@ -355,3 +355,18 @@ func (c *bytemarkClient) UpdateVMMigration(name *VirtualMachineName, speed *int6
 	_, _, err = r.MarshalAndRun(obj, nil)
 	return
 }
+
+func (c *bytemarkClient) CreateUser(username string, privilege string) (err error) {
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/users")
+	if err != nil {
+		return
+	}
+
+	obj := map[string]string{
+		"username":  username,
+		"priv_spec": privilege,
+	}
+
+	_, _, err = r.MarshalAndRun(obj, nil)
+	return
+}

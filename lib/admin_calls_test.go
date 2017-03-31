@@ -674,3 +674,9 @@ func TestPutUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 		t.Errorf("Not expecting an error in TestPutUpdateVMMigrationWithSpeedAndDowntime: %v", err)
 	}
 }
+
+func TestPostCreateUser(t *testing.T) {
+	simplePostTest(t, "/admin/users", `{"priv_spec":"cluster_su","username":"user"}`, func(client Client) error {
+		return client.CreateUser("user", "cluster_su")
+	})
+}

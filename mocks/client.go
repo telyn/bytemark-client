@@ -477,3 +477,7 @@ func (c *Client) UpdateVMMigration(name *lib.VirtualMachineName, speed *int64, d
 	r := c.Called(name, speed, downtime)
 	return r.Error(0)
 }
+func (c *Client) CreateUser(username string, privilege string) error {
+	r := c.Called(username, privilege)
+	return r.Error(0)
+}

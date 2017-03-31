@@ -232,4 +232,5 @@ type Client interface {
 	RejectVM(name *VirtualMachineName, reason string) error
 	RegradeDisc(disc int, newGrade string) error
 	UpdateVMMigration(name *VirtualMachineName, speed *int64, downtime *int) error
+	CreateUser(username string, privilege string) error
 }
