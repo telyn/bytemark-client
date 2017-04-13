@@ -7,9 +7,9 @@ import (
 
 // Disc is a representation of a VM's disc.
 type Disc struct {
-	Label        string `json:"label"`
-	StorageGrade string `json:"storage_grade"`
-	Size         int    `json:"size"`
+	Label        string `json:"label",omitempty`
+	StorageGrade string `json:"storage_grade",omitempty`
+	Size         int    `json:"size",omitempty`
 
 	ID               int    `json:"id,omitempty"`
 	VirtualMachineID int    `json:"virtual_machine_id,omitempty"`
