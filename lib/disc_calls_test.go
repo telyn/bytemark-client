@@ -7,6 +7,7 @@ import (
 	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"testing"
 )
 
@@ -129,15 +130,21 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestResizeDisc(t *testing.T) {
 	is := is.New(t)
+	expectedDisc := map[string]interface{}{
+		"size": 35.0, // json library treats all numbers as float64
+	}
 	client, servers, err := mkTestClientAndServers(t, Handlers{
 		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/accounts/account/groups/group/virtual_machines/vm/discs/666" {
 				bytes, err := ioutil.ReadAll(req.Body)
 				is.Nil(err)
-				var disc brain.Disc
-				err = json.Unmarshal(bytes, &disc)
+				var actualDisc map[string]interface{}
+				err = json.Unmarshal(bytes, &actualDisc)
 				is.Nil(err)
 				// TODO check that we send the right stuff
+				if !reflect.DeepEqual(actualDisc, expectedDisc) {
+					t.Errorf("Resize disc request wasn't as expected.\r\nExpected: %#v\r\nActual: %#v", expectedDisc, actualDisc)
+				}
 			} else if req.URL.Path == "/accounts/invalid-account" {
 				http.NotFound(w, req)
 			} else {
