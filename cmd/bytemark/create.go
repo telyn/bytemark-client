@@ -29,6 +29,7 @@ func init() {
 					},
 				},
 				Action: With(OptionalArgs("username", "privilege"), RequiredFlags("username", "privilege"), AuthProvider, func(c *Context) error {
+					// Privilege is just a string and not a PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
 					if err := global.Client.CreateUser(c.String("username"), c.String("privilege")); err != nil {
 						return err
 					}
