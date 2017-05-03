@@ -52,7 +52,7 @@ func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner *billing.Person) (
 }
 
 // CreateCreditCard creates a credit card on SPP using the given token. Tokens must be acquired by using GetSPPToken or GetSPPTokenWithAccount first.
-func (c *bytemarkClient) CreateCreditCardWithToken(cc *spp.CreditCard, token string) (ref string, err error) {
+func (c *bytemarkClient) CreateCreditCardWithToken(cc spp.CreditCard, token string) (ref string, err error) {
 	req, err := c.BuildRequestNoAuth("POST", SPPEndpoint, "/card.ref")
 	if err != nil {
 		return
@@ -81,8 +81,8 @@ func (c *bytemarkClient) CreateCreditCardWithToken(cc *spp.CreditCard, token str
 }
 
 // CreateCreditCard creates a credit card on SPP. It uses GetSPPToken to get a token.
-func (c *bytemarkClient) CreateCreditCard(cc *spp.CreditCard) (ref string, err error) {
-	token, err := c.GetSPPToken(*cc, nil)
+func (c *bytemarkClient) CreateCreditCard(cc spp.CreditCard) (ref string, err error) {
+	token, err := c.GetSPPToken(cc, nil)
 	if err != nil {
 		return
 	}

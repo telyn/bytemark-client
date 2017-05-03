@@ -494,7 +494,7 @@ func TestPostMigrateDiscWithoutNewStoragePool(t *testing.T) {
 func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
 	err := testPostVirtualMachine(t, "/admin/vms/122/migrate", &brain.VirtualMachine{ID: 122}, `{"new_head_spec":"stg-h2"}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.MigrateVirtualMachine(&vmName, "stg-h2")
+		return client.MigrateVirtualMachine(vmName, "stg-h2")
 	})
 
 	if err != nil {
@@ -505,7 +505,7 @@ func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
 func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
 	err := testPostVirtualMachine(t, "/admin/vms/121/migrate", &brain.VirtualMachine{ID: 121}, `{}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.MigrateVirtualMachine(&vmName, "")
+		return client.MigrateVirtualMachine(vmName, "")
 	})
 
 	if err != nil {
@@ -516,7 +516,7 @@ func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
 func TestPostMigrateVirtualMachineInvalidVirtualMachineName(t *testing.T) {
 	err := testPostVirtualMachine(t, "/will-not-be-called", nil, `{}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.MigrateVirtualMachine(&vmName, "")
+		return client.MigrateVirtualMachine(vmName, "")
 	})
 
 	if err == nil {
@@ -538,13 +538,13 @@ func TestDeleteVLAN(t *testing.T) {
 
 func TestPostAdminCreateGroup(t *testing.T) {
 	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group"}`, func(client Client) error {
-		return client.AdminCreateGroup(&GroupName{Account: "test-account", Group: "test-group"}, 0)
+		return client.AdminCreateGroup(GroupName{Account: "test-account", Group: "test-group"}, 0)
 	})
 }
 
 func TestPostAdminCreateGroupWithVLANNum(t *testing.T) {
 	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group","vlan_num":12}`, func(client Client) error {
-		return client.AdminCreateGroup(&GroupName{Account: "test-account", Group: "test-group"}, 12)
+		return client.AdminCreateGroup(GroupName{Account: "test-account", Group: "test-group"}, 12)
 	})
 }
 
@@ -587,7 +587,7 @@ func TestPostReifyDisc(t *testing.T) {
 func TestPostApproveVM(t *testing.T) {
 	err := testPostVirtualMachine(t, "/admin/vms/134/approve", &brain.VirtualMachine{ID: 134}, `{}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.ApproveVM(&vmName, false)
+		return client.ApproveVM(vmName, false)
 	})
 
 	if err != nil {
@@ -598,7 +598,7 @@ func TestPostApproveVM(t *testing.T) {
 func TestPostApproveVMAndPowerOn(t *testing.T) {
 	err := testPostVirtualMachine(t, "/admin/vms/145/approve", &brain.VirtualMachine{ID: 145}, `{"power_on":true}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.ApproveVM(&vmName, true)
+		return client.ApproveVM(vmName, true)
 	})
 
 	if err != nil {
@@ -609,7 +609,7 @@ func TestPostApproveVMAndPowerOn(t *testing.T) {
 func TestPostRejectVM(t *testing.T) {
 	err := testPostVirtualMachine(t, "/admin/vms/139/reject", &brain.VirtualMachine{ID: 139}, `{"reason":"do not like the name"}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.RejectVM(&vmName, "do not like the name")
+		return client.RejectVM(vmName, "do not like the name")
 	})
 
 	if err != nil {
@@ -627,7 +627,7 @@ func TestPutUpdateVMMigration(t *testing.T) {
 	err := testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{}`, func(client Client) error {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 
-		return client.UpdateVMMigration(&vmName, nil, nil)
+		return client.UpdateVMMigration(vmName, nil, nil)
 	})
 
 	if err != nil {
@@ -640,7 +640,7 @@ func TestPutUpdateVMMigrationWithSpeed(t *testing.T) {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		speed := int64(8500000000000)
 
-		return client.UpdateVMMigration(&vmName, &speed, nil)
+		return client.UpdateVMMigration(vmName, &speed, nil)
 	})
 
 	if err != nil {
@@ -653,7 +653,7 @@ func TestPutUpdateVMMigrationWithDowntime(t *testing.T) {
 		vmName := VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
 		downtime := 15
 
-		return client.UpdateVMMigration(&vmName, nil, &downtime)
+		return client.UpdateVMMigration(vmName, nil, &downtime)
 	})
 
 	if err != nil {
@@ -667,7 +667,7 @@ func TestPutUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 		speed := int64(8500000000000)
 		downtime := 15
 
-		return client.UpdateVMMigration(&vmName, &speed, &downtime)
+		return client.UpdateVMMigration(vmName, &speed, &downtime)
 	})
 
 	if err != nil {
@@ -684,65 +684,65 @@ func TestPostCreateUser(t *testing.T) {
 func TestPostUpdateHead(t *testing.T) {
 	simplePutTest(t, "/admin/heads/stg-h1", `{"usage_strategy":"empty"}`, func(client Client) error {
 		v := "empty"
-		return client.UpdateHead("stg-h1", &UpdateHead{UsageStrategy: &v})
+		return client.UpdateHead("stg-h1", UpdateHead{UsageStrategy: &v})
 	})
 
 	simplePutTest(t, "/admin/heads/stg-h1", `{"usage_strategy":null}`, func(client Client) error {
 		v := ""
-		return client.UpdateHead("stg-h1", &UpdateHead{UsageStrategy: &v})
+		return client.UpdateHead("stg-h1", UpdateHead{UsageStrategy: &v})
 	})
 
 	simplePutTest(t, "/admin/heads/stg-h1", `{"overcommit_ratio":150}`, func(client Client) error {
 		v := 150
-		return client.UpdateHead("stg-h1", &UpdateHead{OvercommitRatio: &v})
+		return client.UpdateHead("stg-h1", UpdateHead{OvercommitRatio: &v})
 	})
 
 	simplePutTest(t, "/admin/heads/stg-h1", `{"label":"new-label"}`, func(client Client) error {
 		v := "new-label"
-		return client.UpdateHead("stg-h1", &UpdateHead{Label: &v})
+		return client.UpdateHead("stg-h1", UpdateHead{Label: &v})
 	})
 }
 
 func TestPostUpdateTail(t *testing.T) {
 	simplePutTest(t, "/admin/tails/stg-t2", `{"usage_strategy":"empty"}`, func(client Client) error {
 		v := "empty"
-		return client.UpdateTail("stg-t2", &UpdateTail{UsageStrategy: &v})
+		return client.UpdateTail("stg-t2", UpdateTail{UsageStrategy: &v})
 	})
 
 	simplePutTest(t, "/admin/tails/stg-t2", `{"usage_strategy":null}`, func(client Client) error {
 		v := ""
-		return client.UpdateTail("stg-t2", &UpdateTail{UsageStrategy: &v})
+		return client.UpdateTail("stg-t2", UpdateTail{UsageStrategy: &v})
 	})
 
 	simplePutTest(t, "/admin/tails/stg-t2", `{"overcommit_ratio":125}`, func(client Client) error {
 		v := 125
-		return client.UpdateTail("stg-t2", &UpdateTail{OvercommitRatio: &v})
+		return client.UpdateTail("stg-t2", UpdateTail{OvercommitRatio: &v})
 	})
 
 	simplePutTest(t, "/admin/tails/stg-t2", `{"label":"new-tail-label"}`, func(client Client) error {
 		v := "new-tail-label"
-		return client.UpdateTail("stg-t2", &UpdateTail{Label: &v})
+		return client.UpdateTail("stg-t2", UpdateTail{Label: &v})
 	})
 }
 
 func TestPostUpdateStoragePool(t *testing.T) {
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":"empty"}`, func(client Client) error {
 		v := "empty"
-		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{UsageStrategy: &v})
+		return client.UpdateStoragePool("t3-sata1", UpdateStoragePool{UsageStrategy: &v})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":null}`, func(client Client) error {
 		v := ""
-		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{UsageStrategy: &v})
+		return client.UpdateStoragePool("t3-sata1", UpdateStoragePool{UsageStrategy: &v})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"overcommit_ratio":115}`, func(client Client) error {
 		v := 115
-		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{OvercommitRatio: &v})
+		return client.UpdateStoragePool("t3-sata1", UpdateStoragePool{OvercommitRatio: &v})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"label":"t3-sata2"}`, func(client Client) error {
 		v := "t3-sata2"
-		return client.UpdateStoragePool("t3-sata1", &UpdateStoragePool{Label: &v})
+		return client.UpdateStoragePool("t3-sata1", UpdateStoragePool{Label: &v})
 	})
 }

@@ -70,7 +70,7 @@ func (c *bytemarkClient) CreateAccount(account *Account) (newAccount *Account, e
 
 // RegisterNewAccount registers a new account with bmbilling. This will create a new user for the owner.
 // If you would like an extra account attached to your regular user, use CreateAccount
-func (c *bytemarkClient) RegisterNewAccount(acc *Account) (newAcc *Account, err error) {
+func (c *bytemarkClient) RegisterNewAccount(acc Account) (newAcc *Account, err error) {
 	req, err := c.BuildRequestNoAuth("POST", BillingEndpoint, "/api/v1/accounts")
 	if err != nil {
 		return nil, err

@@ -293,7 +293,7 @@ func TestRegisterNewAccount(t *testing.T) {
 		Phone:     "735773577357",
 	}
 
-	newAcc, err := client.RegisterNewAccount(&Account{
+	newAcc, err := client.RegisterNewAccount(Account{
 		Owner:         &person,
 		CardReference: "testxq12e",
 	})

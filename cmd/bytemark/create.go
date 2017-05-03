@@ -57,7 +57,7 @@ Used when setting up a private VLAN for a customer.`,
 				},
 				Action: With(OptionalArgs("group", "vlan_num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
 					gp := c.GroupName("group")
-					if err := global.Client.AdminCreateGroup(&gp, c.Int("vlan_num")); err != nil {
+					if err := global.Client.AdminCreateGroup(gp, c.Int("vlan_num")); err != nil {
 						return err
 					}
 					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
@@ -241,7 +241,7 @@ func createDiscs(c *Context) (err error) {
 	log.Logf("Adding %d discs to %s:\r\n", len(discs), vmName)
 	for _, d := range discs {
 		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
-		err := global.Client.CreateDisc(&vmName, d)
+		err := global.Client.CreateDisc(vmName, d)
 		if err != nil {
 			log.Errorf("failure! %v\r\n", err.Error())
 		} else {
@@ -253,7 +253,7 @@ func createDiscs(c *Context) (err error) {
 
 func createGroup(c *Context) (err error) {
 	gp := c.GroupName("group")
-	err = global.Client.CreateGroup(&gp)
+	err = global.Client.CreateGroup(gp)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
 	}
@@ -333,15 +333,11 @@ func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error)
 		return
 	}
 
-	if noImage {
-		imageInstall = nil
-	}
-
 	stopped := c.Bool("stopped")
 	cdrom := c.String("cdrom")
 
-	// if stopped isn't set and either cdrom or image are set, start the server
-	autoreboot := !stopped && ((imageInstall != nil) || (cdrom != ""))
+	// if stopped isn't set and a CDROM or image are present, start the server
+	autoreboot := !stopped && (!noImage || cdrom != "")
 
 	spec = brain.VirtualMachineSpec{
 		VirtualMachine: &brain.VirtualMachine{
@@ -356,7 +352,10 @@ func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error)
 		},
 		Discs:   discs,
 		IPs:     ipspec,
-		Reimage: imageInstall,
+		Reimage: &imageInstall,
+	}
+	if noImage {
+		spec.Reimage = nil
 	}
 	return
 }
@@ -386,7 +385,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return err
 	}
-	vm, err := global.Client.GetVirtualMachine(&name)
+	vm, err := global.Client.GetVirtualMachine(name)
 	if err != nil {
 		return
 	}

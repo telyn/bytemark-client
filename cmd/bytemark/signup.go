@@ -102,13 +102,13 @@ If you have previously used the client, you'll have a login and will need to add
 					return err
 				}
 
-				cardRef, err = global.Client.CreateCreditCardWithToken(&card, token)
+				cardRef, err = global.Client.CreateCreditCardWithToken(card, token)
 				if err != nil {
 					return err
 				}
 			}
 			account.CardReference = cardRef
-			createdAccount, err := global.Client.RegisterNewAccount(&account)
+			createdAccount, err := global.Client.RegisterNewAccount(account)
 
 			if _, ok := err.(lib.AccountCreationDeferredError); ok {
 				log.Log(err.Error())

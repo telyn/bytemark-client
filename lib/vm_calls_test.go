@@ -124,7 +124,7 @@ func TestMoveVirtualMachine(t *testing.T) {
 	newName := oldName
 	newName.VirtualMachine = "new-name"
 
-	err = client.MoveVirtualMachine(&oldName, &newName)
+	err = client.MoveVirtualMachine(oldName, newName)
 	if err != nil {
 		t.Log(err.Error())
 	}
@@ -179,7 +179,7 @@ func TestMoveServerGroup(t *testing.T) {
 	newName.VirtualMachine = "new-name"
 	newName.Group = "new-group"
 
-	err = client.MoveVirtualMachine(&oldName, &newName)
+	err = client.MoveVirtualMachine(oldName, newName)
 	if err != nil {
 		t.Log(err.Error())
 	}
@@ -215,21 +215,21 @@ func TestGetVirtualMachine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	vm, err := client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
+	vm, err := client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
 	is.Nil(vm)
 	is.NotNil(err)
 	if _, ok := err.(BadNameError); !ok {
 		t.Fatalf("Expected BadNameError, got %T", err)
 	}
 
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
 	is.NotNil(err)
 
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
 	is.NotNil(vm)
 	is.Nil(err)
 
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
 	is.NotNil(vm)
 	is.Nil(err)
 
@@ -350,7 +350,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 		}
 
 		group := GroupName{Group: "test-group", Account: "test-account"}
-		_, err = client.CreateVirtualMachine(&group, test.Input)
+		_, err = client.CreateVirtualMachine(group, test.Input)
 		if err != nil && !test.ExpectErr {
 			t.Fatal(err)
 		}
@@ -398,7 +398,7 @@ func TestSetVirtualMachineCDROM(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = client.SetVirtualMachineCDROM(&VirtualMachineName{
+	err = client.SetVirtualMachineCDROM(VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account",

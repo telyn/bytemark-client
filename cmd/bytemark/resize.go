@@ -53,7 +53,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					return util.UserRequestedExit{}
 				}
 
-				err = global.Client.ResizeDisc(&vmName, c.String("disc"), newSize)
+				err = global.Client.ResizeDisc(vmName, c.String("disc"), newSize)
 				if err != nil {
 					log.Logf("Failed!\r\n")
 					return

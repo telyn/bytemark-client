@@ -8,8 +8,8 @@ import (
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
-func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.VirtualMachineSpec) (vm *brain.VirtualMachine, err error) {
-	err = c.validateGroupName(group)
+func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.VirtualMachineSpec) (vm *brain.VirtualMachine, err error) {
+	err = c.validateGroupName(&group)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,8 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.Virtu
 
 // DeleteVirtualMachine deletes the named virtual machine.
 // returns nil on success or an error otherwise.
-func (c *bytemarkClient) DeleteVirtualMachine(name *VirtualMachineName, purge bool) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -65,8 +65,8 @@ func (c *bytemarkClient) DeleteVirtualMachine(name *VirtualMachineName, purge bo
 }
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *brain.VirtualMachine, err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm *brain.VirtualMachine, err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return
 	}
@@ -84,12 +84,12 @@ func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *brain.
 }
 
 //MoveVirtualMachine moves the virtual machine to the given name, across groups if needed.
-func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName *VirtualMachineName) (err error) {
-	err = c.validateVirtualMachineName(oldName)
+func (c *bytemarkClient) MoveVirtualMachine(oldName VirtualMachineName, newName VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&oldName)
 	if err != nil {
 		return
 	}
-	err = c.validateVirtualMachineName(newName)
+	err = c.validateVirtualMachineName(&newName)
 	if err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 	if newName.Group != "" || newName.Account != "" {
 		// get group
 		groupName := GroupName{Group: newName.Group, Account: newName.Account}
-		group, groupErr := c.GetGroup(&groupName)
+		group, groupErr := c.GetGroup(groupName)
 		if groupErr != nil {
 			return groupErr
 		}
@@ -119,8 +119,8 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 
 // ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 // Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
-func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *brain.ImageInstall) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) ReimageVirtualMachine(name VirtualMachineName, image brain.ImageInstall) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -139,8 +139,8 @@ func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *
 // ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
 // button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
 // returns nil on success or an error otherwise.
-func (c *bytemarkClient) ResetVirtualMachine(name *VirtualMachineName) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) ResetVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -155,8 +155,8 @@ func (c *bytemarkClient) ResetVirtualMachine(name *VirtualMachineName) (err erro
 
 // RestartVirtualMachine restarts the named virtual machine. This is
 // returns nil on success or an error otherwise.
-func (c *bytemarkClient) RestartVirtualMachine(name *VirtualMachineName) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) RestartVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -171,8 +171,8 @@ func (c *bytemarkClient) RestartVirtualMachine(name *VirtualMachineName) (err er
 
 // StartVirtualMachine starts the named virtual machine.
 // returns nil on success or an error otherwise.
-func (c *bytemarkClient) StartVirtualMachine(name *VirtualMachineName) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) StartVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -187,8 +187,8 @@ func (c *bytemarkClient) StartVirtualMachine(name *VirtualMachineName) (err erro
 
 // StopVirtualMachine starts the named virtual machine.
 // returns nil on success or an error otherwise.
-func (c *bytemarkClient) StopVirtualMachine(name *VirtualMachineName) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) StopVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -203,8 +203,8 @@ func (c *bytemarkClient) StopVirtualMachine(name *VirtualMachineName) (err error
 
 // ShutdownVirtualMachine sends an ACPI shutdown to the VM. This will cause a graceful shutdown of the machine
 // returns nil on success or an error otherwise.
-func (c *bytemarkClient) ShutdownVirtualMachine(name *VirtualMachineName, stayoff bool) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return
 	}
@@ -231,8 +231,8 @@ func (c *bytemarkClient) ShutdownVirtualMachine(name *VirtualMachineName, stayof
 
 // UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 // Return nil on success, an error otherwise.
-func (c *bytemarkClient) UndeleteVirtualMachine(name *VirtualMachineName) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) UndeleteVirtualMachine(name VirtualMachineName) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -247,8 +247,8 @@ func (c *bytemarkClient) UndeleteVirtualMachine(name *VirtualMachineName) (err e
 
 // SetVirtualMachineHardwareProfile specifies the hardware profile on a VM. Optionally locks or unlocks h. profile
 // Return nil on success, an error otherwise.
-func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name *VirtualMachineName, profile string, locked ...bool) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name VirtualMachineName, profile string, locked ...bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -271,8 +271,8 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name *VirtualMachineNa
 
 // SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
 // Return nil on success, an error otherwise.
-func (c *bytemarkClient) SetVirtualMachineHardwareProfileLock(name *VirtualMachineName, locked bool) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) SetVirtualMachineHardwareProfileLock(name VirtualMachineName, locked bool) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -292,8 +292,8 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfileLock(name *VirtualMachi
 
 // SetVirtualMachineMemory sets the RAM available to a virtual machine in megabytes
 // Return nil on success, an error otherwise.
-func (c *bytemarkClient) SetVirtualMachineMemory(name *VirtualMachineName, memory int) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) SetVirtualMachineMemory(name VirtualMachineName, memory int) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -310,8 +310,8 @@ func (c *bytemarkClient) SetVirtualMachineMemory(name *VirtualMachineName, memor
 
 // SetVirtualMachineCores sets the number of CPUs available to a virtual machine
 // Return nil on success, an error otherwise.
-func (c *bytemarkClient) SetVirtualMachineCores(name *VirtualMachineName, cores int) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) SetVirtualMachineCores(name VirtualMachineName, cores int) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}
@@ -328,8 +328,8 @@ func (c *bytemarkClient) SetVirtualMachineCores(name *VirtualMachineName, cores 
 
 // SetVirtualMachineCDROM sets the URL of a CD to attach to a virtual machine. Set url to "" to remove the CD.
 // Returns nil on success, an error otherwise.
-func (c *bytemarkClient) SetVirtualMachineCDROM(name *VirtualMachineName, url string) (err error) {
-	err = c.validateVirtualMachineName(name)
+func (c *bytemarkClient) SetVirtualMachineCDROM(name VirtualMachineName, url string) (err error) {
+	err = c.validateVirtualMachineName(&name)
 	if err != nil {
 		return err
 	}

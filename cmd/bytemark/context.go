@@ -161,7 +161,7 @@ func (c *Context) ResizeFlag(flagname string) ResizeFlag {
 func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
 	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
 	if !ok {
-		return *global.Config.GetVirtualMachine()
+		return global.Config.GetVirtualMachine()
 	}
 	return lib.VirtualMachineName(*vmNameFlag)
 }

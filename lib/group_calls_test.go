@@ -49,7 +49,7 @@ func TestCreateGroup(t *testing.T) {
 	err = client.AuthWithCredentials(map[string]string{})
 	is.Nil(err)
 
-	err = client.CreateGroup(&GroupName{Group: "invalid-group", Account: "account"})
+	err = client.CreateGroup(GroupName{Group: "invalid-group", Account: "account"})
 	is.Nil(err)
 }
 
@@ -85,7 +85,7 @@ func TestDeleteGroup(t *testing.T) {
 	err = client.AuthWithCredentials(map[string]string{})
 
 	is.Nil(err)
-	err = client.DeleteGroup(&GroupName{Group: "default", Account: "account"})
+	err = client.DeleteGroup(GroupName{Group: "default", Account: "account"})
 	is.Nil(err)
 
 }
@@ -131,11 +131,11 @@ func TestGetGroup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	group, err := client.GetGroup(&GroupName{Group: "invalid-group", Account: "account"})
+	group, err := client.GetGroup(GroupName{Group: "invalid-group", Account: "account"})
 	is.NotNil(err)
 	is.Equal("", group.Name)
 
-	group, err = client.GetGroup(&GroupName{Group: "default", Account: "account"})
+	group, err = client.GetGroup(GroupName{Group: "default", Account: "account"})
 	is.NotNil(group)
 	is.Nil(err)
 
@@ -155,7 +155,7 @@ func TestGetGroup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	group, err = client.GetGroup(&GroupName{Group: "", Account: ""})
+	group, err = client.GetGroup(GroupName{Group: "", Account: ""})
 	is.NotNil(group)
 	is.Nil(err)
 }

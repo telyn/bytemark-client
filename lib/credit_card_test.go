@@ -182,7 +182,7 @@ func TestCreateCreditCard(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ref, err := client.CreateCreditCard(&testCard)
+	ref, err := client.CreateCreditCard(testCard)
 
 	if err != nil {
 		t.Fatal(err)

@@ -53,7 +53,7 @@ Defaults to connecting to the serial console for the given server.`,
 				return ctx.Help("You must only specify one of --serial and --panel!")
 			}
 
-			vm, err := global.Client.GetVirtualMachine(&vmName)
+			vm, err := global.Client.GetVirtualMachine(vmName)
 			if err != nil {
 				return
 			}

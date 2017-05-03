@@ -123,7 +123,7 @@ func init() {
 					Contiguous: c.Bool("contiguous"),
 				}
 				vmName := c.VirtualMachineName("server")
-				ips, err := global.Client.AddIP(&vmName, &ipcr)
+				ips, err := global.Client.AddIP(vmName, ipcr)
 				if err != nil {
 					return err
 				}

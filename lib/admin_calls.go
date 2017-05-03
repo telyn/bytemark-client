@@ -172,7 +172,7 @@ func (c *bytemarkClient) MigrateDisc(disc int, newStoragePool string) (err error
 	return
 }
 
-func (c *bytemarkClient) MigrateVirtualMachine(vmName *VirtualMachineName, newHead string) (err error) {
+func (c *bytemarkClient) MigrateVirtualMachine(vmName VirtualMachineName, newHead string) (err error) {
 	vm, err := c.GetVirtualMachine(vmName)
 	if err != nil {
 		return err
@@ -212,8 +212,8 @@ func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
 	return
 }
 
-func (c *bytemarkClient) AdminCreateGroup(name *GroupName, vlanNum int) (err error) {
-	err = c.validateGroupName(name)
+func (c *bytemarkClient) AdminCreateGroup(name GroupName, vlanNum int) (err error) {
+	err = c.validateGroupName(&name)
 	if err != nil {
 		return
 	}
@@ -301,7 +301,7 @@ func (c *bytemarkClient) ReifyDisc(id int) (err error) {
 	return
 }
 
-func (c *bytemarkClient) ApproveVM(name *VirtualMachineName, powerOn bool) (err error) {
+func (c *bytemarkClient) ApproveVM(name VirtualMachineName, powerOn bool) (err error) {
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return err
@@ -321,7 +321,7 @@ func (c *bytemarkClient) ApproveVM(name *VirtualMachineName, powerOn bool) (err 
 	return
 }
 
-func (c *bytemarkClient) RejectVM(name *VirtualMachineName, reason string) (err error) {
+func (c *bytemarkClient) RejectVM(name VirtualMachineName, reason string) (err error) {
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return err
@@ -354,7 +354,7 @@ func (c *bytemarkClient) RegradeDisc(disc int, newGrade string) (err error) {
 	return
 }
 
-func (c *bytemarkClient) UpdateVMMigration(name *VirtualMachineName, speed *int64, downtime *int) (err error) {
+func (c *bytemarkClient) UpdateVMMigration(name VirtualMachineName, speed *int64, downtime *int) (err error) {
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return err
@@ -392,7 +392,7 @@ func (c *bytemarkClient) CreateUser(username string, privilege string) (err erro
 	return
 }
 
-func (c *bytemarkClient) UpdateHead(idOrLabel string, options *UpdateHead) (err error) {
+func (c *bytemarkClient) UpdateHead(idOrLabel string, options UpdateHead) (err error) {
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/heads/%s", idOrLabel)
 	if err != nil {
 		return
@@ -419,7 +419,7 @@ func (c *bytemarkClient) UpdateHead(idOrLabel string, options *UpdateHead) (err 
 	return
 }
 
-func (c *bytemarkClient) UpdateTail(idOrLabel string, options *UpdateTail) (err error) {
+func (c *bytemarkClient) UpdateTail(idOrLabel string, options UpdateTail) (err error) {
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/tails/%s", idOrLabel)
 	if err != nil {
 		return
@@ -446,7 +446,7 @@ func (c *bytemarkClient) UpdateTail(idOrLabel string, options *UpdateTail) (err 
 	return
 }
 
-func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options *UpdateStoragePool) (err error) {
+func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options UpdateStoragePool) (err error) {
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/storage_pools/%s", idOrLabel)
 	if err != nil {
 		return

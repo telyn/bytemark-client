@@ -204,7 +204,7 @@ func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
 
 		vmName := c.VirtualMachineName(vmFlagName)
 		discLabel := c.String(discFlagName)
-		c.Disc, err = global.Client.GetDisc(&vmName, discLabel)
+		c.Disc, err = global.Client.GetDisc(vmName, discLabel)
 		if err == nil && c.Disc == nil {
 			err = fmt.Errorf("no disc was returned - please report a bug")
 		}
@@ -236,7 +236,7 @@ func GroupProvider(flagName string) ProviderFunc {
 		}
 
 		groupName := c.GroupName(flagName)
-		c.Group, err = global.Client.GetGroup(&groupName)
+		c.Group, err = global.Client.GetGroup(groupName)
 		if err == nil && c.Group == nil {
 			err = fmt.Errorf("no group was returned - please report a bug")
 		}
@@ -279,11 +279,11 @@ func PrivilegeProvider(flagName string) ProviderFunc {
 		switch c.Privilege.TargetType() {
 		case brain.PrivilegeTargetTypeVM:
 			var vm *brain.VirtualMachine
-			vm, err = global.Client.GetVirtualMachine(pf.VirtualMachineName)
+			vm, err = global.Client.GetVirtualMachine(*pf.VirtualMachineName)
 			c.Privilege.VirtualMachineID = vm.ID
 		case brain.PrivilegeTargetTypeGroup:
 			var group *brain.Group
-			group, err = global.Client.GetGroup(pf.GroupName)
+			group, err = global.Client.GetGroup(*pf.GroupName)
 			c.Privilege.GroupID = group.ID
 		case brain.PrivilegeTargetTypeAccount:
 			var acc *lib.Account
@@ -326,7 +326,7 @@ func VirtualMachineProvider(flagName string) ProviderFunc {
 			return
 		}
 		vmName := c.VirtualMachineName(flagName)
-		c.VirtualMachine, err = global.Client.GetVirtualMachine(&vmName)
+		c.VirtualMachine, err = global.Client.GetVirtualMachine(vmName)
 		if err == nil && c.VirtualMachine == nil {
 			err = fmt.Errorf("no server was returned - please report a bug")
 		}

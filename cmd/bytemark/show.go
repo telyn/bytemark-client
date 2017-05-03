@@ -565,7 +565,7 @@ func findPrivilegesForGroup(name lib.GroupName, recurse bool) (privs brain.Privi
 	if !recurse || err != nil {
 		return
 	}
-	group, err := global.Client.GetGroup(&name)
+	group, err := global.Client.GetGroup(name)
 	if err != nil {
 		return
 	}
