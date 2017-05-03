@@ -350,3 +350,29 @@ func TestCreateIPRangeError(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCreateUser(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateUser", "uname", "cluster_su").Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create user uname cluster_su", " "))
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateUserError(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateUser", "uname", "cluster_su").Return(fmt.Errorf("Error creating user")).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create user uname cluster_su", " "))
+	is.NotNil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}

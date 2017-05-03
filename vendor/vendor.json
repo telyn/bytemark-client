@@ -80,10 +80,10 @@
 			"revisionTime": "2016-05-09T10:48:00Z"
 		},
 		{
-			"checksumSHA1": "l0h7xesS0Qe3qGWcMf+MnEQnja8=",
+			"checksumSHA1": "LMu1NsthSqcXfKu0m6YGPAmwBcY=",
 			"path": "github.com/urfave/cli",
-			"revision": "595ba45e735c1e9c1f9ddc9e2ef21997fca893f2",
-			"revisionTime": "2016-05-24T20:27:12Z"
+			"revision": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6",
+			"revisionTime": "2016-11-22T04:36:10Z"
 		}
 	],
 	"rootPath": "github.com/BytemarkHosting/bytemark-client"

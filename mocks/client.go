@@ -461,3 +461,35 @@ func (c *Client) ReifyDisc(id int) error {
 	r := c.Called(id)
 	return r.Error(0)
 }
+func (c *Client) ApproveVM(name *lib.VirtualMachineName, powerOn bool) error {
+	r := c.Called(name, powerOn)
+	return r.Error(0)
+}
+func (c *Client) RejectVM(name *lib.VirtualMachineName, reason string) error {
+	r := c.Called(name, reason)
+	return r.Error(0)
+}
+func (c *Client) RegradeDisc(disc int, newGrade string) error {
+	r := c.Called(disc, newGrade)
+	return r.Error(0)
+}
+func (c *Client) UpdateVMMigration(name *lib.VirtualMachineName, speed *int64, downtime *int) error {
+	r := c.Called(name, speed, downtime)
+	return r.Error(0)
+}
+func (c *Client) CreateUser(username string, privilege string) error {
+	r := c.Called(username, privilege)
+	return r.Error(0)
+}
+func (c *Client) UpdateHead(idOrLabel string, options *lib.UpdateHead) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateTail(idOrLabel string, options *lib.UpdateTail) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateStoragePool(idOrLabel string, options *lib.UpdateStoragePool) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}

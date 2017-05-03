@@ -228,4 +228,12 @@ type Client interface {
 	EmptyStoragePool(idOrLabel string) error
 	EmptyHead(idOrLabel string) error
 	ReifyDisc(id int) error
+	ApproveVM(name *VirtualMachineName, powerOn bool) error
+	RejectVM(name *VirtualMachineName, reason string) error
+	RegradeDisc(disc int, newGrade string) error
+	UpdateVMMigration(name *VirtualMachineName, speed *int64, downtime *int) error
+	CreateUser(username string, privilege string) error
+	UpdateHead(idOrLabel string, options *UpdateHead) error
+	UpdateTail(idOrLabel string, options *UpdateTail) error
+	UpdateStoragePool(idOrLabel string, options *UpdateStoragePool) error
 }

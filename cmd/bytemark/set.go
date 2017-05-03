@@ -78,7 +78,6 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
 					}
 					return err
-
 				}),
 			},
 			{
@@ -109,7 +108,6 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						}
 					}
 					return global.Client.SetVirtualMachineCores(&vmName, cores)
-
 				}),
 			}, {
 				Name:        "hwprofile",

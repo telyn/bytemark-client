@@ -108,6 +108,11 @@ func (c *Context) Int(flagname string) int {
 	return c.Context.Int(flagname)
 }
 
+// Int64 returns the value of the named flag as an int64
+func (c *Context) Int64(flagname string) int64 {
+	return c.Context.Int64(flagname)
+}
+
 // IPs returns the ips passed along as the named flag.
 func (c *Context) IPs(flagname string) []net.IP {
 	ips, ok := c.Context.Generic(flagname).(*util.IPFlag)
