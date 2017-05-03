@@ -70,7 +70,7 @@ func TestAddKeyCommand(t *testing.T) {
 func TestAddIPCommand(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vm := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
 
@@ -86,7 +86,7 @@ func TestAddIPCommand(t *testing.T) {
 	ipcres := ipcr
 	ipcres.IPs = []*net.IP{&ip}
 
-	c.When("AddIP", &vm, &ipcr).Return(&ipcres, nil)
+	c.When("AddIP", vm, ipcr).Return(&ipcres, nil)
 
 	err := global.App.Run(strings.Split("bytemark add ip --reason testing test-server", " "))
 	if err != nil {

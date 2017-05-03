@@ -15,7 +15,7 @@ import (
 func TestConfigAccountValidation(t *testing.T) {
 	config, client := baseTestSetup(t, false)
 
-	config.When("GetGroup").Return(&lib.GroupName{Group: "default-group", Account: "default-account"})
+	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
@@ -27,7 +27,7 @@ func TestConfigAccountValidation(t *testing.T) {
 func TestConfigGroupValidation(t *testing.T) {
 	config, client := baseTestSetup(t, false)
 
-	config.When("GetGroup").Return(&lib.GroupName{Group: "", Account: ""})
+	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
@@ -49,7 +49,7 @@ func TestConfigEndpointValidation(t *testing.T) {
 func TestConfigValidations(t *testing.T) {
 	config, client := baseTestSetup(t, false)
 
-	config.When("GetGroup").Return(&lib.GroupName{Group: "", Account: ""})
+	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
@@ -102,7 +102,7 @@ func TestCommandConfigSet(t *testing.T) {
 		config.When("GetIgnoreErr", "yubikey").Return("")
 		config.When("GetIgnoreErr", "2fa-otp").Return("")
 		config.When("GetIgnoreErr", "account").Return("")
-		config.When("GetGroup").Return(&lib.GroupName{})
+		config.When("GetGroup").Return(lib.GroupName{})
 		client.When("AuthWithToken", "test-token").Return(nil)
 	}
 
@@ -181,9 +181,9 @@ func setupAccountTest(c *mocks.Client, name string, err error) {
 func setupGroupTest(c *mocks.Client, name string, err error) {
 	groupName := lib.GroupName{Group: name}
 	if err != nil {
-		c.When("GetGroup", &groupName).Return(nil, err).Times(1)
+		c.When("GetGroup", groupName).Return(nil, err).Times(1)
 	} else {
-		c.When("GetGroup", &groupName).Return(&brain.Group{}, nil).Times(1)
+		c.When("GetGroup", groupName).Return(&brain.Group{}, nil).Times(1)
 	}
 }
 

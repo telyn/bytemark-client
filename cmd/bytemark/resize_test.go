@@ -19,16 +19,16 @@ func TestResizeDisk(t *testing.T) {
 		StorageGrade: "sata",
 	}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "default",
 		Account:        "default-account",
 	}
-	c.When("GetDisc", &name, "disc-label").Return(&disc).Times(1)
+	c.When("GetDisc", name, "disc-label").Return(&disc).Times(1)
 
-	c.When("ResizeDisc", &name, "disc-label", 35*1024).Return(nil).Times(1)
+	c.When("ResizeDisc", name, "disc-label", 35*1024).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark resize disc --force test-server disc-label 35", " "))
 	is.Nil(err)

@@ -117,11 +117,11 @@ func TestShowGroupCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetGroup").Return(&defGroup)
+	config.When("GetGroup").Return(defGroup)
 	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
 
 	group := getFixtureGroup()
-	c.When("GetGroup", &gpname).Return(&group, nil).Times(1)
+	c.When("GetGroup", gpname).Return(&group, nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark show group test-group.test-account", " "))
 	is.Nil(err)
@@ -135,10 +135,10 @@ func TestShowServerCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 	vm := getFixtureVM()
-	c.When("GetVirtualMachine", &vmname).Return(&vm, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(&vm, nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
 	is.Nil(err)

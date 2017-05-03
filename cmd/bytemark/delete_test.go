@@ -14,7 +14,7 @@ func TestDeleteServer(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 
 	config.When("Force").Return(true)
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -24,8 +24,8 @@ func TestDeleteServer(t *testing.T) {
 
 	vm := getFixtureVM()
 
-	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
-	c.When("DeleteVirtualMachine", &name, false).Return(nil).Times(1)
+	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
+	c.When("DeleteVirtualMachine", name, false).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark delete server --force test-server", " "))
 	is.Nil(err)
@@ -35,8 +35,8 @@ func TestDeleteServer(t *testing.T) {
 	c.Reset()
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
-	c.When("DeleteVirtualMachine", &name, true).Return(nil).Times(1)
+	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
+	c.When("DeleteVirtualMachine", name, true).Return(nil).Times(1)
 
 	err = global.App.Run(strings.Split("bytemark delete server --force --purge test-server", " "))
 	is.Nil(err)
@@ -51,14 +51,14 @@ func TestDeleteDisc(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 
 	config.When("Force").Return(true)
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account",
 	}
-	c.When("DeleteDisc", &name, "666").Return(nil).Times(1)
+	c.When("DeleteDisc", name, "666").Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark delete disc --force test-server.test-group.test-account 666", " "))
 

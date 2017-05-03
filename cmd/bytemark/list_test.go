@@ -26,7 +26,7 @@ func TestListDiscs(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "spooky-vm",
@@ -42,7 +42,7 @@ func TestListDiscs(t *testing.T) {
 			&brain.Disc{StorageGrade: "archive", Size: 666666, Label: "vdb"},
 		},
 	}
-	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
+	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark list discs spooky-vm", " "))
 	is.Nil(err)
@@ -77,9 +77,9 @@ func TestListServers(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 
 	config.When("GetIgnoreErr", "account").Return("spokny-stevn")
-	config.When("GetGroup").Return(&defGroup)
+	config.When("GetGroup").Return(defGroup)
 
-	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
+	c.When("GetAccount", "spooky-steve").Return(lib.Account{
 		Name: "spooky-steve",
 		Groups: []*brain.Group{{
 			Name: "default",

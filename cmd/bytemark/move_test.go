@@ -20,10 +20,10 @@ func TestMove(t *testing.T) {
 		Group:          "new-group",
 		Account:        "new-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 	config.When("Force").Return(true)
 
-	c.When("MoveVirtualMachine", &oldName, &newName).Return(nil).Times(1)
+	c.When("MoveVirtualMachine", oldName, newName).Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "move", "old-name.old-group.old-account", "new-name.new-group.new-account"})
 
