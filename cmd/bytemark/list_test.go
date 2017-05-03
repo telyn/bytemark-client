@@ -79,7 +79,7 @@ func TestListServers(t *testing.T) {
 	config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 	config.When("GetGroup").Return(defGroup)
 
-	c.When("GetAccount", "spooky-steve").Return(lib.Account{
+	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Name: "spooky-steve",
 		Groups: []*brain.Group{{
 			Name: "default",
