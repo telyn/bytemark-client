@@ -382,7 +382,7 @@ func createServer(c *Context) (err error) {
 		return util.UserRequestedExit{}
 	}
 
-	_, err = global.Client.CreateVirtualMachine(&groupName, spec)
+	_, err = global.Client.CreateVirtualMachine(groupName, spec)
 	if err != nil {
 		return err
 	}
