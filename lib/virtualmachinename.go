@@ -22,8 +22,8 @@ func (vm VirtualMachineName) String() string {
 }
 
 // GroupName returns the group and account of this VirtualMachineName as a group.
-func (vm VirtualMachineName) GroupName() *GroupName {
-	return &GroupName{
+func (vm VirtualMachineName) GroupName() GroupName {
+	return GroupName{
 		Group:   vm.Group,
 		Account: vm.Account,
 	}

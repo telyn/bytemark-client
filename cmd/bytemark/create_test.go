@@ -278,7 +278,7 @@ func TestCreateVLANGroup(t *testing.T) {
 		Group:   "test-group",
 		Account: "test-account",
 	}
-	c.When("AdminCreateGroup", &group, 0).Return(nil).Times(1)
+	c.When("AdminCreateGroup", group, 0).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
 	is.Nil(err)
@@ -297,7 +297,7 @@ func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 		Group:   "test-group",
 		Account: "test-account",
 	}
-	c.When("AdminCreateGroup", &group, 19).Return(nil).Times(1)
+	c.When("AdminCreateGroup", group, 19).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account 19", " "))
 	is.Nil(err)
@@ -316,7 +316,7 @@ func TestCreateVLANGroupError(t *testing.T) {
 		Group:   "test-group",
 		Account: "test-account",
 	}
-	c.When("AdminCreateGroup", &group, 0).Return(fmt.Errorf("Group name already used")).Times(1)
+	c.When("AdminCreateGroup", group, 0).Return(fmt.Errorf("Group name already used")).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
 	is.NotNil(err)

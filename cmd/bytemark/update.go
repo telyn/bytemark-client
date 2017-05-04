@@ -56,7 +56,7 @@ func init() {
 				Action: With(OptionalArgs("head", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
-					options := &lib.UpdateHead{
+					options := lib.UpdateHead{
 						UsageStrategy:   usageStrategy,
 						OvercommitRatio: overcommitRatio,
 						Label:           label,
@@ -96,7 +96,7 @@ func init() {
 				Action: With(OptionalArgs("tail", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("tail"), AuthProvider, func(c *Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
-					options := &lib.UpdateTail{
+					options := lib.UpdateTail{
 						UsageStrategy:   usageStrategy,
 						OvercommitRatio: overcommitRatio,
 						Label:           label,
@@ -136,7 +136,7 @@ func init() {
 				Action: With(OptionalArgs("storage_pool", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
-					options := &lib.UpdateStoragePool{
+					options := lib.UpdateStoragePool{
 						UsageStrategy:   usageStrategy,
 						OvercommitRatio: overcommitRatio,
 						Label:           label,
@@ -195,7 +195,7 @@ func init() {
 								return errors.New("Nothing to update")
 							}
 
-							if err := global.Client.UpdateVMMigration(&vm, speed, downtime); err != nil {
+							if err := global.Client.UpdateVMMigration(vm, speed, downtime); err != nil {
 								return err
 							}
 

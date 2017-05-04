@@ -218,22 +218,22 @@ type Client interface {
 	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
 	GetRecentVMs() ([]*brain.VirtualMachine, error)
 	MigrateDisc(disc int, newStoragePool string) error
-	MigrateVirtualMachine(vmName *VirtualMachineName, newHead string) error
+	MigrateVirtualMachine(vmName VirtualMachineName, newHead string) error
 	ReapVMs() error
 	DeleteVLAN(id int) error
-	AdminCreateGroup(name *GroupName, vlanNum int) error
+	AdminCreateGroup(name GroupName, vlanNum int) error
 	CreateIPRange(ipRange string, vlanNum int) error
 	CancelDiscMigration(id int) error
 	CancelVMMigration(id int) error
 	EmptyStoragePool(idOrLabel string) error
 	EmptyHead(idOrLabel string) error
 	ReifyDisc(id int) error
-	ApproveVM(name *VirtualMachineName, powerOn bool) error
-	RejectVM(name *VirtualMachineName, reason string) error
+	ApproveVM(name VirtualMachineName, powerOn bool) error
+	RejectVM(name VirtualMachineName, reason string) error
 	RegradeDisc(disc int, newGrade string) error
-	UpdateVMMigration(name *VirtualMachineName, speed *int64, downtime *int) error
+	UpdateVMMigration(name VirtualMachineName, speed *int64, downtime *int) error
 	CreateUser(username string, privilege string) error
-	UpdateHead(idOrLabel string, options *UpdateHead) error
-	UpdateTail(idOrLabel string, options *UpdateTail) error
-	UpdateStoragePool(idOrLabel string, options *UpdateStoragePool) error
+	UpdateHead(idOrLabel string, options UpdateHead) error
+	UpdateTail(idOrLabel string, options UpdateTail) error
+	UpdateStoragePool(idOrLabel string, options UpdateStoragePool) error
 }

@@ -16,7 +16,7 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	speed := int64(8500000000000)
 	downtime := 15
-	c.When("UpdateVMMigration", &vmName, &speed, &downtime).Return(nil).Times(1)
+	c.When("UpdateVMMigration", vmName, &speed, &downtime).Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "update", "vm", "migration", "vm123.group.account", "8500000000000", "15"})
 
@@ -46,7 +46,7 @@ func TestUpdateHead(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	options := &lib.UpdateHead{}
+	options := lib.UpdateHead{}
 
 	c.When("UpdateHead", "1", options).Return(nil).Times(1)
 
@@ -63,7 +63,7 @@ func TestUpdateHeadError(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	options := &lib.UpdateHead{}
+	options := lib.UpdateHead{}
 
 	c.When("UpdateHead", "1", options).Return(fmt.Errorf("Could not update head")).Times(1)
 
@@ -80,7 +80,7 @@ func TestUpdateTail(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	options := &lib.UpdateTail{}
+	options := lib.UpdateTail{}
 
 	c.When("UpdateTail", "1", options).Return(nil).Times(1)
 
@@ -97,7 +97,7 @@ func TestUpdateTailError(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	options := &lib.UpdateTail{}
+	options := lib.UpdateTail{}
 
 	c.When("UpdateTail", "1", options).Return(fmt.Errorf("Could not update tail")).Times(1)
 
@@ -114,7 +114,7 @@ func TestUpdateStoragePool(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	options := &lib.UpdateStoragePool{}
+	options := lib.UpdateStoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(nil).Times(1)
 
@@ -131,7 +131,7 @@ func TestUpdateStoragePoolError(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	options := &lib.UpdateStoragePool{}
+	options := lib.UpdateStoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(fmt.Errorf("Could not update storage pool")).Times(1)
 

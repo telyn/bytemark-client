@@ -59,7 +59,7 @@ func init() {
 					vm := c.VirtualMachineName("server")
 					head := c.String("new_head")
 
-					if err := global.Client.MigrateVirtualMachine(&vm, head); err != nil {
+					if err := global.Client.MigrateVirtualMachine(vm, head); err != nil {
 						return err
 					}
 
