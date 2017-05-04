@@ -57,7 +57,7 @@ Used when setting up a private VLAN for a customer.`,
 				},
 				Action: With(OptionalArgs("group", "vlan_num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
 					gp := c.GroupName("group")
-					if err := global.Client.AdminCreateGroup(&gp, c.Int("vlan_num")); err != nil {
+					if err := global.Client.AdminCreateGroup(gp, c.Int("vlan_num")); err != nil {
 						return err
 					}
 					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
