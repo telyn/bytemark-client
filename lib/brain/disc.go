@@ -50,7 +50,7 @@ func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 
 func (d Disc) String() string {
 	buf := new(bytes.Buffer)
-	d.PrettyPrint(buf, prettyprint.SingleLine)
+	_ = d.PrettyPrint(buf, prettyprint.SingleLine)
 	return buf.String()
 }
 

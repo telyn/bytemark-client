@@ -218,7 +218,7 @@ func (c *Context) OutputTable(obj interface{}, fields []string) error {
 		table.Render()
 		return nil
 	}
-	return fmt.Errorf("%T is not a struct or slice type - please file a bug report!", obj)
+	return fmt.Errorf("%T is not a struct or slice type - please file a bug report", obj)
 }
 
 // OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
