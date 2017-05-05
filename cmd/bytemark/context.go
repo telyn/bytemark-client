@@ -2,12 +2,18 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"github.com/olekukonko/tablewriter"
+	"github.com/telyn/row"
 	"github.com/urfave/cli"
 	"net"
+	"reflect"
+	"sort"
+	"strings"
 )
 
 // Context is a wrapper around urfave/cli.Context which provides easy access to
@@ -166,16 +172,90 @@ func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
 	return lib.VirtualMachineName(*vmNameFlag)
 }
 
-// IfNotMarshalJSON checks to see if the json flag was set, and outputs obj as a JSON object if so.
-// if not, runs fn
-func (c *Context) IfNotMarshalJSON(obj interface{}, fn func() error) error {
-	if c.Bool("json") {
-		js, err := json.MarshalIndent(obj, "", "    ")
+// OutputJSON outputs a nicely-indented JSON object that represents obj
+func (c *Context) OutputJSON(obj interface{}) error {
+	js, err := json.MarshalIndent(obj, "", "    ")
+	if err != nil {
+		return err
+	}
+	log.Output(string(js))
+	return nil
+}
+
+func (c *Context) OutputTable(obj interface{}, fields []string) error {
+	table := tablewriter.NewWriter(global.App.Writer)
+	table.SetAutoWrapText(false)
+	table.SetRowLine(true)
+	table.SetAutoFormatHeaders(false)
+
+	table.SetHeader(fields)
+	v := reflect.ValueOf(obj)
+
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	if v.Kind() == reflect.Struct {
+		r, err := row.From(obj, fields)
 		if err != nil {
 			return err
 		}
-		log.Output(string(js))
+		table.Append(r)
+		table.Render()
+		return nil
+	} else if v.Kind() == reflect.Slice || v.Kind() == reflect.Array {
+		length := v.Len()
+		for i := 0; i < length; i++ {
+			el := v.Index(i)
+			r, err := row.From(el.Interface(), fields)
+			if err != nil {
+				return err
+			}
+			table.Append(r)
+		}
+		table.Render()
 		return nil
 	}
-	return fn()
+	return fmt.Errorf("%T is not a struct or slice type - please file a bug report!", obj)
+}
+
+// OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
+// thing should be like "server", "servers", "group", "groups"
+// jsonType should be "array" or "object"
+func OutputFlags(thing string, jsonType string) []cli.Flag {
+	return []cli.Flag{
+		cli.BoolFlag{
+			Name:  "json",
+			Usage: fmt.Sprintf("Output the %s as a JSON %s", thing, jsonType),
+		},
+		cli.BoolFlag{
+			Name:  "table",
+			Usage: fmt.Sprintf("Output the %s as a table", thing),
+		},
+		cli.StringFlag{
+			Name:  "table-fields",
+			Usage: fmt.Sprintf("The fields of the %s to output in the table, comma separated. set to 'help' for a list of fields for this command", thing),
+		},
+	}
+}
+
+// OutputInDesiredForm outputs obj as a JSON object if --json is set,
+// or as a table / table row if --table is set
+// otherwise calls humanOutputFn (which should output it in a very human form - PrettyPrint or such
+func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() error) error {
+	if c.Bool("json") {
+		return c.OutputJSON(obj)
+	} else if c.Bool("table") {
+		fields := strings.Split(c.String("table-fields"), ",")
+		fieldsList := row.FieldsFrom(obj)
+		sort.Strings(fieldsList)
+		if len(fields) > 0 && fields[0] == "help" {
+			log.Outputf("Fields for %T: \r\n%s\r\n\r\n", obj, strings.Join(fieldsList, "\r\n  "))
+		} else if len(fields) > 0 && fields[0] != "" {
+			return c.OutputTable(obj, fields)
+		} else {
+			return c.OutputTable(obj, fieldsList)
+		}
+	}
+	return humanOutputFn()
 }
