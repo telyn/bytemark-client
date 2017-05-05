@@ -250,7 +250,7 @@ func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() erro
 		fieldsList := row.FieldsFrom(obj)
 		sort.Strings(fieldsList)
 		if len(fields) > 0 && fields[0] == "help" {
-			log.Outputf("Fields for %T: \r\n%s\r\n\r\n", obj, strings.Join(fieldsList, "\r\n  "))
+			log.Outputf("Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
 		} else if len(fields) > 0 && fields[0] != "" {
 			return c.OutputTable(obj, fields)
 		} else {
