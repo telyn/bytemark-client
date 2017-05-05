@@ -182,6 +182,8 @@ func (c *Context) OutputJSON(obj interface{}) error {
 	return nil
 }
 
+// OutputTable creates a table for the given object. This makes
+// most sense when it's an array, but a regular struct-y object works fine too.
 func (c *Context) OutputTable(obj interface{}, fields []string) error {
 	table := tablewriter.NewWriter(global.App.Writer)
 	table.SetAutoWrapText(false)
