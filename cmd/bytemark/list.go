@@ -110,7 +110,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if not specified.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			Flags: append(OutputFlags("accounts", "array"),
+			Flags: append(OutputFlags("servers", "array"),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to list the servers of",
