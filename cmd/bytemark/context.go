@@ -250,6 +250,9 @@ func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() erro
 		return c.OutputJSON(obj)
 	} else if c.Bool("table") {
 		fields := strings.Split(c.String("table-fields"), ",")
+		for i, f := range fields {
+			fields[i] = strings.TrimSpace(f)
+		}
 		fieldsList := row.FieldsFrom(obj)
 		sort.Strings(fieldsList)
 		if len(fields) > 0 && fields[0] == "help" {
