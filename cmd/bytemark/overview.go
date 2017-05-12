@@ -46,7 +46,19 @@ func init() {
 					acc.IsDefaultAccount = true
 				}
 			}
-			return lib.FormatOverview(os.Stdout, allAccs, def, global.Client.GetSessionUser())
+			overview := struct {
+				Accounts       []*lib.Account
+				DefaultAccount *lib.Account
+				User           string
+			}{
+				Accounts:       allAccs,
+				DefaultAccount: def,
+				User:           global.Client.GetSessionUser(),
+			}
+
+			return c.OutputInDesiredForm(overview, func() error {
+				return lib.FormatOverview(os.Stdout, allAccs, def, global.Client.GetSessionUser())
+			})
 
 		}),
 	})
