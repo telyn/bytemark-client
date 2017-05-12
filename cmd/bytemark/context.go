@@ -197,15 +197,14 @@ func (c *Context) OutputTable(obj interface{}, fields []string) error {
 		v = v.Elem()
 	}
 
-	if v.Kind() == reflect.Struct {
+	switch v.Kind() {
+	case reflect.Struct:
 		r, err := row.From(obj, fields)
 		if err != nil {
 			return err
 		}
 		table.Append(r)
-		table.Render()
-		return nil
-	} else if v.Kind() == reflect.Slice || v.Kind() == reflect.Array {
+	case reflect.Slice, reflect.Array:
 		length := v.Len()
 		for i := 0; i < length; i++ {
 			el := v.Index(i)
@@ -215,10 +214,12 @@ func (c *Context) OutputTable(obj interface{}, fields []string) error {
 			}
 			table.Append(r)
 		}
-		table.Render()
-		return nil
+	default:
+		return fmt.Errorf("%T is not a struct or slice type - please file a bug report", obj)
 	}
-	return fmt.Errorf("%T is not a struct or slice type - please file a bug report", obj)
+
+	table.Render()
+	return nil
 }
 
 // OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
