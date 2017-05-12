@@ -25,12 +25,12 @@ func init() {
 If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-			Flags: append(OutputFlags("account details", "object"), []cli.Flag{
+			Flags: append(OutputFlags("account details", "object"),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
 					Value: new(AccountNameFlag),
-				}})
+				}),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
 				return c.OutputInDesiredForm(c.Account, func() error {
 					err := c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
