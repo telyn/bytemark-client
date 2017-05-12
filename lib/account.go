@@ -90,6 +90,7 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 	return prettyprint.Run(wr, accountsTemplate, "account"+string(detail), a)
 }
 
+// String formats this account as a string - the same format as prettyprint.SingleLine
 func (a Account) String() string {
 	buf := bytes.Buffer{}
 	err := a.PrettyPrint(&buf, prettyprint.SingleLine)
