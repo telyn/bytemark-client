@@ -68,6 +68,12 @@
 			"revisionTime": "2016-01-22T23:29:15Z"
 		},
 		{
+			"checksumSHA1": "HB6MvfJv0flQn+viiwDzUGKj5gw=",
+			"path": "github.com/olekukonko/tablewriter",
+			"revision": "daf2955e742cf123959884fdff4685aa79b63135",
+			"revisionTime": "2016-06-21T09:30:29Z"
+		},
+		{
 			"checksumSHA1": "mtge+Ock+8oKfUBCqsKrb4auOs8=",
 			"path": "github.com/telyn/form",
 			"revision": "a8f1f52fb0dfdbaad1e49f4c14c9d6befdc93b49",
@@ -78,6 +84,12 @@
 			"path": "github.com/telyn/form/box",
 			"revision": "0ba36cd7909b5981fbde8a58471b28cf1c4a5856",
 			"revisionTime": "2016-05-09T10:48:00Z"
+		},
+		{
+			"checksumSHA1": "Q0VvCPAoFetAidNWYTpZv3zVQMU=",
+			"path": "github.com/telyn/row",
+			"revision": "730dd1a63b49dbd40fb328c6708f66e4571aa078",
+			"revisionTime": "2017-05-05T15:27:16Z"
 		},
 		{
 			"checksumSHA1": "LMu1NsthSqcXfKu0m6YGPAmwBcY=",

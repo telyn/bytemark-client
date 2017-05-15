@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"io"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
@@ -87,4 +88,14 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{- end -}}
 {{- end }}`
 	return prettyprint.Run(wr, accountsTemplate, "account"+string(detail), a)
+}
+
+// String formats this account as a string - the same format as prettyprint.SingleLine
+func (a Account) String() string {
+	buf := bytes.Buffer{}
+	err := a.PrettyPrint(&buf, prettyprint.SingleLine)
+	if err != nil {
+		return "ERROR"
+	}
+	return buf.String()
 }

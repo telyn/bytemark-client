@@ -25,19 +25,14 @@ func init() {
 If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-			Flags: []cli.Flag{
+			Flags: append(OutputFlags("account details", "object"),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
 					Value: new(AccountNameFlag),
-				},
-				cli.BoolFlag{
-					Name:  "json",
-					Usage: "Output account details as a JSON object",
-				},
-			},
+				}),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
-				return c.IfNotMarshalJSON(c.Account, func() error {
+				return c.OutputInDesiredForm(c.Account, func() error {
 					err := c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
 					if err != nil {
 						return err
@@ -64,19 +59,15 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			UsageText: "bytemark show group [--json] [name]",
 			Description: `This command displays information about how many servers are in the given group.
 If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "json",
-					Usage: "Output group details as a JSON object",
-				},
+			Flags: append(OutputFlags("group details", "object"),
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The name of the group to show",
 					Value: new(GroupNameFlag),
 				},
-			},
+			),
 			Action: With(OptionalArgs("group"), GroupProvider("group"), func(c *Context) error {
-				return c.IfNotMarshalJSON(c.Group, func() error {
+				return c.OutputInDesiredForm(c.Group, func() error {
 					s := ""
 					if len(c.Group.VirtualMachines) != 1 {
 						s = "s"
@@ -102,19 +93,15 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Usage:       "displays details about a server",
 			UsageText:   "bytemark show server [--json] <name>",
 			Description: `Displays a collection of details about the server, including its full hostname, CPU and memory allocation, power status, disc capacities and IP addresses.`,
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "json",
-					Usage: "Output server details as a JSON object.",
-				},
+			Flags: append(OutputFlags("server details", "object"),
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
 					Value: new(VirtualMachineNameFlag),
 				},
-			},
+			),
 			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
-				return c.IfNotMarshalJSON(c.VirtualMachine, func() error {
+				return c.OutputInDesiredForm(c.VirtualMachine, func() error {
 					return c.VirtualMachine.PrettyPrint(os.Stderr, prettyprint.Full)
 				})
 			}),
@@ -139,11 +126,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 Setting --recursive will cause a lot of extra requests to be made and may take a long time to run.
 
 Privileges will be output in no particular order.`,
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "json",
-					Usage: "Output privileges as a JSON array.",
-				},
+			Flags: append(OutputFlags("privileges", "array"),
 				cli.BoolFlag{
 					Name:  "recursive",
 					Usage: "for account & group, will also find all privileges for all groups in the account and virtual machines in the group",
@@ -166,7 +149,7 @@ Privileges will be output in no particular order.`,
 					Usage: "The server to show the privileges of",
 					Value: new(VirtualMachineNameFlag),
 				},
-			},
+			),
 			Action: With(AuthProvider, func(c *Context) (err error) {
 				account := c.String("account")
 				group := c.GroupName("group")
@@ -204,7 +187,7 @@ Privileges will be output in no particular order.`,
 					}
 				}
 
-				return c.IfNotMarshalJSON(privs, func() error {
+				return c.OutputInDesiredForm(privs, func() error {
 					for _, p := range privs {
 						log.Outputf("%s\r\n", p.String())
 					}
@@ -222,18 +205,13 @@ Privileges will be output in no particular order.`,
 				Name:      "vlans",
 				Usage:     "shows available VLANs",
 				UsageText: "bytemark --admin show vlans [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the VLANs as a JSON array.",
-					},
-				},
+				Flags:     OutputFlags("VLANs", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					vlans, err := global.Client.GetVLANs()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(vlans, func() error {
+					return c.OutputInDesiredForm(vlans, func() error {
 						for _, vlan := range vlans {
 							if err := vlan.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
@@ -247,22 +225,18 @@ Privileges will be output in no particular order.`,
 				Name:      "vlan",
 				Usage:     "shows the details of a VLAN",
 				UsageText: "bytemark --admin show vlan [--json] <num>",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the VLANs as a JSON object.",
-					},
+				Flags: append(OutputFlags("VLAN", "object"),
 					cli.IntFlag{
 						Name:  "num",
 						Usage: "the num of the VLAN to display",
 					},
-				},
+				),
 				Action: With(OptionalArgs("num"), RequiredFlags("num"), AuthProvider, func(c *Context) error {
 					vlan, err := global.Client.GetVLAN(c.Int("num"))
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(vlan, func() error {
+					return c.OutputInDesiredForm(vlan, func() error {
 						return vlan.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
@@ -271,17 +245,13 @@ Privileges will be output in no particular order.`,
 				Name:      "ip_ranges",
 				Usage:     "shows all IP ranges",
 				UsageText: "bytemark --admin show ip_ranges [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output IP ranges as a JSON array.",
-					},
-				}, Action: With(AuthProvider, func(c *Context) error {
+				Flags:     OutputFlags("ip ranges", "array"),
+				Action: With(AuthProvider, func(c *Context) error {
 					ipRanges, err := global.Client.GetIPRanges()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(ipRanges, func() error {
+					return c.OutputInDesiredForm(ipRanges, func() error {
 						for _, ipRange := range ipRanges {
 							if err := ipRange.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
@@ -295,21 +265,18 @@ Privileges will be output in no particular order.`,
 				Name:      "ip_range",
 				Usage:     "shows the details of an IP range",
 				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the IP range as a JSON object.",
-					},
+				Flags: append(OutputFlags("ip range details", "object"),
 					cli.IntFlag{
 						Name:  "ip_range",
 						Usage: "the ID of the IP range to display",
 					},
-				}, Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
+				),
+				Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
 					ipRange, err := global.Client.GetIPRange(c.Int("ip_range"))
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(ipRange, func() error {
+					return c.OutputInDesiredForm(ipRange, func() error {
 						return ipRange.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
@@ -318,17 +285,13 @@ Privileges will be output in no particular order.`,
 				Name:      "heads",
 				Usage:     "shows the details of all heads",
 				UsageText: "bytemark --admin show heads [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the heads as a JSON array.",
-					},
-				}, Action: With(AuthProvider, func(c *Context) error {
+				Flags:     OutputFlags("heads", "array"),
+				Action: With(AuthProvider, func(c *Context) error {
 					heads, err := global.Client.GetHeads()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(heads, func() error {
+					return c.OutputInDesiredForm(heads, func() error {
 						for _, head := range heads {
 							if err := head.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
@@ -343,21 +306,18 @@ Privileges will be output in no particular order.`,
 				Name:      "head",
 				Usage:     "shows the details of the specified head",
 				UsageText: "bytemark --admin show head <head> [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the head as a JSON object.",
-					},
+				Flags: append(OutputFlags("head details", "object"),
 					cli.StringFlag{
 						Name:  "head",
 						Usage: "the ID of the head to display",
 					},
-				}, Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
+				),
+				Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
 					head, err := global.Client.GetHead(c.String("head"))
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(head, func() error {
+					return c.OutputInDesiredForm(head, func() error {
 						return head.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
@@ -366,17 +326,13 @@ Privileges will be output in no particular order.`,
 				Name:      "tails",
 				Usage:     "shows the details of all tails",
 				UsageText: "bytemark --admin show tails [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the tails as a JSON array.",
-					},
-				}, Action: With(AuthProvider, func(c *Context) error {
+				Flags:     OutputFlags("tails", "array"),
+				Action: With(AuthProvider, func(c *Context) error {
 					tails, err := global.Client.GetTails()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(tails, func() error {
+					return c.OutputInDesiredForm(tails, func() error {
 						for _, tail := range tails {
 							if err := tail.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
@@ -391,21 +347,18 @@ Privileges will be output in no particular order.`,
 				Name:      "tail",
 				Usage:     "shows the details of the specified tail",
 				UsageText: "bytemark --admin show tail <tail> [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the tail as a JSON object.",
-					},
+				Flags: append(OutputFlags("tail details", "object"),
 					cli.StringFlag{
 						Name:  "tail",
 						Usage: "the ID of the tail to display",
 					},
-				}, Action: With(OptionalArgs("tail"), RequiredFlags("tail"), AuthProvider, func(c *Context) error {
+				),
+				Action: With(OptionalArgs("tail"), RequiredFlags("tail"), AuthProvider, func(c *Context) error {
 					tail, err := global.Client.GetTail(c.String("tail"))
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(tail, func() error {
+					return c.OutputInDesiredForm(tail, func() error {
 						return tail.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
@@ -414,17 +367,13 @@ Privileges will be output in no particular order.`,
 				Name:      "storage_pools",
 				Usage:     "shows the details of all storage pools",
 				UsageText: "bytemark --admin show storage_pools [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the storage pools as a JSON array.",
-					},
-				}, Action: With(AuthProvider, func(c *Context) error {
+				Flags:     OutputFlags("storage pools", "array"),
+				Action: With(AuthProvider, func(c *Context) error {
 					storagePools, err := global.Client.GetStoragePools()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(storagePools, func() error {
+					return c.OutputInDesiredForm(storagePools, func() error {
 						for _, storagePool := range storagePools {
 							if err := storagePool.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
@@ -439,40 +388,33 @@ Privileges will be output in no particular order.`,
 				Name:      "storage_pool",
 				Usage:     "shows the details of the specified storage pool",
 				UsageText: "bytemark --admin show storage_pools [--json] <storage_pool>",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the storage pools as a JSON array.",
-					},
+				Flags: append(OutputFlags("storage pool", "object"),
 					cli.StringFlag{
 						Name:  "storage_pool",
 						Usage: "The ID or label of the storage pool to display",
 					},
-				}, Action: With(OptionalArgs("storage_pool"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
+				),
+				Action: With(OptionalArgs("storage_pool"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
 					storagePool, err := global.Client.GetStoragePool(c.String("storage_pool"))
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(storagePool, func() error {
+					return c.OutputInDesiredForm(storagePool, func() error {
 						return storagePool.PrettyPrint(os.Stderr, prettyprint.Full)
 					})
 				}),
 			},
 			{
 				Name:      "migrating_vms",
-				Usage:     "shows a list of migrating VMs",
+				Usage:     "shows a list of migrating servers",
 				UsageText: "bytemark --admin show migrating_vms [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the VMs as a JSON array.",
-					},
-				}, Action: With(AuthProvider, func(c *Context) error {
+				Flags:     OutputFlags("migrating servers", "array"),
+				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetMigratingVMs()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(vms, func() error {
+					return c.OutputInDesiredForm(vms, func() error {
 						for _, vm := range vms {
 							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
@@ -487,17 +429,13 @@ Privileges will be output in no particular order.`,
 				Name:      "stopped_eligible_vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the VMs as a JSON array.",
-					},
-				}, Action: With(AuthProvider, func(c *Context) error {
+				Flags:     OutputFlags("servers", "array"),
+				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetStoppedEligibleVMs()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(vms, func() error {
+					return c.OutputInDesiredForm(vms, func() error {
 						for _, vm := range vms {
 							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
@@ -511,18 +449,14 @@ Privileges will be output in no particular order.`,
 			{
 				Name:      "recent_vms",
 				Usage:     "shows a list of stopped VMs that should be running",
-				UsageText: "bytemark --admin show recent_vms [--json]",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "json",
-						Usage: "Output the VMs as a JSON array.",
-					},
-				}, Action: With(AuthProvider, func(c *Context) error {
+				UsageText: "bytemark --admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
+				Flags:     OutputFlags("servers", "array"),
+				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetRecentVMs()
 					if err != nil {
 						return err
 					}
-					return c.IfNotMarshalJSON(vms, func() error {
+					return c.OutputInDesiredForm(vms, func() error {
 						for _, vm := range vms {
 							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
 								return err
