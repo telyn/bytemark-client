@@ -20,6 +20,7 @@ func init() {
 		Usage:       "list of all commands available",
 		UsageText:   "bytemark commands",
 		Description: "ALL COMMANDS:\r\n\r\n",
+		Action:      cli.ShowSubCommandHelp,
 	})
 }
 
