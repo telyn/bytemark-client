@@ -86,12 +86,6 @@
 			"revisionTime": "2016-05-09T10:48:00Z"
 		},
 		{
-			"checksumSHA1": "Q0VvCPAoFetAidNWYTpZv3zVQMU=",
-			"path": "github.com/telyn/row",
-			"revision": "730dd1a63b49dbd40fb328c6708f66e4571aa078",
-			"revisionTime": "2017-05-05T15:27:16Z"
-		},
-		{
 			"checksumSHA1": "LMu1NsthSqcXfKu0m6YGPAmwBcY=",
 			"path": "github.com/urfave/cli",
 			"revision": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6",
