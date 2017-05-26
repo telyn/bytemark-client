@@ -26,7 +26,7 @@ type Head struct {
 	// state
 
 	MemoryFree int  `json:"memory_free,omitempty"`
-	IsOnline   bool `json:"is_online,omitempty"`
+	IsOnline   bool `json:"online,omitempty"`
 	UsedCores  int  `json:"used_cores"`
 
 	// You may have one or the other.
