@@ -23,6 +23,7 @@ var configVars = [...]string{
 	"user",
 	"account",
 	"group",
+	"output-format",
 	"token",
 	"debug-level",
 	"yubikey",
@@ -413,6 +414,8 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		return v
 	case "force":
 		return ConfigVar{"force", "false", "CODE"}
+	case "output-format":
+		return ConfigVar{"output-format", "human", "CODE"}
 	}
 	return ConfigVar{name, "", "UNSET"}
 }

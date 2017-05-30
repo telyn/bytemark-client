@@ -6,7 +6,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/BytemarkHosting/row"
 	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli"
@@ -20,7 +19,7 @@ import (
 // the next unused argument and can have various bytemarky types attached to it
 // in order to keep code DRY
 type Context struct {
-	Context        *cli.Context
+	Context        innerContext
 	Account        *lib.Account
 	Authed         bool
 	Definitions    *lib.Definitions
@@ -40,6 +39,10 @@ func (c *Context) Reset() {
 	}
 }
 
+func (c *Context) App() *cli.App {
+	return c.App()
+}
+
 // args returns all the args that were passed to the Context (i.e. all the args passed to this (sub)command)
 func (c *Context) args() cli.Args {
 	return c.Context.Args()
@@ -48,6 +51,10 @@ func (c *Context) args() cli.Args {
 // Args returns all the unused arguments
 func (c *Context) Args() []string {
 	return c.args()[c.currentArgIndex:]
+}
+
+func (c *Context) Command() cli.Command {
+	return c.Context.Command()
 }
 
 // NextArg returns the next unused argument, and marks it as used.
@@ -62,7 +69,7 @@ func (c *Context) NextArg() (string, error) {
 
 // Help creates a UsageDisplayedError that will output the issue and a message to consult the documentation
 func (c *Context) Help(whatsyourproblem string) (err error) {
-	return util.UsageDisplayedError{TheProblem: whatsyourproblem, Command: c.Context.Command.FullName()}
+	return util.UsageDisplayedError{TheProblem: whatsyourproblem, Command: c.Command().FullName()}
 }
 
 // flags below
@@ -178,7 +185,7 @@ func (c *Context) OutputJSON(obj interface{}) error {
 	if err != nil {
 		return err
 	}
-	log.Output(string(js))
+	fmt.Fprintf(global.App.Writer, string(js))
 	return nil
 }
 
@@ -254,10 +261,28 @@ func OutputFlags(thing string, jsonType string) []cli.Flag {
 // OutputInDesiredForm outputs obj as a JSON object if --json is set,
 // or as a table / table row if --table is set
 // otherwise calls humanOutputFn (which should output it in a very human form - PrettyPrint or such
-func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() error) error {
+// defaultFormat is an optional string stating that the default format should be
+func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() error, defaultFormat ...string) error {
+	format, err := global.Config.GetV("output-format")
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Before: %v", format)
+	if len(defaultFormat) > 0 && format.Source == "CODE" {
+		fmt.Println("setting format.Value")
+		format.Value = defaultFormat[0]
+	}
+
 	if c.Bool("json") {
-		return c.OutputJSON(obj)
+		format.Value = "json"
 	} else if c.Bool("table") {
+		format.Value = "table"
+	}
+
+	switch format.Value {
+	case "json":
+		return c.OutputJSON(obj)
+	case "table":
 		fields := strings.Split(c.String("table-fields"), ",")
 		for i, f := range fields {
 			fields[i] = strings.TrimSpace(f)
@@ -265,7 +290,7 @@ func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() erro
 		fieldsList := row.FieldsFrom(obj)
 		sort.Strings(fieldsList)
 		if len(fields) > 0 && fields[0] == "help" {
-			log.Outputf("Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
+			fmt.Fprintf(global.App.Writer, "Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
 			return nil
 		} else if len(fields) > 0 && fields[0] != "" {
 			return c.OutputTable(obj, fields)

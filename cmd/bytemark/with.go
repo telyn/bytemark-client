@@ -16,7 +16,7 @@ type ProviderFunc func(*Context) error
 // With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
 func With(providers ...ProviderFunc) func(c *cli.Context) error {
 	return func(cliContext *cli.Context) error {
-		c := Context{Context: cliContext}
+		c := Context{Context: cliContextWrapper{cliContext}}
 		err := foldProviders(&c, providers...)
 		cleanup(&c)
 		return err
@@ -150,7 +150,7 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 // (or that VirtualMachineName / GroupName flags have the full complement of values needed)
 func RequiredFlags(flagNames ...string) ProviderFunc {
 	return func(c *Context) (err error) {
-		for _, flag := range c.Context.Command.Flags {
+		for _, flag := range c.Command().Flags {
 			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(c, flag) {
 				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
 			}

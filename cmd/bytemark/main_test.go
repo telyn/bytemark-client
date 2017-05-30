@@ -136,6 +136,7 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 	config = new(mocks.Config)
 	client = new(mocks.Client)
 	config.When("GetBool", "admin").Return(admin, nil)
+	config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", "human", "CODE"})
 	global.Client = client
 	global.Config = config
 
