@@ -201,7 +201,9 @@ func newBadRequestError(ctx APIError, response []byte) error {
 
 func capitaliseJSON(s string) string {
 	rs := []rune(s)
-	rs[0] = unicode.ToUpper(rs[0])
+	if len(rs) > 0 {
+		rs[0] = unicode.ToUpper(rs[0])
+	}
 	s = string(rs)
 	return strings.Replace(s, "_", " ", -1)
 }
