@@ -186,17 +186,26 @@ func (c *Context) OutputJSON(obj interface{}) error {
 // most sense when it's an array, but a regular struct-y object works fine too.
 func (c *Context) OutputTable(obj interface{}, fields []string) error {
 	table := tablewriter.NewWriter(global.App.Writer)
+	// don't autowrap because fields that are slices output one element per line
+	// and autowrap
 	table.SetAutoWrapText(false)
+	// lines between rows!
 	table.SetRowLine(true)
+	// don't autoformat the headers - autoformat makes them ALLCAPS which makes
+	// it hard to figure out what to set --table-fields to.
+	// with autoformat off, --table-fields can be set by copying and pasting
+	// from the table header.
 	table.SetAutoFormatHeaders(false)
 
 	table.SetHeader(fields)
 	v := reflect.ValueOf(obj)
 
+	// indirect pointers so we can switch on Kind()
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
 
+	// output a single table row for a struct, or several for a slice / array
 	switch v.Kind() {
 	case reflect.Struct:
 		r, err := row.From(obj, fields)
