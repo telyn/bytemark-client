@@ -39,6 +39,7 @@ func (c *Context) Reset() {
 	}
 }
 
+// App returns the cli.App that this context is part of. Usually this will be the same as global.App, but it's nice to depend less on globals.
 func (c *Context) App() *cli.App {
 	return c.App()
 }
@@ -53,6 +54,7 @@ func (c *Context) Args() []string {
 	return c.args()[c.currentArgIndex:]
 }
 
+// Command returns the cli.Command this context is for
 func (c *Context) Command() cli.Command {
 	return c.Context.Command()
 }
