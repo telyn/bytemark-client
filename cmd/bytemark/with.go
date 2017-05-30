@@ -101,8 +101,8 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 
 		value := make([]string, 0, toRead)
 		for i := 0; i < toRead; i++ {
-			arg, err := c.NextArg()
-			if err != nil {
+			arg, argErr := c.NextArg()
+			if argErr != nil {
 				// don't return the error - just means we ran out of arguments to slurp
 				break
 			}
