@@ -269,9 +269,7 @@ func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() erro
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Before: %v", format)
 	if len(defaultFormat) > 0 && format.Source == "CODE" {
-		fmt.Println("setting format.Value")
 		format.Value = defaultFormat[0]
 	}
 

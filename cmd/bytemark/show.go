@@ -218,7 +218,7 @@ Privileges will be output in no particular order.`,
 							}
 						}
 						return nil
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -238,7 +238,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(vlan, func() error {
 						return vlan.PrettyPrint(os.Stderr, prettyprint.Full)
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -258,7 +258,7 @@ Privileges will be output in no particular order.`,
 							}
 						}
 						return nil
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -278,7 +278,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(ipRange, func() error {
 						return ipRange.PrettyPrint(os.Stderr, prettyprint.Full)
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -299,7 +299,7 @@ Privileges will be output in no particular order.`,
 						}
 
 						return nil
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -319,7 +319,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(head, func() error {
 						return head.PrettyPrint(os.Stderr, prettyprint.Full)
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -340,7 +340,7 @@ Privileges will be output in no particular order.`,
 						}
 
 						return nil
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -360,7 +360,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(tail, func() error {
 						return tail.PrettyPrint(os.Stderr, prettyprint.Full)
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -381,7 +381,7 @@ Privileges will be output in no particular order.`,
 						}
 
 						return nil
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -401,7 +401,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(storagePool, func() error {
 						return storagePool.PrettyPrint(os.Stderr, prettyprint.Full)
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -422,7 +422,7 @@ Privileges will be output in no particular order.`,
 						}
 
 						return nil
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -443,7 +443,7 @@ Privileges will be output in no particular order.`,
 						}
 
 						return nil
-					})
+					}, "table")
 				}),
 			},
 			{
@@ -464,7 +464,7 @@ Privileges will be output in no particular order.`,
 						}
 
 						return nil
-					})
+					}, "table")
 				}),
 			},
 		},
