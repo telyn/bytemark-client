@@ -363,6 +363,10 @@ func globalFlags() (flags []cli.Flag) {
 			Usage: "URL of SPP. set to blank in environments without an SPP.",
 		},
 		cli.StringFlag{
+			Name:  "output-format",
+			Usage: "The output format to use. Currently defined output formats are human (default for most commands), json (machine readable format), table (human-readable table format)",
+		},
+		cli.StringFlag{
 			Name:  "user",
 			Usage: "user you wish to log in as",
 		},
