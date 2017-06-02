@@ -10,6 +10,33 @@ import (
 )
 
 func init() {
+	adminCommands = append(adminCommands, cli.Command{
+		Name:   "delete",
+		Action: cli.ShowSubcommandHelp,
+		Subcommands: []cli.Command{
+			{
+				Name:      "vlan",
+				Usage:     "delete a given VLAN",
+				UsageText: "bytemark --admin delete vlan <id>",
+				Flags: []cli.Flag{
+					cli.IntFlag{
+						Name:  "id",
+						Usage: "the ID of the VLAN to delete",
+					},
+				},
+				Action: With(OptionalArgs("id"), RequiredFlags("id"), AuthProvider, func(c *Context) error {
+					if err := global.Client.DeleteVLAN(c.Int("id")); err != nil {
+						return err
+					}
+
+					log.Output("VLAN deleted")
+
+					return nil
+				}),
+			},
+		},
+	})
+
 	commands = append(commands, cli.Command{
 		Name:      "delete",
 		Usage:     "delete a given server, disc, group, account or key",
@@ -114,27 +141,6 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				},
 			},
 			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), deleteServer),
-		}, {
-			Name:        "backup",
-			Usage:       "delete the given backup",
-			UsageText:   `bytemark delete backup <server name> <disc label> <backup label>`,
-			Description: "Deletes the given backup. Backups cannot be recovered after deletion.",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "disc",
-					Usage: "the disc to delete a backup of",
-				},
-				cli.GenericFlag{
-					Name:  "server",
-					Usage: "the server to delete a backup from",
-					Value: new(VirtualMachineNameFlag),
-				},
-				cli.StringFlag{
-					Name:  "backup",
-					Usage: "the name or ID of the backup to delete",
-				},
-			},
-			Action: With(OptionalArgs("server", "disc", "backup"), RequiredFlags("server", "disc", "backup"), AuthProvider, deleteBackup),
 		}},
 	})
 }
@@ -238,11 +244,3 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("       bytemark delete server [--force] [---purge] <server>")
 	log.Log("       bytemark undelete server <server>")
 }*/
-func deleteBackup(c *Context) (err error) {
-	err = global.Client.DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
-	if err != nil {
-		return
-	}
-	log.Logf("Backup '%s' deleted successfully", c.String("backup"))
-	return
-}

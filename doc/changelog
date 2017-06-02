@@ -1,10 +1,44 @@
+bytemark-client (2.2.1) UNRELEASED; urgency=low
+
+  Fixes:
+  * many commands required fully-specified groups or servers when they
+    should've been more permissive and used defaulting.
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 20 Mar 2017 13:26:12 +0000
+
 bytemark-client (2.2) UNRELEASED; urgency=low
 
   New features:
-    * First release of admin interface.
-    * First release of backups interface.
+  * Added admin-only commands accessible by adding the --admin global flag
+  * Added list of admin-only commands to 'bytemark help admin'
+  * Added grant & revoke commands for dealing with privileges
+  * Added show privileges command
+  * Added --version flag - just prints the version and exits
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 06 Mar 2017 16:48:31 +0000
+  Changes:
+  * An error that shouldn't ever be seen (NilAuthError) has been made more
+    user-friendly
+  * Debug output (written to debug.log) now has a header containing useful info
+    (client version, exact invocation)
+  * Almost all arguments are now specifiable as flags
+  * Signup form now maxes out at 120 characters wide
+  * overview command now has a limit on how many servers per group it will
+    show
+  * reimage and create server now check that the image requested exists
+  * global flags now appear in the `bytemark help` output
+  * improved detection of default account for 'show account' and 'overview'
+  * prevent users from uploading private keys in 'add key'
+  * add key now supports key filename being passed as an argument
+
+  Fixes:
+  * show account now detects default accounts decently again. This bug should
+    be well and truly squashed now
+  * Fixed formatting on the USAGE section of help formatting
+  * Certain error messages from the API are now dealt with better
+  * HTTP 500 (Internal Server Errors) are handled much better now
+  * Some error messages that were output twice are now only output once
+
+ -- telyn <telyn@bytemark.co.uk>  Thu, 16 Mar 2017 15:10:45 +0000
 
 bytemark-client (2.1) UNRELEASED; urgency=low
 

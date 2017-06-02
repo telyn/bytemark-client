@@ -16,7 +16,7 @@ type ProviderFunc func(*Context) error
 // With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
 func With(providers ...ProviderFunc) func(c *cli.Context) error {
 	return func(cliContext *cli.Context) error {
-		c := Context{Context: cliContext}
+		c := Context{Context: cliContextWrapper{cliContext}}
 		err := foldProviders(&c, providers...)
 		cleanup(&c)
 		return err
@@ -101,8 +101,8 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 
 		value := make([]string, 0, toRead)
 		for i := 0; i < toRead; i++ {
-			arg, err := c.NextArg()
-			if err != nil {
+			arg, argErr := c.NextArg()
+			if argErr != nil {
 				// don't return the error - just means we ran out of arguments to slurp
 				break
 			}
@@ -128,9 +128,9 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
 		case *VirtualMachineNameFlag:
-			return value.VirtualMachine != "" && value.Group != "" && value.Account != ""
+			return value.VirtualMachine != ""
 		case *GroupNameFlag:
-			return value.Group != "" && value.Account != ""
+			return value.Group != ""
 		case *AccountNameFlag:
 			return *value != ""
 		case *util.SizeSpecFlag:
@@ -150,7 +150,7 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 // (or that VirtualMachineName / GroupName flags have the full complement of values needed)
 func RequiredFlags(flagNames ...string) ProviderFunc {
 	return func(c *Context) (err error) {
-		for _, flag := range c.Context.Command.Flags {
+		for _, flag := range c.Command().Flags {
 			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(c, flag) {
 				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
 			}
@@ -166,7 +166,15 @@ func AccountProvider(flagName string) ProviderFunc {
 		if err != nil {
 			return
 		}
-		c.Account, err = global.Client.GetAccount(c.String(flagName))
+		accName := c.String(flagName)
+		if accName == "" {
+			accName = global.Config.GetIgnoreErr("account")
+		}
+
+		c.Account, err = global.Client.GetAccount(accName)
+		if err == nil && c.Account == nil {
+			err = fmt.Errorf("no account was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -197,6 +205,9 @@ func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
 		vmName := c.VirtualMachineName(vmFlagName)
 		discLabel := c.String(discFlagName)
 		c.Disc, err = global.Client.GetDisc(&vmName, discLabel)
+		if err == nil && c.Disc == nil {
+			err = fmt.Errorf("no disc was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -207,6 +218,9 @@ func DefinitionsProvider(c *Context) (err error) {
 		return
 	}
 	c.Definitions, err = global.Client.ReadDefinitions()
+	if err == nil && c.Definitions == nil {
+		err = fmt.Errorf("no definitions were returned - please report a bug")
+	}
 	return
 }
 
@@ -223,6 +237,9 @@ func GroupProvider(flagName string) ProviderFunc {
 
 		groupName := c.GroupName(flagName)
 		c.Group, err = global.Client.GetGroup(&groupName)
+		if err == nil && c.Group == nil {
+			err = fmt.Errorf("no group was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -291,6 +308,9 @@ func UserProvider(flagName string) ProviderFunc {
 			return
 		}
 		c.User, err = global.Client.GetUser(user)
+		if err == nil && c.User == nil {
+			err = fmt.Errorf("no user was returned - please report a bug")
+		}
 		return
 	}
 }
@@ -307,6 +327,9 @@ func VirtualMachineProvider(flagName string) ProviderFunc {
 		}
 		vmName := c.VirtualMachineName(flagName)
 		c.VirtualMachine, err = global.Client.GetVirtualMachine(&vmName)
+		if err == nil && c.VirtualMachine == nil {
+			err = fmt.Errorf("no server was returned - please report a bug")
+		}
 		return
 	}
 }

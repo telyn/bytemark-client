@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -10,12 +11,9 @@ import (
 
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
@@ -26,7 +24,6 @@ func TestDeleteServer(t *testing.T) {
 
 	vm := getFixtureVM()
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetVirtualMachine", &name).Return(&vm).Times(1)
 	c.When("DeleteVirtualMachine", &name, false).Return(nil).Times(1)
 
@@ -51,12 +48,9 @@ func TestDeleteServer(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
@@ -64,7 +58,6 @@ func TestDeleteDisc(t *testing.T) {
 		Group:          "test-group",
 		Account:        "test-account",
 	}
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteDisc", &name, "666").Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark delete disc --force test-server.test-group.test-account 666", " "))
@@ -77,7 +70,7 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestDeleteKey(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	usr := brain.User{
 		Username: "test-user",
@@ -89,11 +82,7 @@ func TestDeleteKey(t *testing.T) {
 		},
 	}
 
-	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "user").Return("test-user")
-	c.When("AuthWithToken", "test-token").Return(nil)
 	c.When("GetUser", usr.Username).Return(&usr)
 
 	c.When("DeleteUserAuthorizedKey", "test-user", "ssh-rsa AAAAFakeKey test-key-one").Return(nil).Times(1)
@@ -109,6 +98,7 @@ func TestDeleteKey(t *testing.T) {
 	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa-otp").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil)
@@ -125,27 +115,31 @@ func TestDeleteKey(t *testing.T) {
 	c.Reset()
 }
 
-func TestDeleteBackup(t *testing.T) {
+func TestDeleteVLAN(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	_, c := baseTestAuthSetup(t, true)
 
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
-	}
+	c.When("ReapVMs").Return(nil).Times(1)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&defVM)
+	err := global.App.Run([]string{"bytemark", "reap", "servers"})
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("DeleteBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
-
-	err := global.App.Run([]string{
-		"bytemark", "delete", "backup", "test-server", "test-disc", "test-backup",
-	})
 	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteVLANError(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("ReapVMs").Return(fmt.Errorf("Could not delete VLAN")).Times(1)
+
+	err := global.App.Run([]string{"bytemark", "reap", "servers"})
+
+	is.NotNil(err)
+
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
