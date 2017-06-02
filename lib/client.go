@@ -200,7 +200,7 @@ func (c *bytemarkClient) validateAccountName(account *string) error {
 		billAcc, err := c.getDefaultBillingAccount()
 		if err == nil && billAcc != nil {
 			*account = billAcc.Name
-		} else {
+		} else if err != nil {
 			return err
 		}
 	}
