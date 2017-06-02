@@ -119,17 +119,11 @@ type Client interface {
 	//
 	// username is allowed to be empty
 	GetPrivileges(username string) (brain.Privileges, error)
+	GetPrivilegesForAccount(account string) (brain.Privileges, error)
+	GetPrivilegesForGroup(group GroupName) (brain.Privileges, error)
+	GetPrivilegesForVirtualMachine(vm VirtualMachineName) (brain.Privileges, error)
 	GrantPrivilege(p brain.Privilege) error
 	RevokePrivilege(p brain.Privilege) error
-
-	//
-	// BACKUPS
-	//
-
-	CreateBackup(server VirtualMachineName, discLabelOrID string) (brain.Backup, error)
-	DeleteBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) error
-	GetBackups(server VirtualMachineName, discLabelOrID string) (brain.Backups, error)
-	RestoreBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
 
 	//
 	// USERS
@@ -205,4 +199,41 @@ type Client interface {
 	// SetVirtualMachineCDROM sets the URL of a CD to attach to a virtual machine. Set url to "" to remove the CD.
 	// Returns nil on success, an error otherwise.
 	SetVirtualMachineCDROM(name *VirtualMachineName, url string) (err error)
+
+	//
+	// ADMIN
+	//
+
+	GetVLANs() ([]*brain.VLAN, error)
+	GetVLAN(num int) (*brain.VLAN, error)
+	GetIPRanges() ([]*brain.IPRange, error)
+	GetIPRange(id int) (*brain.IPRange, error)
+	GetHeads() ([]*brain.Head, error)
+	GetHead(idOrLabel string) (*brain.Head, error)
+	GetTails() ([]*brain.Tail, error)
+	GetTail(idOrLabel string) (*brain.Tail, error)
+	GetStoragePools() ([]*brain.StoragePool, error)
+	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
+	GetMigratingVMs() ([]*brain.VirtualMachine, error)
+	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
+	GetRecentVMs() ([]*brain.VirtualMachine, error)
+	MigrateDisc(disc int, newStoragePool string) error
+	MigrateVirtualMachine(vmName VirtualMachineName, newHead string) error
+	ReapVMs() error
+	DeleteVLAN(id int) error
+	AdminCreateGroup(name GroupName, vlanNum int) error
+	CreateIPRange(ipRange string, vlanNum int) error
+	CancelDiscMigration(id int) error
+	CancelVMMigration(id int) error
+	EmptyStoragePool(idOrLabel string) error
+	EmptyHead(idOrLabel string) error
+	ReifyDisc(id int) error
+	ApproveVM(name VirtualMachineName, powerOn bool) error
+	RejectVM(name VirtualMachineName, reason string) error
+	RegradeDisc(disc int, newGrade string) error
+	UpdateVMMigration(name VirtualMachineName, speed *int64, downtime *int) error
+	CreateUser(username string, privilege string) error
+	UpdateHead(idOrLabel string, options UpdateHead) error
+	UpdateTail(idOrLabel string, options UpdateTail) error
+	UpdateStoragePool(idOrLabel string, options UpdateStoragePool) error
 }

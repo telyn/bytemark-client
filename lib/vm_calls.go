@@ -2,10 +2,10 @@ package lib
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"strconv"
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
@@ -37,15 +37,10 @@ func (c *bytemarkClient) CreateVirtualMachine(group *GroupName, spec brain.Virtu
 		labelDiscs(spec.Discs, 0)
 	}
 
-	js, err := json.Marshal(spec)
-	if err != nil {
-		return nil, err
-	}
-
 	vm = new(brain.VirtualMachine)
 	oldfile := log.LogFile
 	log.LogFile = nil
-	_, _, err = r.Run(bytes.NewBuffer(js), vm)
+	_, _, err = r.MarshalAndRun(spec, vm)
 	log.LogFile = oldfile
 	return vm, err
 }
@@ -72,16 +67,27 @@ func (c *bytemarkClient) DeleteVirtualMachine(name *VirtualMachineName, purge bo
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
 func (c *bytemarkClient) GetVirtualMachine(name *VirtualMachineName) (vm *brain.VirtualMachine, err error) {
-	err = c.validateVirtualMachineName(name)
-	if err != nil {
-		return
-	}
-	vm = new(brain.VirtualMachine)
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
-	if err != nil {
-		return
+	var r *Request
+
+	// If the VM name is numeric, it means it is an internal Bytemark ID,
+	// so we should use a different endpoint
+	if _, nErr := strconv.Atoi(name.VirtualMachine); nErr == nil {
+		r, err = c.BuildRequest("GET", BrainEndpoint, "/virtual_machines/%s?include_deleted=true&view=overview", name.VirtualMachine)
+		if err != nil {
+			return
+		}
+	} else {
+		err = c.validateVirtualMachineName(name)
+		if err != nil {
+			return
+		}
+		r, err = c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
+		if err != nil {
+			return
+		}
 	}
 
+	vm = new(brain.VirtualMachine)
 	_, _, err = r.Run(nil, vm)
 	if err != nil {
 		return
@@ -118,11 +124,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName *VirtualMachineName, newName
 		return err
 	}
 
-	js, err := json.Marshal(change)
-	if err != nil {
-		return err
-	}
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.MarshalAndRun(change, nil)
 	return err
 
 }
@@ -139,13 +141,9 @@ func (c *bytemarkClient) ReimageVirtualMachine(name *VirtualMachineName, image *
 		return err
 	}
 
-	js, err := json.Marshal(image)
-	if err != nil {
-		return err
-	}
 	oldfile := log.LogFile
 	log.LogFile = nil
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.MarshalAndRun(image, nil)
 	log.LogFile = oldfile
 	return err
 }
@@ -352,11 +350,6 @@ func (c *bytemarkClient) SetVirtualMachineCDROM(name *VirtualMachineName, url st
 		return err
 	}
 
-	cdromJSON, err := json.Marshal(brain.VirtualMachine{CdromURL: url})
-	if err != nil {
-		return err
-	}
-
-	_, _, err = r.Run(bytes.NewReader(cdromJSON), nil)
+	_, _, err = r.MarshalAndRun(brain.VirtualMachine{CdromURL: url}, nil)
 	return err
 }

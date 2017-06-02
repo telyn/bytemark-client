@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strings"
 )
@@ -33,16 +31,11 @@ func (c *bytemarkClient) AddUserAuthorizedKey(username string, key string) error
 	key = strings.TrimSpace(key)
 	user.AuthorizedKeys = append(user.AuthorizedKeys, key)
 
-	userjs, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
-
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/users/%s", username)
 	if err != nil {
 		return err
 	}
-	_, _, err = r.Run(bytes.NewBuffer(userjs), nil)
+	_, _, err = r.MarshalAndRun(user, nil)
 	return err
 
 }
@@ -75,16 +68,12 @@ func (c *bytemarkClient) DeleteUserAuthorizedKey(username string, key string) er
 	}
 
 	user.AuthorizedKeys = newKeys
-	userjs, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
 
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/users/%s", username)
 	if err != nil {
 		return err
 	}
-	_, _, err = r.Run(bytes.NewBuffer(userjs), nil)
+	_, _, err = r.MarshalAndRun(user, nil)
 	return err
 
 }

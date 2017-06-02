@@ -11,11 +11,7 @@ import (
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	config, c := baseTestSetup(t, false)
-
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "user").Return("test-user")
+	_, c := baseTestAuthSetup(t, false)
 
 	err := ioutil.WriteFile("testkey.pub", []byte("ssh-rsa aaaaawhartevervAsde fake key"), 0600)
 	if err != nil {
@@ -26,7 +22,6 @@ func TestAddKeyCommand(t *testing.T) {
 		t.Error(err)
 	}
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
 	err = global.App.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
 	if err != nil {
@@ -73,15 +68,11 @@ func TestAddKeyCommand(t *testing.T) {
 }
 
 func TestAddIPCommand(t *testing.T) {
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "user").Return("test-user")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	vm := lib.VirtualMachineName{VirtualMachine: "test-server"}
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vm, nil).Times(1)
+	vm := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
 
 	ipcr := brain.IPCreateRequest{
 		Addresses:  1,
@@ -95,7 +86,6 @@ func TestAddIPCommand(t *testing.T) {
 	ipcres := ipcr
 	ipcres.IPs = []*net.IP{&ip}
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddIP", &vm, &ipcr).Return(&ipcres, nil)
 
 	err := global.App.Run(strings.Split("bytemark add ip --reason testing test-server", " "))

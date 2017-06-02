@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
+	"regexp"
 	"sort"
 	"strings"
 	"unicode"
@@ -93,6 +94,7 @@ func friendlifyBadRequestPhrases(phrases []string) (newPhrases []string) {
 		"can't", "cannot",
 		"doesn't", "does not",
 	)
+	missingParamRE := regexp.MustCompile("^Missing [a-zA-Z_]+ parameter$")
 
 	newPhrases = make([]string, 0, len(phrases))
 
@@ -116,7 +118,31 @@ func friendlifyBadRequestPhrases(phrases []string) (newPhrases []string) {
 			if found["can't be blank"] && p != "can't be blank" {
 				continue
 			}
+			if missingParamRE.MatchString(p) {
+				newPhrases = append(newPhrases, "was not specified")
+				continue
+			}
+
 			newPhrases = append(newPhrases, replacer.Replace(p))
+		}
+	}
+	return
+}
+
+func unmarshalStringOrStringSlice(data json.RawMessage) (thoseProblems []string, err error) {
+	thoseProblems = make([]string, 0, 1)
+
+	if data[0] == '"' {
+		var str string
+		err = json.Unmarshal(data, &str)
+		if err != nil {
+			return
+		}
+		thoseProblems = append(thoseProblems, str)
+	} else {
+		err = json.Unmarshal(data, &thoseProblems)
+		if err != nil {
+			return
 		}
 	}
 	return
@@ -149,15 +175,19 @@ func newBadRequestError(ctx APIError, response []byte) error {
 				}
 			}
 		case "memory":
-			thoseProblems := make([]string, 0, 1)
-			err := json.Unmarshal(data, &thoseProblems)
+			thoseProblems, err := unmarshalStringOrStringSlice(data)
 			if err != nil {
 				return err
 			}
 			problems["memory_amount"] = friendlifyBadRequestPhrases(thoseProblems)
+		case "interval_seconds":
+			thoseProblems, err := unmarshalStringOrStringSlice(data)
+			if err != nil {
+				return err
+			}
+			problems["interval"] = friendlifyBadRequestPhrases(thoseProblems)
 		default:
-			thoseProblems := make([]string, 0, 1)
-			err := json.Unmarshal(data, &thoseProblems)
+			thoseProblems, err := unmarshalStringOrStringSlice(data)
 			if err != nil {
 				return err
 			}
@@ -171,7 +201,9 @@ func newBadRequestError(ctx APIError, response []byte) error {
 
 func capitaliseJSON(s string) string {
 	rs := []rune(s)
-	rs[0] = unicode.ToUpper(rs[0])
+	if len(rs) > 0 {
+		rs[0] = unicode.ToUpper(rs[0])
+	}
 	s = string(rs)
 	return strings.Replace(s, "_", " ", -1)
 }
@@ -204,8 +236,8 @@ type InternalServerError struct {
 
 func (e InternalServerError) Error() string {
 	out := []string{"The API server returned an error"}
-	if e.RequestBody != "" {
-		out = append(out, fmt.Sprintf("It had this to say: %s", e.RequestBody))
+	if e.ResponseBody != "" {
+		out = append(out, e.ResponseBody)
 	}
 	return strings.Join(out, "\r\n")
 }

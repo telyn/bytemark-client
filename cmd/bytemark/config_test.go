@@ -15,7 +15,7 @@ import (
 func TestConfigAccountValidation(t *testing.T) {
 	config, client := baseTestSetup(t, false)
 
-	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
+	config.When("GetGroup").Return(&lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
@@ -35,7 +35,7 @@ func TestConfigGroupValidation(t *testing.T) {
 	flagset.Bool("force", false, "")
 
 	ctx := Context{
-		Context: cli.NewContext(global.App, flagset, nil),
+		Context: cliContextWrapper{cli.NewContext(global.App, flagset, nil)},
 	}
 	t.Logf("Testing validateGroupForConfig\r\n")
 	runGroupTests(t, &ctx, client, getValidationTests()["group"], validateGroupForConfig)
@@ -57,7 +57,7 @@ func TestConfigValidations(t *testing.T) {
 	flagset.Bool("force", false, "")
 
 	ctx := Context{
-		Context: cli.NewContext(global.App, flagset, nil),
+		Context: cliContextWrapper{cli.NewContext(global.App, flagset, nil)},
 	}
 
 	tests := getValidationTests()
@@ -100,6 +100,7 @@ func TestCommandConfigSet(t *testing.T) {
 		config.When("Get", "token").Return("test-token", nil)
 		config.When("GetIgnoreErr", "user").Return("old-test-user")
 		config.When("GetIgnoreErr", "yubikey").Return("")
+		config.When("GetIgnoreErr", "2fa-otp").Return("")
 		config.When("GetIgnoreErr", "account").Return("")
 		config.When("GetGroup").Return(&lib.GroupName{})
 		client.When("AuthWithToken", "test-token").Return(nil)
@@ -169,7 +170,6 @@ func TestCommandConfigSet(t *testing.T) {
 }
 
 func setupAccountTest(c *mocks.Client, name string, err error) {
-	c.When("ParseAccountName", name, []string{""}).Return(name)
 
 	if err != nil {
 		c.When("GetAccount", name).Return(nil, err)
@@ -180,7 +180,6 @@ func setupAccountTest(c *mocks.Client, name string, err error) {
 
 func setupGroupTest(c *mocks.Client, name string, err error) {
 	groupName := lib.GroupName{Group: name}
-	c.When("ParseGroupName", name, []*lib.GroupName{{}}).Return(&groupName)
 	if err != nil {
 		c.When("GetGroup", &groupName).Return(nil, err).Times(1)
 	} else {

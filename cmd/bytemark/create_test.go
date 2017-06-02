@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -11,17 +12,12 @@ import (
 
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	name := lib.VirtualMachineName{VirtualMachine: "test-server"}
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&name).Times(1)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", &name).Return(&brain.VirtualMachine{Hostname: "test-server.default.test-user.endpoint"})
+	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
+	c.When("GetVirtualMachine", &name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
 
 	disc := brain.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
@@ -37,17 +33,14 @@ func TestCreateDiskCommand(t *testing.T) {
 
 func TestCreateGroupCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetGroup").Return(&defGroup)
 
 	group := lib.GroupName{
-		Group: "test-group",
+		Group:   "test-group",
+		Account: "default-account",
 	}
-	c.When("ParseGroupName", "test-group", []*lib.GroupName{&defGroup}).Return(&group).Times(1)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("CreateGroup", &group).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark create group test-group", " "))
@@ -99,15 +92,10 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 }
 
 func TestCreateServerCommand(t *testing.T) {
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&defVM)
-
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&lib.VirtualMachineName{VirtualMachine: "test-server"})
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	// where most commands use &defVM to make sure the VirtualMachineName has all three components (and to avoid calls to GetDefaultAccount, presumably), I have singled out TestCreateServerCommand to also test that unqualified server names will work in practice without account & group set in the config.
+	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{Group: "default"})
 
 	vm := brain.VirtualMachineSpec{
 		Discs: []brain.Disc{
@@ -149,18 +137,12 @@ func TestCreateServerCommand(t *testing.T) {
 	getvm.Discs[1] = &vm.Discs[1]
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
-	group := lib.GroupName{
-		Group:   "",
-		Account: "",
-	}
-
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
 	}
 
-	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
+	c.When("CreateVirtualMachine", &lib.GroupName{Group: "default"}, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
@@ -191,14 +173,9 @@ func TestCreateServerCommand(t *testing.T) {
 }
 
 func TestCreateServerNoImage(t *testing.T) {
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	vm := brain.VirtualMachineSpec{
 		VirtualMachine: &brain.VirtualMachine{
@@ -220,17 +197,16 @@ func TestCreateServerNoImage(t *testing.T) {
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	group := lib.GroupName{
-		Group:   "",
-		Account: "",
+		Group:   "default",
+		Account: "default-account",
 	}
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname)
 	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
@@ -252,17 +228,14 @@ func TestCreateServerNoImage(t *testing.T) {
 
 func TestCreateServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetVirtualMachine").Return(&defVM)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+		Group:          "default",
+		Account:        "default-account",
 	}
 
 	vm := brain.VirtualMachineSpec{
@@ -274,19 +247,13 @@ func TestCreateServer(t *testing.T) {
 		Discs: []brain.Disc{{
 			Size:         34 * 1024,
 			StorageGrade: "archive",
-		},
-		},
+		}},
 	}
 	getvm := new(brain.VirtualMachine)
 	*getvm = *vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
-	group := lib.GroupName{}
-
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-
-	c.When("CreateVirtualMachine", &group, vm).Return(vm.VirtualMachine, nil).Times(1)
+	c.When("CreateVirtualMachine", &defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)
 	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
@@ -301,29 +268,110 @@ func TestCreateServer(t *testing.T) {
 	}
 }
 
-func TestCreateBackup(t *testing.T) {
+func TestCreateVLANGroup(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, true)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{"", "", ""})
+	config.When("GetGroup").Return(&defGroup).Times(1)
 
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "",
-		Account:        "",
+	group := lib.GroupName{
+		Group:   "test-group",
+		Account: "test-account",
 	}
-	c.When("ParseVirtualMachineName", "test-server", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("AdminCreateGroup", group, 0).Return(nil).Times(1)
 
-	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)
-
-	err := global.App.Run([]string{
-		"bytemark", "create", "backup", "test-server", "test-disc",
-	})
+	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
 	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateVLANGroupWithVLANNum(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestAuthSetup(t, true)
+
+	config.When("GetGroup").Return(&defGroup).Times(1)
+
+	group := lib.GroupName{
+		Group:   "test-group",
+		Account: "test-account",
+	}
+	c.When("AdminCreateGroup", group, 19).Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account 19", " "))
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateVLANGroupError(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestAuthSetup(t, true)
+
+	config.When("GetGroup").Return(&defGroup).Times(1)
+
+	group := lib.GroupName{
+		Group:   "test-group",
+		Account: "test-account",
+	}
+	c.When("AdminCreateGroup", group, 0).Return(fmt.Errorf("Group name already used")).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
+	is.NotNil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateIPRange(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateIPRange", "192.168.3.0/28", 14).Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 14", " "))
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateIPRangeError(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateIPRange", "192.168.3.0/28", 18).Return(fmt.Errorf("Error creating IP range")).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 18", " "))
+	is.NotNil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateUser(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateUser", "uname", "cluster_su").Return(nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create user uname cluster_su", " "))
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateUserError(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	c.When("CreateUser", "uname", "cluster_su").Return(fmt.Errorf("Error creating user")).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark create user uname cluster_su", " "))
+	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}

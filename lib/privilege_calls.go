@@ -1,13 +1,12 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// user is optional, will get all privileges you can see without it
+// GetPrivileges gets all privileges for the given user (if you are that user or are cluster-admin)
+// is user is blank, assumed to be your user
 func (c *bytemarkClient) GetPrivileges(user string) (privileges brain.Privileges, err error) {
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/users/%s/privileges", user)
 	if err != nil {
@@ -23,6 +22,36 @@ func (c *bytemarkClient) GetPrivileges(user string) (privileges brain.Privileges
 	return
 }
 
+// GetPrivilegesForAccount gets all privileges lower than your privilege on the given account
+func (c *bytemarkClient) GetPrivilegesForAccount(account string) (privileges brain.Privileges, err error) {
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/privileges", account)
+	if err != nil {
+		return
+	}
+	_, _, err = req.Run(nil, &privileges)
+	return
+}
+
+// GetPrivilegesForGroup gets all privileges lower than your privilege on the given group
+func (c *bytemarkClient) GetPrivilegesForGroup(group GroupName) (privileges brain.Privileges, err error) {
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/privileges", group.Account, group.Group)
+	if err != nil {
+		return
+	}
+	_, _, err = req.Run(nil, &privileges)
+	return
+}
+
+// GetPrivilegesForVirtualMachine gets all privileges lower than your privilege on the given virtual machine
+func (c *bytemarkClient) GetPrivilegesForVirtualMachine(vm VirtualMachineName) (privileges brain.Privileges, err error) {
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/privileges", vm.Account, vm.Group, vm.VirtualMachine)
+	if err != nil {
+		return
+	}
+	_, _, err = req.Run(nil, &privileges)
+	return
+}
+
 func (c *bytemarkClient) GrantPrivilege(privilege brain.Privilege) (err error) {
 	username := privilege.Username
 	req, err := c.BuildRequest("POST", BrainEndpoint, "/users/%s/privileges", username)
@@ -31,11 +60,7 @@ func (c *bytemarkClient) GrantPrivilege(privilege brain.Privilege) (err error) {
 	}
 	privilege.Username = ""
 
-	js, err := json.Marshal(privilege)
-	if err != nil {
-		return
-	}
-	_, _, err = req.Run(bytes.NewBuffer(js), nil)
+	_, _, err = req.MarshalAndRun(privilege, nil)
 	return
 }
 

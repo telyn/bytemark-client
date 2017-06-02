@@ -44,7 +44,7 @@ func TestBackupPrettyPrint(t *testing.T) {
 			Expected: "taylorswift-1989-this-sick-beat-trademark-violations-20170101",
 		},
 	}
-	prettyprint.RunTests(t, "TestBackupPrettyPrint", tests)
+	prettyprint.RunTests(t, tests)
 }
 
 func TestBackupsPrettyPrint(t *testing.T) {
@@ -66,7 +66,7 @@ func TestBackupsPrettyPrint(t *testing.T) {
 			},
 		},
 	}
-	prettyprint.RunTests(t, "TestBackupsPrettyPrint", []prettyprint.Test{
+	prettyprint.RunTests(t, []prettyprint.Test{
 		{
 			Object: backups,
 			Detail: prettyprint.Full,

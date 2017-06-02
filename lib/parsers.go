@@ -4,10 +4,10 @@ import (
 	"strings"
 )
 
-// ParseAccountName parses a group name given in .account[.extrabits] format.
+// ParseAccountName parses a group name given in account[.extrabits] format.
 // If there is a blank account name, tries to figure out the best possible account name to use.
 // If authentication has already happened, this also involves asking bmbilling.
-func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (account string) {
+func ParseAccountName(name string, defaults ...string) (account string) {
 	// 1 piece with optional extra cruft for the fqdn
 
 	if len(defaults) != 0 {
@@ -20,11 +20,19 @@ func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (acco
 	}
 
 	return account
+}
 
+// ParseAccountName parses a group name given in account[.extrabits] format.
+// If there is a blank account name, tries to figure out the best possible account name to use.
+// If authentication has already happened, this also involves asking bmbilling.
+// This is deprecated and will be removed in bytemark-client 3.0
+// TODO(telyn): delete this method
+func (c *bytemarkClient) ParseAccountName(name string, defaults ...string) (account string) {
+	return ParseAccountName(name, defaults...)
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
-func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (group *GroupName) {
+func ParseGroupName(name string, defaults ...*GroupName) (group *GroupName) {
 	group = new(GroupName)
 	if len(defaults) == 0 {
 		group.Group = ""
@@ -40,14 +48,21 @@ func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (gr
 
 	}
 	if len(bits) >= 2 {
-		group.Account = c.ParseAccountName(bits[1], group.Account)
+		group.Account = ParseAccountName(bits[1], group.Account)
 	}
 	return group
 
 }
 
+// ParseGroupName parses a group name given in group[.account[.extrabits]] format.
+// This is deprecated and will be removed in bytemark-client 3.0
+// TODO(telyn): delete this method
+func (c *bytemarkClient) ParseGroupName(name string, defaults ...*GroupName) (group *GroupName) {
+	return ParseGroupName(name, defaults...)
+}
+
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*VirtualMachineName) (vm *VirtualMachineName, err error) {
+func ParseVirtualMachineName(name string, defaults ...*VirtualMachineName) (vm *VirtualMachineName, err error) {
 	vm = new(VirtualMachineName)
 
 	if len(defaults) == 0 {
@@ -63,7 +78,7 @@ func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*Virtu
 	bits := strings.SplitN(name, ".", 2)
 	vm.VirtualMachine = bits[0]
 	if len(bits) > 1 {
-		gp := c.ParseGroupName(bits[1], &GroupName{Group: vm.Group, Account: vm.Account})
+		gp := ParseGroupName(bits[1], &GroupName{Group: vm.Group, Account: vm.Account})
 		vm.Group = gp.Group
 		vm.Account = gp.Account
 	}
@@ -72,4 +87,11 @@ func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*Virtu
 		return vm, BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
 	}
 	return vm, nil
+}
+
+// ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
+// This is deprecated and will be removed in bytemark-client 3.0
+// TODO(telyn): delete this method
+func (c *bytemarkClient) ParseVirtualMachineName(name string, defaults ...*VirtualMachineName) (vm *VirtualMachineName, err error) {
+	return ParseVirtualMachineName(name, defaults...)
 }
