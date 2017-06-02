@@ -234,7 +234,7 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.Nil(err)
 
 	// Check that being just numeric is valid as well
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "123"})
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "123"})
 	is.NotNil(vm)
 	is.Nil(err)
 
