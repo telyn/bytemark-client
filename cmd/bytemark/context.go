@@ -275,7 +275,7 @@ func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() erro
 
 	if c.Bool("json") {
 		format.Value = "json"
-	} else if c.Bool("table") {
+	} else if c.Bool("table") || c.String("table-fields") != "" {
 		format.Value = "table"
 	}
 
