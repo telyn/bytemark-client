@@ -52,7 +52,7 @@ var templateFuncMap = map[string]interface{}{
 	"percentage": func(num int, denom int) string {
 		return fmt.Sprintf("%d%%", int(100*float64(num)/float64(denom)))
 	},
-	// pluralize returns single if num == 1, plural if num == 2. For instance, {{ pluralize "horse" "horses" 2 }} will return "horses", while {{ pluralize "bacterium" "bacteria" 1 }} will return "bacterium".
+	// pluralize returns single if num == 1, plural if num == 2. For instance, {{ pluralize "horse" "horses" 2 }} will return "2 horses", while {{ pluralize "bacterium" "bacteria" 1 }} will return "1 bacterium".
 	"pluralize": func(single string, plural string, num int) string {
 		if num == 1 {
 			return fmt.Sprintf("%d %s", num, single)
