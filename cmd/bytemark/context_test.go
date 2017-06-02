@@ -94,6 +94,18 @@ func TestOutput(t *testing.T) {
 				ID:   11323,
 			},
 			Expected: "+-----------+-------+---------------+-----------------+\n| AccountID |  ID   |     Name      | VirtualMachines |\n+-----------+-------+---------------+-----------------+\n|         0 | 11323 | my-cool-group |                 |\n+-----------+-------+---------------+-----------------+\n",
+			// also, --table-fields being non-empty should imply --table and be case insensitive
+		}, {
+			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
+			DefaultFormat: []string{"human"},
+			HumanFn:       humanFnErr,
+			TableFlag:     false,
+			TableFields:   "AccountID,ID,Name,VirtualMachines",
+			Object: brain.Group{
+				Name: "my-cool-group",
+				ID:   11323,
+			},
+			Expected: "+-----------+-------+---------------+-----------------+\n| AccountID |  ID   |     Name      | VirtualMachines |\n+-----------+-------+---------------+-----------------+\n|         0 | 11323 | my-cool-group |                 |\n+-----------+-------+---------------+-----------------+\n",
 		},
 	}
 

@@ -67,9 +67,11 @@ func (c *bytemarkClient) GrantPrivilege(privilege brain.Privilege) (err error) {
 func (c *bytemarkClient) RevokePrivilege(privilege brain.Privilege) (err error) {
 	if privilege.ID == 0 {
 		// ok annoying, we have to go find out the privilege's id first
-		privs, err := c.GetPrivileges(privilege.Username)
+
+		var privs brain.Privileges
+		privs, err = c.GetPrivileges(privilege.Username)
 		if err != nil {
-			return err
+			return
 		}
 		index := privs.IndexOf(privilege)
 		if index == -1 {
