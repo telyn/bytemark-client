@@ -16,7 +16,7 @@ type ProviderFunc func(*Context) error
 // With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
 func With(providers ...ProviderFunc) func(c *cli.Context) error {
 	return func(cliContext *cli.Context) error {
-		c := Context{Context: cliContext}
+		c := Context{Context: cliContextWrapper{cliContext}}
 		err := foldProviders(&c, providers...)
 		cleanup(&c)
 		return err
@@ -101,8 +101,8 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 
 		value := make([]string, 0, toRead)
 		for i := 0; i < toRead; i++ {
-			arg, err := c.NextArg()
-			if err != nil {
+			arg, argErr := c.NextArg()
+			if argErr != nil {
 				// don't return the error - just means we ran out of arguments to slurp
 				break
 			}
@@ -128,9 +128,9 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
 		case *VirtualMachineNameFlag:
-			return value.VirtualMachine != "" && value.Group != "" && value.Account != ""
+			return value.VirtualMachine != ""
 		case *GroupNameFlag:
-			return value.Group != "" && value.Account != ""
+			return value.Group != ""
 		case *AccountNameFlag:
 			return *value != ""
 		case *util.SizeSpecFlag:
@@ -150,7 +150,7 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 // (or that VirtualMachineName / GroupName flags have the full complement of values needed)
 func RequiredFlags(flagNames ...string) ProviderFunc {
 	return func(c *Context) (err error) {
-		for _, flag := range c.Context.Command.Flags {
+		for _, flag := range c.Command().Flags {
 			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(c, flag) {
 				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
 			}

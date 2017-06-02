@@ -2,7 +2,7 @@
 variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
-  GOVERSION: "1.6"
+  GOVERSION: "1.8"
 
 stages:
   - test
@@ -16,6 +16,7 @@ stages:
   before_script:
     # these two are needed for coverage stats
     - go get github.com/BytemarkHosting/auth-client
+    - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
@@ -50,7 +51,7 @@ release-check:
   - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
   script:
   - |
-    if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ;
+    if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
       echo "Mismatch between branch name and changelog version"
       exit 1
     fi
@@ -94,6 +95,7 @@ test:
   before_script:
     # these two are needed for coverage stats
     - go get github.com/BytemarkHosting/auth-client
+    - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
@@ -201,7 +203,7 @@ package-debian-amd64:
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
-  - '[ "$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION~$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
+  - '[ "release-$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
   - mv ../bytemark-client*.deb .
@@ -258,7 +260,7 @@ publish:
   before_script: *version_script
   script:
   - mkdir -p pkg/{linux,mac,freebsd,openbsd,windows,debian,rpm}
-  - VERSION=${VERSION:-$CHANGELOG_VERSION~$SNAPSHOT_VERSION}
+  - VERSION=${VERSION:-$CHANGELOG_VERSION+$SNAPSHOT_VERSION}
   - cp bytemark-amd64-linux.tar.gz pkg/linux/bytemark-$VERSION.tar.gz
   - cp bytemark-amd64-freebsd.tar.gz pkg/freebsd/bytemark-$VERSION.tar.gz
   - cp bytemark-amd64-openbsd.tar.gz pkg/openbsd/bytemark-$VERSION.tar.gz
@@ -321,8 +323,8 @@ release-to-brew:
   - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
   # upload to repo
   - scp bytemark-amd64-darwin.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
-  - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/windows/bytemark-latest.zip"
-  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
+  - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/mac/bytemark-latest.zip"
+  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/mac/bytemark-latest.zip"
   # update the homebrew repo
   - git clone git@github.com:BytemarkHosting/homebrew-tools.git
   - cd homebrew-tools

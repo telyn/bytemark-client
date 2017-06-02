@@ -10,12 +10,7 @@ import (
 
 func TestListAccounts(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
-
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	_, c := baseTestAuthSetup(t, false)
 
 	c.When("GetAccounts").Return([]*lib.Account{&lib.Account{BrainID: 1, Name: "dr-evil"}}).Times(1)
 
@@ -29,10 +24,8 @@ func TestListAccounts(t *testing.T) {
 
 func TestListDiscs(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	name := lib.VirtualMachineName{
@@ -40,7 +33,6 @@ func TestListDiscs(t *testing.T) {
 		Group:          "default",
 		Account:        "default-account",
 	}
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	vm := brain.VirtualMachine{
 		ID:   4,
@@ -61,13 +53,9 @@ func TestListDiscs(t *testing.T) {
 
 func TestListGroups(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Groups: []*brain.Group{
@@ -86,14 +74,10 @@ func TestListGroups(t *testing.T) {
 
 func TestListServers(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 	config.When("GetGroup").Return(&defGroup)
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("GetAccount", "spooky-steve").Return(&lib.Account{
 		Name: "spooky-steve",

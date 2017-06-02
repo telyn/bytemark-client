@@ -8,19 +8,6 @@ import (
 	"testing"
 )
 
-// baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
-// user is test-user
-func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks.Client) {
-	config, c = baseTestSetup(t, admin)
-
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "user").Return("test-user")
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	return config, c
-}
-
 func TestGrantPrivilege(t *testing.T) {
 
 	tests := []struct {
