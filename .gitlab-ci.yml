@@ -2,7 +2,7 @@
 variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
-  GOVERSION: "1.6"
+  GOVERSION: "1.8"
 
 stages:
   - test
@@ -16,6 +16,7 @@ stages:
   before_script:
     # these two are needed for coverage stats
     - go get github.com/BytemarkHosting/auth-client
+    - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
@@ -94,6 +95,7 @@ test:
   before_script:
     # these two are needed for coverage stats
     - go get github.com/BytemarkHosting/auth-client
+    - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client

@@ -3,6 +3,8 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"regexp"
 	"sort"
 )
 
@@ -16,6 +18,60 @@ type Definitions struct {
 	HardwareProfiles         []string
 	Keymaps                  []string
 	Sendkeys                 []string
+}
+
+// DistributionDefinitions processes DistributionDescriptions into a slice of DistributionDefinitions
+func (d Definitions) DistributionDefinitions() (dists []brain.DistributionDefinition) {
+	// TODO: mix in data from the imager.
+	dists = make([]brain.DistributionDefinition, 0, len(d.DistributionDescriptions))
+	for name, desc := range d.DistributionDescriptions {
+		dists = append(dists, brain.DistributionDefinition{Name: name, Description: desc})
+	}
+	return
+}
+
+// HardwareProfileDefinitions processes HardwareProfiles into a slice of HardwareProfileDefinitions and mixes in some static data since the API doesn't return any more useful information yet.
+func (d Definitions) HardwareProfileDefinitions() (profs []brain.HardwareProfileDefinition) {
+	profs = make([]brain.HardwareProfileDefinition, 0, len(d.HardwareProfiles))
+
+	descriptions := map[string]string{
+		"^virtio": "Default, high-performance hardware profile",
+		"^compat": "More-compatible, but slower, hardware profile. May be useful for getting niche operating systems or older kernels to boot",
+	}
+	for _, name := range d.HardwareProfiles {
+		desc := ""
+		for regex, newDesc := range descriptions {
+			if match, _ := regexp.MatchString(regex, name); match {
+				desc = newDesc
+			}
+		}
+		profs = append(profs, brain.HardwareProfileDefinition{Name: name, Description: desc})
+
+	}
+	return
+}
+
+// StorageGradeDefinitions processes StorageGradeDescriptions into a slice of StorageGradeDefinitions
+func (d Definitions) StorageGradeDefinitions() (grades []brain.StorageGradeDefinition) {
+	grades = make([]brain.StorageGradeDefinition, 0, len(d.StorageGradeDescriptions))
+	for name, desc := range d.StorageGradeDescriptions {
+		grades = append(grades, brain.StorageGradeDefinition{Name: name, Description: desc})
+	}
+	return
+}
+
+// ZoneDefinitions processes ZoneNames into a slice of ZoneDefinitions, adding some static data of our own since there's nothing coming from the API about that right now
+func (d Definitions) ZoneDefinitions() (zones []brain.ZoneDefinition) {
+	zones = make([]brain.ZoneDefinition, 0, len(d.ZoneNames))
+	zoneDescriptionsMap := map[string]string{
+		"york":       "Cloud Servers in York",
+		"manchester": "Cloud Servers in Manchester",
+	}
+
+	for _, name := range d.ZoneNames {
+		zones = append(zones, brain.ZoneDefinition{Name: name, Description: zoneDescriptionsMap[name]})
+	}
+	return
 }
 
 // JSONDefinition is an intermediate type used for converting BigV's JSON output for /definitions into the beautiful Definitions struct above. It should not be exported.

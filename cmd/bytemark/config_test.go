@@ -35,7 +35,7 @@ func TestConfigGroupValidation(t *testing.T) {
 	flagset.Bool("force", false, "")
 
 	ctx := Context{
-		Context: cli.NewContext(global.App, flagset, nil),
+		Context: cliContextWrapper{cli.NewContext(global.App, flagset, nil)},
 	}
 	t.Logf("Testing validateGroupForConfig\r\n")
 	runGroupTests(t, &ctx, client, getValidationTests()["group"], validateGroupForConfig)
@@ -57,7 +57,7 @@ func TestConfigValidations(t *testing.T) {
 	flagset.Bool("force", false, "")
 
 	ctx := Context{
-		Context: cli.NewContext(global.App, flagset, nil),
+		Context: cliContextWrapper{cli.NewContext(global.App, flagset, nil)},
 	}
 
 	tests := getValidationTests()

@@ -52,8 +52,11 @@ func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 	// last minute alterations to commands
 	// used for modifying help descriptions, mostly.
 	for idx, cmd := range app.Commands {
-		if cmd.Name == "admin" {
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateAdminCommandsHelp()
+		switch cmd.Name {
+		case "admin":
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(adminCommands)
+		case "commands":
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(app.Commands)
 		}
 	}
 	return
@@ -358,6 +361,10 @@ func globalFlags() (flags []cli.Flag) {
 		cli.StringFlag{
 			Name:  "spp-endpoint",
 			Usage: "URL of SPP. set to blank in environments without an SPP.",
+		},
+		cli.StringFlag{
+			Name:  "output-format",
+			Usage: "The output format to use. Currently defined output formats are human (default for most commands), json (machine readable format), table (human-readable table format)",
 		},
 		cli.StringFlag{
 			Name:  "user",

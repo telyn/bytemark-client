@@ -188,7 +188,7 @@ func TestGetVirtualMachine(t *testing.T) {
 	is := is.New(t)
 	client, servers, err := mkTestClientAndServers(t, Handlers{
 		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path == "/accounts/account/groups/default/virtual_machines/valid-vm" {
+			if req.URL.Path == "/accounts/account/groups/default/virtual_machines/valid-vm" || req.URL.Path == "/virtual_machines/123" {
 				str, err := json.Marshal(getFixtureVM())
 				if err != nil {
 					t.Fatal(err)
@@ -230,6 +230,11 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.Nil(err)
 
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
+	is.NotNil(vm)
+	is.Nil(err)
+
+	// Check that being just numeric is valid as well
+	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "123"})
 	is.NotNil(vm)
 	is.Nil(err)
 

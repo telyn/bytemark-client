@@ -1,6 +1,7 @@
 package brain
 
 import (
+	"bytes"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
 )
@@ -45,6 +46,12 @@ func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 {{ define "hasbackups" }}{{ if gt .BackupCount 0 }} (has {{ pluralize "backup" "backups" .BackupCount }}){{ end }}{{ end }}
 `
 	return prettyprint.Run(wr, tmpl, "disc"+string(detail), d)
+}
+
+func (d Disc) String() string {
+	buf := new(bytes.Buffer)
+	_ = d.PrettyPrint(buf, prettyprint.SingleLine)
+	return buf.String()
 }
 
 // Validate makes sure the disc has a storage grade.

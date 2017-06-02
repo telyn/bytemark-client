@@ -101,7 +101,7 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs
 
 If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags: []cli.Flag{
+		Flags: append(OutputFlags("server", "object"),
 			cli.IntFlag{
 				Name:  "cores",
 				Value: 1,
@@ -130,10 +130,6 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Value: new(util.IPFlag),
 				Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
 			},
-			cli.BoolFlag{
-				Name:  "json",
-				Usage: "If set, will output the spec and created virtual machine as a JSON object.",
-			},
 			cli.GenericFlag{
 				Name:  "memory",
 				Value: new(util.SizeSpecFlag),
@@ -156,8 +152,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Name:  "zone",
 				Usage: "Which zone the server will be created in. See `bytemark zones` for the choices.",
 			},
-		},
-
+		),
 		Action: With(OptionalArgs("name", "cores", "memory", "disc"), RequiredFlags("name"), AuthProvider, createServer),
 	}
 	createServerCmd.Flags = append(createServerCmd.Flags, imageInstallFlags...)
@@ -389,7 +384,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
+	return c.OutputInDesiredForm(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
 		log.Log("cloud server created successfully")
 		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
 		if err != nil {
