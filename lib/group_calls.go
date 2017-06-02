@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
@@ -21,11 +19,7 @@ func (c *bytemarkClient) CreateGroup(name *GroupName) (err error) {
 		"name": name.Group,
 	}
 
-	js, err := json.Marshal(obj)
-	if err != nil {
-		return
-	}
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.MarshalAndRun(obj, nil)
 	return
 }
 

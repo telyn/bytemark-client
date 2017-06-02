@@ -35,6 +35,11 @@ func TestBadRequestError(t *testing.T) {
 				"• Hardware profile is invalid",
 			},
 		},
+		test{`{"interval_seconds":"Missing interval_seconds parameter"}`,
+			[]string{
+				"• Interval was not specified",
+			},
+		},
 	}
 
 	for _, d := range tests {

@@ -1,6 +1,7 @@
 package brain
 
 import (
+	"fmt"
 	"net"
 )
 
@@ -19,4 +20,8 @@ type NetworkInterface struct {
 	// and we can't use map[*net.IP]*net.IP because we could have two identical IPs in different memory locations and they wouldn't be equal. Rubbish.
 	ExtraIPs         map[string]*net.IP `json:"extra_ips"`
 	VirtualMachineID int                `json:"virtual_machine_id"`
+}
+
+func (nic NetworkInterface) String() string {
+	return fmt.Sprintf("%s - %s - %d IPs", nic.Label, nic.Mac, len(nic.IPs)+len(nic.ExtraIPs))
 }

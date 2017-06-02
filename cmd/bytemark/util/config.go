@@ -23,6 +23,7 @@ var configVars = [...]string{
 	"user",
 	"account",
 	"group",
+	"output-format",
 	"token",
 	"debug-level",
 	"yubikey",
@@ -90,6 +91,7 @@ type ConfigManager interface {
 	GetDebugLevel() int
 	EndpointName() string
 	PanelURL() string
+	ConfigDir() string
 
 	ImportFlags(*flag.FlagSet) []string
 }
@@ -322,10 +324,10 @@ func (config *Config) GetAll() (vars []ConfigVar, err error) {
 	for i, v := range configVars {
 		vars[i], err = config.GetV(v)
 		if err != nil {
-			return nil, err
+			return
 		}
 	}
-	return vars, nil
+	return
 }
 
 // GetDefault returns the default ConfigVar for the given key.
@@ -412,6 +414,8 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		return v
 	case "force":
 		return ConfigVar{"force", "false", "CODE"}
+	case "output-format":
+		return ConfigVar{"output-format", "human", "CODE"}
 	}
 	return ConfigVar{name, "", "UNSET"}
 }
@@ -514,4 +518,9 @@ func (config *Config) EndpointName() string {
 	endpoint = strings.TrimPrefix(endpoint, "https://")
 	endpoint = strings.TrimPrefix(endpoint, "http://") // it never hurts to be prepared
 	return endpoint
+}
+
+// ConfigDir returns the path of the directory used to read config.
+func (config *Config) ConfigDir() string {
+	return config.Dir
 }

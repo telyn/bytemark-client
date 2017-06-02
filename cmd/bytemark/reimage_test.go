@@ -11,7 +11,7 @@ import (
 
 func TestReimage(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -25,13 +25,9 @@ func TestReimage(t *testing.T) {
 		PublicKeys:      "",
 	}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 	config.When("Force").Return(true)
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("ReimageVirtualMachine", &vmname, image).Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "reimage", "--force", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
@@ -44,7 +40,7 @@ func TestReimage(t *testing.T) {
 
 func TestReimageFileFlags(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -67,13 +63,9 @@ func TestReimageFileFlags(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 	config.When("Force").Return(true)
 
-	c.When("ParseVirtualMachineName", "test-server.test-group.test-account", []*lib.VirtualMachineName{&defVM}).Return(&vmname).Times(1)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("ReimageVirtualMachine", &vmname, image).Return(nil).Times(1)
 
 	err = global.App.Run([]string{"bytemark", "reimage", "--force", "--image", "image", "--root-password", "test-pass", "--firstboot-script-file", "firstboot", "--authorized-keys-file", "authorized-keys", "test-server.test-group.test-account"})

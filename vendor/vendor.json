@@ -68,10 +68,16 @@
 			"revisionTime": "2016-01-22T23:29:15Z"
 		},
 		{
-			"checksumSHA1": "6QxUBjaVF1hH+xozFdVo+P0oRr4=",
+			"checksumSHA1": "HB6MvfJv0flQn+viiwDzUGKj5gw=",
+			"path": "github.com/olekukonko/tablewriter",
+			"revision": "daf2955e742cf123959884fdff4685aa79b63135",
+			"revisionTime": "2016-06-21T09:30:29Z"
+		},
+		{
+			"checksumSHA1": "mtge+Ock+8oKfUBCqsKrb4auOs8=",
 			"path": "github.com/telyn/form",
-			"revision": "0ba36cd7909b5981fbde8a58471b28cf1c4a5856",
-			"revisionTime": "2016-05-09T10:48:00Z"
+			"revision": "a8f1f52fb0dfdbaad1e49f4c14c9d6befdc93b49",
+			"revisionTime": "2017-01-18T16:33:55Z"
 		},
 		{
 			"checksumSHA1": "E7L0II5K7ivwGtJazYaBD6D7ggI=",
@@ -80,10 +86,10 @@
 			"revisionTime": "2016-05-09T10:48:00Z"
 		},
 		{
-			"checksumSHA1": "l0h7xesS0Qe3qGWcMf+MnEQnja8=",
+			"checksumSHA1": "LMu1NsthSqcXfKu0m6YGPAmwBcY=",
 			"path": "github.com/urfave/cli",
-			"revision": "595ba45e735c1e9c1f9ddc9e2ef21997fca893f2",
-			"revisionTime": "2016-05-24T20:27:12Z"
+			"revision": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6",
+			"revisionTime": "2016-11-22T04:36:10Z"
 		}
 	],
 	"rootPath": "github.com/BytemarkHosting/bytemark-client"

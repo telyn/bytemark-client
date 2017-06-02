@@ -294,23 +294,202 @@ func (c *Client) UndeleteVirtualMachine(name *lib.VirtualMachineName) error {
 	return r.Error(0)
 }
 
-func (c *Client) CreateSnapshot(server lib.VirtualMachineName, discLabelOrID string) (brain.Snapshot, error) {
+func (c *Client) CreateBackup(server lib.VirtualMachineName, discLabelOrID string) (brain.Backup, error) {
 	r := c.Called(server, discLabelOrID)
-	snap, _ := r.Get(0).(brain.Snapshot)
+	snap, _ := r.Get(0).(brain.Backup)
 	return snap, r.Error(1)
 }
-func (c *Client) DeleteSnapshot(server lib.VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) error {
-	r := c.Called(server, discLabelOrID, snapshotLabelOrID)
+func (c *Client) DeleteBackup(server lib.VirtualMachineName, discLabelOrID string, backupLabelOrID string) error {
+	r := c.Called(server, discLabelOrID, backupLabelOrID)
 	return r.Error(0)
 }
-func (c *Client) GetSnapshots(server lib.VirtualMachineName, discLabelOrID string) (brain.Snapshots, error) {
+func (c *Client) CreateBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, start string, interval int) (brain.BackupSchedule, error) {
+	r := c.Called(server, discLabelOrID, start, interval)
+	sched, _ := r.Get(0).(brain.BackupSchedule)
+	return sched, r.Error(1)
+}
+func (c *Client) DeleteBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, id int) error {
+	r := c.Called(server, discLabelOrID, id)
+	return r.Error(0)
+}
+func (c *Client) GetBackups(server lib.VirtualMachineName, discLabelOrID string) (brain.Backups, error) {
 	r := c.Called(server, discLabelOrID)
-	snaps, _ := r.Get(0).(brain.Snapshots)
+	snaps, _ := r.Get(0).(brain.Backups)
 	return snaps, r.Error(1)
 }
-func (c *Client) RestoreSnapshot(server lib.VirtualMachineName, discLabelOrID string, snapshotLabelOrID string) (brain.Snapshot, error) {
-	r := c.Called(server, discLabelOrID, snapshotLabelOrID)
-	snap, _ := r.Get(0).(brain.Snapshot)
+func (c *Client) RestoreBackup(server lib.VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error) {
+	r := c.Called(server, discLabelOrID, backupLabelOrID)
+	snap, _ := r.Get(0).(brain.Backup)
 
 	return snap, r.Error(1)
+}
+
+func (c *Client) GetPrivileges(username string) (privs brain.Privileges, err error) {
+	r := c.Called(username)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForAccount(accountName string) (privs brain.Privileges, err error) {
+	r := c.Called(accountName)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForGroup(group lib.GroupName) (privs brain.Privileges, err error) {
+	r := c.Called(group)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GetPrivilegesForVirtualMachine(vm lib.VirtualMachineName) (privs brain.Privileges, err error) {
+	r := c.Called(vm)
+	privs, _ = r.Get(0).(brain.Privileges)
+	return privs, r.Error(1)
+}
+func (c *Client) GrantPrivilege(priv brain.Privilege) (err error) {
+	r := c.Called(priv)
+	return r.Error(0)
+}
+func (c *Client) RevokePrivilege(priv brain.Privilege) (err error) {
+	r := c.Called(priv)
+	return r.Error(0)
+}
+func (c *Client) GetVLANs() ([]*brain.VLAN, error) {
+	r := c.Called()
+	vlans, _ := r.Get(0).([]*brain.VLAN)
+	return vlans, r.Error(1)
+}
+func (c *Client) GetVLAN(num int) (*brain.VLAN, error) {
+	r := c.Called(num)
+	vlans, _ := r.Get(0).(*brain.VLAN)
+	return vlans, r.Error(1)
+}
+func (c *Client) GetIPRanges() ([]*brain.IPRange, error) {
+	r := c.Called()
+	ipRanges, _ := r.Get(0).([]*brain.IPRange)
+	return ipRanges, r.Error(1)
+}
+func (c *Client) GetIPRange(id int) (*brain.IPRange, error) {
+	r := c.Called(id)
+	ipRange, _ := r.Get(0).(*brain.IPRange)
+	return ipRange, r.Error(1)
+}
+func (c *Client) GetHeads() ([]*brain.Head, error) {
+	r := c.Called()
+	heads, _ := r.Get(0).([]*brain.Head)
+	return heads, r.Error(1)
+}
+func (c *Client) GetHead(idOrLabel string) (*brain.Head, error) {
+	r := c.Called(idOrLabel)
+	head, _ := r.Get(0).(*brain.Head)
+	return head, r.Error(1)
+}
+func (c *Client) GetTails() ([]*brain.Tail, error) {
+	r := c.Called()
+	tails, _ := r.Get(0).([]*brain.Tail)
+	return tails, r.Error(1)
+}
+func (c *Client) GetTail(idOrLabel string) (*brain.Tail, error) {
+	r := c.Called(idOrLabel)
+	tail, _ := r.Get(0).(*brain.Tail)
+	return tail, r.Error(1)
+}
+func (c *Client) GetStoragePools() ([]*brain.StoragePool, error) {
+	r := c.Called()
+	storagePools, _ := r.Get(0).([]*brain.StoragePool)
+	return storagePools, r.Error(1)
+}
+func (c *Client) GetStoragePool(idOrLabel string) (*brain.StoragePool, error) {
+	r := c.Called(idOrLabel)
+	storagePool, _ := r.Get(0).(*brain.StoragePool)
+	return storagePool, r.Error(1)
+}
+func (c *Client) GetMigratingVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+}
+func (c *Client) GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+}
+func (c *Client) GetRecentVMs() ([]*brain.VirtualMachine, error) {
+	r := c.Called()
+	vms, _ := r.Get(0).([]*brain.VirtualMachine)
+	return vms, r.Error(1)
+}
+func (c *Client) MigrateDisc(disc int, newStoragePool string) error {
+	r := c.Called(disc, newStoragePool)
+	return r.Error(0)
+}
+func (c *Client) MigrateVirtualMachine(vmName lib.VirtualMachineName, newHead string) error {
+	r := c.Called(vmName, newHead)
+	return r.Error(0)
+}
+func (c *Client) ReapVMs() error {
+	r := c.Called()
+	return r.Error(0)
+}
+func (c *Client) DeleteVLAN(id int) error {
+	r := c.Called()
+	return r.Error(0)
+}
+func (c *Client) AdminCreateGroup(name lib.GroupName, vlanNum int) error {
+	r := c.Called(name, vlanNum)
+	return r.Error(0)
+}
+func (c *Client) CreateIPRange(ipRange string, vlanNum int) error {
+	r := c.Called(ipRange, vlanNum)
+	return r.Error(0)
+}
+func (c *Client) CancelDiscMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) CancelVMMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) EmptyStoragePool(idOrLabel string) error {
+	r := c.Called(idOrLabel)
+	return r.Error(0)
+}
+func (c *Client) EmptyHead(idOrLabel string) error {
+	r := c.Called(idOrLabel)
+	return r.Error(0)
+}
+func (c *Client) ReifyDisc(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) ApproveVM(name lib.VirtualMachineName, powerOn bool) error {
+	r := c.Called(name, powerOn)
+	return r.Error(0)
+}
+func (c *Client) RejectVM(name lib.VirtualMachineName, reason string) error {
+	r := c.Called(name, reason)
+	return r.Error(0)
+}
+func (c *Client) RegradeDisc(disc int, newGrade string) error {
+	r := c.Called(disc, newGrade)
+	return r.Error(0)
+}
+func (c *Client) UpdateVMMigration(name lib.VirtualMachineName, speed *int64, downtime *int) error {
+	r := c.Called(name, speed, downtime)
+	return r.Error(0)
+}
+func (c *Client) CreateUser(username string, privilege string) error {
+	r := c.Called(username, privilege)
+	return r.Error(0)
+}
+func (c *Client) UpdateHead(idOrLabel string, options lib.UpdateHead) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateTail(idOrLabel string, options lib.UpdateTail) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateStoragePool(idOrLabel string, options lib.UpdateStoragePool) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
 }

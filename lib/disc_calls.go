@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
@@ -39,12 +37,7 @@ func (c *bytemarkClient) CreateDisc(name *VirtualMachineName, disc brain.Disc) (
 		return
 	}
 
-	js, err := json.Marshal(discs[0])
-	if err != nil {
-		return
-	}
-
-	_, _, err = r.Run(bytes.NewBuffer(js), nil)
+	_, _, err = r.MarshalAndRun(discs[0], nil)
 	return
 
 }
@@ -77,10 +70,11 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 		return
 	}
 
-	// TODO(telyn): marshal json instead of sprintf
-	disc := fmt.Sprintf(`{"size":%d}`, sizeMB)
+	disc := brain.Disc{
+		Size: sizeMB,
+	}
 
-	_, _, err = r.Run(bytes.NewBufferString(disc), nil)
+	_, _, err = r.MarshalAndRun(disc, nil)
 	return err
 }
 
@@ -95,16 +89,11 @@ func (c *bytemarkClient) SetDiscIopsLimit(vm *VirtualMachineName, discLabelOrID 
 		return
 	}
 
-	data := map[string]int{
+	limitPatch := map[string]int{
 		"iops_limit": iopsLimit,
 	}
 
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-
-	_, _, err = r.Run(bytes.NewBuffer(jsonData), nil)
+	_, _, err = r.MarshalAndRun(limitPatch, nil)
 	return err
 }
 
