@@ -13,41 +13,33 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
-				Name:      "disc",
-				Usage:     "disc related admin operations",
-				UsageText: "bytemark --admin set disc command [command options] [arguments...]",
-				Action:    cli.ShowSubcommandHelp,
-				Subcommands: []cli.Command{
-					{
-						Name:      "iops_limit",
-						Usage:     "set the IOPS limit of a disc",
-						UsageText: "bytemark --admin set disc iops_limit <server> <disc> <limit>",
-						Flags: []cli.Flag{
-							cli.StringFlag{
-								Name:  "disc",
-								Usage: "the name of the disc to alter the iops_limit of",
-							},
-							cli.GenericFlag{
-								Name:  "server",
-								Usage: "the server the disc belongs to",
-								Value: new(VirtualMachineNameFlag),
-							},
-							cli.IntFlag{
-								Name:  "iops-limit",
-								Usage: "the limit to set",
-							},
-						},
-						Action: With(OptionalArgs("server", "disc", "iops-limit"), RequiredFlags("server", "disc", "iops-limit"), AuthProvider, func(c *Context) error {
-							iopsLimit := c.Int("iops-limit")
-							if iopsLimit < 1 {
-								return fmt.Errorf("IOPS limit must be at least 1")
-							}
-							vmName := c.VirtualMachineName("server")
-
-							return global.Client.SetDiscIopsLimit(&vmName, c.String("disc"), iopsLimit)
-						}),
+				Name:      "iops_limit",
+				Usage:     "set the IOPS limit of a disc",
+				UsageText: "bytemark --admin set disc iops_limit <server> <disc> <limit>",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "disc",
+						Usage: "the name of the disc to alter the iops_limit of",
+					},
+					cli.GenericFlag{
+						Name:  "server",
+						Usage: "the server the disc belongs to",
+						Value: new(VirtualMachineNameFlag),
+					},
+					cli.IntFlag{
+						Name:  "iops-limit",
+						Usage: "the limit to set",
 					},
 				},
+				Action: With(OptionalArgs("server", "disc", "iops-limit"), RequiredFlags("server", "disc", "iops-limit"), AuthProvider, func(c *Context) error {
+					iopsLimit := c.Int("iops-limit")
+					if iopsLimit < 1 {
+						return fmt.Errorf("IOPS limit must be at least 1")
+					}
+					vmName := c.VirtualMachineName("server")
+
+					return global.Client.SetDiscIopsLimit(&vmName, c.String("disc"), iopsLimit)
+				}),
 			},
 		},
 	})
@@ -86,7 +78,6 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
 					}
 					return err
-
 				}),
 			},
 			{
@@ -117,7 +108,6 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						}
 					}
 					return global.Client.SetVirtualMachineCores(&vmName, cores)
-
 				}),
 			}, {
 				Name:        "hwprofile",

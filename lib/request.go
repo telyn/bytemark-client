@@ -233,7 +233,7 @@ func (r *Request) handleResponse(req *http.Request, requestBody []byte, res *htt
 
 // BuildURL pieces together a URL from parts, escaping as necessary..
 func (c *bytemarkClient) BuildURL(endpoint Endpoint, format string, args ...string) (*url.URL, error) {
-	arr := make([]interface{}, len(args), len(args))
+	arr := make([]interface{}, len(args))
 	for i, str := range args {
 		arr[i] = url.QueryEscape(str)
 	}

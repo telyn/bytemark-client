@@ -70,7 +70,6 @@ func (c *bytemarkClient) ResizeDisc(vm *VirtualMachineName, discLabelOrID string
 		return
 	}
 
-	// TODO(telyn): marshal json instead of sprintf
 	disc := brain.Disc{
 		Size: sizeMB,
 	}

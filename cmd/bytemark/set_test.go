@@ -9,19 +9,16 @@ import (
 
 func TestSetCDROM(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.When("SetVirtualMachineCDROM", &vmname, "test-cdrom").Return(nil).Times(1)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark set cdrom test-server.test-group.test-account test-cdrom", " "))
 	is.Nil(err)
@@ -32,20 +29,17 @@ func TestSetCDROM(t *testing.T) {
 
 func TestSetCores(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	vm := getFixtureVM()
 	c.When("GetVirtualMachine", &vmname).Return(&vm)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineCores", &vmname, 4).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark set cores --force test-server.test-group.test-account 4", " "))
@@ -58,20 +52,17 @@ func TestSetCores(t *testing.T) {
 
 func TestSetMemory(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "default",
 		Account:        "default-account"}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	vm := getFixtureVM()
 	c.When("GetVirtualMachine", &vmname).Return(&vm)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineMemory", &vmname, 4096).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark set memory --force test-server 4", " "))
@@ -84,6 +75,7 @@ func TestSetMemory(t *testing.T) {
 	config.Reset()
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
+	config.When("GetIgnoreErr", "2fa-otp").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
 	c.Reset()
@@ -128,13 +120,9 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	// test hardware profile only
 
-	config.Reset()
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
+	config, c = baseTestAuthSetup(t, false)
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.Reset()
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("SetVirtualMachineHardwareProfile", &vmname, "virtio123", []bool(nil)).Return(nil).Times(1)
 
 	err = global.App.Run(strings.Split("bytemark set hwprofile test-server virtio123", " "))
@@ -145,8 +133,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	}
 
 	// test --lock flag
-	c.Reset()
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	config, c = baseTestAuthSetup(t, false)
+	config.When("GetVirtualMachine").Return(&defVM)
 	c.When("SetVirtualMachineHardwareProfile", &vmname, "virtio123", []bool{true}).Return(nil).Times(1)
 
 	err = global.App.Run(strings.Split("bytemark set hwprofile --lock test-server virtio123", " "))
@@ -157,8 +145,8 @@ func TestSetHWProfileCommand(t *testing.T) {
 	}
 
 	// test --unlock flag
-	c.Reset()
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	config, c = baseTestAuthSetup(t, false)
+	config.When("GetVirtualMachine").Return(&defVM)
 	c.When("SetVirtualMachineHardwareProfile", &vmname, "virtio123", []bool{false}).Return(nil).Times(1)
 
 	err = global.App.Run(strings.Split("bytemark set hwprofile --unlock test-server virtio123", " "))
@@ -171,12 +159,9 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 func TestSetDiscIOPSLimit(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, true)
+	config, c := baseTestAuthSetup(t, true)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "yubikey").Return("")
 
 	config.When("GetVirtualMachine").Return(&defVM)
 
@@ -185,11 +170,10 @@ func TestSetDiscIOPSLimit(t *testing.T) {
 		Group:          "default",
 		Account:        "default-account",
 	}
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("SetDiscIopsLimit", &name, "disc-label", 100).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark set disc iops_limit test-server disc-label 100", " "))
+	err := global.App.Run(strings.Split("bytemark set iops_limit test-server disc-label 100", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

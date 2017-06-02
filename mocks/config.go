@@ -17,6 +17,10 @@ func (c *Config) EndpointName() string {
 	ret := c.Called()
 	return ret.String(0)
 }
+func (c *Config) ConfigDir() string {
+	ret := c.Called()
+	return ret.String(0)
+}
 func (c *Config) Force() bool {
 	ret := c.Called()
 	return ret.Bool(0)

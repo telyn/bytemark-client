@@ -16,6 +16,7 @@ import (
 	"strings"
 )
 
+// forceFlag is common to a bunch of commands and can have a generic Usage.
 var forceFlag = cli.BoolFlag{
 	Name:  "force",
 	Usage: "Do not prompt for confirmation when destroying data or increasing costs.",
@@ -47,6 +48,16 @@ func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 		app.Commands = mergeCommands(commands, adminCommands)
 	} else {
 		app.Commands = commands
+	}
+	// last minute alterations to commands
+	// used for modifying help descriptions, mostly.
+	for idx, cmd := range app.Commands {
+		switch cmd.Name {
+		case "admin":
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(adminCommands)
+		case "commands":
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(app.Commands)
+		}
 	}
 	return
 
@@ -88,9 +99,33 @@ func main() {
 	global.Client = cli
 	global.Client.SetDebugLevel(global.Config.GetDebugLevel())
 
+	outputDebugInfo()
+
 	err = global.App.Run(args)
 
 	os.Exit(int(util.ProcessError(err)))
+}
+
+func outputDebugInfo() {
+	log.Debugf(log.LvlOutline, "bytemark-client %s\r\n\r\n", lib.Version)
+	// assemble a string of config vars (excluding token)
+	vars, err := global.Config.GetAll()
+	if err != nil {
+		log.Debugf(log.LvlFlags, "(not a real problem maybe): had trouble getting all config vars: %s\r\n", err.Error())
+	}
+
+	log.Debugf(log.LvlFlags, "reading config from %s\r\n\r\n", global.Config.ConfigDir())
+	log.Debug(log.LvlFlags, "config vars:")
+	for _, v := range vars {
+		if v.Name == "token" {
+			log.Debugf(log.LvlFlags, "  %s (%s): not printed for security\r\n", v.Name, v.Source)
+			continue
+		}
+		log.Debugf(log.LvlFlags, "  %s (%s): '%s'\r\n", v.Name, v.Source, v.Value)
+	}
+	log.Debug(log.LvlFlags, "")
+
+	log.Debugf(log.LvlFlags, "invocation: %s\r\n\r\n", strings.Join(os.Args, " "))
 }
 
 // EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.
@@ -123,10 +158,37 @@ func EnsureAuth() error {
 			}
 
 			err = global.Client.AuthWithCredentials(credents)
+
+			// Handle the special case here where we just need to prompt for 2FA and try again
+			if err != nil && strings.Contains(err.Error(), "Missing 2FA") {
+				for global.Config.GetIgnoreErr("2fa-otp") == "" {
+					token := util.Prompt("Enter 2FA token: ")
+					global.Config.Set("2fa-otp", strings.TrimSpace(token), "INTERACTION")
+				}
+
+				credents["2fa"] = global.Config.GetIgnoreErr("2fa-otp")
+
+				err = global.Client.AuthWithCredentials(credents)
+			}
+
 			if err == nil {
-				// sucess!
+				// success!
 				// it doesn't _really_ matter if we can't write the token to the token place, right?
 				_ = global.Config.SetPersistent("token", global.Client.GetSessionToken(), "AUTH")
+
+				// Check this here, as it is only relevant the initial login,
+				// not subsequent validations of the token (as opposed to yubikey)
+				if global.Config.GetIgnoreErr("2fa-otp") != "" {
+					factors := global.Client.GetSessionFactors()
+
+					if global.Config.GetIgnoreErr("2fa-otp") != "" {
+						if !factorExists(factors, "2fa") {
+							// Should never happen, as long as auth correctly returns the factors
+							return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
+						}
+					}
+				}
+
 				break
 			} else {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
@@ -135,6 +197,7 @@ func EnsureAuth() error {
 						global.Config.Set("user", global.Config.GetIgnoreErr("user"), "PRIOR INTERACTION")
 						global.Config.Set("pass", "", "INVALID")
 						global.Config.Set("yubikey-otp", "", "INVALID")
+						global.Config.Set("2fa-otp", "", "INVALID")
 					} else {
 						return err
 					}
@@ -147,16 +210,33 @@ func EnsureAuth() error {
 	}
 	if global.Config.GetIgnoreErr("yubikey") != "" {
 		factors := global.Client.GetSessionFactors()
-		for _, f := range factors {
-			if f == "yubikey" {
-				return nil
+
+		if global.Config.GetIgnoreErr("yubikey") != "" {
+			if !factorExists(factors, "yubikey") {
+				// Current auth token doesn't have a yubikey,
+				// so prompt the user to login again with yubikey
+
+				// This happens when someone has logged in already,
+				// but then tries to run a command with the
+				// "yubikey" flag set
+
+				global.Config.Set("token", "", "FLAG yubikey")
+
+				return EnsureAuth()
 			}
 		}
-		// if still executing, we didn't have yubikey factor
-		global.Config.Set("token", "", "FLAG yubikey")
-		return EnsureAuth()
 	}
 	return nil
+}
+
+func factorExists(factors []string, factor string) bool {
+	for _, f := range factors {
+		if f == factor {
+			return true
+		}
+	}
+
+	return false
 }
 
 // mergeCommand merges src into dst, only copying non-nil fields of src,
@@ -176,9 +256,7 @@ func mergeCommand(dst *cli.Command, src cli.Command) {
 		dst.Action = src.Action
 	}
 	if src.Flags != nil {
-		for _, f := range src.Flags {
-			dst.Flags = append(dst.Flags, f)
-		}
+		dst.Flags = append(dst.Flags, src.Flags...)
 	}
 	if src.Subcommands != nil {
 		dst.Subcommands = mergeCommands(dst.Subcommands, src.Subcommands)
@@ -206,6 +284,7 @@ func mergeCommands(base []cli.Command, extras []cli.Command) (result []cli.Comma
 	return
 }
 
+// overrideHelp writes our own help templates into urfave/cli
 func overrideHelp() {
 	cli.SubcommandHelpTemplate = `NAME:
    {{.HelpName}} - {{.Usage}}
@@ -226,7 +305,7 @@ OPTIONS:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-{{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
+   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
 
 CATEGORY:
    {{.Category}}{{end}}{{if .Description}}
@@ -284,6 +363,10 @@ func globalFlags() (flags []cli.Flag) {
 			Usage: "URL of SPP. set to blank in environments without an SPP.",
 		},
 		cli.StringFlag{
+			Name:  "output-format",
+			Usage: "The output format to use. Currently defined output formats are human (default for most commands), json (machine readable format), table (human-readable table format)",
+		},
+		cli.StringFlag{
 			Name:  "user",
 			Usage: "user you wish to log in as",
 		},
@@ -338,7 +421,6 @@ func prepConfig() (flags []cli.Flag, args []string) {
 		copy(args[1:], flargs)
 	}
 	args[0] = os.Args[0]
-	log.Debugf(log.LvlFlags, "orig: %v\r\nflag: %v\r\n new: %v\r\n", os.Args, flargs, args)
 
 	if *help || *h {
 		helpArgs := make([]string, len(args)+1)

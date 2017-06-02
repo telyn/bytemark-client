@@ -10,12 +10,9 @@ import (
 
 func TestResizeDisk(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
 	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "yubikey").Return("")
 
 	disc := brain.Disc{
 		Size:         25600,
@@ -29,7 +26,6 @@ func TestResizeDisk(t *testing.T) {
 		Group:          "default",
 		Account:        "default-account",
 	}
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetDisc", &name, "disc-label").Return(&disc).Times(1)
 
 	c.When("ResizeDisc", &name, "disc-label", 35*1024).Return(nil).Times(1)
