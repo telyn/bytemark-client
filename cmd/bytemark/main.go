@@ -404,8 +404,9 @@ func prepConfig() (flags []cli.Flag, args []string) {
 	// import the flags into config
 	flargs := config.ImportFlags(flagset)
 	if config.GetIgnoreErr("endpoint") == "https://int.bigv.io" {
-		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using bigv-int")
-		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using bigv-int")
+		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using int")
+		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using int")
+		config.Set("account", "bytemark", "CODE use bytemark account as default on int")
 	}
 	global.Config = config
 

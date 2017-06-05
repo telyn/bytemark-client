@@ -237,6 +237,7 @@ func GroupProvider(flagName string) ProviderFunc {
 
 		groupName := c.GroupName(flagName)
 		c.Group, err = global.Client.GetGroup(&groupName)
+		// this if is a guard against tricky-to-debug nil-pointer errors
 		if err == nil && c.Group == nil {
 			err = fmt.Errorf("no group was returned - please report a bug")
 		}
