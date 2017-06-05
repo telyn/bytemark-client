@@ -268,7 +268,7 @@ Privileges will be output in no particular order.`,
 				Flags: append(OutputFlags("ip range details", "object"),
 					cli.StringFlag{
 						Name:  "ip_range",
-						Usage: "the ID of the IP range to display",
+						Usage: "the ID or CIDR representation of the IP range to display",
 					},
 				),
 				Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
