@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"strconv"
-
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"net/url"
+	"strconv"
 )
 
 // UpdateHead is a struct with all the possible settings that can be updated on a head
@@ -57,8 +57,10 @@ func (c *bytemarkClient) GetIPRanges() (ipRanges []*brain.IPRange, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetIPRange(id int) (ipRange *brain.IPRange, err error) {
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", strconv.Itoa(id))
+func (c *bytemarkClient) GetIPRange(id string) (ipRange *brain.IPRange, err error) {
+	// QueryEscape the lookup value, so we encode the "/" it might include if an IP range was supplied
+	// so "192.168.13.0/24" would become "192.168.13.0%2F24"
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", url.QueryEscape(id))
 	if err != nil {
 		return
 	}

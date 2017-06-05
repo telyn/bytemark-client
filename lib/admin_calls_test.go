@@ -278,7 +278,22 @@ func TestGetIPRange(t *testing.T) {
 		Available: 200.0,
 	}
 	simpleGetTest(t, "/admin/ip_ranges/1234", &testIPRange, func(client Client) (interface{}, error) {
-		return client.GetIPRange(1234)
+		return client.GetIPRange("1234")
+	})
+}
+
+func TestGetIPRangeByIPRange(t *testing.T) {
+	testIPRange := brain.IPRange{
+		ID:      1234,
+		Spec:    "192.168.13.0/24",
+		VLANNum: 123,
+		Zones: []string{
+			"test-zone",
+		},
+		Available: 200.0,
+	}
+	simpleGetTest(t, "/admin/ip_ranges/192.168.13.0%2F24", &testIPRange, func(client Client) (interface{}, error) {
+		return client.GetIPRange("192.168.13.0/24")
 	})
 }
 
