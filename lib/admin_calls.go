@@ -1,8 +1,8 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"net/url"
 	"strconv"
 )
 
@@ -57,16 +57,34 @@ func (c *bytemarkClient) GetIPRanges() (ipRanges []*brain.IPRange, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetIPRange(id string) (ipRange *brain.IPRange, err error) {
-	// QueryEscape the lookup value, so we encode the "/" it might include if an IP range was supplied
-	// so "192.168.13.0/24" would become "192.168.13.0%2F24"
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", url.QueryEscape(id))
-	if err != nil {
-		return
+func (c *bytemarkClient) GetIPRange(idOrCIDR string) (*brain.IPRange, error) {
+	if _, err := strconv.Atoi(idOrCIDR); err == nil {
+		// Numeric means it is just an ID
+		r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", idOrCIDR)
+		if err != nil {
+			return nil, err
+		}
+
+		var ipRange *brain.IPRange
+		_, _, err = r.Run(nil, &ipRange)
+		return ipRange, err
+	} else {
+		// Non numeric means we got a CIDR
+		r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges?cidr=%s", idOrCIDR)
+		if err != nil {
+			return nil, err
+		}
+
+		// The /admin/ip_ranges endpoint always returns an array of IP ranges,
+		// so we just need to get the first one and return it
+		var ipRanges []*brain.IPRange
+		_, _, err = r.Run(nil, &ipRanges)
+		if len(ipRanges) > 0 {
+			return ipRanges[0], nil
+		}
 	}
 
-	_, _, err = r.Run(nil, &ipRange)
-	return
+	return nil, fmt.Errorf("IP Range not found")
 }
 
 func (c *bytemarkClient) GetHeads() (heads []*brain.Head, err error) {

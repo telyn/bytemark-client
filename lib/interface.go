@@ -207,7 +207,7 @@ type Client interface {
 	GetVLANs() ([]*brain.VLAN, error)
 	GetVLAN(num int) (*brain.VLAN, error)
 	GetIPRanges() ([]*brain.IPRange, error)
-	GetIPRange(id string) (*brain.IPRange, error)
+	GetIPRange(idOrCIDR string) (*brain.IPRange, error)
 	GetHeads() ([]*brain.Head, error)
 	GetHead(idOrLabel string) (*brain.Head, error)
 	GetTails() ([]*brain.Tail, error)
