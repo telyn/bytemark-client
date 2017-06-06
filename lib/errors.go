@@ -62,6 +62,7 @@ func (e NotFoundError) Error() string {
 }
 
 // NotAuthorizedError is returned when an action was unable to be performed because the caller doesn't have permission.
+// TODO(telyn): rename to ForbiddenError in 3.0
 type NotAuthorizedError struct {
 	APIError
 }
