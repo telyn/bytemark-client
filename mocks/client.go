@@ -367,8 +367,8 @@ func (c *Client) GetIPRanges() ([]*brain.IPRange, error) {
 	ipRanges, _ := r.Get(0).([]*brain.IPRange)
 	return ipRanges, r.Error(1)
 }
-func (c *Client) GetIPRange(id int) (*brain.IPRange, error) {
-	r := c.Called(id)
+func (c *Client) GetIPRange(idOrCIDR string) (*brain.IPRange, error) {
+	r := c.Called(idOrCIDR)
 	ipRange, _ := r.Get(0).(*brain.IPRange)
 	return ipRange, r.Error(1)
 }
