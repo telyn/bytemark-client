@@ -67,7 +67,17 @@ type NotAuthorizedError struct {
 }
 
 func (e NotAuthorizedError) Error() string {
-	return fmt.Sprintf("403 Unauthorized\r\n%s", e.APIError.Error())
+	return fmt.Sprintf("403 Forbidden\r\n%s", e.APIError.Error())
+
+}
+
+// UnauthorizedError is returned when an action was unable to be performed because the callers' authentication is bad - they aren't logged in, or their token is invalid
+type UnauthorizedError struct {
+	APIError
+}
+
+func (e UnauthorizedError) Error() string {
+	return fmt.Sprintf("401 Unauthorized\r\n%s\r\nYour credentials were rejected by the brain - try `bytemark config unset token` and then logging in again.\r\n", e.APIError.Error())
 
 }
 
