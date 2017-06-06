@@ -80,11 +80,19 @@ func (c *bytemarkClient) GetIPRange(idOrCIDR string) (*brain.IPRange, error) {
 	// so we just need to get the first one and return it
 	var ipRanges []*brain.IPRange
 	_, _, err = r.Run(nil, &ipRanges)
-	if len(ipRanges) > 0 {
-		return ipRanges[0], nil
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, fmt.Errorf("IP Range not found")
+	if len(ipRanges) == 0 {
+		return nil, fmt.Errorf("IP Range not found")
+	}
+
+	if len(ipRanges) > 1 {
+		return nil, fmt.Errorf("More than one IP Range found, please report this as a bug")
+	}
+
+	return ipRanges[0], nil
 }
 
 func (c *bytemarkClient) GetHeads() (heads []*brain.Head, err error) {
