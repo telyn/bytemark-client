@@ -208,6 +208,8 @@ func (r *Request) handleResponse(req *http.Request, requestBody []byte, res *htt
 	case 400:
 		// because we need to reference fields specific to BadRequestError later
 		err = newBadRequestError(baseErr, body)
+	case 401:
+		err = UnauthorizedError{baseErr}
 	case 403:
 		err = NotAuthorizedError{baseErr}
 	case 404:
