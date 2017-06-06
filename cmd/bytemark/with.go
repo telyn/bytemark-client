@@ -236,6 +236,9 @@ func GroupProvider(flagName string) ProviderFunc {
 		}
 
 		groupName := c.GroupName(flagName)
+		if groupName.Account == "" {
+			groupName.Account = global.Config.GetIgnoreErr("account")
+		}
 		c.Group, err = global.Client.GetGroup(&groupName)
 		// this if is a guard against tricky-to-debug nil-pointer errors
 		if err == nil && c.Group == nil {
