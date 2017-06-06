@@ -3,6 +3,7 @@ package lib
 import (
 	"errors"
 	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // EndpointURLs are the URLs stored by the client for the various API endpoints the client touches.
@@ -197,8 +198,24 @@ func (c *bytemarkClient) validateGroupName(group *GroupName) error {
 
 func (c *bytemarkClient) validateAccountName(account *string) error {
 	if *account == "" && c.authSession != nil {
+		log.Debug(log.LvlArgs, "validateAccountName called with empty name and a valid auth session - will try to figure out the default by talking to APIs.")
+		if c.urls.Billing == "" {
+			log.Debug(log.LvlArgs, "validateAccountName - there's no Billing endpoint, so we're most likely on a cluster devoid of bmbilling. Requesting account list from bigv...")
+			brainAccs, err := c.getBrainAccounts()
+			if err != nil {
+				return err
+			}
+			log.Debugf(log.LvlArgs, "validateAccountName found %d accounts\r\n", len(brainAccs))
+			if len(brainAccs) > 0 {
+				log.Debugf(log.LvlArgs, "validateAccountName using the first account returned from bigv (%s) as the default\r\n", brainAccs[0].Name)
+				*account = brainAccs[0].Name
+			}
+			return nil
+		}
+		log.Debug(log.LvlArgs, "validateAccountName finding the default billing account")
 		billAcc, err := c.getDefaultBillingAccount()
 		if err == nil && billAcc != nil {
+			log.Debugf(log.LvlArgs, "validateAccountName found the default billing account - %s\r\n", billAcc.Name)
 			*account = billAcc.Name
 		} else if err != nil {
 			return err
