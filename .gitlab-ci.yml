@@ -107,29 +107,7 @@ release-check:
 
 #### BUILD STAGE
 ## The build stage builds a binary for each OS and architecture combination we support
-
-.build-job: &build
-  stage: build
-  image: golang:$GOVERSION
-  before_script: *version_script
-  script:
-    # if VERSION is not set (i.e. this is not a release branch), set version.go to include the snapshot version.
-    # this doesn't seem to work
-    - echo VERSION = "'" $VERSION "'"
-    - |
-      [ -z "$VERSION" ] && sed -i 's/".*"/"'"$CHANGELOG_VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
-    - echo "version.go:"
-    - cat lib/version.go
-    - go get github.com/BytemarkHosting/auth-client
-    - go get github.com/BytemarkHosting/row
-    - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-      # stick our code in the correct place.
-    - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-    - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
-  artifacts:
-    paths:
-    - bytemark-$GOARCH-$GOOS
-    expire_in: '1 month'
+## and also assembles a manpage and pdf version of the manpage.
 
 build-manpage:
   stage: build
@@ -144,6 +122,27 @@ build-manpage:
     - doc/bytemark.1
     - doc/bytemark.pdf
     expire_in: '1 month'
+
+.build-job: &build
+  stage: build
+  image: golang:$GOVERSION
+  before_script: *version_script
+  script:
+    # if VERSION is not set (i.e. this is not a release branch), set version.go to include the snapshot version.
+    - |
+      [ -z "$VERSION" ] && sed -i 's/".*"/"'"$CHANGELOG_VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
+    - cat lib/version.go
+    - go get github.com/BytemarkHosting/auth-client
+    - go get github.com/BytemarkHosting/row
+    - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+      # stick our code in the correct place.
+    - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+  artifacts:
+    paths:
+    - bytemark-$GOARCH-$GOOS
+    expire_in: '1 month'
+
 
 build-amd64-linux:
   <<: *build
@@ -175,6 +174,10 @@ build-amd64-windows:
     GOOS: windows
     GOARCH: amd64
 
+#### PACKAGE STAGE
+## the package job assembles tarballs for each OS & arch we support (zips for windows)
+## and assembles debian, RPM and chocolatey packages
+
 .package-job: &package
   stage: package
   before_script: *version_script
@@ -182,17 +185,7 @@ build-amd64-windows:
   - build-amd64-linux
   - build-manpage
 
-    #package-debian-amd64:
-    #  <<: *package
-    #package-fedora-amd64:
-    #  <<: *package
-    #
-    #package-windows-amd64:
-    #  <<: *package
-    #  dependencies:
-    #  - build-amd64-windows
-    #  chocolatey makes me sad
-    #  script:
+# package-generic-amd64 makes the tars and zips for manual install
 
 package-generic-amd64:
   <<: *package
@@ -222,6 +215,7 @@ package-generic-amd64:
     - "*.tar.gz"
     expire_in: '1 month'
 
+# assembles debian packages
 package-debian-amd64:
   <<: *package
   image: gitlab.bytemark.co.uk:8443/docker-images/debhelper:jessie
@@ -241,6 +235,7 @@ package-debian-amd64:
   - build-manpage
 
 
+# assembles rpm packages
 # if desired, we can use mock to set up a cleanroom build using the cap-sys-admin runner.
 package-rpm-amd64:
   <<: *package
@@ -259,7 +254,7 @@ package-rpm-amd64:
   - build-amd64-linux
   - build-manpage
 
-
+# makes a chocolatey package
 package-windows-amd64:
     <<: *package
     image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
@@ -278,6 +273,12 @@ package-windows-amd64:
     dependencies:
     - build-amd64-windows
 
+#### RELEASE STAGE
+## the release stage pushes the tars, zips, debs & rpms out to repo.bytemark
+## it also updates our homebrew repo at github.com/BytemarkHosting/homebrew-tools
+## and pushes the chocolatey package up to chocolatey
+
+# the publish job pushes the tars, zips, debs & rpms to repo.bytemark.co.uk/open-source/bytemark-client/<branch name>
 publish:
   stage: release
   tags:
@@ -302,6 +303,8 @@ publish:
   - package-debian-amd64
   - package-windows-amd64
 
+
+# this is a base which sets up SSH and git, so that the release-to-repo and release-to-brew jobs don't have to
 .release-job: &release
   stage: release
   image: gitlab.bytemark.co.uk:8443/docker-images/debian-git
@@ -317,6 +320,8 @@ publish:
   only:
   - /^release-\d+(\.\d+)+$/
 
+# releases a new version of bytemark client to repo.bytemark.co.uk/bytemark-client
+# this includes tarballs, zipballs, debian and rpm repos.
 release-to-repo:
   <<: *release
   script:
@@ -342,6 +347,24 @@ release-to-repo:
   - package-rpm-amd64
   - package-debian-amd64
 
+# pushes the chocolate package to chocolatey.
+release-to-chocolatey:
+  <<: *release
+  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
+  before_script:
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
+  script:
+  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
+  dependencies:
+  - package-windows-amd64
+
+# release-to-brew and release-to-brew-beta both update our
+# github.com/BytemarkHosting/homebrew-tools repository with
+# the new sha256sum for the mac tarball.
+# They're separate jobs despite sharing a lot of their scripts
+# to absolutely ensure that development builds don't end up
+# being released to stable
 release-to-brew:
   <<: *release
   script:
@@ -363,47 +386,21 @@ release-to-brew:
   - git push origin master
   dependencies:
   - package-generic-amd64
-
-release-to-chocolatey:
+release-to-brew-beta:
   <<: *release
-  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
-  before_script:
-  - VERSION=${CI_BUILD_REF_NAME##release-}
-  - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
-  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
+  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
+  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
+  - URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_PIPELINE_ID/mac/bytemark-$CHANGELOG_VERSION~$SNAPSHOT_VERSION.tar.gz'"'!)
+  - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
+  - echo sed -e "$URLRULE" -e "$HASHRULE" -i "bytemark-client-beta.rb"
+  - sed -e "$URLRULE" -e "$HASHRULE" -i "bytemark-client-beta.rb"
+  - git commit -m "Update bytemark-client-beta to version VERSION" -- "bytemark-client-beta.rb"
+  - git log HEAD^..HEAD
+  - git diff HEAD^..HEAD
+  - git push origin master
+  only:
+  - develop
   dependencies:
-  - package-windows-amd64
-
-#update-homebrew:
-#  <<: *release
-#  stage: update-homebrew
-#  script:
-#  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
-#  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
-#  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
-#  # update the homebrew repo
-#  - git clone git@github.com:BytemarkHosting/homebrew-tools.git
-#  - cd homebrew-tools
-#  - |
-#    if [ "${CI_BUILD_REF_NAME%%-*}" = "release" ]; then
-#      NAME="bytemark-client"
-#      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/bytemark-client/mac/bytemark-$VERSION.tar.gz'"'!)
-#      HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
-#    else
-#      NAME="bytemark-client-beta"
-#      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_PIPELINE_ID/mac/bytemark-$CHANGELOG_VERSION~$SNAPSHOT_VERSION.tar.gz'"'!)
-#      HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
-#    fi
-#  - echo sed -e "$URLRULE" -e "$HASHRULE" -i "$NAME.rb"
-#  - sed -e "$URLRULE" -e "$HASHRULE" -i "$NAME.rb"
-#  - git commit -m "Update bytemark-client to version VERSION" -- "$NAME.rb"
-#  - git log HEAD^..HEAD
-#  - git diff HEAD^..HEAD
-#  - git push origin master
-#  only:
-#  - /^release-\d+(\.\d+)+$/
-#  - develop
-#  - 157-add-snapshot-version-number-to-version-go-or-something
-#  dependencies:
-#  - package-generic-amd64
+  - package-generic-amd64
