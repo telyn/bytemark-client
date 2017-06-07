@@ -198,11 +198,27 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	ipRangeID := 1
+	ipRangeID := "1"
 	ipRange := getFixtureIPRange()
 	c.When("GetIPRange", ipRangeID).Return(&ipRange, nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark --admin show ip_range 1", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
+func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	rangeString := "192.168.33.0/24"
+	ipRange := getFixtureIPRange()
+	c.When("GetIPRange", rangeString).Return(&ipRange, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show ip_range 192.168.33.0/24", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

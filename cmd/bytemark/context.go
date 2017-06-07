@@ -280,9 +280,13 @@ func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() erro
 	}
 
 	switch format.Value {
+	case "debug":
+		fmt.Printf("%#v", obj)
+		return nil
 	case "json":
 		return c.OutputJSON(obj)
 	case "table":
+		// this is so horrible
 		fields := strings.Split(c.String("table-fields"), ",")
 		for i, f := range fields {
 			fields[i] = strings.TrimSpace(f)

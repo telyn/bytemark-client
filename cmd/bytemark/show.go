@@ -266,13 +266,13 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows the details of an IP range",
 				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",
 				Flags: append(OutputFlags("ip range details", "object"),
-					cli.IntFlag{
+					cli.StringFlag{
 						Name:  "ip_range",
-						Usage: "the ID of the IP range to display",
+						Usage: "the ID or CIDR representation of the IP range to display",
 					},
 				),
 				Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
-					ipRange, err := global.Client.GetIPRange(c.Int("ip_range"))
+					ipRange, err := global.Client.GetIPRange(c.String("ip_range"))
 					if err != nil {
 						return err
 					}
