@@ -9,7 +9,22 @@ stages:
   - build
   - package
   - release
-  - update-homebrew
+
+# understanding version_script is kind of central to understanding a lot of jobs, so I am putting it here, at the top.
+# if this is a release branch, VERSION is set to the version specified in the branch name
+# if not, VERSION is blank
+# in either case, CHANGELOG_VERSION is the version in the most recent entry in doc/changelog
+# and SNAPSHOT_VERSION is "<pipeline ID>.git<7 chars of commit id>"
+.version_script: &version_script
+  - VERSION=${CI_BUILD_REF_NAME##release-}
+  # If the CI_BUILD_REF_NAME is not prefixed with release- (e.g. for a branch)
+  # then VERSION will be equal to CI_BUILD_REF_NAME.
+  - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || VERSION=""'
+  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
+
+#### TEST STAGE
+## The test stage runs the test, checks the code for lint issues, and makes sure that if release-branches are up-to-snuff
 
 .test-job: &test
   image: golang:$GOVERSION
@@ -22,6 +37,9 @@ stages:
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
+# we do a lot of linting to keep our code clean
+#
+# the lint-with-fail-allowed job lets us know how bad we are at the stuff I don't particularly care about
 lint-with-fail-allowed:
   <<: *test
   allow_failure: true # delete me once we've got the lintiness down to 0
@@ -40,29 +58,6 @@ lint-in-anger:
     gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
   allow_failure: false
 
-release-check:
-  stage: test
-  image: alpine
-  before_script: &version_script
-  - VERSION=${CI_BUILD_REF_NAME##release-}
-  # If the CI_BUILD_REF_NAME is not prefixed with release- (e.g. for a branch)
-  # then VERSION will be equal to CI_BUILD_REF_NAME.
-  - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || VERSION=""'
-  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
-  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
-  script:
-  - |
-    if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
-      echo "Mismatch between branch name and changelog version"
-      exit 1
-    fi
-    if ! grep 'Version = "'$VERSION'"' lib/version.go > /dev/null; then
-      echo "Mismatch between branch name and lib/version.go version"
-      exit 1
-    fi
-  only:
-  - /^release-\d+(\.\d+)+$/
-
 # the vet linter in gometalinter doesn't seem as reliable, so we keep it as a separate job
 vet:
   <<: *test
@@ -70,6 +65,7 @@ vet:
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - go vet $(go list ./... | grep -v vendor/)
 
+# and we should actually run the tests, too...
 test:
   <<: *test
   script:
@@ -90,13 +86,40 @@ test:
     - coverage.html
     expire_in: '1 week'
 
+# release-check makes sure that if we're on a release branch then the changelog and lib/version.go have been updated.
+release-check:
+  stage: test
+  image: alpine
+  before_script: *version_script
+  script:
+  - |
+    if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
+      echo "Mismatch between branch name and changelog version"
+      exit 1
+    fi
+    if ! grep 'Version = "'$VERSION'"' lib/version.go > /dev/null; then
+      echo "Mismatch between branch name and lib/version.go version"
+      exit 1
+    fi
+  only:
+  - /^release-\d+(\.\d+)+$/
+
+
+#### BUILD STAGE
+## The build stage builds a binary for each OS and architecture combination we support
+
 .build-job: &build
   stage: build
   image: golang:$GOVERSION
   before_script: *version_script
   script:
+    # if VERSION is not set (i.e. this is not a release branch), set version.go to include the snapshot version.
+    # this doesn't seem to work
+    - echo VERSION = "'" $VERSION "'"
     - |
       [ -z "$VERSION" ] && sed -i 's/".*"/"'"$CHANGELOG_VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
+    - echo "version.go:"
+    - cat lib/version.go
     - go get github.com/BytemarkHosting/auth-client
     - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
