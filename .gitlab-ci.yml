@@ -375,35 +375,35 @@ release-to-chocolatey:
   dependencies:
   - package-windows-amd64
 
-update-homebrew:
-  <<: *release
-  stage: update-homebrew
-  script:
-  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
-  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
-  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
-  # update the homebrew repo
-  - git clone git@github.com:BytemarkHosting/homebrew-tools.git
-  - cd homebrew-tools
-  - |
-    if [ "${CI_BUILD_REF_NAME%%-*}" = "release" ]; then
-      NAME="bytemark-client"
-      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/bytemark-client/mac/bytemark-$VERSION.tar.gz'"'!)
-      HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
-    else
-      NAME="bytemark-client-beta"
-      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_PIPELINE_ID/mac/bytemark-$CHANGELOG_VERSION~$SNAPSHOT_VERSION.tar.gz'"'!)
-      HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
-    fi
-  - echo sed -e "$URLRULE" -e "$HASHRULE" -i "$NAME.rb"
-  - sed -e "$URLRULE" -e "$HASHRULE" -i "$NAME.rb"
-  - git commit -m "Update bytemark-client to version VERSION" -- "$NAME.rb"
-  - git log HEAD^..HEAD
-  - git diff HEAD^..HEAD
-  - git push origin master
-  only:
-  - /^release-\d+(\.\d+)+$/
-  - develop
-  - 157-add-snapshot-version-number-to-version-go-or-something
-  dependencies:
-  - package-generic-amd64
+#update-homebrew:
+#  <<: *release
+#  stage: update-homebrew
+#  script:
+#  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
+#  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+#  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
+#  # update the homebrew repo
+#  - git clone git@github.com:BytemarkHosting/homebrew-tools.git
+#  - cd homebrew-tools
+#  - |
+#    if [ "${CI_BUILD_REF_NAME%%-*}" = "release" ]; then
+#      NAME="bytemark-client"
+#      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/bytemark-client/mac/bytemark-$VERSION.tar.gz'"'!)
+#      HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
+#    else
+#      NAME="bytemark-client-beta"
+#      URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_PIPELINE_ID/mac/bytemark-$CHANGELOG_VERSION~$SNAPSHOT_VERSION.tar.gz'"'!)
+#      HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
+#    fi
+#  - echo sed -e "$URLRULE" -e "$HASHRULE" -i "$NAME.rb"
+#  - sed -e "$URLRULE" -e "$HASHRULE" -i "$NAME.rb"
+#  - git commit -m "Update bytemark-client to version VERSION" -- "$NAME.rb"
+#  - git log HEAD^..HEAD
+#  - git diff HEAD^..HEAD
+#  - git push origin master
+#  only:
+#  - /^release-\d+(\.\d+)+$/
+#  - develop
+#  - 157-add-snapshot-version-number-to-version-go-or-something
+#  dependencies:
+#  - package-generic-amd64
