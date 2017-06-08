@@ -124,7 +124,7 @@ func TestOutput(t *testing.T) {
 		cliContext.When("Bool", "table").Return(test.TableFlag)
 		cliContext.When("GlobalString", "table-fields").Return(test.TableFields)
 		cliContext.When("String", "table-fields").Return(test.TableFields)
-		cliContext.When("IsSet", "table-fields").Return(true)
+		cliContext.When("IsSet", "table-fields").Return(test.TableFields != "")
 		global.Config = config
 
 		buf := bytes.Buffer{}

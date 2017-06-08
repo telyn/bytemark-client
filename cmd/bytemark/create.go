@@ -385,7 +385,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.OutputInDesiredForm(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
+	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: *vm}, func() (err error) {
 		log.Log("cloud server created successfully")
 		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
 		if err != nil {
@@ -400,4 +400,9 @@ func createServer(c *Context) (err error) {
 		}
 		return
 	})
+}
+
+type CreatedVirtualMachine struct {
+	Spec           brain.VirtualMachineSpec `json:"spec"`
+	VirtualMachine brain.VirtualMachine     `json:"virtual_machine"`
 }
