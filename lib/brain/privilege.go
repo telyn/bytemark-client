@@ -62,6 +62,20 @@ type Privilege struct {
 	YubikeyOTPMaxAge int `json:"yubikey_otp_max_age,omitempty"`
 }
 
+// Target returns a formatted string containing the target type and its ID.
+func (p Privilege) Target() string {
+	switch p.TargetType() {
+	case PrivilegeTargetTypeVM:
+		return fmt.Sprintf("server %d", p.VirtualMachineID)
+	case PrivilegeTargetTypeGroup:
+		return fmt.Sprintf("group %d", p.GroupID)
+	case PrivilegeTargetTypeAccount:
+		return fmt.Sprintf("account %d", p.GroupID)
+	}
+	return ""
+
+}
+
 // TargetType returns the prefix of the PrivilegeLevel, which should be one of the PrivilegeTargetType* constants.
 func (p Privilege) TargetType() string {
 	return strings.Split(string(p.Level), "_")[0]

@@ -28,7 +28,7 @@ func (ipr IPRange) String() string {
 		zones = fmt.Sprintf(", in zone%s %s", pluralise, strings.Join(ipr.Zones, ","))
 	}
 	// Since `Available` is a float64 but won't have decimal points, we just format accordingly.
-	return fmt.Sprintf("IP range %s%s, %.0f IPs available.", ipr.Spec, zones, ipr.Available)
+	return fmt.Sprintf("%s%s, %.0f IPs available.", ipr.Spec, zones, ipr.Available)
 }
 
 // PrettyPrint writes an overview of this IP range out to the given writer.

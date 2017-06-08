@@ -240,10 +240,28 @@ func (c *Context) OutputTable(obj interface{}, fields []string) error {
 	return nil
 }
 
+const (
+	DefaultAccountTableFields        = "BillingID, Name, Suspended, Groups"
+	DefaultBackupTableFields         = "ID, Manual, Label, StorageGrade, Size, BackupCount, BackupSchedules"
+	DefaultBackupScheduleTableFields = "ID, StartDate, Interval"
+	DefaultDiscTableFields           = "ID, Label, StorageGrade, Size, BackupCount, BackupSchedules"
+	DefaultGroupTableFields          = "ID, Name, VirtualMachines"
+	DefaultPrivilegeTableFields      = "ID, Username, Level, Target, YubikeyRequired"
+	DefaultServerTableFields         = "ID, HostName, ManagementIP, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
+
+	DefaultHeadTableFields        = "ID, Label, Online?, UsageStrategy, UUID, CCAddress, VirtualMachinesCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
+	DefaultTailTableFields        = "ID, Label, Online?, UUID, CCAddress, StoragePools, ZoneName"
+	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade"
+	DefaultIPRangeTableFields     = "ID, Spec, VLANNum, Available, Zones"
+	DefaultVLANTableFields        = "ID, Num, UsageType, IPRanges"
+
+	DefaultDefinitionTableFields = ""
+)
+
 // OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
 // thing should be like "server", "servers", "group", "groups"
 // jsonType should be "array" or "object"
-func OutputFlags(thing string, jsonType string) []cli.Flag {
+func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli.Flag {
 	return []cli.Flag{
 		cli.BoolFlag{
 			Name:  "json",
@@ -256,6 +274,7 @@ func OutputFlags(thing string, jsonType string) []cli.Flag {
 		cli.StringFlag{
 			Name:  "table-fields",
 			Usage: fmt.Sprintf("The fields of the %s to output in the table, comma separated. set to 'help' for a list of fields for this command", thing),
+			Value: defaultTableFields,
 		},
 	}
 }
