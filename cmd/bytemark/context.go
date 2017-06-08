@@ -148,7 +148,7 @@ func (c *Context) PrivilegeFlag(flagname string) PrivilegeFlag {
 
 // String returns the value of the named flag as a string
 func (c *Context) String(flagname string) string {
-	if c.Context.IsSet(flagname) {
+	if c.Context.IsSet(flagname) || c.Context.String(flagname) != "" {
 		return c.Context.String(flagname)
 	}
 	return c.Context.GlobalString(flagname)
@@ -241,21 +241,34 @@ func (c *Context) OutputTable(obj interface{}, fields []string) error {
 }
 
 const (
-	DefaultAccountTableFields        = "BillingID, Name, Suspended, Groups"
-	DefaultBackupTableFields         = "ID, Manual, Label, StorageGrade, Size, BackupCount, BackupSchedules"
+	// DefaultAccountTableFields is the default for --table-fields for lib.Account
+	DefaultAccountTableFields = "BillingID, Name, Suspended, Groups"
+	// DefaultBackupTableFields is the default for --table-fields for brain.Backup
+	DefaultBackupTableFields = "ID, Manual, Label, StorageGrade, Size, BackupCount, BackupSchedules"
+	// DefaultBackupScheduleTableFields is the default for --table-fields for brain.BackupSchedule
 	DefaultBackupScheduleTableFields = "ID, StartDate, Interval"
-	DefaultDiscTableFields           = "ID, Label, StorageGrade, Size, BackupCount, BackupSchedules"
-	DefaultGroupTableFields          = "ID, Name, VirtualMachines"
-	DefaultPrivilegeTableFields      = "ID, Username, Level, Target, YubikeyRequired"
-	DefaultServerTableFields         = "ID, HostName, ManagementIP, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
+	// DefaultDiscTableFields is the default for --table-fields for brain.Disc
+	DefaultDiscTableFields = "ID, Label, StorageGrade, Size, BackupCount, BackupSchedules"
+	// DefaultGroupTableFields is the default for --table-fields for brain.Group
+	DefaultGroupTableFields = "ID, Name, VirtualMachines"
+	// DefaultPrivilegeTableFields is the default for --table-fields for brain.Privilege
+	DefaultPrivilegeTableFields = "ID, Username, Level, Target, YubikeyRequired"
+	// DefaultServerTableFields is the default for --table-fields for brain.VirtualMachine
+	DefaultServerTableFields = "ID, Hostname, ManagementAddress, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
 
-	DefaultHeadTableFields        = "ID, Label, Online?, UsageStrategy, UUID, CCAddress, VirtualMachinesCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
-	DefaultTailTableFields        = "ID, Label, Online?, UUID, CCAddress, StoragePools, ZoneName"
+	// DefaultHeadTableFields is the default for --table-fields for brain.Head
+	DefaultHeadTableFields = "ID, Label, Online?, UsageStrategy, UUID, CCAddress, VirtualMachinesCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
+	// DefaultTailTableFields is the default for --table-fields for brain.Tail
+	DefaultTailTableFields = "ID, Label, Online?, UUID, CCAddress, StoragePools, ZoneName"
+	// DefaultStoragePoolTableFields is the default for --table-fields for brain.StoragePool
 	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade"
-	DefaultIPRangeTableFields     = "ID, Spec, VLANNum, Available, Zones"
-	DefaultVLANTableFields        = "ID, Num, UsageType, IPRanges"
+	// DefaultIPRangeTableFields is the default for --table-fields for brain.IPRange
+	DefaultIPRangeTableFields = "ID, Spec, VLANNum, Available, Zones"
+	// DefaultVLANTableFields is the default for --table-fields for brain.VLAN
+	DefaultVLANTableFields = "ID, Num, UsageType, IPRanges"
 
-	DefaultDefinitionTableFields = ""
+	// DefaultDefinitionTableFields is the default for --table-fields for the *Definition types, because they're all the same at the moment.
+	DefaultDefinitionTableFields = "Name, Description"
 )
 
 // OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
