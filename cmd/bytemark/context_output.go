@@ -171,12 +171,10 @@ func SupportedOutputTypes() (outputTypes []string) {
 // otherwise calls humanOutputFn (which should output it in a very human form - PrettyPrint or such
 // defaultFormat is an optional string stating that the default format should be
 func (c *Context) OutputInDesiredForm(obj interface{}, humanOutputFn func() error, defaultFormat ...string) error {
-	fmt.Printf("OutputInDesiredForm waddup")
 	format, err := global.Config.GetV("output-format")
 	if err != nil {
 		return err
 	}
-	fmt.Printf("OutputInDesiredForm format %+v", format)
 	if len(defaultFormat) > 0 && format.Source == "CODE" {
 		format.Value = defaultFormat[0]
 	}
