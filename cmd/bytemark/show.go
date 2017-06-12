@@ -6,7 +6,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"os"
 )
 
 func init() {
@@ -33,7 +32,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				}),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
 				return c.OutputInDesiredForm(c.Account, func() error {
-					err := c.Account.PrettyPrint(os.Stderr, prettyprint.Full)
+					err := c.Account.PrettyPrint(global.App.Writer, prettyprint.Full)
 					if err != nil {
 						return err
 					}
@@ -42,7 +41,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 
 					for _, g := range c.Account.Groups {
 						for _, vm := range g.VirtualMachines {
-							err := vm.PrettyPrint(os.Stderr, prettyprint.Medium)
+							err := vm.PrettyPrint(global.App.Writer, prettyprint.Medium)
 							log.Output()
 							log.Output()
 							if err != nil {
@@ -77,7 +76,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					log.Output()
 					for _, vm := range c.Group.VirtualMachines {
 
-						err := vm.PrettyPrint(os.Stderr, prettyprint.Medium)
+						err := vm.PrettyPrint(global.App.Writer, prettyprint.Medium)
 						log.Output()
 						log.Output()
 						if err != nil {
@@ -102,7 +101,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			),
 			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
 				return c.OutputInDesiredForm(c.VirtualMachine, func() error {
-					return c.VirtualMachine.PrettyPrint(os.Stderr, prettyprint.Full)
+					return c.VirtualMachine.PrettyPrint(global.App.Writer, prettyprint.Full)
 				})
 			}),
 		}, {
@@ -213,7 +212,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(vlans, func() error {
 						for _, vlan := range vlans {
-							if err := vlan.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := vlan.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
@@ -237,7 +236,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.OutputInDesiredForm(vlan, func() error {
-						return vlan.PrettyPrint(os.Stderr, prettyprint.Full)
+						return vlan.PrettyPrint(global.App.Writer, prettyprint.Full)
 					}, "table")
 				}),
 			},
@@ -253,7 +252,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(ipRanges, func() error {
 						for _, ipRange := range ipRanges {
-							if err := ipRange.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := ipRange.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
@@ -277,7 +276,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.OutputInDesiredForm(ipRange, func() error {
-						return ipRange.PrettyPrint(os.Stderr, prettyprint.Full)
+						return ipRange.PrettyPrint(global.App.Writer, prettyprint.Full)
 					}, "table")
 				}),
 			},
@@ -293,7 +292,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(heads, func() error {
 						for _, head := range heads {
-							if err := head.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := head.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
@@ -318,7 +317,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.OutputInDesiredForm(head, func() error {
-						return head.PrettyPrint(os.Stderr, prettyprint.Full)
+						return head.PrettyPrint(global.App.Writer, prettyprint.Full)
 					}, "table")
 				}),
 			},
@@ -334,7 +333,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(tails, func() error {
 						for _, tail := range tails {
-							if err := tail.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := tail.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
@@ -359,7 +358,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.OutputInDesiredForm(tail, func() error {
-						return tail.PrettyPrint(os.Stderr, prettyprint.Full)
+						return tail.PrettyPrint(global.App.Writer, prettyprint.Full)
 					}, "table")
 				}),
 			},
@@ -375,7 +374,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(storagePools, func() error {
 						for _, storagePool := range storagePools {
-							if err := storagePool.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := storagePool.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
@@ -400,7 +399,7 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 					return c.OutputInDesiredForm(storagePool, func() error {
-						return storagePool.PrettyPrint(os.Stderr, prettyprint.Full)
+						return storagePool.PrettyPrint(global.App.Writer, prettyprint.Full)
 					}, "table")
 				}),
 			},
@@ -416,7 +415,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(vms, func() error {
 						for _, vm := range vms {
-							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := vm.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
@@ -437,7 +436,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(vms, func() error {
 						for _, vm := range vms {
-							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := vm.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
@@ -458,7 +457,7 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(vms, func() error {
 						for _, vm := range vms {
-							if err := vm.PrettyPrint(os.Stderr, prettyprint.SingleLine); err != nil {
+							if err := vm.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
 								return err
 							}
 						}
