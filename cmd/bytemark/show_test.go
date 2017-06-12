@@ -163,12 +163,6 @@ func TestShowAccountCommand(t *testing.T) {
 
 }
 
-var showGroupTestOutput = map[string]string{
-	"table": "",
-	"json":  "",
-	"human": "",
-}
-
 func TestShowGroupCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)

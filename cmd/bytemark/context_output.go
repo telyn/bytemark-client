@@ -10,9 +10,7 @@ import (
 	"strings"
 )
 
-type OutputFn func(context *Context, obj interface{}) error
-
-// OutputJSON outputs a nicely-indented JSON object that represents obj
+// OutputJSON is an OutputFn which outputs a nicely-indented JSON object that represents obj
 func (c *Context) OutputJSON(obj interface{}) error {
 	js, err := json.MarshalIndent(obj, "", "    ")
 	if err != nil {
@@ -43,6 +41,7 @@ func (c *Context) determineTableFields(obj interface{}) []string {
 	}
 }
 
+// OutputTable is an OutputFn which outputs the object in table form, using github.com/BytemarkHosting/row and github.com/olekukonko/tablewriter
 func (c *Context) OutputTable(obj interface{}) error {
 	fields := c.determineTableFields(obj)
 	return RenderTable(obj, fields)
@@ -149,6 +148,11 @@ func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli
 	}
 }
 
+// OutputFn is a function for outputting an object to the terminal in some way
+// See the OutputFormatFns map to see examples
+type OutputFn func(context *Context, obj interface{}) error
+
+// OutputFormatFns is a map which contains all the supported output format functions -- except 'human' because that's implemented in the OutputInDesiredForm method, by necessity.
 var OutputFormatFns = map[string]OutputFn{
 	"debug": func(c *Context, obj interface{}) error {
 		fmt.Fprintf(global.App.Writer, "%#v", obj)
@@ -158,11 +162,13 @@ var OutputFormatFns = map[string]OutputFn{
 	"table": (*Context).OutputTable,
 }
 
+// SupportedOutputTypes returns a list of all suppported output forms, including 'human'
 func SupportedOutputTypes() (outputTypes []string) {
 	outputTypes = make([]string, 0, len(OutputFormatFns))
 	for k := range OutputFormatFns {
 		outputTypes = append(outputTypes, k)
 	}
+	outputTypes = append(outputTypes, "human")
 	return
 }
 
