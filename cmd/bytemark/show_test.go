@@ -114,6 +114,7 @@ func TestShowAccountCommand(t *testing.T) {
 }
 
 func TestShowGroupCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
@@ -132,6 +133,7 @@ func TestShowGroupCommand(t *testing.T) {
 }
 
 func TestShowServerCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
@@ -149,6 +151,7 @@ func TestShowServerCommand(t *testing.T) {
 }
 
 func TestAdminShowVLANsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -164,6 +167,7 @@ func TestAdminShowVLANsCommand(t *testing.T) {
 }
 
 func TestAdminShowVLANCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -180,6 +184,7 @@ func TestAdminShowVLANCommand(t *testing.T) {
 }
 
 func TestAdminShowIPRangesCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -195,6 +200,7 @@ func TestAdminShowIPRangesCommand(t *testing.T) {
 }
 
 func TestAdminShowIPRangeCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -211,6 +217,7 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 }
 
 func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -227,6 +234,7 @@ func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
 }
 
 func TestAdminShowHeadsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -242,6 +250,7 @@ func TestAdminShowHeadsCommand(t *testing.T) {
 }
 
 func TestAdminShowHeadCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -258,6 +267,7 @@ func TestAdminShowHeadCommand(t *testing.T) {
 }
 
 func TestAdminShowTailsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -273,6 +283,7 @@ func TestAdminShowTailsCommand(t *testing.T) {
 }
 
 func TestAdminShowTailCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -289,6 +300,7 @@ func TestAdminShowTailCommand(t *testing.T) {
 }
 
 func TestAdminShowStoragePoolsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -304,6 +316,7 @@ func TestAdminShowStoragePoolsCommand(t *testing.T) {
 }
 
 func TestAdminShowStoragePoolCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -320,6 +333,7 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 }
 
 func TestAdminShowMigratingVMsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -335,6 +349,7 @@ func TestAdminShowMigratingVMsCommand(t *testing.T) {
 }
 
 func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -350,6 +365,7 @@ func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 }
 
 func TestAdminShowRecentVMsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -364,7 +380,6 @@ func TestAdminShowRecentVMsCommand(t *testing.T) {
 	}
 }
 
-// TODO(telyn): show account? show user?
 func TestShowPrivileges(t *testing.T) {
 
 	tests := []struct {

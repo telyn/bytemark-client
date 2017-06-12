@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -24,14 +25,20 @@ var DebugLevel int
 // LogFile is the file which bytemark-client is to log to. This can be nil, in which case it won't. Usually ~/.bytemark/debug.log
 var LogFile *os.File
 
-// Error outputs stuff to os.Stderr and LogFile, one thing per line.
+// Writer is the output destination for normal output
+var Writer io.Writer = os.Stdout
+
+// ErrWriter is the output destination for error messages, warnings, etc.
+var ErrWriter io.Writer = os.Stderr
+
+// Error outputs stuff to ErrWriter and LogFile, one thing per line.
 func Error(stuff ...interface{}) {
 	if len(stuff) == 0 {
 		Error("")
 	}
 	for _, v := range stuff {
 		/* #nosec */
-		fmt.Fprintln(os.Stderr, v)
+		fmt.Fprintln(ErrWriter, v)
 		if LogFile != nil {
 			/* #nosec */
 			fmt.Fprintln(LogFile, v)
@@ -43,21 +50,21 @@ func Error(stuff ...interface{}) {
 // Errorf formats the string and outputs it to Stderr and Logfile.
 func Errorf(format string, args ...interface{}) {
 	/* #nosec */
-	fmt.Fprintf(os.Stderr, format, args...)
+	fmt.Fprintf(ErrWriter, format, args...)
 	if LogFile != nil {
 		/* #nosec */
 		fmt.Fprintf(LogFile, format, args...)
 	}
 }
 
-// Log outputs stuff to os.Stderr and LogFile, one thing per line.
+// Log outputs stuff to ErrWriter and LogFile, one thing per line.
 func Log(stuff ...interface{}) {
 	if len(stuff) == 0 {
 		Log("")
 	}
 	for _, v := range stuff {
 		/* #nosec */
-		fmt.Fprintln(os.Stderr, v)
+		fmt.Fprintln(ErrWriter, v)
 		if LogFile != nil {
 			/* #nosec */
 			fmt.Fprintln(LogFile, v)
@@ -68,7 +75,7 @@ func Log(stuff ...interface{}) {
 // Logf formats the string and outputs it to Stderr and Logfile.
 func Logf(format string, args ...interface{}) {
 	/* #nosec */
-	fmt.Fprintf(os.Stderr, format, args...)
+	fmt.Fprintf(ErrWriter, format, args...)
 	if LogFile != nil {
 		/* #nosec */
 		fmt.Fprintf(LogFile, format, args...)
@@ -83,7 +90,7 @@ func Output(stuff ...interface{}) {
 	}
 	for _, v := range stuff {
 		/* #nosec */
-		fmt.Println(v)
+		fmt.Fprintln(Writer, v)
 		if LogFile != nil {
 			/* #nosec */
 			fmt.Fprintln(LogFile, v)
@@ -94,7 +101,7 @@ func Output(stuff ...interface{}) {
 // Outputf formats the string and outputs it to Stdout and Logfile.
 func Outputf(format string, args ...interface{}) {
 	/* #nosec */
-	fmt.Printf(format, args...)
+	fmt.Fprintf(Writer, format, args...)
 	if LogFile != nil {
 		/* #nosec */
 		fmt.Fprintf(LogFile, format, args...)
@@ -106,7 +113,7 @@ func Debug(level int, stuff ...interface{}) {
 	for _, v := range stuff {
 		if level <= DebugLevel {
 			/* #nosec */
-			fmt.Fprintln(os.Stderr, v)
+			fmt.Fprintln(ErrWriter, v)
 		}
 		if LogFile != nil {
 			/* #nosec */
@@ -119,7 +126,7 @@ func Debug(level int, stuff ...interface{}) {
 func Debugf(level int, format string, args ...interface{}) {
 	if level <= DebugLevel {
 		/* #nosec */
-		fmt.Fprintf(os.Stderr, format, args...)
+		fmt.Fprintf(ErrWriter, format, args...)
 	}
 	if LogFile != nil {
 		/* #nosec */
