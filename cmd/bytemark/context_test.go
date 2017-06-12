@@ -33,7 +33,7 @@ func TestOutput(t *testing.T) {
 		Expected      string
 		TableFields   string
 	}{
-		{
+		{ // 0
 			// default to human output
 			ConfigFormat: util.ConfigVar{"output-format", "human", "CODE"},
 			HumanFn:      humanFnOK,
@@ -43,14 +43,14 @@ func TestOutput(t *testing.T) {
 				ID:           123,
 			},
 			Expected: "OK",
-		}, {
+		}, { // 1
 			// default to human output with an error
 			ConfigFormat: util.ConfigVar{"output-format", "human", "CODE"},
 			HumanFn:      humanFnErr,
 			Object:       nil,
 			Expected:     "NOT OK",
 			ShouldErr:    true,
-		}, {
+		}, { // 2
 			// when there's a default format specific to the command, use that instead of the uber-default
 			ConfigFormat:  util.ConfigVar{"output-format", "human", "CODE"},
 			DefaultFormat: []string{"table"},
@@ -62,7 +62,7 @@ func TestOutput(t *testing.T) {
 			},
 			TableFields: "ID",
 			Expected:    "+-----+\n| ID  |\n+-----+\n| 123 |\n+-----+\n",
-		}, {
+		}, { // 3
 			// except when the JSON flag is set, then output JSON
 			ConfigFormat:  util.ConfigVar{"output-format", "human", "CODE"},
 			DefaultFormat: []string{"table"},
@@ -73,7 +73,7 @@ func TestOutput(t *testing.T) {
 				ID:   11323,
 			},
 			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}",
-		}, {
+		}, { // 4
 			// or if output-format is set by a FILE
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
 			DefaultFormat: []string{"table"},
@@ -84,7 +84,7 @@ func TestOutput(t *testing.T) {
 			},
 			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}",
 			// but the table and json flags should have precedence in every situation
-		}, {
+		}, { // 5
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
 			DefaultFormat: []string{"human"},
 			HumanFn:       humanFnErr,
@@ -95,7 +95,7 @@ func TestOutput(t *testing.T) {
 			},
 			Expected: "+-----------+-------+---------------+-----------------+\n| AccountID |  ID   |     Name      | VirtualMachines |\n+-----------+-------+---------------+-----------------+\n|         0 | 11323 | my-cool-group |                 |\n+-----------+-------+---------------+-----------------+\n",
 			// also, --table-fields being non-empty should imply --table and be case insensitive
-		}, {
+		}, { // 6
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
 			DefaultFormat: []string{"human"},
 			HumanFn:       humanFnErr,
