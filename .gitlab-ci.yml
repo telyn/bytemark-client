@@ -386,12 +386,16 @@ release-to-brew:
   - git push origin master
   dependencies:
   - package-generic-amd64
+
 release-to-brew-beta:
   <<: *release
   script:
   - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
   - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
   - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
+  # update the homebrew repo
+  - git clone git@github.com:BytemarkHosting/homebrew-tools.git
+  - cd homebrew-tools
   - URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_PIPELINE_ID/mac/bytemark-$CHANGELOG_VERSION~$SNAPSHOT_VERSION.tar.gz'"'!)
   - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
   - echo sed -e "$URLRULE" -e "$HASHRULE" -i "bytemark-client-beta.rb"
