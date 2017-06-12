@@ -93,7 +93,7 @@ func TestOutput(t *testing.T) {
 				Name: "my-cool-group",
 				ID:   11323,
 			},
-			Expected: "+-----------+-------+---------------+-----------------+\n| AccountID |  ID   |     Name      | VirtualMachines |\n+-----------+-------+---------------+-----------------+\n|         0 | 11323 | my-cool-group |                 |\n+-----------+-------+---------------+-----------------+\n",
+			Expected: "+---------------+-----------+-------+-----------------+\n|     Name      | AccountID |  ID   | VirtualMachines |\n+---------------+-----------+-------+-----------------+\n| my-cool-group |         0 | 11323 |                 |\n+---------------+-----------+-------+-----------------+\n",
 			// also, --table-fields being non-empty should imply --table and be case insensitive
 		}, { // 6
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
