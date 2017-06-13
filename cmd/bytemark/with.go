@@ -304,13 +304,14 @@ func UserProvider(flagName string) ProviderFunc {
 		if c.User != nil {
 			return
 		}
-		user := c.String(flagName)
-		if user != "" {
-			user = global.Config.GetIgnoreErr("user")
-		}
 		if err = AuthProvider(c); err != nil {
 			return
 		}
+		user := c.String(flagName)
+		if user == "" {
+			user = global.Client.GetSessionUser()
+		}
+
 		c.User, err = global.Client.GetUser(user)
 		if err == nil && c.User == nil {
 			err = fmt.Errorf("no user was returned - please report a bug")

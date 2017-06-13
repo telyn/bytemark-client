@@ -113,9 +113,9 @@ const (
 	DefaultServerTableFields = "ID, Hostname, ManagementAddress, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
 
 	// DefaultHeadTableFields is the default for --table-fields for brain.Head
-	DefaultHeadTableFields = "ID, Label, Online?, UsageStrategy, UUID, CCAddress, VirtualMachinesCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
+	DefaultHeadTableFields = "ID, Label, Online, UsageStrategy, UUID, CCAddress, VirtualMachineCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
 	// DefaultTailTableFields is the default for --table-fields for brain.Tail
-	DefaultTailTableFields = "ID, Label, Online?, UUID, CCAddress, StoragePools, ZoneName"
+	DefaultTailTableFields = "ID, Label, Online, UUID, CCAddress, StoragePools, ZoneName"
 	// DefaultStoragePoolTableFields is the default for --table-fields for brain.StoragePool
 	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade"
 	// DefaultIPRangeTableFields is the default for --table-fields for brain.IPRange
@@ -164,7 +164,7 @@ var OutputFormatFns = map[string]OutputFn{
 
 // SupportedOutputTypes returns a list of all suppported output forms, including 'human'
 func SupportedOutputTypes() (outputTypes []string) {
-	outputTypes = make([]string, 0, len(OutputFormatFns))
+	outputTypes = make([]string, 0, len(OutputFormatFns)+1)
 	for k := range OutputFormatFns {
 		outputTypes = append(outputTypes, k)
 	}
