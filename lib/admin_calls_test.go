@@ -4,6 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
+	"math/big"
 	"net/http"
 	"reflect"
 	"runtime"
@@ -230,7 +231,7 @@ func TestGetVLANS(t *testing.T) {
 					Zones: []string{
 						"test-zone",
 					},
-					Available: 200.0,
+					Available: big.NewInt(200),
 				},
 			},
 		},
@@ -258,7 +259,7 @@ func TestGetIPRanges(t *testing.T) {
 			Zones: []string{
 				"test-zone",
 			},
-			Available: 200.0,
+			Available: big.NewInt(200),
 		},
 	}
 	simpleGetTest(t, "/admin/ip_ranges", testIPRanges, func(client Client) (interface{}, error) {
@@ -275,7 +276,7 @@ func TestGetIPRange(t *testing.T) {
 		Zones: []string{
 			"test-zone",
 		},
-		Available: 200.0,
+		Available: big.NewInt(200),
 	}
 	simpleGetTest(t, "/admin/ip_ranges/1234", &testIPRange, func(client Client) (interface{}, error) {
 		return client.GetIPRange("1234")
@@ -290,7 +291,7 @@ func TestGetIPRangeByIPRange(t *testing.T) {
 		Zones: []string{
 			"test-zone",
 		},
-		Available: 200.0,
+		Available: big.NewInt(200),
 	}
 
 	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
