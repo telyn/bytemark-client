@@ -93,7 +93,7 @@ func TestOutput(t *testing.T) {
 				Name: "my-cool-group",
 				ID:   11323,
 			},
-			Expected: "+-----------+-------+---------------+-----------------+\n| AccountID |  ID   |     Name      | VirtualMachines |\n+-----------+-------+---------------+-----------------+\n|         0 | 11323 | my-cool-group |                 |\n+-----------+-------+---------------+-----------------+\n",
+			Expected: "+---------------------------------------------+---------------+-----------+-------+-----------------+\n|                   String                    |     Name      | AccountID |  ID   | VirtualMachines |\n+---------------------------------------------+---------------+-----------+-------+-----------------+\n| group 11323 \"my-cool-group\" - has 0 servers | my-cool-group |         0 | 11323 |                 |\n+---------------------------------------------+---------------+-----------+-------+-----------------+\n",
 			// also, --table-fields being non-empty should imply --table and be case insensitive
 		}, { // 6
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
@@ -110,7 +110,7 @@ func TestOutput(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		fmt.Printf("TestOutput %d\r\n", i)
+		t.Logf("TestOutput %d\n", i)
 		config, _ := baseTestSetup(t, true)
 		config.Reset()
 
@@ -124,7 +124,7 @@ func TestOutput(t *testing.T) {
 		cliContext.When("Bool", "table").Return(test.TableFlag)
 		cliContext.When("GlobalString", "table-fields").Return(test.TableFields)
 		cliContext.When("String", "table-fields").Return(test.TableFields)
-		cliContext.When("IsSet", "table-fields").Return(true)
+		cliContext.When("IsSet", "table-fields").Return(test.TableFields != "")
 		global.Config = config
 
 		buf := bytes.Buffer{}
@@ -144,7 +144,7 @@ func TestOutput(t *testing.T) {
 
 		output := buf.String()
 		if output != test.Expected {
-			t.Errorf("Output for %d didn't match expected.\r\nExpected: %q\r\nActual: %q", i, test.Expected, output)
+			t.Errorf("Output for %d didn't match expected.\r\nExpected: %q\r\nActual:   %q", i, test.Expected, output)
 		}
 		global.App.Writer = oldWriter
 	}

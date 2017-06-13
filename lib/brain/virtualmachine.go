@@ -1,6 +1,7 @@
 package brain
 
 import (
+	"bytes"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
 	"net"
@@ -70,6 +71,12 @@ func (vm VirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLeve
 {{ end }}`
 	return prettyprint.Run(wr, template, "server"+string(detail), vm)
 
+}
+
+func (vm VirtualMachine) String() string {
+	buf := bytes.Buffer{}
+	_ = vm.PrettyPrint(&buf, prettyprint.SingleLine)
+	return buf.String()
 }
 
 // TotalDiscSize returns the sum of all disc capacities in the VM for the given storage grade.

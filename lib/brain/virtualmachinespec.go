@@ -16,6 +16,13 @@ type VirtualMachineSpec struct {
 	IPs            *IPSpec         `json:"ips,omitempty"`
 }
 
+func (spec VirtualMachineSpec) String() string {
+	if spec.Reimage == nil {
+		return "No image specified"
+	}
+	return fmt.Sprintf("image: %s\nroot password: %s", spec.Reimage.Distribution, spec.Reimage.RootPassword)
+}
+
 // PrettyPrint outputs a human-readable spec to the given writer.
 // TODO(telyn): rewrite using templates
 func (spec VirtualMachineSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {

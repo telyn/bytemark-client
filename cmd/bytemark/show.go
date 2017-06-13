@@ -24,7 +24,7 @@ func init() {
 If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-			Flags: append(OutputFlags("account details", "object"),
+			Flags: append(OutputFlags("account details", "object", DefaultAccountTableFields),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
@@ -58,7 +58,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			UsageText: "bytemark show group [--json] [name]",
 			Description: `This command displays information about how many servers are in the given group.
 If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
-			Flags: append(OutputFlags("group details", "object"),
+			Flags: append(OutputFlags("group details", "object", DefaultGroupTableFields),
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The name of the group to show",
@@ -92,7 +92,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Usage:       "displays details about a server",
 			UsageText:   "bytemark show server [--json] <name>",
 			Description: `Displays a collection of details about the server, including its full hostname, CPU and memory allocation, power status, disc capacities and IP addresses.`,
-			Flags: append(OutputFlags("server details", "object"),
+			Flags: append(OutputFlags("server details", "object", DefaultServerTableFields),
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
@@ -109,6 +109,12 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Usage:       "displays info about a user",
 			UsageText:   "bytemark show user <name>",
 			Description: `Currently the only details are what SSH keys are authorised for this user`,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "user",
+					Usage: "The user to show the details of",
+				},
+			},
 			Action: With(OptionalArgs("user"), RequiredFlags("user"), UserProvider("user"), func(c *Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
 				for _, k := range c.User.AuthorizedKeys {
@@ -125,7 +131,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 Setting --recursive will cause a lot of extra requests to be made and may take a long time to run.
 
 Privileges will be output in no particular order.`,
-			Flags: append(OutputFlags("privileges", "array"),
+			Flags: append(OutputFlags("privileges", "array", DefaultPrivilegeTableFields),
 				cli.BoolFlag{
 					Name:  "recursive",
 					Usage: "for account & group, will also find all privileges for all groups in the account and virtual machines in the group",
@@ -204,7 +210,7 @@ Privileges will be output in no particular order.`,
 				Name:      "vlans",
 				Usage:     "shows available VLANs",
 				UsageText: "bytemark --admin show vlans [--json]",
-				Flags:     OutputFlags("VLANs", "array"),
+				Flags:     OutputFlags("VLANs", "array", DefaultVLANTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					vlans, err := global.Client.GetVLANs()
 					if err != nil {
@@ -224,7 +230,7 @@ Privileges will be output in no particular order.`,
 				Name:      "vlan",
 				Usage:     "shows the details of a VLAN",
 				UsageText: "bytemark --admin show vlan [--json] <num>",
-				Flags: append(OutputFlags("VLAN", "object"),
+				Flags: append(OutputFlags("VLAN", "object", DefaultVLANTableFields),
 					cli.IntFlag{
 						Name:  "num",
 						Usage: "the num of the VLAN to display",
@@ -244,7 +250,7 @@ Privileges will be output in no particular order.`,
 				Name:      "ip_ranges",
 				Usage:     "shows all IP ranges",
 				UsageText: "bytemark --admin show ip_ranges [--json]",
-				Flags:     OutputFlags("ip ranges", "array"),
+				Flags:     OutputFlags("ip ranges", "array", DefaultIPRangeTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					ipRanges, err := global.Client.GetIPRanges()
 					if err != nil {
@@ -264,7 +270,7 @@ Privileges will be output in no particular order.`,
 				Name:      "ip_range",
 				Usage:     "shows the details of an IP range",
 				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",
-				Flags: append(OutputFlags("ip range details", "object"),
+				Flags: append(OutputFlags("ip range details", "object", DefaultIPRangeTableFields),
 					cli.StringFlag{
 						Name:  "ip_range",
 						Usage: "the ID or CIDR representation of the IP range to display",
@@ -284,7 +290,7 @@ Privileges will be output in no particular order.`,
 				Name:      "heads",
 				Usage:     "shows the details of all heads",
 				UsageText: "bytemark --admin show heads [--json]",
-				Flags:     OutputFlags("heads", "array"),
+				Flags:     OutputFlags("heads", "array", DefaultHeadTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					heads, err := global.Client.GetHeads()
 					if err != nil {
@@ -305,7 +311,7 @@ Privileges will be output in no particular order.`,
 				Name:      "head",
 				Usage:     "shows the details of the specified head",
 				UsageText: "bytemark --admin show head <head> [--json]",
-				Flags: append(OutputFlags("head details", "object"),
+				Flags: append(OutputFlags("head details", "object", DefaultHeadTableFields),
 					cli.StringFlag{
 						Name:  "head",
 						Usage: "the ID of the head to display",
@@ -325,7 +331,7 @@ Privileges will be output in no particular order.`,
 				Name:      "tails",
 				Usage:     "shows the details of all tails",
 				UsageText: "bytemark --admin show tails [--json]",
-				Flags:     OutputFlags("tails", "array"),
+				Flags:     OutputFlags("tails", "array", DefaultTailTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					tails, err := global.Client.GetTails()
 					if err != nil {
@@ -346,7 +352,7 @@ Privileges will be output in no particular order.`,
 				Name:      "tail",
 				Usage:     "shows the details of the specified tail",
 				UsageText: "bytemark --admin show tail <tail> [--json]",
-				Flags: append(OutputFlags("tail details", "object"),
+				Flags: append(OutputFlags("tail details", "object", DefaultTailTableFields),
 					cli.StringFlag{
 						Name:  "tail",
 						Usage: "the ID of the tail to display",
@@ -366,7 +372,7 @@ Privileges will be output in no particular order.`,
 				Name:      "storage_pools",
 				Usage:     "shows the details of all storage pools",
 				UsageText: "bytemark --admin show storage_pools [--json]",
-				Flags:     OutputFlags("storage pools", "array"),
+				Flags:     OutputFlags("storage pools", "array", DefaultStoragePoolTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					storagePools, err := global.Client.GetStoragePools()
 					if err != nil {
@@ -387,7 +393,7 @@ Privileges will be output in no particular order.`,
 				Name:      "storage_pool",
 				Usage:     "shows the details of the specified storage pool",
 				UsageText: "bytemark --admin show storage_pools [--json] <storage_pool>",
-				Flags: append(OutputFlags("storage pool", "object"),
+				Flags: append(OutputFlags("storage pool", "object", DefaultStoragePoolTableFields),
 					cli.StringFlag{
 						Name:  "storage_pool",
 						Usage: "The ID or label of the storage pool to display",
@@ -407,7 +413,7 @@ Privileges will be output in no particular order.`,
 				Name:      "migrating_vms",
 				Usage:     "shows a list of migrating servers",
 				UsageText: "bytemark --admin show migrating_vms [--json]",
-				Flags:     OutputFlags("migrating servers", "array"),
+				Flags:     OutputFlags("migrating servers", "array", DefaultServerTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetMigratingVMs()
 					if err != nil {
@@ -428,7 +434,7 @@ Privileges will be output in no particular order.`,
 				Name:      "stopped_eligible_vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
-				Flags:     OutputFlags("servers", "array"),
+				Flags:     OutputFlags("servers", "array", DefaultServerTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetStoppedEligibleVMs()
 					if err != nil {
@@ -449,7 +455,7 @@ Privileges will be output in no particular order.`,
 				Name:      "recent_vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
-				Flags:     OutputFlags("servers", "array"),
+				Flags:     OutputFlags("servers", "array", DefaultServerTableFields),
 				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetRecentVMs()
 					if err != nil {

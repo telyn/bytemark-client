@@ -101,7 +101,7 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs
 
 If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags: append(OutputFlags("server", "object"),
+		Flags: append(OutputFlags("server", "object", ""),
 			cli.IntFlag{
 				Name:  "cores",
 				Value: 1,
@@ -385,7 +385,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.OutputInDesiredForm(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
+	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: *vm}, func() (err error) {
 		log.Log("cloud server created successfully")
 		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
 		if err != nil {
@@ -400,4 +400,10 @@ func createServer(c *Context) (err error) {
 		}
 		return
 	})
+}
+
+// CreatedVirtualMachine is a struct containing the vm object returned by the VM after creation, and the spec that went into creating it.
+type CreatedVirtualMachine struct {
+	Spec           brain.VirtualMachineSpec `json:"spec"`
+	VirtualMachine brain.VirtualMachine     `json:"virtual_machine"`
 }
