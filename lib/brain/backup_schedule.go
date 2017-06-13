@@ -64,7 +64,7 @@ func (scheds BackupSchedules) PrettyPrint(wr io.Writer, detail prettyprint.Detai
 	tmpl := `{{ define "backupschedules_sgl" }}{{ if len . | ne 0 }}Backups are taken every {{ map . ".Interval" | joinWithSpecialLast ", " " & "}} seconds{{ else }}No backups scheduled{{ end }}{{ end }}
 {{ define "backupschedules_medium" }}{{ template "backupschedules_sgl" .}}{{ end }}
 {{ define "backupschedules_full" }}{{ range . -}}
-• #{{.ID}} - {{ prettysprint . "_sgl" }}
+• {{ prettysprint . "_sgl" }}
 {{ end }}{{ end }}`
 	return prettyprint.Run(wr, tmpl, "backupschedules"+string(detail), scheds)
 }
