@@ -10,6 +10,7 @@ import (
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"testing"
 )
@@ -212,7 +213,7 @@ func getFixtureIPRange() brain.IPRange {
 		Spec:      "192.168.1.1/28",
 		VLANNum:   1,
 		Zones:     make([]string, 0),
-		Available: 11,
+		Available: big.NewInt(11),
 	}
 }
 
