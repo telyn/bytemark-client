@@ -4,6 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"io/ioutil"
+	"math/big"
 	"net/http"
 	"reflect"
 	"runtime"
@@ -230,7 +231,7 @@ func TestGetVLANS(t *testing.T) {
 					Zones: []string{
 						"test-zone",
 					},
-					Available: 200.0,
+					Available: big.NewInt(200),
 				},
 			},
 		},
@@ -258,7 +259,7 @@ func TestGetIPRanges(t *testing.T) {
 			Zones: []string{
 				"test-zone",
 			},
-			Available: 200.0,
+			Available: big.NewInt(200),
 		},
 	}
 	simpleGetTest(t, "/admin/ip_ranges", testIPRanges, func(client Client) (interface{}, error) {
@@ -275,11 +276,58 @@ func TestGetIPRange(t *testing.T) {
 		Zones: []string{
 			"test-zone",
 		},
-		Available: 200.0,
+		Available: big.NewInt(200),
 	}
 	simpleGetTest(t, "/admin/ip_ranges/1234", &testIPRange, func(client Client) (interface{}, error) {
-		return client.GetIPRange(1234)
+		return client.GetIPRange("1234")
 	})
+}
+
+func TestGetIPRangeByIPRange(t *testing.T) {
+	testIPRange := &brain.IPRange{
+		ID:      1234,
+		Spec:    "192.168.13.0/24",
+		VLANNum: 123,
+		Zones: []string{
+			"test-zone",
+		},
+		Available: big.NewInt(200),
+	}
+
+	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
+		brain: Mux{
+			"/admin/ip_ranges": func(wr http.ResponseWriter, r *http.Request) {
+				if err := r.ParseForm(); err != nil {
+					t.Fatalf("Error parsing form: %v", err)
+				}
+
+				if r.Form.Get("cidr") != "192.168.13.0/24" {
+					t.Fatalf("Unexpected CIDR: %s", r.Form.Get("cidr"))
+				}
+
+				assertMethod(t, r, "GET")
+				writeJSON(t, wr, []*brain.IPRange{testIPRange})
+			},
+		},
+	})
+	defer servers.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Actual test start
+	object, err := client.GetIPRange("192.168.13.0/24")
+	if err != nil {
+		t.Fatalf("TestGetIPRangeByIPRange errored: %s", err.Error())
+	}
+
+	if !reflect.DeepEqual(testIPRange, object) {
+		t.Errorf("TestGetIPRangeByIPRange didn't get expected object.\r\nExpected: %#v\r\nActual:   %#v", testIPRange, object)
+	}
 }
 
 func TestGetHeads(t *testing.T) {

@@ -15,7 +15,7 @@ func init() {
 		Description: `This command displays an overview of the hosting you have with Bytemark.
 
 		If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-		Flags: OutputFlags("account details", "object"),
+		Flags: OutputFlags("account details", "object", DefaultAccountTableFields),
 		Action: With(AuthProvider, func(c *Context) error {
 
 			allAccs, err := global.Client.GetAccounts()

@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"strconv"
-
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"strconv"
 )
 
 // UpdateHead is a struct with all the possible settings that can be updated on a head
@@ -57,14 +57,42 @@ func (c *bytemarkClient) GetIPRanges() (ipRanges []*brain.IPRange, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetIPRange(id int) (ipRange *brain.IPRange, err error) {
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", strconv.Itoa(id))
-	if err != nil {
-		return
+func (c *bytemarkClient) GetIPRange(idOrCIDR string) (*brain.IPRange, error) {
+	if _, err := strconv.Atoi(idOrCIDR); err == nil {
+		// Numeric means it is just an ID
+		r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", idOrCIDR)
+		if err != nil {
+			return nil, err
+		}
+
+		var ipRange *brain.IPRange
+		_, _, err = r.Run(nil, &ipRange)
+		return ipRange, err
 	}
 
-	_, _, err = r.Run(nil, &ipRange)
-	return
+	// Non numeric means we got a CIDR
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges?cidr=%s", idOrCIDR)
+	if err != nil {
+		return nil, err
+	}
+
+	// The /admin/ip_ranges endpoint always returns an array of IP ranges,
+	// so we just need to get the first one and return it
+	var ipRanges []*brain.IPRange
+	_, _, err = r.Run(nil, &ipRanges)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(ipRanges) == 0 {
+		return nil, fmt.Errorf("IP Range not found")
+	}
+
+	if len(ipRanges) > 1 {
+		return nil, fmt.Errorf("More than one IP Range found, please report this as a bug")
+	}
+
+	return ipRanges[0], nil
 }
 
 func (c *bytemarkClient) GetHeads() (heads []*brain.Head, err error) {

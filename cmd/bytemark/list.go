@@ -31,7 +31,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the accounts you're able to see",
 			UsageText:   "bytemark list accounts",
 			Description: `This will list all the accounts that your authentication token has some form of access to.`,
-			Flags:       OutputFlags("accounts", "array"),
+			Flags:       OutputFlags("accounts", "array", DefaultAccountTableFields),
 			Action: With(AuthProvider, func(c *Context) error {
 				accounts, err := global.Client.GetAccounts()
 
@@ -50,7 +50,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the discs attached to a given virtual machine",
 			UsageText:   "bytemark list discs <virtual machine>",
 			Description: `This command lists all the discs attached to the given virtual machine. They're presented in the following format: 'LABEL: SIZE GRADE', where size is an integer number of megabytes. Add the --human flag to output the size in GiB (rounded down to the nearest GiB)`,
-			Flags: append(OutputFlags("discs", "array"),
+			Flags: append(OutputFlags("discs", "array", DefaultDiscTableFields),
 				cli.BoolFlag{
 					Name:  "human",
 					Usage: "output disc size in GiB, suffixed",
@@ -78,7 +78,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the groups in an account",
 			UsageText:   "bytemark list groups [account]",
 			Description: `This command lists all the groups in the given account, or in your default account if not specified.`,
-			Flags: append(OutputFlags("groups", "array"),
+			Flags: append(OutputFlags("groups", "array", DefaultGroupTableFields),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to list the groups of",
@@ -111,7 +111,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if not specified.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			Flags: append(OutputFlags("servers", "array"),
+			Flags: append(OutputFlags("servers", "array", DefaultServerTableFields),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to list the servers of",
