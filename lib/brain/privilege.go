@@ -70,7 +70,7 @@ func (p Privilege) Target() string {
 	case PrivilegeTargetTypeGroup:
 		return fmt.Sprintf("group %d", p.GroupID)
 	case PrivilegeTargetTypeAccount:
-		return fmt.Sprintf("account %d", p.GroupID)
+		return fmt.Sprintf("account %d", p.AccountID)
 	}
 	return ""
 
