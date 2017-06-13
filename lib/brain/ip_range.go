@@ -15,7 +15,7 @@ type IPRange struct {
 	Spec      string   `json:"spec"`
 	VLANNum   int      `json:"vlan_num"`
 	Zones     []string `json:"zones"`
-	Available *big.Int `json:"available"` // Needs to be a float64, since the number could go past int64 size
+	Available *big.Int `json:"available"`
 }
 
 // String serialises an IP range to easily be output
