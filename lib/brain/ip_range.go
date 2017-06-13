@@ -8,13 +8,19 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
+type IntAsFloat float64
+
+func (iaf IntAsFloat) String() string {
+	return fmt.Sprintf("%0.f", iaf)
+}
+
 // IPRange is a representation of an IP range
 type IPRange struct {
-	ID        int      `json:"id"`
-	Spec      string   `json:"spec"`
-	VLANNum   int      `json:"vlan_num"`
-	Zones     []string `json:"zones"`
-	Available float64  `json:"available"` // Needs to be a float64, since the number could go past int64 size
+	ID        int        `json:"id"`
+	Spec      string     `json:"spec"`
+	VLANNum   int        `json:"vlan_num"`
+	Zones     []string   `json:"zones"`
+	Available IntAsFloat `json:"available"` // Needs to be a float64, since the number could go past int64 size
 }
 
 // String serialises an IP range to easily be output
