@@ -18,17 +18,24 @@ type BackupSchedule struct {
 // All the detail levels are the same.
 func (sched BackupSchedule) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	// TODO(telyn): really ought to be nicer.
-	scheduleTpl := `{{ define "schedule_sgl" }}{{ printf "Every %d seconds starting from %s" .Interval .StartDate }}{{ end }}
+	scheduleTpl := `{{ define "schedule_sgl" }}{{ printf "#%d: Every %d seconds starting from %s" .ID .Interval .StartDate }}{{ end }}
 {{ define "schedule_medium" }}{{ template "schedule_sgl" . }}{{ end }}
 {{ define "schedule_full" }}{{ template "schedule_medium" . }}{{ end }}
 `
 	return prettyprint.Run(wr, scheduleTpl, "schedule"+string(detail), sched)
 }
 
+func (sched BackupSchedule) String() string {
+	buf := bytes.Buffer{}
+	sched.PrettyPrint(&buf, prettyprint.SingleLine)
+	return buf.String()
+}
+
 // BackupSchedules represents multiple backup schedules
 type BackupSchedules []*BackupSchedule
 
 // MapTemplateFragment takes a template fragment (as if it was starting within a {{ }}) and executes it against every schedule in scheds, returning all the results as a slice of strings, or an error if one occurred.
+// it is called by the 'map' template function, as used in BackupSchedules.PrettyPrint
 // Is this the most heinous thing ever?
 func (scheds BackupSchedules) MapTemplateFragment(templateFrag string) (strs []string, err error) {
 	strs = make([]string, len(scheds))

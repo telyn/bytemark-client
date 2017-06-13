@@ -136,7 +136,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 			Usage:       "list all the backups of a server or disc",
 			UsageText:   "bytemark list backups <server name> [disc label]",
 			Description: "Lists all the backups of all the discs in the given server, or if you also give a disc label, just the backups of that disc.",
-			Flags: []cli.Flag{
+			Flags: append(OutputFlags("backups", "array", DefaultBackupTableFields),
 				cli.StringFlag{
 					Name:  "disc",
 					Usage: "the disc you wish to list the backups of",
@@ -146,7 +146,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 					Usage: "the server you wish to list the backups of",
 					Value: new(VirtualMachineNameFlag),
 				},
-			},
+			),
 			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
 				vmName := c.VirtualMachineName("server")
 				label := c.String("disc")
@@ -171,7 +171,9 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						backups = append(backups, snaps...)
 					}
 				}
-				return backups.PrettyPrint(global.App.Writer, prettyprint.Full)
+				return c.OutputInDesiredForm(backups, func() error {
+					return backups.PrettyPrint(global.App.Writer, prettyprint.Full)
+				})
 			}),
 		}},
 	})
