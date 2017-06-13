@@ -113,9 +113,9 @@ const (
 	DefaultServerTableFields = "ID, Hostname, ManagementAddress, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
 
 	// DefaultHeadTableFields is the default for --table-fields for brain.Head
-	DefaultHeadTableFields = "ID, Label, Online, UsageStrategy, UUID, CCAddress, VirtualMachineCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
+	DefaultHeadTableFields = "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, VirtualMachineCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
 	// DefaultTailTableFields is the default for --table-fields for brain.Tail
-	DefaultTailTableFields = "ID, Label, Online, UUID, CCAddress, StoragePools, ZoneName"
+	DefaultTailTableFields = "ID, Label, IsOnline, UUID, CCAddress, StoragePools, ZoneName"
 	// DefaultStoragePoolTableFields is the default for --table-fields for brain.StoragePool
 	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade"
 	// DefaultIPRangeTableFields is the default for --table-fields for brain.IPRange
