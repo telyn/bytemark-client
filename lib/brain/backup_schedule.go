@@ -27,7 +27,7 @@ func (sched BackupSchedule) PrettyPrint(wr io.Writer, detail prettyprint.DetailL
 
 func (sched BackupSchedule) String() string {
 	buf := bytes.Buffer{}
-	sched.PrettyPrint(&buf, prettyprint.SingleLine)
+	_ = sched.PrettyPrint(&buf, prettyprint.SingleLine)
 	return buf.String()
 }
 
