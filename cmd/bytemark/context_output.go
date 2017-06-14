@@ -117,7 +117,7 @@ const (
 	// DefaultTailTableFields is the default for --table-fields for brain.Tail
 	DefaultTailTableFields = "ID, Label, IsOnline, UUID, CCAddress, StoragePools, ZoneName"
 	// DefaultStoragePoolTableFields is the default for --table-fields for brain.StoragePool
-	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade"
+	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, ZoneName"
 	// DefaultIPRangeTableFields is the default for --table-fields for brain.IPRange
 	DefaultIPRangeTableFields = "ID, Spec, VLANNum, Available, Zones"
 	// DefaultVLANTableFields is the default for --table-fields for brain.VLAN
