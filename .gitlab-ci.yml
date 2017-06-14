@@ -92,6 +92,7 @@ release-check:
   image: alpine
   before_script: *version_script
   script:
+  - apk update && apk add git
   - git branch --contains $CI_BUILD_REF_NAME | grep -E '^[[:space:]]*master$'
   - |
     if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
