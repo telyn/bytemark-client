@@ -163,12 +163,11 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						return
 					}
 					for _, disc := range c.VirtualMachine.Discs {
-						snaps, err := global.Client.GetBackups(vmName, disc.Label)
+						discbackups, err := global.Client.GetBackups(vmName, disc.Label)
 						if err != nil {
 							return err
 						}
-						// TODO(telyn): loop over snaps, attach disc as ParentDisc
-						backups = append(backups, snaps...)
+						backups = append(backups, discbackups...)
 					}
 				}
 				return c.OutputInDesiredForm(backups, func() error {
