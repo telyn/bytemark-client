@@ -103,8 +103,6 @@ release-check:
     fi
   only:
   - /^v\d+(\.\d+)+$/
-  except: # this except hopefully prevents this from running on version-tagged branches that aren't master
-  - /^(?<!master)$
 
 
 #### BUILD STAGE
@@ -320,10 +318,7 @@ publish:
   - git config --global user.name Bytemark Automation
   - git config --global user.email nobody@bytemark.co.uk
   only:
-    #- /^v\d+(\.\d+)+$/
-  - this-is-not-a-branch-that-will-ever-exist
-    #except: # this except hopefully prevents this from running on version-tagged branches that aren't master
-    #- /^(?<!master)$
+  - /^v\d+(\.\d+)+$/
 
 # releases a new version of bytemark client to repo.bytemark.co.uk/bytemark-client
 # this includes tarballs, zipballs, debian and rpm repos.
