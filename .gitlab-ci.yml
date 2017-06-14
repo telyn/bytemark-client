@@ -16,7 +16,8 @@ stages:
 # in either case, CHANGELOG_VERSION is the version in the most recent entry in doc/changelog
 # and SNAPSHOT_VERSION is "<pipeline ID>.git<7 chars of commit id>"
 .version_script: &version_script
-  - VERSION=${CI_BUILD_REF_NAME##v}
+  - VERSIONPREFIX=${VERSIONPREFIX:-v}
+  - VERSION=${CI_BUILD_REF_NAME##$VERSIONPREFIX}
   # If the CI_BUILD_REF_NAME is not prefixed with v
   # then VERSION will be equal to CI_BUILD_REF_NAME.
   - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || VERSION=""'
@@ -91,7 +92,7 @@ release-check:
   stage: test
   image: alpine
   before_script: *version_script
-  script:
+  script: &release_check_script
   - |
     if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
       echo "Mismatch between branch name and changelog version"
@@ -109,6 +110,16 @@ release-check:
     fi
   only:
   - /^v\d+(\.\d+)+$/
+
+release-branch-check:
+  stage: test
+  image: alpine
+  before_script: *version_script
+  script: *release_check_script
+  only:
+  - /^release-\d+(\.\d+)+$/
+  variables:
+    VERSIONPREFIX: "release-"
 
 
 #### BUILD STAGE
