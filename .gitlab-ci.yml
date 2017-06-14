@@ -104,7 +104,7 @@ release-check:
     fi
   - apk update && apk add git
   - |
-    if [ "$(git rev-parse $CI_BUILD_REF_NAME)" != "$(git rev-parse master)"; then
+    if [ "$(git rev-parse HEAD)" != "$(git rev-parse master)"; then
       echo "release branch or version tag is not the same as current master, will not release"
       exit 1
     fi
