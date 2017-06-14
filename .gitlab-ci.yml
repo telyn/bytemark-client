@@ -103,7 +103,11 @@ release-check:
       exit 1
     fi
   after_script:
-  - apk update && apk add git
+  - apk update && apk add git gpg
+  - |
+    echo "$GPG_TAG_SIGNING_PUBLIC_KEY" > key.asc
+    gpg --import key.asc
+    git tag -v $CI_BUILD_REF_NAME
   - |
     git fetch origin master
     git rev-parse HEAD
@@ -113,7 +117,8 @@ release-check:
       exit 1
     fi
   only:
-  - /^v\d+(\.\d+)+$/
+    ##- /^v\d+(\.\d+)+$/
+  - nevernevernever
 
 release-branch-check:
   stage: test
