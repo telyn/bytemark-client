@@ -30,12 +30,12 @@ func (c *Context) determineTableFields(obj interface{}) []string {
 	chosenFields := strings.Split(c.String("table-fields"), ",")
 	trimAllSpace(chosenFields)
 
-	fieldsList := row.FieldsFrom(obj)
 	if len(chosenFields) > 0 && chosenFields[0] != "" {
 		return chosenFields
-	} else {
-		return fieldsList
 	}
+
+	fieldsList := row.FieldsFrom(obj)
+	return fieldsList
 }
 
 // OutputTable is an OutputFn which outputs the object in table form, using github.com/BytemarkHosting/row and github.com/olekukonko/tablewriter
