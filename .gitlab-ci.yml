@@ -97,7 +97,10 @@ release-check:
   - |
     echo "$GPG_TAG_SIGNING_PUBLIC_KEY" > key.asc
     gpg --import key.asc
-    git tag -v $CI_BUILD_REF_NAME
+    if ! git tag -v $CI_BUILD_REF_NAME; then
+      echo "$CI_BUILD_REF_NAME is not a signed tag, or it is, but it's not signed by someone we trust (see GPG_TAG_SIGNING_PUBLIC_KEY secret variable)"
+      exit 1
+    fi
   - |
     if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
       echo "Mismatch between branch name and changelog version"
