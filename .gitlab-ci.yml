@@ -92,6 +92,7 @@ release-check:
   image: alpine
   before_script: *version_script
   script:
+  - git branch --contains $CI_BUILD_REF_NAME | grep -E '^[[:space:]]*master$'
   - |
     if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
       echo "Mismatch between branch name and changelog version"
@@ -318,7 +319,8 @@ publish:
   - git config --global user.name Bytemark Automation
   - git config --global user.email nobody@bytemark.co.uk
   only:
-  - /^v\d+(\.\d+)+$/
+    #- /^v\d+(\.\d+)+$/
+  - nevernevernever
 
 # releases a new version of bytemark client to repo.bytemark.co.uk/bytemark-client
 # this includes tarballs, zipballs, debian and rpm repos.
