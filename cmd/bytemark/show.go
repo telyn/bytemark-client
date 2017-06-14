@@ -55,7 +55,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 		}, {
 			Name:        "disc",
 			Usage:       "outputs info about a disc",
-			UsageText:   "bytemark show group [--json | --table] [--table-fields help | <fields>] <server> <disc label>",
+			UsageText:   "bytemark show disc [--json | --table] [--table-fields help | <fields>] <server> <disc label>",
 			Description: `This command displays information about a disc including any backups and backup schedules on the disc`,
 			Flags: append(OutputFlags("disc details", "object", DefaultDiscTableFields),
 				cli.GenericFlag{
