@@ -92,11 +92,6 @@ release-check:
   image: alpine
   before_script: *version_script
   script:
-  - apk update && apk add git
-  - |
-    if ! git branch --contains $CI_BUILD_REF_NAME | grep -E '^[[:space:]]*master$'; then
-      echo "version-tagged commit has not been merged into master - will not release!"
-    fi
   - |
     if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
       echo "Mismatch between branch name and changelog version"
@@ -104,6 +99,12 @@ release-check:
     fi
     if ! grep 'Version = "'$VERSION'"' lib/version.go > /dev/null; then
       echo "Mismatch between branch name and lib/version.go version"
+      exit 1
+    fi
+  - apk update && apk add git
+  - |
+    if ! git branch --contains $CI_BUILD_REF_NAME | grep -E '^[[:space:]]*master$'; then
+      echo "version-tagged commit has not been merged into master - will not release!"
       exit 1
     fi
   only:
