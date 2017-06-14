@@ -105,7 +105,9 @@ release-check:
   - apk update && apk add git
   - |
     git fetch origin master
-    if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)"; then
+    git rev-parse HEAD
+    git rev-parse FETCH_HEAD
+    if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
       echo "release branch or version tag is not the same as current master, will not release"
       exit 1
     fi
