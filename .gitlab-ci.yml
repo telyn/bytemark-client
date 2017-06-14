@@ -102,13 +102,14 @@ release-check:
       echo "Mismatch between branch name and lib/version.go version"
       exit 1
     fi
+  after_script:
   - apk update && apk add git
   - |
     git fetch origin master
     git rev-parse HEAD
     git rev-parse FETCH_HEAD
     if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
-      echo "release branch or version tag is not the same as current master, will not release"
+      echo "version tag is not the same as current master, will not release"
       exit 1
     fi
   only:
