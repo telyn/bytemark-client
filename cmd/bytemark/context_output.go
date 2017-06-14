@@ -30,19 +30,21 @@ func (c *Context) determineTableFields(obj interface{}) []string {
 	chosenFields := strings.Split(c.String("table-fields"), ",")
 	trimAllSpace(chosenFields)
 
-	fieldsList := row.FieldsFrom(obj)
-	if len(chosenFields) > 0 && chosenFields[0] == "help" {
-		fmt.Fprintf(global.App.Writer, "Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
-		return nil
-	} else if len(chosenFields) > 0 && chosenFields[0] != "" {
+	if len(chosenFields) > 0 && chosenFields[0] != "" {
 		return chosenFields
-	} else {
-		return fieldsList
 	}
+
+	fieldsList := row.FieldsFrom(obj)
+	return fieldsList
 }
 
 // OutputTable is an OutputFn which outputs the object in table form, using github.com/BytemarkHosting/row and github.com/olekukonko/tablewriter
 func (c *Context) OutputTable(obj interface{}) error {
+	if c.String("table-fields") == "help" {
+		fieldsList := row.FieldsFrom(obj)
+		fmt.Fprintf(global.App.Writer, "Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
+		return nil
+	}
 	fields := c.determineTableFields(obj)
 	return RenderTable(obj, fields)
 }
