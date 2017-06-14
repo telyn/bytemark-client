@@ -16,15 +16,15 @@ stages:
 # in either case, CHANGELOG_VERSION is the version in the most recent entry in doc/changelog
 # and SNAPSHOT_VERSION is "<pipeline ID>.git<7 chars of commit id>"
 .version_script: &version_script
-  - VERSION=${CI_BUILD_REF_NAME##release-}
-  # If the CI_BUILD_REF_NAME is not prefixed with release- (e.g. for a branch)
+  - VERSION=${CI_BUILD_REF_NAME##v}
+  # If the CI_BUILD_REF_NAME is not prefixed with v
   # then VERSION will be equal to CI_BUILD_REF_NAME.
   - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || VERSION=""'
   - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
   - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
 
 #### TEST STAGE
-## The test stage runs the test, checks the code for lint issues, and makes sure that if release-branches are up-to-snuff
+## The test stage runs the test, checks the code for lint issues, and makes sure that release tags are up-to-snuff
 
 .test-job: &test
   image: golang:$GOVERSION
@@ -86,7 +86,7 @@ test:
     - coverage.html
     expire_in: '1 week'
 
-# release-check makes sure that if we're on a release branch then the changelog and lib/version.go have been updated.
+# release-check makes sure that if we're on a release tag then the changelog and lib/version.go have been updated.
 release-check:
   stage: test
   image: alpine
@@ -103,6 +103,8 @@ release-check:
     fi
   only:
   - /^v\d+(\.\d+)+$/
+  except: # this except hopefully prevents this from running on version-tagged branches that aren't master
+  - /^(?<!master)$
 
 
 #### BUILD STAGE
@@ -222,7 +224,7 @@ package-debian-amd64:
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
-  - '[ "release-$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
+  - '[ "v$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
   - mv ../bytemark-client*.deb .
@@ -314,11 +316,14 @@ publish:
   - mkdir ~/.ssh
   - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
   - REPO=$REPO_SSH_HOST:$REPO_PATH
-  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - VERSION=${CI_BUILD_REF_NAME##v}
   - git config --global user.name Bytemark Automation
   - git config --global user.email nobody@bytemark.co.uk
   only:
-  - /^v\d+(\.\d+)+$/
+    #- /^v\d+(\.\d+)+$/
+  - this-is-not-a-branch-that-will-ever-exist
+    #except: # this except hopefully prevents this from running on version-tagged branches that aren't master
+    #- /^(?<!master)$
 
 # releases a new version of bytemark client to repo.bytemark.co.uk/bytemark-client
 # this includes tarballs, zipballs, debian and rpm repos.
@@ -352,7 +357,7 @@ release-to-chocolatey:
   <<: *release
   image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
   before_script:
-  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - VERSION=${CI_BUILD_REF_NAME##v}
   - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
   - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
