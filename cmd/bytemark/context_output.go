@@ -30,19 +30,21 @@ func (c *Context) determineTableFields(obj interface{}) []string {
 	chosenFields := strings.Split(c.String("table-fields"), ",")
 	trimAllSpace(chosenFields)
 
-	fieldsList := row.FieldsFrom(obj)
-	if len(chosenFields) > 0 && chosenFields[0] == "help" {
-		fmt.Fprintf(global.App.Writer, "Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
-		return nil
-	} else if len(chosenFields) > 0 && chosenFields[0] != "" {
+	if len(chosenFields) > 0 && chosenFields[0] != "" {
 		return chosenFields
-	} else {
-		return fieldsList
 	}
+
+	fieldsList := row.FieldsFrom(obj)
+	return fieldsList
 }
 
 // OutputTable is an OutputFn which outputs the object in table form, using github.com/BytemarkHosting/row and github.com/olekukonko/tablewriter
 func (c *Context) OutputTable(obj interface{}) error {
+	if c.String("table-fields") == "help" {
+		fieldsList := row.FieldsFrom(obj)
+		fmt.Fprintf(global.App.Writer, "Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
+		return nil
+	}
 	fields := c.determineTableFields(obj)
 	return RenderTable(obj, fields)
 }
@@ -117,7 +119,7 @@ const (
 	// DefaultTailTableFields is the default for --table-fields for brain.Tail
 	DefaultTailTableFields = "ID, Label, IsOnline, UUID, CCAddress, StoragePools, ZoneName"
 	// DefaultStoragePoolTableFields is the default for --table-fields for brain.StoragePool
-	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade"
+	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
 	// DefaultIPRangeTableFields is the default for --table-fields for brain.IPRange
 	DefaultIPRangeTableFields = "ID, Spec, VLANNum, Available, Zones"
 	// DefaultVLANTableFields is the default for --table-fields for brain.VLAN
