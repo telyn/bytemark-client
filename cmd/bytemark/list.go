@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -128,6 +129,49 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						listServersInGroup(g)
 					}
 					return nil
+				})
+			}),
+		}, {
+			Name:        "backups",
+			Usage:       "list all the backups of a server or disc",
+			UsageText:   "bytemark list backups <server name> [disc label]",
+			Description: "Lists all the backups of all the discs in the given server, or if you also give a disc label, just the backups of that disc.",
+			Flags: append(OutputFlags("backups", "array", DefaultBackupTableFields),
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "the disc you wish to list the backups of",
+				},
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server you wish to list the backups of",
+					Value: new(VirtualMachineNameFlag),
+				},
+			),
+			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
+				vmName := c.VirtualMachineName("server")
+				label := c.String("disc")
+				var backups brain.Backups
+
+				if label != "" {
+					backups, err = global.Client.GetBackups(vmName, label)
+					if err != nil {
+						return
+					}
+				} else {
+					err = VirtualMachineProvider("server")(c)
+					if err != nil {
+						return
+					}
+					for _, disc := range c.VirtualMachine.Discs {
+						discbackups, err := global.Client.GetBackups(vmName, disc.Label)
+						if err != nil {
+							return err
+						}
+						backups = append(backups, discbackups...)
+					}
+				}
+				return c.OutputInDesiredForm(backups, func() error {
+					return backups.PrettyPrint(global.App.Writer, prettyprint.Full)
 				})
 			}),
 		}},
