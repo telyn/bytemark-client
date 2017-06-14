@@ -10,7 +10,7 @@ import (
 type StoragePool struct {
 	Name            string   `json:"name"`
 	Label           string   `json:"label"`
-	ZoneName        string   `json:"zone"`
+	Zone            string   `json:"zone"`
 	Size            int      `json:"size"`
 	FreeSpace       int      `json:"free_space"`
 	AllocatedSpace  int      `json:"alloc"`
