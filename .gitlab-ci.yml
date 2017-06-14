@@ -93,6 +93,11 @@ release-check:
   image: alpine
   before_script: *version_script
   script: &release_check_script
+  - apk update && apk add git gpg
+  - |
+    echo "$GPG_TAG_SIGNING_PUBLIC_KEY" > key.asc
+    gpg --import key.asc
+    git tag -v $CI_BUILD_REF_NAME
   - |
     if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
       echo "Mismatch between branch name and changelog version"
@@ -103,11 +108,6 @@ release-check:
       exit 1
     fi
   after_script:
-  - apk update && apk add git gpg
-  - |
-    echo "$GPG_TAG_SIGNING_PUBLIC_KEY" > key.asc
-    gpg --import key.asc
-    git tag -v $CI_BUILD_REF_NAME
   - |
     git fetch origin master
     git rev-parse HEAD
