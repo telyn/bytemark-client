@@ -93,7 +93,7 @@ release-check:
   image: alpine
   before_script: *version_script
   script: &release_check_script
-  - apk update && apk add git gpg
+  - apk update && apk add git gnupg
   - |
     echo "$GPG_TAG_SIGNING_PUBLIC_KEY" > key.asc
     gpg --import key.asc
