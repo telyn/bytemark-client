@@ -102,7 +102,7 @@ release-check:
       exit 1
     fi
   only:
-  - /^release-\d+(\.\d+)+$/
+  - /^v\d+(\.\d+)+$/
 
 
 #### BUILD STAGE
@@ -318,7 +318,7 @@ publish:
   - git config --global user.name Bytemark Automation
   - git config --global user.email nobody@bytemark.co.uk
   only:
-  - /^release-\d+(\.\d+)+$/
+  - /^v\d+(\.\d+)+$/
 
 # releases a new version of bytemark client to repo.bytemark.co.uk/bytemark-client
 # this includes tarballs, zipballs, debian and rpm repos.
