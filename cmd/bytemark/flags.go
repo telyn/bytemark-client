@@ -103,6 +103,10 @@ func (rf ResizeFlag) String() string {
 	return fmt.Sprintf("%s%d%s", plus, sz, units)
 }
 
+// privArgs is an array of strings which can have an argument shifted off the front.
+// there are other (better?) ways to do it - just a shift function which takes a *[]string?)
+// there's nothing specific about privileges to it either except the error.. perhaps it should be ShiftableStringSlice?
+// but again, a func shift(*[]string) (arg string, ok bool) is probably better.
 type privArgs []string
 
 func (args *privArgs) shift() (arg string, err error) {

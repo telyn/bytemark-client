@@ -94,7 +94,6 @@ It was not possible to determine your default account. Please set one using byte
 		"Username":       username,
 		"OwnedAccounts":  ownedAccounts,
 		"OtherAccounts":  otherAccounts,
-		"Writer":         wr,
 	}
 
 	err = tmpl.ExecuteTemplate(wr, "full_overview", data)

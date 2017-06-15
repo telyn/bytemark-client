@@ -236,7 +236,11 @@ func GroupProvider(flagName string) ProviderFunc {
 		}
 
 		groupName := c.GroupName(flagName)
+		if groupName.Account == "" {
+			groupName.Account = global.Config.GetIgnoreErr("account")
+		}
 		c.Group, err = global.Client.GetGroup(groupName)
+		// this if is a guard against tricky-to-debug nil-pointer errors
 		if err == nil && c.Group == nil {
 			err = fmt.Errorf("no group was returned - please report a bug")
 		}
@@ -300,13 +304,14 @@ func UserProvider(flagName string) ProviderFunc {
 		if c.User != nil {
 			return
 		}
-		user := c.String(flagName)
-		if user != "" {
-			user = global.Config.GetIgnoreErr("user")
-		}
 		if err = AuthProvider(c); err != nil {
 			return
 		}
+		user := c.String(flagName)
+		if user == "" {
+			user = global.Client.GetSessionUser()
+		}
+
 		c.User, err = global.Client.GetUser(user)
 		if err == nil && c.User == nil {
 			err = fmt.Errorf("no user was returned - please report a bug")

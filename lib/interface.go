@@ -126,6 +126,22 @@ type Client interface {
 	RevokePrivilege(p brain.Privilege) error
 
 	//
+	// BACKUPS
+	//
+
+	CreateBackup(server VirtualMachineName, discLabelOrID string) (brain.Backup, error)
+	DeleteBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) error
+	GetBackups(server VirtualMachineName, discLabelOrID string) (brain.Backups, error)
+	RestoreBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
+
+	//
+	// BACKUP SCHEDULES
+	//
+
+	CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, intervalSeconds int) (brain.BackupSchedule, error)
+	DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) error
+
+	//
 	// USERS
 	//
 
@@ -207,7 +223,7 @@ type Client interface {
 	GetVLANs() ([]*brain.VLAN, error)
 	GetVLAN(num int) (*brain.VLAN, error)
 	GetIPRanges() ([]*brain.IPRange, error)
-	GetIPRange(id int) (*brain.IPRange, error)
+	GetIPRange(idOrCIDR string) (*brain.IPRange, error)
 	GetHeads() ([]*brain.Head, error)
 	GetHead(idOrLabel string) (*brain.Head, error)
 	GetTails() ([]*brain.Tail, error)

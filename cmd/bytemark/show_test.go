@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -21,39 +24,63 @@ type showAccountTest struct {
 	ShouldErr    bool
 }
 
+// mkExpectedOutput loops over every value in template, running fmt.Sprintf to replace all %s with substitute
+// in this way it can be used to prepare an expected output array. See showTestAccountOutput and TestShowAccountCommand for some overly complicated example usage.
+func mkExpectedOutput(template map[string]string, substitute string) map[string]string {
+	m := make(map[string]string)
+	for k, v := range template {
+		toReplace := strings.Count(v, "%s")
+		fmtArgs := make([]interface{}, toReplace)
+		for i := 0; i < toReplace; i++ {
+			fmtArgs[i] = substitute
+		}
+		m[k] = fmt.Sprintf(v, fmtArgs...)
+	}
+	return m
+}
+
+var showAccountTestOutput = map[string]string{
+	"table": "+-----------+------+-----------+--------+\n| BillingID | Name | Suspended | Groups |\n+-----------+------+-----------+--------+\n|       213 | %s | false     |        |\n+-----------+------+-----------+--------+\n",
+	"json":  "{\n    \"name\": \"%s\",\n    \"owner\": {\n        \"username\": \"\",\n        \"email\": \"\",\n        \"password\": \"\",\n        \"firstname\": \"%s\",\n        \"surname\": \"Testo\",\n        \"address\": \"\",\n        \"city\": \"\",\n        \"postcode\": \"\",\n        \"country\": \"\",\n        \"phone\": \"\"\n    },\n    \"technical_contact\": {\n        \"username\": \"\",\n        \"email\": \"\",\n        \"password\": \"\",\n        \"firstname\": \"%s\",\n        \"surname\": \"Testo\",\n        \"address\": \"\",\n        \"city\": \"\",\n        \"postcode\": \"\",\n        \"country\": \"\",\n        \"phone\": \"\"\n    },\n    \"billing_id\": 213,\n    \"brain_id\": 112,\n    \"card_reference\": \"\",\n    \"groups\": [],\n    \"suspended\": false\n}",
+	"human": "213 - %s\n",
+}
+
 func TestShowAccountCommand(t *testing.T) {
-	baseShowAccountSetup := func(c *mocks.Client, config *mocks.Config, configAccount string) {
+	baseShowAccountSetup := func(c *mocks.Client, config *mocks.Config, configAccount, outputFormat string) {
+		config.Mock.Functions = resetOneMockedFunction(config.Mock.Functions, "GetV", "output-format")
+		config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", outputFormat, "FLAG output-format"})
 		config.When("GetIgnoreErr", "account").Return(configAccount)
 	}
+
 	tests := []showAccountTest{
 		{ // 0
-			Input:         "bytemark show account",
+			Input:         "show account",
 			ConfigAccount: "",
 		},
 		{ // 1
-			Input:         "bytemark show account",
-			ConfigAccount: "sec",
-			AccountToGet:  "sec",
+			Input:         "show account",
+			ConfigAccount: "secg",
+			AccountToGet:  "secg",
 		},
 		{ // 2
-			Input:         "bytemark --account caan show account",
+			Input:         "--account caan show account",
 			ConfigAccount: "",
 			AccountToGet:  "caan",
 		},
 		{ // 3
-			Input:         "bytemark --account caan show account",
+			Input:         "--account caan show account",
 			ConfigAccount: "jast",
 			AccountToGet:  "caan",
 		},
 		{ // 4
-			Input:         "bytemark show account thay",
+			Input:         "show account thay",
 			ConfigAccount: "jast",
 			AccountToGet:  "thay",
 		},
 		{ // 5
-			Input:         "bytemark show account --account jast",
+			Input:         "show account --account caan",
 			ConfigAccount: "jast",
-			AccountToGet:  "jast",
+			AccountToGet:  "caan",
 		},
 	}
 
@@ -63,47 +90,70 @@ func TestShowAccountCommand(t *testing.T) {
 				t.Errorf("TestShowAccountCommand %d panicked: %v %s", i, err, debug.Stack())
 			}
 		}()
-		config, c := baseTestAuthSetup(t, false)
-		baseShowAccountSetup(c, config, test.ConfigAccount)
+
+		expectedOutput := mkExpectedOutput(showAccountTestOutput, test.AccountToGet)
 		if test.AccountToGet == "" {
-			c.When("GetAccount", "").Return(&lib.Account{
-				Name:      "default-account",
-				BrainID:   112,
-				BillingID: 213,
-				Groups:    []*brain.Group{},
-				Owner: &billing.Person{
-					FirstName: "Doctor",
-					LastName:  "Testo",
-				},
-				TechnicalContact: &billing.Person{
-					FirstName: "Doctor",
-					LastName:  "Testo",
-				},
-			}).Times(1)
-		} else {
-			c.When("GetAccount", test.AccountToGet).Return(&lib.Account{
-				Name:      "default-account",
-				BrainID:   112,
-				BillingID: 213,
-				Groups:    []*brain.Group{},
-				Owner: &billing.Person{
-					FirstName: "Doctor",
-					LastName:  "Testo",
-				},
-				TechnicalContact: &billing.Person{
-					FirstName: "Doctor",
-					LastName:  "Testo",
-				},
-			}).Times(1)
+			expectedOutput = mkExpectedOutput(showAccountTestOutput, "defa")
 		}
-		err := global.App.Run(strings.Split(test.Input, " "))
-		if !test.ShouldErr && err != nil {
-			t.Errorf("TestShowAccountCommand %d shouldn't err, but did: %T{%s}", i, err, err.Error())
-		} else if test.ShouldErr && err == nil {
-			t.Errorf("TestShowAccountCommand %d should err, but didn't", i)
-		}
-		if ok, vErr := c.Verify(); !ok {
-			t.Errorf("TestShowAccountCommand %d client failed to verify: %s", i, vErr.Error())
+		for _, format := range []string{"table", "json", "human"} {
+
+			config, c := baseTestAuthSetup(t, false)
+			baseShowAccountSetup(c, config, test.ConfigAccount, format)
+			if test.AccountToGet == "" {
+				c.When("GetAccount", "").Return(&lib.Account{
+					Name:      "defa",
+					BrainID:   112,
+					BillingID: 213,
+					Groups:    []*brain.Group{},
+					Owner: &billing.Person{
+						FirstName: "defa",
+						LastName:  "Testo",
+					},
+					TechnicalContact: &billing.Person{
+						FirstName: "defa",
+						LastName:  "Testo",
+					},
+				}).Times(1)
+			} else {
+				// wat
+				c.When("GetAccount", test.AccountToGet).Return(&lib.Account{
+					Name:      test.AccountToGet,
+					BrainID:   112,
+					BillingID: 213,
+					Groups:    []*brain.Group{},
+					Owner: &billing.Person{
+						FirstName: test.AccountToGet,
+						LastName:  "Testo",
+					},
+					TechnicalContact: &billing.Person{
+						FirstName: test.AccountToGet,
+						LastName:  "Testo",
+					},
+				}).Times(1)
+			}
+
+			buf := bytes.Buffer{}
+			global.App.Writer = &buf
+			global.App.ErrWriter = &buf
+			args := fmt.Sprintf("bytemark --output-format=%s %s", format, test.Input)
+			//t.Logf("TestShowAccountCommand %d args: %s", i, args)
+			err := global.App.Run(strings.Split(args, " "))
+			if !test.ShouldErr && err != nil {
+				t.Errorf("TestShowAccountCommand %d shouldn't err, but did: %T{%s}", i, err, err.Error())
+			} else if test.ShouldErr && err == nil {
+				t.Errorf("TestShowAccountCommand %d should err, but didn't", i)
+			}
+			if ok, vErr := c.Verify(); !ok {
+				t.Errorf("TestShowAccountCommand %d client failed to verify: %s", i, vErr.Error())
+			}
+			if expected, ok := expectedOutput[format]; ok {
+				actual := buf.String()
+				if expected != actual {
+					t.Errorf("TestShowAccountCommand %d didn't match expected %s output.\r\nExpected: %q\r\nActual %q", i, format, expected, actual)
+				}
+			} else {
+				t.Errorf("TestShowAccountCommand %d didn't have an expected %s output. Maybe it should be %q", i, format, buf.String())
+			}
 		}
 	}
 
@@ -114,6 +164,7 @@ func TestShowAccountCommand(t *testing.T) {
 }
 
 func TestShowGroupCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
@@ -132,6 +183,7 @@ func TestShowGroupCommand(t *testing.T) {
 }
 
 func TestShowServerCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
@@ -149,6 +201,7 @@ func TestShowServerCommand(t *testing.T) {
 }
 
 func TestAdminShowVLANsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -164,6 +217,7 @@ func TestAdminShowVLANsCommand(t *testing.T) {
 }
 
 func TestAdminShowVLANCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -180,6 +234,7 @@ func TestAdminShowVLANCommand(t *testing.T) {
 }
 
 func TestAdminShowIPRangesCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -195,10 +250,11 @@ func TestAdminShowIPRangesCommand(t *testing.T) {
 }
 
 func TestAdminShowIPRangeCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	ipRangeID := 1
+	ipRangeID := "1"
 	ipRange := getFixtureIPRange()
 	c.When("GetIPRange", ipRangeID).Return(&ipRange, nil).Times(1)
 
@@ -210,7 +266,25 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 	}
 }
 
+func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	rangeString := "192.168.33.0/24"
+	ipRange := getFixtureIPRange()
+	c.When("GetIPRange", rangeString).Return(&ipRange, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show ip_range 192.168.33.0/24", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 func TestAdminShowHeadsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -226,6 +300,7 @@ func TestAdminShowHeadsCommand(t *testing.T) {
 }
 
 func TestAdminShowHeadCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -242,6 +317,7 @@ func TestAdminShowHeadCommand(t *testing.T) {
 }
 
 func TestAdminShowTailsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -257,6 +333,7 @@ func TestAdminShowTailsCommand(t *testing.T) {
 }
 
 func TestAdminShowTailCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -273,6 +350,7 @@ func TestAdminShowTailCommand(t *testing.T) {
 }
 
 func TestAdminShowStoragePoolsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -288,6 +366,7 @@ func TestAdminShowStoragePoolsCommand(t *testing.T) {
 }
 
 func TestAdminShowStoragePoolCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -304,6 +383,7 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 }
 
 func TestAdminShowMigratingVMsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -319,6 +399,7 @@ func TestAdminShowMigratingVMsCommand(t *testing.T) {
 }
 
 func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -334,6 +415,7 @@ func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 }
 
 func TestAdminShowRecentVMsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
@@ -348,7 +430,6 @@ func TestAdminShowRecentVMsCommand(t *testing.T) {
 	}
 }
 
-// TODO(telyn): show account? show user?
 func TestShowPrivileges(t *testing.T) {
 
 	tests := []struct {

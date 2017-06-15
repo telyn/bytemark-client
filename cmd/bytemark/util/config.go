@@ -348,7 +348,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		return v
 	case "billing-endpoint":
 		if config.GetIgnoreErr("endpoint") == "https://staging.bigv.io" {
-			return ConfigVar{"billing-endpoint", "", "CODE STAGING DEFAULT"}
+			return ConfigVar{"billing-endpoint", "", "CODE nullify billing-endpoint on bigv-staging"}
 		}
 		v := ConfigVar{"billing-endpoint", lib.DefaultURLs().Billing, "CODE"}
 		if val := os.Getenv("BM_BILLING_ENDPOINT"); val != "" {

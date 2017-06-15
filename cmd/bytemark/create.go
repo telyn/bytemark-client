@@ -101,7 +101,7 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs
 
 If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags: append(OutputFlags("server", "object"),
+		Flags: append(OutputFlags("server", "object", ""),
 			cli.IntFlag{
 				Name:  "cores",
 				Value: 1,
@@ -197,6 +197,32 @@ Multiple --disc flags can be used to create multiple discs`,
 		Action: With(OptionalArgs("group"), RequiredFlags("group"), AuthProvider, createGroup),
 	}
 
+	createBackupCmd := cli.Command{
+		Name:        "backup",
+		Usage:       "create a backup of a disc's current state",
+		UsageText:   "bytemark create backup <server name> <disc label>",
+		Description: `Creates a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "disc",
+				Usage: "the disc to create a backup of",
+			},
+			cli.GenericFlag{
+				Name:  "server",
+				Usage: "the server whose disk you wish to backup",
+				Value: new(VirtualMachineNameFlag),
+			},
+		},
+		Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) error {
+			backup, err := global.Client.CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
+			if err != nil {
+				return err
+			}
+			log.Errorf("Backup '%s' taken successfully!", backup.Label)
+			return nil
+		}),
+	}
+
 	commands = append(commands, cli.Command{
 		Name:      "create",
 		Usage:     "creates servers, discs, etc - see `bytemark create <kind of thing> help`",
@@ -217,6 +243,7 @@ Multiple --disc flags can be used to create multiple discs`,
 			createServerCmd,
 			createDiscsCmd,
 			createGroupCmd,
+			createBackupCmd,
 		},
 	})
 }
@@ -384,7 +411,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.OutputInDesiredForm(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
+	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: *vm}, func() (err error) {
 		log.Log("cloud server created successfully")
 		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
 		if err != nil {
@@ -399,4 +426,10 @@ func createServer(c *Context) (err error) {
 		}
 		return
 	})
+}
+
+// CreatedVirtualMachine is a struct containing the vm object returned by the VM after creation, and the spec that went into creating it.
+type CreatedVirtualMachine struct {
+	Spec           brain.VirtualMachineSpec `json:"spec"`
+	VirtualMachine brain.VirtualMachine     `json:"virtual_machine"`
 }
