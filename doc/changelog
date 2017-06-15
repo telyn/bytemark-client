@@ -1,4 +1,4 @@
-bytemark-client (3.0+beta1) UNRELEASED; urgency=low
+bytemark-client (3.0~beta1) UNRELEASED; urgency=low
 
   Remove unnecessary / potentially dangerous pointers from the lib package
 
