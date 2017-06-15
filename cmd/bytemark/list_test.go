@@ -110,7 +110,7 @@ func TestListBackups(t *testing.T) {
 
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("GetBackups", vmname, "test-disc").Return(nil).Times(1)
