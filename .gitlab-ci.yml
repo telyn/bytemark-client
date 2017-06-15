@@ -367,9 +367,9 @@ release-to-repo:
   # remove old -latest symlinks
   - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do rm -f $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
     # add new -latest symlinks
-  - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
+  - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do ln -s bytemark-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
   - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/windows/bytemark-latest.zip"
-  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
+  - ssh $REPO_SSH_HOST -- "ln -s bytemark-$VERSION.zip $REPO_PATH/windows/bytemark-latest.zip"
   dependencies:
   - package-generic-amd64
   - package-rpm-amd64
@@ -397,10 +397,6 @@ release-to-brew:
   <<: *release
   script:
   - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
-  # upload to repo
-  - scp bytemark-amd64-darwin.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
-  - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/mac/bytemark-latest.zip"
-  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/mac/bytemark-latest.zip"
   # update the homebrew repo
   - git clone git@github.com:BytemarkHosting/homebrew-tools.git
   - cd homebrew-tools
