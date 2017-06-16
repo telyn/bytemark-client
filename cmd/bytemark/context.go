@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 	"net"
 )
@@ -14,7 +12,7 @@ import (
 // the next unused argument and can have various bytemarky types attached to it
 // in order to keep code DRY
 type Context struct {
-	Context        *cli.Context
+	Context        innerContext
 	Account        *lib.Account
 	Authed         bool
 	Definitions    *lib.Definitions
@@ -34,6 +32,11 @@ func (c *Context) Reset() {
 	}
 }
 
+// App returns the cli.App that this context is part of. Usually this will be the same as global.App, but it's nice to depend less on globals.
+func (c *Context) App() *cli.App {
+	return c.App()
+}
+
 // args returns all the args that were passed to the Context (i.e. all the args passed to this (sub)command)
 func (c *Context) args() cli.Args {
 	return c.Context.Args()
@@ -42,6 +45,11 @@ func (c *Context) args() cli.Args {
 // Args returns all the unused arguments
 func (c *Context) Args() []string {
 	return c.args()[c.currentArgIndex:]
+}
+
+// Command returns the cli.Command this context is for
+func (c *Context) Command() cli.Command {
+	return c.Context.Command()
 }
 
 // NextArg returns the next unused argument, and marks it as used.
@@ -56,7 +64,7 @@ func (c *Context) NextArg() (string, error) {
 
 // Help creates a UsageDisplayedError that will output the issue and a message to consult the documentation
 func (c *Context) Help(whatsyourproblem string) (err error) {
-	return util.UsageDisplayedError{TheProblem: whatsyourproblem, Command: c.Context.Command.FullName()}
+	return util.UsageDisplayedError{TheProblem: whatsyourproblem, Command: c.Command().FullName()}
 }
 
 // flags below
@@ -108,6 +116,11 @@ func (c *Context) Int(flagname string) int {
 	return c.Context.Int(flagname)
 }
 
+// Int64 returns the value of the named flag as an int64
+func (c *Context) Int64(flagname string) int64 {
+	return c.Context.Int64(flagname)
+}
+
 // IPs returns the ips passed along as the named flag.
 func (c *Context) IPs(flagname string) []net.IP {
 	ips, ok := c.Context.Generic(flagname).(*util.IPFlag)
@@ -128,7 +141,7 @@ func (c *Context) PrivilegeFlag(flagname string) PrivilegeFlag {
 
 // String returns the value of the named flag as a string
 func (c *Context) String(flagname string) string {
-	if c.Context.IsSet(flagname) {
+	if c.Context.IsSet(flagname) || c.Context.String(flagname) != "" {
 		return c.Context.String(flagname)
 	}
 	return c.Context.GlobalString(flagname)
@@ -159,18 +172,4 @@ func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
 		return *global.Config.GetVirtualMachine()
 	}
 	return lib.VirtualMachineName(*vmNameFlag)
-}
-
-// IfNotMarshalJSON checks to see if the json flag was set, and outputs obj as a JSON object if so.
-// if not, runs fn
-func (c *Context) IfNotMarshalJSON(obj interface{}, fn func() error) error {
-	if c.Bool("json") {
-		js, err := json.MarshalIndent(obj, "", "    ")
-		if err != nil {
-			return err
-		}
-		log.Output(string(js))
-		return nil
-	}
-	return fn()
 }

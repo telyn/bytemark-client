@@ -10,6 +10,85 @@ import (
 )
 
 func init() {
+	adminCommands = append(adminCommands, cli.Command{
+		Name:   "create",
+		Action: cli.ShowSubcommandHelp,
+		Subcommands: []cli.Command{
+			{
+				Name:      "user",
+				Usage:     "creates a new cluster admin or cluster superuser",
+				UsageText: "bytemark --admin create user <username> <privilege>",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "username",
+						Usage: "The username of the new user",
+					},
+					cli.StringFlag{
+						Name:  "privilege",
+						Usage: "The privilege to grant to the new user",
+					},
+				},
+				Action: With(OptionalArgs("username", "privilege"), RequiredFlags("username", "privilege"), AuthProvider, func(c *Context) error {
+					// Privilege is just a string and not a PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
+					if err := global.Client.CreateUser(c.String("username"), c.String("privilege")); err != nil {
+						return err
+					}
+					log.Logf("User %s has been created with %s privileges\r\n", c.String("username"), c.String("privilege"))
+					return nil
+				}),
+			},
+			{
+				Name:      "vlan_group",
+				Usage:     "creates groups for private VLANs",
+				UsageText: "bytemark --admin create vlan_group <group> [vlan_num]",
+				Description: `Create a group in the specified account, with an optional VLAN specified.
+
+Used when setting up a private VLAN for a customer.`,
+				Flags: []cli.Flag{
+					cli.GenericFlag{
+						Name:  "group",
+						Usage: "the name of the group to create",
+						Value: new(GroupNameFlag),
+					},
+					cli.IntFlag{
+						Name:  "vlan_num",
+						Usage: "The VLAN number to add the group to",
+					},
+				},
+				Action: With(OptionalArgs("group", "vlan_num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
+					gp := c.GroupName("group")
+					if err := global.Client.AdminCreateGroup(gp, c.Int("vlan_num")); err != nil {
+						return err
+					}
+					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
+					return nil
+				}),
+			},
+			{
+				Name:      "ip_range",
+				Usage:     "create a new IP range in a VLAN",
+				UsageText: "bytemark --admin create ip_range <ip_range> <vlan_num>",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "ip_range",
+						Usage: "the IP range to add",
+					},
+					cli.IntFlag{
+						Name:  "vlan_num",
+						Usage: "The VLAN number to add the IP range to",
+					},
+				},
+				Action: With(OptionalArgs("ip_range", "vlan_num"), RequiredFlags("ip_range", "vlan_num"), AuthProvider, func(c *Context) error {
+					if err := global.Client.CreateIPRange(c.String("ip_range"), c.Int("vlan_num")); err != nil {
+						return err
+					}
+					log.Logf("IP range created\r\n")
+					return nil
+				}),
+			},
+		},
+	})
+
 	createServerCmd := cli.Command{
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,
@@ -22,7 +101,7 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs
 
 If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags: []cli.Flag{
+		Flags: append(OutputFlags("server", "object", ""),
 			cli.IntFlag{
 				Name:  "cores",
 				Value: 1,
@@ -51,10 +130,6 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Value: new(util.IPFlag),
 				Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
 			},
-			cli.BoolFlag{
-				Name:  "json",
-				Usage: "If set, will output the spec and created virtual machine as a JSON object.",
-			},
 			cli.GenericFlag{
 				Name:  "memory",
 				Value: new(util.SizeSpecFlag),
@@ -77,8 +152,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Name:  "zone",
 				Usage: "Which zone the server will be created in. See `bytemark zones` for the choices.",
 			},
-		},
-
+		),
 		Action: With(OptionalArgs("name", "cores", "memory", "disc"), RequiredFlags("name"), AuthProvider, createServer),
 	}
 	createServerCmd.Flags = append(createServerCmd.Flags, imageInstallFlags...)
@@ -132,7 +206,7 @@ Multiple --disc flags can be used to create multiple discs`,
 	create disc[s] [--disc <disc spec>]... <cloud server>
 	create group [--account <name>] <name>
 	create ip [--reason reason] <cloud server>
-	create server (see bytemark create server help)
+	create server (see bytemark help create server)
 
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
@@ -311,7 +385,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.IfNotMarshalJSON(map[string]interface{}{"spec": spec, "virtual_machine": vm}, func() (err error) {
+	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: *vm}, func() (err error) {
 		log.Log("cloud server created successfully")
 		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
 		if err != nil {
@@ -326,4 +400,10 @@ func createServer(c *Context) (err error) {
 		}
 		return
 	})
+}
+
+// CreatedVirtualMachine is a struct containing the vm object returned by the VM after creation, and the spec that went into creating it.
+type CreatedVirtualMachine struct {
+	Spec           brain.VirtualMachineSpec `json:"spec"`
+	VirtualMachine brain.VirtualMachine     `json:"virtual_machine"`
 }

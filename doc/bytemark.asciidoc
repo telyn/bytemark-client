@@ -49,6 +49,10 @@ Global options apply to any subsequent command.
     Use this option if you want enter the Yubikey one-time password on the
     command-line rather than be prompted for it.
 
+*--2fa-otp* 'string'::
+    Use this option if you want enter the 2 Factor Authentication one-time
+    password on the command-line rather than be prompted for it.
+
 *--debug-level* 'num'::
     Set the verbosity of debugging information (for troubleshooting purposes).
 
@@ -63,7 +67,7 @@ Global options apply to any subsequent command.
     this option. However, some people manage Cloud Servers on multiple
     accounts.
 
-*--endpoint* 'URL', *--api-endpoint* 'URL', *--auth-endpoint* 'URL', *--billing-endpoint* 'URL'::
+*--endpoint* 'URL', *--api-endpoint* 'URL', *--auth-endpoint* 'URL', *--billing-endpoint* 'URL', *--spp-endpoint* 'URL'::
     The default endpoints shouldn't need to be changed, but if for some
     reason you need the client to communicate with different endpoints then
     you can use these options.
@@ -71,6 +75,13 @@ Global options apply to any subsequent command.
 *--config-dir* 'dir'::
     The client stores its configuration in $HOME/.bytemark by default. You
     can specify a different directory with this option.
+
+*--output-format* 'format'::
+    The format to return any data in. This mostly affects the 'show' commands 
+    Available formats:
+        'human': the default - outputs data in a human-readable bulleted-list kind of way
+        'json': output data in JSON format
+        'table': output data as a table. By default this will output all the fields for each object. Set the '--table-fields' flag to 'help' on a command that supports table output to see the list of fields available.
 
 
 COMMANDS

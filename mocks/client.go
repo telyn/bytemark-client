@@ -367,8 +367,8 @@ func (c *Client) GetIPRanges() ([]*brain.IPRange, error) {
 	ipRanges, _ := r.Get(0).([]*brain.IPRange)
 	return ipRanges, r.Error(1)
 }
-func (c *Client) GetIPRange(id int) (*brain.IPRange, error) {
-	r := c.Called(id)
+func (c *Client) GetIPRange(idOrCIDR string) (*brain.IPRange, error) {
+	r := c.Called(idOrCIDR)
 	ipRange, _ := r.Get(0).(*brain.IPRange)
 	return ipRange, r.Error(1)
 }
@@ -421,7 +421,75 @@ func (c *Client) MigrateDisc(disc int, newStoragePool string) error {
 	r := c.Called(disc, newStoragePool)
 	return r.Error(0)
 }
-func (c *Client) MigrateVirtualMachine(vmName *lib.VirtualMachineName, newHead string) error {
+func (c *Client) MigrateVirtualMachine(vmName lib.VirtualMachineName, newHead string) error {
 	r := c.Called(vmName, newHead)
+	return r.Error(0)
+}
+func (c *Client) ReapVMs() error {
+	r := c.Called()
+	return r.Error(0)
+}
+func (c *Client) DeleteVLAN(id int) error {
+	r := c.Called()
+	return r.Error(0)
+}
+func (c *Client) AdminCreateGroup(name lib.GroupName, vlanNum int) error {
+	r := c.Called(name, vlanNum)
+	return r.Error(0)
+}
+func (c *Client) CreateIPRange(ipRange string, vlanNum int) error {
+	r := c.Called(ipRange, vlanNum)
+	return r.Error(0)
+}
+func (c *Client) CancelDiscMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) CancelVMMigration(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) EmptyStoragePool(idOrLabel string) error {
+	r := c.Called(idOrLabel)
+	return r.Error(0)
+}
+func (c *Client) EmptyHead(idOrLabel string) error {
+	r := c.Called(idOrLabel)
+	return r.Error(0)
+}
+func (c *Client) ReifyDisc(id int) error {
+	r := c.Called(id)
+	return r.Error(0)
+}
+func (c *Client) ApproveVM(name lib.VirtualMachineName, powerOn bool) error {
+	r := c.Called(name, powerOn)
+	return r.Error(0)
+}
+func (c *Client) RejectVM(name lib.VirtualMachineName, reason string) error {
+	r := c.Called(name, reason)
+	return r.Error(0)
+}
+func (c *Client) RegradeDisc(disc int, newGrade string) error {
+	r := c.Called(disc, newGrade)
+	return r.Error(0)
+}
+func (c *Client) UpdateVMMigration(name lib.VirtualMachineName, speed *int64, downtime *int) error {
+	r := c.Called(name, speed, downtime)
+	return r.Error(0)
+}
+func (c *Client) CreateUser(username string, privilege string) error {
+	r := c.Called(username, privilege)
+	return r.Error(0)
+}
+func (c *Client) UpdateHead(idOrLabel string, options lib.UpdateHead) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateTail(idOrLabel string, options lib.UpdateTail) error {
+	r := c.Called(idOrLabel, options)
+	return r.Error(0)
+}
+func (c *Client) UpdateStoragePool(idOrLabel string, options lib.UpdateStoragePool) error {
+	r := c.Called(idOrLabel, options)
 	return r.Error(0)
 }

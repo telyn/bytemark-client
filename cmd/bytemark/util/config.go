@@ -23,6 +23,7 @@ var configVars = [...]string{
 	"user",
 	"account",
 	"group",
+	"output-format",
 	"token",
 	"debug-level",
 	"yubikey",
@@ -349,7 +350,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		return v
 	case "billing-endpoint":
 		if config.GetIgnoreErr("endpoint") == "https://staging.bigv.io" {
-			return ConfigVar{"billing-endpoint", "", "CODE STAGING DEFAULT"}
+			return ConfigVar{"billing-endpoint", "", "CODE nullify billing-endpoint on bigv-staging"}
 		}
 		v := ConfigVar{"billing-endpoint", lib.DefaultURLs().Billing, "CODE"}
 		if val := os.Getenv("BM_BILLING_ENDPOINT"); val != "" {
@@ -413,6 +414,8 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		return v
 	case "force":
 		return ConfigVar{"force", "false", "CODE"}
+	case "output-format":
+		return ConfigVar{"output-format", "human", "CODE"}
 	}
 	return ConfigVar{name, "", "UNSET"}
 }

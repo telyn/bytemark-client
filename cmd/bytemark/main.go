@@ -52,8 +52,11 @@ func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 	// last minute alterations to commands
 	// used for modifying help descriptions, mostly.
 	for idx, cmd := range app.Commands {
-		if cmd.Name == "admin" {
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateAdminCommandsHelp()
+		switch cmd.Name {
+		case "admin":
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(adminCommands)
+		case "commands":
+			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(app.Commands)
 		}
 	}
 	return
@@ -155,10 +158,37 @@ func EnsureAuth() error {
 			}
 
 			err = global.Client.AuthWithCredentials(credents)
+
+			// Handle the special case here where we just need to prompt for 2FA and try again
+			if err != nil && strings.Contains(err.Error(), "Missing 2FA") {
+				for global.Config.GetIgnoreErr("2fa-otp") == "" {
+					token := util.Prompt("Enter 2FA token: ")
+					global.Config.Set("2fa-otp", strings.TrimSpace(token), "INTERACTION")
+				}
+
+				credents["2fa"] = global.Config.GetIgnoreErr("2fa-otp")
+
+				err = global.Client.AuthWithCredentials(credents)
+			}
+
 			if err == nil {
-				// sucess!
+				// success!
 				// it doesn't _really_ matter if we can't write the token to the token place, right?
 				_ = global.Config.SetPersistent("token", global.Client.GetSessionToken(), "AUTH")
+
+				// Check this here, as it is only relevant the initial login,
+				// not subsequent validations of the token (as opposed to yubikey)
+				if global.Config.GetIgnoreErr("2fa-otp") != "" {
+					factors := global.Client.GetSessionFactors()
+
+					if global.Config.GetIgnoreErr("2fa-otp") != "" {
+						if !factorExists(factors, "2fa") {
+							// Should never happen, as long as auth correctly returns the factors
+							return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
+						}
+					}
+				}
+
 				break
 			} else {
 				if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
@@ -167,6 +197,7 @@ func EnsureAuth() error {
 						global.Config.Set("user", global.Config.GetIgnoreErr("user"), "PRIOR INTERACTION")
 						global.Config.Set("pass", "", "INVALID")
 						global.Config.Set("yubikey-otp", "", "INVALID")
+						global.Config.Set("2fa-otp", "", "INVALID")
 					} else {
 						return err
 					}
@@ -179,16 +210,33 @@ func EnsureAuth() error {
 	}
 	if global.Config.GetIgnoreErr("yubikey") != "" {
 		factors := global.Client.GetSessionFactors()
-		for _, f := range factors {
-			if f == "yubikey" {
-				return nil
+
+		if global.Config.GetIgnoreErr("yubikey") != "" {
+			if !factorExists(factors, "yubikey") {
+				// Current auth token doesn't have a yubikey,
+				// so prompt the user to login again with yubikey
+
+				// This happens when someone has logged in already,
+				// but then tries to run a command with the
+				// "yubikey" flag set
+
+				global.Config.Set("token", "", "FLAG yubikey")
+
+				return EnsureAuth()
 			}
 		}
-		// if still executing, we didn't have yubikey factor
-		global.Config.Set("token", "", "FLAG yubikey")
-		return EnsureAuth()
 	}
 	return nil
+}
+
+func factorExists(factors []string, factor string) bool {
+	for _, f := range factors {
+		if f == factor {
+			return true
+		}
+	}
+
+	return false
 }
 
 // mergeCommand merges src into dst, only copying non-nil fields of src,
@@ -315,6 +363,10 @@ func globalFlags() (flags []cli.Flag) {
 			Usage: "URL of SPP. set to blank in environments without an SPP.",
 		},
 		cli.StringFlag{
+			Name:  "output-format",
+			Usage: "The output format to use. Currently defined output formats are human (default for most commands), json (machine readable format), table (human-readable table format)",
+		},
+		cli.StringFlag{
 			Name:  "user",
 			Usage: "user you wish to log in as",
 		},
@@ -352,8 +404,9 @@ func prepConfig() (flags []cli.Flag, args []string) {
 	// import the flags into config
 	flargs := config.ImportFlags(flagset)
 	if config.GetIgnoreErr("endpoint") == "https://int.bigv.io" {
-		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using bigv-int")
-		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using bigv-int")
+		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using int")
+		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using int")
+		config.Set("account", "bytemark", "CODE use bytemark account as default on int")
 	}
 	global.Config = config
 

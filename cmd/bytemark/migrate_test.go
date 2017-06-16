@@ -9,12 +9,7 @@ import (
 
 func TestMigrateDiscWithNewStoragePool(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, true)
-
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	_, c := baseTestAuthSetup(t, true)
 
 	c.When("MigrateDisc", 123, "t6-sata1").Return(nil).Times(1)
 
@@ -29,12 +24,7 @@ func TestMigrateDiscWithNewStoragePool(t *testing.T) {
 
 func TestMigrateDiscWithoutNewStoragePool(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, true)
-
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	_, c := baseTestAuthSetup(t, true)
 
 	c.When("MigrateDisc", 123, "").Return(nil).Times(1)
 
@@ -49,12 +39,7 @@ func TestMigrateDiscWithoutNewStoragePool(t *testing.T) {
 
 func TestMigrateDiscError(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, true)
-
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	_, c := baseTestAuthSetup(t, true)
 
 	migrateErr := fmt.Errorf("Error migrating")
 	c.When("MigrateDisc", 123, "t6-sata1").Return(migrateErr).Times(1)
@@ -70,16 +55,12 @@ func TestMigrateDiscError(t *testing.T) {
 
 func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, true)
+	config, c := baseTestAuthSetup(t, true)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
-	c.When("MigrateVirtualMachine", &vmName, "stg-h1").Return(nil).Times(1)
+	c.When("MigrateVirtualMachine", vmName, "stg-h1").Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm123.group.account", "stg-h1"})
 
@@ -92,16 +73,12 @@ func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 
 func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, true)
+	config, c := baseTestAuthSetup(t, true)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm122", Group: "group", Account: "account"}
-	c.When("MigrateVirtualMachine", &vmName, "").Return(nil).Times(1)
+	c.When("MigrateVirtualMachine", vmName, "").Return(nil).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm122.group.account"})
 
@@ -114,17 +91,13 @@ func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 
 func TestMigrateVirtualMachineError(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, true)
+	config, c := baseTestAuthSetup(t, true)
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	migrateErr := fmt.Errorf("Error migrating")
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}
-	c.When("MigrateVirtualMachine", &vmName, "stg-h2").Return(migrateErr).Times(1)
+	c.When("MigrateVirtualMachine", vmName, "stg-h2").Return(migrateErr).Times(1)
 
 	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm121.group.account", "stg-h2"})
 

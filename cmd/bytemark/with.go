@@ -16,7 +16,7 @@ type ProviderFunc func(*Context) error
 // With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
 func With(providers ...ProviderFunc) func(c *cli.Context) error {
 	return func(cliContext *cli.Context) error {
-		c := Context{Context: cliContext}
+		c := Context{Context: cliContextWrapper{cliContext}}
 		err := foldProviders(&c, providers...)
 		cleanup(&c)
 		return err
@@ -101,8 +101,8 @@ func JoinArgs(flagName string, n ...int) ProviderFunc {
 
 		value := make([]string, 0, toRead)
 		for i := 0; i < toRead; i++ {
-			arg, err := c.NextArg()
-			if err != nil {
+			arg, argErr := c.NextArg()
+			if argErr != nil {
 				// don't return the error - just means we ran out of arguments to slurp
 				break
 			}
@@ -150,7 +150,7 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 // (or that VirtualMachineName / GroupName flags have the full complement of values needed)
 func RequiredFlags(flagNames ...string) ProviderFunc {
 	return func(c *Context) (err error) {
-		for _, flag := range c.Context.Command.Flags {
+		for _, flag := range c.Command().Flags {
 			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(c, flag) {
 				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
 			}
@@ -236,7 +236,11 @@ func GroupProvider(flagName string) ProviderFunc {
 		}
 
 		groupName := c.GroupName(flagName)
+		if groupName.Account == "" {
+			groupName.Account = global.Config.GetIgnoreErr("account")
+		}
 		c.Group, err = global.Client.GetGroup(&groupName)
+		// this if is a guard against tricky-to-debug nil-pointer errors
 		if err == nil && c.Group == nil {
 			err = fmt.Errorf("no group was returned - please report a bug")
 		}
@@ -300,13 +304,14 @@ func UserProvider(flagName string) ProviderFunc {
 		if c.User != nil {
 			return
 		}
-		user := c.String(flagName)
-		if user != "" {
-			user = global.Config.GetIgnoreErr("user")
-		}
 		if err = AuthProvider(c); err != nil {
 			return
 		}
+		user := c.String(flagName)
+		if user == "" {
+			user = global.Client.GetSessionUser()
+		}
+
 		c.User, err = global.Client.GetUser(user)
 		if err == nil && c.User == nil {
 			err = fmt.Errorf("no user was returned - please report a bug")
