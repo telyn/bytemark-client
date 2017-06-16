@@ -105,7 +105,11 @@ func (d *JSONDefinition) Process(into *Definitions) error {
 	}
 
 	// Shouldn't be a fatal error. into may still be useful
-	return fmt.Errorf("Unknown definition returned: %v", d.ID)
+	// return fmt.Errorf("Unknown definition returned: %v", d.ID)
+	// Don't return an error here, as older version of bytemark-client
+	// may simply be unaware of newly added definitions. It's not
+	// strictly an error, just not handled by the current version.
+	return nil
 
 }
 
