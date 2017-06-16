@@ -1,3 +1,12 @@
+bytemark-client (2.4) UNRELEASED; urgency=low
+
+  New features:
+    * Support for backups via the `create backup`, `delete backup`, `schedule
+      backups`, `unschedule backups`, `show disc` and `list backups` commands.
+  
+
+ -- telyn <telyn@bytemark.co.uk>  Fri, 16 Jun 2017 16:56:28 +0100
+
 bytemark-client (2.3) UNRELEASED; urgency=low
 
   New features:
