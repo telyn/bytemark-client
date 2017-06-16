@@ -1,3 +1,73 @@
+bytemark-client (2.3) UNRELEASED; urgency=low
+
+  New features:
+    * Logging in with 2-factor authentication is now supported, but setting up
+      2-factor auth is not yet ready.
+    * Added a new table output format using `--table` and `--table-fields` to
+      most commands which support `--json` output. `--table` and `--json` are
+      now aliases for the global flag `--output-format <json | table>` - which
+      can also be specified using `config set output-format`. The default
+      output format for most commands is 'human' - which behaves the same as
+      previous versions, but is 'table' for admin-only commands.
+      Table output is not intended to be machine readable and the list of
+      fields displayed by default for any given command may change between
+      releases of bytemark-client. Use the 'json' `--output-format` or the
+      `list` commands for any scripting.
+      Specify `--table-fields help` to see the available fields for a command
+      There is an additional output-format called 'debug' which outputs the
+      object as go code.
+    * Added the `commands` command, which displays a list of all the commands
+      available in bytemark-client.
+    * `show server` will now accept a server's ID instead of a name.
+    * `images`, `zones`, `storage` and `hwprofiles` commands can now be output
+      as JSON or tables using the `--output-format`, `--json`, or `--table`
+      flags.
+
+  Changes / Fixes:
+    * specifying --yubikey will now prompt you to login again if your current
+      auth token was not created using a yubikey
+    * some commands were not correctly setting a default account, forcing the
+      end user to specify their server in server.group.account form, or their
+      group in group.account form. This has now been fixed and should be
+      consistent across all commands.
+    * the --group global flag / config var was being ignored. Now it gets
+      used.
+    * 401 Unauthorized errors are now handled gracefully. These errors occur
+      when your authentication token is invalid or unset, whereas 403
+      Forbidden errors occur when your token is valid but you do not have
+      permission to access something.
+    * Brain accounts without a matching billing account now show their VMs
+      under show account / list servers.
+    * `resize disk` now works again
+
+  New admin commands:
+    * approve server
+    * cancel migration disc
+    * cancel migration server
+    * create ip_range
+    * create user
+    * create vlan_group
+    * delete vlan
+    * empty head
+    * empty storage_pool
+    * empty tail
+    * reap vm
+    * regrade disc
+    * reify discs
+    * reject server
+    * update head
+    * update migration
+    * update storage_pool
+    * update tail
+
+  Admin-only changes:
+    * show ip_range now accepts CIDR representation as well as ID
+    * account name defaulting behaviour on Bytemark internal/staging brains
+      is now better
+    * show head[s] now correctly display whether the heads are online
+
+ -- telyn <telyn@bytemark.co.uk>  Wed, 14 Jun 2017 10:37:32 +0100
+
 bytemark-client (2.2.1) UNRELEASED; urgency=low
 
   Fixes:

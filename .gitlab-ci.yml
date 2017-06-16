@@ -16,15 +16,16 @@ stages:
 # in either case, CHANGELOG_VERSION is the version in the most recent entry in doc/changelog
 # and SNAPSHOT_VERSION is "<pipeline ID>.git<7 chars of commit id>"
 .version_script: &version_script
-  - VERSION=${CI_BUILD_REF_NAME##release-}
-  # If the CI_BUILD_REF_NAME is not prefixed with release- (e.g. for a branch)
+  - VERSIONPREFIX=${VERSIONPREFIX:-v}
+  - VERSION=${CI_BUILD_REF_NAME##$VERSIONPREFIX}
+  # If the CI_BUILD_REF_NAME is not prefixed with v
   # then VERSION will be equal to CI_BUILD_REF_NAME.
   - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || VERSION=""'
   - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
   - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
 
 #### TEST STAGE
-## The test stage runs the test, checks the code for lint issues, and makes sure that if release-branches are up-to-snuff
+## The test stage runs the test, checks the code for lint issues, and makes sure that release tags are up-to-snuff
 
 .test-job: &test
   image: golang:$GOVERSION
@@ -86,12 +87,12 @@ test:
     - coverage.html
     expire_in: '1 week'
 
-# release-check makes sure that if we're on a release branch then the changelog and lib/version.go have been updated.
+# release-check makes sure that if we're on a release tag then the changelog and lib/version.go have been updated.
 release-check:
   stage: test
   image: alpine
   before_script: *version_script
-  script:
+  script: &release_check_script
   - |
     if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
       echo "Mismatch between branch name and changelog version"
@@ -101,8 +102,35 @@ release-check:
       echo "Mismatch between branch name and lib/version.go version"
       exit 1
     fi
+  after_script:
+  - apk update && apk add git gnupg
+  - |
+    echo "$GPG_TAG_SIGNING_PUBLIC_KEY" > key.asc
+    gpg --import key.asc
+    if ! git tag -v $CI_BUILD_REF_NAME; then
+      echo "$CI_BUILD_REF_NAME is not a signed tag, or it is, but it's not signed by someone we trust (see GPG_TAG_SIGNING_PUBLIC_KEY secret variable)"
+      exit 1
+    fi
+  - |
+    git fetch origin master
+    git rev-parse HEAD
+    git rev-parse FETCH_HEAD
+    if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+      echo "version tag is not the same as current master, will not release"
+      exit 1
+    fi
+  only:
+  - /^v\d+(\.\d+)+$/
+
+release-branch-check:
+  stage: test
+  image: alpine
+  before_script: *version_script
+  script: *release_check_script
   only:
   - /^release-\d+(\.\d+)+$/
+  variables:
+    VERSIONPREFIX: "release-"
 
 
 #### BUILD STAGE
@@ -222,7 +250,7 @@ package-debian-amd64:
   script:
   - ln -s .gitlab-ci/debian
   - mv bytemark-amd64-linux bytemark
-  - '[ "release-$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
+  - '[ "v$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
   - fakeroot debian/rules binary
   - lintian -i ../bytemark-client*.deb
   - mv ../bytemark-client*.deb .
@@ -314,11 +342,11 @@ publish:
   - mkdir ~/.ssh
   - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
   - REPO=$REPO_SSH_HOST:$REPO_PATH
-  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - VERSION=${CI_BUILD_REF_NAME##v}
   - git config --global user.name Bytemark Automation
   - git config --global user.email nobody@bytemark.co.uk
   only:
-  - /^release-\d+(\.\d+)+$/
+  - /^v\d+(\.\d+)+$/
 
 # releases a new version of bytemark client to repo.bytemark.co.uk/bytemark-client
 # this includes tarballs, zipballs, debian and rpm repos.
@@ -339,9 +367,9 @@ release-to-repo:
   # remove old -latest symlinks
   - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do rm -f $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
     # add new -latest symlinks
-  - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
+  - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do ln -s bytemark-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
   - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/windows/bytemark-latest.zip"
-  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/windows/bytemark-latest.zip"
+  - ssh $REPO_SSH_HOST -- "ln -s bytemark-$VERSION.zip $REPO_PATH/windows/bytemark-latest.zip"
   dependencies:
   - package-generic-amd64
   - package-rpm-amd64
@@ -352,7 +380,7 @@ release-to-chocolatey:
   <<: *release
   image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
   before_script:
-  - VERSION=${CI_BUILD_REF_NAME##release-}
+  - VERSION=${CI_BUILD_REF_NAME##v}
   - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
   - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
@@ -369,10 +397,6 @@ release-to-brew:
   <<: *release
   script:
   - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
-  # upload to repo
-  - scp bytemark-amd64-darwin.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
-  - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/mac/bytemark-latest.zip"
-  - ssh $REPO_SSH_HOST -- "ln -s bytemark-client-$VERSION.tar.gz $REPO_PATH/mac/bytemark-latest.zip"
   # update the homebrew repo
   - git clone git@github.com:BytemarkHosting/homebrew-tools.git
   - cd homebrew-tools
