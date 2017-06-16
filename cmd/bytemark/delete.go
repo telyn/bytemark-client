@@ -141,27 +141,6 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				},
 			},
 			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), deleteServer),
-		}, {
-			Name:        "backup",
-			Usage:       "delete the given backup",
-			UsageText:   `bytemark delete backup <server name> <disc label> <backup label>`,
-			Description: "Deletes the given backup. Backups cannot be recovered after deletion.",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "disc",
-					Usage: "the disc to delete a backup of",
-				},
-				cli.GenericFlag{
-					Name:  "server",
-					Usage: "the server to delete a backup from",
-					Value: new(VirtualMachineNameFlag),
-				},
-				cli.StringFlag{
-					Name:  "backup",
-					Usage: "the name or ID of the backup to delete",
-				},
-			},
-			Action: With(OptionalArgs("server", "disc", "backup"), RequiredFlags("server", "disc", "backup"), AuthProvider, deleteBackup),
 		}},
 	})
 }
@@ -265,11 +244,3 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("       bytemark delete server [--force] [---purge] <server>")
 	log.Log("       bytemark undelete server <server>")
 }*/
-func deleteBackup(c *Context) (err error) {
-	err = global.Client.DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
-	if err != nil {
-		return
-	}
-	log.Logf("Backup '%s' deleted successfully", c.String("backup"))
-	return
-}
