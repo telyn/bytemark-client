@@ -42,27 +42,59 @@ It's suggested that you avoid using struct embedding or interface composition wi
 Breaking API change
 ===================
 
-The following breaking API change to the 'lib' package occurred in version 2.0.
+The following breaking API change to the 'lib' package occurred in version 3.0
 
-* the packages lib/spp, lib/brain and lib/billing are being created.
-* lib.CreditCard is moving to lib/spp.CreditCard
-* lib.Person is moving to lib/billing.Person
-* lib.billingAccount is moving to lib/billing.Account
-* lib.brainAccount is moving to lib/brain.Account
-* the following types are moving from lib to the same name under lib/brain:
-  * Disc
-  * Group
-  * ImageInstall.go
-  * IP
-  * IPCreateRequest
-  * IPs
-  * IPSpec
-  * NIC
-  * StoragePool
-  * User
-  * VirtualMachine
-  * VirtualMachineSpec
-* lib.VirtualMachineName is being renamed to lib.ServerName
-* lib.ParseVirtualMachineName is being renamed to lib.ParseServerName
+* These `lib.Client` methods have been deleted
+  * `ParseVirtualMachineName`
+  * `ParseGroupName`
+  * `ParseAccountName`
 
-If you require the old API for longer you can use gopkg.in/BytemarkHosting/bytemark-client.v1/lib to refer to the package prior to this change.
+The following changeset can be summarised as "most `lib.Client` methods now take `lib`/`brain` structs as values, rather than as pointers."
+
+* These `lib.Client` methods now take `lib.Account` instead of `*lib.Account`
+  * `RegisterNewAccount`
+* These `lib.Client` methods now take `lib.GroupName` instead of `*lib.GroupName`
+  * `CreateGroup`
+  * `DeleteGroup`
+  * `GetGroup`
+  * `CreateVirtualMachine`
+* These `lib.Client` methods now take `lib.VirtualMachineName` instead of `*lib.VirtualMachineName`
+  * `CreateDisc`
+  * `DeleteDisc`
+  * `GetDisc`
+  * `ResizeDisc`
+  * `SetDiscIopsLimit`
+  * `AddIP`
+  * `DeleteVirtualMachine`
+  * `GetVirtualMachine`
+  * `MoveVirtualMachine`
+  * `ReimageVirtualMachine`
+  * `ResetVirtualMachine`
+  * `RestartVirtualMachine`
+  * `StartVirtualMachine`
+  * `StopVirtualMachine`
+  * `ShutdownVirtualMachine`
+  * `UndeleteVirtualMachine`
+  * `SetVirtualMachineHardwareProfile`
+  * `SetVirtualMachineHardwareProfileLock`
+  * `SetVirtualMachineMemory`
+  * `SetVirtualMachineCores`
+  * `SetVirtualMachineCDROM`
+* These `lib.Client` methods now take `brain.IPCreateRequest` instead of `*brain.IPCreateRequest`
+  * `AddIP`
+* These `lib.Client` methods now take `brain.ImageInstall` instead of `*brain.IPCreateRequest`
+  * `ReimageVirtualMachine`
+* These `lib.Client` methods now take `spp.CreditCard` instead of `*spp.CreditCard`
+  * `CreateCreditCard`
+  * `CreateCreditCardWithToken`
+* These `lib.Client` methods now return `brain.VirtualMachine` instead of `*brain.VirtualMachine`
+  * `CreateVirtualMachine` (not done)
+  * `GetVirtualMachine` (not done)
+* These `lib.Client` methods now return `brain.Group` instead of `*brain.Group`
+  * GetGroup (not done)
+* These `lib.Client` methods now return `brain.Disc` instead of `*brain.Disc`
+  * GetDisc (not done)
+* These `lib.Client` methods now return `lib.Account` instead of `*lib.Account`
+  * RegisterAccount (not done)
+
+If you require the old API for longer you can use `gopkg.in/BytemarkHosting/bytemark-client.v2/lib` to refer to the package prior to this change.
