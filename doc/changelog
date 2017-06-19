@@ -9,9 +9,6 @@ bytemark-client (2.3) UNRELEASED; urgency=low
   New features:
     * Logging in with 2-factor authentication is now supported, but setting up
       2-factor auth is not yet ready.
-    * support for backups using the `create backup`, `delete backup`, `list
-      backups`, `restore backup`, `schedule backups`, `unschedule backups`,
-      and `show disc` commands
     * Added a new table output format using `--table` and `--table-fields` to
       most commands which support `--json` output. `--table` and `--json` are
       now aliases for the global flag `--output-format <json | table>` - which
