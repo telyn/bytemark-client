@@ -59,8 +59,8 @@ type Client interface {
 	///////////////////////
 
 	// CreateAccount(*Account) (*Account, error) // TODO(telyn): figure out if CreateAccount is needed/useful
-	GetSPPToken(cc spp.CreditCard, owner *billing.Person) (string, error)
-	RegisterNewAccount(acc Account) (*Account, error)
+	GetSPPToken(cc spp.CreditCard, owner billing.Person) (string, error)
+	RegisterNewAccount(acc Account) (Account, error)
 
 	////////////////////
 	//// BRAIN STUFF ///
@@ -76,18 +76,18 @@ type Client interface {
 	//
 	// DEFINITIONS
 	//
-	ReadDefinitions() (*Definitions, error)
+	ReadDefinitions() (Definitions, error)
 
 	//
 	// ACCOUNTS
 	//
 
 	// GetAccount takes an account name or ID and returns a filled-out Account object
-	GetAccount(name string) (account *Account, err error)
+	GetAccount(name string) (account Account, err error)
 	// GetDefaultAccount gets the most-likely default account for the user.
-	GetDefaultAccount() (account *Account, err error)
+	GetDefaultAccount() (account Account, err error)
 	// GetAccounts gets all the accounts the logged-in user can see.
-	GetAccounts() (accounts []*Account, err error)
+	GetAccounts() (accounts []Account, err error)
 
 	//
 	// DISCS
@@ -95,7 +95,7 @@ type Client interface {
 
 	CreateDisc(vm VirtualMachineName, disc brain.Disc) error
 	DeleteDisc(vm VirtualMachineName, idOrLabel string) error
-	GetDisc(vm VirtualMachineName, idOrLabel string) (*brain.Disc, error)
+	GetDisc(vm VirtualMachineName, idOrLabel string) (brain.Disc, error)
 	ResizeDisc(vm VirtualMachineName, idOrLabel string, size int) error
 	SetDiscIopsLimit(vm VirtualMachineName, idOrLabel string, iopsLimit int) error
 
@@ -106,7 +106,7 @@ type Client interface {
 	// CreateGroup sends a request to the API server to create a group with the given name.
 	CreateGroup(name GroupName) error
 	DeleteGroup(name GroupName) error
-	GetGroup(name GroupName) (*brain.Group, error)
+	GetGroup(name GroupName) (brain.Group, error)
 
 	//
 	// NICS
@@ -145,7 +145,7 @@ type Client interface {
 	// USERS
 	//
 
-	GetUser(name string) (*brain.User, error)
+	GetUser(name string) (brain.User, error)
 	AddUserAuthorizedKey(username, key string) error
 	DeleteUserAuthorizedKey(username, key string) error
 
@@ -155,14 +155,14 @@ type Client interface {
 
 	// CreateVirtualMachine creates a virtual machine with a given specification in the given group.
 	// returns nil on success or an error otherwise.
-	CreateVirtualMachine(group GroupName, vm brain.VirtualMachineSpec) (*brain.VirtualMachine, error)
+	CreateVirtualMachine(group GroupName, vm brain.VirtualMachineSpec) (brain.VirtualMachine, error)
 
 	// DeleteVirtualMachine deletes the named virtual machine.
 	// returns nil on success or an error otherwise.
 	DeleteVirtualMachine(name VirtualMachineName, purge bool) error
 
 	// GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-	GetVirtualMachine(name VirtualMachineName) (*brain.VirtualMachine, error)
+	GetVirtualMachine(name VirtualMachineName) (brain.VirtualMachine, error)
 
 	// MoveVirtualMachine moves a server from one VirtualMachineName to another.
 	MoveVirtualMachine(old VirtualMachineName, new VirtualMachineName) error
@@ -221,15 +221,15 @@ type Client interface {
 	//
 
 	GetVLANs() ([]*brain.VLAN, error)
-	GetVLAN(num int) (*brain.VLAN, error)
+	GetVLAN(num int) (brain.VLAN, error)
 	GetIPRanges() ([]*brain.IPRange, error)
-	GetIPRange(idOrCIDR string) (*brain.IPRange, error)
+	GetIPRange(idOrCIDR string) (brain.IPRange, error)
 	GetHeads() ([]*brain.Head, error)
-	GetHead(idOrLabel string) (*brain.Head, error)
+	GetHead(idOrLabel string) (brain.Head, error)
 	GetTails() ([]*brain.Tail, error)
-	GetTail(idOrLabel string) (*brain.Tail, error)
+	GetTail(idOrLabel string) (brain.Tail, error)
 	GetStoragePools() ([]*brain.StoragePool, error)
-	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
+	GetStoragePool(idOrLabel string) (brain.StoragePool, error)
 	GetMigratingVMs() ([]*brain.VirtualMachine, error)
 	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
 	GetRecentVMs() ([]*brain.VirtualMachine, error)

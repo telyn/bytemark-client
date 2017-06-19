@@ -26,13 +26,13 @@ type VirtualMachine struct {
 	ZoneName string `json:"zone_name,omitempty"`
 
 	// the following cannot be set
-	Discs             []*Disc             `json:"discs,omitempty"`
-	ID                int                 `json:"id,omitempty"`
-	ManagementAddress *net.IP             `json:"management_address,omitempty"`
-	Deleted           bool                `json:"deleted,omitempty"`
-	Hostname          string              `json:"hostname,omitempty"`
-	Head              string              `json:"head,omitempty"`
-	NetworkInterfaces []*NetworkInterface `json:"network_interfaces,omitempty"`
+	Discs             []Disc             `json:"discs,omitempty"`
+	ID                int                `json:"id,omitempty"`
+	ManagementAddress net.IP             `json:"management_address,omitempty"`
+	Deleted           bool               `json:"deleted,omitempty"`
+	Hostname          string             `json:"hostname,omitempty"`
+	Head              string             `json:"head,omitempty"`
+	NetworkInterfaces []NetworkInterface `json:"network_interfaces,omitempty"`
 
 	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
 }
@@ -114,7 +114,7 @@ func (vm VirtualMachine) AllIPv4Addresses() (ips IPs) {
 		for ip := range nic.ExtraIPs {
 			netip := net.ParseIP(ip)
 			if netip != nil && netip.To4() != nil {
-				ips = append(ips, &netip)
+				ips = append(ips, netip)
 			}
 		}
 	}
@@ -132,7 +132,7 @@ func (vm VirtualMachine) AllIPv6Addresses() (ips IPs) {
 		for ip := range nic.ExtraIPs {
 			netip := net.ParseIP(ip)
 			if netip != nil && netip.To4() == nil {
-				ips = append(ips, &netip)
+				ips = append(ips, netip)
 			}
 		}
 	}
@@ -165,7 +165,7 @@ func (vm VirtualMachine) GetDiscLabelOffset() (offset int) {
 func (vm VirtualMachine) PrimaryIP() net.IP {
 	for _, nic := range vm.NetworkInterfaces {
 		if len(nic.IPs) > 0 {
-			return *nic.IPs[0]
+			return nic.IPs[0]
 		}
 	}
 	return nil

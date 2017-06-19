@@ -2,6 +2,7 @@ package lib
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -13,18 +14,17 @@ import (
 
 // getBillingAccount gets the billing account with the given name.
 // Due to the way the billing API is implemented this is done by grabbing them all and looping *shrug*
-func (c *bytemarkClient) getBillingAccount(name string) (account *billing.Account, err error) {
+func (c *bytemarkClient) getBillingAccount(name string) (account billing.Account, err error) {
 	accounts, err := c.getBillingAccounts()
 	if err != nil {
 		return
 	}
-	for _, account = range accounts {
+	for _, acc := range accounts {
 		if account.Name == name {
-			return
+			return *acc, nil
 		}
 	}
-	account = nil
-	return
+	return billing.Account{}, fmt.Errorf("Couldn't find a billing account called %s", name)
 }
 
 // getBillingAccounts returns all the billing accounts the currently logged in user can see.
@@ -44,19 +44,18 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []*billing.Account, err 
 }
 
 // getBrainAccount gets the brain account with the given name.
-func (c *bytemarkClient) getBrainAccount(name string) (account *brain.Account, err error) {
+func (c *bytemarkClient) getBrainAccount(name string) (account brain.Account, err error) {
 	err = c.validateAccountName(&name)
 	if err != nil {
 		return
 	}
-	account = new(brain.Account)
 
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s?view=overview&include_deleted=true", name)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	_, _, err = req.Run(nil, account)
+	_, _, err = req.Run(nil, &account)
 
 	return
 }
@@ -91,7 +90,7 @@ func (c *bytemarkClient) RegisterNewAccount(acc Account) (newAcc *Account, err e
 		}
 	}
 	newAcc = &Account{}
-	newAcc.fillBilling(&outputBillingAcc)
+	newAcc.fillBilling(outputBillingAcc)
 
 	log.LogFile = oldfile
 	if status == 202 {
@@ -101,19 +100,18 @@ func (c *bytemarkClient) RegisterNewAccount(acc Account) (newAcc *Account, err e
 }
 
 // GetAccount takes an account name or ID and returns a filled-out Account object
-func (c *bytemarkClient) GetAccount(name string) (account *Account, err error) {
+func (c *bytemarkClient) GetAccount(name string) (account Account, err error) {
 	if name == "" {
 		return c.GetDefaultAccount()
 	}
 	billingAccount, err := c.getBillingAccount(name)
 	if err != nil {
-		return nil, err
+		return Account{}, err
 	}
 	brainAccount, err := c.getBrainAccount(name)
 	if err != nil {
-		return nil, err
+		return Account{}, err
 	}
-	account = new(Account)
 	account.fillBrain(brainAccount)
 	account.fillBilling(billingAccount)
 
@@ -159,27 +157,26 @@ func (c *bytemarkClient) getDefaultBillingAccount() (*billing.Account, error) {
 // with the brain's data for it attached. Fingers crossed.
 // Returns the default billing account with NoDefaultAccountError if there's
 // not a bigv_subscription_account on the billing account, and returns nil
-func (c *bytemarkClient) GetDefaultAccount() (acc *Account, err error) {
-	acc = new(Account)
+func (c *bytemarkClient) GetDefaultAccount() (acc Account, err error) {
 	acc.IsDefaultAccount = true
 	billAcc, err := c.getDefaultBillingAccount()
 	log.Debugf(log.LvlMisc, "billAcc: %#v, err: %v\r\n", billAcc, err)
 	if err != nil {
-		return nil, err
+		return
 	}
 	if billAcc != nil {
 		acc.fillBilling(billAcc)
 
 		brainAcc, err := c.getBrainAccount(billAcc.Name)
 		if err != nil {
-			return nil, err
+			return
 		}
 
 		acc.fillBrain(brainAcc)
 	} else {
 		brainAcc, err := c.getBrainAccounts()
 		if err != nil {
-			return nil, err
+			return
 		}
 		acc.fillBrain(brainAcc[0])
 	}

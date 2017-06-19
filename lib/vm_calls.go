@@ -9,7 +9,7 @@ import (
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
-func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.VirtualMachineSpec) (vm *brain.VirtualMachine, err error) {
+func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.VirtualMachineSpec) (vm brain.VirtualMachine, err error) {
 	err = c.validateGroupName(&group)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.Virtua
 	vm = new(brain.VirtualMachine)
 	oldfile := log.LogFile
 	log.LogFile = nil
-	_, _, err = r.MarshalAndRun(spec, vm)
+	_, _, err = r.MarshalAndRun(spec, &vm)
 	log.LogFile = oldfile
 	return vm, err
 }

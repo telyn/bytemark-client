@@ -9,5 +9,5 @@ type IP struct {
 	RDns string `json:"rdns"`
 
 	// this cannot be set.
-	IP *net.IP `json:"ip"`
+	IP net.IP `json:"ip"`
 }

@@ -49,52 +49,27 @@ The following breaking API change to the 'lib' package occurred in version 3.0
   * `ParseGroupName`
   * `ParseAccountName`
 
-The following changeset can be summarised as "most `lib.Client` methods now take `lib`/`brain` structs as values, rather than as pointers."
+Most `lib.Client` methods now take `lib`/`brain`/`billing` structs as values, rather than as pointers. See the `lib/interface.go` for the full list of methods available and their new type signatures.
 
-* These `lib.Client` methods now take `lib.Account` instead of `*lib.Account`
-  * `RegisterNewAccount`
-* These `lib.Client` methods now take `lib.GroupName` instead of `*lib.GroupName`
-  * `CreateGroup`
-  * `DeleteGroup`
-  * `GetGroup`
-  * `CreateVirtualMachine`
-* These `lib.Client` methods now take `lib.VirtualMachineName` instead of `*lib.VirtualMachineName`
-  * `CreateDisc`
-  * `DeleteDisc`
-  * `GetDisc`
-  * `ResizeDisc`
-  * `SetDiscIopsLimit`
-  * `AddIP`
-  * `DeleteVirtualMachine`
-  * `GetVirtualMachine`
-  * `MoveVirtualMachine`
-  * `ReimageVirtualMachine`
-  * `ResetVirtualMachine`
-  * `RestartVirtualMachine`
-  * `StartVirtualMachine`
-  * `StopVirtualMachine`
-  * `ShutdownVirtualMachine`
-  * `UndeleteVirtualMachine`
-  * `SetVirtualMachineHardwareProfile`
-  * `SetVirtualMachineHardwareProfileLock`
-  * `SetVirtualMachineMemory`
-  * `SetVirtualMachineCores`
-  * `SetVirtualMachineCDROM`
-* These `lib.Client` methods now take `brain.IPCreateRequest` instead of `*brain.IPCreateRequest`
-  * `AddIP`
-* These `lib.Client` methods now take `brain.ImageInstall` instead of `*brain.IPCreateRequest`
-  * `ReimageVirtualMachine`
-* These `lib.Client` methods now take `spp.CreditCard` instead of `*spp.CreditCard`
-  * `CreateCreditCard`
-  * `CreateCreditCardWithToken`
-* These `lib.Client` methods now return `brain.VirtualMachine` instead of `*brain.VirtualMachine`
-  * `CreateVirtualMachine` (not done)
-  * `GetVirtualMachine` (not done)
-* These `lib.Client` methods now return `brain.Group` instead of `*brain.Group`
-  * GetGroup (not done)
-* These `lib.Client` methods now return `brain.Disc` instead of `*brain.Disc`
-  * GetDisc (not done)
-* These `lib.Client` methods now return `lib.Account` instead of `*lib.Account`
-  * RegisterAccount (not done)
+Almost all `lib.Client` struct fields are now values or slices of values instead of pointers or slices of pointers - below is a list. Two notable exceptions are `brain.VirtualMachineSpec.ImageInstall` and `brain.VirtualMachineSpec.IPs` - which may need to be null, and so remain as pointers.
+
+* The type of `brain.Account.Groups` has changed from `[]*Group` to `[]Group`
+* The type of `brain.Backups` has changed from `[]*Group` to `[]Group`
+* The type of `brain.BackupSchedules` has changed from `[]*BackupSchedule` to `[]BackupSchedule`
+* The type of `brain.Group.VirtualMachines` has changed from `[]*VirtualMachine` to `[]VirtualMachine`
+* The type of `brain.Head.CCAddress` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.IP.IP` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.IPRange.Available` has changed from `[]*math/big.Int` to `[]math/big.Int`
+* The type of `brain.IPCreateRequest.IPs` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.IPs` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.NetworkInterface.ExtraIPs` has changed from `map[string]*net.IP` to `map[string]net.IP`
+* The type of `brain.Privileges` has changed from `[]*Privilege` to `[]Privilege`
+* The type of `brain.Tail.CCAddress` has changed from `*net.IP` to `net.IP`
+* The type of `brain.VirtualMachine.Discs` has changed from `[]*Disc` to `[]Disc`
+* The type of `brain.VirtualMachine.ManagementAddress` has changed from `*net.IP` to `net.IP`
+* The type of `brain.VirtualMachine.NetworkInterfaces` has changed from `[]*NetworkInterface` to `[]NetworkInterface`
+* The type of `brain.VirtualMachineSpec.VirtualMachine` has changed from `*VirtualMachine` to `VirtualMachine`
+* The type of `brain.VLAN.IPRanges` has changed from `[]*IPRange` to `[]IPRange`
+
 
 If you require the old API for longer you can use `gopkg.in/BytemarkHosting/bytemark-client.v2/lib` to refer to the package prior to this change.

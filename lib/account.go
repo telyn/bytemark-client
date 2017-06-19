@@ -23,22 +23,18 @@ type Account struct {
 	IsDefaultAccount bool `json:"-"`
 }
 
-func (a *Account) fillBrain(b *brain.Account) {
-	if b != nil {
-		a.BrainID = b.ID
-		a.Groups = b.Groups
-		a.Suspended = b.Suspended
-		a.Name = b.Name
-	}
+func (a *Account) fillBrain(b brain.Account) {
+	a.BrainID = b.ID
+	a.Groups = b.Groups
+	a.Suspended = b.Suspended
+	a.Name = b.Name
 }
-func (a *Account) fillBilling(b *billing.Account) {
-	if b != nil {
-		a.BillingID = b.ID
-		a.Owner = b.Owner
-		a.TechnicalContact = b.TechnicalContact
-		a.CardReference = b.CardReference
-		a.Name = b.Name
-	}
+func (a *Account) fillBilling(b billing.Account) {
+	a.BillingID = b.ID
+	a.Owner = b.Owner
+	a.TechnicalContact = b.TechnicalContact
+	a.CardReference = b.CardReference
+	a.Name = b.Name
 }
 
 // CountVirtualMachines returns the number of virtual machines across all the Account's Groups.
