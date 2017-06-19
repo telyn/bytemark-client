@@ -220,19 +220,19 @@ type Client interface {
 	// ADMIN
 	//
 
-	GetVLANs() ([]*brain.VLAN, error)
+	GetVLANs() ([]brain.VLAN, error)
 	GetVLAN(num int) (brain.VLAN, error)
-	GetIPRanges() ([]*brain.IPRange, error)
+	GetIPRanges() ([]brain.IPRange, error)
 	GetIPRange(idOrCIDR string) (brain.IPRange, error)
-	GetHeads() ([]*brain.Head, error)
+	GetHeads() ([]brain.Head, error)
 	GetHead(idOrLabel string) (brain.Head, error)
-	GetTails() ([]*brain.Tail, error)
+	GetTails() ([]brain.Tail, error)
 	GetTail(idOrLabel string) (brain.Tail, error)
-	GetStoragePools() ([]*brain.StoragePool, error)
+	GetStoragePools() ([]brain.StoragePool, error)
 	GetStoragePool(idOrLabel string) (brain.StoragePool, error)
-	GetMigratingVMs() ([]*brain.VirtualMachine, error)
-	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
-	GetRecentVMs() ([]*brain.VirtualMachine, error)
+	GetMigratingVMs() ([]brain.VirtualMachine, error)
+	GetStoppedEligibleVMs() ([]brain.VirtualMachine, error)
+	GetRecentVMs() ([]brain.VirtualMachine, error)
 	MigrateDisc(disc int, newStoragePool string) error
 	MigrateVirtualMachine(vmName VirtualMachineName, newHead string) error
 	ReapVMs() error

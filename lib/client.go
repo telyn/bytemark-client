@@ -214,7 +214,7 @@ func (c *bytemarkClient) validateAccountName(account *string) error {
 		}
 		log.Debug(log.LvlArgs, "validateAccountName finding the default billing account")
 		billAcc, err := c.getDefaultBillingAccount()
-		if err == nil && billAcc != nil {
+		if err == nil && billAcc.ID != 0 {
 			log.Debugf(log.LvlArgs, "validateAccountName found the default billing account - %s\r\n", billAcc.Name)
 			*account = billAcc.Name
 		} else if err != nil {

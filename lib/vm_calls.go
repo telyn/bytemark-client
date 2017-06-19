@@ -12,11 +12,11 @@ import (
 func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.VirtualMachineSpec) (vm brain.VirtualMachine, err error) {
 	err = c.validateGroupName(&group)
 	if err != nil {
-		return nil, err
+		return
 	}
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
 	if err != nil {
-		return nil, err
+		return
 	}
 	if spec.IPs != nil {
 		if spec.IPs.IPv4 == "" && spec.IPs.IPv6 == "" {
@@ -30,14 +30,13 @@ func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.Virtua
 		for i, disc := range spec.Discs {
 			newDisc, discErr := disc.Validate()
 			if discErr != nil {
-				return nil, discErr
+				return vm, discErr
 			}
 			spec.Discs[i] = *newDisc
 		}
 		labelDiscs(spec.Discs, 0)
 	}
 
-	vm = new(brain.VirtualMachine)
 	oldfile := log.LogFile
 	log.LogFile = nil
 	_, _, err = r.MarshalAndRun(spec, &vm)
@@ -66,7 +65,7 @@ func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge boo
 }
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm *brain.VirtualMachine, err error) {
+func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm brain.VirtualMachine, err error) {
 	var r *Request
 
 	// If the VM name is numeric, it means it is an internal Bytemark ID,
@@ -78,14 +77,12 @@ func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm *brain.V
 		if err != nil {
 			return
 		}
-		vm = new(brain.VirtualMachine)
 		r, err = c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
 	}
 	if err != nil {
 		return
 	}
 
-	vm = new(brain.VirtualMachine)
 	_, _, err = r.Run(nil, vm)
 	if err != nil {
 		return

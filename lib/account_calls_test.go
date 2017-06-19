@@ -53,17 +53,20 @@ func TestGetAccount(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	t.Log("Testing an invalid account!")
 	acc, err := client.GetAccount("invalid-account")
 	is.NotNil(err)
 
+	t.Log("Testing the default account!")
 	acc, err = client.GetAccount("")
 	is.Nil(err)
 	is.Equal("account", acc.Name)
 	is.Equal(1, acc.BrainID)
 
+	t.Log("Testing a named account!")
 	acc, err = client.GetAccount("account")
 	is.Nil(err)
-	if acc == nil {
+	if !acc.IsValid() {
 		t.Fatal("account is nil")
 	}
 	is.Equal("account", acc.Name)
@@ -294,7 +297,7 @@ func TestRegisterNewAccount(t *testing.T) {
 	}
 
 	newAcc, err := client.RegisterNewAccount(Account{
-		Owner:         &person,
+		Owner:         person,
 		CardReference: "testxq12e",
 	})
 	if err != nil {

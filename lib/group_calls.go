@@ -38,8 +38,7 @@ func (c *bytemarkClient) DeleteGroup(name GroupName) (err error) {
 }
 
 // GetGroup requests an overview of the group with the given name
-func (c *bytemarkClient) GetGroup(name GroupName) (group *brain.Group, err error) {
-	group = new(brain.Group)
+func (c *bytemarkClient) GetGroup(name GroupName) (group brain.Group, err error) {
 	err = c.validateGroupName(&name)
 	if err != nil {
 		return

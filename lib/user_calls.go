@@ -6,7 +6,7 @@ import (
 )
 
 // Getbigv.User grabs the named user from the brain
-func (c *bytemarkClient) GetUser(name string) (user *brain.User, err error) {
+func (c *bytemarkClient) GetUser(name string) (user brain.User, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/users/%s", name)
 	if err != nil {
 		return
@@ -17,8 +17,7 @@ func (c *bytemarkClient) GetUser(name string) (user *brain.User, err error) {
 	if err != nil {
 		return
 	}
-	user = new(brain.User)
-	jsUser.Process(user)
+	jsUser.Process(&user)
 	return
 }
 

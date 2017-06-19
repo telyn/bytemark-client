@@ -14,13 +14,13 @@ type sppTokenResponse struct {
 	Token string `json:"token"`
 }
 type sppTokenRequest struct {
-	Owner      *billing.Person `json:"owner,omitempty"`
-	CardEnding string          `json:"card_ending"`
+	Owner      billing.Person `json:"owner,omitempty"`
+	CardEnding string         `json:"card_ending"`
 }
 
 // GetSPPToken requests a token to use with SPP from bmbilling.
 // If owner is nil, authenticates against bmbilling.
-func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner *billing.Person) (token string, err error) {
+func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner billing.Person) (token string, err error) {
 	r, err := c.BuildRequestNoAuth("POST", BillingEndpoint, "/api/v1/accounts/spp_token")
 	if err != nil {
 		return
@@ -35,7 +35,7 @@ func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner *billing.Person) (
 		Owner:      owner,
 		CardEnding: cc.Number[len(cc.Number)-4:],
 	}
-	if owner == nil {
+	if owner.FirstName == "" {
 		r.authenticate = true
 	}
 
@@ -82,7 +82,7 @@ func (c *bytemarkClient) CreateCreditCardWithToken(cc spp.CreditCard, token stri
 
 // CreateCreditCard creates a credit card on SPP. It uses GetSPPToken to get a token.
 func (c *bytemarkClient) CreateCreditCard(cc spp.CreditCard) (ref string, err error) {
-	token, err := c.GetSPPToken(cc, nil)
+	token, err := c.GetSPPToken(cc, billing.Person{})
 	if err != nil {
 		return
 	}

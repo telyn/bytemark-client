@@ -13,30 +13,30 @@ import (
 
 func getFixtureVMWithManyIPs() (vm brain.VirtualMachine, v4 []string, v6 []string) {
 	vm = getFixtureVM()
-	vm.NetworkInterfaces = make([]*brain.NetworkInterface, 1)
-	vm.NetworkInterfaces[0] = &brain.NetworkInterface{
+	vm.NetworkInterfaces = make([]brain.NetworkInterface, 1)
+	vm.NetworkInterfaces[0] = brain.NetworkInterface{
 		Label: "test-nic",
 		Mac:   "FF:FE:FF:FF:FF",
-		IPs: []*net.IP{
-			&net.IP{192, 168, 1, 16},
-			&net.IP{192, 168, 1, 22},
-			&net.IP{0xfe, 0x80, 0x00, 0x00,
+		IPs: []net.IP{
+			net.IP{192, 168, 1, 16},
+			net.IP{192, 168, 1, 22},
+			net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x10},
-			&net.IP{0xfe, 0x80, 0x00, 0x00,
+			net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x01, 0x00},
 		},
-		ExtraIPs: map[string]*net.IP{
-			"192.168.2.1":  &net.IP{192, 168, 1, 16},
-			"192.168.5.34": &net.IP{192, 168, 1, 22},
-			"fe80::1:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+		ExtraIPs: map[string]net.IP{
+			"192.168.2.1":  net.IP{192, 168, 1, 16},
+			"192.168.5.34": net.IP{192, 168, 1, 22},
+			"fe80::1:1": net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x01, 0x00},
-			"fe80::2:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+			"fe80::2:1": net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x10},
@@ -63,16 +63,16 @@ func getFixtureVM() (vm brain.VirtualMachine) {
 		HardwareProfile:       "fake-hardwareprofile",
 		HardwareProfileLocked: false,
 		ZoneName:              "default",
-		Discs: []*brain.Disc{
-			&disc,
+		Discs: []brain.Disc{
+			disc,
 		},
 		ID:                1,
-		ManagementAddress: &ip,
+		ManagementAddress: ip,
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
-		NetworkInterfaces: []*brain.NetworkInterface{
-			&nic,
+		NetworkInterfaces: []brain.NetworkInterface{
+			nic,
 		},
 	}
 }
@@ -253,13 +253,13 @@ func TestCreateVirtualMachine(t *testing.T) {
 	}{
 		{
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{
+				VirtualMachine: brain.VirtualMachine{
 					Name: "new-vm",
 				},
 				Discs: []brain.Disc{},
 			},
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{
+				VirtualMachine: brain.VirtualMachine{
 					Name: "new-vm",
 				},
 				Discs: nil,
@@ -268,7 +268,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 		},
 		{
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{},
+				VirtualMachine: brain.VirtualMachine{},
 				Discs: []brain.Disc{
 					{},
 					{
@@ -282,7 +282,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 				},
 			},
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{},
+				VirtualMachine: brain.VirtualMachine{},
 				Discs: []brain.Disc{
 					{
 						StorageGrade: "sata",

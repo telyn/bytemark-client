@@ -10,8 +10,8 @@ import (
 // defaultAccount does not need to be specified, will be removed in 3.0
 // TODO(telyn): make template choice not a string
 // TODO(telyn): use an actual Overview object?
-func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
-	if defaultAccount == nil {
+func FormatOverview(wr io.Writer, accounts []Account, defaultAccount Account, username string) error {
+	if !defaultAccount.IsValid() {
 		for _, a := range accounts {
 			if a.IsDefaultAccount {
 				defaultAccount = a
@@ -67,22 +67,22 @@ It was not possible to determine your default account. Please set one using byte
 
 	tmpl, err := template.New("accounts").Funcs(prettyprint.Funcs).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {
-			if a == nil || defaultAccount == nil {
-				return false
+			if a.IsValid() && defaultAccount.IsValid() {
+				if a.BillingID != 0 && a.BillingID == defaultAccount.BillingID {
+					return true
+				}
+				return a.Name != "" && a.Name == defaultAccount.Name
 			}
-			if a.BillingID != 0 && a.BillingID == defaultAccount.BillingID {
-				return true
-			}
-			return a.Name != "" && a.Name == defaultAccount.Name
+			return false
 		},
 	}).Parse(overviewTemplate)
 	if err != nil {
 		return err
 	}
-	var ownedAccounts []*Account
-	var otherAccounts []*Account
+	var ownedAccounts []Account
+	var otherAccounts []Account
 	for _, a := range accounts {
-		if a.Owner != nil && a.Owner.Username != "" && a.Owner.Username == username {
+		if a.Owner.ID != 0 && a.Owner.Username != "" && a.Owner.Username == username {
 			ownedAccounts = append(ownedAccounts, a)
 		} else {
 			otherAccounts = append(otherAccounts, a)

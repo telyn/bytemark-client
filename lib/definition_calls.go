@@ -114,8 +114,7 @@ func (d *JSONDefinition) Process(into *Definitions) error {
 }
 
 // Process processes our intermediate JSONDefinitions into a Definitions object.
-func (defs JSONDefinitions) Process() *Definitions {
-	var out Definitions
+func (defs JSONDefinitions) Process() (out Definitions) {
 
 	for _, def := range defs {
 		if err := def.Process(&out); err != nil {
@@ -127,11 +126,11 @@ func (defs JSONDefinitions) Process() *Definitions {
 	sort.StringSlice(out.ZoneNames).Sort()
 	sort.StringSlice(out.HardwareProfiles).Sort()
 
-	return &out
+	return out
 }
 
 // ReadDefinitions queries the brain for its definitions
-func (c *bytemarkClient) ReadDefinitions() (definitions *Definitions, err error) {
+func (c *bytemarkClient) ReadDefinitions() (definitions Definitions, err error) {
 	var defs JSONDefinitions
 	r, err := c.BuildRequestNoAuth("GET", BrainEndpoint, "/definitions")
 	if err != nil {

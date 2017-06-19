@@ -13,8 +13,8 @@ func getFixtureGroup() brain.Group {
 	return brain.Group{
 		ID:   1,
 		Name: "default",
-		VirtualMachines: []*brain.VirtualMachine{
-			&vm,
+		VirtualMachines: []brain.VirtualMachine{
+			vm,
 		},
 	}
 

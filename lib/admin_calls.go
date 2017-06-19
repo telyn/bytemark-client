@@ -27,7 +27,7 @@ type UpdateStoragePool struct {
 	Label           *string
 }
 
-func (c *bytemarkClient) GetVLANs() (vlans []*brain.VLAN, err error) {
+func (c bytemarkClient) GetVLANs() (vlans []brain.VLAN, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/vlans")
 	if err != nil {
 		return
@@ -37,7 +37,7 @@ func (c *bytemarkClient) GetVLANs() (vlans []*brain.VLAN, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetVLAN(num int) (vlan *brain.VLAN, err error) {
+func (c *bytemarkClient) GetVLAN(num int) (vlan brain.VLAN, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/vlans/%s", strconv.Itoa(num))
 	if err != nil {
 		return
@@ -47,7 +47,7 @@ func (c *bytemarkClient) GetVLAN(num int) (vlan *brain.VLAN, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetIPRanges() (ipRanges []*brain.IPRange, err error) {
+func (c *bytemarkClient) GetIPRanges() (ipRanges []brain.IPRange, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges")
 	if err != nil {
 		return
@@ -57,15 +57,14 @@ func (c *bytemarkClient) GetIPRanges() (ipRanges []*brain.IPRange, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetIPRange(idOrCIDR string) (*brain.IPRange, error) {
+func (c *bytemarkClient) GetIPRange(idOrCIDR string) (ipRange brain.IPRange, err error) {
 	if _, err := strconv.Atoi(idOrCIDR); err == nil {
 		// Numeric means it is just an ID
 		r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", idOrCIDR)
 		if err != nil {
-			return nil, err
+			return ipRange, err
 		}
 
-		var ipRange *brain.IPRange
 		_, _, err = r.Run(nil, &ipRange)
 		return ipRange, err
 	}
@@ -73,29 +72,31 @@ func (c *bytemarkClient) GetIPRange(idOrCIDR string) (*brain.IPRange, error) {
 	// Non numeric means we got a CIDR
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges?cidr=%s", idOrCIDR)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	// The /admin/ip_ranges endpoint always returns an array of IP ranges,
 	// so we just need to get the first one and return it
-	var ipRanges []*brain.IPRange
+	var ipRanges []brain.IPRange
 	_, _, err = r.Run(nil, &ipRanges)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	if len(ipRanges) == 0 {
-		return nil, fmt.Errorf("IP Range not found")
+		err = fmt.Errorf("IP Range not found")
+		return
 	}
 
 	if len(ipRanges) > 1 {
-		return nil, fmt.Errorf("More than one IP Range found, please report this as a bug")
+		err = fmt.Errorf("More than one IP Range found, please report this as a bug")
+		return
 	}
 
 	return ipRanges[0], nil
 }
 
-func (c *bytemarkClient) GetHeads() (heads []*brain.Head, err error) {
+func (c *bytemarkClient) GetHeads() (heads []brain.Head, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/heads")
 	if err != nil {
 		return
@@ -105,7 +106,7 @@ func (c *bytemarkClient) GetHeads() (heads []*brain.Head, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetHead(idOrLabel string) (head *brain.Head, err error) {
+func (c *bytemarkClient) GetHead(idOrLabel string) (head brain.Head, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/heads/%s", idOrLabel)
 	if err != nil {
 		return
@@ -115,7 +116,7 @@ func (c *bytemarkClient) GetHead(idOrLabel string) (head *brain.Head, err error)
 	return
 }
 
-func (c *bytemarkClient) GetTails() (tails []*brain.Tail, err error) {
+func (c *bytemarkClient) GetTails() (tails []brain.Tail, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/tails")
 	if err != nil {
 		return
@@ -125,7 +126,7 @@ func (c *bytemarkClient) GetTails() (tails []*brain.Tail, err error) {
 	return
 }
 
-func (c *bytemarkClient) GetTail(idOrLabel string) (tail *brain.Tail, err error) {
+func (c *bytemarkClient) GetTail(idOrLabel string) (tail brain.Tail, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/tails/%s", idOrLabel)
 	if err != nil {
 		return
@@ -135,7 +136,7 @@ func (c *bytemarkClient) GetTail(idOrLabel string) (tail *brain.Tail, err error)
 	return
 }
 
-func (c *bytemarkClient) GetStoragePools() (storagePools []*brain.StoragePool, err error) {
+func (c *bytemarkClient) GetStoragePools() (storagePools []brain.StoragePool, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/storage_pools")
 	if err != nil {
 		return
@@ -145,7 +146,7 @@ func (c *bytemarkClient) GetStoragePools() (storagePools []*brain.StoragePool, e
 	return
 }
 
-func (c *bytemarkClient) GetStoragePool(idOrLabel string) (storagePool *brain.StoragePool, err error) {
+func (c *bytemarkClient) GetStoragePool(idOrLabel string) (storagePool brain.StoragePool, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/storage_pools/%s", idOrLabel)
 	if err != nil {
 		return
@@ -155,7 +156,7 @@ func (c *bytemarkClient) GetStoragePool(idOrLabel string) (storagePool *brain.St
 	return
 }
 
-func (c *bytemarkClient) GetMigratingVMs() (vms []*brain.VirtualMachine, err error) {
+func (c *bytemarkClient) GetMigratingVMs() (vms []brain.VirtualMachine, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/migrating_vms")
 	if err != nil {
 		return
@@ -165,7 +166,7 @@ func (c *bytemarkClient) GetMigratingVMs() (vms []*brain.VirtualMachine, err err
 	return
 }
 
-func (c *bytemarkClient) GetStoppedEligibleVMs() (vms []*brain.VirtualMachine, err error) {
+func (c *bytemarkClient) GetStoppedEligibleVMs() (vms []brain.VirtualMachine, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/stopped_eligible_vms")
 	if err != nil {
 		return
@@ -175,7 +176,7 @@ func (c *bytemarkClient) GetStoppedEligibleVMs() (vms []*brain.VirtualMachine, e
 	return
 }
 
-func (c *bytemarkClient) GetRecentVMs() (vms []*brain.VirtualMachine, err error) {
+func (c *bytemarkClient) GetRecentVMs() (vms []brain.VirtualMachine, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/recent_vms")
 	if err != nil {
 		return

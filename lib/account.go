@@ -11,14 +11,14 @@ import (
 
 // Account represents both the BigV and bmbilling parts of an account.
 type Account struct {
-	Name             string          `json:"name"`
-	Owner            *billing.Person `json:"owner"`
-	TechnicalContact *billing.Person `json:"technical_contact"`
-	BillingID        int             `json:"billing_id"`
-	BrainID          int             `json:"brain_id"`
-	CardReference    string          `json:"card_reference"`
-	Groups           []*brain.Group  `json:"groups"`
-	Suspended        bool            `json:"suspended"`
+	Name             string         `json:"name"`
+	Owner            billing.Person `json:"owner"`
+	TechnicalContact billing.Person `json:"technical_contact"`
+	BillingID        int            `json:"billing_id"`
+	BrainID          int            `json:"brain_id"`
+	CardReference    string         `json:"card_reference"`
+	Groups           []brain.Group  `json:"groups"`
+	Suspended        bool           `json:"suspended"`
 
 	IsDefaultAccount bool `json:"-"`
 }
@@ -54,6 +54,10 @@ func (a Account) billingAccount() (b *billing.Account) {
 	b.CardReference = a.CardReference
 	b.Name = a.Name
 	return
+}
+
+func (a Account) IsValid() bool {
+	return a.BillingID != 0 || a.BrainID != 0
 }
 
 // PrettyPrint writes an overview of this account out to the given writer.

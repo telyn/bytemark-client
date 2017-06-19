@@ -94,8 +94,7 @@ func (c *bytemarkClient) SetDiscIopsLimit(vm VirtualMachineName, discLabelOrID s
 }
 
 // GetDisc returns the specified disc from the given virtual machine.
-func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc *brain.Disc, err error) {
-	disc = new(brain.Disc)
+func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc brain.Disc, err error) {
 	err = c.validateVirtualMachineName(&vm)
 	if err != nil {
 		return
