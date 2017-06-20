@@ -84,7 +84,7 @@ func TestAddIPCommand(t *testing.T) {
 	ip := net.ParseIP("10.10.10.10")
 
 	ipcres := ipcr
-	ipcres.IPs = []*net.IP{&ip}
+	ipcres.IPs = []net.IP{ip}
 
 	c.When("AddIP", vm, ipcr).Return(&ipcres, nil)
 

@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func listServersInGroup(g *brain.Group) {
+func listServersInGroup(g brain.Group) {
 	for _, vm := range g.VirtualMachines {
 		if vm.Deleted {
 			log.Output(vm.Hostname + " (deleted)")
@@ -119,7 +119,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 				},
 			),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), AuthProvider, func(c *Context) error {
-				servers := make([]*brain.VirtualMachine, 0)
+				servers := make([]brain.VirtualMachine, 0)
 
 				for _, g := range c.Account.Groups {
 					servers = append(servers, g.VirtualMachines...)

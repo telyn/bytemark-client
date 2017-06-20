@@ -108,7 +108,7 @@ func TestCreateServerCommand(t *testing.T) {
 				StorageGrade: "archive",
 			},
 		},
-		VirtualMachine: &brain.VirtualMachine{
+		VirtualMachine: brain.VirtualMachine{
 			Name:                  "test-server",
 			Autoreboot:            true,
 			Cores:                 1,
@@ -130,11 +130,10 @@ func TestCreateServerCommand(t *testing.T) {
 		},
 	}
 
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
-	getvm.Discs = make([]*brain.Disc, 2)
-	getvm.Discs[0] = &vm.Discs[0]
-	getvm.Discs[1] = &vm.Discs[1]
+	getvm := vm.VirtualMachine
+	getvm.Discs = make([]brain.Disc, 2)
+	getvm.Discs[0] = vm.Discs[0]
+	getvm.Discs[1] = vm.Discs[1]
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	vmname := lib.VirtualMachineName{
@@ -178,7 +177,7 @@ func TestCreateServerNoImage(t *testing.T) {
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vm := brain.VirtualMachineSpec{
-		VirtualMachine: &brain.VirtualMachine{
+		VirtualMachine: brain.VirtualMachine{
 			Name:   "test-server",
 			Cores:  1,
 			Memory: 1024,
@@ -192,8 +191,7 @@ func TestCreateServerNoImage(t *testing.T) {
 	}
 
 	// TODO(telyn): refactor this getvm crap into a function someplace
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
+	getvm := vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	group := lib.GroupName{
@@ -239,7 +237,7 @@ func TestCreateServer(t *testing.T) {
 	}
 
 	vm := brain.VirtualMachineSpec{
-		VirtualMachine: &brain.VirtualMachine{
+		VirtualMachine: brain.VirtualMachine{
 			Name:   "test-server",
 			Cores:  3,
 			Memory: 6565,
@@ -249,8 +247,7 @@ func TestCreateServer(t *testing.T) {
 			StorageGrade: "archive",
 		}},
 	}
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
+	getvm := vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	c.When("CreateVirtualMachine", defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)

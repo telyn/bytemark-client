@@ -72,7 +72,7 @@ If you have previously used the client, you'll have a login and will need to add
 			// TODO(telyn): this whoole section should be moved into a function in util/form.go - CreateAPIObjectsFromSignupForm(*Form) (Account, CreditCard) or something.
 			account := lib.Account{}
 
-			account.Owner = &billing.Person{
+			account.Owner = billing.Person{
 				Username:             fields[util.FormFieldOwnerName].Value(),
 				Password:             fields[util.FormFieldOwnerPassword].Value(),
 				Email:                fields[util.FormFieldOwnerEmail].Value(),

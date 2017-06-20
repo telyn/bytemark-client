@@ -362,7 +362,7 @@ func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error)
 	autoreboot := !stopped && (!noImage || cdrom != "")
 
 	spec = brain.VirtualMachineSpec{
-		VirtualMachine: &brain.VirtualMachine{
+		VirtualMachine: brain.VirtualMachine{
 			Name:                  c.VirtualMachineName("name").VirtualMachine,
 			Autoreboot:            autoreboot,
 			Cores:                 cores,
@@ -411,7 +411,7 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: *vm}, func() (err error) {
+	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: vm}, func() (err error) {
 		log.Log("cloud server created successfully")
 		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
 		if err != nil {

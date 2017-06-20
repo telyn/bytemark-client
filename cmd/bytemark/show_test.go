@@ -104,12 +104,12 @@ func TestShowAccountCommand(t *testing.T) {
 					Name:      "defa",
 					BrainID:   112,
 					BillingID: 213,
-					Groups:    []*brain.Group{},
-					Owner: &billing.Person{
+					Groups:    []brain.Group{},
+					Owner: billing.Person{
 						FirstName: "defa",
 						LastName:  "Testo",
 					},
-					TechnicalContact: &billing.Person{
+					TechnicalContact: billing.Person{
 						FirstName: "defa",
 						LastName:  "Testo",
 					},
@@ -120,12 +120,12 @@ func TestShowAccountCommand(t *testing.T) {
 					Name:      test.AccountToGet,
 					BrainID:   112,
 					BillingID: 213,
-					Groups:    []*brain.Group{},
-					Owner: &billing.Person{
+					Groups:    []brain.Group{},
+					Owner: billing.Person{
 						FirstName: test.AccountToGet,
 						LastName:  "Testo",
 					},
-					TechnicalContact: &billing.Person{
+					TechnicalContact: billing.Person{
 						FirstName: test.AccountToGet,
 						LastName:  "Testo",
 					},

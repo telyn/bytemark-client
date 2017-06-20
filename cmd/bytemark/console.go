@@ -78,7 +78,7 @@ func shortEndpoint(endpoint string) string {
 	return strings.Split(endpoint, ".")[0]
 }
 
-func vncConsoleInstructions(vm *brain.VirtualMachine) {
+func vncConsoleInstructions(vm brain.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -94,7 +94,7 @@ func vncConsoleInstructions(vm *brain.VirtualMachine) {
 	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
 }
 
-func serialConsoleInstructions(vm *brain.VirtualMachine) {
+func serialConsoleInstructions(vm brain.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -107,7 +107,7 @@ func serialConsoleInstructions(vm *brain.VirtualMachine) {
 
 }
 
-func openPanelConsole(vm *brain.VirtualMachine) error {
+func openPanelConsole(vm brain.VirtualMachine) error {
 	ep := global.Config.EndpointName()
 	token := global.Config.GetIgnoreErr("token")
 	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", global.Config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
@@ -152,7 +152,7 @@ func collectArgs(args string) (slice []string) {
 	return
 }
 
-func connectSerialConsole(vm *brain.VirtualMachine, sshargs string) error {
+func connectSerialConsole(vm brain.VirtualMachine, sshargs string) error {
 	host := fmt.Sprintf("%s@%s", global.Client.GetSessionUser(), vm.ManagementAddress)
 	log.Logf("ssh %s\r\n", host)
 

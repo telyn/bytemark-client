@@ -171,10 +171,11 @@ func AccountProvider(flagName string) ProviderFunc {
 			accName = global.Config.GetIgnoreErr("account")
 		}
 
-		c.Account, err = global.Client.GetAccount(accName)
-		if err == nil && c.Account == nil {
-			err = fmt.Errorf("no account was returned - please report a bug")
+		acc, err := global.Client.GetAccount(accName)
+		if err != nil {
+			return
 		}
+		c.Account = &acc
 		return
 	}
 }
@@ -204,10 +205,11 @@ func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
 
 		vmName := c.VirtualMachineName(vmFlagName)
 		discLabel := c.String(discFlagName)
-		c.Disc, err = global.Client.GetDisc(vmName, discLabel)
-		if err == nil && c.Disc == nil {
-			err = fmt.Errorf("no disc was returned - please report a bug")
+		disc, err := global.Client.GetDisc(vmName, discLabel)
+		if err != nil {
+			return
 		}
+		c.Disc = &disc
 		return
 	}
 }
@@ -217,10 +219,11 @@ func DefinitionsProvider(c *Context) (err error) {
 	if c.Definitions != nil {
 		return
 	}
-	c.Definitions, err = global.Client.ReadDefinitions()
-	if err == nil && c.Definitions == nil {
-		err = fmt.Errorf("no definitions were returned - please report a bug")
+	defs, err := global.Client.ReadDefinitions()
+	if err != nil {
+		return
 	}
+	c.Definitions = &defs
 	return
 }
 
@@ -239,11 +242,12 @@ func GroupProvider(flagName string) ProviderFunc {
 		if groupName.Account == "" {
 			groupName.Account = global.Config.GetIgnoreErr("account")
 		}
-		c.Group, err = global.Client.GetGroup(groupName)
+		group, err := global.Client.GetGroup(groupName)
 		// this if is a guard against tricky-to-debug nil-pointer errors
-		if err == nil && c.Group == nil {
-			err = fmt.Errorf("no group was returned - please report a bug")
+		if err != nil {
+			return
 		}
+		c.Group = &group
 		return
 	}
 }
@@ -282,15 +286,15 @@ func PrivilegeProvider(flagName string) ProviderFunc {
 		}
 		switch c.Privilege.TargetType() {
 		case brain.PrivilegeTargetTypeVM:
-			var vm *brain.VirtualMachine
+			var vm brain.VirtualMachine
 			vm, err = global.Client.GetVirtualMachine(*pf.VirtualMachineName)
 			c.Privilege.VirtualMachineID = vm.ID
 		case brain.PrivilegeTargetTypeGroup:
-			var group *brain.Group
+			var group brain.Group
 			group, err = global.Client.GetGroup(*pf.GroupName)
 			c.Privilege.GroupID = group.ID
 		case brain.PrivilegeTargetTypeAccount:
-			var acc *lib.Account
+			var acc lib.Account
 			acc, err = global.Client.GetAccount(pf.AccountName)
 			c.Privilege.AccountID = acc.BrainID
 		}
@@ -307,15 +311,16 @@ func UserProvider(flagName string) ProviderFunc {
 		if err = AuthProvider(c); err != nil {
 			return
 		}
-		user := c.String(flagName)
-		if user == "" {
-			user = global.Client.GetSessionUser()
+		username := c.String(flagName)
+		if username == "" {
+			username = global.Client.GetSessionUser()
 		}
 
-		c.User, err = global.Client.GetUser(user)
-		if err == nil && c.User == nil {
-			err = fmt.Errorf("no user was returned - please report a bug")
+		user, err := global.Client.GetUser(username)
+		if err != nil {
+			return
 		}
+		c.User = &user
 		return
 	}
 }
@@ -331,10 +336,11 @@ func VirtualMachineProvider(flagName string) ProviderFunc {
 			return
 		}
 		vmName := c.VirtualMachineName(flagName)
-		c.VirtualMachine, err = global.Client.GetVirtualMachine(vmName)
-		if err == nil && c.VirtualMachine == nil {
-			err = fmt.Errorf("no server was returned - please report a bug")
+		vm, err := global.Client.GetVirtualMachine(vmName)
+		if err == nil {
+			return
 		}
+		c.VirtualMachine = &vm
 		return
 	}
 }
