@@ -216,7 +216,6 @@ func TestGetVirtualMachine(t *testing.T) {
 	}
 
 	vm, err := client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
-	is.Nil(vm)
 	is.NotNil(err)
 	if _, ok := err.(BadNameError); !ok {
 		t.Fatalf("Expected BadNameError, got %T", err)
@@ -226,16 +225,13 @@ func TestGetVirtualMachine(t *testing.T) {
 	is.NotNil(err)
 
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
-	is.NotNil(vm)
 	is.Nil(err)
 
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
-	is.NotNil(vm)
 	is.Nil(err)
 
 	// Check that being just numeric is valid as well
 	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "123"})
-	is.NotNil(vm)
 	is.Nil(err)
 
 	is.Equal("127.0.0.1", vm.ManagementAddress.String())

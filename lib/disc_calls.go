@@ -105,6 +105,6 @@ func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (d
 		return
 	}
 
-	_, _, err = r.Run(nil, disc)
+	_, _, err = r.Run(nil, &disc)
 	return
 }

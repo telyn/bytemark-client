@@ -49,7 +49,7 @@ func (c *bytemarkClient) GetGroup(name GroupName) (group brain.Group, err error)
 		return
 	}
 
-	_, _, err = r.Run(nil, group)
+	_, _, err = r.Run(nil, &group)
 	if err != nil {
 		return
 	}

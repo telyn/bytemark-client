@@ -218,7 +218,7 @@ func testPutVirtualMachine(t *testing.T, endpoint string, vm *brain.VirtualMachi
 }
 
 func TestGetVLANS(t *testing.T) {
-	testVLANs := []*brain.VLAN{
+	testVLANs := []brain.VLAN{
 		{
 			ID:        90210,
 			Num:       123,
@@ -231,7 +231,7 @@ func TestGetVLANS(t *testing.T) {
 					Zones: []string{
 						"test-zone",
 					},
-					Available: *big.NewInt(200),
+					Available: big.NewInt(200),
 				},
 			},
 		},
@@ -245,13 +245,13 @@ func TestGetVLAN(t *testing.T) {
 	testVLAN := brain.VLAN{
 		Num: 123,
 	}
-	simpleGetTest(t, "/admin/vlans/123", &testVLAN, func(client Client) (interface{}, error) {
+	simpleGetTest(t, "/admin/vlans/123", testVLAN, func(client Client) (interface{}, error) {
 		return client.GetVLAN(123)
 	})
 }
 
 func TestGetIPRanges(t *testing.T) {
-	testIPRanges := []*brain.IPRange{
+	testIPRanges := []brain.IPRange{
 		{
 			ID:      1234,
 			Spec:    "192.168.13.0/24",
@@ -259,7 +259,7 @@ func TestGetIPRanges(t *testing.T) {
 			Zones: []string{
 				"test-zone",
 			},
-			Available: *big.NewInt(200),
+			Available: big.NewInt(200),
 		},
 	}
 	simpleGetTest(t, "/admin/ip_ranges", testIPRanges, func(client Client) (interface{}, error) {
@@ -276,22 +276,22 @@ func TestGetIPRange(t *testing.T) {
 		Zones: []string{
 			"test-zone",
 		},
-		Available: *big.NewInt(200),
+		Available: big.NewInt(200),
 	}
-	simpleGetTest(t, "/admin/ip_ranges/1234", &testIPRange, func(client Client) (interface{}, error) {
+	simpleGetTest(t, "/admin/ip_ranges/1234", testIPRange, func(client Client) (interface{}, error) {
 		return client.GetIPRange("1234")
 	})
 }
 
 func TestGetIPRangeByIPRange(t *testing.T) {
-	testIPRange := &brain.IPRange{
+	testIPRange := brain.IPRange{
 		ID:      1234,
 		Spec:    "192.168.13.0/24",
 		VLANNum: 123,
 		Zones: []string{
 			"test-zone",
 		},
-		Available: *big.NewInt(200),
+		Available: big.NewInt(200),
 	}
 
 	client, servers, err := mkTestClientAndServers(t, MuxHandlers{
@@ -306,7 +306,7 @@ func TestGetIPRangeByIPRange(t *testing.T) {
 				}
 
 				assertMethod(t, r, "GET")
-				writeJSON(t, wr, []*brain.IPRange{testIPRange})
+				writeJSON(t, wr, []brain.IPRange{testIPRange})
 			},
 		},
 	})
@@ -331,7 +331,7 @@ func TestGetIPRangeByIPRange(t *testing.T) {
 }
 
 func TestGetHeads(t *testing.T) {
-	testHeads := []*brain.Head{
+	testHeads := []brain.Head{
 		{
 			ID:       315,
 			UUID:     "234833-2493-3423-324235",
@@ -396,13 +396,13 @@ func TestGetHead(t *testing.T) {
 		UsedCores:           1,
 		VirtualMachineCount: 1,
 	}
-	simpleGetTest(t, "/admin/heads/239", &testHead, func(client Client) (interface{}, error) {
+	simpleGetTest(t, "/admin/heads/239", testHead, func(client Client) (interface{}, error) {
 		return client.GetHead("239")
 	})
 }
 
 func TestGetTails(t *testing.T) {
-	testTails := []*brain.Tail{
+	testTails := []brain.Tail{
 		{
 			ID:           1345,
 			UUID:         "idont-reallyknowwhat-uuids-looklike",
@@ -433,13 +433,13 @@ func TestGetTail(t *testing.T) {
 		IsOnline:     false,
 		StoragePools: []string{"swimming", "paddling"},
 	}
-	simpleGetTest(t, "/admin/tails/1345", &testTail, func(client Client) (interface{}, error) {
+	simpleGetTest(t, "/admin/tails/1345", testTail, func(client Client) (interface{}, error) {
 		return client.GetTail("1345")
 	})
 }
 
 func TestGetStoragePools(t *testing.T) {
-	testStoragePools := []*brain.StoragePool{
+	testStoragePools := []brain.StoragePool{
 		{
 			Label:           "swimming-pool",
 			Zone:            "frozone",
@@ -482,17 +482,17 @@ func TestGetStoragePool(t *testing.T) {
 		StorageGrade:    "sata",
 		Note:            "this note is a test",
 	}
-	simpleGetTest(t, "/admin/storage_pools/useful-pool", &testStoragePool, func(client Client) (interface{}, error) {
+	simpleGetTest(t, "/admin/storage_pools/useful-pool", testStoragePool, func(client Client) (interface{}, error) {
 		return client.GetStoragePool("useful-pool")
 	})
 }
 
 func TestGetMigratingVMs(t *testing.T) {
-	testVMs := []*brain.VirtualMachine{
-		&brain.VirtualMachine{
+	testVMs := []brain.VirtualMachine{
+		{
 			Name: "coolvm",
 		},
-		&brain.VirtualMachine{
+		{
 			Name: "uncoolvm",
 		},
 	}
@@ -502,7 +502,7 @@ func TestGetMigratingVMs(t *testing.T) {
 }
 
 func TestGetStoppedEligibleVMs(t *testing.T) {
-	testVMs := []*brain.VirtualMachine{
+	testVMs := []brain.VirtualMachine{
 		{
 			Name: "eligible-vm",
 		}, {
@@ -515,7 +515,7 @@ func TestGetStoppedEligibleVMs(t *testing.T) {
 }
 
 func TestGetRecentVMs(t *testing.T) {
-	testVMs := []*brain.VirtualMachine{
+	testVMs := []brain.VirtualMachine{
 		{
 			Name: "the-most-recent-vm",
 		}, {
@@ -547,6 +547,7 @@ func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Not expecting an error in TestPostMigrateVirtualMachineWithNewHead")
+		t.Errorf("%s", err)
 	}
 }
 
@@ -558,6 +559,7 @@ func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Not expecting an error in TestPostMigrateVirtualMachineWithoutHead")
+		t.Errorf("%s", err)
 	}
 }
 

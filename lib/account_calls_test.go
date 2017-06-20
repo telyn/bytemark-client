@@ -204,7 +204,7 @@ func TestDefaultAccountHasNoBigVSubscription(t *testing.T) {
 		billing: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/api/v1/accounts" {
 				_, err := w.Write([]byte(`[
-				{ },
+				{ "id":469 },
 				{ "bigv_account_subscription": "not-default-account" }
 				]`))
 				if err != nil {
@@ -303,7 +303,6 @@ func TestRegisterNewAccount(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	is.NotNil(newAcc)
 	is.Equal("test-user", newAcc.Owner.Username)
 	is.Equal("", newAcc.Owner.Password)
 	is.Equal("Test", newAcc.Owner.FirstName)

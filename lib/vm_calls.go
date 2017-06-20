@@ -83,7 +83,7 @@ func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm brain.Vi
 		return
 	}
 
-	_, _, err = r.Run(nil, vm)
+	_, _, err = r.Run(nil, &vm)
 	if err != nil {
 		return
 	}

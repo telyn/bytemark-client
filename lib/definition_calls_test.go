@@ -26,7 +26,6 @@ func TestProcessDefinitions(t *testing.T) {
 	is.Equal(2, len(defs.HardwareProfiles))
 	is.Equal(12, len(defs.Distributions))
 
-	is.NotNil(defs)
 	for k, l := range fixtureDefinitions.Distributions {
 		is.Equal(l, defs.Distributions[k])
 	}
@@ -71,7 +70,6 @@ func TestReadDefinitions(t *testing.T) {
 	is.Equal(2, len(defs.HardwareProfiles))
 	is.Equal(12, len(defs.Distributions))
 
-	is.NotNil(defs)
 	for k, l := range fixtureDefinitions.Distributions {
 		is.Equal(l, defs.Distributions[k])
 	}

@@ -76,7 +76,6 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{- end }}
 {{ end -}}
 
-{{/* account_overview needs $ to be defined, so use single_account_overview as entrypoint */}}
 {{ define "account_full" }}
   {{- if .IsDefaultAccount -}}	
     Your default account ({{ template "account_name" . }})

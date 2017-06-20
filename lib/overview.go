@@ -2,23 +2,25 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"io"
 	"text/template"
 )
 
 // FormatOverview outputs the given overview using the named template to the given writer.
-// defaultAccount does not need to be specified, will be removed in 3.0
 // TODO(telyn): make template choice not a string
 // TODO(telyn): use an actual Overview object?
-func FormatOverview(wr io.Writer, accounts []Account, defaultAccount Account, username string) error {
-	if !defaultAccount.IsValid() {
-		for _, a := range accounts {
-			if a.IsDefaultAccount {
-				defaultAccount = a
-				break
-			}
+func FormatOverview(wr io.Writer, accounts []Account, username string) error {
+	var defaultAccount Account
+	log.Debugf(log.LvlMisc, "I'm looking for the default account")
+	for _, a := range accounts {
+		if a.IsDefaultAccount {
+			log.Debugf(log.LvlMisc, "I found the default account! %#v isValid: %v", a, a.IsValid())
+			defaultAccount = a
+			break
 		}
 	}
+
 	const overviewTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
 
 {{ define "whoami" }}You are '{{ .Username }}'{{ end }}
@@ -56,7 +58,7 @@ Accounts you can access:
 {{ template "owned_accounts" . -}}
 {{- template "extra_accounts" . }}
 
-{{ if .DefaultAccount -}}
+{{ if .DefaultAccount.IsValid -}}
 {{- prettysprint .DefaultAccount "_full" }}
 {{ else -}}
 It was not possible to determine your default account. Please set one using bytemark config set account.

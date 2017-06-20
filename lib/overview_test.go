@@ -8,6 +8,7 @@ import (
 )
 
 func TestFormatOverview(t *testing.T) {
+	overrideLogWriters(t)
 	b := new(bytes.Buffer)
 
 	gp := getFixtureGroup()
@@ -23,19 +24,21 @@ func TestFormatOverview(t *testing.T) {
 		},
 	}
 	tests := []struct {
-		Accounts       []Account
-		DefaultAccount *Account
-		Expected       string
+		Accounts []Account
+		Expected string
 	}{
 		{
 			Accounts: []Account{
 				Account{
 					BillingID: 2402,
+					BrainID:   234,
 					Name:      "test-account",
 					Owner: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
 					TechnicalContact: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
 					Groups: []brain.Group{
@@ -44,12 +47,15 @@ func TestFormatOverview(t *testing.T) {
 					IsDefaultAccount: true,
 				},
 				Account{
+					BrainID:   234,
 					BillingID: 2403,
 					Name:      "test-account-2",
 					Owner: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
 					TechnicalContact: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
 					Groups: []brain.Group{
@@ -57,7 +63,8 @@ func TestFormatOverview(t *testing.T) {
 					},
 				},
 				Account{
-					Name: "test-unowned-account",
+					BrainID: 345,
+					Name:    "test-unowned-account",
 					Groups: []brain.Group{
 						gp,
 					},
@@ -84,7 +91,8 @@ Your default account (2402 - test-account)
 		}, {
 			Accounts: []Account{
 				Account{
-					Name: "test-unowned-account",
+					BrainID: 345,
+					Name:    "test-unowned-account",
 					Groups: []brain.Group{
 						gp,
 					},
@@ -105,7 +113,8 @@ It was not possible to determine your default account. Please set one using byte
 		}, {
 			Accounts: []Account{
 				Account{
-					Name: "test-account",
+					BrainID: 234,
+					Name:    "test-account",
 					Groups: []brain.Group{
 						brain.Group{
 							Name: "default",
@@ -137,14 +146,14 @@ Your default account (test-account)
 	}
 
 	for i, test := range tests {
-		err := FormatOverview(b, test.Accounts, Account{}, "test-user")
+		err := FormatOverview(b, test.Accounts, "test-user")
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		actual := b.String()
 		if test.Expected != actual {
-			t.Errorf("TestFormatOverview %d FAIL\r\nexpected %s\r\nreceived %s", i, test.Expected, actual)
+			t.Errorf("TestFormatOverview %d FAIL\r\nexpected %q\r\nreceived %q", i, test.Expected, actual)
 		}
 
 		b.Reset()
