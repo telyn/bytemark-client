@@ -53,9 +53,9 @@ type bytemarkClient struct {
 	urls          EndpointURLs
 }
 
-// NewSimple creates a new Bytemark API client using the default bytemark endpoints.
+// New creates a new Bytemark API client using the default bytemark endpoints.
 // This function will be renamed to New in 3.0
-func NewSimple() (Client, error) {
+func New() (Client, error) {
 	return NewWithURLs(DefaultURLs())
 }
 
@@ -74,31 +74,6 @@ func NewWithURLs(urls EndpointURLs) (c Client, err error) {
 		debugLevel: 0,
 	}
 	return &client, nil
-}
-
-// New creates a new Bytemark API client using the given Bytemark API endpoint and the default Bytemark auth endpoint, and fills the rest in with defaults.
-// This function will be replaced with NewSimple in 3.0
-func New(brainEndpoint, billingEndpoint, sppEndpoint string) (c Client, err error) {
-	auth, err := auth3.New("https://auth.bytemark.co.uk")
-	if err != nil {
-		return nil, err
-	}
-	return NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint, auth), nil
-}
-
-// NewWithAuth creates a new Bytemark API client using the given Bytemark API endpoint and github.com/BytemarkHosting/auth-client Client
-// This function is deprecated and will be removed in 3.0
-func NewWithAuth(brainEndpoint, billingEndpoint, sppEndpoint string, auth *auth3.Client) Client {
-	urls := DefaultURLs()
-	urls.Brain = brainEndpoint
-	urls.Billing = billingEndpoint
-	urls.SPP = sppEndpoint
-	client := bytemarkClient{
-		urls:       urls,
-		auth:       auth,
-		debugLevel: 0,
-	}
-	return &client
 }
 
 // AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
