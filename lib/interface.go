@@ -65,13 +65,6 @@ type Client interface {
 	////////////////////
 	//// BRAIN STUFF ///
 	////////////////////
-	//
-	// Parsers
-	//
-
-	ParseVirtualMachineName(string, ...VirtualMachineName) (VirtualMachineName, error)
-	ParseGroupName(string, ...GroupName) GroupName
-	ParseAccountName(string, ...string) string
 
 	//
 	// DEFINITIONS
