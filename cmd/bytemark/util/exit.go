@@ -228,7 +228,7 @@ func ProcessError(err error, message ...string) ExitCode {
 		case lib.NilAuthError:
 			errorMessage = "Authorization wasn't set up in the client - please file a bug report containing the name of the command you tried to run."
 			exitCode = ExitCodeClientBug
-		case lib.NotAuthorizedError:
+		case lib.ForbiddenError:
 			errorMessage = err.Error()
 			exitCode = ExitCodeActionNotPermitted
 		case lib.BadRequestError:
