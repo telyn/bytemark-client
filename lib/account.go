@@ -56,6 +56,7 @@ func (a Account) billingAccount() (b *billing.Account) {
 	return
 }
 
+// IsValid returns true if this account has been populated with data from the brain or billing endpoints.
 func (a Account) IsValid() bool {
 	return a.BillingID != 0 || a.BrainID != 0
 }
