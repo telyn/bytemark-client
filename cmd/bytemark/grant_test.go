@@ -46,7 +46,7 @@ func TestGrantPrivilege(t *testing.T) {
 					Account: "test-account",
 				}
 
-				c.When("GetGroup", group).Return(&brain.Group{
+				c.When("GetGroup", group).Return(brain.Group{
 					ID: 303,
 				}).Times(1)
 				c.When("GrantPrivilege", brain.Privilege{
@@ -68,7 +68,7 @@ func TestGrantPrivilege(t *testing.T) {
 					Account: "test-account",
 				}
 
-				c.When("GetGroup", group).Return(&brain.Group{
+				c.When("GetGroup", group).Return(brain.Group{
 					ID: 303,
 				}).Times(1)
 				c.When("GrantPrivilege", brain.Privilege{
@@ -91,7 +91,7 @@ func TestGrantPrivilege(t *testing.T) {
 					Account:        "test-account",
 				}
 
-				c.When("GetVirtualMachine", vm).Return(&brain.VirtualMachine{ID: 333}, nil).Times(1)
+				c.When("GetVirtualMachine", vm).Return(brain.VirtualMachine{ID: 333}, nil).Times(1)
 
 				c.When("GrantPrivilege", brain.Privilege{
 					Username:         "test-user",
@@ -107,7 +107,7 @@ func TestGrantPrivilege(t *testing.T) {
 				// specific to vm_admin/vm_console
 				config.When("GetIgnoreErr", "account").Return("default-account")
 
-				c.When("GetAccount", "test-account").Return(&lib.Account{
+				c.When("GetAccount", "test-account").Return(lib.Account{
 					BrainID: 32310,
 				})
 

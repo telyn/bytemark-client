@@ -337,7 +337,7 @@ func VirtualMachineProvider(flagName string) ProviderFunc {
 		}
 		vmName := c.VirtualMachineName(flagName)
 		vm, err := global.Client.GetVirtualMachine(vmName)
-		if err == nil {
+		if err != nil {
 			return
 		}
 		c.VirtualMachine = &vm

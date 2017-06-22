@@ -24,7 +24,7 @@ func TestDeleteServer(t *testing.T) {
 
 	vm := getFixtureVM()
 
-	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
+	c.When("GetVirtualMachine", name).Return(vm).Times(1)
 	c.When("DeleteVirtualMachine", name, false).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark delete server --force test-server", " "))
@@ -35,7 +35,7 @@ func TestDeleteServer(t *testing.T) {
 	c.Reset()
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
+	c.When("GetVirtualMachine", name).Return(vm).Times(1)
 	c.When("DeleteVirtualMachine", name, true).Return(nil).Times(1)
 
 	err = global.App.Run(strings.Split("bytemark delete server --force --purge test-server", " "))
@@ -83,7 +83,7 @@ func TestDeleteKey(t *testing.T) {
 	}
 
 	config.When("Force").Return(true)
-	c.When("GetUser", usr.Username).Return(&usr)
+	c.When("GetUser", usr.Username).Return(usr)
 
 	c.When("DeleteUserAuthorizedKey", "test-user", "ssh-rsa AAAAFakeKey test-key-one").Return(nil).Times(1)
 
@@ -102,7 +102,7 @@ func TestDeleteKey(t *testing.T) {
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil)
-	c.When("GetUser", usr.Username).Return(&usr)
+	c.When("GetUser", usr.Username).Return(usr)
 	kerr := new(lib.AmbiguousKeyError)
 	c.When("DeleteUserAuthorizedKey", "test-user", "test-key-two").Return(kerr).Times(1)
 

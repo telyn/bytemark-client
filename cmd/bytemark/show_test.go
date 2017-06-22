@@ -100,7 +100,7 @@ func TestShowAccountCommand(t *testing.T) {
 			config, c := baseTestAuthSetup(t, false)
 			baseShowAccountSetup(c, config, test.ConfigAccount, format)
 			if test.AccountToGet == "" {
-				c.When("GetAccount", "").Return(&lib.Account{
+				c.When("GetAccount", "").Return(lib.Account{
 					Name:      "defa",
 					BrainID:   112,
 					BillingID: 213,
@@ -116,7 +116,7 @@ func TestShowAccountCommand(t *testing.T) {
 				}).Times(1)
 			} else {
 				// wat
-				c.When("GetAccount", test.AccountToGet).Return(&lib.Account{
+				c.When("GetAccount", test.AccountToGet).Return(lib.Account{
 					Name:      test.AccountToGet,
 					BrainID:   112,
 					BillingID: 213,

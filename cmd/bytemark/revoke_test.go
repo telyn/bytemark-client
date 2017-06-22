@@ -47,7 +47,7 @@ func TestRevokePrivilege(t *testing.T) {
 					Account:        "test-account",
 				}
 
-				c.When("GetVirtualMachine", vm).Return(&brain.VirtualMachine{ID: 333}, nil).Times(1)
+				c.When("GetVirtualMachine", vm).Return(brain.VirtualMachine{ID: 333}, nil).Times(1)
 				c.When("GetPrivilegesForVirtualMachine", vm).Return(brain.Privileges{
 					{
 						ID:               2342,
@@ -81,7 +81,7 @@ func TestRevokePrivilege(t *testing.T) {
 					Account: "test-account",
 				}
 
-				c.When("GetGroup", group).Return(&brain.Group{ID: 953}, nil).Times(1)
+				c.When("GetGroup", group).Return(brain.Group{ID: 953}, nil).Times(1)
 				c.When("GetPrivilegesForGroup", group).Return(brain.Privileges{
 					{
 						ID:       4354,
@@ -112,7 +112,7 @@ func TestRevokePrivilege(t *testing.T) {
 				config.When("GetIgnoreErr", "account").Return("default-account")
 				acc := "default-account"
 
-				c.When("GetAccount", acc).Return(&lib.Account{BrainID: 223435}, nil).Times(1)
+				c.When("GetAccount", acc).Return(lib.Account{BrainID: 223435}, nil).Times(1)
 				c.When("GetPrivilegesForAccount", acc).Return(brain.Privileges{
 					{
 						ID:        12412,
