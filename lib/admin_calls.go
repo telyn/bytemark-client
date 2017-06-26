@@ -88,13 +88,13 @@ func (c *bytemarkClient) GetIPRange(idOrCIDR string) (ipRange brain.IPRange, err
 		err = fmt.Errorf("IP Range not found")
 		return
 	}
-	ipRange = ipRanges[0]
 
 	if len(ipRanges) > 1 {
 		err = fmt.Errorf("More than one IP Range found, please report this as a bug")
 		return
 	}
 
+	ipRange = ipRanges[0]
 	return
 }
 
