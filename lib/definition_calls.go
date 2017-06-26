@@ -126,7 +126,7 @@ func (defs JSONDefinitions) Process() (out Definitions) {
 	sort.StringSlice(out.ZoneNames).Sort()
 	sort.StringSlice(out.HardwareProfiles).Sort()
 
-	return out
+	return
 }
 
 // ReadDefinitions queries the brain for its definitions

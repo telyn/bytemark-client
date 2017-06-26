@@ -21,11 +21,12 @@ type JSONUser struct {
 	//AccountName string `json:"account_name"`
 }
 
-// Process turns this JSONUser into a User.
-func (jsonUser *JSONUser) Process(into *User) {
-	into.Username = jsonUser.Username
-	into.Email = jsonUser.Email
-	into.AuthorizedKeys = strings.Split(jsonUser.AuthorizedKeys, "\n")
+// User turns this JSONUser into a User.
+func (jsonUser *JSONUser) User() (user User) {
+	user.Username = jsonUser.Username
+	user.Email = jsonUser.Email
+	user.AuthorizedKeys = strings.Split(jsonUser.AuthorizedKeys, "\n")
+	return
 }
 
 // User represents a Bytemark user.

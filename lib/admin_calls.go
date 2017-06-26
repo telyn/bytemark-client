@@ -63,11 +63,11 @@ func (c *bytemarkClient) GetIPRange(idOrCIDR string) (ipRange brain.IPRange, err
 		// Numeric means it is just an ID
 		r, err = c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", idOrCIDR)
 		if err != nil {
-			return ipRange, err
+			return
 		}
 
 		_, _, err = r.Run(nil, &ipRange)
-		return ipRange, err
+		return
 	}
 
 	// Non numeric means we got a CIDR
@@ -88,13 +88,14 @@ func (c *bytemarkClient) GetIPRange(idOrCIDR string) (ipRange brain.IPRange, err
 		err = fmt.Errorf("IP Range not found")
 		return
 	}
+	ipRange = ipRanges[0]
 
 	if len(ipRanges) > 1 {
 		err = fmt.Errorf("More than one IP Range found, please report this as a bug")
 		return
 	}
 
-	return ipRanges[0], nil
+	return
 }
 
 func (c *bytemarkClient) GetHeads() (heads []brain.Head, err error) {

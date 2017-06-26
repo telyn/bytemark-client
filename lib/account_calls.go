@@ -19,12 +19,13 @@ func (c *bytemarkClient) getBillingAccount(name string) (account billing.Account
 	if err != nil {
 		return
 	}
-	for _, acc := range accounts {
-		if acc.Name == name {
-			return acc, nil
+	for _, account = range accounts {
+		if account.Name == name {
+			return
 		}
 	}
-	return billing.Account{}, fmt.Errorf("Couldn't find a billing account called %s", name)
+	err = fmt.Errorf("Couldn't find a billing account called %s", name)
+	return
 }
 
 // getBillingAccounts returns all the billing accounts the currently logged in user can see.
@@ -137,7 +138,8 @@ func (c *bytemarkClient) getBrainAccounts() (accounts []brain.Account, err error
 // getDefaultBillingAccount gets the default billing account for this user.
 func (c *bytemarkClient) getDefaultBillingAccount() (acc billing.Account, err error) {
 	if c.urls.Billing == "https://int.bigv.io" {
-		return billing.Account{Name: "bytemark"}, nil
+		acc = billing.Account{Name: "bytemark"}
+		return
 	}
 	billAccs, err := c.getBillingAccounts()
 	if err != nil {
@@ -146,7 +148,8 @@ func (c *bytemarkClient) getDefaultBillingAccount() (acc billing.Account, err er
 	if len(billAccs) == 0 {
 		return
 	}
-	return billAccs[0], nil
+	acc = billAccs[0]
+	return
 }
 
 // GetDefaultAccount gets the account *most likely* to be your default account.
@@ -162,19 +165,20 @@ func (c *bytemarkClient) GetDefaultAccount() (acc Account, err error) {
 		return
 	}
 	if billAcc.IsValid() {
-		log.Debugf(log.LvlMisc, "acc before: %#v\r\n", acc)
 		acc.fillBilling(billAcc)
-		log.Debugf(log.LvlMisc, "acc after: %#v\r\n", acc)
+		var brainAcc brain.Account
 
-		brainAcc, getErr := c.getBrainAccount(billAcc.Name)
-		if getErr != nil {
-			return acc, getErr
+		brainAcc, err = c.getBrainAccount(billAcc.Name)
+		if err != nil {
+			return
 		}
 		acc.fillBrain(brainAcc)
 	} else {
-		brainAccs, getErr := c.getBrainAccounts()
-		if getErr != nil {
-			return acc, getErr
+		var brainAccs []brain.Account
+
+		brainAccs, err = c.getBrainAccounts()
+		if err != nil {
+			return
 		}
 		acc.fillBrain(brainAccs[0])
 	}

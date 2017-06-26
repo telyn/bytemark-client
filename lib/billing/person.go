@@ -25,3 +25,7 @@ type Person struct {
 	OrganizationDivision string `json:"division,omitempty"`
 	VATNumber            string `json:"vatnumber,omitempty"`
 }
+
+func (p Person) IsValid() bool {
+	return p.Username != ""
+}

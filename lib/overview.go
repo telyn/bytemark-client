@@ -84,7 +84,7 @@ It was not possible to determine your default account. Please set one using byte
 	var ownedAccounts []Account
 	var otherAccounts []Account
 	for _, a := range accounts {
-		if a.Owner.ID != 0 && a.Owner.Username != "" && a.Owner.Username == username {
+		if a.Owner.IsValid() && a.Owner.Username == username {
 			ownedAccounts = append(ownedAccounts, a)
 		} else {
 			otherAccounts = append(otherAccounts, a)

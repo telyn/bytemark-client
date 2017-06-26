@@ -17,7 +17,7 @@ func (c *bytemarkClient) GetUser(name string) (user brain.User, err error) {
 	if err != nil {
 		return
 	}
-	jsUser.Process(&user)
+	user = jsUser.User()
 	return
 }
 

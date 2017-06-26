@@ -67,7 +67,7 @@ func TestGetAccount(t *testing.T) {
 	acc, err = client.GetAccount("account")
 	is.Nil(err)
 	if !acc.IsValid() {
-		t.Fatal("account is nil")
+		t.Fatal("account isn't valid")
 	}
 	is.Equal("account", acc.Name)
 
