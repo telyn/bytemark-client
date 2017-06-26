@@ -26,6 +26,7 @@ type Person struct {
 	VATNumber            string `json:"vatnumber,omitempty"`
 }
 
+// IsValid returns true if the Person is valid, false otherwise.
 func (p Person) IsValid() bool {
 	return p.Username != ""
 }
