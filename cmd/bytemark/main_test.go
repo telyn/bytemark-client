@@ -101,6 +101,7 @@ func TestEnsureAuth(t *testing.T) {
 		credentials := auth3.Credentials{
 			"username": test.InputUsername,
 			"password": test.InputPassword,
+			"validity": "1800",
 		}
 
 		c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[0]).Times(1)
@@ -110,6 +111,7 @@ func TestEnsureAuth(t *testing.T) {
 			credentials := auth3.Credentials{
 				"username": test.InputUsername,
 				"password": test.InputPassword,
+				"validity": "1800",
 				"2fa":      test.Input2FA,
 			}
 			c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[1]).Times(1) // Returns nil means success
@@ -170,8 +172,8 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks.Client) {
 	config, c = baseTestSetup(t, admin)
 
-	config.When("Get", "token").Return("test-token")
 	config.When("Get", "account").Return("test-account")
+	config.When("GetIgnoreErr", "token").Return("test-token")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "2fa-otp").Return("")

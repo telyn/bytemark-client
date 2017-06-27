@@ -10,7 +10,7 @@ import (
 
 func TestRestoreBackup(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -18,11 +18,8 @@ func TestRestoreBackup(t *testing.T) {
 		Account:        "default-account",
 	}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(&defVM)
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("RestoreBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
 
 	err := global.App.Run([]string{

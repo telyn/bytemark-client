@@ -40,6 +40,11 @@ func (c *Config) GetBool(name string) (bool, error) {
 	return ret.Bool(0), ret.Error(1)
 }
 
+func (c *Config) GetSessionValidity() (int, error) {
+	ret := c.Called()
+	return ret.Int(0), ret.Error(1)
+}
+
 func (c *Config) GetV(name string) (util.ConfigVar, error) {
 	ret := c.Called(name)
 	return ret.Get(0).(util.ConfigVar), ret.Error(1)
