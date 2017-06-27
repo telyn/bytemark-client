@@ -147,9 +147,9 @@ func makeCredentials() (credents map[string]string, err error) {
 // EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.
 // TODO(telyn): This REALLY, REALLY needs breaking apart into more manageable chunks
 func EnsureAuth() error {
-	token, err := global.Config.Get("token")
+	token := global.Config.GetIgnoreErr("token")
 
-	err = global.Client.AuthWithToken(token)
+	err := global.Client.AuthWithToken(token)
 	if err != nil {
 		if aErr, ok := err.(*auth3.Error); ok {
 			if _, ok := aErr.Err.(*url.Error); ok {
