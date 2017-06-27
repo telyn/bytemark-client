@@ -9,9 +9,9 @@ type Group struct {
 	Name string `json:"name"`
 
 	// the following cannot be set
-	AccountID       int               `json:"account_id"`
-	ID              int               `json:"id"`
-	VirtualMachines []*VirtualMachine `json:"virtual_machines"`
+	AccountID       int              `json:"account_id"`
+	ID              int              `json:"id"`
+	VirtualMachines []VirtualMachine `json:"virtual_machines"`
 }
 
 func (g Group) String() string {

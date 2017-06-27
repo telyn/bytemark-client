@@ -13,8 +13,8 @@ func getFixtureGroup() brain.Group {
 	return brain.Group{
 		ID:   1,
 		Name: "default",
-		VirtualMachines: []*brain.VirtualMachine{
-			&vm,
+		VirtualMachines: []brain.VirtualMachine{
+			vm,
 		},
 	}
 
@@ -49,7 +49,7 @@ func TestCreateGroup(t *testing.T) {
 	err = client.AuthWithCredentials(map[string]string{})
 	is.Nil(err)
 
-	err = client.CreateGroup(&GroupName{Group: "invalid-group", Account: "account"})
+	err = client.CreateGroup(GroupName{Group: "invalid-group", Account: "account"})
 	is.Nil(err)
 }
 
@@ -85,7 +85,7 @@ func TestDeleteGroup(t *testing.T) {
 	err = client.AuthWithCredentials(map[string]string{})
 
 	is.Nil(err)
-	err = client.DeleteGroup(&GroupName{Group: "default", Account: "account"})
+	err = client.DeleteGroup(GroupName{Group: "default", Account: "account"})
 	is.Nil(err)
 
 }
@@ -111,7 +111,7 @@ func TestGetGroup(t *testing.T) {
 	}
 	billingHandler := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/api/v1/accounts" {
-			_, err := w.Write([]byte(`[{ "bigv_account_subscription": "account" }]`))
+			_, err := w.Write([]byte(`[{ "id": 234, "bigv_account_subscription": "account" }]`))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -131,15 +131,19 @@ func TestGetGroup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	group, err := client.GetGroup(&GroupName{Group: "invalid-group", Account: "account"})
+	t.Logf("Trying invalid-group")
+
+	group, err := client.GetGroup(GroupName{Group: "invalid-group", Account: "account"})
 	is.NotNil(err)
 	is.Equal("", group.Name)
 
-	group, err = client.GetGroup(&GroupName{Group: "default", Account: "account"})
-	is.NotNil(group)
+	t.Logf("Trying default.account")
+
+	group, err = client.GetGroup(GroupName{Group: "default", Account: "account"})
 	is.Nil(err)
 
 	servers.Close()
+	t.Logf("Setting up new servers")
 
 	client, servers, err = mkTestClientAndServers(t, Handlers{
 		brain:   http.HandlerFunc(groupHandler),
@@ -155,7 +159,8 @@ func TestGetGroup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	group, err = client.GetGroup(&GroupName{Group: "", Account: ""})
-	is.NotNil(group)
+	t.Logf("Trying blank group")
+
+	group, err = client.GetGroup(GroupName{Group: "", Account: ""})
 	is.Nil(err)
 }

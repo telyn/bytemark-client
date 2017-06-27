@@ -7,7 +7,7 @@ import (
 )
 
 // IPs represent multiple net.IPs
-type IPs []*net.IP
+type IPs []net.IP
 
 // StringSep combines all the IPs into a single string with the given seperator
 func (ips IPs) StringSep(sep string) string {
@@ -36,8 +36,8 @@ func (ips IPs) Sort() IPs {
 
 // Less looks at the ips at index i and j, and returns true if i should come before j.
 func (ips IPs) Less(i, j int) bool {
-	a := *ips[i]
-	b := *ips[j]
+	a := ips[i]
+	b := ips[j]
 	// loop over each byte of the address and compare.
 	if a.Equal(a.To4()) && b.Equal(b.To4()) {
 		a4 := a.To4()

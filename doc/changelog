@@ -1,3 +1,9 @@
+bytemark-client (3.0~beta1) UNRELEASED; urgency=low
+
+  Remove unnecessary / potentially dangerous pointers from the lib package
+
+ -- telyn <telyn@bytemark.co.uk>  Thu, 15 Jun 2017 11:39:15 +0100
+
 bytemark-client (2.3) UNRELEASED; urgency=low
 
   New features:

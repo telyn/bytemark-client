@@ -107,7 +107,7 @@ func (p Privilege) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (er
 }
 
 // Privileges is used to allow API consumers to use IndexOf on the array of privileges.
-type Privileges []*Privilege
+type Privileges []Privilege
 
 // IndexOf finds the privilege given in the list of privileges, ignoring the Privilege ID and returns the index. If it couldn't find it, returns -1.
 func (ps Privileges) IndexOf(priv Privilege) int {

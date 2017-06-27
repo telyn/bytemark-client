@@ -14,14 +14,14 @@ func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
-	c.When("GetVirtualMachine", &name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
+	c.When("GetVirtualMachine", name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
 
 	disc := brain.Disc{Size: 35 * 1024, StorageGrade: "archive"}
 
-	c.When("CreateDisc", &name, disc).Return(nil).Times(1)
+	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark create disc --force --disc archive:35 test-server", " "))
 	is.Nil(err)
@@ -35,13 +35,13 @@ func TestCreateGroupCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetGroup").Return(&defGroup)
+	config.When("GetGroup").Return(defGroup)
 
 	group := lib.GroupName{
 		Group:   "test-group",
 		Account: "default-account",
 	}
-	c.When("CreateGroup", &group).Return(nil).Times(1)
+	c.When("CreateGroup", group).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark create group test-group", " "))
 	is.Nil(err)
@@ -95,7 +95,7 @@ func TestCreateServerCommand(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 
 	// where most commands use &defVM to make sure the VirtualMachineName has all three components (and to avoid calls to GetDefaultAccount, presumably), I have singled out TestCreateServerCommand to also test that unqualified server names will work in practice without account & group set in the config.
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{Group: "default"})
+	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{Group: "default"})
 
 	vm := brain.VirtualMachineSpec{
 		Discs: []brain.Disc{
@@ -108,7 +108,7 @@ func TestCreateServerCommand(t *testing.T) {
 				StorageGrade: "archive",
 			},
 		},
-		VirtualMachine: &brain.VirtualMachine{
+		VirtualMachine: brain.VirtualMachine{
 			Name:                  "test-server",
 			Autoreboot:            true,
 			Cores:                 1,
@@ -130,11 +130,10 @@ func TestCreateServerCommand(t *testing.T) {
 		},
 	}
 
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
-	getvm.Discs = make([]*brain.Disc, 2)
-	getvm.Discs[0] = &vm.Discs[0]
-	getvm.Discs[1] = &vm.Discs[1]
+	getvm := vm.VirtualMachine
+	getvm.Discs = make([]brain.Disc, 2)
+	getvm.Discs[0] = vm.Discs[0]
+	getvm.Discs[1] = vm.Discs[1]
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	vmname := lib.VirtualMachineName{
@@ -142,8 +141,8 @@ func TestCreateServerCommand(t *testing.T) {
 		Group:          "default",
 	}
 
-	c.When("CreateVirtualMachine", &lib.GroupName{Group: "default"}, vm).Return(vm, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
+	c.When("CreateVirtualMachine", lib.GroupName{Group: "default"}, vm).Return(vm, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
 		"bytemark", "create", "server",
@@ -175,10 +174,10 @@ func TestCreateServerCommand(t *testing.T) {
 func TestCreateServerNoImage(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vm := brain.VirtualMachineSpec{
-		VirtualMachine: &brain.VirtualMachine{
+		VirtualMachine: brain.VirtualMachine{
 			Name:   "test-server",
 			Cores:  1,
 			Memory: 1024,
@@ -192,8 +191,7 @@ func TestCreateServerNoImage(t *testing.T) {
 	}
 
 	// TODO(telyn): refactor this getvm crap into a function someplace
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
+	getvm := vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
 	group := lib.GroupName{
@@ -207,8 +205,8 @@ func TestCreateServerNoImage(t *testing.T) {
 		Account:        "default-account",
 	}
 
-	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
+	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
 		"bytemark", "create", "server",
@@ -230,7 +228,7 @@ func TestCreateServer(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -239,7 +237,7 @@ func TestCreateServer(t *testing.T) {
 	}
 
 	vm := brain.VirtualMachineSpec{
-		VirtualMachine: &brain.VirtualMachine{
+		VirtualMachine: brain.VirtualMachine{
 			Name:   "test-server",
 			Cores:  3,
 			Memory: 6565,
@@ -249,12 +247,11 @@ func TestCreateServer(t *testing.T) {
 			StorageGrade: "archive",
 		}},
 	}
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
+	getvm := vm.VirtualMachine
 	getvm.Hostname = "test-server.test-group.test-account.tld"
 
-	c.When("CreateVirtualMachine", &defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
+	c.When("CreateVirtualMachine", defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(getvm, nil).Times(1)
 
 	err := global.App.Run([]string{
 		"bytemark", "create", "server",
@@ -275,7 +272,7 @@ func TestCreateBackup(t *testing.T) {
 	config.When("Get", "account").Return("test-account")
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -298,7 +295,7 @@ func TestCreateVLANGroup(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetGroup").Return(&defGroup).Times(1)
+	config.When("GetGroup").Return(defGroup).Times(1)
 
 	group := lib.GroupName{
 		Group:   "test-group",
@@ -317,7 +314,7 @@ func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetGroup").Return(&defGroup).Times(1)
+	config.When("GetGroup").Return(defGroup).Times(1)
 
 	group := lib.GroupName{
 		Group:   "test-group",
@@ -336,7 +333,7 @@ func TestCreateVLANGroupError(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetGroup").Return(&defGroup).Times(1)
+	config.When("GetGroup").Return(defGroup).Times(1)
 
 	group := lib.GroupName{
 		Group:   "test-group",

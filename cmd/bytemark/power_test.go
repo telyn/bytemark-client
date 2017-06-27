@@ -12,9 +12,9 @@ func TestResetCommand(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("ResetVirtualMachine", &vmn).Times(1)
+	c.When("ResetVirtualMachine", vmn).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark reset test-server.test-group.test-account", " "))
 	is.Nil(err)
@@ -28,9 +28,9 @@ func TestRestartCommand(t *testing.T) {
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("RestartVirtualMachine", &vmn).Times(1)
+	c.When("RestartVirtualMachine", vmn).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
 	is.Nil(err)
@@ -43,9 +43,9 @@ func TestShutdownCommand(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("ShutdownVirtualMachine", &vmn, true).Times(1)
+	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark shutdown test-server.test-group.test-account", " "))
 	is.Nil(err)
@@ -58,9 +58,9 @@ func TestStartCommand(t *testing.T) {
 	config, c := baseTestAuthSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("StartVirtualMachine", &vmn).Times(1)
+	c.When("StartVirtualMachine", vmn).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark start test-server.test-group.test-account", " "))
 	is.Nil(err)
@@ -74,9 +74,9 @@ func TestStopCommand(t *testing.T) {
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("StopVirtualMachine", &vmn).Times(1)
+	c.When("StopVirtualMachine", vmn).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark stop test-server.test-group.test-account", " "))
 	is.Nil(err)

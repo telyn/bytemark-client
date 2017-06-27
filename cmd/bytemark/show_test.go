@@ -100,32 +100,32 @@ func TestShowAccountCommand(t *testing.T) {
 			config, c := baseTestAuthSetup(t, false)
 			baseShowAccountSetup(c, config, test.ConfigAccount, format)
 			if test.AccountToGet == "" {
-				c.When("GetAccount", "").Return(&lib.Account{
+				c.When("GetAccount", "").Return(lib.Account{
 					Name:      "defa",
 					BrainID:   112,
 					BillingID: 213,
-					Groups:    []*brain.Group{},
-					Owner: &billing.Person{
+					Groups:    []brain.Group{},
+					Owner: billing.Person{
 						FirstName: "defa",
 						LastName:  "Testo",
 					},
-					TechnicalContact: &billing.Person{
+					TechnicalContact: billing.Person{
 						FirstName: "defa",
 						LastName:  "Testo",
 					},
 				}).Times(1)
 			} else {
 				// wat
-				c.When("GetAccount", test.AccountToGet).Return(&lib.Account{
+				c.When("GetAccount", test.AccountToGet).Return(lib.Account{
 					Name:      test.AccountToGet,
 					BrainID:   112,
 					BillingID: 213,
-					Groups:    []*brain.Group{},
-					Owner: &billing.Person{
+					Groups:    []brain.Group{},
+					Owner: billing.Person{
 						FirstName: test.AccountToGet,
 						LastName:  "Testo",
 					},
-					TechnicalContact: &billing.Person{
+					TechnicalContact: billing.Person{
 						FirstName: test.AccountToGet,
 						LastName:  "Testo",
 					},
@@ -168,11 +168,11 @@ func TestShowGroupCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetGroup").Return(&defGroup)
+	config.When("GetGroup").Return(defGroup)
 	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
 
 	group := getFixtureGroup()
-	c.When("GetGroup", &gpname).Return(&group, nil).Times(1)
+	c.When("GetGroup", gpname).Return(&group, nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark show group test-group.test-account", " "))
 	is.Nil(err)
@@ -187,10 +187,10 @@ func TestShowServerCommand(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, false)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 	vm := getFixtureVM()
-	c.When("GetVirtualMachine", &vmname).Return(&vm, nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(&vm, nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
 	is.Nil(err)

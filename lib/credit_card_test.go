@@ -54,7 +54,7 @@ func TestGetSPPToken(t *testing.T) {
 
 	cc := spp.CreditCard{Number: "4343"}
 
-	token, err := client.GetSPPToken(cc, nil)
+	token, err := client.GetSPPToken(cc, billing.Person{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,8 +89,8 @@ func TestGetSPPTokenWithAccount(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if tr.Owner == nil {
-					t.Fatalf("TestGetSPPTokenWithAccount shouldn't have nil account. for real content: \r\n%s\r\n", string(body))
+				if !tr.Owner.IsValid() {
+					t.Fatalf("TestGetSPPTokenWithAccount shouldn't have an invalid owner. real content: \r\n%s\r\n", string(body))
 				}
 				is.Equal("Melanie", tr.Owner.FirstName)
 				is.Equal("Ownersdottir", tr.Owner.LastName)
@@ -110,7 +110,9 @@ func TestGetSPPTokenWithAccount(t *testing.T) {
 	}
 
 	cc := spp.CreditCard{Number: "4343"}
-	token, err := client.GetSPPToken(cc, &billing.Person{
+	token, err := client.GetSPPToken(cc, billing.Person{
+		ID:        9020,
+		Username:  "melanie",
 		FirstName: "Melanie",
 		LastName:  "Ownersdottir",
 	})
@@ -182,7 +184,7 @@ func TestCreateCreditCard(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ref, err := client.CreateCreditCard(&testCard)
+	ref, err := client.CreateCreditCard(testCard)
 
 	if err != nil {
 		t.Fatal(err)

@@ -8,61 +8,68 @@ import (
 )
 
 func TestFormatOverview(t *testing.T) {
+	overrideLogWriters(t)
 	b := new(bytes.Buffer)
 
 	gp := getFixtureGroup()
 	vm := getFixtureVM()
-	megaGroup := &brain.Group{
+	megaGroup := brain.Group{
 		Name: "mega-group",
-		VirtualMachines: []*brain.VirtualMachine{
-			&vm, &vm, &vm, &vm,
-			&vm, &vm, &vm, &vm,
-			&vm, &vm, &vm, &vm,
-			&vm, &vm, &vm, &vm,
-			&vm, &vm, &vm, &vm,
+		VirtualMachines: []brain.VirtualMachine{
+			vm, vm, vm, vm,
+			vm, vm, vm, vm,
+			vm, vm, vm, vm,
+			vm, vm, vm, vm,
+			vm, vm, vm, vm,
 		},
 	}
 	tests := []struct {
-		Accounts       []*Account
-		DefaultAccount *Account
-		Expected       string
+		Accounts []Account
+		Expected string
 	}{
 		{
-			Accounts: []*Account{
-				&Account{
+			Accounts: []Account{
+				Account{
 					BillingID: 2402,
+					BrainID:   234,
 					Name:      "test-account",
-					Owner: &billing.Person{
+					Owner: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
-					TechnicalContact: &billing.Person{
+					TechnicalContact: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
-					Groups: []*brain.Group{
-						&gp,
+					Groups: []brain.Group{
+						gp,
 					},
 					IsDefaultAccount: true,
 				},
-				&Account{
+				Account{
+					BrainID:   234,
 					BillingID: 2403,
 					Name:      "test-account-2",
-					Owner: &billing.Person{
+					Owner: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
-					TechnicalContact: &billing.Person{
+					TechnicalContact: billing.Person{
+						ID:       124,
 						Username: "test-user",
 					},
-					Groups: []*brain.Group{
+					Groups: []brain.Group{
 						megaGroup,
 					},
 				},
-				&Account{
-					Name: "test-unowned-account",
-					Groups: []*brain.Group{
-						&gp,
+				Account{
+					BrainID: 345,
+					Name:    "test-unowned-account",
+					Groups: []brain.Group{
+						gp,
 					},
 				},
-				&Account{
+				Account{
 					BillingID: 2406,
 				},
 			},
@@ -82,14 +89,15 @@ Your default account (2402 - test-account)
 
 `,
 		}, {
-			Accounts: []*Account{
-				&Account{
-					Name: "test-unowned-account",
-					Groups: []*brain.Group{
-						&gp,
+			Accounts: []Account{
+				Account{
+					BrainID: 345,
+					Name:    "test-unowned-account",
+					Groups: []brain.Group{
+						gp,
 					},
 				},
-				&Account{
+				Account{
 					BillingID: 2406,
 				},
 			},
@@ -103,14 +111,15 @@ It was not possible to determine your default account. Please set one using byte
 
 `,
 		}, {
-			Accounts: []*Account{
-				&Account{
-					Name: "test-account",
-					Groups: []*brain.Group{
-						&brain.Group{
+			Accounts: []Account{
+				Account{
+					BrainID: 234,
+					Name:    "test-account",
+					Groups: []brain.Group{
+						brain.Group{
 							Name: "default",
-							VirtualMachines: []*brain.VirtualMachine{
-								&vm, &vm, &vm, &vm, &vm,
+							VirtualMachines: []brain.VirtualMachine{
+								vm, vm, vm, vm, vm,
 							},
 						},
 						megaGroup,
@@ -137,14 +146,14 @@ Your default account (test-account)
 	}
 
 	for i, test := range tests {
-		err := FormatOverview(b, test.Accounts, nil, "test-user")
+		err := FormatOverview(b, test.Accounts, "test-user")
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		actual := b.String()
 		if test.Expected != actual {
-			t.Errorf("TestFormatOverview %d FAIL\r\nexpected %s\r\nreceived %s", i, test.Expected, actual)
+			t.Errorf("TestFormatOverview %d FAIL\r\nexpected %q\r\nreceived %q", i, test.Expected, actual)
 		}
 
 		b.Reset()

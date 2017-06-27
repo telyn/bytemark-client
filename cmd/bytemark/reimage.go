@@ -77,7 +77,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 				return util.UserRequestedExit{}
 			}
 
-			err = global.Client.ReimageVirtualMachine(&vmName, imageInstall)
+			err = global.Client.ReimageVirtualMachine(vmName, imageInstall)
 			if err != nil && !isatty.IsTerminal(os.Stdout.Fd()) {
 				fmt.Fprintf(os.Stdout, imageInstall.RootPassword)
 			}
@@ -86,7 +86,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 	})
 }
 
-func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulted bool, err error) {
+func prepareImageInstall(c *Context) (imageInstall brain.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
 	firstbootScriptFile := c.FileContents("firstboot-script-file")
@@ -126,7 +126,7 @@ func prepareImageInstall(c *Context) (imageInstall *brain.ImageInstall, defaulte
 		rootPassword = util.GeneratePassword()
 	}
 
-	return &brain.ImageInstall{
+	return brain.ImageInstall{
 		Distribution:    image,
 		FirstbootScript: firstbootScript,
 		PublicKeys:      pubkeys,

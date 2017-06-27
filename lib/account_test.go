@@ -17,14 +17,14 @@ func TestFormatAccount(t *testing.T) {
 	acc := Account{
 		BillingID: 2402,
 		Name:      "test-account",
-		Owner: &billing.Person{
+		Owner: billing.Person{
 			Username: "test-user",
 		},
-		TechnicalContact: &billing.Person{
+		TechnicalContact: billing.Person{
 			Username: "test-user",
 		},
-		Groups: []*brain.Group{
-			&gp,
+		Groups: []brain.Group{
+			gp,
 		},
 	}
 

@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -148,9 +149,26 @@ type ServersFactory interface {
 	MakeServers(t *testing.T) (s Servers)
 }
 
+type TestLogWriter struct {
+	t *testing.T
+}
+
+func (tlw TestLogWriter) Write(p []byte) (n int, err error) {
+	tlw.t.Log(string(p))
+	return len(p), nil
+}
+
+func overrideLogWriters(t *testing.T) {
+	log.Writer = TestLogWriter{t}
+	log.ErrWriter = TestLogWriter{t}
+}
+
 // mkTestClientAndServers constructs httptest Servers for a pretend auth and API endpoint, then constructs a Client that uses those servers.
 // Used to test that the right URLs are being requested and such.
+// because this is used in nearly all of the tests in lib, this also does some weird magic to set up a writer for log such that all the test output comes out attached to the test it's from
 func mkTestClientAndServers(t *testing.T, factory ServersFactory) (c Client, s Servers, err error) {
+	log.Writer = TestLogWriter{t}
+	log.ErrWriter = TestLogWriter{t}
 	s = factory.MakeServers(t)
 	c, err = s.Client()
 	return

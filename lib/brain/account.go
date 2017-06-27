@@ -5,7 +5,7 @@ type Account struct {
 	Name string `json:"name"`
 
 	// the following cannot be set
-	ID        int      `json:"id"`
-	Suspended bool     `json:"suspended"`
-	Groups    []*Group `json:"groups"`
+	ID        int     `json:"id"`
+	Suspended bool    `json:"suspended"`
+	Groups    []Group `json:"groups"`
 }

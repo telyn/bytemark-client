@@ -13,8 +13,8 @@ type Tail struct {
 	UUID  string `json:"uuid"`
 	Label string `json:"label"`
 
-	CCAddress *net.IP `json:"cnc_address"`
-	ZoneName  string  `json:"zone"`
+	CCAddress net.IP `json:"cnc_address"`
+	ZoneName  string `json:"zone"`
 
 	IsOnline     bool     `json:"online"`
 	StoragePools []string `json:"pools"`

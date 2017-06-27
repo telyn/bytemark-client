@@ -33,7 +33,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 					return
 				}
 
-				err = global.Client.UndeleteVirtualMachine(&vmName)
+				err = global.Client.UndeleteVirtualMachine(vmName)
 
 				if err != nil {
 					return

@@ -38,7 +38,7 @@ func init() {
 					}
 					vmName := c.VirtualMachineName("server")
 
-					return global.Client.SetDiscIopsLimit(&vmName, c.String("disc"), iopsLimit)
+					return global.Client.SetDiscIopsLimit(vmName, c.String("disc"), iopsLimit)
 				}),
 			},
 		},
@@ -73,7 +73,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 				},
 				Action: With(OptionalArgs("server", "cd-url"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
 					vmName := c.VirtualMachineName("server")
-					err := global.Client.SetVirtualMachineCDROM(&vmName, c.String("cd-url"))
+					err := global.Client.SetVirtualMachineCDROM(vmName, c.String("cd-url"))
 					if _, ok := err.(lib.InternalServerError); ok {
 						return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
 					}
@@ -107,7 +107,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 							return util.UserRequestedExit{}
 						}
 					}
-					return global.Client.SetVirtualMachineCores(&vmName, cores)
+					return global.Client.SetVirtualMachineCores(vmName, cores)
 				}),
 			}, {
 				Name:        "hwprofile",
@@ -144,11 +144,11 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					}
 					vmName := c.VirtualMachineName("server")
 					if c.Bool("lock") {
-						return global.Client.SetVirtualMachineHardwareProfile(&vmName, profile, true)
+						return global.Client.SetVirtualMachineHardwareProfile(vmName, profile, true)
 					} else if c.Bool("unlock") {
-						return global.Client.SetVirtualMachineHardwareProfile(&vmName, profile, false)
+						return global.Client.SetVirtualMachineHardwareProfile(vmName, profile, false)
 					} else {
-						return global.Client.SetVirtualMachineHardwareProfile(&vmName, profile)
+						return global.Client.SetVirtualMachineHardwareProfile(vmName, profile)
 					}
 				}),
 			}, {
@@ -179,7 +179,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					}
 
 					vmName := c.VirtualMachineName("server")
-					return global.Client.SetVirtualMachineMemory(&vmName, memory)
+					return global.Client.SetVirtualMachineMemory(vmName, memory)
 				}),
 			}},
 	})

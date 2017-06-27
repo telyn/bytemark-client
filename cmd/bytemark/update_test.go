@@ -11,7 +11,7 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	speed := int64(8500000000000)
@@ -31,7 +31,7 @@ func TestUpdateVMMigrationError(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	err := global.App.Run([]string{"bytemark", "update", "vm", "migration", "vm124.group.account"})
 

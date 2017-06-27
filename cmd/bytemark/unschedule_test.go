@@ -10,7 +10,7 @@ func TestUnscheduleBackups(t *testing.T) {
 	config, client := baseTestSetup(t, false)
 	config.When("Get", "token").Return("test-token")
 	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	tests := []struct {
 		Args []string

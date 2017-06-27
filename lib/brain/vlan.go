@@ -8,10 +8,10 @@ import (
 
 // VLAN is a representation of a VLAN, as used by admin endpoints
 type VLAN struct {
-	ID        int        `json:"id"`
-	Num       int        `json:"num"`
-	UsageType string     `json:"usage_type"`
-	IPRanges  []*IPRange `json:"ip_ranges"`
+	ID        int       `json:"id"`
+	Num       int       `json:"num"`
+	UsageType string    `json:"usage_type"`
+	IPRanges  []IPRange `json:"ip_ranges"`
 }
 
 // PrettyPrint writes an overview of this VLAN out to the given writer.

@@ -72,7 +72,7 @@ If you have previously used the client, you'll have a login and will need to add
 			// TODO(telyn): this whoole section should be moved into a function in util/form.go - CreateAPIObjectsFromSignupForm(*Form) (Account, CreditCard) or something.
 			account := lib.Account{}
 
-			account.Owner = &billing.Person{
+			account.Owner = billing.Person{
 				Username:             fields[util.FormFieldOwnerName].Value(),
 				Password:             fields[util.FormFieldOwnerPassword].Value(),
 				Email:                fields[util.FormFieldOwnerEmail].Value(),
@@ -102,13 +102,13 @@ If you have previously used the client, you'll have a login and will need to add
 					return err
 				}
 
-				cardRef, err = global.Client.CreateCreditCardWithToken(&card, token)
+				cardRef, err = global.Client.CreateCreditCardWithToken(card, token)
 				if err != nil {
 					return err
 				}
 			}
 			account.CardReference = cardRef
-			createdAccount, err := global.Client.RegisterNewAccount(&account)
+			createdAccount, err := global.Client.RegisterNewAccount(account)
 
 			if _, ok := err.(lib.AccountCreationDeferredError); ok {
 				log.Log(err.Error())

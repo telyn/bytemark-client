@@ -13,30 +13,30 @@ import (
 
 func getFixtureVMWithManyIPs() (vm brain.VirtualMachine, v4 []string, v6 []string) {
 	vm = getFixtureVM()
-	vm.NetworkInterfaces = make([]*brain.NetworkInterface, 1)
-	vm.NetworkInterfaces[0] = &brain.NetworkInterface{
+	vm.NetworkInterfaces = make([]brain.NetworkInterface, 1)
+	vm.NetworkInterfaces[0] = brain.NetworkInterface{
 		Label: "test-nic",
 		Mac:   "FF:FE:FF:FF:FF",
-		IPs: []*net.IP{
-			&net.IP{192, 168, 1, 16},
-			&net.IP{192, 168, 1, 22},
-			&net.IP{0xfe, 0x80, 0x00, 0x00,
+		IPs: []net.IP{
+			net.IP{192, 168, 1, 16},
+			net.IP{192, 168, 1, 22},
+			net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x10},
-			&net.IP{0xfe, 0x80, 0x00, 0x00,
+			net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x01, 0x00},
 		},
-		ExtraIPs: map[string]*net.IP{
-			"192.168.2.1":  &net.IP{192, 168, 1, 16},
-			"192.168.5.34": &net.IP{192, 168, 1, 22},
-			"fe80::1:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+		ExtraIPs: map[string]net.IP{
+			"192.168.2.1":  net.IP{192, 168, 1, 16},
+			"192.168.5.34": net.IP{192, 168, 1, 22},
+			"fe80::1:1": net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x01, 0x00},
-			"fe80::2:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+			"fe80::2:1": net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x10},
@@ -63,16 +63,16 @@ func getFixtureVM() (vm brain.VirtualMachine) {
 		HardwareProfile:       "fake-hardwareprofile",
 		HardwareProfileLocked: false,
 		ZoneName:              "default",
-		Discs: []*brain.Disc{
-			&disc,
+		Discs: []brain.Disc{
+			disc,
 		},
 		ID:                1,
-		ManagementAddress: &ip,
+		ManagementAddress: ip,
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
-		NetworkInterfaces: []*brain.NetworkInterface{
-			&nic,
+		NetworkInterfaces: []brain.NetworkInterface{
+			nic,
 		},
 	}
 }
@@ -124,7 +124,7 @@ func TestMoveVirtualMachine(t *testing.T) {
 	newName := oldName
 	newName.VirtualMachine = "new-name"
 
-	err = client.MoveVirtualMachine(&oldName, &newName)
+	err = client.MoveVirtualMachine(oldName, newName)
 	if err != nil {
 		t.Log(err.Error())
 	}
@@ -179,7 +179,7 @@ func TestMoveServerGroup(t *testing.T) {
 	newName.VirtualMachine = "new-name"
 	newName.Group = "new-group"
 
-	err = client.MoveVirtualMachine(&oldName, &newName)
+	err = client.MoveVirtualMachine(oldName, newName)
 	if err != nil {
 		t.Log(err.Error())
 	}
@@ -215,27 +215,23 @@ func TestGetVirtualMachine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	vm, err := client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
-	is.Nil(vm)
+	vm, err := client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
 	is.NotNil(err)
 	if _, ok := err.(BadNameError); !ok {
 		t.Fatalf("Expected BadNameError, got %T", err)
 	}
 
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
 	is.NotNil(err)
 
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
-	is.NotNil(vm)
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
 	is.Nil(err)
 
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
-	is.NotNil(vm)
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
 	is.Nil(err)
 
 	// Check that being just numeric is valid as well
-	vm, err = client.GetVirtualMachine(&VirtualMachineName{VirtualMachine: "123"})
-	is.NotNil(vm)
+	vm, err = client.GetVirtualMachine(VirtualMachineName{VirtualMachine: "123"})
 	is.Nil(err)
 
 	is.Equal("127.0.0.1", vm.ManagementAddress.String())
@@ -253,13 +249,13 @@ func TestCreateVirtualMachine(t *testing.T) {
 	}{
 		{
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{
+				VirtualMachine: brain.VirtualMachine{
 					Name: "new-vm",
 				},
 				Discs: []brain.Disc{},
 			},
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{
+				VirtualMachine: brain.VirtualMachine{
 					Name: "new-vm",
 				},
 				Discs: nil,
@@ -268,7 +264,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 		},
 		{
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{},
+				VirtualMachine: brain.VirtualMachine{},
 				Discs: []brain.Disc{
 					{},
 					{
@@ -282,7 +278,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 				},
 			},
 			brain.VirtualMachineSpec{
-				VirtualMachine: &brain.VirtualMachine{},
+				VirtualMachine: brain.VirtualMachine{},
 				Discs: []brain.Disc{
 					{
 						StorageGrade: "sata",
@@ -355,7 +351,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 		}
 
 		group := GroupName{Group: "test-group", Account: "test-account"}
-		_, err = client.CreateVirtualMachine(&group, test.Input)
+		_, err = client.CreateVirtualMachine(group, test.Input)
 		if err != nil && !test.ExpectErr {
 			t.Fatal(err)
 		}
@@ -403,7 +399,7 @@ func TestSetVirtualMachineCDROM(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = client.SetVirtualMachineCDROM(&VirtualMachineName{
+	err = client.SetVirtualMachineCDROM(VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account",

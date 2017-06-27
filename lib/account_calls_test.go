@@ -53,18 +53,21 @@ func TestGetAccount(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	t.Log("Testing an invalid account!")
 	acc, err := client.GetAccount("invalid-account")
 	is.NotNil(err)
 
+	t.Log("Testing the default account!")
 	acc, err = client.GetAccount("")
 	is.Nil(err)
 	is.Equal("account", acc.Name)
 	is.Equal(1, acc.BrainID)
 
+	t.Log("Testing a named account!")
 	acc, err = client.GetAccount("account")
 	is.Nil(err)
-	if acc == nil {
-		t.Fatal("account is nil")
+	if !acc.IsValid() {
+		t.Fatal("account isn't valid")
 	}
 	is.Equal("account", acc.Name)
 
@@ -201,7 +204,7 @@ func TestDefaultAccountHasNoBigVSubscription(t *testing.T) {
 		billing: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/api/v1/accounts" {
 				_, err := w.Write([]byte(`[
-				{ },
+				{ "id":469 },
 				{ "bigv_account_subscription": "not-default-account" }
 				]`))
 				if err != nil {
@@ -293,14 +296,13 @@ func TestRegisterNewAccount(t *testing.T) {
 		Phone:     "735773577357",
 	}
 
-	newAcc, err := client.RegisterNewAccount(&Account{
-		Owner:         &person,
+	newAcc, err := client.RegisterNewAccount(Account{
+		Owner:         person,
 		CardReference: "testxq12e",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	is.NotNil(newAcc)
 	is.Equal("test-user", newAcc.Owner.Username)
 	is.Equal("", newAcc.Owner.Password)
 	is.Equal("Test", newAcc.Owner.FirstName)
