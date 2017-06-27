@@ -4,15 +4,11 @@ import (
 	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"testing"
 )
 
 func TestScheduleBackups(t *testing.T) {
-	config, client := baseTestSetup(t, false)
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetVirtualMachine").Return(&defVM)
-
 	type ScheduleTest struct {
 		Args []string
 
@@ -24,17 +20,20 @@ func TestScheduleBackups(t *testing.T) {
 		ShouldErr  bool
 		ShouldCall bool
 		CreateErr  error
+		BaseTestFn func(*testing.T, bool) (*mocks.Config, *mocks.Client)
 	}
 
 	tests := []ScheduleTest{
 		{
 			ShouldCall: false,
 			ShouldErr:  true,
+			BaseTestFn: baseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name"},
 			ShouldCall: false,
 			ShouldErr:  true,
+			BaseTestFn: baseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
@@ -44,6 +43,7 @@ func TestScheduleBackups(t *testing.T) {
 			Interval:   86400,
 			ShouldCall: true,
 			ShouldErr:  false,
+			BaseTestFn: baseTestAuthSetup,
 		},
 		{
 			ShouldCall: true,
@@ -52,6 +52,7 @@ func TestScheduleBackups(t *testing.T) {
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   3600,
+			BaseTestFn: baseTestAuthSetup,
 		},
 		{
 			Args:       []string{"--start", "thursday", "vm-name", "disc-label", "3235"},
@@ -62,6 +63,7 @@ func TestScheduleBackups(t *testing.T) {
 			ShouldCall: true,
 			ShouldErr:  true,
 			CreateErr:  fmt.Errorf("intermittent failure"),
+			BaseTestFn: baseTestAuthSetup,
 		},
 	}
 
@@ -75,7 +77,9 @@ func TestScheduleBackups(t *testing.T) {
 
 	for i, test = range tests {
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
-		client.When("AuthWithToken", "test-token").Return(nil)
+
+		config, client := test.BaseTestFn(t, false)
+		config.When("GetVirtualMachine").Return(&defVM)
 
 		retSched := brain.BackupSchedule{
 			StartDate: test.Start,

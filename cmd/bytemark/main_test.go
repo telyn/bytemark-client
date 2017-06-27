@@ -172,8 +172,8 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks.Client) {
 	config, c = baseTestSetup(t, admin)
 
-	config.When("Get", "token").Return("test-token")
 	config.When("Get", "account").Return("test-account")
+	config.When("GetIgnoreErr", "token").Return("test-token")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "2fa-otp").Return("")

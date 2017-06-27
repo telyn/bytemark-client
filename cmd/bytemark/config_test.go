@@ -97,7 +97,7 @@ func TestCommandConfigSet(t *testing.T) {
 		config.When("GetV", "endpoint").Return(util.ConfigVar{"endpoint", "", ""})
 		config.When("GetV", "group").Return(util.ConfigVar{"group", "", ""})
 		config.When("GetV", "debug-level").Return(util.ConfigVar{"debug-level", "", ""})
-		config.When("Get", "token").Return("test-token", nil)
+		config.When("GetIgnoreErr", "token").Return("test-token")
 		config.When("GetIgnoreErr", "user").Return("old-test-user")
 		config.When("GetIgnoreErr", "yubikey").Return("")
 		config.When("GetIgnoreErr", "2fa-otp").Return("")
