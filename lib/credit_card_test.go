@@ -112,6 +112,7 @@ func TestGetSPPTokenWithAccount(t *testing.T) {
 	cc := spp.CreditCard{Number: "4343"}
 	token, err := client.GetSPPToken(cc, billing.Person{
 		ID:        9020,
+		Username:  "melanie",
 		FirstName: "Melanie",
 		LastName:  "Ownersdottir",
 	})
