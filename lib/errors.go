@@ -61,13 +61,12 @@ func (e NotFoundError) Error() string {
 	return fmt.Sprintf("404 Not found\r\n%s", e.APIError.Error())
 }
 
-// NotAuthorizedError is returned when an action was unable to be performed because the caller doesn't have permission.
-// TODO(telyn): rename to ForbiddenError in 3.0
-type NotAuthorizedError struct {
+// ForbiddenError is returned when an action was unable to be performed because the user you're logged in as doesn't have permission.
+type ForbiddenError struct {
 	APIError
 }
 
-func (e NotAuthorizedError) Error() string {
+func (e ForbiddenError) Error() string {
 	return fmt.Sprintf("403 Forbidden\r\n%s", e.APIError.Error())
 
 }
