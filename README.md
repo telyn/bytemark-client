@@ -42,12 +42,18 @@ It's suggested that you avoid using struct embedding or interface composition wi
 Breaking API change
 ===================
 
-The following breaking API change to the 'lib' package occurred in version 3.0
+The following breaking API change to the `lib` package occurred in version 3.0
+
+* These functions have been removed from `lib`
+  * `FormatAccount` (replaced by brain.Account.PrettyPrint)
+  * `FormatVirtualMachine` (replaced by brain.VirtualMachine.PrettyPrint)
+  * `FormatVirtualMachineSpec` (replaced by brain.VirtualMachineSpec.PrettyPrint)
+  * `FormatImageInstall` (replaced by brain.ImageInstall.PrettyPrint)
 
 * These `lib.Client` methods have been deleted
-  * `ParseVirtualMachineName`
-  * `ParseGroupName`
-  * `ParseAccountName`
+  * `ParseVirtualMachineName` (replaced by lib.ParseVirtualMachineName)
+  * `ParseGroupName` (replaced by lib.ParseGroupName)
+  * `ParseAccountName`(replaced by lib.ParseAccountName)
 
 Most `lib.Client` methods now take `lib`/`brain`/`billing` structs as values, rather than as pointers. See the `lib/interface.go` for the full list of methods available and their new type signatures.
 
