@@ -49,6 +49,10 @@ Global options apply to any subsequent command.
     Use this option if you want enter the Yubikey one-time password on the
     command-line rather than be prompted for it.
 
+*--session-validity* 'num'::
+    Specifies the length of time, in seconds, that your login session will be
+    valid for without running another command.
+
 *--2fa-otp* 'string'::
     Use this option if you want enter the 2 Factor Authentication one-time
     password on the command-line rather than be prompted for it.

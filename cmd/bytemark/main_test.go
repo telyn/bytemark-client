@@ -101,6 +101,7 @@ func TestEnsureAuth(t *testing.T) {
 		credentials := auth3.Credentials{
 			"username": test.InputUsername,
 			"password": test.InputPassword,
+			"validity": "1800",
 		}
 
 		c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[0]).Times(1)
@@ -110,6 +111,7 @@ func TestEnsureAuth(t *testing.T) {
 			credentials := auth3.Credentials{
 				"username": test.InputUsername,
 				"password": test.InputPassword,
+				"validity": "1800",
 				"2fa":      test.Input2FA,
 			}
 			c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[1]).Times(1) // Returns nil means success

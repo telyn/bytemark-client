@@ -128,7 +128,24 @@ func outputDebugInfo() {
 	log.Debugf(log.LvlFlags, "invocation: %s\r\n\r\n", strings.Join(os.Args, " "))
 }
 
+func makeCredentials() (credents map[string]string, err error) {
+	err = PromptForCredentials()
+	if err != nil {
+		return
+	}
+	credents = map[string]string{
+		"username": global.Config.GetIgnoreErr("user"),
+		"password": global.Config.GetIgnoreErr("pass"),
+		"validity": global.Config.GetIgnoreErr("session-validity"),
+	}
+	if useKey, _ := global.Config.GetBool("yubikey"); useKey {
+		credents["yubikey"] = global.Config.GetIgnoreErr("yubikey-otp")
+	}
+	return
+}
+
 // EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.
+// TODO(telyn): This REALLY, REALLY needs breaking apart into more manageable chunks
 func EnsureAuth() error {
 	token, err := global.Config.Get("token")
 
@@ -145,18 +162,11 @@ func EnsureAuth() error {
 		for err != nil {
 			attempts--
 
-			err = PromptForCredentials()
+			credents, err := makeCredentials()
+
 			if err != nil {
 				return err
 			}
-			credents := map[string]string{
-				"username": global.Config.GetIgnoreErr("user"),
-				"password": global.Config.GetIgnoreErr("pass"),
-			}
-			if useKey, _ := global.Config.GetBool("yubikey"); useKey {
-				credents["yubikey"] = global.Config.GetIgnoreErr("yubikey-otp")
-			}
-
 			err = global.Client.AuthWithCredentials(credents)
 
 			// Handle the special case here where we just need to prompt for 2FA and try again
@@ -173,7 +183,7 @@ func EnsureAuth() error {
 
 			if err == nil {
 				// success!
-				// it doesn't _really_ matter if we can't write the token to the token place, right?
+				// TODO(telyn): warn on failure to write to token
 				_ = global.Config.SetPersistent("token", global.Client.GetSessionToken(), "AUTH")
 
 				// Check this here, as it is only relevant the initial login,
@@ -373,6 +383,12 @@ func globalFlags() (flags []cli.Flag) {
 		cli.StringFlag{
 			Name:  "yubikey-otp",
 			Usage: "one-time password from your yubikey to use to login",
+		},
+		cli.IntFlag{
+			Name:  "session-validity",
+			Usage: "seconds until your session is automatically invalidated (max 3600)",
+			Value: util.DefaultSessionValidity,
+			// TODO(telyn): add more defaults to these flags
 		},
 	}
 }
