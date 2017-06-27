@@ -50,6 +50,12 @@ The following breaking API change to the `lib` package occurred in version 3.0
   * `FormatVirtualMachineSpec` (replaced by brain.VirtualMachineSpec.PrettyPrint)
   * `FormatImageInstall` (replaced by brain.ImageInstall.PrettyPrint)
 
+* These functions have been removed from `lib`
+  * `NewWithAuth` has been removed - use `lib.NewWithURLs`. It is no longer possible to pass an auth3.Client directly, but this shouldn't be an issue.
+
+* These functions have been altered:
+  * `lib.NewSimple` has been renamed to `lib.New` - the old implementation of `lib.New` has been removed.
+
 * These `lib.Client` methods have been deleted
   * `ParseVirtualMachineName` (replaced by lib.ParseVirtualMachineName)
   * `ParseGroupName` (replaced by lib.ParseGroupName)
