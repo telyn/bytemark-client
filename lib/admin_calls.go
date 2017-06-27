@@ -27,7 +27,7 @@ type UpdateStoragePool struct {
 	Label           *string
 }
 
-func (c bytemarkClient) GetVLANs() (vlans []brain.VLAN, err error) {
+func (c *bytemarkClient) GetVLANs() (vlans []brain.VLAN, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/vlans")
 	if err != nil {
 		return
