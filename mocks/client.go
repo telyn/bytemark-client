@@ -493,3 +493,9 @@ func (c *Client) UpdateStoragePool(idOrLabel string, options lib.UpdateStoragePo
 	r := c.Called(idOrLabel, options)
 	return r.Error(0)
 }
+
+func (c *Client) GetMigratingDiscs() ([]brain.Disc, error) {
+	r := c.Called()
+	discs := r.Get(0).([]brain.Disc)
+	return discs, r.Error(1)
+}
