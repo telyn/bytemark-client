@@ -89,8 +89,8 @@ func TestGetSPPTokenWithAccount(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if tr.Owner.FirstName == "" {
-					t.Fatalf("TestGetSPPTokenWithAccount shouldn't have nil account. for real content: \r\n%s\r\n", string(body))
+				if !tr.Owner.IsValid() {
+					t.Fatalf("TestGetSPPTokenWithAccount shouldn't have an invalid owner. real content: \r\n%s\r\n", string(body))
 				}
 				is.Equal("Melanie", tr.Owner.FirstName)
 				is.Equal("Ownersdottir", tr.Owner.LastName)

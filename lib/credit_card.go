@@ -35,7 +35,7 @@ func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner billing.Person) (t
 		Owner:      owner,
 		CardEnding: cc.Number[len(cc.Number)-4:],
 	}
-	if owner.FirstName == "" {
+	if !owner.IsValid() {
 		r.authenticate = true
 	}
 
