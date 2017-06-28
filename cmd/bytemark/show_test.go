@@ -398,6 +398,22 @@ func TestAdminShowMigratingVMsCommand(t *testing.T) {
 	}
 }
 
+func TestAdminShowMigratingDiscsCommand(t *testing.T) {
+	// TODO(telyn): make table-driven
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	discs := []brain.Disc{{ID: 134, StorageGrade: "sata", Size: 25600}}
+	c.When("GetMigratingDiscs").Return(discs, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show migrating_discs", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
+
 func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)

@@ -230,6 +230,7 @@ type Client interface {
 	GetTail(idOrLabel string) (*brain.Tail, error)
 	GetStoragePools() ([]*brain.StoragePool, error)
 	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
+	GetMigratingDiscs() ([]brain.Disc, error)
 	GetMigratingVMs() ([]*brain.VirtualMachine, error)
 	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
 	GetRecentVMs() ([]*brain.VirtualMachine, error)
