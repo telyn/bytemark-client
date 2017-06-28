@@ -126,6 +126,22 @@ type Client interface {
 	RevokePrivilege(p brain.Privilege) error
 
 	//
+	// BACKUPS
+	//
+
+	CreateBackup(server VirtualMachineName, discLabelOrID string) (brain.Backup, error)
+	DeleteBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) error
+	GetBackups(server VirtualMachineName, discLabelOrID string) (brain.Backups, error)
+	RestoreBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
+
+	//
+	// BACKUP SCHEDULES
+	//
+
+	CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, intervalSeconds int) (brain.BackupSchedule, error)
+	DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) error
+
+	//
 	// USERS
 	//
 
@@ -214,6 +230,7 @@ type Client interface {
 	GetTail(idOrLabel string) (*brain.Tail, error)
 	GetStoragePools() ([]*brain.StoragePool, error)
 	GetStoragePool(idOrLabel string) (*brain.StoragePool, error)
+	GetMigratingDiscs() ([]brain.Disc, error)
 	GetMigratingVMs() ([]*brain.VirtualMachine, error)
 	GetStoppedEligibleVMs() ([]*brain.VirtualMachine, error)
 	GetRecentVMs() ([]*brain.VirtualMachine, error)

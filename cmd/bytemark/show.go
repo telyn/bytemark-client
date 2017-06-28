@@ -53,6 +53,27 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				})
 			}),
 		}, {
+			Name:        "disc",
+			Usage:       "outputs info about a disc",
+			UsageText:   "bytemark show disc [--json | --table] [--table-fields help | <fields>] <server> <disc label>",
+			Description: `This command displays information about a disc including any backups and backup schedules on the disc`,
+			Flags: append(OutputFlags("disc details", "object", DefaultDiscTableFields),
+				cli.GenericFlag{
+					Name:  "server",
+					Usage: "the server to display",
+					Value: new(VirtualMachineNameFlag),
+				},
+				cli.StringFlag{
+					Name:  "disc",
+					Usage: "The label or ID of the disc to show",
+				},
+			),
+			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), DiscProvider("server", "disc"), func(c *Context) error {
+				return c.OutputInDesiredForm(c.Disc, func() error {
+					return c.Disc.PrettyPrint(global.App.Writer, prettyprint.Full)
+				})
+			}),
+		}, {
 			Name:      "group",
 			Usage:     "outputs info about a group",
 			UsageText: "bytemark show group [--json] [name]",
@@ -406,6 +427,27 @@ Privileges will be output in no particular order.`,
 					}
 					return c.OutputInDesiredForm(storagePool, func() error {
 						return storagePool.PrettyPrint(global.App.Writer, prettyprint.Full)
+					}, "table")
+				}),
+			},
+			{
+				Name:      "migrating_discs",
+				Usage:     "shows a list of migrating discs",
+				UsageText: "bytemark --admin show migrating_discs [--json]",
+				Flags:     OutputFlags("migrating discs", "array", DefaultDiscTableFields),
+				Action: With(AuthProvider, func(c *Context) error {
+					discs, err := global.Client.GetMigratingDiscs()
+					if err != nil {
+						return err
+					}
+					return c.OutputInDesiredForm(discs, func() error {
+						for _, disc := range discs {
+							if err := disc.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+
+						return nil
 					}, "table")
 				}),
 			},

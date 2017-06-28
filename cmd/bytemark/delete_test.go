@@ -93,12 +93,10 @@ func TestDeleteKey(t *testing.T) {
 	if ok, vErr := c.Verify(); !ok {
 		t.Fatal(vErr)
 	}
-	c.Reset()
-	config.Reset()
-	config.When("Get", "token").Return("test-token")
+
+	config, c = baseTestAuthSetup(t, false)
+
 	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa-otp").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil)
@@ -113,6 +111,29 @@ func TestDeleteKey(t *testing.T) {
 		t.Fatal(err)
 	}
 	c.Reset()
+}
+
+func TestDeleteBackup(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestAuthSetup(t, false)
+
+	vmname := lib.VirtualMachineName{
+		VirtualMachine: "test-server",
+		Group:          "default",
+		Account:        "default-account",
+	}
+
+	config.When("GetVirtualMachine").Return(&defVM)
+
+	c.When("DeleteBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
+
+	err := global.App.Run([]string{
+		"bytemark", "delete", "backup", "test-server", "test-disc", "test-backup",
+	})
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
 }
 
 func TestDeleteVLAN(t *testing.T) {

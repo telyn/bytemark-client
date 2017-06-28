@@ -1,3 +1,15 @@
+bytemark-client (2.4) UNRELEASED; urgency=low
+
+  New features:
+    * Support for backups via the `create backup`, `delete backup`, `schedule
+      backups`, `unschedule backups`, `show disc` and `list backups` commands.
+    * Support for longer session validities than the old default of 5 minutes.
+      Use the --session-validity global flag & config variable to set your
+      session validity. Otherwise, it will default to the new default of 30
+      minutes.
+
+ -- telyn <telyn@bytemark.co.uk>  Fri, 27 Jun 2017 16:56:28 +0100
+
 bytemark-client (2.3) UNRELEASED; urgency=low
 
   New features:

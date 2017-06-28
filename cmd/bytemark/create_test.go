@@ -268,6 +268,28 @@ func TestCreateServer(t *testing.T) {
 	}
 }
 
+func TestCreateBackup(t *testing.T) {
+	is := is.New(t)
+	config, c := baseTestAuthSetup(t, false)
+
+	config.When("GetVirtualMachine").Return(&defVM)
+
+	vmname := lib.VirtualMachineName{
+		VirtualMachine: "test-server",
+		Group:          "default",
+		Account:        "default-account",
+	}
+
+	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)
+
+	err := global.App.Run([]string{
+		"bytemark", "create", "backup", "test-server", "test-disc",
+	})
+	is.Nil(err)
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}
 func TestCreateVLANGroup(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
