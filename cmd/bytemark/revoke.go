@@ -56,7 +56,7 @@ func init() {
 				return fmt.Errorf("Couldn't find such a privilege to revoke")
 			}
 
-			err = global.Client.RevokePrivilege(*privs[i])
+			err = global.Client.RevokePrivilege(privs[i])
 			if err == nil {
 				log.Outputf("Revoked %s\r\n", c.PrivilegeFlag("privilege").String())
 

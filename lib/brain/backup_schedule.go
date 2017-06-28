@@ -32,7 +32,7 @@ func (sched BackupSchedule) String() string {
 }
 
 // BackupSchedules represents multiple backup schedules
-type BackupSchedules []*BackupSchedule
+type BackupSchedules []BackupSchedule
 
 // MapTemplateFragment takes a template fragment (as if it was starting within a {{ }}) and executes it against every schedule in scheds, returning all the results as a slice of strings, or an error if one occurred.
 // it is called by the 'map' template function, as used in BackupSchedules.PrettyPrint

@@ -16,9 +16,9 @@ func TestLockHWProfileCommand(t *testing.T) {
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("SetVirtualMachineHardwareProfileLock", &vmname, true).Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark lock hwprofile test-server.test-group.test-account", " "))
 	is.Nil(err)
@@ -37,9 +37,9 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("SetVirtualMachineHardwareProfileLock", &vmname, false).Return(nil).Times(1)
+	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark unlock hwprofile test-server.test-group.test-account", " "))
 	is.Nil(err)

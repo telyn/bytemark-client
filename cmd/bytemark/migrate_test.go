@@ -57,7 +57,7 @@ func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	c.When("MigrateVirtualMachine", vmName, "stg-h1").Return(nil).Times(1)
@@ -75,7 +75,7 @@ func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm122", Group: "group", Account: "account"}
 	c.When("MigrateVirtualMachine", vmName, "").Return(nil).Times(1)
@@ -93,7 +93,7 @@ func TestMigrateVirtualMachineError(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	migrateErr := fmt.Errorf("Error migrating")
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}

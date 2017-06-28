@@ -52,7 +52,7 @@ func TestUnscheduleBackups(t *testing.T) {
 
 	for i, test := range tests {
 		config, client := test.BaseTestFn(t, false)
-		config.When("GetVirtualMachine").Return(&defVM)
+		config.When("GetVirtualMachine").Return(defVM)
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 
 		if test.ShouldCall {

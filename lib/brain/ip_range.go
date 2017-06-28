@@ -15,7 +15,7 @@ type IPRange struct {
 	Spec      string   `json:"spec"`
 	VLANNum   int      `json:"vlan_num"`
 	Zones     []string `json:"zones"`
-	Available *big.Int `json:"available"`
+	Available *big.Int `json:"available"` // wants to be a pointer because MarshalText is defined on the pointer type and we need it for the tests (but not for non-tests)
 }
 
 // String serialises an IP range to easily be output

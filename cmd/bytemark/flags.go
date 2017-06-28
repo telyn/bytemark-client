@@ -28,7 +28,7 @@ type GroupNameFlag lib.GroupName
 // Set runs lib.ParseGroupName to make sure we have a valid group name
 func (name *GroupNameFlag) Set(value string) error {
 	gp := lib.ParseGroupName(value, global.Config.GetGroup())
-	*name = GroupNameFlag(*gp)
+	*name = GroupNameFlag(gp)
 	return nil
 }
 
@@ -46,7 +46,7 @@ func (name *VirtualMachineNameFlag) Set(value string) error {
 	if err != nil {
 		return err
 	}
-	*name = VirtualMachineNameFlag(*vm)
+	*name = VirtualMachineNameFlag(vm)
 	return nil
 }
 
@@ -147,11 +147,15 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 				return
 			}
 		}
+		var vmName lib.VirtualMachineName
+		var groupName lib.GroupName
 		switch pf.TargetType() {
 		case brain.PrivilegeTargetTypeVM:
-			pf.VirtualMachineName, err = lib.ParseVirtualMachineName(target, global.Config.GetVirtualMachine())
+			vmName, err = lib.ParseVirtualMachineName(target, global.Config.GetVirtualMachine())
+			pf.VirtualMachineName = &vmName
 		case brain.PrivilegeTargetTypeGroup:
-			pf.GroupName = lib.ParseGroupName(target, global.Config.GetGroup())
+			groupName = lib.ParseGroupName(target, global.Config.GetGroup())
+			pf.GroupName = &groupName
 		case brain.PrivilegeTargetTypeAccount:
 			pf.AccountName = lib.ParseAccountName(target, global.Config.GetIgnoreErr("account"))
 		}

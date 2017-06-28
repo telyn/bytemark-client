@@ -211,7 +211,7 @@ func (r *Request) handleResponse(req *http.Request, requestBody []byte, res *htt
 	case 401:
 		err = UnauthorizedError{baseErr}
 	case 403:
-		err = NotAuthorizedError{baseErr}
+		err = ForbiddenError{baseErr}
 	case 404:
 		err = NotFoundError{baseErr}
 	case 500:

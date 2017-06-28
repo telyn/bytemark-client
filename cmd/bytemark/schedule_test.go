@@ -79,7 +79,7 @@ func TestScheduleBackups(t *testing.T) {
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 
 		config, client := test.BaseTestFn(t, false)
-		config.When("GetVirtualMachine").Return(&defVM)
+		config.When("GetVirtualMachine").Return(defVM)
 
 		retSched := brain.BackupSchedule{
 			StartDate: test.Start,

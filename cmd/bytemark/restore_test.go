@@ -18,7 +18,7 @@ func TestRestoreBackup(t *testing.T) {
 		Account:        "default-account",
 	}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	c.When("RestoreBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
 

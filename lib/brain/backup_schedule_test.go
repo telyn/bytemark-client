@@ -38,22 +38,22 @@ func TestBackupSchedulePrettyPrint(t *testing.T) {
 
 func TestBackupSchedulesPrettyPrint(t *testing.T) {
 	schedules := brain.BackupSchedules{
-		&brain.BackupSchedule{
+		brain.BackupSchedule{
 			ID:        24,
 			StartDate: "2017-03-03 5:00:00",
 			Interval:  35,
 		},
-		&brain.BackupSchedule{
+		brain.BackupSchedule{
 			ID:        4902,
 			StartDate: "2017-03-03 5:00:00",
 			Interval:  999,
 		},
-		&brain.BackupSchedule{
+		brain.BackupSchedule{
 			ID:        655,
 			StartDate: "2017-03-03 5:00:00",
 			Interval:  3306,
 		},
-		&brain.BackupSchedule{
+		brain.BackupSchedule{
 			ID:        234,
 			StartDate: "2017-01-11 10:00:00",
 			Interval:  86400,

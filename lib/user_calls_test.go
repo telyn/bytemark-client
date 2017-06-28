@@ -54,7 +54,6 @@ func TestGetUser(t *testing.T) {
 	}
 
 	user, err := client.GetUser("nonexistent-user")
-	is.Nil(user)
 	is.NotNil(err)
 
 	if _, ok := err.(NotFoundError); !ok {
@@ -63,7 +62,6 @@ func TestGetUser(t *testing.T) {
 
 	user, err = client.GetUser("test-user")
 	is.Nil(err)
-	is.NotNil(user)
 
 	is.Equal("test-user", user.Username)
 	is.Equal("test@user.com", user.Email)

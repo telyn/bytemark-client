@@ -90,7 +90,7 @@ func TestCreateDisc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = client.CreateDisc(&VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, getFixtureDisc())
+	err = client.CreateDisc(VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, getFixtureDisc())
 
 	is.Nil(err)
 
@@ -123,7 +123,7 @@ func TestDeleteDisc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = client.DeleteDisc(&VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666")
+	err = client.DeleteDisc(VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666")
 	is.Nil(err)
 
 }
@@ -163,7 +163,7 @@ func TestResizeDisc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = client.ResizeDisc(&VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666", 35)
+	err = client.ResizeDisc(VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666", 35)
 	is.Nil(err)
 
 }
@@ -198,7 +198,7 @@ func TestShowDisc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	disc, err := client.GetDisc(&VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666")
+	disc, err := client.GetDisc(VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666")
 	if err != nil {
 		t.Fatal(err)
 	}

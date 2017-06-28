@@ -1,6 +1,6 @@
 package lib
 
 const (
-        // Version is the version number the client believes it is
-	Version = "2.4"
+	// Version is the version number the client believes it is
+	Version = "3.0~beta1"
 )

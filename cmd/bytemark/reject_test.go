@@ -11,7 +11,7 @@ func TestRejectVM(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	c.When("RejectVM", vmName, "reason text").Return(nil).Times(1)
@@ -29,7 +29,7 @@ func TestRejectVMError(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	rejectErr := fmt.Errorf("Error rejecting")
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}

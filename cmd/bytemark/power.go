@@ -21,7 +21,7 @@ func init() {
 		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to reset %v...\r\n", vmName)
-			err = global.Client.ResetVirtualMachine(&vmName)
+			err = global.Client.ResetVirtualMachine(vmName)
 			if err != nil {
 				return err
 			}
@@ -44,7 +44,7 @@ func init() {
 		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to restart %v...\r\n", vmName)
-			err = global.Client.RestartVirtualMachine(&vmName)
+			err = global.Client.RestartVirtualMachine(vmName)
 			if err != nil {
 				return
 			}
@@ -67,7 +67,7 @@ func init() {
 		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to shutdown %v...\r\n", vmName)
-			err = global.Client.ShutdownVirtualMachine(&vmName, true)
+			err = global.Client.ShutdownVirtualMachine(vmName, true)
 			if err != nil {
 				return
 			}
@@ -90,7 +90,7 @@ func init() {
 		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to start %s...\r\n", vmName)
-			err = global.Client.StartVirtualMachine(&vmName)
+			err = global.Client.StartVirtualMachine(vmName)
 			if err != nil {
 				return
 			}
@@ -113,7 +113,7 @@ func init() {
 		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to stop %s...\r\n", vmName)
-			err = global.Client.StopVirtualMachine(&vmName)
+			err = global.Client.StopVirtualMachine(vmName)
 			if err != nil {
 				return
 			}

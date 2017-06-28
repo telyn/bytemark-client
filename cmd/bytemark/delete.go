@@ -70,7 +70,7 @@ func init() {
 					return util.UserRequestedExit{}
 				}
 				vmName := c.VirtualMachineName("server")
-				return global.Client.DeleteDisc(&vmName, c.String("disc"))
+				return global.Client.DeleteDisc(vmName, c.String("disc"))
 			}),
 		}, {
 			Name:      "group",
@@ -187,7 +187,7 @@ func deleteServer(c *Context) (err error) {
 	}
 
 	vmName := c.VirtualMachineName("server")
-	err = global.Client.DeleteVirtualMachine(&vmName, purge)
+	err = global.Client.DeleteVirtualMachine(vmName, purge)
 	if err != nil {
 		return
 	}
@@ -234,7 +234,7 @@ func deleteGroup(c *Context) (err error) {
 		err = &util.WontDeleteNonEmptyGroupError{Group: &groupName}
 		return
 	}
-	err = global.Client.DeleteGroup(&groupName)
+	err = global.Client.DeleteGroup(groupName)
 	if err == nil {
 		log.Logf("Group %s deleted successfully.\r\n", groupName.String())
 	}
@@ -246,7 +246,7 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 	for _, vm := range group.VirtualMachines {
 		vmn.VirtualMachine = vm.Name
-		err := global.Client.DeleteVirtualMachine(&vmn, true)
+		err := global.Client.DeleteVirtualMachine(vmn, true)
 		if err != nil {
 			return err
 		}

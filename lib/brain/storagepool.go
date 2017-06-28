@@ -22,7 +22,7 @@ type StoragePool struct {
 
 	// These were defined, but aren't returned by the API
 	// ID        int
-	// Tail      *Tail
+	// Tail      Tail
 	// IOPSLimit int
 }
 

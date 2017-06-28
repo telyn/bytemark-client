@@ -11,7 +11,7 @@ func TestApproveVM(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	c.When("ApproveVM", vmName, false).Return(nil).Times(1)
@@ -29,7 +29,7 @@ func TestApproveVMAndPowerOn(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm122", Group: "group", Account: "account"}
 	c.When("ApproveVM", vmName, true).Return(nil).Times(1)
@@ -47,7 +47,7 @@ func TestApproveVMError(t *testing.T) {
 	is := is.New(t)
 	config, c := baseTestAuthSetup(t, true)
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 
 	approveErr := fmt.Errorf("Error approving")
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}

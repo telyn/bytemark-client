@@ -205,7 +205,7 @@ func getFixtureVLAN() brain.VLAN {
 		ID:        1,
 		Num:       1,
 		UsageType: "",
-		IPRanges:  make([]*brain.IPRange, 0),
+		IPRanges:  make([]brain.IPRange, 0),
 	}
 }
 
@@ -241,9 +241,8 @@ func getFixtureStoragePool() brain.StoragePool {
 }
 
 func getFixtureGroup() brain.Group {
-	vms := make([]*brain.VirtualMachine, 1)
-	vm := getFixtureVM()
-	vms[0] = &vm
+	vms := make([]brain.VirtualMachine, 1)
+	vms[0] = getFixtureVM()
 
 	return brain.Group{
 		Name:            "test-group",

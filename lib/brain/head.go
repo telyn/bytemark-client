@@ -17,7 +17,7 @@ type Head struct {
 	// descriptive information that can be modified
 
 	Architecture  string   `json:"arch"`
-	CCAddress     *net.IP  `json:"cnc_address"`
+	CCAddress     net.IP   `json:"cnc_address"`
 	Note          string   `json:"note"`
 	Memory        int      `json:"memory,omitempty"`
 	UsageStrategy string   `json:"usage_strategy,omitempty"`

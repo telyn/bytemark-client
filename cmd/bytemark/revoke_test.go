@@ -40,14 +40,14 @@ func TestRevokePrivilege(t *testing.T) {
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 
-				config.When("GetVirtualMachine").Return(&defVM)
+				config.When("GetVirtualMachine").Return(defVM)
 				vm := lib.VirtualMachineName{
 					VirtualMachine: "test-vm",
 					Group:          "test-group",
 					Account:        "test-account",
 				}
 
-				c.When("GetVirtualMachine", &vm).Return(&brain.VirtualMachine{ID: 333}, nil).Times(1)
+				c.When("GetVirtualMachine", vm).Return(brain.VirtualMachine{ID: 333}, nil).Times(1)
 				c.When("GetPrivilegesForVirtualMachine", vm).Return(brain.Privileges{
 					{
 						ID:               2342,
@@ -75,13 +75,13 @@ func TestRevokePrivilege(t *testing.T) {
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 
-				config.When("GetGroup").Return(&defGroup)
+				config.When("GetGroup").Return(defGroup)
 				group := lib.GroupName{
 					Group:   "test-group",
 					Account: "test-account",
 				}
 
-				c.When("GetGroup", &group).Return(&brain.Group{ID: 953}, nil).Times(1)
+				c.When("GetGroup", group).Return(brain.Group{ID: 953}, nil).Times(1)
 				c.When("GetPrivilegesForGroup", group).Return(brain.Privileges{
 					{
 						ID:       4354,
@@ -112,7 +112,7 @@ func TestRevokePrivilege(t *testing.T) {
 				config.When("GetIgnoreErr", "account").Return("default-account")
 				acc := "default-account"
 
-				c.When("GetAccount", acc).Return(&lib.Account{BrainID: 223435}, nil).Times(1)
+				c.When("GetAccount", acc).Return(lib.Account{BrainID: 223435}, nil).Times(1)
 				c.When("GetPrivilegesForAccount", acc).Return(brain.Privileges{
 					{
 						ID:        12412,

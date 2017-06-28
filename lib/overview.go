@@ -2,23 +2,25 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"io"
 	"text/template"
 )
 
 // FormatOverview outputs the given overview using the named template to the given writer.
-// defaultAccount does not need to be specified, will be removed in 3.0
 // TODO(telyn): make template choice not a string
 // TODO(telyn): use an actual Overview object?
-func FormatOverview(wr io.Writer, accounts []*Account, defaultAccount *Account, username string) error {
-	if defaultAccount == nil {
-		for _, a := range accounts {
-			if a.IsDefaultAccount {
-				defaultAccount = a
-				break
-			}
+func FormatOverview(wr io.Writer, accounts []Account, username string) error {
+	var defaultAccount Account
+	log.Debugf(log.LvlMisc, "I'm looking for the default account")
+	for _, a := range accounts {
+		if a.IsDefaultAccount {
+			log.Debugf(log.LvlMisc, "I found the default account! %#v isValid: %v", a, a.IsValid())
+			defaultAccount = a
+			break
 		}
 	}
+
 	const overviewTemplate = `{{ define "account_name" }}{{ if .BillingID }}{{ .BillingID }} - {{ end }}{{ if .Name }}{{ .Name }}{{ else }}[no bigv account]{{ end }}{{ end }}
 
 {{ define "whoami" }}You are '{{ .Username }}'{{ end }}
@@ -56,7 +58,7 @@ Accounts you can access:
 {{ template "owned_accounts" . -}}
 {{- template "extra_accounts" . }}
 
-{{ if .DefaultAccount -}}
+{{ if .DefaultAccount.IsValid -}}
 {{- prettysprint .DefaultAccount "_full" }}
 {{ else -}}
 It was not possible to determine your default account. Please set one using bytemark config set account.
@@ -67,22 +69,22 @@ It was not possible to determine your default account. Please set one using byte
 
 	tmpl, err := template.New("accounts").Funcs(prettyprint.Funcs).Funcs(map[string]interface{}{
 		"isDefaultAccount": func(a *Account) bool {
-			if a == nil || defaultAccount == nil {
-				return false
+			if a.IsValid() && defaultAccount.IsValid() {
+				if a.BillingID != 0 && a.BillingID == defaultAccount.BillingID {
+					return true
+				}
+				return a.Name != "" && a.Name == defaultAccount.Name
 			}
-			if a.BillingID != 0 && a.BillingID == defaultAccount.BillingID {
-				return true
-			}
-			return a.Name != "" && a.Name == defaultAccount.Name
+			return false
 		},
 	}).Parse(overviewTemplate)
 	if err != nil {
 		return err
 	}
-	var ownedAccounts []*Account
-	var otherAccounts []*Account
+	var ownedAccounts []Account
+	var otherAccounts []Account
 	for _, a := range accounts {
-		if a.Owner != nil && a.Owner.Username != "" && a.Owner.Username == username {
+		if a.Owner.IsValid() && a.Owner.Username == username {
 			ownedAccounts = append(ownedAccounts, a)
 		} else {
 			otherAccounts = append(otherAccounts, a)

@@ -24,7 +24,7 @@ func init() {
 			}
 
 			accName := global.Config.GetIgnoreErr("account")
-			var def *lib.Account
+			var def lib.Account
 			if accName != "" {
 				def, err = global.Client.GetAccount(accName)
 				if err != nil {
@@ -47,8 +47,8 @@ func init() {
 				}
 			}
 			overview := struct {
-				Accounts       []*lib.Account
-				DefaultAccount *lib.Account
+				Accounts       []lib.Account
+				DefaultAccount lib.Account
 				User           string
 			}{
 				Accounts:       allAccs,
@@ -57,7 +57,7 @@ func init() {
 			}
 
 			return c.OutputInDesiredForm(overview, func() error {
-				return lib.FormatOverview(os.Stdout, allAccs, def, global.Client.GetSessionUser())
+				return lib.FormatOverview(os.Stdout, allAccs, global.Client.GetSessionUser())
 			})
 
 		}),
