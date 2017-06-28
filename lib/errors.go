@@ -277,12 +277,12 @@ type AmbiguousKeyError struct {
 }
 
 func (e AmbiguousKeyError) Error() string {
-	return fmt.Sprint("The specified key was ambiguous - please specify the full key")
+	return "The specified key was ambiguous - please specify the full key"
 }
 
 // AccountCreationDeferredError is returned when we get a particular response from bmbilling.
 type AccountCreationDeferredError struct{}
 
 func (e AccountCreationDeferredError) Error() string {
-	return fmt.Sprintf("Account creation request accepted\r\n\r\nYour account requires a manual check, which shouldn't take long. We'll send an email when your account is ready.")
+	return "Account creation request accepted\r\n\r\nYour account requires a manual check, which shouldn't take long. We'll send an email when your account is ready."
 }
