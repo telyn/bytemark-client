@@ -62,7 +62,7 @@ func TestSetMemory(t *testing.T) {
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vm := getFixtureVM()
-	c.When("GetVirtualMachine", vmname).Return(&vm)
+	c.When("GetVirtualMachine", vmname).Return(vm)
 	c.When("SetVirtualMachineMemory", vmname, 4096).Return(nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark set memory --force test-server 4", " "))
@@ -72,15 +72,10 @@ func TestSetMemory(t *testing.T) {
 		t.Fatal(vErr)
 	}
 
-	config.Reset()
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa-otp").Return("")
+	config, c = baseTestAuthSetup(t, false)
 	config.When("GetVirtualMachine").Return(defVM)
 
-	c.Reset()
-	c.When("GetVirtualMachine", vmname).Return(&vm)
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
+	c.When("GetVirtualMachine", vmname).Return(vm)
 	c.When("SetVirtualMachineMemory", vmname, 16384).Return(nil).Times(1)
 
 	err = global.App.Run(strings.Split("bytemark set memory --force test-server 16384M", " "))

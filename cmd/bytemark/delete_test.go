@@ -93,12 +93,10 @@ func TestDeleteKey(t *testing.T) {
 	if ok, vErr := c.Verify(); !ok {
 		t.Fatal(vErr)
 	}
-	c.Reset()
-	config.Reset()
-	config.When("Get", "token").Return("test-token")
+
+	config, c = baseTestAuthSetup(t, false)
+
 	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa-otp").Return("")
 	config.When("GetIgnoreErr", "user").Return("test-user")
 
 	c.When("AuthWithToken", "test-token").Return(nil)
@@ -117,7 +115,7 @@ func TestDeleteKey(t *testing.T) {
 
 func TestDeleteBackup(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -125,11 +123,8 @@ func TestDeleteBackup(t *testing.T) {
 		Account:        "default-account",
 	}
 
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("DeleteBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
 
 	err := global.App.Run([]string{

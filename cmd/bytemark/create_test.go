@@ -267,11 +267,8 @@ func TestCreateServer(t *testing.T) {
 
 func TestCreateBackup(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestSetup(t, false)
+	config, c := baseTestAuthSetup(t, false)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("Get", "token").Return("test-token")
-	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vmname := lib.VirtualMachineName{
@@ -279,7 +276,6 @@ func TestCreateBackup(t *testing.T) {
 		Group:          "default",
 		Account:        "default-account",
 	}
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 
 	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)
 

@@ -501,6 +501,26 @@ func TestGetMigratingVMs(t *testing.T) {
 	})
 }
 
+func TestGetMigratingDiscs(t *testing.T) {
+	testDiscs := []brain.Disc{
+		{
+			ID:           123,
+			Label:        "bliblbalb",
+			StorageGrade: "sata",
+			Size:         23456,
+		},
+		{
+			ID:           1223,
+			Label:        "blibsdfa",
+			StorageGrade: "archive",
+			Size:         24321,
+		},
+	}
+	simpleGetTest(t, "/admin/migrating_discs", testDiscs, func(client Client) (interface{}, error) {
+		return client.GetMigratingDiscs()
+	})
+}
+
 func TestGetStoppedEligibleVMs(t *testing.T) {
 	testVMs := []brain.VirtualMachine{
 		{

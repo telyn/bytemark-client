@@ -431,6 +431,27 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
+				Name:      "migrating_discs",
+				Usage:     "shows a list of migrating discs",
+				UsageText: "bytemark --admin show migrating_discs [--json]",
+				Flags:     OutputFlags("migrating discs", "array", DefaultDiscTableFields),
+				Action: With(AuthProvider, func(c *Context) error {
+					discs, err := global.Client.GetMigratingDiscs()
+					if err != nil {
+						return err
+					}
+					return c.OutputInDesiredForm(discs, func() error {
+						for _, disc := range discs {
+							if err := disc.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
+								return err
+							}
+						}
+
+						return nil
+					}, "table")
+				}),
+			},
+			{
 				Name:      "migrating_vms",
 				Usage:     "shows a list of migrating servers",
 				UsageText: "bytemark --admin show migrating_vms [--json]",

@@ -14,6 +14,11 @@ import (
 	"strings"
 )
 
+// DefaultSessionValidity is the default for the --session-validity flag
+const DefaultSessionValidity = 1800
+
+// TODO(telyn): extract more config vars' defaults into consts
+
 var configVars = [...]string{
 	"endpoint",
 	"billing-endpoint",
@@ -24,6 +29,7 @@ var configVars = [...]string{
 	"account",
 	"group",
 	"output-format",
+	"session-validity",
 	"token",
 	"debug-level",
 	"yubikey",
@@ -82,6 +88,7 @@ type ConfigManager interface {
 	GetIgnoreErr(string) string
 	GetBool(string) (bool, error)
 	GetV(string) (ConfigVar, error)
+	GetSessionValidity() (int, error)
 	GetVirtualMachine() lib.VirtualMachineName
 	GetGroup() lib.GroupName
 	GetAll() ([]ConfigVar, error)
@@ -279,6 +286,28 @@ func (config *Config) Get(name string) (string, error) {
 	return v.Value, err
 }
 
+// GetSessionValidity returns the configured session validity or the default, if the configured one is not a valid int between 0 and infinity
+func (config *Config) GetSessionValidity() (validity int, err error) {
+	validity = DefaultSessionValidity
+	v, err := config.Get("session-validity")
+	if err != nil {
+		return
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil {
+		return
+	}
+	// if the configured session validity is a negative number, return default without error
+	// the brain will happily clamp the validity to whatever the maximum is if it's more than that, so we don't need to worry on that score
+	// TODO(telyn): print a warning to cmd/bytemark.global.App.Writer
+	if n < 0 {
+		return
+	}
+	validity = n
+	return
+
+}
+
 // GetIgnoreErr returns the value of a ConfigVar or an empty string , if it was unable to read it for whatever reason.
 func (config *Config) GetIgnoreErr(name string) string {
 	s, _ := config.Get(name)
@@ -414,6 +443,8 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		return ConfigVar{"force", "false", "CODE"}
 	case "output-format":
 		return ConfigVar{"output-format", "human", "CODE"}
+	case "session-validity":
+		return ConfigVar{"session-validity", fmt.Sprintf("%d", DefaultSessionValidity), "CODE"}
 	}
 	return ConfigVar{name, "", "UNSET"}
 }

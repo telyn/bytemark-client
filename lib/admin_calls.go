@@ -168,6 +168,16 @@ func (c *bytemarkClient) GetMigratingVMs() (vms []brain.VirtualMachine, err erro
 	return
 }
 
+func (c *bytemarkClient) GetMigratingDiscs() (discs []brain.Disc, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/migrating_discs")
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &discs)
+	return
+}
+
 func (c *bytemarkClient) GetStoppedEligibleVMs() (vms []brain.VirtualMachine, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/stopped_eligible_vms")
 	if err != nil {
