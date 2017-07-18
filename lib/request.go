@@ -28,7 +28,7 @@ func (e RequestAlreadyRunError) Error() string {
 }
 
 func (e InsecureConnectionError) Error() string {
-	return "A Request to an insecure endpoint was attempted when AllowInsecure had not been called."
+	return "A Request to an insecure endpoint was attempted when AllowInsecureRequests had not been called."
 }
 
 // Request is the workhorse of the bytemark-client/lib - it builds up a request, then Run can be called to get its results.
