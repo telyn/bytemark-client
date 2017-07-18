@@ -225,14 +225,14 @@ Multiple --disc flags can be used to create multiple discs`,
 
 	commands = append(commands, cli.Command{
 		Name:      "create",
-		Usage:     "creates servers, discs, etc - see `bytemark create <kind of thing> help`",
-		UsageText: "bytemark create disc|group|ip|server",
-		Description: `create a new disc, group, IP or server
+		Usage:     "creates servers, discs, etc - see `bytemark help create <kind of thing> `",
+		UsageText: "bytemark create server|group|disc|backup",
+		Description: `create a new group, server, disc or backup
 
 	create disc[s] [--disc <disc spec>]... <cloud server>
 	create group [--account <name>] <name>
-	create ip [--reason reason] <cloud server>
 	create server (see bytemark help create server)
+	create backup <cloud server> <disc label>
 
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
