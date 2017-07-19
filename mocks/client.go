@@ -172,6 +172,12 @@ func (c *Client) GetDisc(name lib.VirtualMachineName, discId string) (disc brain
 	return disc, r.Error(1)
 }
 
+func (c *Client) GetDiscByID(id int) (disc brain.Disc, err error) {
+	r := c.Called(id)
+	disc, _ = r.Get(0).(brain.Disc)
+	return disc, r.Error(1)
+}
+
 func (c *Client) CreateGroup(name lib.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
