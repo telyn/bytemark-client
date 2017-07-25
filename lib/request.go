@@ -205,18 +205,18 @@ func (r *Request) handleResponse(req *http.Request, requestBody []byte, res *htt
 	baseErr.ResponseBody = string(body)
 
 	switch res.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		// because we need to reference fields specific to BadRequestError later
 		err = newBadRequestError(baseErr, body)
-	case 401:
+	case http.StatusUnauthorized:
 		err = UnauthorizedError{baseErr}
-	case 403:
+	case http.StatusForbidden:
 		err = ForbiddenError{baseErr}
-	case 404:
+	case http.StatusNotFound:
 		err = NotFoundError{baseErr}
-	case 500:
+	case http.StatusInternalServerError:
 		err = InternalServerError{baseErr}
-	case 503:
+	case http.StatusServiceUnavailable:
 		err = ServiceUnavailableError{baseErr}
 	default:
 		if 200 <= res.StatusCode && res.StatusCode <= 299 {
