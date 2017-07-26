@@ -262,7 +262,8 @@ bytemark-client (0.7.0) UNRELEASED; urgency=low
   * Help command now shows subcommands (e.g. `bytemark help show` shows the
     help for show and indicates that `show server` and `show account`, etc.
     exist.
-  * xdg-utils no longer a dependency, is a suggested instead. (debian package only)
+  * xdg-utils no longer a dependency, is a suggested instead. (debian package
+    only)
   * Better help text for the `config` command
   * Add confirmation step to reimage command.
   * `show account` shows more (billing) details about the account
