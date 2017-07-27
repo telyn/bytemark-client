@@ -156,6 +156,8 @@ build-changelogs:
   image: perl:5
   script:
     - gen/convert-changelog rpm < doc/changelog > doc/changelog.rpm
+    - gen/convert-changelog md < doc/changelog > doc/changelog.md
+
   artifacts:
     paths:
       - doc/changelog.*

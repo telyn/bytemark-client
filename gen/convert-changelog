@@ -1,16 +1,25 @@
 #!/usr/bin/perl
+
 use strict;
 use warnings;
 use Data::Dumper;
+use Getopt::Long;
+use English;
+
+my $max_entries = -1;
+GetOptions(
+	"entries=i" => \$max_entries)
+or die("error in command line arguments\n");
 
 my $format = shift;
+
+my $DATE = $OSNAME eq 'linux' ? 'date' : 'gdate';
 
 my @changelog_entries;
 
 {
 	my %entry;
 	my $expecting_blank = 0;
-	print "reading input\n";
 	while(<>) {
 		if ( /^([a-z0-9-]+) \(([^)]+)\)/ ) {
 			$entry{'name'} = $1;
@@ -34,7 +43,7 @@ if ($format eq "rpm") {
 	foreach my $entry_ref (@changelog_entries) {
 		my %entry = %$entry_ref;
 		my $date = $entry{'date'};
-		$date = `LANG=en_US gdate --date="$date" +"%b %d %Y"`;
+		$date = `LANG=en_US $DATE --date="$date" +"%b %d %Y"`;
 		chomp $date;
 
 		my @lines = split /^/m, $entry{'message'};
@@ -56,9 +65,17 @@ if ($format eq "rpm") {
 		print "* $date $entry{'author'} $entry{'version'}\n";
 		print "$message\n\n";
 	}
-} elsif ($format eq "choco") {
+} elsif ($format eq "md") {
+	foreach my $entry_ref (@changelog_entries) {
+		my %entry = %$entry_ref;
+		my $date = $entry{'date'};
+		$date = `LANG=en_US $DATE --date="$date" +"%Y-%m-%d"`;
+		chomp $date;
 
-} elsif ($format eq "markdown") {
+		print "## $entry{'version'} ($date)\n";
+		print "$entry{'message'}\n\n";
+	}
+
 } else {
 	print Dumper(@changelog_entries);
 }

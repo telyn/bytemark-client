@@ -2,7 +2,6 @@ Name: bytemark-client
 Version: %{version}
 Release: %{release} 
 Summary: Command-line client for Bytemark Hosting's self-service hosting products.
-
 License: MIT
 URL: http://github.com/BytemarkHosting/bytemark-client
 Source0: bytemark
@@ -22,11 +21,6 @@ install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_mandir}/man1
 install -p -m 755 %{SOURCE0} %{buildroot}%{_bindir}
 install -p -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man1
-
-%check
-
-%clean
-rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
