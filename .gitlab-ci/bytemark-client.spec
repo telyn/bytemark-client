@@ -28,4 +28,3 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man1
 %{_mandir}/man1/bytemark.1*
 
 %changelog
-

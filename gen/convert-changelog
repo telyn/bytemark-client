@@ -21,6 +21,9 @@ my @changelog_entries;
 	my %entry;
 	my $expecting_blank = 0;
 	while(<>) {
+		if ( $max_entries == 0 ) {
+			last;
+		}
 		if ( /^([a-z0-9-]+) \(([^)]+)\)/ ) {
 			$entry{'name'} = $1;
 			$entry{'version'} = $2;
@@ -32,6 +35,9 @@ my @changelog_entries;
 			my %newentry = %entry;
 			push @changelog_entries, \%newentry;
 			%entry = ();
+			if ( $max_entries > 0 ) {
+				$max_entries--;
+			}
 		}
 		if ( /^  (.*)$/ ) {
 			$entry{'message'} .= "$1\n"
@@ -43,7 +49,7 @@ if ($format eq "rpm") {
 	foreach my $entry_ref (@changelog_entries) {
 		my %entry = %$entry_ref;
 		my $date = $entry{'date'};
-		$date = `LANG=en_US $DATE --date="$date" +"%b %d %Y"`;
+		$date = `LANG=en_US $DATE --date="$date" +"%a %b %d %Y"`;
 		chomp $date;
 
 		my @lines = split /^/m, $entry{'message'};
