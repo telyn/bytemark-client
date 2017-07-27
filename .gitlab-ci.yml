@@ -154,10 +154,11 @@ build-manpage:
 build-changelogs:
   stage: build
   image: perl:5
+  script:
     - gen/convert-changelog rpm < doc/changelog > doc/changelog.rpm
   artifacts:
     paths:
-      - doc/changelog.rpm
+      - doc/changelog.*
     expire_in: '1 month'
 
 .build-job: &build
