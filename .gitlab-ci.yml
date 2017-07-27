@@ -235,11 +235,12 @@ package-generic-amd64:
   - |
     for i in bytemark-amd64-*; do
       cp $i bytemark
+      cp doc/changelog.md doc/changelog.txt
       if echo "$i" | grep -- '-windows$'; then
           mv bytemark bytemark.exe
-          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog doc/LICENSE.txt
+          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog.txt doc/LICENSE.txt
       else
-          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
+          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
       fi
     done
   dependencies:
@@ -249,6 +250,7 @@ package-generic-amd64:
   - build-amd64-openbsd
   - build-amd64-windows
   - build-manpage
+  - build-changelogs
   artifacts:
     paths:
     - "*.zip"
