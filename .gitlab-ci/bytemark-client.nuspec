@@ -15,8 +15,8 @@
     <projectUrl>http://bytemark.co.uk/docs/command-line</projectUrl>
     <projectSourceUrl>https://github.com/BytemarkHosting/bytemark-client</projectSourceUrl>
     <packageSourceUrl>https://github.com/BytemarkHosting/bytemark-client</packageSourceUrl>
-    <docsUrl></docsUrl>
-    <mailingListUrl></mailingListUrl>
+    <docsUrl>http://bytemark.co.uk/docs/command-line</docsUrl>
+    <!--<mailingListUrl></mailingListUrl>-->
     <bugTrackerUrl>https://github.com/BytemarkHosting/bytemark-client</bugTrackerUrl>
     <tags>bytemark hosting cloud virtual-machines</tags>
     <copyright>Copyright 2015-2016 Bytemark Limited</copyright>
