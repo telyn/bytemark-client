@@ -318,6 +318,7 @@ package-windows-amd64:
       expire_in: "1 month"
     dependencies:
     - build-amd64-windows
+    - build-changelogs
 
 #### RELEASE STAGE
 ## the release stage pushes the tars, zips, debs & rpms out to repo.bytemark
