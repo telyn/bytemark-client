@@ -151,6 +151,15 @@ build-manpage:
     - doc/bytemark.pdf
     expire_in: '1 month'
 
+build-changelogs:
+  stage: build
+  image: perl:5
+    - gen/convert-changelog rpm < doc/changelog > doc/changelog.rpm
+  artifacts:
+    paths:
+      - doc/changelog.rpm
+    expire_in: '1 month'
+
 .build-job: &build
   stage: build
   image: golang:$GOVERSION
@@ -270,6 +279,7 @@ package-rpm-amd64:
   image: nrechn/fedora-mock
   script:
   - mkdir -p ~/rpmbuild/SOURCES
+  - cat doc/changelog.rpm >> .gitlab-ci/bytemark-client.spec
   - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
   - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
   - rpmbuild --define "version ${VERSION:-$CHANGELOG_VERSION}" --define "release ${SNAPSHOT_VERSION}" -bb .gitlab-ci/bytemark-client.spec
@@ -281,6 +291,7 @@ package-rpm-amd64:
   dependencies:
   - build-amd64-linux
   - build-manpage
+  - build-changelogs
 
 # makes a chocolatey package
 package-windows-amd64:
