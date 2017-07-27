@@ -17,7 +17,7 @@
     <packageSourceUrl>https://github.com/BytemarkHosting/bytemark-client</packageSourceUrl>
     <docsUrl></docsUrl>
     <mailingListUrl></mailingListUrl>
-    <bugTrackerUrl>http://projects.bytemark.co.uk/projects/bytemark-client</bugTrackerUrl>-->
+    <bugTrackerUrl>https://github.com/BytemarkHosting/bytemark-client</bugTrackerUrl>
     <tags>bytemark hosting cloud virtual-machines</tags>
     <copyright>Copyright 2015-2016 Bytemark Limited</copyright>
     <licenseUrl>http://repo.bytemark.co.uk/bytemark-client/LICENSE.txt</licenseUrl>
