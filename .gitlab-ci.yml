@@ -305,7 +305,7 @@ package-windows-amd64:
       # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
     - CHANGELOG_VERSION=${CHANGELOG_VERSION%%~*}
     - sed -i 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g' doc/changelog.md
-    - xml tr --xinclude .gitlab-ci/noop.xsd .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - xmlstarlet tr --xinclude .gitlab-ci/noop.xsd .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
     - sed -i -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" choco/bytemark-client.nuspec
     - mv bytemark-amd64-windows choco/tools/bytemark.exe
     - cd choco
