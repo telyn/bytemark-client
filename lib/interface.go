@@ -89,6 +89,7 @@ type Client interface {
 	CreateDisc(vm VirtualMachineName, disc brain.Disc) error
 	DeleteDisc(vm VirtualMachineName, idOrLabel string) error
 	GetDisc(vm VirtualMachineName, idOrLabel string) (brain.Disc, error)
+	GetDiscByID(id int) (brain.Disc, error)
 	ResizeDisc(vm VirtualMachineName, idOrLabel string, size int) error
 	SetDiscIopsLimit(vm VirtualMachineName, idOrLabel string, iopsLimit int) error
 

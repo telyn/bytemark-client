@@ -212,3 +212,45 @@ func TestShowDisc(t *testing.T) {
 	is.Equal(fx.StoragePool, disc.StoragePool)
 
 }
+
+func TestShowDiscByID(t *testing.T) {
+	is := is.New(t)
+
+	client, servers, err := mkTestClientAndServers(t, Handlers{
+		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/discs/667" {
+				bytes, err := json.Marshal(getFixtureDisc())
+				is.Nil(err)
+				_, err = w.Write(bytes)
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
+			}
+
+		}),
+	})
+	defer servers.Close()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.AuthWithCredentials(map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	disc, err := client.GetDiscByID(667)
+	if err != nil {
+		t.Fatal(err)
+	}
+	is.Nil(err)
+	fx := getFixtureDisc()
+
+	is.Equal(fx.ID, disc.ID)
+	is.Equal(fx.Label, disc.Label)
+	is.Equal(fx.Size, disc.Size)
+	is.Equal(fx.StorageGrade, disc.StorageGrade)
+	is.Equal(fx.StoragePool, disc.StoragePool)
+}
