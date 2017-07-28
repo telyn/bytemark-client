@@ -250,9 +250,10 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 			// dump all the flags into the memo
 			// should be reet...reet?
 			flags.Visit(func(f *flag.Flag) {
+				val := config.massageFlagValue(f.Name, f.Value.String())
 				config.Memo[f.Name] = ConfigVar{
 					f.Name,
-					f.Value.String(),
+					val,
 					"FLAG " + f.Name,
 				}
 			})
@@ -267,7 +268,26 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 			return flags.Args()
 		}
 	}
+	config.endpointOverrides()
 	return nil
+}
+
+func (config *Config) massageFlagValue(name string, val string) string {
+	switch name {
+	case "account":
+		defAccount := config.GetDefault(val)
+		return lib.ParseAccountName(val, defAccount.Value)
+	}
+	return val
+}
+
+func (config *Config) endpointOverrides() {
+	switch config.GetIgnoreErr("endpoint") {
+	case "https://int.bigv.io":
+		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using int")
+		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using int")
+		config.Set("account", "bytemark", "CODE use bytemark account as default on int")
+	}
 }
 
 // GetDebugLevel returns the current debug-level as an integer. This is used throughout the github.com/BytemarkHosting/bytemark-client library to determine verbosity of output.
