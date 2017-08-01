@@ -3,7 +3,7 @@ package brain
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/cheekybits/is"
 	"net"
 	"reflect"

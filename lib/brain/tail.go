@@ -4,7 +4,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // Tail represents a Bytemark Cloud Servers tail (disk storage machine), as returned by the admin API.

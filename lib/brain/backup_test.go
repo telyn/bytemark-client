@@ -2,7 +2,7 @@ package brain_test
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"testing"
 )
 

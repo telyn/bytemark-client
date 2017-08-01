@@ -3,7 +3,7 @@ package brain
 import (
 	"io"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // StoragePool represents a Bytemark Cloud Servers disk storage pool, as returned by the admin API.

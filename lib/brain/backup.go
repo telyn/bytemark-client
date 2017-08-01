@@ -1,7 +1,7 @@
 package brain
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 )
 
