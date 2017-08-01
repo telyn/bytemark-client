@@ -20,6 +20,10 @@ const (
 	// Ridiculous will include all the detail probably no one cares about.
 	// For example: What head a VM is on, what storage pool a disc is in, every note on a head
 	//Ridiculous = "_ridiculous"
+
+	// List is a very minimal amount of information, good for scripting against. In most cases it will be a name. Sometimes followed by a bit of status information, after a space.
+	// On collection types, such as Backups (rather than Backup)
+	List = "_list"
 )
 
 // PrettyPrinter is the common interface used to output different entities in a user friendly way

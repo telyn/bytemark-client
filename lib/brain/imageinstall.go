@@ -2,7 +2,7 @@ package brain
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 	"strings"
 )
