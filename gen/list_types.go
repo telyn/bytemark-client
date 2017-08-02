@@ -42,12 +42,14 @@ func main() {
 	// aaaallllrighty that's all the flag stuff outta the way
 	// now we read all the packages and fmt.Fprintf(wr, tmpl, types)
 	var types []string
+	hasFailed := false
 
 	for _, p := range flag.Args() {
 		pkg, err := importer.Import(p)
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			hasFailed = true
+			continue
 		}
 		pkgName := pkg.Name()
 		pkgPath := pkg.Path()
@@ -68,6 +70,9 @@ func main() {
 	err = wr.Close()
 	if err != nil {
 		fmt.Println(err)
+		hasFailed = true
+	}
+	if hasFailed {
 		os.Exit(1)
 	}
 
