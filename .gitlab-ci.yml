@@ -73,6 +73,7 @@ test:
     - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - ls lib/
     - go generate github.com/BytemarkHosting/bytemark-client/lib/output
     - |
       for pkg in $(go list ./... | grep -v vendor/); do
