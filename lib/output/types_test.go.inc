@@ -19,7 +19,8 @@ func IsArrayType(typ reflect.Type) bool {
 }
 
 func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
-	dfhType := reflect.TypeOf((*output.DefaultFieldsHaver)(nil))
+	// weird trick we have to do to get a reflect.Type for output.DefaultFieldsHaver
+	dfhType := reflect.TypeOf((*output.DefaultFieldsHaver)(nil)).Elem()
 	// p is for pointer
 	for p := range []interface{}{
 		(*lib.Account)(nil),
