@@ -28,11 +28,11 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 		typ := reflect.TypeOf(p)
 		if IsArrayType(typ) {
 			if !typ.Elem().Implements(dfhType) {
-				t.Fail(fmt.Sprintf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ.Name()))
+				t.Errorf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ.Name())
 			}
 		}
 		if !typ.Implements(dfhType) {
-			t.Fail(fmt.Sprintf("%%s is not a DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ.Name()))
+			t.Errorf("%%s is not a DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ.Name())
 		}
 
 	}
