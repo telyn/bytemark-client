@@ -35,6 +35,7 @@ stages:
     - go get github.com/BytemarkHosting/auth-client
     - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - mkdir -p $GOPATH/pkg $GOPATH/bin
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
