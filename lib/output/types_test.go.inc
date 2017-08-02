@@ -26,7 +26,9 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 		(*lib.Account)(nil),
 		%s
 	} {
+		fmt.Printf("%T\n", p)
 		typ := reflect.TypeOf(p)
+		
 		if IsArrayType(typ) {
 			if !typ.Elem().Implements(dfhType) {
 				t.Errorf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ.Name())
