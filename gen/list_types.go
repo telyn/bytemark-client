@@ -59,7 +59,7 @@ func main() {
 			obj := scope.Lookup(name)
 			inScopeRef := fmt.Sprintf("%s.%s", pkgName, name)
 			fullNameWithPath := fmt.Sprintf("%s.%s", pkgPath, name)
-			if obj.Type().String() == fullNameWithPath {
+			if obj.Exported() && obj.Type().String() == fullNameWithPath {
 				types = append(types, fmt.Sprintf(*fmtStr, inScopeRef))
 			}
 		}

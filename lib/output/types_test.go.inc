@@ -22,20 +22,19 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 	// weird trick we have to do to get a reflect.Type for output.DefaultFieldsHaver
 	dfhType := reflect.TypeOf((*output.DefaultFieldsHaver)(nil)).Elem()
 	// p is for pointer
-	for p := range []interface{}{
+	for _, p := range []interface{}{
 		(*lib.Account)(nil),
 		%s
 	} {
-		fmt.Printf("%T\n", p)
 		typ := reflect.TypeOf(p)
 		
 		if IsArrayType(typ) {
 			if !typ.Elem().Implements(dfhType) {
-				t.Errorf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ.Name())
+				t.Errorf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ)
 			}
 		}
 		if !typ.Implements(dfhType) {
-			t.Errorf("%%s is not a DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ.Name())
+			t.Errorf("%%s is not a DefaultsFieldHaver. Implement the PrettyPrint and DefaultFields methods.", typ)
 		}
 
 	}
