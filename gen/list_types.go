@@ -10,24 +10,7 @@ import (
 	"strings"
 )
 
-type SliceFlag []string
-
-func (sf *SliceFlag) Set(value string) error {
-	*sf = append(*sf, value)
-	return nil
-}
-
-func (sf SliceFlag) String() string {
-	return strings.Join(sf, ", ")
-}
-
-func (sf SliceFlag) Get() interface{} {
-	return sf
-}
-
 func main() {
-	var packageFlag SliceFlag
-	flag.Var(&packageFlag, "p", "package to list types of. can be used multiple times")
 	outputFile := flag.String("o", "-", "File to output to. Blank or - for stdin")
 	templateFile := flag.String("t", "", "File to use as template for sprintf. if blank, just list the types")
 	fmtStr := flag.String("f", "%s", "Format string to use on each type before sending to the template")
@@ -54,13 +37,13 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	importer := importer.For("gc", nil)
+	importer := importer.Default()
 
 	// aaaallllrighty that's all the flag stuff outta the way
 	// now we read all the packages and fmt.Fprintf(wr, tmpl, types)
 	var types []string
 
-	for _, p := range packageFlag {
+	for _, p := range flag.Args() {
 		pkg, err := importer.Import(p)
 		if err != nil {
 			fmt.Println(err)
