@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func IsArrayType(typ reflect.Type) {
+func IsArrayType(typ reflect.Type) bool {
 	switch typ.Kind() {
 	case reflect.Slice,reflect.Array:
 		return true
