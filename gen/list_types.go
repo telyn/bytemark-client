@@ -61,7 +61,7 @@ func main() {
 	var types []string
 
 	for _, p := range packageFlag {
-		pkg, err := importer.Import(p)
+		pkg, err := importer.For("gc", nil).Import(p)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
