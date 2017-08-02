@@ -54,14 +54,14 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	importer := importer.Default()
+	importer := importer.For("gc", nil)
 
 	// aaaallllrighty that's all the flag stuff outta the way
 	// now we read all the packages and fmt.Fprintf(wr, tmpl, types)
 	var types []string
 
 	for _, p := range packageFlag {
-		pkg, err := importer.For("gc", nil).Import(p)
+		pkg, err := importer.Import(p)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
