@@ -87,6 +87,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				},
 			),
 			Action: With(OptionalArgs("group"), GroupProvider("group"), func(c *Context) error {
+				// TODO: rewrite in terms of prettyprint
 				return c.OutputInDesiredForm(c.Group, func() error {
 					s := ""
 					if len(c.Group.VirtualMachines) != 1 {
