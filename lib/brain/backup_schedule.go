@@ -2,6 +2,7 @@ package brain
 
 import (
 	"bytes"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 	"text/template"
@@ -12,6 +13,15 @@ type BackupSchedule struct {
 	ID        int    `json:"id,omitempty"`
 	StartDate string `json:"start_at"`
 	Interval  int    `json:"interval_seconds"`
+}
+
+func (sched BackupSchedule) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, StartDate, Interval"
+	default: // also output.Table
+		return "ID, StartDate, Interval"
+	}
 }
 
 // PrettyPrint outputs a nicely-formatted human-readable version of the schedule to the given writer.
