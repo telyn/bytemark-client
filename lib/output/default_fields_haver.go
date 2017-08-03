@@ -5,6 +5,5 @@ import (
 )
 
 type DefaultFieldsHaver interface {
-	prettyprint.PrettyPrinter
 	DefaultFields(f Format) string
 }
