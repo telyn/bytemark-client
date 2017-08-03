@@ -22,7 +22,7 @@ func IsArrayType(typ reflect.Type) bool {
 func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 	// weird trick we have to do to get a reflect.Type for output.DefaultFieldsHaver and prettyprint.PrettyPrinter
 	dfhType := reflect.TypeOf((*output.DefaultFieldsHaver)(nil)).Elem()
-	dfhType := reflect.TypeOf((*prettyprint.PrettyPrinter)(nil)).Elem()
+	ppType := reflect.TypeOf((*prettyprint.PrettyPrinter)(nil)).Elem()
 	// p is for pointer
 	for _, p := range []interface{}{
 		(*lib.Account)(nil),
