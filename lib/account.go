@@ -77,12 +77,16 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{- end }}
 {{ end -}}
 
-{{ define "account_full" }}
+{{ define "account_medium" }}
   {{- if .IsDefaultAccount -}}	
     Your default account ({{ template "account_name" . }})
   {{- else -}}
     {{- template "account_name" . -}}
   {{- end }}
+{{ end }}
+
+{{ define "account_full" -}}
+{{- template "account_medium" . }}
 {{ range .Groups -}}
     {{ template "group_overview" . -}}
 {{- end -}}
