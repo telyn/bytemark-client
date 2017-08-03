@@ -1,5 +1,9 @@
 package output_test
 
+// this file gets used to generate a valid go source file which is
+// used to test whether or not types that might get output have
+// implement the PrettyPrinter and DefaultFieldsHaver interfaces
+
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -26,7 +30,9 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 	// p is for pointer
 	for _, p := range []interface{}{
 		(*lib.Account)(nil),
+		// BEGIN GENERATED LIST OF TYPE POINTERS
 		%s
+		// END GENERATED LIST OF TYPE POINTERS
 	} {
 		typ := reflect.TypeOf(p)
 		
