@@ -35,14 +35,14 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 				t.Errorf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the DefaultFields method.", typ)
 			}
 			if !typ.Elem().Implements(ppType) {
-				t.Errorf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the PrettyPrint method.", typ)
+				t.Errorf("%%s is a slice type, but its elem is not PrettyPrinter. Implement the PrettyPrint method.", typ)
 			}
 		}
 		if !typ.Implements(dfhType) {
 			t.Errorf("%%s is not a DefaultsFieldHaver. Implement the DefaultFields method.", typ)
 		}
 		if !typ.Implements(ppType) {
-			t.Errorf("%%s is not a DefaultsFieldHaver. Implement the PrettyPrint method.", typ)
+			t.Errorf("%%s is not a PrettyPrinter. Implement the PrettyPrint method.", typ)
 		}
 
 	}
