@@ -6,6 +6,7 @@ package output_test
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"fmt"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -17,8 +18,13 @@ import (
 
 func IsArrayType(typ reflect.Type) bool {
 	switch typ.Kind() {
+	case reflect.Ptr:
+		return IsArrayType(typ.Elem())
 	case reflect.Slice,reflect.Array:
 		return true
+	case reflect.Invalid:
+		fmt.Println("oops, type is invalid. this shouldn't happen")
+		return false
 	}
 	return false
 }
@@ -35,13 +41,25 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 		// END GENERATED LIST OF TYPE POINTERS
 	} {
 		typ := reflect.TypeOf(p)
+		switch typ.Kind() {
+		case reflect.Ptr:
+			typ = typ.Elem()
+		}
+		orig := typ
+		
 		
 		if IsArrayType(typ) {
-			if !typ.Elem().Implements(dfhType) {
-				t.Errorf("%%s is a slice type, but its elem is not DefaultsFieldHaver. Implement the DefaultFields method.", typ)
+			typ = typ.Elem()
+			switch typ.Kind() {
+			case reflect.Ptr:
+				typ = typ.Elem()
 			}
-			if !typ.Elem().Implements(ppType) {
-				t.Errorf("%%s is a slice type, but its elem is not PrettyPrinter. Implement the PrettyPrint method.", typ)
+
+			if !typ.Implements(dfhType){
+				t.Errorf("%%s is a slice type, but its elem (%%s) is not DefaultsFieldHaver. Implement the DefaultFields method.", orig, typ)
+			}
+			if !typ.Implements(ppType) {
+				t.Errorf("%%s is a slice type, but its elem (%%s) is not PrettyPrinter. Implement the PrettyPrint method.", orig, typ)
 			}
 		}
 		if !typ.Implements(dfhType) {
