@@ -9,6 +9,7 @@ bytemark.exe
 /doc/*.ps
 /docs/
 /lib/version.go
+/lib/output/generated_types_test.go
 *.nupkg
 *.json
 *.coverprofile

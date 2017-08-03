@@ -1,4 +1,3 @@
-
 variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
