@@ -44,6 +44,13 @@ func (a Account) CountVirtualMachines() (servers int) {
 	}
 	return
 }
+func (a Account) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "BillingID, Name, Suspended"
+	}
+	return "BillingID, Name, Suspended, Groups"
+}
 
 // billingAccount copies all the billing parts of the account into a new billingAccount.
 func (a Account) billingAccount() (b *billing.Account) {
