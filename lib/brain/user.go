@@ -2,7 +2,11 @@ package brain
 
 import (
 	"encoding/json"
+	"io"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // JSONUser is used as an intermediate type that gets processed into a User. It should not have been exported.
@@ -34,6 +38,24 @@ type User struct {
 	Username       string
 	Email          string
 	AuthorizedKeys []string
+}
+
+func (user User) DefaultFields(f output.Format) string {
+	return "Username, Email"
+}
+
+func (user User) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	userTpl := `
+{{ define "user_sgl" }}{{ .Username }}{{ end }}
+{{ define "user_medium" }}{{ .Username }} - {{ .Email }}{{ end }}
+{{ define "user_full " }}{{ template "user_medium" }}
+
+Authorized keys:
+{{ for .AuthorizedKeys }}
+{{ . }}	
+{{ end }}
+`
+	return prettyprint.Run(wr, userTpl, "user"+string(detail), user)
 }
 
 // MarshalJSON marshals the User into a JSON bytestream.

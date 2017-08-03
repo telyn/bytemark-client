@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
@@ -18,6 +19,14 @@ type Tail struct {
 
 	IsOnline     bool     `json:"online"`
 	StoragePools []string `json:"pools"`
+}
+
+func (t Tail) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Label, IsOnline, UUID, StoragePools, ZoneName"
+	}
+	return "ID, Label, IsOnline, UUID, CCAddress, StoragePools, ZoneName"
 }
 
 // PrettyPrint writes an overview of this tail out to the given writer.

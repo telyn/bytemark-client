@@ -2,10 +2,12 @@ package brain
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 	"math"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // VirtualMachineSpec represents the specification for a VM that is passed to the create_vm endpoint
@@ -14,6 +16,11 @@ type VirtualMachineSpec struct {
 	Discs          []Disc         `json:"discs,omitempty"`
 	Reimage        *ImageInstall  `json:"reimage,omitempty"` // may want to be null, so is a pointer
 	IPs            *IPSpec        `json:"ips,omitempty"`     // may want to be null, so is a pointer
+}
+
+// TODO: work on this?
+func (spec VirtualMachineSpec) DefaultFields(f output.Format) string {
+	return "String"
 }
 
 func (spec VirtualMachineSpec) String() string {

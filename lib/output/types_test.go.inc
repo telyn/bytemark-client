@@ -16,10 +16,38 @@ import (
 	"testing"
 )
 
-func IsArrayType(typ reflect.Type) bool {
+var IgnoredTypes = []string {
+}
+
+func isIgnoredType(t string) bool {
+	switch t {
+	// the brain will never send us an IPSpec - we will never Output it.
+	case "brain.IPSpec":
+		return true
+	// IPs are always part of a NetworkInterface
+	case "brain.IPs":
+		return true
+	// JSONUser is only public because it needs to be so we can write JSON to it
+	// no public method in lib.Client returns a JSONUser
+	case "brain.JSONUser":
+		return true
+        // PrivilegeLevel is never gonna come out of the lib, except as part of a Privilege
+	case "brain.PrivilegeLevel":
+		return true
+	// billing.Accounts should ALWAYS be dressed as lib.Accounts
+	case "billing.Account":
+		return true
+	// as if spp would return credit card details to us :]
+	case "spp.CreditCard":
+		return true
+	}
+	return false
+}
+
+func isArrayType(typ reflect.Type) bool {
 	switch typ.Kind() {
 	case reflect.Ptr:
-		return IsArrayType(typ.Elem())
+		return isArrayType(typ.Elem())
 	case reflect.Slice,reflect.Array:
 		return true
 	case reflect.Invalid:
@@ -47,8 +75,11 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 		}
 		orig := typ
 		
-		
-		if IsArrayType(typ) {
+		if isIgnoredType(typ.String()) {
+			continue
+		}
+
+		if isArrayType(typ) {
 			typ = typ.Elem()
 			switch typ.Kind() {
 			case reflect.Ptr:
@@ -61,12 +92,13 @@ func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 			if !typ.Implements(ppType) {
 				t.Errorf("%%s is a slice type, but its elem (%%s) is not PrettyPrinter. Implement the PrettyPrint method.", orig, typ)
 			}
-		}
-		if !typ.Implements(dfhType) {
-			t.Errorf("%%s is not a DefaultsFieldHaver. Implement the DefaultFields method.", typ)
-		}
-		if !typ.Implements(ppType) {
-			t.Errorf("%%s is not a PrettyPrinter. Implement the PrettyPrint method.", typ)
+		} else {
+			if !typ.Implements(dfhType) {
+				t.Errorf("%%s is not a DefaultsFieldHaver. Implement the DefaultFields method.", typ)
+			}
+			if !typ.Implements(ppType) {
+				t.Errorf("%%s is not a PrettyPrinter. Implement the PrettyPrint method.", typ)
+			}
 		}
 
 	}

@@ -1,5 +1,12 @@
 package billing
 
+import (
+	"io"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+)
+
 // Person represents a bmbilling person
 type Person struct {
 	ID int `json:"id,omitempty"`
@@ -24,6 +31,36 @@ type Person struct {
 	Organization         string `json:"organization,omitempty"`
 	OrganizationDivision string `json:"division,omitempty"`
 	VATNumber            string `json:"vatnumber,omitempty"`
+}
+
+func (p Person) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Username, Email, FirstName, LastName, Phone, MobilePhone, Organization, OrganizationDivision"
+	}
+	return "ID, Username, Email, FirstName, LastName, Phone, MobilePhone, Address, City, Postcode, Country, Organization, OrganizationDivision, VATNumber"
+}
+
+func (p Person) PrettyPrint(wr io.Writer, detail prettypreint.DetailLevel) error {
+	personTpl := `
+{{ define "person_sgl" }}{{ .FirstName }} {{ .LastName }} ({{ .Username }}) - {{ .Email }}{{ end }}
+{{ define "person_medium" }}{{ template "person_sgl" . }}
+Address: {{ .Address }}
+    {{ .City }}
+    {{ .Postcode }}
+    {{ .Country }}
+
+Phone: {{ .Phone }} 
+Mobile: {{ .MobilePhone -}}
+{{- end }}
+{{ define "person_full" }}{{ template "person_medium" . }}
+
+Organization: {{ .Organization }}
+Division: {{ .OrganizationDivision }}
+VAT Number: {{ .VATNumber -}}
+{{- end }}
+`
+	return prettyprint.Run(wr, personTpl, "person"+string(detail), p)
 }
 
 // IsValid returns true if the Person is valid, false otherwise.

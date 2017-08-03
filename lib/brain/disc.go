@@ -26,7 +26,7 @@ type Disc struct {
 	NewStoragePool  string `json:"new_storage_pool,omitempty"`
 }
 
-func (d Disc) DefaulFields(f output.Format) string {
+func (d Disc) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
 		return "ID, Label, StorageGrade, Size, BackupCount"

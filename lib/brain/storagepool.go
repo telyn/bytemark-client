@@ -3,6 +3,7 @@ package brain
 import (
 	"io"
 
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
@@ -24,6 +25,14 @@ type StoragePool struct {
 	// ID        int
 	// Tail      Tail
 	// IOPSLimit int
+}
+
+func (sp StoragePool) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
+	}
+	return "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
 }
 
 // PercentFull gives us the (numeric) percentage of how full the disc is
