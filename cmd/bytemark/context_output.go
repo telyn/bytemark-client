@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"reflect"
 	"strings"
 
@@ -13,8 +14,13 @@ import (
 	"github.com/urfave/cli"
 )
 
+type outputtable interface {
+	prettyprint.PrettyPrinter
+	output.DefaultFieldsHaver
+}
+
 // OutputJSON is an OutputFn which outputs a nicely-indented JSON object that represents obj
-func (c *Context) OutputJSON(obj interface{}) error {
+func (c *Context) OutputJSON(obj outputtable) error {
 	js, err := json.MarshalIndent(obj, "", "    ")
 	if err != nil {
 		return err
@@ -29,33 +35,37 @@ func trimAllSpace(strs []string) {
 	}
 }
 
-func (c *Context) determineTableFields(obj interface{}) []string {
-	chosenFields := strings.Split(c.String("table-fields"), ",")
-	trimAllSpace(chosenFields)
+func (c *Context) determineTableFields(obj output.DefaultFieldsHaver) []string {
+	fields := strings.Split(c.String("table-fields"), ",")
+	trimAllSpace(fields)
 
-	if len(chosenFields) > 0 && chosenFields[0] != "" {
-		return chosenFields
+	if len(fields) > 0 && fields[0] != "" {
+		return fields
 	}
-
-	fieldsList := row.FieldsFrom(obj)
-	return fieldsList
+	fields = strings.Split(obj.DefaultFields(output.Table), ",")
+	trimAllSpace(fields)
+	return fields
 }
 
 // OutputTable is an OutputFn which outputs the object in table form, using github.com/BytemarkHosting/row and github.com/olekukonko/tablewriter
-func (c *Context) OutputTable(obj interface{}) error {
-	if c.String("table-fields") == "help" {
+func OutputTable(wr io.Writer, cfg OutputConfig, obj output.DefaultFieldsHaver) error {
+	if cfg.Fields == "help" {
 		fieldsList := row.FieldsFrom(obj)
-		fmt.Fprintf(global.App.Writer, "Table fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
+		fmt.Fprintf(global.App.Writer, "Fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
 		return nil
 	}
-	fields := c.determineTableFields(obj)
-	return RenderTable(obj, fields)
+	fields := determineFields(cfg, obj)
+	return RenderTable(wr, fields, obj)
+}
+
+func SetupTable(wr io.Writer, cfg OutputConfig) *table.Table {
+
 }
 
 // RenderTable creates a table for the given object. This makes
 // most sense when it's an array, but a regular struct-y object works fine too.
-func RenderTable(obj interface{}, fields []string) error {
-	table := tablewriter.NewWriter(global.App.Writer)
+func RenderTable(wr io.Writer, fields []string, obj interface{}) error {
+	table := tablewriter.NewWriter(wr)
 	// don't autowrap because fields that are slices output one element per line
 	// and autowrap
 	table.SetAutoWrapText(false)
@@ -122,18 +132,26 @@ func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli
 	}
 }
 
+type OutputConfig struct {
+	Fields string
+	Format output.Format
+}
+
 // OutputFn is a function for outputting an object to the terminal in some way
 // See the OutputFormatFns map to see examples
-type OutputFn func(context *Context, obj interface{}) error
+type OutputFn func(wr io.Writer, fields string, obj outputtable) error
 
 // OutputFormatFns is a map which contains all the supported output format functions -- except 'human' because that's implemented in the OutputInDesiredForm method, by necessity.
 var OutputFormatFns = map[string]OutputFn{
-	"debug": func(c *Context, obj interface{}) error {
-		fmt.Fprintf(global.App.Writer, "%#v", obj)
+	"debug": func(wr io.Writer, cfg OutputConfig, obj outputtable) error {
+		fmt.Fprintf(wr, "%#v", obj)
 		return nil
 	},
-	"json":  (*Context).OutputJSON,
-	"table": (*Context).OutputTable,
+	"json":  OutputJSON,
+	"table": OutputTable,
+	"human": func(wr io.Writer, cfg OutputConfig, obj outputtable) error {
+		return obj.PrettyPrint(wr, prettyprint.Full)
+	},
 }
 
 // SupportedOutputTypes returns a list of all suppported output forms, including 'human'
@@ -144,11 +162,6 @@ func SupportedOutputTypes() (outputTypes []string) {
 	}
 	outputTypes = append(outputTypes, "human")
 	return
-}
-
-type outputtable interface {
-	prettyprint.PrettyPrinter
-	output.DefaultFieldsHaver
 }
 
 // OutputInDesiredForm outputs obj as a JSON object if --json is set,
