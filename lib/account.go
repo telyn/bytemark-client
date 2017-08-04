@@ -45,6 +45,8 @@ func (a Account) CountVirtualMachines() (servers int) {
 	}
 	return
 }
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (a Account) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

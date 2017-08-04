@@ -31,6 +31,7 @@ type DistributionDefinition struct {
 	Description string
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (d DistributionDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
@@ -46,6 +47,7 @@ type HardwareProfileDefinition struct {
 	Description string
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (hp HardwareProfileDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
@@ -61,6 +63,7 @@ type StorageGradeDefinition struct {
 	Description string
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (sg StorageGradeDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
@@ -76,6 +79,7 @@ type ZoneDefinition struct {
 	Description string
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (z ZoneDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }

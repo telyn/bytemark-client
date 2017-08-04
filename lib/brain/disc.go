@@ -26,6 +26,7 @@ type Disc struct {
 	NewStoragePool  string `json:"new_storage_pool,omitempty"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (d Disc) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

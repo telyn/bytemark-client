@@ -36,6 +36,7 @@ type Head struct {
 	VirtualMachines     []string `json:"virtual_machines,omitempty"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (h Head) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

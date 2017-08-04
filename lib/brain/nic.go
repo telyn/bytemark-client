@@ -37,6 +37,7 @@ func (nic NetworkInterface) ExtraIPStrings() (ips []string) {
 	return ips
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (nic NetworkInterface) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

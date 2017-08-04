@@ -18,6 +18,7 @@ type ImageInstall struct {
 	PublicKeys      string `json:"ssh_public_key"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (ii ImageInstall) DefaultFields(f output.Format) string {
 	return "Distribution, RootPassword"
 }

@@ -21,6 +21,7 @@ type Tail struct {
 	StoragePools []string `json:"pools"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (t Tail) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

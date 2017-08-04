@@ -17,6 +17,7 @@ type Account struct {
 	Groups    []Group `json:"groups"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
 func (a Account) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
