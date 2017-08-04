@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"github.com/urfave/cli"
 	"os"
 	"os/exec"
 	"strings"
 	"syscall"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"github.com/urfave/cli"
 )
 
 func init() {

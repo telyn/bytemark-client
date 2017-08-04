@@ -3,10 +3,11 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cheekybits/is"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestProcessDefinitions(t *testing.T) {

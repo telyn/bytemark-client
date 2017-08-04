@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/cheekybits/is"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestCollectArgs(t *testing.T) {

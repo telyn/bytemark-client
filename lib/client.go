@@ -2,6 +2,7 @@ package lib
 
 import (
 	"errors"
+
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )

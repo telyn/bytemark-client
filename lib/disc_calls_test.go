@@ -3,12 +3,13 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
 )
 
 func getFixtureDisc() brain.Disc {

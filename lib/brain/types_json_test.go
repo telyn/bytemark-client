@@ -3,9 +3,10 @@ package brain
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cheekybits/is"
 	"net"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 var (

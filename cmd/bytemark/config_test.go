@@ -2,14 +2,15 @@ package main
 
 import (
 	"flag"
+	"strings"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 	"github.com/urfave/cli"
-	"strings"
-	"testing"
 )
 
 func TestConfigAccountValidation(t *testing.T) {

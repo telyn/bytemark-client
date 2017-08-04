@@ -3,10 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
-	"testing"
 )
 
 func TestOutput(t *testing.T) {

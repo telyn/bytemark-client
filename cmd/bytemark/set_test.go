@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/cheekybits/is"
 	"strings"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/cheekybits/is"
 )
 
 func TestSetCDROM(t *testing.T) {

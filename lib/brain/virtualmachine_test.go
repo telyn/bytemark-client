@@ -3,11 +3,12 @@ package brain
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"github.com/cheekybits/is"
 	"net"
 	"reflect"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+	"github.com/cheekybits/is"
 )
 
 func getFixtureNic() NetworkInterface {

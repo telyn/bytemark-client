@@ -2,9 +2,6 @@ package util
 
 import (
 	"fmt"
-	auth3 "github.com/BytemarkHosting/auth-client"
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net"
 	"net/url"
 	"os"
@@ -12,6 +9,10 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+
+	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // UserRequestedExit is returned when the user said 'No' to a 'yes/no' prompt.

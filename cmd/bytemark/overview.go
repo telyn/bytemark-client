@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
-	"os"
 )
 
 func init() {

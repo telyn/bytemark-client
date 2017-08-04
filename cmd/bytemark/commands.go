@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/urfave/cli"
 	"sort"
 	"strings"
+
+	"github.com/urfave/cli"
 )
 
 func init() {

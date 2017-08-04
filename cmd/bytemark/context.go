@@ -1,11 +1,12 @@
 package main
 
 import (
+	"net"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
-	"net"
 )
 
 // Context is a wrapper around urfave/cli.Context which provides easy access to

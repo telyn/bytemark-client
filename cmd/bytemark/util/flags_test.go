@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/cheekybits/is"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestIPFlag(t *testing.T) {

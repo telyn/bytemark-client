@@ -1,9 +1,10 @@
 package lib
 
 import (
-	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func Test400BadRequestError(t *testing.T) {

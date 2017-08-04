@@ -1,9 +1,10 @@
 package main
 
 import (
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
-	"testing"
 )
 
 func TestMove(t *testing.T) {

@@ -2,9 +2,10 @@ package main
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/cheekybits/is"
 	"github.com/urfave/cli"
-	"testing"
 )
 
 func TestMergeCommand(t *testing.T) {

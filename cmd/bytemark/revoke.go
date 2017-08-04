@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"

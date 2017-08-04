@@ -1,10 +1,11 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"io"
 	"text/template"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // FormatOverview outputs the given overview using the named template to the given writer.

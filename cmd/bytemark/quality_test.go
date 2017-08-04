@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/urfave/cli"
 	"testing"
+
+	"github.com/urfave/cli"
 )
 
 var destructiveCommands = [...]string{

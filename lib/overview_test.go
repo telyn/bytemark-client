@@ -2,9 +2,10 @@ package lib
 
 import (
 	"bytes"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"testing"
 )
 
 func TestFormatOverview(t *testing.T) {

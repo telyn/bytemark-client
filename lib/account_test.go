@@ -2,11 +2,12 @@ package lib
 
 import (
 	"bytes"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/cheekybits/is"
-	"testing"
 )
 
 func TestFormatAccount(t *testing.T) {

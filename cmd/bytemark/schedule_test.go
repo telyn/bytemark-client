@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
-	"testing"
 )
 
 func TestScheduleBackups(t *testing.T) {

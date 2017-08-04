@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/cheekybits/is"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestCancelDiscMigration(t *testing.T) {

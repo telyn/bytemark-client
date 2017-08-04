@@ -5,12 +5,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // RequestAlreadyRunError is returned if the Run method was already called for this Request.

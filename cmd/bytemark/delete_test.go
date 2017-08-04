@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
-	"strings"
-	"testing"
 )
 
 func TestDeleteServer(t *testing.T) {

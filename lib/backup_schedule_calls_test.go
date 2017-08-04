@@ -2,9 +2,10 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net/http"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 func TestCreateBackupSchedule(t *testing.T) {

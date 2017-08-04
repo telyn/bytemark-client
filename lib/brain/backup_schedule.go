@@ -2,10 +2,11 @@ package brain
 
 import (
 	"bytes"
-	"github.com/BytemarkHosting/bytemark-client/lib/output"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 	"text/template"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // BackupSchedule represents a schedule to take backups on. It is represented as a start date in YYYY-MM-DD hh:mm:ss format (and assuming UK timezones of some kind.)

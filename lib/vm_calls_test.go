@@ -2,13 +2,14 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
 )
 
 func getFixtureVMWithManyIPs() (vm brain.VirtualMachine, v4 []string, v6 []string) {

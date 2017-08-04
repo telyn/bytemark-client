@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 )
 

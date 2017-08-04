@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"net/url"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"net/url"
 )
 
 type sppTokenResponse struct {

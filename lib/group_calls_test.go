@@ -2,10 +2,11 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
 )
 
 func getFixtureGroup() brain.Group {

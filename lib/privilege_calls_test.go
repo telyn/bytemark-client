@@ -1,9 +1,10 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net/http"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 var testPrivileges = brain.Privileges{
