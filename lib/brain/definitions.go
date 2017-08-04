@@ -36,6 +36,7 @@ func (d DistributionDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
 func (d DistributionDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(d, wr, detail)
 }
@@ -52,6 +53,7 @@ func (hp HardwareProfileDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
 func (hp HardwareProfileDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(hp, wr, detail)
 }
@@ -68,6 +70,7 @@ func (sg StorageGradeDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
 func (sg StorageGradeDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(sg, wr, detail)
 }
@@ -84,6 +87,7 @@ func (z ZoneDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
 func (z ZoneDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(z, wr, detail)
 }

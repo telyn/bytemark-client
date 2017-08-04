@@ -26,6 +26,7 @@ func (a Account) DefaultFields(f output.Format) string {
 	return "ID, Name, Groups"
 }
 
+// PrettyPrint outputs a nice human-readable overview of the account to the given writer.
 func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	accountTpl := `
 	{{ define "account_sgl" }}{{ .Name }}{{ if .Suspended }} (suspended){{ end}}{{ end }}
