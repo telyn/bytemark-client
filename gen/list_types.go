@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"go/importer"
+	"go/types"
 	"io"
 	"io/ioutil"
 	"os"
@@ -45,7 +46,8 @@ func main() {
 	hasFailed := false
 
 	for _, p := range flag.Args() {
-		pkg, err := importer.Import(p)
+		var pkg *types.Package
+		pkg, err = importer.Import(p)
 		if err != nil {
 			fmt.Println(err)
 			hasFailed = true
