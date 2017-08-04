@@ -1,7 +1,5 @@
 package lib
 
-import ()
-
 // GroupName is the double-form of the name of a Group, which should be enough to find the group.
 type GroupName struct {
 	Group   string

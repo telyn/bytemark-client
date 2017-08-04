@@ -1,8 +1,9 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // Getbigv.User grabs the named user from the brain

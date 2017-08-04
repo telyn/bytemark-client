@@ -3,9 +3,10 @@ package lib
 import (
 	"bytes"
 	"fmt"
+	"strconv"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"strconv"
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.

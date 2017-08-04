@@ -1,8 +1,9 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strconv"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // CreateBackupSchedule creates a new backup schedule starting at the given date, with backups occuring every interval seconds

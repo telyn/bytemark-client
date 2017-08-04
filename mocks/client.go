@@ -2,14 +2,15 @@ package mocks
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
+
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	mock "github.com/maraino/go-mock"
-	"net/http"
-	"net/url"
 )
 
 type Client struct {

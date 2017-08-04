@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/BytemarkHosting/row"
 	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli"
-	"reflect"
-	"strings"
 )
 
 // OutputJSON is an OutputFn which outputs a nicely-indented JSON object that represents obj

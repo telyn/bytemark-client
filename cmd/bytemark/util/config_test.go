@@ -3,11 +3,12 @@ package util
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 /*

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
-	"testing"
 )
 
 //TODO(telyn): add test for restore server

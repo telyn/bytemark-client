@@ -2,8 +2,9 @@ package lib
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strconv"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // UpdateHead is a struct with all the possible settings that can be updated on a head

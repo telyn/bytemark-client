@@ -3,13 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"strconv"
+	"strings"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"net/url"
-	"strconv"
-	"strings"
 )
 
 func validateEndpointForConfig(endpoint string) error {

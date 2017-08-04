@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"io/ioutil"
 	"net"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 func TestAddKeyCommand(t *testing.T) {

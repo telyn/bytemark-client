@@ -3,15 +3,16 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"runtime/debug"
+	"strings"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
-	"runtime/debug"
-	"strings"
-	"testing"
 )
 
 type showAccountTest struct {

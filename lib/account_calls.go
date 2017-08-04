@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"

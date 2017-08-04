@@ -1,8 +1,9 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 func getFixtureNic() brain.NetworkInterface {

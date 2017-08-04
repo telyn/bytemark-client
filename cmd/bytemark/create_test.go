@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"github.com/urfave/cli"
-	"strings"
-	"testing"
 )
 
 func TestCreateDiskCommand(t *testing.T) {

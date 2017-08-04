@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
-	"strings"
-	"testing"
 )
 
 func TestRevokePrivilege(t *testing.T) {

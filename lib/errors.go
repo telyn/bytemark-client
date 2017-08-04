@@ -3,12 +3,13 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/url"
 	"regexp"
 	"sort"
 	"strings"
 	"unicode"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // UnsupportedEndpointError is returned when the Endpoint given was not valid.

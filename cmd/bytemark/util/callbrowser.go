@@ -3,11 +3,12 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"os"
 	"os/exec"
 	"runtime"
 	"syscall"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 func openCommand() string {

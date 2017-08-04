@@ -2,13 +2,14 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/billing"
-	"github.com/BytemarkHosting/bytemark-client/lib/spp"
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/spp"
+	"github.com/cheekybits/is"
 )
 
 var testCard = spp.CreditCard{

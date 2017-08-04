@@ -2,11 +2,12 @@ package lib
 
 import (
 	"encoding/json"
+	"net/http"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/cheekybits/is"
-	"net/http"
-	"testing"
 )
 
 func getFixtureUser() (user *brain.User) {

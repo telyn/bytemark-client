@@ -3,10 +3,11 @@ package util
 import (
 	"bufio"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // PromptYesNo provides a y/n prompt. Returns true if the user enters y, false otherwise.
