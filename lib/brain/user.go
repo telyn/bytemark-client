@@ -53,7 +53,7 @@ func (user User) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{ define "user_full " }}{{ template "user_medium" }}
 
 Authorized keys:
-{{ for .AuthorizedKeys }}
+{{ range .AuthorizedKeys }}
 {{ . }}	
 {{ end }}
 `

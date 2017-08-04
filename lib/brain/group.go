@@ -45,7 +45,7 @@ func (g Group) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 {{ define "group_full" -}}
 {{ template "group_sgl" . }}
 
-{{ for .VirtualMachines -}}
+{{ range .VirtualMachines -}}
 {{- prettysprint "_sgl" . }}
 {{ end -}}
 {{- end }}
