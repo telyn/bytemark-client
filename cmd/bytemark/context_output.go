@@ -3,11 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/BytemarkHosting/row"
 	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli"
-	"reflect"
-	"strings"
 )
 
 // OutputJSON is an OutputFn which outputs a nicely-indented JSON object that represents obj
@@ -98,37 +101,6 @@ func RenderTable(obj interface{}, fields []string) error {
 	return nil
 }
 
-const (
-	// DefaultAccountTableFields is the default for --table-fields for lib.Account
-	DefaultAccountTableFields = "BillingID, Name, Suspended, Groups"
-	// DefaultBackupTableFields is the default for --table-fields for brain.Backup
-	DefaultBackupTableFields = "ID, Manual, Label, StorageGrade, Size, BackupCount, BackupSchedules"
-	// DefaultBackupScheduleTableFields is the default for --table-fields for brain.BackupSchedule
-	DefaultBackupScheduleTableFields = "ID, StartDate, Interval"
-	// DefaultDiscTableFields is the default for --table-fields for brain.Disc
-	DefaultDiscTableFields = "ID, Label, StorageGrade, Size, BackupCount, BackupSchedules"
-	// DefaultGroupTableFields is the default for --table-fields for brain.Group
-	DefaultGroupTableFields = "ID, Name, VirtualMachines"
-	// DefaultPrivilegeTableFields is the default for --table-fields for brain.Privilege
-	DefaultPrivilegeTableFields = "ID, Username, Level, Target, YubikeyRequired"
-	// DefaultServerTableFields is the default for --table-fields for brain.VirtualMachine
-	DefaultServerTableFields = "ID, Hostname, ManagementAddress, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
-
-	// DefaultHeadTableFields is the default for --table-fields for brain.Head
-	DefaultHeadTableFields = "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, VirtualMachineCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
-	// DefaultTailTableFields is the default for --table-fields for brain.Tail
-	DefaultTailTableFields = "ID, Label, IsOnline, UUID, CCAddress, StoragePools, ZoneName"
-	// DefaultStoragePoolTableFields is the default for --table-fields for brain.StoragePool
-	DefaultStoragePoolTableFields = "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
-	// DefaultIPRangeTableFields is the default for --table-fields for brain.IPRange
-	DefaultIPRangeTableFields = "ID, Spec, VLANNum, Available, Zones"
-	// DefaultVLANTableFields is the default for --table-fields for brain.VLAN
-	DefaultVLANTableFields = "ID, Num, UsageType, IPRanges"
-
-	// DefaultDefinitionTableFields is the default for --table-fields for the *Definition types, because they're all the same at the moment.
-	DefaultDefinitionTableFields = "Name, Description"
-)
-
 // OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
 // thing should be like "server", "servers", "group", "groups"
 // jsonType should be "array" or "object"
@@ -172,6 +144,11 @@ func SupportedOutputTypes() (outputTypes []string) {
 	}
 	outputTypes = append(outputTypes, "human")
 	return
+}
+
+type outputtable interface {
+	prettyprint.PrettyPrinter
+	output.DefaultFieldsHaver
 }
 
 // OutputInDesiredForm outputs obj as a JSON object if --json is set,
