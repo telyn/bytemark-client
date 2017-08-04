@@ -17,6 +17,7 @@ type Group struct {
 	VirtualMachines []VirtualMachine `json:"virtual_machines"`
 }
 
+// CountVirtualMachines returns the number of virtual machines in this group
 func (g Group) CountVirtualMachines() int {
 	return len(g.VirtualMachines)
 }
@@ -52,6 +53,7 @@ func (g Group) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, groupTpl, "group"+string(detail), g)
 }
 
+// String formats the Group as a string - a single line in a human-readable form.
 func (g Group) String() string {
 	return fmt.Sprintf("group %d %q - has %d servers", g.ID, g.Name, len(g.VirtualMachines))
 }

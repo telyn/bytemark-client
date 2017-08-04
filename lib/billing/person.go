@@ -42,6 +42,7 @@ func (p Person) DefaultFields(f output.Format) string {
 	return "ID, Username, Email, FirstName, LastName, Phone, MobilePhone, Address, City, Postcode, Country, Organization, OrganizationDivision, VATNumber"
 }
 
+// PrettyPrint ouputs the person to the writer in a human readable form, at the specified detail level.
 func (p Person) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	personTpl := `
 {{ define "person_sgl" }}{{ .FirstName }} {{ .LastName }} ({{ .Username }}) - {{ .Email }}{{ end }}

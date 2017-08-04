@@ -46,11 +46,21 @@ func (nic NetworkInterface) DefaultFields(f output.Format) string {
 	return "ID, Label, Mac, VlanNum, IPs, ExtraIPStrings"
 }
 
+// PrettyPrint outputs the 
 func (nic NetworkInterface) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	nicTpl := `
+{{ define "nic_sgl" }}{{ .String }}{{ end }}
+{{ define "nic_medium" }}{{ template "nic_sgl" . }}{{ end }}
+{{ define "nic_full" -}}
+{{- template "nic_medium" . }}
+IPs directly attached: {{ join .IPs ", " }}
 
-	return nil
+`
+
+	return prettyprint.Run(wr, nicTpl, "nic"+string(detail), nic)
 }
 
+// String formats the network interface as a single descriptive line of text.
 func (nic NetworkInterface) String() string {
 	return fmt.Sprintf("%s - %s - %d IPs", nic.Label, nic.Mac, len(nic.IPs)+len(nic.ExtraIPs))
 }
