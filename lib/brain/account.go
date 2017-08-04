@@ -41,6 +41,6 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{- end -}}
 {{- end }}
 {{ end -}}
-	`
+`
 	return prettyprint.Run(wr, accountTpl, "account"+string(detail), a)
 }

@@ -90,7 +90,7 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
     Your default account ({{ template "account_name" . }})
   {{- else -}}
     {{- template "account_name" . -}}
-  {{- end }}
+  {{- end -}}
 {{ end }}
 
 {{ define "account_full" -}}
