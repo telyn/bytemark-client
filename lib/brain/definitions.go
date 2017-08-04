@@ -10,9 +10,8 @@ func definitionDefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
 		return "Name, Description"
-	default: // also output.Table
-		return "Name, Description"
 	}
+	return "Name, Description"
 }
 
 func definitionPrettyPrint(definition interface{}, wr io.Writer, detail prettyprint.DetailLevel) error {

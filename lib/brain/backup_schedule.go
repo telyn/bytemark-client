@@ -20,9 +20,8 @@ func (sched BackupSchedule) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
 		return "ID, StartDate, Interval"
-	default: // also output.Table
-		return "ID, StartDate, Interval"
 	}
+	return "ID, StartDate, Interval"
 }
 
 // PrettyPrint outputs a nicely-formatted human-readable version of the schedule to the given writer.
