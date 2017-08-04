@@ -31,7 +31,7 @@ func (g Group) DefaultFields(f output.Format) string {
 	return "Name, VirtualMachines"
 }
 
-// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr.
 func (g Group) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	groupTpl := `
 {{ define "group_sgl " -}}
