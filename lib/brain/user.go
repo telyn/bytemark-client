@@ -45,6 +45,7 @@ func (user User) DefaultFields(f output.Format) string {
 	return "Username, Email"
 }
 
+// PrettyPrint outputs human-readable information about the user to the given writer at some level of detail.
 func (user User) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	userTpl := `
 {{ define "user_sgl" }}{{ .Username }}{{ end }}
