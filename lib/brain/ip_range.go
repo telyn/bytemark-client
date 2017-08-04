@@ -20,7 +20,7 @@ type IPRange struct {
 
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (ipr IPRange) DefaultFields(f output.Format) string {
 	return "ID, Spec, VLANNum, Zones, Available"
 }
