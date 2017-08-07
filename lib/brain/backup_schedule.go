@@ -15,7 +15,7 @@ type BackupSchedule struct {
 	Interval  int    `json:"interval_seconds"`
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (sched BackupSchedule) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

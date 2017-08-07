@@ -27,7 +27,7 @@ type StoragePool struct {
 	// IOPSLimit int
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (sp StoragePool) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

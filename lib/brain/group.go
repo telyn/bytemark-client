@@ -22,7 +22,7 @@ func (g Group) CountVirtualMachines() int {
 	return len(g.VirtualMachines)
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (g Group) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
