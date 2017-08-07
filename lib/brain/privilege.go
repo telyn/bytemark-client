@@ -101,7 +101,7 @@ func (p Privilege) String() string {
 	return fmt.Sprintf("%s for %s%s", p.Level, p.Username, requiresYubikey)
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (p Privilege) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

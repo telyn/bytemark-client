@@ -39,7 +39,7 @@ type VirtualMachine struct {
 	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (vm VirtualMachine) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

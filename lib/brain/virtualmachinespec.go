@@ -18,7 +18,7 @@ type VirtualMachineSpec struct {
 	IPs            *IPSpec        `json:"ips,omitempty"`     // may want to be null, so is a pointer
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (spec VirtualMachineSpec) DefaultFields(f output.Format) string {
 	// TODO: work on this?
 	return "String"
