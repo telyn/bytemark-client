@@ -46,7 +46,7 @@ func (nic NetworkInterface) DefaultFields(f output.Format) string {
 	return "ID, Label, Mac, VlanNum, IPs, ExtraIPStrings"
 }
 
-// PrettyPrint outputs the 
+// PrettyPrint outputs the NetworkInterface to wr in a human readable form at the given level of detail.
 func (nic NetworkInterface) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	nicTpl := `
 {{ define "nic_sgl" }}{{ .String }}{{ end }}
