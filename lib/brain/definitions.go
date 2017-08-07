@@ -32,12 +32,12 @@ type DistributionDefinition struct {
 	Description string
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (d DistributionDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
-// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr.
 func (d DistributionDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(d, wr, detail)
 }
@@ -49,12 +49,12 @@ type HardwareProfileDefinition struct {
 	Description string
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (hp HardwareProfileDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
-// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr.
 func (hp HardwareProfileDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(hp, wr, detail)
 }
@@ -66,12 +66,12 @@ type StorageGradeDefinition struct {
 	Description string
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (sg StorageGradeDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
-// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr.
 func (sg StorageGradeDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(sg, wr, detail)
 }
@@ -83,12 +83,12 @@ type ZoneDefinition struct {
 	Description string
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (z ZoneDefinition) DefaultFields(f output.Format) string {
 	return definitionDefaultFields(f)
 }
 
-// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr.
 func (z ZoneDefinition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return definitionPrettyPrint(z, wr, detail)
 }
