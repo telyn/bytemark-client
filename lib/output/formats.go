@@ -1,5 +1,7 @@
 package output
 
+import "strings"
+
 // Format is a canonical name of output formats
 type Format string
 
@@ -15,3 +17,20 @@ const (
 	// Debug is the canonical name of the Debug output format
 	Debug = "debug"
 )
+
+// FormatByName returns the Format for the given format name. If the name is not valid, returns Human
+func FormatByName(name string) Format {
+	formats := map[string]Format{
+		"debug": Debug,
+		"list":  List,
+		"json":  JSON,
+		"table": Table,
+		"human": Human,
+	}
+	name = strings.ToLower(name)
+	if f, ok := formats[name]; ok {
+		return f
+	} else {
+		return Human
+	}
+}
