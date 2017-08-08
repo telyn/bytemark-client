@@ -1,84 +1,89 @@
 bytemark-client (3.0~beta1) UNRELEASED; urgency=low
 
-  Remove unnecessary / potentially dangerous pointers from the lib package
+  * Remove unnecessary / potentially dangerous pointers from the lib package
 
- -- telyn <telyn@bytemark.co.uk>  Thu, 15 Jun 2017 11:39:15 +0100
+ -- telyn <telyn@bytemark.co.uk>  Thu, 27 Jul 2017 14:09:15 +0100
 
 bytemark-client (2.4) UNRELEASED; urgency=low
 
-  New features:
-    * Support for backups via the `create backup`, `delete backup`, `schedule
-      backups`, `unschedule backups`, `show disc` and `list backups` commands.
-    * Support for longer session validities than the old default of 5 minutes.
-      Use the --session-validity global flag & config variable to set your
-      session validity. Otherwise, it will default to the new default of 30
-      minutes.
+  ### New features
+
+  * Support for backups via the `create backup`, `delete backup`, `schedule
+    backups`, `unschedule backups`, `show disc` and `list backups` commands.
+  * Support for longer session validities than the old default of 5 minutes.
+    Use the --session-validity global flag & config variable to set your
+    session validity. Otherwise, it will default to the new default of 30
+    minutes.
 
  -- telyn <telyn@bytemark.co.uk>  Fri, 27 Jun 2017 16:56:28 +0100
 
 bytemark-client (2.3) UNRELEASED; urgency=low
 
-  New features:
-    * Logging in with 2-factor authentication is now supported, but setting up
-      2-factor auth is not yet ready.
-    * Added a new table output format using `--table` and `--table-fields` to
-      most commands which support `--json` output. `--table` and `--json` are
-      now aliases for the global flag `--output-format <json | table>` - which
-      can also be specified using `config set output-format`. The default
-      output format for most commands is 'human' - which behaves the same as
-      previous versions, but is 'table' for admin-only commands.
-      Table output is not intended to be machine readable and the list of
-      fields displayed by default for any given command may change between
-      releases of bytemark-client. Use the 'json' `--output-format` or the
-      `list` commands for any scripting.
-      Specify `--table-fields help` to see the available fields for a command
-      There is an additional output-format called 'debug' which outputs the
-      object as go code.
-    * Added the `commands` command, which displays a list of all the commands
-      available in bytemark-client.
-    * `show server` will now accept a server's ID instead of a name.
-    * `images`, `zones`, `storage` and `hwprofiles` commands can now be output
-      as JSON or tables using the `--output-format`, `--json`, or `--table`
-      flags.
+  ### New features
 
-  Changes / Fixes:
-    * specifying --yubikey will now prompt you to login again if your current
-      auth token was not created using a yubikey
-    * some commands were not correctly setting a default account, forcing the
-      end user to specify their server in server.group.account form, or their
-      group in group.account form. This has now been fixed and should be
-      consistent across all commands.
-    * the --group global flag / config var was being ignored. Now it gets
-      used.
-    * 401 Unauthorized errors are now handled gracefully. These errors occur
-      when your authentication token is invalid or unset, whereas 403
-      Forbidden errors occur when your token is valid but you do not have
-      permission to access something.
-    * Brain accounts without a matching billing account now show their VMs
-      under show account / list servers.
-    * `resize disk` now works again
+  * Logging in with 2-factor authentication is now supported, but setting up
+    2-factor auth is not yet ready.
+  * Added a new table output format using `--table` and `--table-fields` to
+    most commands which support `--json` output. `--table` and `--json` are
+    now aliases for the global flag `--output-format <json | table>` - which
+    can also be specified using `config set output-format`. The default
+    output format for most commands is 'human' - which behaves the same as
+    previous versions, but is 'table' for admin-only commands.
+    Table output is not intended to be machine readable and the list of
+    fields displayed by default for any given command may change between
+    releases of bytemark-client. Use the 'json' `--output-format` or the
+    `list` commands for any scripting.
+    Specify `--table-fields help` to see the available fields for a command
+    There is an additional output-format called 'debug' which outputs the
+    object as go code.
+  * Added the `commands` command, which displays a list of all the commands
+    available in bytemark-client.
+  * `show server` will now accept a server's ID instead of a name.
+  * `images`, `zones`, `storage` and `hwprofiles` commands can now be output
+    as JSON or tables using the `--output-format`, `--json`, or `--table`
+    flags.
 
-  New admin commands:
-    * approve server
-    * cancel migration disc
-    * cancel migration server
-    * create ip_range
-    * create user
-    * create vlan_group
-    * delete vlan
-    * empty head
-    * empty storage_pool
-    * empty tail
-    * reap vm
-    * regrade disc
-    * reify discs
-    * reject server
-    * update head
-    * update migration
-    * update storage_pool
-    * update tail
+  ### Changes / Fixes
 
-  Admin-only changes:
+  * specifying --yubikey will now prompt you to login again if your current
+    auth token was not created using a yubikey
+  * some commands were not correctly setting a default account, forcing the
+    end user to specify their server in server.group.account form, or their
+    group in group.account form. This has now been fixed and should be
+    consistent across all commands.
+  * the --group global flag / config var was being ignored. Now it gets
+    used.
+  * 401 Unauthorized errors are now handled gracefully. These errors occur
+    when your authentication token is invalid or unset, whereas 403
+    Forbidden errors occur when your token is valid but you do not have
+    permission to access something.
+  * Brain accounts without a matching billing account now show their VMs
+    under show account / list servers.
+  * `resize disk` now works again
+
+  ### New admin commands
+
+  * approve server
+  * cancel migration disc
+  * cancel migration server
+  * create ip_range
+  * create user
+  * create vlan_group
+  * delete vlan
+  * empty head
+  * empty storage_pool
+  * empty tail
+  * reap vm
+  * regrade disc
+  * reify discs
+  * reject server
+  * update head
+  * update migration
+  * update storage_pool
+  * update tail
+
+  ### Admin-only changes
+
     * show ip_range now accepts CIDR representation as well as ID
     * account name defaulting behaviour on Bytemark internal/staging brains
       is now better
@@ -88,7 +93,8 @@ bytemark-client (2.3) UNRELEASED; urgency=low
 
 bytemark-client (2.2.1) UNRELEASED; urgency=low
 
-  Fixes:
+  ### Fixes
+
   * many commands required fully-specified groups or servers when they
     should've been more permissive and used defaulting.
 
@@ -96,14 +102,16 @@ bytemark-client (2.2.1) UNRELEASED; urgency=low
 
 bytemark-client (2.2) UNRELEASED; urgency=low
 
-  New features:
+  ### New features
+
   * Added admin-only commands accessible by adding the --admin global flag
   * Added list of admin-only commands to 'bytemark help admin'
   * Added grant & revoke commands for dealing with privileges
   * Added show privileges command
   * Added --version flag - just prints the version and exits
 
-  Changes:
+  ### Changes
+
   * An error that shouldn't ever be seen (NilAuthError) has been made more
     user-friendly
   * Debug output (written to debug.log) now has a header containing useful info
@@ -118,7 +126,8 @@ bytemark-client (2.2) UNRELEASED; urgency=low
   * prevent users from uploading private keys in 'add key'
   * add key now supports key filename being passed as an argument
 
-  Fixes:
+  ### Fixes
+
   * show account now detects default accounts decently again. This bug should
     be well and truly squashed now
   * Fixed formatting on the USAGE section of help formatting
@@ -130,74 +139,81 @@ bytemark-client (2.2) UNRELEASED; urgency=low
 
 bytemark-client (2.1) UNRELEASED; urgency=low
 
-  New features:
-    * `bytemark set cdrom` has been added to set the URL of an ISO for a server.
-    * bytemark config set now validates values - account name typos should be
-      a thing of the past :-)
+  ### New features
 
-  Changes:
-    * RPM packages are now signed
-    * man page has been made nicer.
-    * man page is the same on macOS as Linux now.
-    * Disc labels are now generated as 'disc-N', where N is the index of the
-      disc or one larger than the largest other disc with a 'disc-N' label,
-      whichever is larger. This matches the panel's behaviour.
-    * The --no-discs flag on create server has been removed due to the endpoint
-      no longer supporting it.
-    * The list of images in `bytemark images` and `bytemark storage grades` are
-      now sorted.
+  * `bytemark set cdrom` has been added to set the URL of an ISO for a server.
+  * bytemark config set now validates values - account name typos should be
+    a thing of the past :-)
 
-  Fixes:
-    * bytemark delete key now accepts the --user flag instead of producing an
-      error
-    * bytemark show user now works instead of erroring.
-    * -v | --version now shows the current version instead of producing an error
-    * RPM package now contains the man page, instead of 2 copies of the client
-      itself.
-    * Users no longer get asked to file a bug report when they enter invalid
-      login details
+  ### Changes
+
+  * RPM packages are now signed
+  * man page has been made nicer.
+  * man page is the same on macOS as Linux now.
+  * Disc labels are now generated as 'disc-N', where N is the index of the
+    disc or one larger than the largest other disc with a 'disc-N' label,
+    whichever is larger. This matches the panel's behaviour.
+  * The --no-discs flag on create server has been removed due to the endpoint
+    no longer supporting it.
+  * The list of images in `bytemark images` and `bytemark storage grades` are
+    now sorted.
+
+  ### Fixes
+
+  * bytemark delete key now accepts the --user flag instead of producing an
+    error
+  * bytemark show user now works instead of erroring.
+  * -v | --version now shows the current version instead of producing an error
+  * RPM package now contains the man page, instead of 2 copies of the client
+    itself.
+  * Users no longer get asked to file a bug report when they enter invalid
+    login details
 
  -- telyn <telyn@bytemark.co.uk>  Thu, 29 Dec 2016 11:40:03 +0000
 
 bytemark-client (2.0.1) UNRELEASED; urgency=low
 
-  Changes:
+  ### Changes
+
     * Registering a card (such as during signup) now sends a token to SPP.
 
  -- telyn <telyn@bytemark.co.uk>  Tue, 20 Dec 2016 12:08:35 +0000
 
 bytemark-client (2.0) UNRELEASED; urgency=low
 
-  New features:
-    * --admin flag to enable admin-mode, which adds more commands to the
-      client . Admin commands can only be used by cluster admins.
-    * admin command: show heads. this is only an initial version and will
-      change over time.
+  ### New features
 
-  Changes:
-    * Input errors (not enough arguments, too many arguments, incorrect flags)
-      now output only one error and don't show the help for that command,
-      instead suggesting you look at the help for that command.
-    * add key now errors when no key is entered.
-    * Improve algorithm for figuring out which account is default, and make
-      list commands use the same algorithm as other commands.
-    * Reordered address fields in the signup form
-    * Stabilised the order of the IP address list on each server
-    * Improved output when the brain returns an HTTP 400 (Bad Request)
+  * --admin flag to enable admin-mode, which adds more commands to the
+    client . Admin commands can only be used by cluster admins.
+  * admin command: show heads. this is only an initial version and will
+    change over time.
+
+  ### Changes
+
+  * Input errors (not enough arguments, too many arguments, incorrect flags)
+    now output only one error and don't show the help for that command,
+    instead suggesting you look at the help for that command.
+  * add key now errors when no key is entered.
+  * Improve algorithm for figuring out which account is default, and make
+    list commands use the same algorithm as other commands.
+  * Reordered address fields in the signup form
+  * Stabilised the order of the IP address list on each server
+  * Improved output when the brain returns an HTTP 400 (Bad Request)
   
-  Fixes:
-    * Numerous small code fixes
-    * Update panel URL to panel.bytemark.co.uk
-    * Fix address for bytemark-internal panel
-    * Recursive group delete now outputs correctly
-    * Confirmation prompts in reimage and create server commands now appears
-      on own line
-    * --ip flag on create server now works
-    * Numerous typo fixes
-    * Remove some unintended debug output
-    * Fix create server erroring out every time (despite success)
-    * --auth-endpoint now works.
-    * in show and overview, servers with no discs now display correctly
+  ### Fixes
+
+  * Numerous small code fixes
+  * Update panel URL to panel.bytemark.co.uk
+  * Fix address for bytemark-internal panel
+  * Recursive group delete now outputs correctly
+  * Confirmation prompts in reimage and create server commands now appears
+    on own line
+  * --ip flag on create server now works
+  * Numerous typo fixes
+  * Remove some unintended debug output
+  * Fix create server erroring out every time (despite success)
+  * --auth-endpoint now works.
+  * in show and overview, servers with no discs now display correctly
 
  -- telyn <telyn@bytemark.co.uk>  Fri, 11 Nov 2016 13:24:40 +0000
 
@@ -205,8 +221,8 @@ bytemark-client (1.1) UNRELEASED; urgency=low
 
   Prevent the following from being output to the log file during account
   creation:
-  * card reference
-  * user password
+    * card reference
+    * user password
 
   Also prevent card references from being output to the log file whenever
   account information is downloaded, and root passwords for servers being
@@ -223,11 +239,13 @@ bytemark-client (1.1) UNRELEASED; urgency=low
 
 bytemark-client (1.0) UNRELEASED; urgency=low
 
-  New features:
+  ### New features
+
   * overview command - shows an overview of what accounts the user can access
   * move command - rename a server and/or move it between groups
 
-  Changes: 
+  ### Changes: 
+
   * show account, show group and show server now have different, prettier
     output
   * prompt for confirmation on all commands that could increase cost or delete
@@ -238,7 +256,8 @@ bytemark-client (1.0) UNRELEASED; urgency=low
   * Add --ssh-args to console command, so that you can specify a different key
     to use, etc.
 
-  Fixes:
+  ### Fixes
+
   * show server: Correct IPv4 addresses are shown 
   * create server: firstboot script no longer ignored
   * reimage/create server: fix bug with authorized-keys-file
@@ -247,27 +266,31 @@ bytemark-client (1.0) UNRELEASED; urgency=low
 
 bytemark-client (0.7.1) UNRELEASED; urgency=low
 
-  No changes; this is a repackage of 0.7.0's code with a new build pipeline
+  * No changes; this is a repackage of 0.7.0's code with a new build pipeline
 
  -- Telyn ZF Roat <telyn.roat@bytemark.co.uk>  Fri, 20 May 2016 12:54:27 +0100
 
 bytemark-client (0.7.0) UNRELEASED; urgency=low
 
-  New features:
+  ### New features
+
   * New commands: `signup`, `add ip`
   * Add a man page (all platforms except Windows)
 
-  Changes:
+  ### Changes
+
   * Tweak the header-line of servers in the show command
   * Help command now shows subcommands (e.g. `bytemark help show` shows the
     help for show and indicates that `show server` and `show account`, etc.
     exist.
-  * xdg-utils no longer a dependency, is a suggested instead. (debian package only)
+  * xdg-utils no longer a dependency, is a suggested instead. (debian package
+    only)
   * Better help text for the `config` command
   * Add confirmation step to reimage command.
   * `show account` shows more (billing) details about the account
 
-  Fixes:
+  ### Fixes
+
   * Fix crash when zero arguments given
   * Fix finding a default account
   * Fix list servers when no account specified
@@ -279,11 +302,13 @@ bytemark-client (0.7.0) UNRELEASED; urgency=low
 
 bytemark-client (0.6.0) UNRELEASED; urgency=low
 
-  New features: 
+  ### New features: 
+
   * deleted servers are shown when using `list servers`
   * --json flag added to `create server`
   
-  Changes: 
+  ### Changes: 
+  
   * Much better help text for all commands
   * --force and --silent flags have been removed
   * Mention of non-existent `delete account` command has been removed
@@ -292,13 +317,15 @@ bytemark-client (0.6.0) UNRELEASED; urgency=low
 
 bytemark-client (0.5.0) UNRELEASED; urgency=low
 
-  New features: None!
+  ### New features: None!
 
-  Changes:
+  ### Changes
+
   * MIT licensed (hooray)
   * Build number no longer part of version number.
 
-  Fixes: 
+  ### Fixes: 
+
   * Hook up VNC and serial commands
   * console connection instructions improved for v6-only clusters
   * Entering a nonexistent flag no longer produces weird output
@@ -321,19 +348,22 @@ bytemark-client (0.4.254-1) UNRELEASED; urgency=low
 
 bytemark-client (0.4.253-1) UNRELEASED; urgency=low
   
-    New features:
-    * `show account` now shows owner & tech contact details
-    * last debug.log is kept as debug.log.1
+  ### New features
+
+  * `show account` now shows owner & tech contact details
+  * last debug.log is kept as debug.log.1
   
-    Changes:
-    * `create vm`, `show vm`, `list vms` now use 'server' in place of 'vm'
+  ### Changes
+
+  * `create vm`, `show vm`, `list vms` now use 'server' in place of 'vm'
   
-    Fixes:
-    * `config set` now checks whether the var you're setting is real.
-    * power commands output correct help info
-    * power commands check for too many arguments
-    * `create server` now takes arguments after the name, bringing it in line
-      with the help.
+  ### Fixes
+  
+  * `config set` now checks whether the var you're setting is real.
+  * power commands output correct help info
+  * power commands check for too many arguments
+  * `create server` now takes arguments after the name, bringing it in line
+    with the help.
   
  -- Telyn <telyn@bytemark.co.uk>  Tue, 16 Feb 2016 11:41:45 +0000
 

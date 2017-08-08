@@ -1,22 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
-<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd" xmlns:xi="http://www.w3.org/2001/XInclude">
   <metadata>
     <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
     <id>bytemark</id>
     <title>Bytemark Client</title>
     <version>VERSION</version>
-    <authors>Telyn Z.F., Matthew Bloch</authors>
-    <owners>Telyn Z.F.</owners>
+    <authors>Telyn Z.F., Phil Manavopoulos, Matthew Bloch</authors>
+    <owners>Telyn Z.F., Phil Manavopoulos</owners>
     <summary>Command-line client for Bytemark's self-service hosting.</summary>
     <description>Bytemark Client is a command-line client for interacting
     with Bytemark's self-service hosting.
     </description>
     <projectUrl>http://bytemark.co.uk/docs/command-line</projectUrl>
-    <!--<projectSourceUrl></projectSourceUrl>
-    <docsUrl></docsUrl>
-    <mailingListUrl></mailingListUrl>
-    <bugTrackerUrl>http://projects.bytemark.co.uk/projects/bytemark-client</bugTrackerUrl>-->
+    <projectSourceUrl>https://github.com/BytemarkHosting/bytemark-client</projectSourceUrl>
+    <packageSourceUrl>https://github.com/BytemarkHosting/bytemark-client</packageSourceUrl>
+    <docsUrl>http://bytemark.co.uk/docs/command-line</docsUrl>
+    <!--<mailingListUrl></mailingListUrl>-->
+    <bugTrackerUrl>https://github.com/BytemarkHosting/bytemark-client</bugTrackerUrl>
     <tags>bytemark hosting cloud virtual-machines</tags>
     <copyright>Copyright 2015-2016 Bytemark Limited</copyright>
     <licenseUrl>http://repo.bytemark.co.uk/bytemark-client/LICENSE.txt</licenseUrl>
@@ -26,7 +27,7 @@
       <dependency id="" version="__VERSION__" />
       <dependency id="" />
     </dependencies>-->
-    <releaseNotes></releaseNotes>
+    <releaseNotes><xi:include parse="text" href="../doc/changelog.md" /></releaseNotes>
     <!--<provides></provides>-->
   </metadata>
   <files>

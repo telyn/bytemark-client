@@ -9,7 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// AccountNameFlag is used for all --account flags, including the global one.
+// AccountNameFlag is used for all --account flags, excluding the global one.
 type AccountNameFlag string
 
 // Set runs lib.ParseAccountName to make sure we get just the 'pure' account name; no cluster / endpoint details

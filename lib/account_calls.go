@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"net/http"
 )
 
 /*func (c *Client) RegisterAccount() {
@@ -94,7 +95,7 @@ func (c *bytemarkClient) RegisterNewAccount(acc Account) (newAcc Account, err er
 	newAcc.fillBilling(outputBillingAcc)
 
 	log.LogFile = oldfile
-	if status == 202 {
+	if status == http.StatusAccepted {
 		return newAcc, AccountCreationDeferredError{}
 	}
 	return newAcc, err

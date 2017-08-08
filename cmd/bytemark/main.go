@@ -332,10 +332,9 @@ OPTIONS:
 
 func globalFlags() (flags []cli.Flag) {
 	return []cli.Flag{
-		cli.GenericFlag{
+		cli.StringFlag{
 			Name:  "account",
 			Usage: "account name to use when no other accounts are specified",
-			Value: new(AccountNameFlag),
 		},
 		cli.StringFlag{
 			Name:  "api-endpoint",
@@ -418,13 +417,7 @@ func prepConfig() (flags []cli.Flag, args []string) {
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
-	// import the flags into config
 	flargs := config.ImportFlags(flagset)
-	if config.GetIgnoreErr("endpoint") == "https://int.bigv.io" {
-		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using int")
-		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using int")
-		config.Set("account", "bytemark", "CODE use bytemark account as default on int")
-	}
 	global.Config = config
 
 	//juggle the arguments in order to get the executable on the beginning
