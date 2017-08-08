@@ -3,6 +3,7 @@ package brain
 import (
 	"io"
 
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
@@ -12,6 +13,15 @@ type VLAN struct {
 	Num       int       `json:"num"`
 	UsageType string    `json:"usage_type"`
 	IPRanges  []IPRange `json:"ip_ranges"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (v VLAN) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Num, UsageType"
+	}
+	return "ID, Num, UsageType, IPRanges"
 }
 
 // PrettyPrint writes an overview of this VLAN out to the given writer.

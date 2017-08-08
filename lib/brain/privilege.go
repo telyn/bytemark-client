@@ -2,9 +2,11 @@ package brain
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // PrivilegeLevel is a type to represent different privilege levels.
@@ -97,6 +99,15 @@ func (p Privilege) String() string {
 		return fmt.Sprintf("%s on account #%d for %s%s", p.Level, p.AccountID, p.Username, requiresYubikey)
 	}
 	return fmt.Sprintf("%s for %s%s", p.Level, p.Username, requiresYubikey)
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (p Privilege) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Username, Level, YubikeyRequired, Target"
+	}
+	return "ID, Username, Level, Target, YubikeyRequired"
 }
 
 // PrettyPrint nicely formats the Privilege and sends it to the given writer.

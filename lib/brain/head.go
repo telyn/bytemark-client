@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
@@ -33,6 +34,16 @@ type Head struct {
 
 	VirtualMachineCount int      `json:"virtual_machines_count,omitempty"`
 	VirtualMachines     []string `json:"virtual_machines,omitempty"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (h Head) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Label, ZoneName, Architecture, VirtualMachineCount, MemoryFree, MemoryFree, UsageStrategy"
+	}
+	return "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, VirtualMachineCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
+
 }
 
 // CountVirtualMachines returns the number of virtual machines running on this head

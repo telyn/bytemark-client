@@ -2,8 +2,10 @@ package brain
 
 import (
 	"bytes"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // Disc is a representation of a VM's disc.
@@ -22,6 +24,15 @@ type Disc struct {
 
 	NewStorageGrade string `json:"new_storage_grade,omitempty"`
 	NewStoragePool  string `json:"new_storage_pool,omitempty"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (d Disc) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Label, StorageGrade, Size, BackupCount"
+	}
+	return "ID, Label, StorageGrade, Size, BackupCount, BackupSchedules"
 }
 
 // PrettyPrint outputs the disc nicely-formatted to the writer.

@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
@@ -45,6 +46,15 @@ func (a Account) CountVirtualMachines() (servers int) {
 	return
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (a Account) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "BillingID, Name, Suspended"
+	}
+	return "BillingID, Name, Suspended, Groups"
+}
+
 // billingAccount copies all the billing parts of the account into a new billingAccount.
 func (a Account) billingAccount() (b *billing.Account) {
 	b = new(billing.Account)
@@ -77,12 +87,16 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{- end }}
 {{ end -}}
 
-{{ define "account_full" }}
+{{ define "account_medium" }}
   {{- if .IsDefaultAccount -}}	
     Your default account ({{ template "account_name" . }})
   {{- else -}}
     {{- template "account_name" . -}}
-  {{- end }}
+  {{- end -}}
+{{ end }}
+
+{{ define "account_full" -}}
+{{- template "account_medium" . }}
 {{ range .Groups -}}
     {{ template "group_overview" . -}}
 {{- end -}}

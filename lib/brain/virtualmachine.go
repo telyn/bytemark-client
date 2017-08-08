@@ -2,12 +2,14 @@ package brain
 
 import (
 	"bytes"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 	"net"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // VirtualMachine represents a VirtualMachine, as passed around from the virtual_machines endpoint
@@ -35,6 +37,15 @@ type VirtualMachine struct {
 	NetworkInterfaces []NetworkInterface `json:"network_interfaces,omitempty"`
 
 	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (vm VirtualMachine) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Hostname, ManagementAddress, Memory, Cores, Autoreboot, PowerOn, Deleted"
+	}
+	return "ID, Hostname, ManagementAddress, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
 }
 
 // PrettyPrint outputs a nice human-readable overview of the server to the given writer.

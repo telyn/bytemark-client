@@ -1,4 +1,3 @@
-
 variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
@@ -35,6 +34,7 @@ stages:
     - go get github.com/BytemarkHosting/auth-client
     - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - mkdir -p $GOPATH/pkg $GOPATH/bin
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
@@ -73,6 +73,8 @@ test:
     - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - export GOPATH
+    - go generate github.com/BytemarkHosting/bytemark-client/lib/output
     - |
       for pkg in $(go list ./... | grep -v vendor/); do
         shortpkg="${pkg##github.com/BytemarkHosting/}"

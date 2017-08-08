@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
@@ -16,6 +17,12 @@ type IPRange struct {
 	VLANNum   int      `json:"vlan_num"`
 	Zones     []string `json:"zones"`
 	Available *big.Int `json:"available"` // wants to be a pointer because MarshalText is defined on the pointer type and we need it for the tests (but not for non-tests)
+
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (ipr IPRange) DefaultFields(f output.Format) string {
+	return "ID, Spec, VLANNum, Zones, Available"
 }
 
 // String serialises an IP range to easily be output

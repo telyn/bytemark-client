@@ -1,6 +1,7 @@
 package brain
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"io"
 )
@@ -13,6 +14,15 @@ type Backup struct {
 	Disc
 	ParentDiscID int  `json:"parent_disc_id"`
 	Manual       bool `json:"manual"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (s Backup) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Label, Size"
+	}
+	return "ID, Manual, Label, StorageGrade, Size, BackupCount, BackupSchedules"
 }
 
 // OnColdStorage returns true if the disc is currently on cold storage (whatever storage grade that is)
