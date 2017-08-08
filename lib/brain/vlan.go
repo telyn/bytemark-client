@@ -15,7 +15,7 @@ type VLAN struct {
 	IPRanges  []IPRange `json:"ip_ranges"`
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (v VLAN) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:

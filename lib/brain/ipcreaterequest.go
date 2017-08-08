@@ -18,7 +18,7 @@ type IPCreateRequest struct {
 	IPs []net.IP `json:"ips"`
 }
 
-// DefaultFields returns the default fields for feeding into github.com/BytemarkHosting/row.FieldsFrom
+// DefaultFields returns the default fields for feeding into github.com/BytemarkHosting/row.From
 func (ipcr IPCreateRequest) DefaultFields(f output.Format) string {
 	return "Addresses, Family, Reason, Contiguous, IPs"
 }

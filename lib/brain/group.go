@@ -23,7 +23,7 @@ func (g Group) CountVirtualMachines() int {
 	return len(g.VirtualMachines)
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (g Group) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
@@ -32,7 +32,7 @@ func (g Group) DefaultFields(f output.Format) string {
 	return "Name, VirtualMachines"
 }
 
-// PrettyPrint outputs a vaguely human-readable version of the definition to wr. Detail is ignored.
+// PrettyPrint outputs a vaguely human-readable version of the definition to wr.
 func (g Group) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	groupTpl := `
 {{ define "group_sgl " -}}

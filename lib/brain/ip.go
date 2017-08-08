@@ -17,7 +17,7 @@ type IP struct {
 	IP net.IP `json:"ip"`
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (ip IP) DefaultFields(f output.Format) string {
 	return "IP, RDns"
 }

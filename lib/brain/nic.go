@@ -37,7 +37,7 @@ func (nic NetworkInterface) ExtraIPStrings() (ips []string) {
 	return ips
 }
 
-// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/bytemark-client for this type.
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (nic NetworkInterface) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
@@ -46,7 +46,7 @@ func (nic NetworkInterface) DefaultFields(f output.Format) string {
 	return "ID, Label, Mac, VlanNum, IPs, ExtraIPStrings"
 }
 
-// PrettyPrint outputs the 
+// PrettyPrint outputs the network interface in a human-readable form to the supplied writer.
 func (nic NetworkInterface) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	nicTpl := `
 {{ define "nic_sgl" }}{{ .String }}{{ end }}
