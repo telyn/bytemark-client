@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"math/big"
 	"net/http"
@@ -10,6 +8,9 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
 )
 
 type simpleGetTestFn func(Client) (interface{}, error)

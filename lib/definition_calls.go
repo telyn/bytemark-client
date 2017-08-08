@@ -3,9 +3,10 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"regexp"
 	"sort"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // Definitions represent all the possible things that can be returned as part of BigV's /definitions endpoint.

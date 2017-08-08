@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/cheekybits/is"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestGeneratePassword(t *testing.T) {

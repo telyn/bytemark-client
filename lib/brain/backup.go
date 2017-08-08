@@ -1,9 +1,10 @@
 package brain
 
 import (
+	"io"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"io"
 )
 
 // ColdStorageGrade is the name for the storage grade used as 'cold storage' - i.e. where backups get sent after being taken.

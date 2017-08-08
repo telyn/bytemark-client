@@ -1,10 +1,11 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 func validAlways(string) (string, bool) {

@@ -4,14 +4,15 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // DefaultSessionValidity is the default for the --session-validity flag

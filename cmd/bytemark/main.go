@@ -3,17 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"net/url"
+	"os"
+	"os/signal"
+	"strings"
+
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/bgentry/speakeasy"
 	"github.com/urfave/cli"
-	"io/ioutil"
-	"net/url"
-	"os"
-	"os/signal"
-	"strings"
 )
 
 // forceFlag is common to a bunch of commands and can have a generic Usage.

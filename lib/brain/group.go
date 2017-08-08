@@ -2,9 +2,10 @@ package brain
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"io"
 )
 
 // Group represents a group

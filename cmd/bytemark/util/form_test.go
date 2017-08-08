@@ -1,9 +1,10 @@
 package util
 
 import (
-	"github.com/cheekybits/is"
 	"strconv"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestLuhn(t *testing.T) {

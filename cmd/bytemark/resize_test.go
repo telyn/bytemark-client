@@ -1,11 +1,12 @@
 package main
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
-	"strings"
-	"testing"
 )
 
 func TestResizeDisk(t *testing.T) {

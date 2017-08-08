@@ -2,10 +2,11 @@ package util
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // IPFlag is a flag.Value used to provide an array of net.IPs

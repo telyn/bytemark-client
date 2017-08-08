@@ -1,8 +1,9 @@
 package lib
 
 import (
-	"github.com/cheekybits/is"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestParseVirtualMachineName(t *testing.T) {

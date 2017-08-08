@@ -2,6 +2,7 @@ package mocks
 
 import (
 	"flag"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	mock "github.com/maraino/go-mock"

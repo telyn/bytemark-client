@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
-	"testing"
 )
 
 func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {

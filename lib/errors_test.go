@@ -1,9 +1,10 @@
 package lib
 
 import (
-	"github.com/cheekybits/is"
 	"strings"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestBadRequestError(t *testing.T) {

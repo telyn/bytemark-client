@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"github.com/urfave/cli"
 	"strings"
 	"testing"
 	"unicode"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"github.com/urfave/cli"
 )
 
 // This test ensures that all commands have an Action, Description, Usage and UsageText

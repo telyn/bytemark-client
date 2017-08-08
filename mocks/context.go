@@ -1,9 +1,10 @@
 package mocks
 
 import (
+	"time"
+
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
-	"time"
 )
 
 type CliContext struct {

@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"strings"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
-	"net"
-	"strings"
 )
 
 // ProviderFunc is the function type that can be passed to With()

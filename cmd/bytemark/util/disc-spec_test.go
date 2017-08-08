@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 func TestParseDiscSpec(t *testing.T) {

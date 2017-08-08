@@ -2,10 +2,11 @@ package lib
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/billing"
-	"github.com/cheekybits/is"
 	"net/http"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/cheekybits/is"
 )
 
 func TestGetAccount(t *testing.T) {

@@ -2,10 +2,11 @@ package lib
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // ok this shit is a bit weird / crap

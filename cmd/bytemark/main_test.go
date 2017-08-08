@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"math/big"
+	"os"
+	"testing"
+
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -9,10 +14,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
-	"io/ioutil"
-	"math/big"
-	"os"
-	"testing"
 )
 
 var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}

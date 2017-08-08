@@ -1,11 +1,12 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"os"
 	"os/exec"
 	"strings"
 	"syscall"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 func CallBrowser(url string) error {
