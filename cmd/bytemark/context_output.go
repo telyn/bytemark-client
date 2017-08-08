@@ -52,7 +52,7 @@ func (c *Context) CreateOutputConfig(obj output.DefaultFieldsHaver, defaultForma
 // OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
 // thing should be like "server", "servers", "group", "groups"
 // jsonType should be "array" or "object"
-func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli.Flag {
+func OutputFlags(thing string, jsonType string) []cli.Flag {
 	return []cli.Flag{
 		cli.BoolFlag{
 			Name:  "json",
@@ -65,7 +65,6 @@ func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli
 		cli.StringFlag{
 			Name:  "table-fields",
 			Usage: fmt.Sprintf("The fields of the %s to output in the table, comma separated. set to 'help' for a list of fields for this command", thing),
-			Value: defaultTableFields,
 		},
 	}
 }

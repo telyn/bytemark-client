@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"os"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -102,7 +105,7 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs
 
 If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags: append(OutputFlags("server", "object", ""),
+		Flags: append(OutputFlags("server", "object"),
 			cli.IntFlag{
 				Name:  "cores",
 				Value: 1,
@@ -412,25 +415,33 @@ func createServer(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: vm}, func() (err error) {
-		log.Log("cloud server created successfully")
-		err = vm.PrettyPrint(os.Stderr, prettyprint.Full)
-		if err != nil {
-			return
-		}
-		if spec.Reimage != nil {
-			log.Log()
-			log.Logf("Root password: ") // logf so we don't get a trailing \r\n
-			log.Outputf("%s\r\n", spec.Reimage.RootPassword)
-		} else {
-			log.Log("Machine was not imaged")
-		}
-		return
-	})
+	return c.OutputInDesiredForm(CreatedVirtualMachine{Spec: spec, VirtualMachine: vm})
 }
 
 // CreatedVirtualMachine is a struct containing the vm object returned by the VM after creation, and the spec that went into creating it.
 type CreatedVirtualMachine struct {
 	Spec           brain.VirtualMachineSpec `json:"spec"`
 	VirtualMachine brain.VirtualMachine     `json:"virtual_machine"`
+}
+
+func (cvm CreatedVirtualMachine) DefaultFields(f output.Format) string {
+	return "Spec, VirtualMachine"
+}
+
+func (cvm CreatedVirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (err error) {
+	_, err = fmt.Fprintf(wr, "cloud server created successfully\r\n")
+	if err != nil {
+		return
+	}
+
+	err = cvm.VirtualMachine.PrettyPrint(wr, prettyprint.Full)
+	if err != nil {
+		return
+	}
+	if cvm.Spec.Reimage != nil {
+		_, err = fmt.Fprintf(wr, "\r\nRoot password: %s\r\n", cvm.Spec.Reimage.RootPassword)
+	} else {
+		_, err = fmt.Fprintf(wr, "Machine was not imaged\r\n")
+	}
+	return
 }
