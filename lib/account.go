@@ -113,3 +113,27 @@ func (a Account) String() string {
 	}
 	return buf.String()
 }
+
+type Accounts []Account
+
+func (as Accounts) DefaultFields(f output.Format) string {
+	return (Account{}).DefaultFields(f)
+}
+
+func (as Accounts) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	accountsTpl := `
+{{ define "accounts_sgl" -}}
+{{- range . -}}
+{{- .Name }}, {{ end -}}
+{{- end }}
+
+{{ define "accounts_medium" }}{{ template "accounts_sgl" . }}{{ end }}
+
+{{ define "accounts_full" }}
+Accounts: 
+{{ range . -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}`
+	return prettyprint.Run(wr, accountsTpl, "accounts"+string(detail), as)
+}

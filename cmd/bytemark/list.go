@@ -31,26 +31,21 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the accounts you're able to see",
 			UsageText:   "bytemark list accounts",
 			Description: `This will list all the accounts that your authentication token has some form of access to.`,
-			Flags:       OutputFlags("accounts", "array", DefaultAccountTableFields),
+			Flags:       OutputFlags("accounts", "array"),
 			Action: With(AuthProvider, func(c *Context) error {
 				accounts, err := global.Client.GetAccounts()
 
 				if err != nil {
 					return err
 				}
-				return c.OutputInDesiredForm(accounts, func() error {
-					for _, account := range accounts {
-						log.Output(account.Name)
-					}
-					return nil
-				})
+				return c.OutputInDesiredForm(accounts)
 			}),
 		}, {
 			Name:        "discs",
 			Usage:       "list all the discs attached to a given virtual machine",
 			UsageText:   "bytemark list discs <virtual machine>",
 			Description: `This command lists all the discs attached to the given virtual machine. They're presented in the following format: 'LABEL: SIZE GRADE', where size is an integer number of megabytes. Add the --human flag to output the size in GiB (rounded down to the nearest GiB)`,
-			Flags: append(OutputFlags("discs", "array", DefaultDiscTableFields),
+			Flags: append(OutputFlags("discs", "array"),
 				cli.BoolFlag{
 					Name:  "human",
 					Usage: "output disc size in GiB, suffixed",

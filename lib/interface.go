@@ -80,7 +80,7 @@ type Client interface {
 	// GetDefaultAccount gets the most-likely default account for the user.
 	GetDefaultAccount() (account Account, err error)
 	// GetAccounts gets all the accounts the logged-in user can see.
-	GetAccounts() (accounts []Account, err error)
+	GetAccounts() (accounts Accounts, err error)
 
 	//
 	// DISCS

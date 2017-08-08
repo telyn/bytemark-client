@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"net/http"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"net/http"
 )
 
 /*func (c *Client) RegisterAccount() {
@@ -188,7 +189,7 @@ func (c *bytemarkClient) GetDefaultAccount() (acc Account, err error) {
 }
 
 // Gets all Accounts you can see, merging data from both the brain and the billing
-func (c *bytemarkClient) GetAccounts() (accounts []Account, err error) {
+func (c *bytemarkClient) GetAccounts() (accounts Accounts, err error) {
 	byName := make(map[string]*Account)
 	billingAccounts, err := c.getBillingAccounts()
 	if err != nil {
