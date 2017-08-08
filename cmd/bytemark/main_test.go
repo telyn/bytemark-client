@@ -241,6 +241,13 @@ func getFixtureStoragePool() brain.StoragePool {
 	}
 }
 
+func getFixtureDisc() brain.Disc {
+	return brain.Disc{
+		ID:    132,
+		Label: "disc.sata-1.132",
+	}
+}
+
 func getFixtureGroup() brain.Group {
 	vms := make([]brain.VirtualMachine, 1)
 	vms[0] = getFixtureVM()

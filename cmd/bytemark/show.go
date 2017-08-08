@@ -249,6 +249,28 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
+				Name:        "disc_by_id",
+				Usage:       "displays details about a disc",
+				UsageText:   "bytemark show disc_by_id [--json] <id>",
+				Description: `Displays a collection of details about the disc.`,
+				Flags: append(OutputFlags("disc details", "object", DefaultDiscTableFields),
+					cli.IntFlag{
+						Name:  "disc",
+						Usage: "the disc to display",
+					},
+				),
+				Action: With(AuthProvider, OptionalArgs("disc"), RequiredFlags("disc"), func(c *Context) error {
+					disc, err := global.Client.GetDiscByID(c.Int("disc"))
+					if err != nil {
+						return err
+					}
+
+					return c.OutputInDesiredForm(disc, func() error {
+						return disc.PrettyPrint(global.App.Writer, prettyprint.Full)
+					})
+				}),
+			},
+			{
 				Name:      "vlan",
 				Usage:     "shows the details of a VLAN",
 				UsageText: "bytemark --admin show vlan [--json] <num>",

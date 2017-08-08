@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use Getopt::Long;
+use English;
+
+my $max_entries = -1;
+GetOptions(
+	"entries=i" => \$max_entries)
+or die("error in command line arguments\n");
+
+my $format = shift;
+
+my $DATE = $OSNAME eq 'linux' ? 'date' : 'gdate';
+
+my @changelog_entries;
+
+{
+	my %entry;
+	my $expecting_blank = 0;
+	while(<>) {
+		if ( $max_entries == 0 ) {
+			last;
+		}
+		if ( /^([a-z0-9-]+) \(([^)]+)\)/ ) {
+			$entry{'name'} = $1;
+			$entry{'version'} = $2;
+			$expecting_blank = 1;
+		}
+		if ( /^ -- ([^>]*>)  (.*)$/ ) {
+			$entry{'author'} = $1;
+			$entry{'date'} = $2;
+			my %newentry = %entry;
+			push @changelog_entries, \%newentry;
+			%entry = ();
+			if ( $max_entries > 0 ) {
+				$max_entries--;
+			}
+		}
+		if ( /^  (.*)$/ ) {
+			$entry{'message'} .= "$1\n"
+		}
+	}
+}
+
+if ($format eq "rpm") {
+	foreach my $entry_ref (@changelog_entries) {
+		my %entry = %$entry_ref;
+		my $date = $entry{'date'};
+		$date = `LANG=en_US $DATE --date="$date" +"%a %b %d %Y"`;
+		chomp $date;
+
+		my @lines = split /^/m, $entry{'message'};
+		for (my $i = 0, $_ = $lines[0]; $i < @lines ; $i++, $_ = $lines[$i]) {
+			chomp;
+
+			if ( /^\s*\* (.*)$/ ) {
+				$lines[$i] = "-   $1";
+			} elsif ( /^\s+(.*)$/ ) {
+				$lines[$i] = "- $1";
+			} else {
+				$lines[$i] = "- $_";
+			}
+			chomp $lines[$i];
+		}
+		my $message = join "\n", @lines;
+		$message =~ s/\n+/\n/gm;
+
+		print "* $date $entry{'author'} $entry{'version'}\n";
+		print "$message\n\n";
+	}
+} elsif ($format eq "md") {
+	foreach my $entry_ref (@changelog_entries) {
+		my %entry = %$entry_ref;
+		my $date = $entry{'date'};
+		$date = `LANG=en_US $DATE --date="$date" +"%Y-%m-%d"`;
+		chomp $date;
+
+		print "## $entry{'version'} ($date)\n";
+		print "$entry{'message'}\n\n";
+	}
+
+} else {
+	print Dumper(@changelog_entries);
+}

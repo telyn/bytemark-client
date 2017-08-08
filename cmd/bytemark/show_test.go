@@ -478,3 +478,19 @@ func TestShowPrivileges(t *testing.T) {
 		}
 	}
 }
+
+func TestAdminShowDiscByIDCommand(t *testing.T) {
+	is := is.New(t)
+	_, c := baseTestAuthSetup(t, true)
+
+	discID := 132
+	disc := getFixtureDisc()
+	c.When("GetDiscByID", discID).Return(&disc, nil).Times(1)
+
+	err := global.App.Run(strings.Split("bytemark --admin show disc_by_id 132", " "))
+	is.Nil(err)
+
+	if ok, err := c.Verify(); !ok {
+		t.Fatal(err)
+	}
+}

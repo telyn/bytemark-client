@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
@@ -101,6 +102,18 @@ func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (d
 		return
 	}
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+
+	if err != nil {
+		return
+	}
+
+	_, _, err = r.Run(nil, &disc)
+	return
+}
+
+// GetDiscByID returns the specified disc from the given ID.
+func (c *bytemarkClient) GetDiscByID(id int) (disc brain.Disc, err error) {
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/discs/%s", strconv.Itoa(id))
 
 	if err != nil {
 		return

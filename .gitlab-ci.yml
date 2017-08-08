@@ -153,6 +153,18 @@ build-manpage:
     - doc/bytemark.pdf
     expire_in: '1 month'
 
+build-changelogs:
+  stage: build
+  image: perl:5
+  script:
+    - gen/convert-changelog rpm < doc/changelog > doc/changelog.rpm
+    - gen/convert-changelog md < doc/changelog > doc/changelog.md
+
+  artifacts:
+    paths:
+      - doc/changelog.*
+    expire_in: '1 month'
+
 .build-job: &build
   stage: build
   image: golang:$GOVERSION
@@ -225,11 +237,12 @@ package-generic-amd64:
   - |
     for i in bytemark-amd64-*; do
       cp $i bytemark
+      cp doc/changelog.md doc/changelog.txt
       if echo "$i" | grep -- '-windows$'; then
           mv bytemark bytemark.exe
-          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog doc/LICENSE.txt
+          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog.txt doc/LICENSE.txt
       else
-          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
+          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
       fi
     done
   dependencies:
@@ -239,6 +252,7 @@ package-generic-amd64:
   - build-amd64-openbsd
   - build-amd64-windows
   - build-manpage
+  - build-changelogs
   artifacts:
     paths:
     - "*.zip"
@@ -272,6 +286,7 @@ package-rpm-amd64:
   image: nrechn/fedora-mock
   script:
   - mkdir -p ~/rpmbuild/SOURCES
+  - cat doc/changelog.rpm >> .gitlab-ci/bytemark-client.spec
   - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
   - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
   - rpmbuild --define "version ${VERSION:-$CHANGELOG_VERSION}" --define "release ${SNAPSHOT_VERSION}" -bb .gitlab-ci/bytemark-client.spec
@@ -283,6 +298,7 @@ package-rpm-amd64:
   dependencies:
   - build-amd64-linux
   - build-manpage
+  - build-changelogs
 
 # makes a chocolatey package
 package-windows-amd64:
@@ -292,7 +308,9 @@ package-windows-amd64:
     - mkdir -p choco/tools
       # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
     - CHANGELOG_VERSION=${CHANGELOG_VERSION%%~*}
-    - sed -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - sed -i 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g' doc/changelog.md
+    - xmlstarlet tr --xinclude .gitlab-ci/noop.xsl .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - sed -i -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" choco/bytemark-client.nuspec
     - mv bytemark-amd64-windows choco/tools/bytemark.exe
     - cd choco
     - mono /usr/bin/choco.exe pack bytemark-client.nuspec
@@ -304,6 +322,7 @@ package-windows-amd64:
       expire_in: "1 month"
     dependencies:
     - build-amd64-windows
+    - build-changelogs
 
 #### RELEASE STAGE
 ## the release stage pushes the tars, zips, debs & rpms out to repo.bytemark
