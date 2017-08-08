@@ -22,9 +22,8 @@ func (s Backup) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
 		return "ID, Label, Size"
-	default: // also output.Table
-		return "ID, Manual, Label, StorageGrade, Size, BackupCount, BackupSchedules"
 	}
+	return "ID, Manual, Label, StorageGrade, Size, BackupCount, BackupSchedules"
 }
 
 // OnColdStorage returns true if the disc is currently on cold storage (whatever storage grade that is)

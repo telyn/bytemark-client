@@ -11,9 +11,8 @@ func definitionDefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
 		return "Name, Description"
-	default: // also output.Table
-		return "Name, Description"
 	}
+	return "Name, Description"
 }
 
 func definitionPrettyPrint(definition interface{}, wr io.Writer, detail prettyprint.DetailLevel) error {
@@ -42,7 +41,7 @@ func (d DistributionDefinition) PrettyPrint(wr io.Writer, detail prettyprint.Det
 	return definitionPrettyPrint(d, wr, detail)
 }
 
-// HardwareProfileDefinition is an object we assemble from hardwareprofiles in the /*Definitions API call and some static data in lib/definitions.go
+// HardwareProfileDefinition is an object we assemble from hardwareprofiles from the /definitions API call
 // in the future (bytemark-client 3.0?) a slice of these this will replace the Definitions.HardwareProfiles slice.
 type HardwareProfileDefinition struct {
 	Name        string
@@ -59,7 +58,7 @@ func (hp HardwareProfileDefinition) PrettyPrint(wr io.Writer, detail prettyprint
 	return definitionPrettyPrint(hp, wr, detail)
 }
 
-// StorageGradeDefinition is an object we assemble from storage_grades and storage_grade_descriptions in the /*Definitions API call
+// StorageGradeDefinition is an object we assemble from storage_grades and storage_grade_descriptions from the /definitions API call
 // in the future (bytemark-client 3.0?) a slice of these this will replace the Definitions.StorageGrades slice and Definitions.StorageGradeDescriptions map.
 type StorageGradeDefinition struct {
 	Name        string
@@ -76,7 +75,7 @@ func (sg StorageGradeDefinition) PrettyPrint(wr io.Writer, detail prettyprint.De
 	return definitionPrettyPrint(sg, wr, detail)
 }
 
-// ZoneDefinition is an object we assemble from zone_names in the /*Definitions API call and some static data in lib/definitions.go
+// ZoneDefinition is an object we assemble from zone_names from the /definitions API call and some static data in lib/definitions.go
 // in the future (bytemark-client 3.0?) a slice of these this will replace the Definitions.ZoneNames slice.
 type ZoneDefinition struct {
 	Name        string
