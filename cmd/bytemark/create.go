@@ -419,6 +419,7 @@ func createServer(c *Context) (err error) {
 }
 
 // CreatedVirtualMachine is a struct containing the vm object returned by the VM after creation, and the spec that went into creating it.
+// TODO(telyn): move this type into lib/brain?
 type CreatedVirtualMachine struct {
 	Spec           brain.VirtualMachineSpec `json:"spec"`
 	VirtualMachine brain.VirtualMachine     `json:"virtual_machine"`
@@ -429,6 +430,7 @@ func (cvm CreatedVirtualMachine) DefaultFields(f output.Format) string {
 	return "Spec, VirtualMachine"
 }
 
+// PrettyPrint outputs this created virtual machine in a vaguely nice format to the given writer. detail is ignored.
 func (cvm CreatedVirtualMachine) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (err error) {
 	_, err = fmt.Fprintf(wr, "cloud server created successfully\r\n")
 	if err != nil {

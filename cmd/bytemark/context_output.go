@@ -33,7 +33,7 @@ func (c *Context) determineOutputFormat(defaultFormat ...string) (output.Format,
 
 }
 
-func (c *Context) CreateOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...string) (cfg output.Config, err error) {
+func (c *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...string) (cfg output.Config, err error) {
 	cfg = output.Config{}
 	cfg.Format, err = c.determineOutputFormat(defaultFormat...)
 
@@ -77,7 +77,7 @@ func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...s
 	if obj == nil {
 		return fmt.Errorf("Object passed to OutputInDesiredForm was nil")
 	}
-	cfg, err := c.CreateOutputConfig(obj, defaultFormat...)
+	cfg, err := c.createOutputConfig(obj, defaultFormat...)
 	if err != nil {
 		return err
 	}
