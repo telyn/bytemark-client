@@ -85,7 +85,7 @@ func (ds Discs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 
 {{ define "discs_medium" -}}
 {{- range . -}}
-{{ prettysprint "_sgl" . }}
+{{ prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 

@@ -18,8 +18,8 @@ func (gs VirtualMachines) PrettyPrint(wr io.Writer, detail prettyprint.DetailLev
 {{ define "virtualmachines_sgl" }}{{ len . }} servers{{ end }}
 
 {{ define "virtualmachines_medium" -}}
-{{- range -}}
-{{- prettysprint "_sgl" . }}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 

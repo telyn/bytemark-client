@@ -65,8 +65,8 @@ func (hs Tails) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 {{ define "tails_sgl" }}{{ len . }} servers{{ end }}
 
 {{ define "tails_medium" -}}
-{{- range -}}
-{{- prettysprint "_sgl" . }}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 

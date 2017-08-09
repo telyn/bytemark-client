@@ -81,8 +81,8 @@ func (hs StoragePools) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel)
 {{ define "storagepools_sgl" }}{{ len . }} servers{{ end }}
 
 {{ define "storagepools_medium" -}}
-{{- range -}}
-{{- prettysprint "_sgl" . }}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 

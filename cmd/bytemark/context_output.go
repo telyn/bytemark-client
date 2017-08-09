@@ -74,6 +74,9 @@ func OutputFlags(thing string, jsonType string) []cli.Flag {
 // otherwise calls humanOutputFn (which should output it in a very human form - PrettyPrint or such
 // defaultFormat is an optional string stating what the default format should be
 func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...string) error {
+	if obj == nil {
+		return fmt.Errorf("Object passed to OutputInDesiredForm was nil")
+	}
 	cfg, err := c.CreateOutputConfig(obj, defaultFormat...)
 	if err != nil {
 		return err

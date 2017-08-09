@@ -74,8 +74,8 @@ func (iprs IPRanges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) e
 {{ define "ipranges_sgl" }}{{ len . }} servers{{ end }}
 
 {{ define "ipranges_medium" -}}
-{{- range -}}
-{{- prettysprint "_sgl" . }}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 

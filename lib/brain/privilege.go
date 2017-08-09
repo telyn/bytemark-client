@@ -142,15 +142,15 @@ func (ps Privileges) DefaultFields(f output.Format) string {
 
 func (ps Privileges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	privilegesTpl := `
-{{ define "tails_sgl" }}{{ len . }} servers{{ end }}
+{{ define "privileges_sgl" }}{{ len . }} servers{{ end }}
 
-{{ define "tails_medium" -}}
-{{- range -}}
-{{- prettysprint "_sgl" . }}
+{{ define "privileges_medium" -}}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 
-{{ define "tails_full" }}{{ template "tails_medium" . }}{{ end }}
+{{ define "privileges_full" }}{{ template "privileges_medium" . }}{{ end }}
 `
 	return prettyprint.Run(wr, privilegesTpl, "privileges"+string(detail), ps)
 }

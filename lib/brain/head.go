@@ -89,8 +89,8 @@ func (hs Heads) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 {{ define "heads_sgl" }}{{ len . }} servers{{ end }}
 
 {{ define "heads_medium" -}}
-{{- range -}}
-{{- prettysprint "_sgl" . }}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 

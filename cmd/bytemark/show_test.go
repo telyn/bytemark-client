@@ -42,7 +42,7 @@ func mkExpectedOutput(template map[string]string, substitute string) map[string]
 
 var showAccountTestOutput = map[string]string{
 	"table": "+-----------+------+-----------+--------+\n| BillingID | Name | Suspended | Groups |\n+-----------+------+-----------+--------+\n|       213 | %s | false     |        |\n+-----------+------+-----------+--------+\n",
-	"json":  "{\n    \"name\": \"%s\",\n    \"owner\": {\n        \"username\": \"\",\n        \"email\": \"\",\n        \"password\": \"\",\n        \"firstname\": \"%s\",\n        \"surname\": \"Testo\",\n        \"address\": \"\",\n        \"city\": \"\",\n        \"postcode\": \"\",\n        \"country\": \"\",\n        \"phone\": \"\"\n    },\n    \"technical_contact\": {\n        \"username\": \"\",\n        \"email\": \"\",\n        \"password\": \"\",\n        \"firstname\": \"%s\",\n        \"surname\": \"Testo\",\n        \"address\": \"\",\n        \"city\": \"\",\n        \"postcode\": \"\",\n        \"country\": \"\",\n        \"phone\": \"\"\n    },\n    \"billing_id\": 213,\n    \"brain_id\": 112,\n    \"card_reference\": \"\",\n    \"groups\": [],\n    \"suspended\": false\n}",
+	"json":  "{\n    \"name\": \"%s\",\n    \"owner\": {\n        \"username\": \"\",\n        \"email\": \"\",\n        \"password\": \"\",\n        \"firstname\": \"%s\",\n        \"surname\": \"Testo\",\n        \"address\": \"\",\n        \"city\": \"\",\n        \"postcode\": \"\",\n        \"country\": \"\",\n        \"phone\": \"\"\n    },\n    \"technical_contact\": {\n        \"username\": \"\",\n        \"email\": \"\",\n        \"password\": \"\",\n        \"firstname\": \"%s\",\n        \"surname\": \"Testo\",\n        \"address\": \"\",\n        \"city\": \"\",\n        \"postcode\": \"\",\n        \"country\": \"\",\n        \"phone\": \"\"\n    },\n    \"billing_id\": 213,\n    \"brain_id\": 112,\n    \"card_reference\": \"\",\n    \"groups\": [],\n    \"suspended\": false\n}\n",
 	"human": "213 - %s\n",
 }
 
@@ -404,7 +404,7 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	is := is.New(t)
 	_, c := baseTestAuthSetup(t, true)
 
-	discs := []brain.Disc{{ID: 134, StorageGrade: "sata", Size: 25600}}
+	discs := brain.Discs{{ID: 134, StorageGrade: "sata", Size: 25600}}
 	c.When("GetMigratingDiscs").Return(discs, nil).Times(1)
 
 	err := global.App.Run(strings.Split("bytemark --admin show migrating_discs", " "))

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
@@ -14,23 +13,12 @@ import (
 func TestOutput(t *testing.T) {
 	oldWriter := global.App.Writer
 
-	humanFnOK := func() error {
-		fmt.Fprint(global.App.Writer, "OK")
-		return nil
-	}
-
-	humanFnErr := func() error {
-		fmt.Fprint(global.App.Writer, "NOT OK")
-		return fmt.Errorf("humanFnErr called")
-	}
-
 	tests := []struct {
 		ShouldErr     bool
 		DefaultFormat []string
 		ConfigFormat  util.ConfigVar
 		JSONFlag      bool
 		TableFlag     bool
-		HumanFn       func() error
 		Object        output.Outputtable
 		Expected      string
 		TableFields   string
@@ -38,25 +26,23 @@ func TestOutput(t *testing.T) {
 		{ // 0
 			// default to human output
 			ConfigFormat: util.ConfigVar{"output-format", "human", "CODE"},
-			HumanFn:      humanFnOK,
 			Object: brain.Disc{
+				Label:        "disk-1",
 				StorageGrade: "sata",
 				Size:         25660,
 				ID:           123,
 			},
-			Expected: "OK",
+			Expected: "disk-1 - 25GiB, sata grade\n",
 		}, { // 1
 			// default to human output with an error
 			ConfigFormat: util.ConfigVar{"output-format", "human", "CODE"},
-			HumanFn:      humanFnErr,
 			Object:       nil,
-			Expected:     "NOT OK",
+			Expected:     "",
 			ShouldErr:    true,
 		}, { // 2
 			// when there's a default format specific to the command, use that instead of the uber-default
 			ConfigFormat:  util.ConfigVar{"output-format", "human", "CODE"},
 			DefaultFormat: []string{"table"},
-			HumanFn:       humanFnErr,
 			Object: brain.Disc{
 				StorageGrade: "sata",
 				Size:         25660,
@@ -69,38 +55,34 @@ func TestOutput(t *testing.T) {
 			ConfigFormat:  util.ConfigVar{"output-format", "human", "CODE"},
 			DefaultFormat: []string{"table"},
 			JSONFlag:      true,
-			HumanFn:       humanFnErr,
 			Object: brain.Group{
 				Name: "my-cool-group",
 				ID:   11323,
 			},
-			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}",
+			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}\n",
 		}, { // 4
 			// or if output-format is set by a FILE
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
 			DefaultFormat: []string{"table"},
-			HumanFn:       humanFnErr,
 			Object: brain.Group{
 				Name: "my-cool-group",
 				ID:   11323,
 			},
-			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}",
+			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}\n",
 			// but the table and json flags should have precedence in every situation
 		}, { // 5
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
 			DefaultFormat: []string{"human"},
-			HumanFn:       humanFnErr,
 			TableFlag:     true,
 			Object: brain.Group{
 				Name: "my-cool-group",
 				ID:   11323,
 			},
-			Expected: "+----------------------+---------------------------------------------+---------------+-----------+-------+-----------------+\n| CountVirtualMachines |                   String                    |     Name      | AccountID |  ID   | VirtualMachines |\n+----------------------+---------------------------------------------+---------------+-----------+-------+-----------------+\n|                    0 | group 11323 \"my-cool-group\" - has 0 servers | my-cool-group |         0 | 11323 |                 |\n+----------------------+---------------------------------------------+---------------+-----------+-------+-----------------+\n",
+			Expected: "+---------------+-----------------+\n|     Name      | VirtualMachines |\n+---------------+-----------------+\n| my-cool-group |                 |\n+---------------+-----------------+\n",
 			// also, --table-fields being non-empty should imply --table and be case insensitive
 		}, { // 6
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
 			DefaultFormat: []string{"human"},
-			HumanFn:       humanFnErr,
 			TableFlag:     false,
 			TableFields:   "AccountID,ID,Name,VirtualMachines",
 			Object: brain.Group{

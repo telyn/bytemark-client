@@ -64,7 +64,7 @@ func (vs VLANs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 
 {{ define "vlans_medium" -}}
 {{- range -}}
-{{- prettysprint "_sgl" . }}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}
 

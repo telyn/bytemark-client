@@ -132,7 +132,7 @@ func (as Accounts) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) err
 {{ define "accounts_full" }}
 Accounts: 
 {{ range . -}}
-{{- prettysprint "_sgl" . }}
+{{- prettysprint . "_sgl" }}
 {{ end -}}
 {{- end }}`
 	return prettyprint.Run(wr, accountsTpl, "accounts"+string(detail), as)
