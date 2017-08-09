@@ -46,6 +46,7 @@ func (s Backup) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 // Backups represents a collection of backups
 type Backups []Backup
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (ss Backups) DefaultFields(f output.Format) string {
 	return (Backup{}).DefaultFields(f)
 }

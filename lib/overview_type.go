@@ -14,6 +14,7 @@ type Overview struct {
 	Accounts       []Account
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (o Overview) DefaultFields(f output.Format) string {
 	return "Username, DefaultAccount, Accounts"
 }

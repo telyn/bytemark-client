@@ -424,6 +424,7 @@ type CreatedVirtualMachine struct {
 	VirtualMachine brain.VirtualMachine     `json:"virtual_machine"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (cvm CreatedVirtualMachine) DefaultFields(f output.Format) string {
 	return "Spec, VirtualMachine"
 }
