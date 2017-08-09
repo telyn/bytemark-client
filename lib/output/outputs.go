@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"github.com/telyn/row"
+	"github.com/BytemarkHosting/row"
 )
 
 // Format is a canonical name of output formats
