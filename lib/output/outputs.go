@@ -26,12 +26,12 @@ const (
 	Debug = "debug"
 )
 
-// OutputFn is a function for outputting an object to the terminal in some way
-// See the OutputFormatFns map to see examples
-type OutputFn func(wr io.Writer, config Config, obj Outputtable) error
+// Fn is a function for outputting an object to the terminal in some way
+// See the FormatFns map to see examples
+type Fn func(wr io.Writer, config Config, obj Outputtable) error
 
-// OutputFormatFns is a map which contains all the supported output format functions -- except 'human' because that's implemented in the OutputInDesiredForm method, by necessity.
-var OutputFormatFns = map[Format]OutputFn{
+// FormatFns is a map which contains all the supported output format functions -- except 'human' because that's implemented in the OutputInDesiredForm method, by necessity.
+var FormatFns = map[Format]Fn{
 	Debug: func(wr io.Writer, cfg Config, obj Outputtable) error {
 		fmt.Fprintf(wr, "%#v", obj)
 		return nil
@@ -61,7 +61,7 @@ func outputTable(wr io.Writer, cfg Config, obj Outputtable) error {
 // FormatByName returns the Format for the given format name. If the name is not valid, returns Human
 func FormatByName(name string) Format {
 	name = strings.ToLower(name)
-	for f := range OutputFormatFns {
+	for f := range FormatFns {
 		if string(f) == name {
 			return f
 		}
@@ -71,8 +71,8 @@ func FormatByName(name string) Format {
 
 // SupportedOutputFormats returns a list of all suppported output forms, including 'human'
 func SupportedOutputFormats() (outputFormats []string) {
-	outputFormats = make([]string, 0, len(OutputFormatFns)+1)
-	for k := range OutputFormatFns {
+	outputFormats = make([]string, 0, len(FormatFns)+1)
+	for k := range FormatFns {
 		outputFormats = append(outputFormats, string(k))
 	}
 	outputFormats = append(outputFormats, "human")
