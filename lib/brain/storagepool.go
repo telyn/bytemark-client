@@ -70,12 +70,15 @@ func (sp StoragePool) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) 
 	return prettyprint.Run(wr, t, "storage_pool"+string(detail), sp)
 }
 
+// StoragePools represents more than one storage pool in output.Outputtable form.
 type StoragePools []StoragePool
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as StoragePool.DefaultFields
 func (hs StoragePools) DefaultFields(f output.Format) string {
 	return (StoragePool{}).DefaultFields(f)
 }
 
+// PrettyPrint writes a human-readable summary of the storage pools to writer at the given detail level.
 func (hs StoragePools) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	storagepoolsTpl := `
 {{ define "storagepools_sgl" }}{{ len . }} servers{{ end }}

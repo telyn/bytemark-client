@@ -54,12 +54,15 @@ func (t Tail) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, tpl, "tail"+string(detail), t)
 }
 
+// Tails represents more than one tail in output.Outputtable form.
 type Tails []Tail
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as Tail.DefaultFields.
 func (hs Tails) DefaultFields(f output.Format) string {
 	return (Tail{}).DefaultFields(f)
 }
 
+// PrettyPrint writes a human-readable summary of the tails to writer at the given detail level.
 func (hs Tails) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	tailsTpl := `
 {{ define "tails_sgl" }}{{ len . }} servers{{ end }}

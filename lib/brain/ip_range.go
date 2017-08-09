@@ -63,12 +63,15 @@ func (ipr IPRange) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) err
 	return prettyprint.Run(wr, t, "ip_range"+string(detail), ipr)
 }
 
+// IPRanges represents more than one ip range in output.Outputtable form.
 type IPRanges []IPRange
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as IPRange.DefaultFields
 func (iprs IPRanges) DefaultFields(f output.Format) string {
 	return (IPRange{}).DefaultFields(f)
 }
 
+// PrettyPrint writes a human-readable summary of the ranges to writer at the given detail level.
 func (iprs IPRanges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	iprangesTpl := `
 {{ define "ipranges_sgl" }}{{ len . }} servers{{ end }}

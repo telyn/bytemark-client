@@ -136,10 +136,12 @@ func (ps Privileges) IndexOf(priv Privilege) int {
 	return -1
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as Privilege.DefaultFields.
 func (ps Privileges) DefaultFields(f output.Format) string {
 	return (Privilege{}).DefaultFields(f)
 }
 
+// PrettyPrint writes a human-readable summary of the privileges to writer at the given detail level.
 func (ps Privileges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	privilegesTpl := `
 {{ define "privileges_sgl" }}{{ len . }} servers{{ end }}

@@ -59,12 +59,15 @@ func (g Group) String() string {
 	return fmt.Sprintf("group %d %q - has %d servers", g.ID, g.Name, len(g.VirtualMachines))
 }
 
+// Groups represents multiple Group objects in output.Outputtable form.
 type Groups []Group
 
+// DefaultFields provides the default fields for Groups, which is the same as those of Group.
 func (gs Groups) DefaultFields(f output.Format) string {
 	return (Group{}).DefaultFields(f)
 }
 
+// PrettyPrint writes a summary of the groups to wr at the provided detail level.
 func (gs Groups) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	groupsTpl := `
 {{ define "groups_sgl" }}{{ len . }} groups{{ end }}

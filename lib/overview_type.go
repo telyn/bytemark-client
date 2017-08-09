@@ -19,6 +19,8 @@ func (o Overview) DefaultFields(f output.Format) string {
 	return "Username, DefaultAccount, Accounts"
 }
 
+// PrettyPrint writes this overview out to the given writer.
+// TODO(telyn): rewrite without FormatOverview
 func (o Overview) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return FormatOverview(wr, o.Accounts, o.Username)
 }

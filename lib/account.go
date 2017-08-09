@@ -114,6 +114,7 @@ func (a Account) String() string {
 	return buf.String()
 }
 
+// Accounts represents more than one account in output.Outputtable form.
 type Accounts []Account
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
@@ -121,6 +122,7 @@ func (as Accounts) DefaultFields(f output.Format) string {
 	return (Account{}).DefaultFields(f)
 }
 
+// PrettyPrint writes a human-readable summary of the accounts to writer at the given detail level.
 func (as Accounts) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	accountsTpl := `
 {{ define "accounts_sgl" -}}

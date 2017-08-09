@@ -52,12 +52,15 @@ func (v VLAN) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, t, "vlan"+string(detail), v)
 }
 
+// VLANs represents more than one VLAN in output.Outputtable form.
 type VLANs []VLAN
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as VLAN.DefaultFields
 func (vs VLANs) DefaultFields(f output.Format) string {
 	return (VLAN{}).DefaultFields(f)
 }
 
+// PrettyPrint writes a human-readable summary of the VLANs to writer at the given detail level.
 func (vs VLANs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	vlansTpl := `
 {{ define "vlans_sgl" }}{{ len . }} servers{{ end }}
