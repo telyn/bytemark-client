@@ -156,7 +156,7 @@ func (c *Client) GetDefaultAccount() (account lib.Account, err error) {
 	return acc, r.Error(1)
 }
 
-func (c *Client) GetAccounts() (accounts []lib.Account, err error) {
+func (c *Client) GetAccounts() (accounts lib.Accounts, err error) {
 	r := c.Called()
 	acc, _ := r.Get(0).([]lib.Account)
 	return acc, r.Error(1)
@@ -359,9 +359,9 @@ func (c *Client) RevokePrivilege(priv brain.Privilege) (err error) {
 	r := c.Called(priv)
 	return r.Error(0)
 }
-func (c *Client) GetVLANs() ([]brain.VLAN, error) {
+func (c *Client) GetVLANs() (brain.VLANs, error) {
 	r := c.Called()
-	vlans, _ := r.Get(0).([]brain.VLAN)
+	vlans, _ := r.Get(0).(brain.VLANs)
 	return vlans, r.Error(1)
 }
 func (c *Client) GetVLAN(num int) (brain.VLAN, error) {
@@ -369,9 +369,9 @@ func (c *Client) GetVLAN(num int) (brain.VLAN, error) {
 	vlans, _ := r.Get(0).(brain.VLAN)
 	return vlans, r.Error(1)
 }
-func (c *Client) GetIPRanges() ([]brain.IPRange, error) {
+func (c *Client) GetIPRanges() (brain.IPRanges, error) {
 	r := c.Called()
-	ipRanges, _ := r.Get(0).([]brain.IPRange)
+	ipRanges, _ := r.Get(0).(brain.IPRanges)
 	return ipRanges, r.Error(1)
 }
 func (c *Client) GetIPRange(idOrCIDR string) (brain.IPRange, error) {
@@ -379,9 +379,9 @@ func (c *Client) GetIPRange(idOrCIDR string) (brain.IPRange, error) {
 	ipRange, _ := r.Get(0).(brain.IPRange)
 	return ipRange, r.Error(1)
 }
-func (c *Client) GetHeads() ([]brain.Head, error) {
+func (c *Client) GetHeads() (brain.Heads, error) {
 	r := c.Called()
-	heads, _ := r.Get(0).([]brain.Head)
+	heads, _ := r.Get(0).(brain.Heads)
 	return heads, r.Error(1)
 }
 func (c *Client) GetHead(idOrLabel string) (brain.Head, error) {
@@ -389,9 +389,9 @@ func (c *Client) GetHead(idOrLabel string) (brain.Head, error) {
 	head, _ := r.Get(0).(brain.Head)
 	return head, r.Error(1)
 }
-func (c *Client) GetTails() ([]brain.Tail, error) {
+func (c *Client) GetTails() (brain.Tails, error) {
 	r := c.Called()
-	tails, _ := r.Get(0).([]brain.Tail)
+	tails, _ := r.Get(0).(brain.Tails)
 	return tails, r.Error(1)
 }
 func (c *Client) GetTail(idOrLabel string) (brain.Tail, error) {
@@ -399,9 +399,9 @@ func (c *Client) GetTail(idOrLabel string) (brain.Tail, error) {
 	tail, _ := r.Get(0).(brain.Tail)
 	return tail, r.Error(1)
 }
-func (c *Client) GetStoragePools() ([]brain.StoragePool, error) {
+func (c *Client) GetStoragePools() (brain.StoragePools, error) {
 	r := c.Called()
-	storagePools, _ := r.Get(0).([]brain.StoragePool)
+	storagePools, _ := r.Get(0).(brain.StoragePools)
 	return storagePools, r.Error(1)
 }
 func (c *Client) GetStoragePool(idOrLabel string) (brain.StoragePool, error) {
@@ -409,19 +409,19 @@ func (c *Client) GetStoragePool(idOrLabel string) (brain.StoragePool, error) {
 	storagePool, _ := r.Get(0).(brain.StoragePool)
 	return storagePool, r.Error(1)
 }
-func (c *Client) GetMigratingVMs() ([]brain.VirtualMachine, error) {
+func (c *Client) GetMigratingVMs() (brain.VirtualMachines, error) {
 	r := c.Called()
-	vms, _ := r.Get(0).([]brain.VirtualMachine)
+	vms, _ := r.Get(0).(brain.VirtualMachines)
 	return vms, r.Error(1)
 }
-func (c *Client) GetStoppedEligibleVMs() ([]brain.VirtualMachine, error) {
+func (c *Client) GetStoppedEligibleVMs() (brain.VirtualMachines, error) {
 	r := c.Called()
-	vms, _ := r.Get(0).([]brain.VirtualMachine)
+	vms, _ := r.Get(0).(brain.VirtualMachines)
 	return vms, r.Error(1)
 }
-func (c *Client) GetRecentVMs() ([]brain.VirtualMachine, error) {
+func (c *Client) GetRecentVMs() (brain.VirtualMachines, error) {
 	r := c.Called()
-	vms, _ := r.Get(0).([]brain.VirtualMachine)
+	vms, _ := r.Get(0).(brain.VirtualMachines)
 	return vms, r.Error(1)
 }
 func (c *Client) MigrateDisc(disc int, newStoragePool string) error {
@@ -501,8 +501,8 @@ func (c *Client) UpdateStoragePool(idOrLabel string, options lib.UpdateStoragePo
 	return r.Error(0)
 }
 
-func (c *Client) GetMigratingDiscs() ([]brain.Disc, error) {
+func (c *Client) GetMigratingDiscs() (brain.Discs, error) {
 	r := c.Called()
-	discs := r.Get(0).([]brain.Disc)
+	discs := r.Get(0).(brain.Discs)
 	return discs, r.Error(1)
 }

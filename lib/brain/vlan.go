@@ -9,10 +9,10 @@ import (
 
 // VLAN is a representation of a VLAN, as used by admin endpoints
 type VLAN struct {
-	ID        int       `json:"id"`
-	Num       int       `json:"num"`
-	UsageType string    `json:"usage_type"`
-	IPRanges  []IPRange `json:"ip_ranges"`
+	ID        int      `json:"id"`
+	Num       int      `json:"num"`
+	UsageType string   `json:"usage_type"`
+	IPRanges  IPRanges `json:"ip_ranges"`
 }
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
@@ -50,4 +50,25 @@ func (v VLAN) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 {{- end }}
 `
 	return prettyprint.Run(wr, t, "vlan"+string(detail), v)
+}
+
+type VLANs []VLAN
+
+func (vs VLANs) DefaultFields(f output.Format) string {
+	return (VLAN{}).DefaultFields(f)
+}
+
+func (vs VLANs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	vlansTpl := `
+{{ define "vlans_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "vlans_medium" -}}
+{{- range -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "vlans_full" }}{{ template "vlans_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, vlansTpl, "vlans"+string(detail), vs)
 }

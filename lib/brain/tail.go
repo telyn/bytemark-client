@@ -53,3 +53,24 @@ func (t Tail) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 `
 	return prettyprint.Run(wr, tpl, "tail"+string(detail), t)
 }
+
+type Tails []Tail
+
+func (hs Tails) DefaultFields(f output.Format) string {
+	return (Tail{}).DefaultFields(f)
+}
+
+func (hs Tails) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	tailsTpl := `
+{{ define "tails_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "tails_medium" -}}
+{{- range -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "tails_full" }}{{ template "tails_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, tailsTpl, "tails"+string(detail), hs)
+}

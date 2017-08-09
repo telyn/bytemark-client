@@ -46,6 +46,10 @@ func (s Backup) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 // Backups represents a collection of backups
 type Backups []Backup
 
+func (ss Backups) DefaultFields(f output.Format) string {
+	return (Backup{}).DefaultFields(f)
+}
+
 // PrettyPrint outputs a nicely-formatted string detailing the backup to the given writer.
 func (ss Backups) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (err error) {
 	backupsTpl := `

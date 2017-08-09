@@ -77,3 +77,24 @@ func (h Head) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 `
 	return prettyprint.Run(wr, t, "head"+string(detail), h)
 }
+
+type Heads []Head
+
+func (hs Heads) DefaultFields(f output.Format) string {
+	return (Head{}).DefaultFields(f)
+}
+
+func (hs Heads) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	headsTpl := `
+{{ define "heads_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "heads_medium" -}}
+{{- range -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "heads_full" }}{{ template "heads_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, headsTpl, "heads"+string(detail), hs)
+}

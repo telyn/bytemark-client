@@ -135,3 +135,22 @@ func (ps Privileges) IndexOf(priv Privilege) int {
 	}
 	return -1
 }
+
+func (ps Privileges) DefaultFields(f output.Format) string {
+	return (Privilege{}).DefaultFields(f)
+}
+
+func (ps Privileges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	privilegesTpl := `
+{{ define "tails_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "tails_medium" -}}
+{{- range -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "tails_full" }}{{ template "tails_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, privilegesTpl, "privileges"+string(detail), ps)
+}

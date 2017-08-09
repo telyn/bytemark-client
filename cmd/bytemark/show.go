@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -24,40 +23,21 @@ func init() {
 If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-			Flags: append(OutputFlags("account details", "object", DefaultAccountTableFields),
+			Flags: append(OutputFlags("account details", "object"),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
 					Value: new(AccountNameFlag),
 				}),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
-				return c.OutputInDesiredForm(c.Account, func() error {
-					err := c.Account.PrettyPrint(global.App.Writer, prettyprint.Full)
-					if err != nil {
-						return err
-					}
-					log.Output()
-					log.Output()
-
-					for _, g := range c.Account.Groups {
-						for _, vm := range g.VirtualMachines {
-							err := vm.PrettyPrint(global.App.Writer, prettyprint.Medium)
-							log.Output()
-							log.Output()
-							if err != nil {
-								return err
-							}
-						}
-					}
-					return nil
-				})
+				return c.OutputInDesiredForm(c.Account)
 			}),
 		}, {
 			Name:        "disc",
 			Usage:       "outputs info about a disc",
 			UsageText:   "bytemark show disc [--json | --table] [--table-fields help | <fields>] <server> <disc label>",
 			Description: `This command displays information about a disc including any backups and backup schedules on the disc`,
-			Flags: append(OutputFlags("disc details", "object", DefaultDiscTableFields),
+			Flags: append(OutputFlags("disc details", "object"),
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
@@ -69,9 +49,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				},
 			),
 			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), DiscProvider("server", "disc"), func(c *Context) error {
-				return c.OutputInDesiredForm(c.Disc, func() error {
-					return c.Disc.PrettyPrint(global.App.Writer, prettyprint.Full)
-				})
+				return c.OutputInDesiredForm(c.Disc)
 			}),
 		}, {
 			Name:      "group",
@@ -79,7 +57,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			UsageText: "bytemark show group [--json] [name]",
 			Description: `This command displays information about how many servers are in the given group.
 If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
-			Flags: append(OutputFlags("group details", "object", DefaultGroupTableFields),
+			Flags: append(OutputFlags("group details", "object"),
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The name of the group to show",
@@ -87,34 +65,14 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				},
 			),
 			Action: With(OptionalArgs("group"), GroupProvider("group"), func(c *Context) error {
-				// TODO: rewrite in terms of prettyprint
-				return c.OutputInDesiredForm(c.Group, func() error {
-					s := ""
-					if len(c.Group.VirtualMachines) != 1 {
-						s = "s"
-					}
-					log.Outputf("%s - Group containing %d cloud server%s\r\n", c.Group.Name, len(c.Group.VirtualMachines), s)
-
-					log.Output()
-					for _, vm := range c.Group.VirtualMachines {
-
-						err := vm.PrettyPrint(global.App.Writer, prettyprint.Medium)
-						log.Output()
-						log.Output()
-						if err != nil {
-							return err
-						}
-					}
-
-					return nil
-				})
+				return c.OutputInDesiredForm(c.Group)
 			}),
 		}, {
 			Name:        "server",
 			Usage:       "displays details about a server",
 			UsageText:   "bytemark show server [--json] <name>",
 			Description: `Displays a collection of details about the server, including its full hostname, CPU and memory allocation, power status, disc capacities and IP addresses.`,
-			Flags: append(OutputFlags("server details", "object", DefaultServerTableFields),
+			Flags: append(OutputFlags("server details", "object"),
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
@@ -122,9 +80,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				},
 			),
 			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
-				return c.OutputInDesiredForm(c.VirtualMachine, func() error {
-					return c.VirtualMachine.PrettyPrint(global.App.Writer, prettyprint.Full)
-				})
+				return c.OutputInDesiredForm(c.VirtualMachine)
 			}),
 		}, {
 			Name:        "user",
@@ -153,7 +109,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 Setting --recursive will cause a lot of extra requests to be made and may take a long time to run.
 
 Privileges will be output in no particular order.`,
-			Flags: append(OutputFlags("privileges", "array", DefaultPrivilegeTableFields),
+			Flags: append(OutputFlags("privileges", "array"),
 				cli.BoolFlag{
 					Name:  "recursive",
 					Usage: "for account & group, will also find all privileges for all groups in the account and virtual machines in the group",
@@ -214,12 +170,7 @@ Privileges will be output in no particular order.`,
 					}
 				}
 
-				return c.OutputInDesiredForm(privs, func() error {
-					for _, p := range privs {
-						log.Outputf("%s\r\n", p.String())
-					}
-					return nil
-				})
+				return c.OutputInDesiredForm(privs)
 			}),
 		}},
 	})
@@ -232,20 +183,13 @@ Privileges will be output in no particular order.`,
 				Name:      "vlans",
 				Usage:     "shows available VLANs",
 				UsageText: "bytemark --admin show vlans [--json]",
-				Flags:     OutputFlags("VLANs", "array", DefaultVLANTableFields),
+				Flags:     OutputFlags("VLANs", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					vlans, err := global.Client.GetVLANs()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vlans, func() error {
-						for _, vlan := range vlans {
-							if err := vlan.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(vlans, "table")
 				}),
 			},
 			{
@@ -253,7 +197,7 @@ Privileges will be output in no particular order.`,
 				Usage:       "displays details about a disc",
 				UsageText:   "bytemark show disc_by_id [--json] <id>",
 				Description: `Displays a collection of details about the disc.`,
-				Flags: append(OutputFlags("disc details", "object", DefaultDiscTableFields),
+				Flags: append(OutputFlags("disc details", "object"),
 					cli.IntFlag{
 						Name:  "disc",
 						Usage: "the disc to display",
@@ -265,16 +209,14 @@ Privileges will be output in no particular order.`,
 						return err
 					}
 
-					return c.OutputInDesiredForm(disc, func() error {
-						return disc.PrettyPrint(global.App.Writer, prettyprint.Full)
-					})
+					return c.OutputInDesiredForm(disc)
 				}),
 			},
 			{
 				Name:      "vlan",
 				Usage:     "shows the details of a VLAN",
 				UsageText: "bytemark --admin show vlan [--json] <num>",
-				Flags: append(OutputFlags("VLAN", "object", DefaultVLANTableFields),
+				Flags: append(OutputFlags("VLAN", "object"),
 					cli.IntFlag{
 						Name:  "num",
 						Usage: "the num of the VLAN to display",
@@ -285,36 +227,27 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vlan, func() error {
-						return vlan.PrettyPrint(global.App.Writer, prettyprint.Full)
-					}, "table")
+					return c.OutputInDesiredForm(vlan, "table")
 				}),
 			},
 			{
 				Name:      "ip_ranges",
 				Usage:     "shows all IP ranges",
 				UsageText: "bytemark --admin show ip_ranges [--json]",
-				Flags:     OutputFlags("ip ranges", "array", DefaultIPRangeTableFields),
+				Flags:     OutputFlags("ip ranges", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					ipRanges, err := global.Client.GetIPRanges()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(ipRanges, func() error {
-						for _, ipRange := range ipRanges {
-							if err := ipRange.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(ipRanges, "table")
 				}),
 			},
 			{
 				Name:      "ip_range",
 				Usage:     "shows the details of an IP range",
 				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",
-				Flags: append(OutputFlags("ip range details", "object", DefaultIPRangeTableFields),
+				Flags: append(OutputFlags("ip range details", "object"),
 					cli.StringFlag{
 						Name:  "ip_range",
 						Usage: "the ID or CIDR representation of the IP range to display",
@@ -325,37 +258,27 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(ipRange, func() error {
-						return ipRange.PrettyPrint(global.App.Writer, prettyprint.Full)
-					}, "table")
+					return c.OutputInDesiredForm(ipRange, "table")
 				}),
 			},
 			{
 				Name:      "heads",
 				Usage:     "shows the details of all heads",
 				UsageText: "bytemark --admin show heads [--json]",
-				Flags:     OutputFlags("heads", "array", DefaultHeadTableFields),
+				Flags:     OutputFlags("heads", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					heads, err := global.Client.GetHeads()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(heads, func() error {
-						for _, head := range heads {
-							if err := head.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(heads, "table")
 				}),
 			},
 			{
 				Name:      "head",
 				Usage:     "shows the details of the specified head",
 				UsageText: "bytemark --admin show head <head> [--json]",
-				Flags: append(OutputFlags("head details", "object", DefaultHeadTableFields),
+				Flags: append(OutputFlags("head details", "object"),
 					cli.StringFlag{
 						Name:  "head",
 						Usage: "the ID of the head to display",
@@ -366,37 +289,27 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(head, func() error {
-						return head.PrettyPrint(global.App.Writer, prettyprint.Full)
-					}, "table")
+					return c.OutputInDesiredForm(head, "table")
 				}),
 			},
 			{
 				Name:      "tails",
 				Usage:     "shows the details of all tails",
 				UsageText: "bytemark --admin show tails [--json]",
-				Flags:     OutputFlags("tails", "array", DefaultTailTableFields),
+				Flags:     OutputFlags("tails", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					tails, err := global.Client.GetTails()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(tails, func() error {
-						for _, tail := range tails {
-							if err := tail.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(tails, "table")
 				}),
 			},
 			{
 				Name:      "tail",
 				Usage:     "shows the details of the specified tail",
 				UsageText: "bytemark --admin show tail <tail> [--json]",
-				Flags: append(OutputFlags("tail details", "object", DefaultTailTableFields),
+				Flags: append(OutputFlags("tail details", "object"),
 					cli.StringFlag{
 						Name:  "tail",
 						Usage: "the ID of the tail to display",
@@ -407,37 +320,27 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(tail, func() error {
-						return tail.PrettyPrint(global.App.Writer, prettyprint.Full)
-					}, "table")
+					return c.OutputInDesiredForm(tail, "table")
 				}),
 			},
 			{
 				Name:      "storage_pools",
 				Usage:     "shows the details of all storage pools",
 				UsageText: "bytemark --admin show storage_pools [--json]",
-				Flags:     OutputFlags("storage pools", "array", DefaultStoragePoolTableFields),
+				Flags:     OutputFlags("storage pools", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					storagePools, err := global.Client.GetStoragePools()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(storagePools, func() error {
-						for _, storagePool := range storagePools {
-							if err := storagePool.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(storagePools, "table")
 				}),
 			},
 			{
 				Name:      "storage_pool",
 				Usage:     "shows the details of the specified storage pool",
 				UsageText: "bytemark --admin show storage_pools [--json] <storage_pool>",
-				Flags: append(OutputFlags("storage pool", "object", DefaultStoragePoolTableFields),
+				Flags: append(OutputFlags("storage pool", "object"),
 					cli.StringFlag{
 						Name:  "storage_pool",
 						Usage: "The ID or label of the storage pool to display",
@@ -448,93 +351,59 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(storagePool, func() error {
-						return storagePool.PrettyPrint(global.App.Writer, prettyprint.Full)
-					}, "table")
+					return c.OutputInDesiredForm(storagePool, "table")
 				}),
 			},
 			{
 				Name:      "migrating_discs",
 				Usage:     "shows a list of migrating discs",
 				UsageText: "bytemark --admin show migrating_discs [--json]",
-				Flags:     OutputFlags("migrating discs", "array", DefaultDiscTableFields),
+				Flags:     OutputFlags("migrating discs", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					discs, err := global.Client.GetMigratingDiscs()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(discs, func() error {
-						for _, disc := range discs {
-							if err := disc.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(discs, "table")
 				}),
 			},
 			{
 				Name:      "migrating_vms",
 				Usage:     "shows a list of migrating servers",
 				UsageText: "bytemark --admin show migrating_vms [--json]",
-				Flags:     OutputFlags("migrating servers", "array", DefaultServerTableFields),
+				Flags:     OutputFlags("migrating servers", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetMigratingVMs()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vms, func() error {
-						for _, vm := range vms {
-							if err := vm.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(vms, "table")
 				}),
 			},
 			{
 				Name:      "stopped_eligible_vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
-				Flags:     OutputFlags("servers", "array", DefaultServerTableFields),
+				Flags:     OutputFlags("servers", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetStoppedEligibleVMs()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vms, func() error {
-						for _, vm := range vms {
-							if err := vm.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(vms, "table")
 				}),
 			},
 			{
 				Name:      "recent_vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
-				Flags:     OutputFlags("servers", "array", DefaultServerTableFields),
+				Flags:     OutputFlags("servers", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					vms, err := global.Client.GetRecentVMs()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vms, func() error {
-						for _, vm := range vms {
-							if err := vm.PrettyPrint(global.App.Writer, prettyprint.SingleLine); err != nil {
-								return err
-							}
-						}
-
-						return nil
-					}, "table")
+					return c.OutputInDesiredForm(vms, "table")
 				}),
 			},
 		},

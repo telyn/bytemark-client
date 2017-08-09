@@ -18,7 +18,7 @@ type Account struct {
 	BillingID        int            `json:"billing_id"`
 	BrainID          int            `json:"brain_id"`
 	CardReference    string         `json:"card_reference"`
-	Groups           []brain.Group  `json:"groups"`
+	Groups           brain.Groups   `json:"groups"`
 	Suspended        bool           `json:"suspended"`
 
 	IsDefaultAccount bool `json:"-"`

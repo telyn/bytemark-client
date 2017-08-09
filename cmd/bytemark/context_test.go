@@ -7,6 +7,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
@@ -30,7 +31,7 @@ func TestOutput(t *testing.T) {
 		JSONFlag      bool
 		TableFlag     bool
 		HumanFn       func() error
-		Object        interface{}
+		Object        output.Outputtable
 		Expected      string
 		TableFields   string
 	}{
@@ -133,9 +134,9 @@ func TestOutput(t *testing.T) {
 
 		var err error
 		if test.DefaultFormat == nil {
-			err = context.OutputInDesiredForm(test.Object, test.HumanFn)
+			err = context.OutputInDesiredForm(test.Object)
 		} else {
-			err = context.OutputInDesiredForm(test.Object, test.HumanFn, test.DefaultFormat...)
+			err = context.OutputInDesiredForm(test.Object, test.DefaultFormat...)
 		}
 		if err != nil && !test.ShouldErr {
 			t.Errorf("TestOutput %d ERR: %s", i, err)

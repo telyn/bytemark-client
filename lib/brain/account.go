@@ -12,9 +12,9 @@ type Account struct {
 	Name string `json:"name"`
 
 	// the following cannot be set
-	ID        int     `json:"id"`
-	Suspended bool    `json:"suspended"`
-	Groups    []Group `json:"groups"`
+	ID        int    `json:"id"`
+	Suspended bool   `json:"suspended"`
+	Groups    Groups `json:"groups"`
 }
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.

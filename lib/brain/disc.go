@@ -72,3 +72,24 @@ func (d Disc) Validate() (*Disc, error) {
 	}
 	return &d, nil
 }
+
+type Discs []Disc
+
+func (ds Discs) DefaultFields(f output.Format) string {
+	return (Disc{}).DefaultFields(f)
+}
+
+func (ds Discs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	discsTpl := `
+{{ define "discs_sgl" }}{{ len . }} discs{{ end }}
+
+{{ define "discs_medium" -}}
+{{- range . -}}
+{{ prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "discs_full" -}}{{ template "discs_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, discsTpl, "discs"+string(detail), ds)
+}

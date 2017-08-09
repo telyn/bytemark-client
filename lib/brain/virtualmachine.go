@@ -28,7 +28,7 @@ type VirtualMachine struct {
 	ZoneName string `json:"zone_name,omitempty"`
 
 	// the following cannot be set
-	Discs             []Disc             `json:"discs,omitempty"`
+	Discs             Discs              `json:"discs,omitempty"`
 	ID                int                `json:"id,omitempty"`
 	ManagementAddress net.IP             `json:"management_address,omitempty"`
 	Deleted           bool               `json:"deleted,omitempty"`

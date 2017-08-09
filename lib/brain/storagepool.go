@@ -69,3 +69,24 @@ func (sp StoragePool) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) 
 `
 	return prettyprint.Run(wr, t, "storage_pool"+string(detail), sp)
 }
+
+type StoragePools []StoragePool
+
+func (hs StoragePools) DefaultFields(f output.Format) string {
+	return (StoragePool{}).DefaultFields(f)
+}
+
+func (hs StoragePools) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	storagepoolsTpl := `
+{{ define "storagepools_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "storagepools_medium" -}}
+{{- range -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "storagepools_full" }}{{ template "storagepools_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, storagepoolsTpl, "storagepools"+string(detail), hs)
+}

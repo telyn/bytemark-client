@@ -219,13 +219,6 @@ func (c *bytemarkClient) GetAccounts() (accounts Accounts, err error) {
 
 }
 
-// Overview is a combination of a user's default account, their username, and all the accounts they have access to see.
-type Overview struct {
-	DefaultAccount Account
-	Username       string
-	Accounts       []Account
-}
-
 // GetOverview gets an Overview for everything the user can access at bytemark
 func (c *bytemarkClient) GetOverview() (*Overview, error) {
 	o := new(Overview)

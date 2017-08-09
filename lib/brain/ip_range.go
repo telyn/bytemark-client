@@ -62,3 +62,24 @@ func (ipr IPRange) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) err
 `
 	return prettyprint.Run(wr, t, "ip_range"+string(detail), ipr)
 }
+
+type IPRanges []IPRange
+
+func (iprs IPRanges) DefaultFields(f output.Format) string {
+	return (IPRange{}).DefaultFields(f)
+}
+
+func (iprs IPRanges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	iprangesTpl := `
+{{ define "ipranges_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "ipranges_medium" -}}
+{{- range -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "ipranges_full" }}{{ template "ipranges_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, iprangesTpl, "ipranges"+string(detail), iprs)
+}

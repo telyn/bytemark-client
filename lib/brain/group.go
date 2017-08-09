@@ -58,3 +58,24 @@ func (g Group) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 func (g Group) String() string {
 	return fmt.Sprintf("group %d %q - has %d servers", g.ID, g.Name, len(g.VirtualMachines))
 }
+
+type Groups []Group
+
+func (gs Groups) DefaultFields(f output.Format) string {
+	return (Group{}).DefaultFields(f)
+}
+
+func (gs Groups) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	groupsTpl := `
+{{ define "groups_sgl" }}{{ len . }} groups{{ end }}
+
+{{ define "groups_medium" -}}
+{{- range -}}
+{{- prettysprint "_sgl" . }}
+{{ end -}}
+{{- end }}
+
+{{ define "groups_full" }}{{ template "groups_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, groupsTpl, "groups"+string(detail), gs)
+}

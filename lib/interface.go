@@ -214,20 +214,20 @@ type Client interface {
 	// ADMIN
 	//
 
-	GetVLANs() ([]brain.VLAN, error)
+	GetVLANs() (brain.VLANs, error)
 	GetVLAN(num int) (brain.VLAN, error)
-	GetIPRanges() ([]brain.IPRange, error)
+	GetIPRanges() (brain.IPRanges, error)
 	GetIPRange(idOrCIDR string) (brain.IPRange, error)
-	GetHeads() ([]brain.Head, error)
+	GetHeads() (brain.Heads, error)
 	GetHead(idOrLabel string) (brain.Head, error)
-	GetTails() ([]brain.Tail, error)
+	GetTails() (brain.Tails, error)
 	GetTail(idOrLabel string) (brain.Tail, error)
-	GetStoragePools() ([]brain.StoragePool, error)
+	GetStoragePools() (brain.StoragePools, error)
 	GetStoragePool(idOrLabel string) (brain.StoragePool, error)
-	GetMigratingDiscs() ([]brain.Disc, error)
-	GetMigratingVMs() ([]brain.VirtualMachine, error)
-	GetStoppedEligibleVMs() ([]brain.VirtualMachine, error)
-	GetRecentVMs() ([]brain.VirtualMachine, error)
+	GetMigratingDiscs() (brain.Discs, error)
+	GetMigratingVMs() (brain.VirtualMachines, error)
+	GetStoppedEligibleVMs() (brain.VirtualMachines, error)
+	GetRecentVMs() (brain.VirtualMachines, error)
 	MigrateDisc(disc int, newStoragePool string) error
 	MigrateVirtualMachine(vmName VirtualMachineName, newHead string) error
 	ReapVMs() error
