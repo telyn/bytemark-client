@@ -35,7 +35,10 @@ func (c *Context) Reset() {
 
 // App returns the cli.App that this context is part of. Usually this will be the same as global.App, but it's nice to depend less on globals.
 func (c *Context) App() *cli.App {
-	return c.App()
+	if c.Context == nil {
+		return nil
+	}
+	return c.Context.App()
 }
 
 // args returns all the args that were passed to the Context (i.e. all the args passed to this (sub)command)
