@@ -14,13 +14,13 @@ func trimAllSpace(strs []string) {
 	}
 }
 
-func (c *Context) determineOutputFormat(defaultFormat ...string) (output.Format, error) {
+func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.Format, error) {
 	format, err := global.Config.GetV("output-format")
 	if err != nil {
 		return output.Human, err
 	}
 	if len(defaultFormat) > 0 && format.Source == "CODE" {
-		format.Value = defaultFormat[0]
+		format.Value = string(defaultFormat[0])
 	}
 
 	if c.Bool("json") {
@@ -33,7 +33,7 @@ func (c *Context) determineOutputFormat(defaultFormat ...string) (output.Format,
 
 }
 
-func (c *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...string) (cfg output.Config, err error) {
+func (c *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...output.Format) (cfg output.Config, err error) {
 	cfg = output.Config{}
 	cfg.Format, err = c.determineOutputFormat(defaultFormat...)
 
@@ -73,7 +73,7 @@ func OutputFlags(thing string, jsonType string) []cli.Flag {
 // or as a table / table row if --table is set
 // otherwise calls humanOutputFn (which should output it in a very human form - PrettyPrint or such
 // defaultFormat is an optional string stating what the default format should be
-func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...string) error {
+func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...output.Format) error {
 	if obj == nil {
 		return fmt.Errorf("Object passed to OutputInDesiredForm was nil")
 	}

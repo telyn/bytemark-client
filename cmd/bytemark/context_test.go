@@ -15,7 +15,7 @@ func TestOutput(t *testing.T) {
 
 	tests := []struct {
 		ShouldErr     bool
-		DefaultFormat []string
+		DefaultFormat []output.Format
 		ConfigFormat  util.ConfigVar
 		JSONFlag      bool
 		TableFlag     bool
@@ -42,7 +42,7 @@ func TestOutput(t *testing.T) {
 		}, { // 2
 			// when there's a default format specific to the command, use that instead of the uber-default
 			ConfigFormat:  util.ConfigVar{"output-format", "human", "CODE"},
-			DefaultFormat: []string{"table"},
+			DefaultFormat: []output.Format{output.Table},
 			Object: brain.Disc{
 				StorageGrade: "sata",
 				Size:         25660,
@@ -53,7 +53,7 @@ func TestOutput(t *testing.T) {
 		}, { // 3
 			// except when the JSON flag is set, then output JSON
 			ConfigFormat:  util.ConfigVar{"output-format", "human", "CODE"},
-			DefaultFormat: []string{"table"},
+			DefaultFormat: []output.Format{output.Table},
 			JSONFlag:      true,
 			Object: brain.Group{
 				Name: "my-cool-group",
@@ -63,7 +63,7 @@ func TestOutput(t *testing.T) {
 		}, { // 4
 			// or if output-format is set by a FILE
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
-			DefaultFormat: []string{"table"},
+			DefaultFormat: []output.Format{output.Table},
 			Object: brain.Group{
 				Name: "my-cool-group",
 				ID:   11323,
@@ -72,7 +72,7 @@ func TestOutput(t *testing.T) {
 			// but the table and json flags should have precedence in every situation
 		}, { // 5
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
-			DefaultFormat: []string{"human"},
+			DefaultFormat: []output.Format{output.Human},
 			TableFlag:     true,
 			Object: brain.Group{
 				Name: "my-cool-group",
@@ -82,7 +82,7 @@ func TestOutput(t *testing.T) {
 			// also, --table-fields being non-empty should imply --table and be case insensitive
 		}, { // 6
 			ConfigFormat:  util.ConfigVar{"output-format", "json", "FILE"},
-			DefaultFormat: []string{"human"},
+			DefaultFormat: []output.Format{output.Human},
 			TableFlag:     false,
 			TableFields:   "AccountID,ID,Name,VirtualMachines",
 			Object: brain.Group{

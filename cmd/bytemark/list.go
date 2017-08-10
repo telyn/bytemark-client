@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -37,7 +38,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 				if err != nil {
 					return err
 				}
-				return c.OutputInDesiredForm(accounts, "list")
+				return c.OutputInDesiredForm(accounts, output.List)
 			}),
 		}, {
 			Name:        "discs",
@@ -56,7 +57,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 				},
 			),
 			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
-				return c.OutputInDesiredForm(c.VirtualMachine.Discs, "list")
+				return c.OutputInDesiredForm(c.VirtualMachine.Discs, output.List)
 			}),
 		}, {
 			Name:        "groups",
@@ -71,7 +72,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 				},
 			),
 			Action: With(OptionalArgs("account"), RequiredFlags("account"), AccountProvider("account"), func(c *Context) error {
-				return c.OutputInDesiredForm(c.Account.Groups, "list")
+				return c.OutputInDesiredForm(c.Account.Groups, output.List)
 			}),
 		}, {
 			Name:        "keys",
@@ -100,12 +101,12 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 				},
 			),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), AuthProvider, func(c *Context) error {
-				servers := brain.VirtualMachines(make([]brain.VirtualMachine, 0))
+				servers := brain.VirtualMachines{}
 
 				for _, g := range c.Account.Groups {
 					servers = append(servers, g.VirtualMachines...)
 				}
-				return c.OutputInDesiredForm(servers)
+				return c.OutputInDesiredForm(servers, output.List)
 			}),
 		}, {
 			Name:        "backups",
@@ -146,7 +147,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						backups = append(backups, discbackups...)
 					}
 				}
-				return c.OutputInDesiredForm(backups)
+				return c.OutputInDesiredForm(backups, output.List)
 			}),
 		}},
 	})

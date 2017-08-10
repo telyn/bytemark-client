@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -170,7 +171,7 @@ Privileges will be output in no particular order.`,
 					}
 				}
 
-				return c.OutputInDesiredForm(privs)
+				return c.OutputInDesiredForm(privs, output.List)
 			}),
 		}},
 	})
@@ -189,7 +190,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vlans, "table")
+					return c.OutputInDesiredForm(vlans, output.Table)
 				}),
 			},
 			{
@@ -227,7 +228,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vlan, "table")
+					return c.OutputInDesiredForm(vlan, output.Table)
 				}),
 			},
 			{
@@ -240,7 +241,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(ipRanges, "table")
+					return c.OutputInDesiredForm(ipRanges, output.Table)
 				}),
 			},
 			{
@@ -258,7 +259,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(ipRange, "table")
+					return c.OutputInDesiredForm(ipRange, output.Table)
 				}),
 			},
 			{
@@ -271,7 +272,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(heads, "table")
+					return c.OutputInDesiredForm(heads, output.Table)
 				}),
 			},
 			{
@@ -289,7 +290,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(head, "table")
+					return c.OutputInDesiredForm(head, output.Table)
 				}),
 			},
 			{
@@ -302,7 +303,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(tails, "table")
+					return c.OutputInDesiredForm(tails, output.Table)
 				}),
 			},
 			{
@@ -320,7 +321,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(tail, "table")
+					return c.OutputInDesiredForm(tail, output.Table)
 				}),
 			},
 			{
@@ -333,7 +334,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(storagePools, "table")
+					return c.OutputInDesiredForm(storagePools, output.Table)
 				}),
 			},
 			{
@@ -351,7 +352,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(storagePool, "table")
+					return c.OutputInDesiredForm(storagePool, output.Table)
 				}),
 			},
 			{
@@ -364,7 +365,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(discs, "table")
+					return c.OutputInDesiredForm(discs, output.Table)
 				}),
 			},
 			{
@@ -377,7 +378,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vms, "table")
+					return c.OutputInDesiredForm(vms, output.Table)
 				}),
 			},
 			{
@@ -390,7 +391,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vms, "table")
+					return c.OutputInDesiredForm(vms, output.Table)
 				}),
 			},
 			{
@@ -403,7 +404,7 @@ Privileges will be output in no particular order.`,
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(vms, "table")
+					return c.OutputInDesiredForm(vms, output.Table)
 				}),
 			},
 		},
