@@ -5,8 +5,8 @@ import (
 	"io"
 	"reflect"
 
+	"github.com/BytemarkHosting/row"
 	"github.com/olekukonko/tablewriter"
-	"github.com/telyn/row"
 )
 
 // SetupTable creates a tablewriter.Table for the given writer and output config.

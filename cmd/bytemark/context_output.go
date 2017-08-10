@@ -14,13 +14,13 @@ func trimAllSpace(strs []string) {
 	}
 }
 
-func (c *Context) determineOutputFormat(defaultFormat ...string) (output.Format, error) {
+func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.Format, error) {
 	format, err := global.Config.GetV("output-format")
 	if err != nil {
 		return output.Human, err
 	}
 	if len(defaultFormat) > 0 && format.Source == "CODE" {
-		format.Value = defaultFormat[0]
+		format.Value = string(defaultFormat[0])
 	}
 
 	if c.Bool("json") {
@@ -33,7 +33,7 @@ func (c *Context) determineOutputFormat(defaultFormat ...string) (output.Format,
 
 }
 
-func (c *Context) CreateOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...string) (cfg output.Config, err error) {
+func (c *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...output.Format) (cfg output.Config, err error) {
 	cfg = output.Config{}
 	cfg.Format, err = c.determineOutputFormat(defaultFormat...)
 
@@ -52,7 +52,7 @@ func (c *Context) CreateOutputConfig(obj output.DefaultFieldsHaver, defaultForma
 // OutputFlags creates some cli.Flags for when you wanna use OutputInDesiredForm
 // thing should be like "server", "servers", "group", "groups"
 // jsonType should be "array" or "object"
-func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli.Flag {
+func OutputFlags(thing string, jsonType string) []cli.Flag {
 	return []cli.Flag{
 		cli.BoolFlag{
 			Name:  "json",
@@ -65,7 +65,6 @@ func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli
 		cli.StringFlag{
 			Name:  "table-fields",
 			Usage: fmt.Sprintf("The fields of the %s to output in the table, comma separated. set to 'help' for a list of fields for this command", thing),
-			Value: defaultTableFields,
 		},
 	}
 }
@@ -74,8 +73,11 @@ func OutputFlags(thing string, jsonType string, defaultTableFields string) []cli
 // or as a table / table row if --table is set
 // otherwise calls humanOutputFn (which should output it in a very human form - PrettyPrint or such
 // defaultFormat is an optional string stating what the default format should be
-func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...string) error {
-	cfg, err := c.CreateOutputConfig(obj, defaultFormat...)
+func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...output.Format) error {
+	if obj == nil {
+		return fmt.Errorf("Object passed to OutputInDesiredForm was nil")
+	}
+	cfg, err := c.createOutputConfig(obj, defaultFormat...)
 	if err != nil {
 		return err
 	}

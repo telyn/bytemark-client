@@ -7,15 +7,31 @@ import (
 	"strings"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"github.com/telyn/row"
+	"github.com/BytemarkHosting/row"
 )
 
-// OutputFn is a function for outputting an object to the terminal in some way
-// See the OutputFormatFns map to see examples
-type OutputFn func(wr io.Writer, config Config, obj Outputtable) error
+// Format is a canonical name of output formats
+type Format string
 
-// OutputFormatFns is a map which contains all the supported output format functions -- except 'human' because that's implemented in the OutputInDesiredForm method, by necessity.
-var OutputFormatFns = map[Format]OutputFn{
+const (
+	// List is the canonical name of the List output format
+	List Format = "list"
+	// Table is the canonical name of the Table output format
+	Table = "table"
+	// JSON is the canonical name of the JSON output format
+	JSON = "json"
+	// Human is the canonical name of the Human output format
+	Human = "human"
+	// Debug is the canonical name of the Debug output format
+	Debug = "debug"
+)
+
+// Fn is a function for outputting an object to the terminal in some way
+// See the FormatFns map to see examples
+type Fn func(wr io.Writer, config Config, obj Outputtable) error
+
+// FormatFns is a map which contains all the supported output format functions -- except 'human' because that's implemented in the OutputInDesiredForm method, by necessity.
+var FormatFns = map[Format]Fn{
 	Debug: func(wr io.Writer, cfg Config, obj Outputtable) error {
 		fmt.Fprintf(wr, "%#v", obj)
 		return nil
@@ -42,12 +58,23 @@ func outputTable(wr io.Writer, cfg Config, obj Outputtable) error {
 	return RenderTable(wr, cfg, obj)
 }
 
-// SupportedOutputTypes returns a list of all suppported output forms, including 'human'
-func SupportedOutputTypes() (outputTypes []string) {
-	outputTypes = make([]string, 0, len(OutputFormatFns)+1)
-	for k := range OutputFormatFns {
-		outputTypes = append(outputTypes, string(k))
+// FormatByName returns the Format for the given format name. If the name is not valid, returns Human
+func FormatByName(name string) Format {
+	name = strings.ToLower(name)
+	for f := range FormatFns {
+		if string(f) == name {
+			return f
+		}
 	}
-	outputTypes = append(outputTypes, "human")
+	return Human
+}
+
+// SupportedOutputFormats returns a list of all suppported output forms, including 'human'
+func SupportedOutputFormats() (outputFormats []string) {
+	outputFormats = make([]string, 0, len(FormatFns)+1)
+	for k := range FormatFns {
+		outputFormats = append(outputFormats, string(k))
+	}
+	outputFormats = append(outputFormats, "human")
 	return
 }

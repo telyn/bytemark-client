@@ -72,3 +72,27 @@ func (d Disc) Validate() (*Disc, error) {
 	}
 	return &d, nil
 }
+
+// Discs represents multiple Disc objects in an output.Outputtable form.
+type Discs []Disc
+
+// DefaultFields provides the default fields for Discs, which is the same as those of Disc.
+func (ds Discs) DefaultFields(f output.Format) string {
+	return (Disc{}).DefaultFields(f)
+}
+
+// PrettyPrint writes a human-readable summary of the discs to wr at the given detail level.
+func (ds Discs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	discsTpl := `
+{{ define "discs_sgl" }}{{ len . }} discs{{ end }}
+
+{{ define "discs_medium" -}}
+{{- range . -}}
+{{ prettysprint . "_sgl" }}
+{{ end -}}
+{{- end }}
+
+{{ define "discs_full" -}}{{ template "discs_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, discsTpl, "discs"+string(detail), ds)
+}

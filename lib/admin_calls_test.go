@@ -219,12 +219,12 @@ func testPutVirtualMachine(t *testing.T, endpoint string, vm *brain.VirtualMachi
 }
 
 func TestGetVLANS(t *testing.T) {
-	testVLANs := []brain.VLAN{
+	testVLANs := brain.VLANs{
 		{
 			ID:        90210,
 			Num:       123,
 			UsageType: "recipes",
-			IPRanges: []brain.IPRange{
+			IPRanges: brain.IPRanges{
 				{
 					ID:      1234,
 					Spec:    "192.168.13.0/24",
@@ -252,7 +252,7 @@ func TestGetVLAN(t *testing.T) {
 }
 
 func TestGetIPRanges(t *testing.T) {
-	testIPRanges := []brain.IPRange{
+	testIPRanges := brain.IPRanges{
 		{
 			ID:      1234,
 			Spec:    "192.168.13.0/24",
@@ -307,7 +307,7 @@ func TestGetIPRangeByIPRange(t *testing.T) {
 				}
 
 				assertMethod(t, r, "GET")
-				writeJSON(t, wr, []brain.IPRange{testIPRange})
+				writeJSON(t, wr, brain.IPRanges{testIPRange})
 			},
 		},
 	})
@@ -332,7 +332,7 @@ func TestGetIPRangeByIPRange(t *testing.T) {
 }
 
 func TestGetHeads(t *testing.T) {
-	testHeads := []brain.Head{
+	testHeads := brain.Heads{
 		{
 			ID:       315,
 			UUID:     "234833-2493-3423-324235",
@@ -403,7 +403,7 @@ func TestGetHead(t *testing.T) {
 }
 
 func TestGetTails(t *testing.T) {
-	testTails := []brain.Tail{
+	testTails := brain.Tails{
 		{
 			ID:           1345,
 			UUID:         "idont-reallyknowwhat-uuids-looklike",
@@ -440,7 +440,7 @@ func TestGetTail(t *testing.T) {
 }
 
 func TestGetStoragePools(t *testing.T) {
-	testStoragePools := []brain.StoragePool{
+	testStoragePools := brain.StoragePools{
 		{
 			Label:           "swimming-pool",
 			Zone:            "frozone",
@@ -489,7 +489,7 @@ func TestGetStoragePool(t *testing.T) {
 }
 
 func TestGetMigratingVMs(t *testing.T) {
-	testVMs := []brain.VirtualMachine{
+	testVMs := brain.VirtualMachines{
 		{
 			Name: "coolvm",
 		},
@@ -503,7 +503,7 @@ func TestGetMigratingVMs(t *testing.T) {
 }
 
 func TestGetMigratingDiscs(t *testing.T) {
-	testDiscs := []brain.Disc{
+	testDiscs := brain.Discs{
 		{
 			ID:           123,
 			Label:        "bliblbalb",
@@ -523,7 +523,7 @@ func TestGetMigratingDiscs(t *testing.T) {
 }
 
 func TestGetStoppedEligibleVMs(t *testing.T) {
-	testVMs := []brain.VirtualMachine{
+	testVMs := brain.VirtualMachines{
 		{
 			Name: "eligible-vm",
 		}, {
@@ -536,7 +536,7 @@ func TestGetStoppedEligibleVMs(t *testing.T) {
 }
 
 func TestGetRecentVMs(t *testing.T) {
-	testVMs := []brain.VirtualMachine{
+	testVMs := brain.VirtualMachines{
 		{
 			Name: "the-most-recent-vm",
 		}, {
