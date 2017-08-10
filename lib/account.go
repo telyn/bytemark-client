@@ -18,7 +18,7 @@ type Account struct {
 	BillingID        int            `json:"billing_id"`
 	BrainID          int            `json:"brain_id"`
 	CardReference    string         `json:"card_reference"`
-	Groups           []brain.Group  `json:"groups"`
+	Groups           brain.Groups   `json:"groups"`
 	Suspended        bool           `json:"suspended"`
 
 	IsDefaultAccount bool `json:"-"`
@@ -112,4 +112,31 @@ func (a Account) String() string {
 		return "ERROR"
 	}
 	return buf.String()
+}
+
+// Accounts represents more than one account in output.Outputtable form.
+type Accounts []Account
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (as Accounts) DefaultFields(f output.Format) string {
+	return (Account{}).DefaultFields(f)
+}
+
+// PrettyPrint writes a human-readable summary of the accounts to writer at the given detail level.
+func (as Accounts) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	accountsTpl := `
+{{ define "accounts_sgl" -}}
+{{- range . -}}
+{{- .Name }}, {{ end -}}
+{{- end }}
+
+{{ define "accounts_medium" }}{{ template "accounts_sgl" . }}{{ end }}
+
+{{ define "accounts_full" }}
+Accounts: 
+{{ range . -}}
+{{- prettysprint . "_sgl" }}
+{{ end -}}
+{{- end }}`
+	return prettyprint.Run(wr, accountsTpl, "accounts"+string(detail), as)
 }

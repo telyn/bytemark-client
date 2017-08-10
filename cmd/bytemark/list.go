@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -31,26 +31,21 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			Usage:       "list all the accounts you're able to see",
 			UsageText:   "bytemark list accounts",
 			Description: `This will list all the accounts that your authentication token has some form of access to.`,
-			Flags:       OutputFlags("accounts", "array", DefaultAccountTableFields),
+			Flags:       OutputFlags("accounts", "array"),
 			Action: With(AuthProvider, func(c *Context) error {
 				accounts, err := global.Client.GetAccounts()
 
 				if err != nil {
 					return err
 				}
-				return c.OutputInDesiredForm(accounts, func() error {
-					for _, account := range accounts {
-						log.Output(account.Name)
-					}
-					return nil
-				})
+				return c.OutputInDesiredForm(accounts, output.List)
 			}),
 		}, {
 			Name:        "discs",
 			Usage:       "list all the discs attached to a given virtual machine",
 			UsageText:   "bytemark list discs <virtual machine>",
 			Description: `This command lists all the discs attached to the given virtual machine. They're presented in the following format: 'LABEL: SIZE GRADE', where size is an integer number of megabytes. Add the --human flag to output the size in GiB (rounded down to the nearest GiB)`,
-			Flags: append(OutputFlags("discs", "array", DefaultDiscTableFields),
+			Flags: append(OutputFlags("discs", "array"),
 				cli.BoolFlag{
 					Name:  "human",
 					Usage: "output disc size in GiB, suffixed",
@@ -62,23 +57,14 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 				},
 			),
 			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
-				return c.OutputInDesiredForm(c.VirtualMachine.Discs, func() error {
-					for _, disc := range c.VirtualMachine.Discs {
-						if c.Bool("human") {
-							log.Outputf("%s: %dGiB %s\r\n", disc.Label, (disc.Size / 1024), disc.StorageGrade)
-						} else {
-							log.Outputf("%s: %d %s\r\n", disc.Label, disc.Size, disc.StorageGrade)
-						}
-					}
-					return nil
-				})
+				return c.OutputInDesiredForm(c.VirtualMachine.Discs, output.List)
 			}),
 		}, {
 			Name:        "groups",
 			Usage:       "list all the groups in an account",
 			UsageText:   "bytemark list groups [account]",
 			Description: `This command lists all the groups in the given account, or in your default account if not specified.`,
-			Flags: append(OutputFlags("groups", "array", DefaultGroupTableFields),
+			Flags: append(OutputFlags("groups", "array"),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to list the groups of",
@@ -86,12 +72,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 				},
 			),
 			Action: With(OptionalArgs("account"), RequiredFlags("account"), AccountProvider("account"), func(c *Context) error {
-				return c.OutputInDesiredForm(c.Account.Groups, func() error {
-					for _, group := range c.Account.Groups {
-						log.Output(group.Name)
-					}
-					return nil
-				})
+				return c.OutputInDesiredForm(c.Account.Groups, output.List)
 			}),
 		}, {
 			Name:        "keys",
@@ -99,6 +80,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			UsageText:   "bytemark list keys [user]",
 			Description: "Lists all the SSH public keys associated with a user, defaulting to your log-in user.",
 			Action: With(OptionalArgs("user"), UserProvider("user"), func(c *Context) error {
+				// TODO(telyn): could this be rewritten using OutputInDesiredForm / is it desirable to?
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
 				}
@@ -111,7 +93,7 @@ This commmand will list the kind of object you request, one per line. Perfect fo
 			UsageText: "bytemark list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if not specified.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
-			Flags: append(OutputFlags("servers", "array", DefaultServerTableFields),
+			Flags: append(OutputFlags("servers", "array"),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to list the servers of",
@@ -119,24 +101,19 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 				},
 			),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), AuthProvider, func(c *Context) error {
-				servers := make([]brain.VirtualMachine, 0)
+				servers := brain.VirtualMachines{}
 
 				for _, g := range c.Account.Groups {
 					servers = append(servers, g.VirtualMachines...)
 				}
-				return c.OutputInDesiredForm(servers, func() error {
-					for _, g := range c.Account.Groups {
-						listServersInGroup(g)
-					}
-					return nil
-				})
+				return c.OutputInDesiredForm(servers, output.List)
 			}),
 		}, {
 			Name:        "backups",
 			Usage:       "list all the backups of a server or disc",
 			UsageText:   "bytemark list backups <server name> [disc label]",
 			Description: "Lists all the backups of all the discs in the given server, or if you also give a disc label, just the backups of that disc.",
-			Flags: append(OutputFlags("backups", "array", DefaultBackupTableFields),
+			Flags: append(OutputFlags("backups", "array"),
 				cli.StringFlag{
 					Name:  "disc",
 					Usage: "the disc you wish to list the backups of",
@@ -170,9 +147,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						backups = append(backups, discbackups...)
 					}
 				}
-				return c.OutputInDesiredForm(backups, func() error {
-					return backups.PrettyPrint(global.App.Writer, prettyprint.Full)
-				})
+				return c.OutputInDesiredForm(backups, output.List)
 			}),
 		}},
 	})
