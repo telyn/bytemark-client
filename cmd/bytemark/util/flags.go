@@ -12,7 +12,7 @@ import (
 // IPFlag is a flag.Value used to provide an array of net.IPs
 type IPFlag []net.IP
 
-// Set sets the IPFlag given the space-seperated string of IPs
+// Set sets the IPFlag given the space-separated string of IPs
 func (ips *IPFlag) Set(value string) error {
 	for _, val := range strings.Split(value, " ") {
 		ip := net.ParseIP(val)

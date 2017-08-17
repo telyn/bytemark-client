@@ -142,7 +142,7 @@ func TestCommandConfigSet(t *testing.T) {
 			if errSpec.shouldErr && err == nil {
 				t.Errorf("bytemark config set %s %s should've errored but didn't.\r\n", varname, value)
 			} else if !errSpec.shouldErr && err != nil {
-				t.Errorf("bytemark config set %s %s should've suceeded but didn't: %s\r\n", varname, value, err.Error())
+				t.Errorf("bytemark config set %s %s should've succeeded but didn't: %s\r\n", varname, value, err.Error())
 			}
 			if ok, vErr := config.Verify(); !ok {
 				t.Errorf("bytemark config set %s %s - config.Verify error: %s\r\n", varname, value, vErr)
@@ -160,7 +160,7 @@ func TestCommandConfigSet(t *testing.T) {
 
 			err = global.App.Run([]string{"bytemark", "config", "set", "--force", varname, value})
 			if err != nil {
-				t.Errorf("bytemark config set %s %s should've suceeded but didn't: %s\r\n", varname, value, err.Error())
+				t.Errorf("bytemark config set %s %s should've succeeded but didn't: %s\r\n", varname, value, err.Error())
 			}
 			if ok, vErr := config.Verify(); !ok {
 				t.Errorf("bytemark config set %s %s - config.Verify error: %s\r\n", varname, value, vErr)

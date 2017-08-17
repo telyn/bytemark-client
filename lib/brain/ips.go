@@ -9,7 +9,7 @@ import (
 // IPs represent multiple net.IPs
 type IPs []net.IP
 
-// StringSep combines all the IPs into a single string with the given seperator
+// StringSep combines all the IPs into a single string with the given separator
 func (ips IPs) StringSep(sep string) string {
 	return strings.Join(ips.Strings(), sep)
 }
