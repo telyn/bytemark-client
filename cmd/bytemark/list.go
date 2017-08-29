@@ -24,7 +24,7 @@ func init() {
 		UsageText: "bytemark list accounts|discs|groups|keys|servers",
 		Description: `scripting-friendly lists of your assets at Bytemark
 
-This commmand will list the kind of object you request, one per line. Perfect for piping into a bash while loop!`,
+This command will list the kind of object you request, one per line. Perfect for piping into a bash while loop!`,
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "accounts",

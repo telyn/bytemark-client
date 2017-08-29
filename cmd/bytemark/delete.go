@@ -120,7 +120,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 
 				err = global.Client.DeleteUserAuthorizedKey(user, key)
 				if err == nil {
-					log.Log("Key deleted successfullly")
+					log.Log("Key deleted successfully")
 				}
 				return
 			}),

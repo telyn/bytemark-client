@@ -33,7 +33,7 @@ Sorted.`,
 		Action:    cli.ShowSubcommandHelp,
 		Description: `The Bytemark client has been programmed from the beginning to attempt to make it easy for users to script with it.
 
-Some particularly relavent notes: 
+Some particularly relevant notes: 
     * The 'list' command is entirely designed for scripting - it outputs to stdout, one item per line.
     * The reimage and create server commands only print the root password to stdout - all other output is sent to stderr.
     * All exit codes are documented - see the help topic exit codes.

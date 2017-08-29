@@ -72,7 +72,7 @@ var templateFuncMap = map[string]interface{}{
 	"map": func(mapper TemplateFragmentMapper, fragment string) ([]string, error) {
 		return mapper.MapTemplateFragment(fragment)
 	},
-	// join joins multiple strings together with a seperator
+	// join joins multiple strings together with a separator
 	"join": strings.Join,
 	"joinWithSpecialLast": func(sep string, fin string, strs []string) string {
 		switch len(strs) {
