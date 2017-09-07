@@ -11,17 +11,17 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
-				Name:      "storage_pool",
+				Name:      "storage pool",
 				Usage:     "empty a storage pool",
-				UsageText: "bytemark --admin empty storage_pool <storage_pool>",
+				UsageText: "bytemark --admin empty storage pool <storage-pool>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
-						Name:  "storage_pool",
+						Name:  "storage-pool",
 						Usage: "the ID or label of the storage pool to be emptied",
 					},
 				},
-				Action: With(OptionalArgs("storage_pool"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
-					if err := global.Client.EmptyStoragePool(c.String("storage_pool")); err != nil {
+				Action: With(OptionalArgs("storage-pool"), RequiredFlags("storage-pool"), AuthProvider, func(c *Context) error {
+					if err := global.Client.EmptyStoragePool(c.String("storage-pool")); err != nil {
 						return err
 					}
 

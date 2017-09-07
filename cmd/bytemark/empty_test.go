@@ -13,7 +13,7 @@ func TestEmptyStoragePool(t *testing.T) {
 
 	c.When("EmptyStoragePool", "pool1").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "empty", "storage_pool", "pool1"})
+	err := global.App.Run([]string{"bytemark", "empty", "storage", "pool", "pool1"})
 
 	is.Nil(err)
 
@@ -28,7 +28,7 @@ func TestEmptyStoragePoolError(t *testing.T) {
 
 	c.When("EmptyStoragePool", "pool1").Return(fmt.Errorf("Could not empty storage pool")).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "empty", "storage_pool", "pool1"})
+	err := global.App.Run([]string{"bytemark", "empty", "storage", "pool", "pool1"})
 
 	is.NotNil(err)
 

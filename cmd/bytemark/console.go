@@ -58,7 +58,7 @@ Defaults to connecting to the serial console for the given server.`,
 			if err != nil {
 				return
 			}
-			if ctx.Bool("no_connect") {
+			if ctx.Bool("no-connect") {
 				serialConsoleInstructions(vm)
 				log.Log()
 				vncConsoleInstructions(vm)
