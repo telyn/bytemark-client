@@ -20,7 +20,7 @@ func mkTestCommand() cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			return fmt.Errorf("Test error!")
+			return fmt.Errorf("test error")
 		},
 	}
 }
@@ -52,6 +52,8 @@ func TestCreateMultiwordCommand(t *testing.T) {
 	is.Equal("this is a test", subcmds[0].Description)
 	is.Equal("--test", subcmds[0].UsageText)
 	is.Equal("this is a real good test", subcmds[0].Usage)
+	action := subcmds[0].Action.(func(*cli.Context) error)
+	is.Equal("test error", action(nil).Error())
 
 }
 
@@ -97,6 +99,11 @@ func TestCreateMultiwordCommands(t *testing.T) {
 						if afterDeepTestCommand.Name == "command" {
 							foundDeepTestCommand = true
 						}
+						is.Equal(cmd.Usage, afterDeepTestCommand.Usage)
+						is.Equal(cmd.UsageText, afterDeepTestCommand.UsageText)
+						is.Equal(cmd.Description, afterDeepTestCommand.Description)
+						action := afterDeepTestCommand.Action.(func(*cli.Context) error)
+						is.Equal("test error", action(nil).Error())
 					}
 				}
 			}
@@ -105,6 +112,8 @@ func TestCreateMultiwordCommands(t *testing.T) {
 			is.Equal(cmd.Usage, afterDeep.Usage)
 			is.Equal(cmd.UsageText, afterDeep.UsageText)
 			is.Equal(cmd.Description, afterDeep.Description)
+			action := afterDeep.Action.(func(*cli.Context) error)
+			is.Equal("test error", action(nil).Error())
 		}
 	}
 

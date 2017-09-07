@@ -1,4 +1,4 @@
-// cliutil is a collection of functions to help work with urfave/cli
+// Package cliutil is a collection of functions to help work with urfave/cli
 package cliutil
 
 import (
@@ -7,6 +7,14 @@ import (
 	"github.com/urfave/cli"
 )
 
+// CreateMultiwordCommand creates a new cli.Command with subcommands for each
+// word with the innermost one being identical to the original, but for the name
+// and for being hidden.
+//
+// For example, given a command called "example command", this creates a command
+// called "example" with a subcommand called "command" - where "command" is
+// identical to "example command".
+// This is a workaround for urfave/cli not supporting multi-word commands.
 func CreateMultiwordCommand(orig cli.Command) cli.Command {
 	if !strings.Contains(orig.Name, " ") {
 		return orig
@@ -16,15 +24,8 @@ func CreateMultiwordCommand(orig cli.Command) cli.Command {
 	lastIndex := len(cmdNameParts) - 1
 
 	// create the innermost Command
-	cmd := cli.Command{
-		Name:        cmdNameParts[lastIndex],
-		Usage:       orig.Usage,
-		UsageText:   orig.UsageText,
-		Description: orig.Description,
-		Flags:       orig.Flags,
-		Action:      orig.Action,
-		Hidden:      true,
-	}
+	cmd := orig
+	cmd.Name = cmdNameParts[lastIndex]
 
 	lastIndex--
 	for lastIndex >= 0 {
