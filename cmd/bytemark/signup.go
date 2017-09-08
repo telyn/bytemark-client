@@ -35,11 +35,11 @@ If you have previously used the client, you'll have a login and will need to add
 
 			// TODO(telyn): check a terminal is attached to stdin to try to help prevent fraudy/spammy crap just in case
 			ssoExists := false
-			token := global.Config.GetIgnoreErr("token")
+			token := c.Config().GetIgnoreErr("token")
 			if token != "" {
 				ssoExists = true
 			}
-			user, err := global.Config.GetV("user")
+			user, err := c.Config().GetV("user")
 			if err == nil && user.Source != "ENV USER" {
 				ssoExists = true
 			}
@@ -98,18 +98,18 @@ If you have previously used the client, you'll have a login and will need to add
 					CVV:    fields[util.FormFieldCreditCardCVV].Value(),
 				}
 
-				token, err := global.Client.GetSPPToken(card, account.Owner)
+				token, err := c.Client().GetSPPToken(card, account.Owner)
 				if err != nil {
 					return err
 				}
 
-				cardRef, err = global.Client.CreateCreditCardWithToken(card, token)
+				cardRef, err = c.Client().CreateCreditCardWithToken(card, token)
 				if err != nil {
 					return err
 				}
 			}
 			account.CardReference = cardRef
-			createdAccount, err := global.Client.RegisterNewAccount(account)
+			createdAccount, err := c.Client().RegisterNewAccount(account)
 
 			if _, ok := err.(lib.AccountCreationDeferredError); ok {
 				log.Log(err.Error())

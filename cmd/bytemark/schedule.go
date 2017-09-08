@@ -61,7 +61,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 					}
 
 					vmName := c.VirtualMachineName("server")
-					sched, err := global.Client.CreateBackupSchedule(vmName, c.String("disc"), start, c.Int("interval"))
+					sched, err := c.Client().CreateBackupSchedule(vmName, c.String("disc"), start, c.Int("interval"))
 					if err == nil {
 						log.Logf("Schedule set. Backups will be taken every %d seconds.", sched.Interval)
 					}

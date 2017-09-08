@@ -63,7 +63,7 @@ func init() {
 						Label:           label,
 					}
 
-					if err := global.Client.UpdateHead(c.String("head"), options); err != nil {
+					if err := c.Client().UpdateHead(c.String("head"), options); err != nil {
 						return err
 					}
 
@@ -103,7 +103,7 @@ func init() {
 						Label:           label,
 					}
 
-					if err := global.Client.UpdateTail(c.String("tail"), options); err != nil {
+					if err := c.Client().UpdateTail(c.String("tail"), options); err != nil {
 						return err
 					}
 
@@ -143,7 +143,7 @@ func init() {
 						Label:           label,
 					}
 
-					if err := global.Client.UpdateStoragePool(c.String("storage_pool"), options); err != nil {
+					if err := c.Client().UpdateStoragePool(c.String("storage_pool"), options); err != nil {
 						return err
 					}
 
@@ -196,7 +196,7 @@ func init() {
 								return errors.New("Nothing to update")
 							}
 
-							if err := global.Client.UpdateVMMigration(vm, speed, downtime); err != nil {
+							if err := c.Client().UpdateVMMigration(vm, speed, downtime); err != nil {
 								return err
 							}
 

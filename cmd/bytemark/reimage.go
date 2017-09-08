@@ -78,7 +78,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 				return util.UserRequestedExit{}
 			}
 
-			err = global.Client.ReimageVirtualMachine(vmName, imageInstall)
+			err = c.Client().ReimageVirtualMachine(vmName, imageInstall)
 			if err != nil && !isatty.IsTerminal(os.Stdout.Fd()) {
 				fmt.Fprintf(os.Stdout, imageInstall.RootPassword)
 			}
@@ -102,7 +102,7 @@ func prepareImageInstall(c *Context) (imageInstall brain.ImageInstall, defaulted
 
 	if !c.Bool("force") {
 		var exists bool
-		exists, err = imageExists(image)
+		exists, err = imageExists(c, image)
 		if err != nil {
 			return
 		}
@@ -135,8 +135,8 @@ func prepareImageInstall(c *Context) (imageInstall brain.ImageInstall, defaulted
 	}, defaulted, err
 }
 
-func imageExists(name string) (exists bool, err error) {
-	defs, err := global.Client.ReadDefinitions()
+func imageExists(c *Context, name string) (exists bool, err error) {
+	defs, err := c.Client().ReadDefinitions()
 	if err != nil {
 		return
 	}

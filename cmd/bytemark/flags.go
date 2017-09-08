@@ -14,7 +14,7 @@ type AccountNameFlag string
 
 // Set runs lib.ParseAccountName to make sure we get just the 'pure' account name; no cluster / endpoint details
 func (name *AccountNameFlag) Set(value string) error {
-	*name = AccountNameFlag(lib.ParseAccountName(value, global.Config.GetIgnoreErr("account")))
+	*name = AccountNameFlag(lib.ParseAccountName(value, c.Config().GetIgnoreErr("account")))
 	return nil
 }
 
@@ -28,7 +28,7 @@ type GroupNameFlag lib.GroupName
 
 // Set runs lib.ParseGroupName to make sure we have a valid group name
 func (name *GroupNameFlag) Set(value string) error {
-	gp := lib.ParseGroupName(value, global.Config.GetGroup())
+	gp := lib.ParseGroupName(value, c.Config().GetGroup())
 	*name = GroupNameFlag(gp)
 	return nil
 }
@@ -41,9 +41,9 @@ func (name GroupNameFlag) String() string {
 // VirtualMachineNameFlag is used for all --account flags, including the global one.
 type VirtualMachineNameFlag lib.VirtualMachineName
 
-// Set runs lib.ParseVirtualMachineName using the global.Client to make sure we have a valid group name
+// Set runs lib.ParseVirtualMachineName using the c.Client() to make sure we have a valid group name
 func (name *VirtualMachineNameFlag) Set(value string) error {
-	vm, err := lib.ParseVirtualMachineName(value, global.Config.GetVirtualMachine())
+	vm, err := lib.ParseVirtualMachineName(value, c.Config().GetVirtualMachine())
 	if err != nil {
 		return err
 	}
@@ -152,13 +152,13 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 		var groupName lib.GroupName
 		switch pf.TargetType() {
 		case brain.PrivilegeTargetTypeVM:
-			vmName, err = lib.ParseVirtualMachineName(target, global.Config.GetVirtualMachine())
+			vmName, err = lib.ParseVirtualMachineName(target, c.Config().GetVirtualMachine())
 			pf.VirtualMachineName = &vmName
 		case brain.PrivilegeTargetTypeGroup:
-			groupName = lib.ParseGroupName(target, global.Config.GetGroup())
+			groupName = lib.ParseGroupName(target, c.Config().GetGroup())
 			pf.GroupName = &groupName
 		case brain.PrivilegeTargetTypeAccount:
-			pf.AccountName = lib.ParseAccountName(target, global.Config.GetIgnoreErr("account"))
+			pf.AccountName = lib.ParseAccountName(target, c.Config().GetIgnoreErr("account"))
 		}
 	}
 	return

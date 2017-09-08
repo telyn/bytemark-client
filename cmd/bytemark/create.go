@@ -34,7 +34,7 @@ func init() {
 				},
 				Action: With(OptionalArgs("username", "privilege"), RequiredFlags("username", "privilege"), AuthProvider, func(c *Context) error {
 					// Privilege is just a string and not a PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
-					if err := global.Client.CreateUser(c.String("username"), c.String("privilege")); err != nil {
+					if err := c.Client().CreateUser(c.String("username"), c.String("privilege")); err != nil {
 						return err
 					}
 					log.Logf("User %s has been created with %s privileges\r\n", c.String("username"), c.String("privilege"))
@@ -61,7 +61,7 @@ Used when setting up a private VLAN for a customer.`,
 				},
 				Action: With(OptionalArgs("group", "vlan_num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
 					gp := c.GroupName("group")
-					if err := global.Client.AdminCreateGroup(gp, c.Int("vlan_num")); err != nil {
+					if err := c.Client().AdminCreateGroup(gp, c.Int("vlan_num")); err != nil {
 						return err
 					}
 					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
@@ -83,7 +83,7 @@ Used when setting up a private VLAN for a customer.`,
 					},
 				},
 				Action: With(OptionalArgs("ip_range", "vlan_num"), RequiredFlags("ip_range", "vlan_num"), AuthProvider, func(c *Context) error {
-					if err := global.Client.CreateIPRange(c.String("ip_range"), c.Int("vlan_num")); err != nil {
+					if err := c.Client().CreateIPRange(c.String("ip_range"), c.Int("vlan_num")); err != nil {
 						return err
 					}
 					log.Logf("IP range created\r\n")
@@ -218,7 +218,7 @@ Multiple --disc flags can be used to create multiple discs`,
 			},
 		},
 		Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) error {
-			backup, err := global.Client.CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
+			backup, err := c.Client().CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
 			if err != nil {
 				return err
 			}
@@ -267,7 +267,7 @@ func createDiscs(c *Context) (err error) {
 	log.Logf("Adding %d discs to %s:\r\n", len(discs), vmName)
 	for _, d := range discs {
 		log.Logf("    %dGiB %s...", d.Size/1024, d.StorageGrade)
-		err := global.Client.CreateDisc(vmName, d)
+		err := c.Client().CreateDisc(vmName, d)
 		if err != nil {
 			log.Errorf("failure! %v\r\n", err.Error())
 		} else {
@@ -279,7 +279,7 @@ func createDiscs(c *Context) (err error) {
 
 func createGroup(c *Context) (err error) {
 	gp := c.GroupName("group")
-	err = global.Client.CreateGroup(gp)
+	err = c.Client().CreateGroup(gp)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
 	}
@@ -407,11 +407,11 @@ func createServer(c *Context) (err error) {
 		return util.UserRequestedExit{}
 	}
 
-	_, err = global.Client.CreateVirtualMachine(groupName, spec)
+	_, err = c.Client().CreateVirtualMachine(groupName, spec)
 	if err != nil {
 		return err
 	}
-	vm, err := global.Client.GetVirtualMachine(name)
+	vm, err := c.Client().GetVirtualMachine(name)
 	if err != nil {
 		return
 	}

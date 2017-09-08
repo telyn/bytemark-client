@@ -13,7 +13,7 @@ import (
 
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -24,7 +24,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create disc --force --disc archive:35 test-server", " "))
+	err := app.Run(strings.Split("bytemark create disc --force --disc archive:35 test-server", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -34,7 +34,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 func TestCreateGroupCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetGroup").Return(defGroup)
 
@@ -44,7 +44,7 @@ func TestCreateGroupCommand(t *testing.T) {
 	}
 	c.When("CreateGroup", group).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create group test-group", " "))
+	err := app.Run(strings.Split("bytemark create group test-group", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -93,7 +93,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 }
 
 func TestCreateServerCommand(t *testing.T) {
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	// where most commands use &defVM to make sure the VirtualMachineName has all three components (and to avoid calls to GetDefaultAccount, presumably), I have singled out TestCreateServerCommand to also test that unqualified server names will work in practice without account & group set in the config.
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{Group: "default"})
@@ -145,7 +145,7 @@ func TestCreateServerCommand(t *testing.T) {
 	c.When("CreateVirtualMachine", lib.GroupName{Group: "default"}, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", vmname).Return(getvm, nil).Times(1)
 
-	err := global.App.Run([]string{
+	err := app.Run([]string{
 		"bytemark", "create", "server",
 		"--authorized-keys", "test-pubkey",
 		"--firstboot-script", "test-script",
@@ -173,7 +173,7 @@ func TestCreateServerCommand(t *testing.T) {
 }
 
 func TestCreateServerNoImage(t *testing.T) {
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -209,7 +209,7 @@ func TestCreateServerNoImage(t *testing.T) {
 	c.When("CreateVirtualMachine", group, vm).Return(vm, nil).Times(1)
 	c.When("GetVirtualMachine", vmname).Return(getvm, nil).Times(1)
 
-	err := global.App.Run([]string{
+	err := app.Run([]string{
 		"bytemark", "create", "server",
 		"--cores", "1",
 		"--force",
@@ -227,7 +227,7 @@ func TestCreateServerNoImage(t *testing.T) {
 
 func TestCreateServer(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -254,7 +254,7 @@ func TestCreateServer(t *testing.T) {
 	c.When("CreateVirtualMachine", defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)
 	c.When("GetVirtualMachine", vmname).Return(getvm, nil).Times(1)
 
-	err := global.App.Run([]string{
+	err := app.Run([]string{
 		"bytemark", "create", "server",
 		"--force",
 		"--no-image",
@@ -268,7 +268,7 @@ func TestCreateServer(t *testing.T) {
 
 func TestCreateBackup(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -280,7 +280,7 @@ func TestCreateBackup(t *testing.T) {
 
 	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)
 
-	err := global.App.Run([]string{
+	err := app.Run([]string{
 		"bytemark", "create", "backup", "test-server", "test-disc",
 	})
 	is.Nil(err)
@@ -290,7 +290,7 @@ func TestCreateBackup(t *testing.T) {
 }
 func TestCreateVLANGroup(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := baseTestAuthSetup (t, true)
 
 	config.When("GetGroup").Return(defGroup).Times(1)
 
@@ -300,7 +300,7 @@ func TestCreateVLANGroup(t *testing.T) {
 	}
 	c.When("AdminCreateGroup", group, 0).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
+	err := app.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -309,7 +309,7 @@ func TestCreateVLANGroup(t *testing.T) {
 
 func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := baseTestAuthSetup (t, true)
 
 	config.When("GetGroup").Return(defGroup).Times(1)
 
@@ -319,7 +319,7 @@ func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 	}
 	c.When("AdminCreateGroup", group, 19).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account 19", " "))
+	err := app.Run(strings.Split("bytemark create vlan_group test-group.test-account 19", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -328,7 +328,7 @@ func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 
 func TestCreateVLANGroupError(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := baseTestAuthSetup (t, true)
 
 	config.When("GetGroup").Return(defGroup).Times(1)
 
@@ -338,7 +338,7 @@ func TestCreateVLANGroupError(t *testing.T) {
 	}
 	c.When("AdminCreateGroup", group, 0).Return(fmt.Errorf("Group name already used")).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
+	err := app.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
 	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -347,11 +347,11 @@ func TestCreateVLANGroupError(t *testing.T) {
 
 func TestCreateIPRange(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	c.When("CreateIPRange", "192.168.3.0/28", 14).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 14", " "))
+	err := app.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 14", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -360,11 +360,11 @@ func TestCreateIPRange(t *testing.T) {
 
 func TestCreateIPRangeError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	c.When("CreateIPRange", "192.168.3.0/28", 18).Return(fmt.Errorf("Error creating IP range")).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 18", " "))
+	err := app.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 18", " "))
 	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -373,11 +373,11 @@ func TestCreateIPRangeError(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	c.When("CreateUser", "uname", "cluster_su").Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create user uname cluster_su", " "))
+	err := app.Run(strings.Split("bytemark create user uname cluster_su", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -386,11 +386,11 @@ func TestCreateUser(t *testing.T) {
 
 func TestCreateUserError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	c.When("CreateUser", "uname", "cluster_su").Return(fmt.Errorf("Error creating user")).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create user uname cluster_su", " "))
+	err := app.Run(strings.Split("bytemark create user uname cluster_su", " "))
 	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

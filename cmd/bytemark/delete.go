@@ -26,7 +26,7 @@ func init() {
 					},
 				},
 				Action: With(OptionalArgs("id"), RequiredFlags("id"), AuthProvider, func(c *Context) error {
-					if err := global.Client.DeleteVLAN(c.Int("id")); err != nil {
+					if err := c.Client().DeleteVLAN(c.Int("id")); err != nil {
 						return err
 					}
 
@@ -71,7 +71,7 @@ func init() {
 					return util.UserRequestedExit{}
 				}
 				vmName := c.VirtualMachineName("server")
-				return global.Client.DeleteDisc(vmName, c.String("disc"))
+				return c.Client().DeleteDisc(vmName, c.String("disc"))
 			}),
 		}, {
 			Name:      "group",
@@ -110,7 +110,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			Action: With(JoinArgs("public-key"), RequiredFlags("public-key"), AuthProvider, func(c *Context) (err error) {
 				user := c.String("user")
 				if user == "" {
-					user = global.Config.GetIgnoreErr("user")
+					user = c.Config().GetIgnoreErr("user")
 				}
 
 				key := c.String("public-key")
@@ -118,7 +118,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					return c.Help("You must specify a key to delete.\r\n")
 				}
 
-				err = global.Client.DeleteUserAuthorizedKey(user, key)
+				err = c.Client().DeleteUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key deleted successfully")
 				}
@@ -188,7 +188,7 @@ func deleteServer(c *Context) (err error) {
 	}
 
 	vmName := c.VirtualMachineName("server")
-	err = global.Client.DeleteVirtualMachine(vmName, purge)
+	err = c.Client().DeleteVirtualMachine(vmName, purge)
 	if err != nil {
 		return
 	}
@@ -227,7 +227,7 @@ func deleteGroup(c *Context) (err error) {
 		if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
 			return util.UserRequestedExit{}
 		}
-		err = recursiveDeleteGroup(&groupName, c.Group)
+		err = recursiveDeleteGroup(c, &groupName, c.Group)
 		if err != nil {
 			return
 		}
@@ -235,19 +235,19 @@ func deleteGroup(c *Context) (err error) {
 		err = &util.WontDeleteNonEmptyGroupError{Group: &groupName}
 		return
 	}
-	err = global.Client.DeleteGroup(groupName)
+	err = c.Client().DeleteGroup(groupName)
 	if err == nil {
 		log.Logf("Group %s deleted successfully.\r\n", groupName.String())
 	}
 	return
 }
 
-func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
+func recursiveDeleteGroup(c *Context, name *lib.GroupName, group *brain.Group) error {
 	log.Log("", "")
 	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 	for _, vm := range group.VirtualMachines {
 		vmn.VirtualMachine = vm.Name
-		err := global.Client.DeleteVirtualMachine(vmn, true)
+		err := c.Client().DeleteVirtualMachine(vmn, true)
 		if err != nil {
 			return err
 		}
@@ -267,7 +267,7 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("       bytemark undelete server <server>")
 }*/
 func deleteBackup(c *Context) (err error) {
-	err = global.Client.DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
+	err = c.Client().DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 	if err != nil {
 		return
 	}

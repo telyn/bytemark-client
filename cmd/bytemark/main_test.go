@@ -72,7 +72,7 @@ func TestEnsureAuth(t *testing.T) {
 	}
 
 	for _, test := range tt {
-		_, c := baseTestSetup(t, false)
+		_, c, _ := baseTestSetup(t, false)
 
 		configDir, err := ioutil.TempDir("", "")
 		if err != nil {
@@ -90,12 +90,10 @@ func TestEnsureAuth(t *testing.T) {
 			t.Errorf("Unexpected error when setting up config temp directory: %v", err)
 		}
 
-		global.Config = config
-
 		// Pretending the input comes from terminal
-		global.Config.Set("user", test.InputUsername, "INTERACTION")
-		global.Config.Set("pass", test.InputPassword, "TESTING")
-		global.Config.Set("2fa-otp", test.Input2FA, "TESTING")
+		config.Set("user", test.InputUsername, "INTERACTION")
+		config.Set("pass", test.InputPassword, "TESTING")
+		config.Set("2fa-otp", test.Input2FA, "TESTING")
 
 		c.When("AuthWithToken", "").Return(fmt.Errorf("Not logged in")).Times(1)
 
@@ -123,7 +121,7 @@ func TestEnsureAuth(t *testing.T) {
 
 		c.When("GetSessionFactors").Return(test.Factors)
 
-		err = EnsureAuth()
+		err = EnsureAuth(c, config)
 		if test.ExpectedError && err == nil {
 			t.Error("Expecting EnsureAuth to error, but it didn't")
 		} else if !test.ExpectedError && err != nil {
@@ -136,21 +134,18 @@ func TestEnsureAuth(t *testing.T) {
 	}
 }
 
-func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mocks.Client) {
+func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mocks.Client, app *cli.App) {
 	config = new(mocks.Config)
 	client = new(mocks.Client)
 	config.When("GetBool", "admin").Return(admin, nil)
 	config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", "human", "CODE"})
-	global.Client = client
-	global.Config = config
 
-	app, err := baseAppSetup(globalFlags())
+	app, err := baseAppSetup(globalFlags(), config)
 	if err != nil {
 		t.Fatal(err)
 	}
-	global.App = app
-	oldWriter := global.App.Writer
-	global.App.Writer = ioutil.Discard
+	oldWriter := app.Writer
+	app.Writer = ioutil.Discard
 	for _, c := range commands {
 		//config.When("Get", "token").Return("no-not-a-token")
 
@@ -161,17 +156,17 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 		// subcommands in order to get every subcommand to have a correct Command.commandPath
 
 		if c.Subcommands != nil && len(c.Subcommands) > 0 {
-			_ = global.App.Run([]string{"bytemark.test", c.Name, "help"})
+			_ = app.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
-	global.App.Writer = oldWriter
+	app.Writer = oldWriter
 	return
 }
 
 // baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
 // user is test-user
-func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks.Client) {
-	config, c = baseTestSetup(t, admin)
+func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks.Client, app *cli.App) {
+	config, c, app = baseTestSetup(t, admin)
 
 	config.When("Get", "account").Return("test-account")
 	config.When("GetIgnoreErr", "token").Return("test-token")
@@ -180,7 +175,7 @@ func baseTestAuthSetup(t *testing.T, admin bool) (config *mocks.Config, c *mocks
 	config.When("GetIgnoreErr", "2fa-otp").Return("")
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	return config, c
+	return config, c, app
 }
 
 func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {

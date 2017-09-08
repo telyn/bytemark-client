@@ -29,7 +29,7 @@ func init() {
 				Action: With(OptionalArgs("server", "power-on"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
 					vm := c.VirtualMachineName("server")
 
-					if err := global.Client.ApproveVM(vm, c.Bool("power-on")); err != nil {
+					if err := c.Client().ApproveVM(vm, c.Bool("power-on")); err != nil {
 						return err
 					}
 

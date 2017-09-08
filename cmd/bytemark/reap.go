@@ -16,7 +16,7 @@ func init() {
 				Usage:     "triggers server reaping, purging all deleted servers and discs",
 				UsageText: "bytemark --admin reap servers",
 				Action: With(AuthProvider, func(c *Context) error {
-					if err := global.Client.ReapVMs(); err != nil {
+					if err := c.Client().ReapVMs(); err != nil {
 						return err
 					}
 

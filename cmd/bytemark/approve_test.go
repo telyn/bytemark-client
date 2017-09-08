@@ -10,14 +10,14 @@ import (
 
 func TestApproveVM(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := baseTestAuthSetup (t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	c.When("ApproveVM", vmName, false).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "approve", "vm", "vm123.group.account"})
+	err := app.Run([]string{"bytemark", "approve", "vm", "vm123.group.account"})
 
 	is.Nil(err)
 
@@ -28,14 +28,14 @@ func TestApproveVM(t *testing.T) {
 
 func TestApproveVMAndPowerOn(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := baseTestAuthSetup (t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm122", Group: "group", Account: "account"}
 	c.When("ApproveVM", vmName, true).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "approve", "vm", "vm122.group.account", "true"})
+	err := app.Run([]string{"bytemark", "approve", "vm", "vm122.group.account", "true"})
 
 	is.Nil(err)
 
@@ -46,7 +46,7 @@ func TestApproveVMAndPowerOn(t *testing.T) {
 
 func TestApproveVMError(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := baseTestAuthSetup (t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -54,7 +54,7 @@ func TestApproveVMError(t *testing.T) {
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}
 	c.When("ApproveVM", vmName, false).Return(approveErr).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "approve", "vm", "vm121.group.account"})
+	err := app.Run([]string{"bytemark", "approve", "vm", "vm121.group.account"})
 
 	is.Equal(err, approveErr)
 

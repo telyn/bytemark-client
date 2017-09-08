@@ -35,7 +35,7 @@ func (c *Context) Reset() {
 
 // App returns the cli.App that this context is part of. Usually this will be the same as global.App, but it's nice to depend less on globals.
 func (c *Context) App() *cli.App {
-	return c.App()
+	return c.Context.App()
 }
 
 // args returns all the args that were passed to the Context (i.e. all the args passed to this (sub)command)
@@ -51,6 +51,20 @@ func (c *Context) Args() []string {
 // Command returns the cli.Command this context is for
 func (c *Context) Command() cli.Command {
 	return c.Context.Command()
+}
+
+func (c *Context) Config() util.ConfigManager {
+	if config, ok := c.App().Metadata["config"].(util.ConfigManager); ok {
+		return config
+	}
+	return nil
+}
+
+func (c *Context) Client() lib.Client {
+	if client, ok := c.App().Metadata["client"].(lib.Client); ok {
+		return client
+	}
+	return nil
 }
 
 // NextArg returns the next unused argument, and marks it as used.
@@ -170,7 +184,7 @@ func (c *Context) ResizeFlag(flagname string) ResizeFlag {
 func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
 	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
 	if !ok {
-		return global.Config.GetVirtualMachine()
+		return c.Config().GetVirtualMachine()
 	}
 	return lib.VirtualMachineName(*vmNameFlag)
 }

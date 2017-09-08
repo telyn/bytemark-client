@@ -46,7 +46,7 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 						return fmt.Errorf("schedule-id not specified or invalid")
 					}
 					vmName := c.VirtualMachineName("server")
-					err = global.Client.DeleteBackupSchedule(vmName, c.String("disc"), c.Int("schedule-id"))
+					err = c.Client().DeleteBackupSchedule(vmName, c.String("disc"), c.Int("schedule-id"))
 					if err == nil {
 						log.Log("Backups unscheduled.")
 					}

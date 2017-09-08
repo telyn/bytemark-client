@@ -98,7 +98,7 @@ func TestShowAccountCommand(t *testing.T) {
 		}
 		for _, format := range []string{"table", "json", "human"} {
 
-			config, c := baseTestAuthSetup(t, false)
+			config, c, app := baseTestAuthSetup (t, false)
 			baseShowAccountSetup(c, config, test.ConfigAccount, format)
 			if test.AccountToGet == "" {
 				c.When("GetAccount", "").Return(lib.Account{
@@ -134,11 +134,11 @@ func TestShowAccountCommand(t *testing.T) {
 			}
 
 			buf := bytes.Buffer{}
-			global.App.Writer = &buf
-			global.App.ErrWriter = &buf
+			app.Writer = &buf
+			app.ErrWriter = &buf
 			args := fmt.Sprintf("bytemark --output-format=%s %s", format, test.Input)
 			//t.Logf("TestShowAccountCommand %d args: %s", i, args)
-			err := global.App.Run(strings.Split(args, " "))
+			err := app.Run(strings.Split(args, " "))
 			if !test.ShouldErr && err != nil {
 				t.Errorf("TestShowAccountCommand %d shouldn't err, but did: %T{%s}", i, err, err.Error())
 			} else if test.ShouldErr && err == nil {
@@ -167,7 +167,7 @@ func TestShowAccountCommand(t *testing.T) {
 func TestShowGroupCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetGroup").Return(defGroup)
 	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
@@ -175,7 +175,7 @@ func TestShowGroupCommand(t *testing.T) {
 	group := getFixtureGroup()
 	c.When("GetGroup", gpname).Return(&group, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark show group test-group.test-account", " "))
+	err := app.Run(strings.Split("bytemark show group test-group.test-account", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -186,14 +186,14 @@ func TestShowGroupCommand(t *testing.T) {
 func TestShowServerCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 	vm := getFixtureVM()
 	c.When("GetVirtualMachine", vmname).Return(&vm, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
+	err := app.Run(strings.Split("bytemark show server test-server.test-group.test-account", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -204,12 +204,12 @@ func TestShowServerCommand(t *testing.T) {
 func TestAdminShowVLANsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	vlans := []brain.VLAN{getFixtureVLAN()}
 	c.When("GetVLANs").Return(&vlans, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show vlans", " "))
+	err := app.Run(strings.Split("bytemark --admin show vlans", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -220,13 +220,13 @@ func TestAdminShowVLANsCommand(t *testing.T) {
 func TestAdminShowVLANCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	vlanNum := 1
 	vlan := getFixtureVLAN()
 	c.When("GetVLAN", vlanNum).Return(&vlan, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show vlan 1", " "))
+	err := app.Run(strings.Split("bytemark --admin show vlan 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -237,12 +237,12 @@ func TestAdminShowVLANCommand(t *testing.T) {
 func TestAdminShowIPRangesCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	ipRanges := []brain.IPRange{getFixtureIPRange()}
 	c.When("GetIPRanges").Return(&ipRanges, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show ip_ranges", " "))
+	err := app.Run(strings.Split("bytemark --admin show ip_ranges", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -253,13 +253,13 @@ func TestAdminShowIPRangesCommand(t *testing.T) {
 func TestAdminShowIPRangeCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	ipRangeID := "1"
 	ipRange := getFixtureIPRange()
 	c.When("GetIPRange", ipRangeID).Return(&ipRange, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show ip_range 1", " "))
+	err := app.Run(strings.Split("bytemark --admin show ip_range 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -270,13 +270,13 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	rangeString := "192.168.33.0/24"
 	ipRange := getFixtureIPRange()
 	c.When("GetIPRange", rangeString).Return(&ipRange, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show ip_range 192.168.33.0/24", " "))
+	err := app.Run(strings.Split("bytemark --admin show ip_range 192.168.33.0/24", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -287,12 +287,12 @@ func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
 func TestAdminShowHeadsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	heads := []brain.Head{getFixtureHead()}
 	c.When("GetHeads").Return(&heads, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show heads", " "))
+	err := app.Run(strings.Split("bytemark --admin show heads", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -303,13 +303,13 @@ func TestAdminShowHeadsCommand(t *testing.T) {
 func TestAdminShowHeadCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	headID := "1"
 	head := getFixtureHead()
 	c.When("GetHead", headID).Return(&head, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show head 1", " "))
+	err := app.Run(strings.Split("bytemark --admin show head 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -320,12 +320,12 @@ func TestAdminShowHeadCommand(t *testing.T) {
 func TestAdminShowTailsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	tails := []brain.Tail{getFixtureTail()}
 	c.When("GetTails").Return(&tails, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show tails", " "))
+	err := app.Run(strings.Split("bytemark --admin show tails", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -336,13 +336,13 @@ func TestAdminShowTailsCommand(t *testing.T) {
 func TestAdminShowTailCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	tailID := "1"
 	tail := getFixtureTail()
 	c.When("GetTail", tailID).Return(&tail, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show tail 1", " "))
+	err := app.Run(strings.Split("bytemark --admin show tail 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -353,12 +353,12 @@ func TestAdminShowTailCommand(t *testing.T) {
 func TestAdminShowStoragePoolsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	storagePool := []brain.StoragePool{getFixtureStoragePool()}
 	c.When("GetStoragePools").Return(&storagePool, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show storage_pools", " "))
+	err := app.Run(strings.Split("bytemark --admin show storage_pools", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -369,13 +369,13 @@ func TestAdminShowStoragePoolsCommand(t *testing.T) {
 func TestAdminShowStoragePoolCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	storagePoolID := "1"
 	storagePool := getFixtureStoragePool()
 	c.When("GetStoragePool", storagePoolID).Return(&storagePool, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show storage_pool 1", " "))
+	err := app.Run(strings.Split("bytemark --admin show storage_pool 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -386,12 +386,12 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 func TestAdminShowMigratingVMsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetMigratingVMs").Return(&vms, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show migrating_vms", " "))
+	err := app.Run(strings.Split("bytemark --admin show migrating_vms", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -402,12 +402,12 @@ func TestAdminShowMigratingVMsCommand(t *testing.T) {
 func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	discs := brain.Discs{{ID: 134, StorageGrade: "sata", Size: 25600}}
 	c.When("GetMigratingDiscs").Return(discs, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show migrating_discs", " "))
+	err := app.Run(strings.Split("bytemark --admin show migrating_discs", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -418,12 +418,12 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetStoppedEligibleVMs").Return(&vms, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show stopped_eligible_vms", " "))
+	err := app.Run(strings.Split("bytemark --admin show stopped_eligible_vms", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -434,12 +434,12 @@ func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 func TestAdminShowRecentVMsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetRecentVMs").Return(&vms, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show recent_vms", " "))
+	err := app.Run(strings.Split("bytemark --admin show recent_vms", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -464,10 +464,10 @@ func TestShowPrivileges(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		_, c := baseTestAuthSetup(t, true)
+		_, c, app := baseTestAuthSetup (t, true)
 		c.When("GetPrivileges", test.user).Return(test.privs, nil)
 
-		err := global.App.Run(strings.Split(test.args, " "))
+		err := app.Run(strings.Split(test.args, " "))
 		if test.shouldErr && err == nil {
 			t.Errorf("TestShowPrivilege %d should err and didn't", i)
 		} else if !test.shouldErr && err != nil {
@@ -481,13 +481,13 @@ func TestShowPrivileges(t *testing.T) {
 
 func TestAdminShowDiscByIDCommand(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := baseTestAuthSetup (t, true)
 
 	discID := 132
 	disc := getFixtureDisc()
 	c.When("GetDiscByID", discID).Return(&disc, nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark --admin show disc_by_id 132", " "))
+	err := app.Run(strings.Split("bytemark --admin show disc_by_id 132", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

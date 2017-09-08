@@ -169,10 +169,10 @@ func AccountProvider(flagName string) ProviderFunc {
 		}
 		accName := c.String(flagName)
 		if accName == "" {
-			accName = global.Config.GetIgnoreErr("account")
+			accName = c.Config().GetIgnoreErr("account")
 		}
 
-		acc, err := global.Client.GetAccount(accName)
+		acc, err := c.Client().GetAccount(accName)
 		if err != nil {
 			return
 		}
@@ -184,7 +184,7 @@ func AccountProvider(flagName string) ProviderFunc {
 // AuthProvider makes sure authentication has been successfully completed, attempting it if necessary.
 func AuthProvider(c *Context) (err error) {
 	if !c.Authed {
-		err = EnsureAuth()
+		err = EnsureAuth(c.Client(), c.Config())
 		if err != nil {
 			return
 		}
@@ -206,7 +206,7 @@ func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
 
 		vmName := c.VirtualMachineName(vmFlagName)
 		discLabel := c.String(discFlagName)
-		disc, err := global.Client.GetDisc(vmName, discLabel)
+		disc, err := c.Client().GetDisc(vmName, discLabel)
 		if err != nil {
 			return
 		}
@@ -220,7 +220,7 @@ func DefinitionsProvider(c *Context) (err error) {
 	if c.Definitions != nil {
 		return
 	}
-	defs, err := global.Client.ReadDefinitions()
+	defs, err := c.Client().ReadDefinitions()
 	if err != nil {
 		return
 	}
@@ -241,9 +241,9 @@ func GroupProvider(flagName string) ProviderFunc {
 
 		groupName := c.GroupName(flagName)
 		if groupName.Account == "" {
-			groupName.Account = global.Config.GetIgnoreErr("account")
+			groupName.Account = c.Config().GetIgnoreErr("account")
 		}
-		group, err := global.Client.GetGroup(groupName)
+		group, err := c.Client().GetGroup(groupName)
 		// this if is a guard against tricky-to-debug nil-pointer errors
 		if err != nil {
 			return
@@ -288,15 +288,15 @@ func PrivilegeProvider(flagName string) ProviderFunc {
 		switch c.Privilege.TargetType() {
 		case brain.PrivilegeTargetTypeVM:
 			var vm brain.VirtualMachine
-			vm, err = global.Client.GetVirtualMachine(*pf.VirtualMachineName)
+			vm, err = c.Client().GetVirtualMachine(*pf.VirtualMachineName)
 			c.Privilege.VirtualMachineID = vm.ID
 		case brain.PrivilegeTargetTypeGroup:
 			var group brain.Group
-			group, err = global.Client.GetGroup(*pf.GroupName)
+			group, err = c.Client().GetGroup(*pf.GroupName)
 			c.Privilege.GroupID = group.ID
 		case brain.PrivilegeTargetTypeAccount:
 			var acc lib.Account
-			acc, err = global.Client.GetAccount(pf.AccountName)
+			acc, err = c.Client().GetAccount(pf.AccountName)
 			c.Privilege.AccountID = acc.BrainID
 		}
 		return
@@ -314,10 +314,10 @@ func UserProvider(flagName string) ProviderFunc {
 		}
 		username := c.String(flagName)
 		if username == "" {
-			username = global.Client.GetSessionUser()
+			username = c.Client().GetSessionUser()
 		}
 
-		user, err := global.Client.GetUser(username)
+		user, err := c.Client().GetUser(username)
 		if err != nil {
 			return
 		}
@@ -337,7 +337,7 @@ func VirtualMachineProvider(flagName string) ProviderFunc {
 			return
 		}
 		vmName := c.VirtualMachineName(flagName)
-		vm, err := global.Client.GetVirtualMachine(vmName)
+		vm, err := c.Client().GetVirtualMachine(vmName)
 		if err != nil {
 			return
 		}

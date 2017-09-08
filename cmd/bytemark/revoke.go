@@ -32,22 +32,22 @@ func init() {
 			var privs brain.Privileges
 			switch c.Privilege.TargetType() {
 			case brain.PrivilegeTargetTypeVM:
-				privs, err = global.Client.GetPrivilegesForVirtualMachine(*pf.VirtualMachineName)
+				privs, err = c.Client().GetPrivilegesForVirtualMachine(*pf.VirtualMachineName)
 				if err != nil {
 					return
 				}
 			case brain.PrivilegeTargetTypeGroup:
-				privs, err = global.Client.GetPrivilegesForGroup(*pf.GroupName)
+				privs, err = c.Client().GetPrivilegesForGroup(*pf.GroupName)
 				if err != nil {
 					return
 				}
 			case brain.PrivilegeTargetTypeAccount:
-				privs, err = global.Client.GetPrivilegesForAccount(pf.AccountName)
+				privs, err = c.Client().GetPrivilegesForAccount(pf.AccountName)
 				if err != nil {
 					return
 				}
 			default:
-				privs, err = global.Client.GetPrivileges(pf.Username)
+				privs, err = c.Client().GetPrivileges(pf.Username)
 				if err != nil {
 					return
 				}
@@ -57,7 +57,7 @@ func init() {
 				return fmt.Errorf("Couldn't find such a privilege to revoke")
 			}
 
-			err = global.Client.RevokePrivilege(privs[i])
+			err = c.Client().RevokePrivilege(privs[i])
 			if err == nil {
 				log.Outputf("Revoked %s\r\n", c.PrivilegeFlag("privilege").String())
 

@@ -3,7 +3,6 @@
 package speakeasy
 
 import (
-	"os"
 	"syscall"
 )
 

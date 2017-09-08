@@ -38,7 +38,7 @@ EXAMPLES
 			from := c.VirtualMachineName("from")
 			to := c.VirtualMachineName("to")
 
-			err = global.Client.MoveVirtualMachine(from, to)
+			err = c.Client().MoveVirtualMachine(from, to)
 			if err != nil {
 				log.Output("Couldn't rename server.")
 				return err

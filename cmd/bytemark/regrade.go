@@ -25,7 +25,7 @@ func init() {
 					},
 				},
 				Action: With(OptionalArgs("disc", "new-grade"), RequiredFlags("disc", "new-grade"), AuthProvider, func(c *Context) (err error) {
-					if err := global.Client.RegradeDisc(c.Int("disc"), c.String("new-grade")); err != nil {
+					if err := c.Client().RegradeDisc(c.Int("disc"), c.String("new-grade")); err != nil {
 						return err
 					}
 

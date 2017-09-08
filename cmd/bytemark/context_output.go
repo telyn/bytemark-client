@@ -15,7 +15,7 @@ func trimAllSpace(strs []string) {
 }
 
 func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.Format, error) {
-	format, err := global.Config.GetV("output-format")
+	format, err := c.Config().GetV("output-format")
 	if err != nil {
 		return output.Human, err
 	}
@@ -81,5 +81,5 @@ func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...o
 	if err != nil {
 		return err
 	}
-	return output.Write(global.App.Writer, cfg, obj)
+	return output.Write(c.App().Writer, cfg, obj)
 }
