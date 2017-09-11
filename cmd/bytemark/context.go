@@ -51,6 +51,9 @@ func (c *Context) Args() []string {
 	return c.args()[c.currentArgIndex:]
 }
 
+// Debug runs fmt.Fprintf on the args, outputting to the App's debugWriter.
+// In tests, this is a TestWriter. Otherwise it's nil for now - but might be
+// changed to the debug.log File in the future.
 func (c *Context) Debug(format string, values ...interface{}) {
 	dw, ok := c.App().Metadata["debugWriter"]
 	if !ok {
@@ -66,6 +69,7 @@ func (c *Context) Command() cli.Command {
 	return c.Context.Command()
 }
 
+// Config returns the config attached to the App this Context is for
 func (c *Context) Config() util.ConfigManager {
 	if config, ok := c.App().Metadata["config"].(util.ConfigManager); ok {
 		return config
@@ -73,6 +77,7 @@ func (c *Context) Config() util.ConfigManager {
 	return nil
 }
 
+// Config returns the API client attached to the App this Context is for
 func (c *Context) Client() lib.Client {
 	if client, ok := c.App().Metadata["client"].(lib.Client); ok {
 		return client
