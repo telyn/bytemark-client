@@ -77,7 +77,7 @@ func (c *Context) Config() util.ConfigManager {
 	return nil
 }
 
-// Config returns the API client attached to the App this Context is for
+// Client returns the API client attached to the App this Context is for
 func (c *Context) Client() lib.Client {
 	if client, ok := c.App().Metadata["client"].(lib.Client); ok {
 		return client

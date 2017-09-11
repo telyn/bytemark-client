@@ -9,7 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// Preprocessor allows a Flag to have a preprocess step that requires a Context
+// A Preprocesser is a Flag that has a preprocess step that requires a Context
 type Preprocesser interface {
 	Preprocess(c *Context) error
 }
@@ -225,6 +225,8 @@ func (pf *PrivilegeFlag) Set(value string) (err error) {
 	return nil
 }
 
+// Preprocess parses the PrivilegeFlag and looks up the target's ID so it can
+// be made into a brain.Privilege
 func (pf *PrivilegeFlag) Preprocess(c *Context) (err error) {
 	args := privArgs(strings.Split(pf.Value, " "))
 

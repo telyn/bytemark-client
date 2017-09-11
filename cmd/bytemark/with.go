@@ -27,6 +27,7 @@ func With(providers ...ProviderFunc) func(c *cli.Context) error {
 	}
 }
 
+// Preprocess runs the Preprocess methods on all flags that implement Preprocessor
 func Preprocess(c *Context) error {
 	if c.preproDone {
 		return nil
