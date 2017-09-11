@@ -12,7 +12,7 @@ import (
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	_, c, app := baseTestAuthSetup (t, false)
+	_, c, app := baseTestAuthSetup(t, false)
 
 	err := ioutil.WriteFile("testkey.pub", []byte("ssh-rsa aaaaawhartevervAsde fake key"), 0600)
 	if err != nil {
@@ -69,7 +69,7 @@ func TestAddKeyCommand(t *testing.T) {
 }
 
 func TestAddIPCommand(t *testing.T) {
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 

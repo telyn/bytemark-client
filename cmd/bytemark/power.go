@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -15,10 +18,10 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to reset",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to reset %v...\r\n", vmName)
 			err = c.Client().ResetVirtualMachine(vmName)
@@ -38,10 +41,10 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to restart",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to restart %v...\r\n", vmName)
 			err = c.Client().RestartVirtualMachine(vmName)
@@ -61,10 +64,10 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to shutdown",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to shutdown %v...\r\n", vmName)
 			err = c.Client().ShutdownVirtualMachine(vmName, true)
@@ -84,10 +87,10 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to start",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to start %s...\r\n", vmName)
 			err = c.Client().StartVirtualMachine(vmName)
@@ -107,10 +110,10 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to stop",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			log.Logf("Attempting to stop %s...\r\n", vmName)
 			err = c.Client().StopVirtualMachine(vmName)

@@ -10,7 +10,7 @@ import (
 
 func TestMigrateDiscWithNewStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("MigrateDisc", 123, "t6-sata1").Return(nil).Times(1)
 
@@ -25,7 +25,7 @@ func TestMigrateDiscWithNewStoragePool(t *testing.T) {
 
 func TestMigrateDiscWithoutNewStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("MigrateDisc", 123, "").Return(nil).Times(1)
 
@@ -40,7 +40,7 @@ func TestMigrateDiscWithoutNewStoragePool(t *testing.T) {
 
 func TestMigrateDiscError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	migrateErr := fmt.Errorf("Error migrating")
 	c.When("MigrateDisc", 123, "t6-sata1").Return(migrateErr).Times(1)
@@ -56,7 +56,7 @@ func TestMigrateDiscError(t *testing.T) {
 
 func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -74,7 +74,7 @@ func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 
 func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -92,7 +92,7 @@ func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 
 func TestMigrateVirtualMachineError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 

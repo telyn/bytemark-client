@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
@@ -54,9 +57,9 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 		Flags: append(imageInstallFlags, forceFlag, cli.GenericFlag{
 			Name:  "server",
 			Usage: "the server to reimage",
-			Value: new(VirtualMachineNameFlag),
+			Value: new(app.VirtualMachineNameFlag),
 		}),
-		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {
@@ -87,7 +90,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 	})
 }
 
-func prepareImageInstall(c *Context) (imageInstall brain.ImageInstall, defaulted bool, err error) {
+func prepareImageInstall(c *app.Context) (imageInstall brain.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
 	firstbootScriptFile := c.FileContents("firstboot-script-file")
@@ -135,7 +138,7 @@ func prepareImageInstall(c *Context) (imageInstall brain.ImageInstall, defaulted
 	}, defaulted, err
 }
 
-func imageExists(c *Context, name string) (exists bool, err error) {
+func imageExists(c *app.Context, name string) (exists bool, err error) {
 	defs, err := c.Client().ReadDefinitions()
 	if err != nil {
 		return

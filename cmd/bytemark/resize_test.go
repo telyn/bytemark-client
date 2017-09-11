@@ -11,7 +11,7 @@ import (
 
 func TestResizeDisk(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	config.When("Force").Return(true)
 

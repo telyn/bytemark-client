@@ -10,7 +10,7 @@ import (
 
 func TestApproveVM(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -28,7 +28,7 @@ func TestApproveVM(t *testing.T) {
 
 func TestApproveVMAndPowerOn(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -46,7 +46,7 @@ func TestApproveVMAndPowerOn(t *testing.T) {
 
 func TestApproveVMError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 

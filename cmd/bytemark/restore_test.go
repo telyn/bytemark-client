@@ -11,7 +11,7 @@ import (
 
 func TestRestoreBackup(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",

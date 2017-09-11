@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -20,7 +23,7 @@ func init() {
 						Usage: "the ID of the disc to reify",
 					},
 				},
-				Action: With(OptionalArgs("disc"), RequiredFlags("disc"), AuthProvider, func(c *Context) (err error) {
+				Action: app.With(args.Optional("disc"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) (err error) {
 					if err := c.Client().ReifyDisc(c.Int("disc")); err != nil {
 						return err
 					}

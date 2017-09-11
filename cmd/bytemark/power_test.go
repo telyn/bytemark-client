@@ -10,7 +10,7 @@ import (
 
 func TestResetCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("GetVirtualMachine").Return(defVM)
@@ -25,7 +25,7 @@ func TestResetCommand(t *testing.T) {
 }
 func TestRestartCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
@@ -41,7 +41,7 @@ func TestRestartCommand(t *testing.T) {
 }
 func TestShutdownCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("GetVirtualMachine").Return(defVM)
@@ -56,7 +56,7 @@ func TestShutdownCommand(t *testing.T) {
 }
 func TestStartCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("GetVirtualMachine").Return(defVM)
@@ -71,7 +71,7 @@ func TestStartCommand(t *testing.T) {
 }
 func TestStopCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 

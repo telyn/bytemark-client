@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"time"
@@ -48,14 +48,15 @@ type innerContext interface {
 	Command() cli.Command
 }
 
-type cliContextWrapper struct {
+// CliContextWrapper is a struct which embeds cli.Context and is used to ensure that the entirety of innerContext is implemented on it. This allows for making mocks of cli.Contexts. App() and Command() are the methods unique to innerContext that are not in cli.Context
+type CliContextWrapper struct {
 	*cli.Context
 }
 
-func (c cliContextWrapper) App() *cli.App {
+func (c CliContextWrapper) App() *cli.App {
 	return c.Context.App
 }
 
-func (c cliContextWrapper) Command() cli.Command {
+func (c CliContextWrapper) Command() cli.Command {
 	return c.Context.Command
 }

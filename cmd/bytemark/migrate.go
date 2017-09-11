@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -25,7 +28,7 @@ func init() {
 						Usage: "the storage pool to move the disc to",
 					},
 				},
-				Action: With(OptionalArgs("disc", "new-storage-pool"), RequiredFlags("disc"), AuthProvider, func(c *Context) (err error) {
+				Action: app.With(args.Optional("disc", "new-storage-pool"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) (err error) {
 					disc := c.Int("disc")
 					storagePool := c.String("new-storage-pool")
 
@@ -48,14 +51,14 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to migrate",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.StringFlag{
 						Name:  "new-head",
 						Usage: "the head to move the server to",
 					},
 				},
-				Action: With(OptionalArgs("server", "new-head"), RequiredFlags("server"), AuthProvider, func(c *Context) (err error) {
+				Action: app.With(args.Optional("server", "new-head"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 					vm := c.VirtualMachineName("server")
 					head := c.String("new-head")
 

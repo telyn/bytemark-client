@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -24,7 +27,7 @@ func init() {
 								Usage: "the ID of the disc that is migrating",
 							},
 						},
-						Action: With(OptionalArgs("disc"), RequiredFlags("disc"), AuthProvider, func(c *Context) error {
+						Action: app.With(args.Optional("disc"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) error {
 							if err := c.Client().CancelDiscMigration(c.Int("disc")); err != nil {
 								return err
 							}
@@ -45,7 +48,7 @@ func init() {
 								Usage: "the ID of the server that is migrating",
 							},
 						},
-						Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+						Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 							if err := c.Client().CancelVMMigration(c.Int("server")); err != nil {
 								return err
 							}

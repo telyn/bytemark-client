@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -24,7 +27,7 @@ func init() {
 						Usage: "the new grade of the disc",
 					},
 				},
-				Action: With(OptionalArgs("disc", "new-grade"), RequiredFlags("disc", "new-grade"), AuthProvider, func(c *Context) (err error) {
+				Action: app.With(args.Optional("disc", "new-grade"), with.RequiredFlags("disc", "new-grade"), with.Auth, func(c *app.Context) (err error) {
 					if err := c.Client().RegradeDisc(c.Int("disc"), c.String("new-grade")); err != nil {
 						return err
 					}

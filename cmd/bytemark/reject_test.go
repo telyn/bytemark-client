@@ -10,7 +10,7 @@ import (
 
 func TestRejectVM(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -28,7 +28,7 @@ func TestRejectVM(t *testing.T) {
 
 func TestRejectVMError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 

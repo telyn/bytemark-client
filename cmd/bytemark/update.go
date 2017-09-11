@@ -3,13 +3,16 @@ package main
 import (
 	"errors"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
 func init() {
-	readUpdateFlags := func(c *Context) (usageStrategy *string, overcommitRatio *int, label *string) {
+	readUpdateFlags := func(c *app.Context) (usageStrategy *string, overcommitRatio *int, label *string) {
 		if c.Context.IsSet("usage-strategy") {
 			v := c.String("usage-strategy")
 			usageStrategy = &v
@@ -54,7 +57,7 @@ func init() {
 						Usage: "the label of the head",
 					},
 				},
-				Action: With(OptionalArgs("head", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("head", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateHead{
@@ -94,7 +97,7 @@ func init() {
 						Usage: "the label of the tail",
 					},
 				},
-				Action: With(OptionalArgs("tail", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("tail"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("tail", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("tail"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateTail{
@@ -134,7 +137,7 @@ func init() {
 						Usage: "the label of the storage pool",
 					},
 				},
-				Action: With(OptionalArgs("storage-pool", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("storage-pool"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateStoragePool{
@@ -166,7 +169,7 @@ func init() {
 							cli.GenericFlag{
 								Name:  "server",
 								Usage: "the server to migrate",
-								Value: new(VirtualMachineNameFlag),
+								Value: new(app.VirtualMachineNameFlag),
 							},
 							cli.Int64Flag{
 								Name:  "migrate-speed",
@@ -177,7 +180,7 @@ func init() {
 								Usage: "the max allowed downtime",
 							},
 						},
-						Action: With(OptionalArgs("server", "migrate-speed", "migrate-downtime"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+						Action: app.With(args.Optional("server", "migrate-speed", "migrate-downtime"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 							vm := c.VirtualMachineName("server")
 
 							var speed *int64

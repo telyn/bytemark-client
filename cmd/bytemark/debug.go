@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -34,7 +36,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 				Usage: "Send the request to the billing endpoint instead of the brain.",
 			},
 		},
-		Action: With(func(c *Context) error {
+		Action: app.With(func(c *app.Context) error {
 			shouldAuth := c.Bool("auth")
 
 			endpoint := lib.BrainEndpoint
@@ -62,7 +64,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					url = "/" + url
 				}
 				if c.Bool("auth") {
-					err := EnsureAuth(c.Client(), c.Config())
+					err := with.Auth(c)
 					if err != nil {
 						return err
 					}

@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -26,15 +29,15 @@ EXAMPLES
 			cli.GenericFlag{
 				Name:  "from",
 				Usage: "the server to move",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 			cli.GenericFlag{
 				Name:  "to",
 				Usage: "the new name for the server",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("from", "to"), RequiredFlags("from", "to"), AuthProvider, func(c *Context) (err error) {
+		Action: app.With(args.Optional("from", "to"), with.RequiredFlags("from", "to"), with.Auth, func(c *app.Context) (err error) {
 			from := c.VirtualMachineName("from")
 			to := c.VirtualMachineName("to")
 

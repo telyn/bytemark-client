@@ -123,7 +123,7 @@ func TestGrantPrivilege(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		config, c, app := baseTestAuthSetup (t, false)
+		config, c, app := baseTestAuthSetup(t, false)
 		test.Setup(config, c)
 
 		err := app.Run(strings.Split(test.Input, " "))

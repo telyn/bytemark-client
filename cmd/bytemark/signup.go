@@ -3,6 +3,7 @@ package main
 import (
 	"strings"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
@@ -31,7 +32,7 @@ If you have previously used the client, you'll have a login and will need to add
 				Usage: "sign up for a new account & login despite already having a login.",
 			},
 		},
-		Action: With(func(c *Context) error {
+		Action: app.With(func(c *app.Context) error {
 
 			// TODO(telyn): check a terminal is attached to stdin to try to help prevent fraudy/spammy crap just in case
 			ssoExists := false

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
 )
@@ -14,8 +16,8 @@ func init() {
 		Description: `This command displays an overview of the hosting you have with Bytemark.
 
 		If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-		Flags: OutputFlags("account details", "object"),
-		Action: With(AuthProvider, func(c *Context) error {
+		Flags: app.OutputFlags("account details", "object"),
+		Action: app.With(with.Auth, func(c *app.Context) error {
 
 			allAccs, err := c.Client().GetAccounts()
 			if err != nil {

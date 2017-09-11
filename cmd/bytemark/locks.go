@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/urfave/cli"
 )
 
@@ -22,10 +25,10 @@ This command locks the given server's hardware profile in place, preventing it f
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to lock",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 				vmName := c.VirtualMachineName("server")
 				return c.Client().SetVirtualMachineHardwareProfileLock(vmName, true)
 			}),
@@ -47,10 +50,10 @@ This command locks the given server's hardware profile in place, preventing it f
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to unlock",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 				vmName := c.VirtualMachineName("server")
 				return c.Client().SetVirtualMachineHardwareProfileLock(vmName, false)
 			}),

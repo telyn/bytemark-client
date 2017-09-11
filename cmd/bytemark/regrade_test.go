@@ -9,7 +9,7 @@ import (
 
 func TestRegradeDisc(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("RegradeDisc", 111, "newg").Return(nil).Times(1)
 
@@ -24,7 +24,7 @@ func TestRegradeDisc(t *testing.T) {
 
 func TestRegradeDiscError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("RegradeDisc", 112, "newg").Return(fmt.Errorf("Could not regrade disc")).Times(1)
 

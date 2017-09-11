@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -23,10 +26,10 @@ Note that it cannot be used to restore a server that has been permanently delete
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server that the disc is attached to",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) (err error) {
+			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) (err error) {
 				vmName := c.VirtualMachineName("server")
 				if !c.VirtualMachine.Deleted {
 					log.Errorf("%s was already restored\r\n", c.VirtualMachine.Hostname)
@@ -54,14 +57,14 @@ Note that it cannot be used to restore a server that has been permanently delete
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server that the disc is attached to",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 				cli.StringFlag{
 					Name:  "backup",
 					Usage: "the name or ID of the backup to restore",
 				},
 			},
-			Action: With(OptionalArgs("server", "disc", "backup"), RequiredFlags("server", "disc", "backup"), AuthProvider, func(c *Context) (err error) {
+			Action: app.With(args.Optional("server", "disc", "backup"), with.RequiredFlags("server", "disc", "backup"), with.Auth, func(c *app.Context) (err error) {
 				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
 				_, err = c.Client().RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 				if err != nil {

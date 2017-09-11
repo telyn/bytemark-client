@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -14,15 +15,15 @@ import (
 )
 
 func TestConfigAccountValidation(t *testing.T) {
-	config, client, app := baseTestSetup(t, false)
+	config, client, cliapp := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
-	ctx := Context{
-		Context: cliContextWrapper{&cli.Context{
-			App: app,
+	ctx := app.Context{
+		Context: app.CliContextWrapper{&cli.Context{
+			App: cliapp,
 		}},
 	}
 
@@ -30,7 +31,7 @@ func TestConfigAccountValidation(t *testing.T) {
 }
 
 func TestConfigGroupValidation(t *testing.T) {
-	config, client, app := baseTestSetup(t, false)
+	config, client, cliapp := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -39,8 +40,8 @@ func TestConfigGroupValidation(t *testing.T) {
 	flagset := flag.NewFlagSet("TestValidation", flag.ContinueOnError)
 	flagset.Bool("force", false, "")
 
-	ctx := Context{
-		Context: cliContextWrapper{cli.NewContext(app, flagset, nil)},
+	ctx := app.Context{
+		Context: app.CliContextWrapper{cli.NewContext(cliapp, flagset, nil)},
 	}
 	t.Logf("Testing validateGroupForConfig\r\n")
 	runGroupTests(t, &ctx, client, getValidationTests()["group"], validateGroupForConfig)
@@ -52,7 +53,7 @@ func TestConfigEndpointValidation(t *testing.T) {
 }
 
 func TestConfigValidations(t *testing.T) {
-	config, client, app := baseTestSetup(t, false)
+	config, client, cliapp := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -61,8 +62,8 @@ func TestConfigValidations(t *testing.T) {
 	flagset := flag.NewFlagSet("TestValidationWithForce", flag.ContinueOnError)
 	flagset.Bool("force", false, "")
 
-	ctx := Context{
-		Context: cliContextWrapper{cli.NewContext(app, flagset, nil)},
+	ctx := app.Context{
+		Context: app.CliContextWrapper{cli.NewContext(cliapp, flagset, nil)},
 	}
 
 	tests := getValidationTests()
@@ -72,10 +73,10 @@ func TestConfigValidations(t *testing.T) {
 			return validateConfigValue(&ctx, varname, endpoint)
 		})
 	}
-	runGroupTests(t, &ctx, client, tests["group"], func(c *Context, groupName string) error {
+	runGroupTests(t, &ctx, client, tests["group"], func(c *app.Context, groupName string) error {
 		return validateConfigValue(c, "group", groupName)
 	})
-	runAccountTests(t, &ctx, client, tests["account"], func(c *Context, accountName string) error {
+	runAccountTests(t, &ctx, client, tests["account"], func(c *app.Context, accountName string) error {
 
 		return validateConfigValue(c, "account", accountName)
 	})
@@ -192,9 +193,9 @@ func setupGroupTest(c *mocks.Client, name string, err error) {
 	}
 }
 
-type validationFn func(ctx *Context, name string) error
+type validationFn func(ctx *app.Context, name string) error
 
-func runAccountTests(t *testing.T, ctx *Context, c *mocks.Client, accounts map[string]errSpec, fnUnderTest validationFn) {
+func runAccountTests(t *testing.T, ctx *app.Context, c *mocks.Client, accounts map[string]errSpec, fnUnderTest validationFn) {
 	for a, spec := range accounts {
 		setupAccountTest(c, a, spec.err)
 		err := fnUnderTest(ctx, a)
@@ -234,7 +235,7 @@ func runEndpointTests(t *testing.T, varname string, endpoints map[string]errSpec
 	}
 }
 
-func runGroupTests(t *testing.T, c *Context, client *mocks.Client, groups map[string]errSpec, fnUnderTest validationFn) {
+func runGroupTests(t *testing.T, c *app.Context, client *mocks.Client, groups map[string]errSpec, fnUnderTest validationFn) {
 	for g, spec := range groups {
 		t.Log(g)
 		setupGroupTest(client, g, spec.err)

@@ -9,7 +9,7 @@ import (
 
 func TestReapVMs(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("ReapVMs").Return(nil).Times(1)
 
@@ -24,7 +24,7 @@ func TestReapVMs(t *testing.T) {
 
 func TestReapVMsAlias(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("ReapVMs").Return(nil).Times(1)
 
@@ -39,7 +39,7 @@ func TestReapVMsAlias(t *testing.T) {
 
 func TestReapVMsError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("ReapVMs").Return(fmt.Errorf("Error reaping VMs")).Times(1)
 

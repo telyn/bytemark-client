@@ -9,7 +9,7 @@ import (
 
 func TestMove(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	oldName := lib.VirtualMachineName{
 		VirtualMachine: "old-name",

@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -27,7 +29,7 @@ func validateEndpointForConfig(endpoint string) error {
 	return nil
 }
 
-func validateAccountForConfig(c *Context, name string) (err error) {
+func validateAccountForConfig(c *app.Context, name string) (err error) {
 	_, err = c.Client().GetAccount(name)
 	if err != nil {
 		if _, ok := err.(lib.NotFoundError); ok {
@@ -38,8 +40,8 @@ func validateAccountForConfig(c *Context, name string) (err error) {
 	return
 }
 
-func validateGroupForConfig(c *Context, name string) (err error) {
-	// we can't just use GroupProvider because it expects NextArg() to be the account name - there's no way to pass one in.
+func validateGroupForConfig(c *app.Context, name string) (err error) {
+	// we can't just use with.Group because it expects NextArg() to be the account name - there's no way to pass one in.
 	groupName := lib.ParseGroupName(name, c.Config().GetGroup())
 	_, err = c.Client().GetGroup(groupName)
 	if err != nil {
@@ -51,7 +53,7 @@ func validateGroupForConfig(c *Context, name string) (err error) {
 	return
 }
 
-func validateConfigValue(c *Context, varname string, value string) error {
+func validateConfigValue(c *app.Context, varname string, value string) error {
 	if c.Bool("force") {
 		return nil
 	}
@@ -105,7 +107,7 @@ The set and unset subcommands can be used to set and unset such variables.
 						Usage: "Don't run any validation checks against the value",
 					},
 				},
-				Action: With(func(ctx *Context) error {
+				Action: app.With(func(ctx *app.Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {
 						return err
@@ -127,7 +129,7 @@ The set and unset subcommands can be used to set and unset such variables.
 					}
 
 					if varname == "account" || varname == "group" {
-						err = AuthProvider(ctx)
+						err = with.Auth(ctx)
 						if err != nil {
 							return err
 						}
@@ -155,7 +157,7 @@ The set and unset subcommands can be used to set and unset such variables.
 				UsageText:   "bytemark config unset <variable>",
 				Usage:       "unsets a bytemark client configuration option",
 				Description: "Unsets the named variable.",
-				Action: With(func(ctx *Context) error {
+				Action: app.With(func(ctx *app.Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {
 						return err
@@ -165,13 +167,14 @@ The set and unset subcommands can be used to set and unset such variables.
 				}),
 			},
 		},
-		Action: With(func(ctx *Context) (err error) {
+		Action: app.With(func(ctx *app.Context) (err error) {
+			/* TODO(telyn): put this back. Phil - if you see this, I hecked up.
 			if ctx.Bool("help") {
 				if ccw, ok := ctx.Context.(cliContextWrapper); ok {
 					err = cli.ShowSubcommandHelp(ccw.Context)
 					return
 				}
-			}
+			}*/
 			vars, err := ctx.Config().GetAll()
 			if err != nil {
 				return
