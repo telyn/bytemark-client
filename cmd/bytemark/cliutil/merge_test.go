@@ -1,4 +1,4 @@
-package main
+package cliutil
 
 import (
 	"errors"
@@ -58,7 +58,7 @@ func TestMergeCommand(t *testing.T) {
 
 	for _, test := range tests {
 		result := base
-		mergeCommand(&result, test.cmd)
+		MergeCommand(&result, test.cmd)
 		is.Equal(base.Name, result.Name)
 		is.Equal(test.exUsage, result.Usage)
 		is.Equal(test.exUsageText, result.UsageText)

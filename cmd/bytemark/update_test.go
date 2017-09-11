@@ -119,7 +119,7 @@ func TestUpdateStoragePool(t *testing.T) {
 
 	c.When("UpdateStoragePool", "1", options).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "storage_pool", "1"})
+	err := global.App.Run([]string{"bytemark", "update", "storage pool", "1"})
 
 	is.Nil(err)
 
@@ -136,7 +136,7 @@ func TestUpdateStoragePoolError(t *testing.T) {
 
 	c.When("UpdateStoragePool", "1", options).Return(fmt.Errorf("Could not update storage pool")).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "storage_pool", "1"})
+	err := global.App.Run([]string{"bytemark", "update", "storage pool", "1"})
 
 	is.NotNil(err)
 

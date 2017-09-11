@@ -300,7 +300,7 @@ func TestCreateVLANGroup(t *testing.T) {
 	}
 	c.When("AdminCreateGroup", group, 0).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
+	err := global.App.Run(strings.Split("bytemark create vlan-group test-group.test-account", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -319,7 +319,7 @@ func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 	}
 	c.When("AdminCreateGroup", group, 19).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account 19", " "))
+	err := global.App.Run(strings.Split("bytemark create vlan-group test-group.test-account 19", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -338,7 +338,7 @@ func TestCreateVLANGroupError(t *testing.T) {
 	}
 	c.When("AdminCreateGroup", group, 0).Return(fmt.Errorf("Group name already used")).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create vlan_group test-group.test-account", " "))
+	err := global.App.Run(strings.Split("bytemark create vlan-group test-group.test-account", " "))
 	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -351,7 +351,7 @@ func TestCreateIPRange(t *testing.T) {
 
 	c.When("CreateIPRange", "192.168.3.0/28", 14).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 14", " "))
+	err := global.App.Run(strings.Split("bytemark create ip range 192.168.3.0/28 14", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -364,7 +364,7 @@ func TestCreateIPRangeError(t *testing.T) {
 
 	c.When("CreateIPRange", "192.168.3.0/28", 18).Return(fmt.Errorf("Error creating IP range")).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark create ip_range 192.168.3.0/28 18", " "))
+	err := global.App.Run(strings.Split("bytemark create ip range 192.168.3.0/28 18", " "))
 	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

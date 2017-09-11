@@ -194,9 +194,9 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:        "disc_by_id",
+				Name:        "disc by id",
 				Usage:       "displays details about a disc",
-				UsageText:   "bytemark show disc_by_id [--json] <id>",
+				UsageText:   "bytemark show disc by id [--json] <id>",
 				Description: `Displays a collection of details about the disc.`,
 				Flags: append(OutputFlags("disc details", "object"),
 					cli.IntFlag{
@@ -232,9 +232,9 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "ip_ranges",
+				Name:      "ip ranges",
 				Usage:     "shows all IP ranges",
-				UsageText: "bytemark --admin show ip_ranges [--json]",
+				UsageText: "bytemark --admin show ip ranges [--json]",
 				Flags:     OutputFlags("ip ranges", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					ipRanges, err := global.Client.GetIPRanges()
@@ -245,17 +245,17 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "ip_range",
+				Name:      "ip range",
 				Usage:     "shows the details of an IP range",
-				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",
+				UsageText: "bytemark --admin show ip range [--json] <ip-range>",
 				Flags: append(OutputFlags("ip range details", "object"),
 					cli.StringFlag{
-						Name:  "ip_range",
+						Name:  "ip-range",
 						Usage: "the ID or CIDR representation of the IP range to display",
 					},
 				),
-				Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
-					ipRange, err := global.Client.GetIPRange(c.String("ip_range"))
+				Action: With(OptionalArgs("ip-range"), RequiredFlags("ip-range"), AuthProvider, func(c *Context) error {
+					ipRange, err := global.Client.GetIPRange(c.String("ip-range"))
 					if err != nil {
 						return err
 					}
@@ -325,9 +325,9 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "storage_pools",
+				Name:      "storage pools",
 				Usage:     "shows the details of all storage pools",
-				UsageText: "bytemark --admin show storage_pools [--json]",
+				UsageText: "bytemark --admin show storage pools [--json]",
 				Flags:     OutputFlags("storage pools", "array"),
 				Action: With(AuthProvider, func(c *Context) error {
 					storagePools, err := global.Client.GetStoragePools()
@@ -338,17 +338,17 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "storage_pool",
+				Name:      "storage pool",
 				Usage:     "shows the details of the specified storage pool",
-				UsageText: "bytemark --admin show storage_pools [--json] <storage_pool>",
+				UsageText: "bytemark --admin show storage pool [--json] <storage-pool>",
 				Flags: append(OutputFlags("storage pool", "object"),
 					cli.StringFlag{
-						Name:  "storage_pool",
+						Name:  "storage-pool",
 						Usage: "The ID or label of the storage pool to display",
 					},
 				),
-				Action: With(OptionalArgs("storage_pool"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
-					storagePool, err := global.Client.GetStoragePool(c.String("storage_pool"))
+				Action: With(OptionalArgs("storage-pool"), RequiredFlags("storage-pool"), AuthProvider, func(c *Context) error {
+					storagePool, err := global.Client.GetStoragePool(c.String("storage-pool"))
 					if err != nil {
 						return err
 					}
@@ -356,7 +356,7 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "migrating_discs",
+				Name:      "migrating discs",
 				Usage:     "shows a list of migrating discs",
 				UsageText: "bytemark --admin show migrating_discs [--json]",
 				Flags:     OutputFlags("migrating discs", "array"),
@@ -369,7 +369,7 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "migrating_vms",
+				Name:      "migrating vms",
 				Usage:     "shows a list of migrating servers",
 				UsageText: "bytemark --admin show migrating_vms [--json]",
 				Flags:     OutputFlags("migrating servers", "array"),
@@ -382,7 +382,7 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "stopped_eligible_vms",
+				Name:      "stopped eligible vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
 				Flags:     OutputFlags("servers", "array"),
@@ -395,7 +395,7 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "recent_vms",
+				Name:      "recent vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
 				Flags:     OutputFlags("servers", "array"),

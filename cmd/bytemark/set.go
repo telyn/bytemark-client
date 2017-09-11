@@ -14,13 +14,13 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
-				Name:      "iops_limit",
+				Name:      "iops limit",
 				Usage:     "set the IOPS limit of a disc",
-				UsageText: "bytemark --admin set disc iops_limit <server> <disc> <limit>",
+				UsageText: "bytemark --admin set disc iops limit <server> <disc> <limit>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "disc",
-						Usage: "the name of the disc to alter the iops_limit of",
+						Usage: "the name of the disc to alter the iops limit of",
 					},
 					cli.GenericFlag{
 						Name:  "server",

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -46,7 +47,7 @@ func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 		return app, err
 	}
 	if wantAdminCmds {
-		app.Commands = mergeCommands(commands, adminCommands)
+		app.Commands = cliutil.MergeCommands(commands, adminCommands)
 	} else {
 		app.Commands = commands
 	}
@@ -60,6 +61,7 @@ func baseAppSetup(flags []cli.Flag) (app *cli.App, err error) {
 			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(app.Commands)
 		}
 	}
+	app.Commands = cliutil.CreateMultiwordCommands(app.Commands)
 	return
 
 }
@@ -248,51 +250,6 @@ func factorExists(factors []string, factor string) bool {
 	}
 
 	return false
-}
-
-// mergeCommand merges src into dst, only copying non-nil fields of src,
-// and calling mergeCommands upon the .Subcommands
-// and appending all .Flags
-func mergeCommand(dst *cli.Command, src cli.Command) {
-	if src.Usage != "" {
-		dst.Usage = src.Usage
-	}
-	if src.UsageText != "" {
-		dst.UsageText = src.UsageText
-	}
-	if src.Description != "" {
-		dst.Description = src.Description
-	}
-	if src.Action != nil {
-		dst.Action = src.Action
-	}
-	if src.Flags != nil {
-		dst.Flags = append(dst.Flags, src.Flags...)
-	}
-	if src.Subcommands != nil {
-		dst.Subcommands = mergeCommands(dst.Subcommands, src.Subcommands)
-	}
-}
-
-// mergeCommands copies over all the commands from base to result,
-// then puts all the commands from extras in too, overwriting any provided fields.
-func mergeCommands(base []cli.Command, extras []cli.Command) (result []cli.Command) {
-	result = make([]cli.Command, len(base))
-	copy(result, base)
-
-	for _, cmd := range extras {
-		found := false
-		for idx := range result {
-			if result[idx].Name == cmd.Name {
-				mergeCommand(&result[idx], cmd)
-				found = true
-			}
-		}
-		if !found {
-			result = append(result, cmd)
-		}
-	}
-	return
 }
 
 // overrideHelp writes our own help templates into urfave/cli
