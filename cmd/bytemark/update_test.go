@@ -10,7 +10,7 @@ import (
 
 func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -30,7 +30,7 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 
 func TestUpdateVMMigrationError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, true)
+	config, c, app := baseTestAuthSetup(t, true)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -45,7 +45,7 @@ func TestUpdateVMMigrationError(t *testing.T) {
 
 func TestUpdateHead(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	options := lib.UpdateHead{}
 
@@ -62,7 +62,7 @@ func TestUpdateHead(t *testing.T) {
 
 func TestUpdateHeadError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	options := lib.UpdateHead{}
 
@@ -79,7 +79,7 @@ func TestUpdateHeadError(t *testing.T) {
 
 func TestUpdateTail(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	options := lib.UpdateTail{}
 
@@ -96,7 +96,7 @@ func TestUpdateTail(t *testing.T) {
 
 func TestUpdateTailError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	options := lib.UpdateTail{}
 
@@ -113,13 +113,13 @@ func TestUpdateTailError(t *testing.T) {
 
 func TestUpdateStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	options := lib.UpdateStoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(nil).Times(1)
 
-	err := app.Run([]string{"bytemark", "update", "storage_pool", "1"})
+	err := app.Run([]string{"bytemark", "update", "storage", "pool", "1"})
 
 	is.Nil(err)
 
@@ -130,13 +130,13 @@ func TestUpdateStoragePool(t *testing.T) {
 
 func TestUpdateStoragePoolError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	options := lib.UpdateStoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(fmt.Errorf("Could not update storage pool")).Times(1)
 
-	err := app.Run([]string{"bytemark", "update", "storage_pool", "1"})
+	err := app.Run([]string{"bytemark", "update", "storage", "pool", "1"})
 
 	is.NotNil(err)
 

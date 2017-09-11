@@ -113,12 +113,12 @@ func init() {
 				}),
 			},
 			{
-				Name:      "storage_pool",
+				Name:      "storage pool",
 				Usage:     "update the settings of a storage pool",
-				UsageText: "bytemark --admin update storage_pool <storage_pool> [--usage-strategy] [--overcommit-ratio] [--label]",
+				UsageText: "bytemark --admin update storage pool <storage-pool> [--usage-strategy] [--overcommit-ratio] [--label]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
-						Name:  "storage_pool",
+						Name:  "storage-pool",
 						Usage: "the ID or label of the storage pool to be updated",
 					},
 					cli.StringFlag{
@@ -134,7 +134,7 @@ func init() {
 						Usage: "the label of the storage pool",
 					},
 				},
-				Action: With(OptionalArgs("storage_pool", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
+				Action: With(OptionalArgs("storage-pool", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("storage-pool"), AuthProvider, func(c *Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateStoragePool{
@@ -143,11 +143,11 @@ func init() {
 						Label:           label,
 					}
 
-					if err := c.Client().UpdateStoragePool(c.String("storage_pool"), options); err != nil {
+					if err := c.Client().UpdateStoragePool(c.String("storage-pool"), options); err != nil {
 						return err
 					}
 
-					log.Outputf("Storage pool %s updated\n", c.String("storage_pool"))
+					log.Outputf("Storage pool %s updated\n", c.String("storage-pool"))
 
 					return nil
 				}),

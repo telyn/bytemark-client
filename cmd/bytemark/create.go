@@ -42,9 +42,9 @@ func init() {
 				}),
 			},
 			{
-				Name:      "vlan_group",
+				Name:      "vlan-group",
 				Usage:     "creates groups for private VLANs",
-				UsageText: "bytemark --admin create vlan_group <group> [vlan_num]",
+				UsageText: "bytemark --admin create vlan-group <group> [vlan-num]",
 				Description: `Create a group in the specified account, with an optional VLAN specified.
 
 Used when setting up a private VLAN for a customer.`,
@@ -55,13 +55,13 @@ Used when setting up a private VLAN for a customer.`,
 						Value: new(GroupNameFlag),
 					},
 					cli.IntFlag{
-						Name:  "vlan_num",
+						Name:  "vlan-num",
 						Usage: "The VLAN number to add the group to",
 					},
 				},
-				Action: With(OptionalArgs("group", "vlan_num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
+				Action: With(OptionalArgs("group", "vlan-num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
 					gp := c.GroupName("group")
-					if err := c.Client().AdminCreateGroup(gp, c.Int("vlan_num")); err != nil {
+					if err := c.Client().AdminCreateGroup(gp, c.Int("vlan-num")); err != nil {
 						return err
 					}
 					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
@@ -69,21 +69,21 @@ Used when setting up a private VLAN for a customer.`,
 				}),
 			},
 			{
-				Name:      "ip_range",
+				Name:      "ip range",
 				Usage:     "create a new IP range in a VLAN",
-				UsageText: "bytemark --admin create ip_range <ip_range> <vlan_num>",
+				UsageText: "bytemark --admin create ip range <ip-range> <vlan-num>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
-						Name:  "ip_range",
+						Name:  "ip-range",
 						Usage: "the IP range to add",
 					},
 					cli.IntFlag{
-						Name:  "vlan_num",
+						Name:  "vlan-num",
 						Usage: "The VLAN number to add the IP range to",
 					},
 				},
-				Action: With(OptionalArgs("ip_range", "vlan_num"), RequiredFlags("ip_range", "vlan_num"), AuthProvider, func(c *Context) error {
-					if err := c.Client().CreateIPRange(c.String("ip_range"), c.Int("vlan_num")); err != nil {
+				Action: With(OptionalArgs("ip-range", "vlan-num"), RequiredFlags("ip-range", "vlan-num"), AuthProvider, func(c *Context) error {
+					if err := c.Client().CreateIPRange(c.String("ip-range"), c.Int("vlan-num")); err != nil {
 						return err
 					}
 					log.Logf("IP range created\r\n")

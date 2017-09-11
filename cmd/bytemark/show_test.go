@@ -243,7 +243,7 @@ func TestAdminShowIPRangesCommand(t *testing.T) {
 	ipRanges := []brain.IPRange{getFixtureIPRange()}
 	c.When("GetIPRanges").Return(&ipRanges, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show ip_ranges", " "))
+	err := app.Run(strings.Split("bytemark --admin show ip ranges", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -260,7 +260,7 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 	ipRange := getFixtureIPRange()
 	c.When("GetIPRange", ipRangeID).Return(&ipRange, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show ip_range 1", " "))
+	err := app.Run(strings.Split("bytemark --admin show ip range 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -277,7 +277,7 @@ func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
 	ipRange := getFixtureIPRange()
 	c.When("GetIPRange", rangeString).Return(&ipRange, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show ip_range 192.168.33.0/24", " "))
+	err := app.Run(strings.Split("bytemark --admin show ip range 192.168.33.0/24", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -359,7 +359,7 @@ func TestAdminShowStoragePoolsCommand(t *testing.T) {
 	storagePool := []brain.StoragePool{getFixtureStoragePool()}
 	c.When("GetStoragePools").Return(&storagePool, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show storage_pools", " "))
+	err := app.Run(strings.Split("bytemark --admin show storage pools", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -376,7 +376,7 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 	storagePool := getFixtureStoragePool()
 	c.When("GetStoragePool", storagePoolID).Return(&storagePool, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show storage_pool 1", " "))
+	err := app.Run(strings.Split("bytemark --admin show storage pool 1", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -392,7 +392,7 @@ func TestAdminShowMigratingVMsCommand(t *testing.T) {
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetMigratingVMs").Return(&vms, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show migrating_vms", " "))
+	err := app.Run(strings.Split("bytemark --admin show migrating vms", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -408,7 +408,7 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	discs := brain.Discs{{ID: 134, StorageGrade: "sata", Size: 25600}}
 	c.When("GetMigratingDiscs").Return(discs, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show migrating_discs", " "))
+	err := app.Run(strings.Split("bytemark --admin show migrating discs", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -424,7 +424,7 @@ func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetStoppedEligibleVMs").Return(&vms, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show stopped_eligible_vms", " "))
+	err := app.Run(strings.Split("bytemark --admin show stopped eligible vms", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -440,7 +440,7 @@ func TestAdminShowRecentVMsCommand(t *testing.T) {
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetRecentVMs").Return(&vms, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show recent_vms", " "))
+	err := app.Run(strings.Split("bytemark --admin show recent vms", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -488,7 +488,7 @@ func TestAdminShowDiscByIDCommand(t *testing.T) {
 	disc := getFixtureDisc()
 	c.When("GetDiscByID", discID).Return(&disc, nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark --admin show disc_by_id 132", " "))
+	err := app.Run(strings.Split("bytemark --admin show disc by id 132", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

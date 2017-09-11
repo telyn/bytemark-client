@@ -169,7 +169,7 @@ func TestSetDiscIOPSLimit(t *testing.T) {
 
 	c.When("SetDiscIopsLimit", name, "disc-label", 100).Return(nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark set iops_limit test-server disc-label 100", " "))
+	err := app.Run(strings.Split("bytemark set iops limit test-server disc-label 100", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

@@ -9,11 +9,11 @@ import (
 
 func TestEmptyStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("EmptyStoragePool", "pool1").Return(nil).Times(1)
 
-	err := app.Run([]string{"bytemark", "empty", "storage_pool", "pool1"})
+	err := app.Run([]string{"bytemark", "empty", "storage", "pool", "pool1"})
 
 	is.Nil(err)
 
@@ -24,11 +24,11 @@ func TestEmptyStoragePool(t *testing.T) {
 
 func TestEmptyStoragePoolError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("EmptyStoragePool", "pool1").Return(fmt.Errorf("Could not empty storage pool")).Times(1)
 
-	err := app.Run([]string{"bytemark", "empty", "storage_pool", "pool1"})
+	err := app.Run([]string{"bytemark", "empty", "storage", "pool", "pool1"})
 
 	is.NotNil(err)
 
@@ -39,7 +39,7 @@ func TestEmptyStoragePoolError(t *testing.T) {
 
 func TestEmptyHead(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("EmptyHead", "pool1").Return(nil).Times(1)
 
@@ -54,7 +54,7 @@ func TestEmptyHead(t *testing.T) {
 
 func TestEmptyHeadError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	c.When("EmptyHead", "pool1").Return(fmt.Errorf("Could not empty storage pool")).Times(1)
 
