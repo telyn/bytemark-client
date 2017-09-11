@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+// Preprocessor allows a Flag to have a preprocess step that requires a Context
 type Preprocesser interface {
 	Preprocess(c *Context) error
 }
@@ -25,6 +26,8 @@ func (name *AccountNameFlag) Set(value string) error {
 	return nil
 }
 
+// Preprocess sets the value of this flag to the global account flag if it's unset,
+// and then runs lib.ParseAccountName
 func (name *AccountNameFlag) Preprocess(c *Context) (err error) {
 	if name.Value == "" {
 		name.Value = c.Context.GlobalString("account")
@@ -37,9 +40,8 @@ func (name *AccountNameFlag) Preprocess(c *Context) (err error) {
 func (name AccountNameFlag) String() string {
 	if name.AccountName == "" {
 		return name.Value
-	} else {
-		return name.AccountName
 	}
+	return name.AccountName
 }
 
 // GroupNameFlag is used for all --group flags, including the global one.
@@ -54,6 +56,8 @@ func (name *GroupNameFlag) Set(value string) error {
 	return nil
 }
 
+// Preprocess defaults the value of this flag to the default group from the
+// config attached to the context and then runs lib.ParseGroupName
 func (name *GroupNameFlag) Preprocess(c *Context) (err error) {
 	if name.GroupName != nil {
 		c.Debug("GroupNameFlag.Preprocess before %#v", *name.GroupName)
@@ -71,9 +75,8 @@ func (name *GroupNameFlag) Preprocess(c *Context) (err error) {
 func (name GroupNameFlag) String() string {
 	if name.GroupName != nil {
 		return name.GroupName.String()
-	} else {
-		return ""
 	}
+	return ""
 }
 
 // VirtualMachineNameFlag is used for all --account flags, including the global one.
@@ -88,6 +91,8 @@ func (name *VirtualMachineNameFlag) Set(value string) error {
 	return nil
 }
 
+// Preprocess defaults the value of this flag to the default server from the
+// config attached to the context and then runs lib.ParseVirtualMachineName
 func (name *VirtualMachineNameFlag) Preprocess(c *Context) (err error) {
 	if name.Value == "" {
 		return
@@ -101,9 +106,8 @@ func (name *VirtualMachineNameFlag) Preprocess(c *Context) (err error) {
 func (name VirtualMachineNameFlag) String() string {
 	if name.VirtualMachineName != nil {
 		return name.VirtualMachineName.String()
-	} else {
-		return ""
 	}
+	return ""
 }
 
 // ResizeMode represents whether to increment a size or just to set it.
