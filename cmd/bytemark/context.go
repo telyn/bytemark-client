@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"net"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
@@ -24,6 +26,7 @@ type Context struct {
 	VirtualMachine *brain.VirtualMachine
 
 	currentArgIndex int
+	preproDone      bool
 }
 
 // Reset replaces the Context with a blank one (keeping the cli.Context)
@@ -46,6 +49,16 @@ func (c *Context) args() cli.Args {
 // Args returns all the unused arguments
 func (c *Context) Args() []string {
 	return c.args()[c.currentArgIndex:]
+}
+
+func (c *Context) Debug(format string, values ...interface{}) {
+	dw, ok := c.App().Metadata["debugWriter"]
+	if !ok {
+		return
+	}
+	if wr, ok := dw.(io.Writer); ok {
+		fmt.Fprintf(wr, format, values...)
+	}
 }
 
 // Command returns the cli.Command this context is for
@@ -118,12 +131,17 @@ func (c *Context) FileContents(flagname string) string {
 }
 
 // GroupName returns the named flag as a lib.GroupName
-func (c *Context) GroupName(flagname string) lib.GroupName {
+func (c *Context) GroupName(flagname string) (gp lib.GroupName) {
 	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
 	if !ok {
+		fmt.Println("WRONGO")
 		return lib.GroupName{}
 	}
-	return lib.GroupName(*gpNameFlag)
+	if gpNameFlag.GroupName == nil {
+		fmt.Println("NILO")
+		return lib.GroupName{}
+	}
+	return *gpNameFlag.GroupName
 }
 
 // Int returns the value of the named flag as an int
@@ -157,6 +175,7 @@ func (c *Context) PrivilegeFlag(flagname string) PrivilegeFlag {
 // String returns the value of the named flag as a string
 func (c *Context) String(flagname string) string {
 	if c.Context.IsSet(flagname) || c.Context.String(flagname) != "" {
+		c.Debug("IsSet || String() != nil")
 		return c.Context.String(flagname)
 	}
 	return c.Context.GlobalString(flagname)
@@ -181,10 +200,16 @@ func (c *Context) ResizeFlag(flagname string) ResizeFlag {
 }
 
 // VirtualMachineName returns the named flag as a lib.VirtualMachineName
-func (c *Context) VirtualMachineName(flagname string) lib.VirtualMachineName {
+func (c *Context) VirtualMachineName(flagname string) (vm lib.VirtualMachineName) {
 	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
 	if !ok {
+		fmt.Println("WRONGO")
 		return c.Config().GetVirtualMachine()
 	}
-	return lib.VirtualMachineName(*vmNameFlag)
+	if vmNameFlag.VirtualMachineName == nil {
+		fmt.Println("NILO")
+		return lib.VirtualMachineName{}
+	}
+
+	return *vmNameFlag.VirtualMachineName
 }

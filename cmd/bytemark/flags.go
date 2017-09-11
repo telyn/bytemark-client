@@ -9,51 +9,101 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+type Preprocesser interface {
+	Preprocess(c *Context) error
+}
+
 // AccountNameFlag is used for all --account flags, excluding the global one.
-type AccountNameFlag string
+type AccountNameFlag struct {
+	AccountName string
+	Value       string
+}
 
 // Set runs lib.ParseAccountName to make sure we get just the 'pure' account name; no cluster / endpoint details
 func (name *AccountNameFlag) Set(value string) error {
-	*name = AccountNameFlag(lib.ParseAccountName(value, c.Config().GetIgnoreErr("account")))
+	name.Value = value
 	return nil
+}
+
+func (name *AccountNameFlag) Preprocess(c *Context) (err error) {
+	if name.Value == "" {
+		name.Value = c.Context.GlobalString("account")
+	}
+	name.AccountName = lib.ParseAccountName(name.Value, c.Config().GetIgnoreErr("account"))
+	return
 }
 
 // String returns the AccountNameFlag as a string.
-func (name *AccountNameFlag) String() string {
-	return string(*name)
+func (name AccountNameFlag) String() string {
+	if name.AccountName == "" {
+		return name.Value
+	} else {
+		return name.AccountName
+	}
 }
 
-// GroupNameFlag is used for all --account flags, including the global one.
-type GroupNameFlag lib.GroupName
+// GroupNameFlag is used for all --group flags, including the global one.
+type GroupNameFlag struct {
+	GroupName *lib.GroupName
+	Value     string
+}
 
 // Set runs lib.ParseGroupName to make sure we have a valid group name
 func (name *GroupNameFlag) Set(value string) error {
-	gp := lib.ParseGroupName(value, c.Config().GetGroup())
-	*name = GroupNameFlag(gp)
+	name.Value = value
 	return nil
+}
+
+func (name *GroupNameFlag) Preprocess(c *Context) (err error) {
+	if name.GroupName != nil {
+		c.Debug("GroupNameFlag.Preprocess before %#v", *name.GroupName)
+	}
+	if name.Value == "" {
+		return
+	}
+	groupName := lib.ParseGroupName(name.Value, c.Config().GetGroup())
+	name.GroupName = &groupName
+	c.Debug("GroupNameFlag.Preprocess after %#v", *name.GroupName)
+	return
 }
 
 // String returns the GroupNameFlag as a string.
 func (name GroupNameFlag) String() string {
-	return lib.GroupName(name).String()
+	if name.GroupName != nil {
+		return name.GroupName.String()
+	} else {
+		return ""
+	}
 }
 
 // VirtualMachineNameFlag is used for all --account flags, including the global one.
-type VirtualMachineNameFlag lib.VirtualMachineName
+type VirtualMachineNameFlag struct {
+	VirtualMachineName *lib.VirtualMachineName
+	Value              string
+}
 
 // Set runs lib.ParseVirtualMachineName using the c.Client() to make sure we have a valid group name
 func (name *VirtualMachineNameFlag) Set(value string) error {
-	vm, err := lib.ParseVirtualMachineName(value, c.Config().GetVirtualMachine())
-	if err != nil {
-		return err
-	}
-	*name = VirtualMachineNameFlag(vm)
+	name.Value = value
 	return nil
+}
+
+func (name *VirtualMachineNameFlag) Preprocess(c *Context) (err error) {
+	if name.Value == "" {
+		return
+	}
+	vmName, err := lib.ParseVirtualMachineName(name.Value, c.Config().GetVirtualMachine())
+	name.VirtualMachineName = &vmName
+	return
 }
 
 // String returns the VirtualMachineNameFlag as a string.
 func (name VirtualMachineNameFlag) String() string {
-	return lib.VirtualMachineName(name).String()
+	if name.VirtualMachineName != nil {
+		return name.VirtualMachineName.String()
+	} else {
+		return ""
+	}
 }
 
 // ResizeMode represents whether to increment a size or just to set it.
@@ -127,6 +177,7 @@ type PrivilegeFlag struct {
 	VirtualMachineName *lib.VirtualMachineName
 	Username           string
 	Level              brain.PrivilegeLevel
+	Value              string
 }
 
 // TargetType returns the prefix of the PrivilegeFlag's Level. Use the brain.PrivilegeTargetType* constants for comparison
@@ -135,7 +186,7 @@ func (pf PrivilegeFlag) TargetType() string {
 }
 
 // fillPrivilegeTarget adds the object to the privilege, trying to use it as a VM, Group or Account name depending on what PrivilegeLevel the Privilege is for. The target is expected to be the NextArg at this point in the Context
-func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
+func (pf *PrivilegeFlag) fillPrivilegeTarget(c *Context, args *privArgs) (err error) {
 	if pf.TargetType() != brain.PrivilegeTargetTypeCluster {
 		var target string
 		target, err = args.shift()
@@ -166,7 +217,12 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(args *privArgs) (err error) {
 
 // Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from|for] <user>"
 func (pf *PrivilegeFlag) Set(value string) (err error) {
-	args := privArgs(strings.Split(value, " "))
+	pf.Value = value
+	return nil
+}
+
+func (pf *PrivilegeFlag) Preprocess(c *Context) (err error) {
+	args := privArgs(strings.Split(pf.Value, " "))
 
 	level, err := args.shift()
 	if err != nil {
@@ -174,7 +230,7 @@ func (pf *PrivilegeFlag) Set(value string) (err error) {
 	}
 	pf.Level = brain.PrivilegeLevel(level)
 
-	err = pf.fillPrivilegeTarget(&args)
+	err = pf.fillPrivilegeTarget(c, &args)
 	if err != nil {
 		return
 	}

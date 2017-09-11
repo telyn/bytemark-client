@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -144,7 +145,11 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 	if err != nil {
 		t.Fatal(err)
 	}
-	oldWriter := app.Writer
+	app.Metadata = map[string]interface{}{
+		"client": client,
+		"config": config,
+	}
+
 	app.Writer = ioutil.Discard
 	for _, c := range commands {
 		//config.When("Get", "token").Return("no-not-a-token")
@@ -159,8 +164,23 @@ func baseTestSetup(t *testing.T, admin bool) (config *mocks.Config, client *mock
 			_ = app.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
-	app.Writer = oldWriter
+
+	buf := bytes.Buffer{}
+	app.Metadata["buf"] = &buf
+	app.Metadata["debugWriter"] = &TestWriter{t}
+
+	app.Writer = &buf
+
 	return
+}
+
+type TestWriter struct {
+	t *testing.T
+}
+
+func (tw *TestWriter) Write(p []byte) (n int, err error) {
+	tw.t.Log(string(p))
+	return len(p), nil
 }
 
 // baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.

@@ -109,8 +109,6 @@ func TestOutput(t *testing.T) {
 		cliContext.When("String", "table-fields").Return(test.TableFields)
 		cliContext.When("IsSet", "table-fields").Return(test.TableFields != "")
 
-		buf := bytes.Buffer{}
-
 		var err error
 		if test.DefaultFormat == nil {
 			err = context.OutputInDesiredForm(test.Object)
@@ -123,6 +121,7 @@ func TestOutput(t *testing.T) {
 			t.Errorf("TestOutput %d Didn't error", i)
 		}
 
+		buf := app.Metadata["buf"].(*bytes.Buffer)
 		output := buf.String()
 		if output != test.Expected {
 			t.Errorf("Output for %d didn't match expected.\r\nExpected: %q\r\nActual:   %q", i, test.Expected, output)

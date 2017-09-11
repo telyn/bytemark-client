@@ -97,8 +97,9 @@ func TestShowAccountCommand(t *testing.T) {
 			expectedOutput = mkExpectedOutput(showAccountTestOutput, "defa")
 		}
 		for _, format := range []string{"table", "json", "human"} {
+			t.Logf("show account %d %s", i, format)
 
-			config, c, app := baseTestAuthSetup (t, false)
+			config, c, app := baseTestAuthSetup(t, false)
 			baseShowAccountSetup(c, config, test.ConfigAccount, format)
 			if test.AccountToGet == "" {
 				c.When("GetAccount", "").Return(lib.Account{
@@ -167,7 +168,7 @@ func TestShowAccountCommand(t *testing.T) {
 func TestShowGroupCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	config.When("GetGroup").Return(defGroup)
 	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
@@ -186,7 +187,7 @@ func TestShowGroupCommand(t *testing.T) {
 func TestShowServerCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := baseTestAuthSetup(t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
@@ -204,7 +205,7 @@ func TestShowServerCommand(t *testing.T) {
 func TestAdminShowVLANsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	vlans := []brain.VLAN{getFixtureVLAN()}
 	c.When("GetVLANs").Return(&vlans, nil).Times(1)
@@ -220,7 +221,7 @@ func TestAdminShowVLANsCommand(t *testing.T) {
 func TestAdminShowVLANCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	vlanNum := 1
 	vlan := getFixtureVLAN()
@@ -237,7 +238,7 @@ func TestAdminShowVLANCommand(t *testing.T) {
 func TestAdminShowIPRangesCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	ipRanges := []brain.IPRange{getFixtureIPRange()}
 	c.When("GetIPRanges").Return(&ipRanges, nil).Times(1)
@@ -253,7 +254,7 @@ func TestAdminShowIPRangesCommand(t *testing.T) {
 func TestAdminShowIPRangeCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	ipRangeID := "1"
 	ipRange := getFixtureIPRange()
@@ -270,7 +271,7 @@ func TestAdminShowIPRangeCommand(t *testing.T) {
 func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	rangeString := "192.168.33.0/24"
 	ipRange := getFixtureIPRange()
@@ -287,7 +288,7 @@ func TestAdminShowIPRangeWithIPRangeCommand(t *testing.T) {
 func TestAdminShowHeadsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	heads := []brain.Head{getFixtureHead()}
 	c.When("GetHeads").Return(&heads, nil).Times(1)
@@ -303,7 +304,7 @@ func TestAdminShowHeadsCommand(t *testing.T) {
 func TestAdminShowHeadCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	headID := "1"
 	head := getFixtureHead()
@@ -320,7 +321,7 @@ func TestAdminShowHeadCommand(t *testing.T) {
 func TestAdminShowTailsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	tails := []brain.Tail{getFixtureTail()}
 	c.When("GetTails").Return(&tails, nil).Times(1)
@@ -336,7 +337,7 @@ func TestAdminShowTailsCommand(t *testing.T) {
 func TestAdminShowTailCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	tailID := "1"
 	tail := getFixtureTail()
@@ -353,7 +354,7 @@ func TestAdminShowTailCommand(t *testing.T) {
 func TestAdminShowStoragePoolsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	storagePool := []brain.StoragePool{getFixtureStoragePool()}
 	c.When("GetStoragePools").Return(&storagePool, nil).Times(1)
@@ -369,7 +370,7 @@ func TestAdminShowStoragePoolsCommand(t *testing.T) {
 func TestAdminShowStoragePoolCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	storagePoolID := "1"
 	storagePool := getFixtureStoragePool()
@@ -386,7 +387,7 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 func TestAdminShowMigratingVMsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetMigratingVMs").Return(&vms, nil).Times(1)
@@ -402,7 +403,7 @@ func TestAdminShowMigratingVMsCommand(t *testing.T) {
 func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	discs := brain.Discs{{ID: 134, StorageGrade: "sata", Size: 25600}}
 	c.When("GetMigratingDiscs").Return(discs, nil).Times(1)
@@ -418,7 +419,7 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetStoppedEligibleVMs").Return(&vms, nil).Times(1)
@@ -434,7 +435,7 @@ func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
 func TestAdminShowRecentVMsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	vms := []brain.VirtualMachine{getFixtureVM()}
 	c.When("GetRecentVMs").Return(&vms, nil).Times(1)
@@ -464,7 +465,7 @@ func TestShowPrivileges(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		_, c, app := baseTestAuthSetup (t, true)
+		_, c, app := baseTestAuthSetup(t, true)
 		c.When("GetPrivileges", test.user).Return(test.privs, nil)
 
 		err := app.Run(strings.Split(test.args, " "))
@@ -481,7 +482,7 @@ func TestShowPrivileges(t *testing.T) {
 
 func TestAdminShowDiscByIDCommand(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, true)
+	_, c, app := baseTestAuthSetup(t, true)
 
 	discID := 132
 	disc := getFixtureDisc()

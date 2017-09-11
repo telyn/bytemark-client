@@ -93,8 +93,10 @@ func main() {
 	}
 	client.SetDebugLevel(config.GetDebugLevel())
 
-	app.Metadata["client"] = client
-	app.Metadata["config"] = config
+	app.Metadata = map[string]interface{}{
+		"client": client,
+		"config": config,
+	}
 
 	outputDebugInfo(config)
 

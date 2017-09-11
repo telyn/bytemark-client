@@ -14,19 +14,23 @@ import (
 )
 
 func TestConfigAccountValidation(t *testing.T) {
-	config, client, app := baseTestSetup (t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
-	ctx := Context{}
+	ctx := Context{
+		Context: cliContextWrapper{&cli.Context{
+			App: app,
+		}},
+	}
 
 	runAccountTests(t, &ctx, client, getValidationTests()["account"], validateAccountForConfig)
 }
 
 func TestConfigGroupValidation(t *testing.T) {
-	config, client, app := baseTestSetup (t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -48,7 +52,7 @@ func TestConfigEndpointValidation(t *testing.T) {
 }
 
 func TestConfigValidations(t *testing.T) {
-	config, client, app := baseTestSetup (t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -86,7 +90,7 @@ func TestConfigValidations(t *testing.T) {
 
 func TestCommandConfigSet(t *testing.T) {
 	is := is.New(t)
-	config, client, app := baseTestSetup (t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	// setup sets up all the necessary config defaulty stuff for all our tests
 

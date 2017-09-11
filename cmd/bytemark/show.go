@@ -31,6 +31,8 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					Value: new(AccountNameFlag),
 				}),
 			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
+				c.Debug("show account command output")
+				c.Debug("acc: %s", c.Account.String())
 				return c.OutputInDesiredForm(c.Account)
 			}),
 		}, {
