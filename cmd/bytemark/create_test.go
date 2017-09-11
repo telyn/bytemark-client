@@ -300,7 +300,7 @@ func TestCreateVLANGroup(t *testing.T) {
 	}
 	c.When("AdminCreateGroup", group, 0).Return(nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark create vlan.group test-group.test-account", " "))
+	err := app.Run(strings.Split("bytemark create vlan-group test-group.test-account", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
