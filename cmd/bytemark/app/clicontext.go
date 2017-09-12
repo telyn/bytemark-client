@@ -53,10 +53,12 @@ type CliContextWrapper struct {
 	*cli.Context
 }
 
+// App returns the app for this Context
 func (c CliContextWrapper) App() *cli.App {
 	return c.Context.App
 }
 
+// Command returns the Command that was run to create this Context
 func (c CliContextWrapper) Command() cli.Command {
 	return c.Context.Command
 }

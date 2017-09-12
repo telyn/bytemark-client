@@ -53,14 +53,13 @@ func main() {
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
-	myCommands := []cli.Command{}
+
+	myCommands := commands
 	if wantAdminCmds {
 		myCommands = cliutil.MergeCommands(commands, adminCommands)
-	} else {
-		myCommands = commands
 	}
 
-	app, err := bmapp.BaseAppSetup(flags, config, myCommands)
+	app, err := bmapp.BaseAppSetup(flags, myCommands)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}

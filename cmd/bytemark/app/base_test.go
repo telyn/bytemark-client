@@ -16,7 +16,7 @@ func baseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 	config.When("GetBool", "admin").Return(admin, nil)
 	config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", "human", "CODE"})
 
-	app, err := BaseAppSetup(GlobalFlags(), config, commands)
+	app, err := BaseAppSetup(GlobalFlags(), commands)
 	if err != nil {
 		t.Fatal(err)
 	}

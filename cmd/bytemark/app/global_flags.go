@@ -5,6 +5,8 @@ import (
 	"github.com/urfave/cli"
 )
 
+// GlobalFlags returns a new set of global flags for the client.
+// This is where they are defined.
 func GlobalFlags() (flags []cli.Flag) {
 	return []cli.Flag{
 		cli.StringFlag{

@@ -11,13 +11,14 @@ import (
 	"github.com/urfave/cli"
 )
 
+// BaseTestSetup constructs mock config and client and produces a cli.App with the given commands.
 func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
 	config = new(mocks.Config)
 	client = new(mocks.Client)
 	config.When("GetBool", "admin").Return(admin, nil)
 	config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", "human", "CODE"})
 
-	cliapp, err := app.BaseAppSetup(app.GlobalFlags(), config, commands)
+	cliapp, err := app.BaseAppSetup(app.GlobalFlags(), commands)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,16 +51,19 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 	return
 }
 
+// TestWriter is a writer which writes to the test log.
+// This ruins formatting on e.g. text/template renders, but at least it forces all the output to be in order
 type TestWriter struct {
 	t *testing.T
 }
 
+// Write pushes out the bytes as a string to the testing.T instance stored by the TestWriter using t.Log
 func (tw *TestWriter) Write(p []byte) (n int, err error) {
 	tw.t.Log(string(p))
 	return len(p), nil
 }
 
-// baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
+// BaseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
 // user is test-user
 func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, c *mocks.Client, cliapp *cli.App) {
 	config, c, cliapp = BaseTestSetup(t, admin, commands)

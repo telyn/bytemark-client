@@ -2,12 +2,12 @@ package app
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
 )
 
-func BaseAppSetup(flags []cli.Flag, config util.ConfigManager, commands []cli.Command) (app *cli.App, err error) {
+// BaseAppSetup sets up a cli.App for the given commands and config
+func BaseAppSetup(flags []cli.Flag, commands []cli.Command) (app *cli.App, err error) {
 	app = cli.NewApp()
 	app.Version = lib.Version
 	app.Flags = flags
