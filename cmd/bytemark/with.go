@@ -29,7 +29,7 @@ func With(providers ...ProviderFunc) func(c *cli.Context) error {
 
 // Preprocess runs the Preprocess methods on all flags that implement Preprocessor
 func Preprocess(c *Context) error {
-	if c.preproDone {
+	if c.preprocessHasRun {
 		return nil
 	}
 	c.Debug("Preprocessing\n")
@@ -46,7 +46,7 @@ func Preprocess(c *Context) error {
 			}
 		}
 	}
-	c.preproDone = true
+	c.preprocessHasRun = true
 	return nil
 }
 
@@ -194,7 +194,7 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 // (or that VirtualMachineName / GroupName flags have the full complement of values needed)
 func RequiredFlags(flagNames ...string) ProviderFunc {
 	return func(c *Context) (err error) {
-		if !c.preproDone {
+		if !c.preprocessHasRun {
 			err = Preprocess(c)
 			if err != nil {
 				return

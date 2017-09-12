@@ -25,8 +25,8 @@ type Context struct {
 	User           *brain.User
 	VirtualMachine *brain.VirtualMachine
 
-	currentArgIndex int
-	preproDone      bool
+	currentArgIndex  int
+	preprocessHasRun bool
 }
 
 // Reset replaces the Context with a blank one (keeping the cli.Context)
