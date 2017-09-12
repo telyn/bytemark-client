@@ -33,7 +33,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 					return
 				}
 
-				err = global.Client.UndeleteVirtualMachine(vmName)
+				err = c.Client().UndeleteVirtualMachine(vmName)
 
 				if err != nil {
 					return
@@ -63,7 +63,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 			},
 			Action: With(OptionalArgs("server", "disc", "backup"), RequiredFlags("server", "disc", "backup"), AuthProvider, func(c *Context) (err error) {
 				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
-				_, err = global.Client.RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
+				_, err = c.Client().RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 				if err != nil {
 					return
 				}

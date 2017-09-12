@@ -11,7 +11,6 @@ import (
 )
 
 func TestOutput(t *testing.T) {
-	oldWriter := global.App.Writer
 
 	tests := []struct {
 		ShouldErr     bool
@@ -95,11 +94,11 @@ func TestOutput(t *testing.T) {
 
 	for i, test := range tests {
 		t.Logf("TestOutput %d\n", i)
-		config, _ := baseTestSetup(t, true)
+		config, _, app := baseTestSetup(t, true)
 		config.Reset()
 
 		cliContext := &mocks.CliContext{}
-		cliContext.When("App").Return(global.App)
+		cliContext.When("App").Return(app)
 		context := Context{Context: cliContext}
 
 		config.When("GetBool", "admin").Return(true)
@@ -109,10 +108,6 @@ func TestOutput(t *testing.T) {
 		cliContext.When("GlobalString", "table-fields").Return(test.TableFields)
 		cliContext.When("String", "table-fields").Return(test.TableFields)
 		cliContext.When("IsSet", "table-fields").Return(test.TableFields != "")
-		global.Config = config
-
-		buf := bytes.Buffer{}
-		global.App.Writer = &buf
 
 		var err error
 		if test.DefaultFormat == nil {
@@ -126,11 +121,11 @@ func TestOutput(t *testing.T) {
 			t.Errorf("TestOutput %d Didn't error", i)
 		}
 
+		buf := app.Metadata["buf"].(*bytes.Buffer)
 		output := buf.String()
 		if output != test.Expected {
 			t.Errorf("Output for %d didn't match expected.\r\nExpected: %q\r\nActual:   %q", i, test.Expected, output)
 		}
-		global.App.Writer = oldWriter
 	}
 
 }

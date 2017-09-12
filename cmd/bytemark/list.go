@@ -33,7 +33,7 @@ This command will list the kind of object you request, one per line. Perfect for
 			Description: `This will list all the accounts that your authentication token has some form of access to.`,
 			Flags:       OutputFlags("accounts", "array"),
 			Action: With(AuthProvider, func(c *Context) error {
-				accounts, err := global.Client.GetAccounts()
+				accounts, err := c.Client().GetAccounts()
 
 				if err != nil {
 					return err
@@ -130,7 +130,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 				var backups brain.Backups
 
 				if label != "" {
-					backups, err = global.Client.GetBackups(vmName, label)
+					backups, err = c.Client().GetBackups(vmName, label)
 					if err != nil {
 						return
 					}
@@ -140,7 +140,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 						return
 					}
 					for _, disc := range c.VirtualMachine.Discs {
-						discbackups, err := global.Client.GetBackups(vmName, disc.Label)
+						discbackups, err := c.Client().GetBackups(vmName, disc.Label)
 						if err != nil {
 							return err
 						}

@@ -25,7 +25,7 @@ func init() {
 							},
 						},
 						Action: With(OptionalArgs("disc"), RequiredFlags("disc"), AuthProvider, func(c *Context) error {
-							if err := global.Client.CancelDiscMigration(c.Int("disc")); err != nil {
+							if err := c.Client().CancelDiscMigration(c.Int("disc")); err != nil {
 								return err
 							}
 
@@ -46,7 +46,7 @@ func init() {
 							},
 						},
 						Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
-							if err := global.Client.CancelVMMigration(c.Int("server")); err != nil {
+							if err := c.Client().CancelVMMigration(c.Int("server")); err != nil {
 								return err
 							}
 

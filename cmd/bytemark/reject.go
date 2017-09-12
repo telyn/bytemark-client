@@ -29,7 +29,7 @@ func init() {
 				Action: With(OptionalArgs("server"), JoinArgs("reason"), RequiredFlags("server", "reason"), AuthProvider, func(c *Context) error {
 					vm := c.VirtualMachineName("server")
 
-					if err := global.Client.RejectVM(vm, c.String("reason")); err != nil {
+					if err := c.Client().RejectVM(vm, c.String("reason")); err != nil {
 						return err
 					}
 

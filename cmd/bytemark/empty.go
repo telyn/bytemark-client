@@ -21,7 +21,7 @@ func init() {
 					},
 				},
 				Action: With(OptionalArgs("storage-pool"), RequiredFlags("storage-pool"), AuthProvider, func(c *Context) error {
-					if err := global.Client.EmptyStoragePool(c.String("storage-pool")); err != nil {
+					if err := c.Client().EmptyStoragePool(c.String("storage-pool")); err != nil {
 						return err
 					}
 
@@ -41,7 +41,7 @@ func init() {
 					},
 				},
 				Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
-					if err := global.Client.EmptyHead(c.String("head")); err != nil {
+					if err := c.Client().EmptyHead(c.String("head")); err != nil {
 						return err
 					}
 

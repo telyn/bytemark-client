@@ -29,7 +29,7 @@ func init() {
 					disc := c.Int("disc")
 					storagePool := c.String("new-storage-pool")
 
-					if err := global.Client.MigrateDisc(disc, storagePool); err != nil {
+					if err := c.Client().MigrateDisc(disc, storagePool); err != nil {
 						return err
 					}
 
@@ -59,7 +59,7 @@ func init() {
 					vm := c.VirtualMachineName("server")
 					head := c.String("new-head")
 
-					if err := global.Client.MigrateVirtualMachine(vm, head); err != nil {
+					if err := c.Client().MigrateVirtualMachine(vm, head); err != nil {
 						return err
 					}
 

@@ -28,7 +28,7 @@ func validateEndpointForConfig(endpoint string) error {
 }
 
 func validateAccountForConfig(c *Context, name string) (err error) {
-	_, err = global.Client.GetAccount(name)
+	_, err = c.Client().GetAccount(name)
 	if err != nil {
 		if _, ok := err.(lib.NotFoundError); ok {
 			return fmt.Errorf("No such account %s - check your typing and specify --yubikey if necessary", name)
@@ -40,8 +40,8 @@ func validateAccountForConfig(c *Context, name string) (err error) {
 
 func validateGroupForConfig(c *Context, name string) (err error) {
 	// we can't just use GroupProvider because it expects NextArg() to be the account name - there's no way to pass one in.
-	groupName := lib.ParseGroupName(name, global.Config.GetGroup())
-	_, err = global.Client.GetGroup(groupName)
+	groupName := lib.ParseGroupName(name, c.Config().GetGroup())
+	_, err = c.Client().GetGroup(groupName)
 	if err != nil {
 		if _, ok := err.(lib.NotFoundError); ok {
 			return fmt.Errorf("No such group %v - check your typing and specify --yubikey if necessary", groupName)
@@ -116,7 +116,7 @@ The set and unset subcommands can be used to set and unset such variables.
 						return ctx.Help(fmt.Sprintf("%s is not a valid variable name", varname))
 					}
 
-					oldVar, err := global.Config.GetV(varname)
+					oldVar, err := ctx.Config().GetV(varname)
 					if err != nil {
 						return err
 					}
@@ -138,15 +138,15 @@ The set and unset subcommands can be used to set and unset such variables.
 						return err
 					}
 
-					err = global.Config.SetPersistent(varname, value, "CMD set")
+					err = ctx.Config().SetPersistent(varname, value, "CMD set")
 					if err != nil {
 						return err
 					}
 
 					if oldVar.Source == "config" {
-						log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", varname, oldVar.Value, global.Config.GetIgnoreErr(varname))
+						log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", varname, oldVar.Value, ctx.Config().GetIgnoreErr(varname))
 					} else {
-						log.Logf("%s has been set. \r\nNew value: %s\r\n", varname, global.Config.GetIgnoreErr(varname))
+						log.Logf("%s has been set. \r\nNew value: %s\r\n", varname, ctx.Config().GetIgnoreErr(varname))
 					}
 					return nil
 				}),
@@ -161,16 +161,18 @@ The set and unset subcommands can be used to set and unset such variables.
 						return err
 					}
 					varname = strings.ToLower(varname)
-					return global.Config.Unset(varname)
+					return ctx.Config().Unset(varname)
 				}),
 			},
 		},
-		Action: func(ctx *cli.Context) (err error) {
+		Action: With(func(ctx *Context) (err error) {
 			if ctx.Bool("help") {
-				err = cli.ShowSubcommandHelp(ctx)
-				return
+				if ccw, ok := ctx.Context.(cliContextWrapper); ok {
+					err = cli.ShowSubcommandHelp(ccw.Context)
+					return
+				}
 			}
-			vars, err := global.Config.GetAll()
+			vars, err := ctx.Config().GetAll()
 			if err != nil {
 				return
 			}
@@ -178,6 +180,6 @@ The set and unset subcommands can be used to set and unset such variables.
 				log.Logf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
 			}
 			return
-		},
+		}),
 	})
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	"github.com/urfave/cli"
 )
 
 func TestUnscheduleBackups(t *testing.T) {
@@ -20,7 +21,7 @@ func TestUnscheduleBackups(t *testing.T) {
 		ShouldErr  bool
 		ShouldCall bool
 		CreateErr  error
-		BaseTestFn func(*testing.T, bool) (*mocks.Config, *mocks.Client)
+		BaseTestFn func(*testing.T, bool) (*mocks.Config, *mocks.Client, *cli.App)
 	}{
 		{
 			ShouldCall: false,
@@ -52,7 +53,7 @@ func TestUnscheduleBackups(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		config, client := test.BaseTestFn(t, false)
+		config, client, app := test.BaseTestFn(t, false)
 		config.When("GetVirtualMachine").Return(defVM)
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 
@@ -61,7 +62,7 @@ func TestUnscheduleBackups(t *testing.T) {
 		} else {
 			client.When("DeleteBackupSchedule", test.Name, test.DiscLabel, test.ID).Return(test.CreateErr).Times(0)
 		}
-		err := global.App.Run(append([]string{"bytemark", "unschedule", "backups"}, test.Args...))
+		err := app.Run(append([]string{"bytemark", "unschedule", "backups"}, test.Args...))
 		checkErr(t, "TestUnscheduleBackups", i, test.ShouldErr, err)
 		verifyAndReset(t, "TestUnscheduleBackups", i, client)
 	}

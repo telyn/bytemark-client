@@ -168,11 +168,11 @@ func TestRevokePrivilege(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		config, c := baseTestAuthSetup(t, false)
+		config, c, app := baseTestAuthSetup (t, false)
 		test.Setup(config, c)
 
 		fmt.Println(test.Input)
-		err := global.App.Run(strings.Split(test.Input, " "))
+		err := app.Run(strings.Split(test.Input, " "))
 		if test.ShouldErr && err == nil {
 			t.Errorf("TestRevokePrivilege %d should err and didn't", i)
 		} else if !test.ShouldErr && err != nil {

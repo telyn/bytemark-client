@@ -43,7 +43,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 			}
 
 			if c.Bool("junk-token") {
-				global.Config.Set("token", "", "FLAG junk-token")
+				c.Config().Set("token", "", "FLAG junk-token")
 			}
 
 			method, err := c.NextArg()
@@ -62,7 +62,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					url = "/" + url
 				}
 				if c.Bool("auth") {
-					err := EnsureAuth()
+					err := EnsureAuth(c.Client(), c.Config())
 					if err != nil {
 						return err
 					}
@@ -73,9 +73,9 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					reader = bufio.NewReader(os.Stdin)
 					// read until an eof
 				}
-				req, err := global.Client.BuildRequest(method, endpoint, url)
+				req, err := c.Client().BuildRequest(method, endpoint, url)
 				if !shouldAuth {
-					req, err = global.Client.BuildRequestNoAuth(method, endpoint, url)
+					req, err = c.Client().BuildRequestNoAuth(method, endpoint, url)
 				}
 				if err != nil {
 					return err

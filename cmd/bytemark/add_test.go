@@ -12,7 +12,7 @@ import (
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	_, c := baseTestAuthSetup(t, false)
+	_, c, app := baseTestAuthSetup (t, false)
 
 	err := ioutil.WriteFile("testkey.pub", []byte("ssh-rsa aaaaawhartevervAsde fake key"), 0600)
 	if err != nil {
@@ -24,7 +24,7 @@ func TestAddKeyCommand(t *testing.T) {
 	}
 
 	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
-	err = global.App.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
+	err = app.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,7 +35,7 @@ func TestAddKeyCommand(t *testing.T) {
 	c.Reset()
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
-	err = global.App.Run([]string{"bytemark", "add", "key", "--user", "test-user", "testkey.pub"})
+	err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "testkey.pub"})
 	if err != nil {
 		t.Error(err)
 	}
@@ -46,7 +46,7 @@ func TestAddKeyCommand(t *testing.T) {
 	c.Reset()
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
-	err = global.App.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey.pub"})
+	err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey.pub"})
 	if err != nil {
 		t.Error(err)
 	}
@@ -56,7 +56,7 @@ func TestAddKeyCommand(t *testing.T) {
 
 	c.Reset()
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	err = global.App.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey"})
+	err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey"})
 	if err == nil {
 		t.Error("Expected an error")
 	}
@@ -69,7 +69,7 @@ func TestAddKeyCommand(t *testing.T) {
 }
 
 func TestAddIPCommand(t *testing.T) {
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := baseTestAuthSetup (t, false)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -89,7 +89,7 @@ func TestAddIPCommand(t *testing.T) {
 
 	c.When("AddIP", vm, ipcr).Return(&ipcres, nil)
 
-	err := global.App.Run(strings.Split("bytemark add ip --reason testing test-server", " "))
+	err := app.Run(strings.Split("bytemark add ip --reason testing test-server", " "))
 	if err != nil {
 		t.Error(err)
 	}

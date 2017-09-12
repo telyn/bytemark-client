@@ -35,7 +35,7 @@ func init() {
 		Action: With(JoinArgs("privilege"), RequiredFlags("privilege"), PrivilegeProvider("privilege"), func(c *Context) (err error) {
 			c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 
-			err = global.Client.GrantPrivilege(c.Privilege)
+			err = c.Client().GrantPrivilege(c.Privilege)
 			if err == nil {
 				log.Outputf("Granted %s\r\n", c.PrivilegeFlag("privilege").String())
 			}

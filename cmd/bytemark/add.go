@@ -40,7 +40,7 @@ func init() {
 			Action: With(JoinArgs("public-key"), AuthProvider, func(ctx *Context) (err error) {
 				user := ctx.String("user")
 				if user == "" {
-					user = global.Config.GetIgnoreErr("user")
+					user = ctx.Config().GetIgnoreErr("user")
 				}
 
 				key := strings.TrimSpace(ctx.String("public-key"))
@@ -62,7 +62,7 @@ func init() {
 					return ctx.Help("The key needs to be a public key, not a private key")
 				}
 
-				err = global.Client.AddUserAuthorizedKey(user, key)
+				err = ctx.Client().AddUserAuthorizedKey(user, key)
 				if err == nil {
 					log.Log("Key added successfully")
 				}
@@ -124,7 +124,7 @@ func init() {
 					Contiguous: c.Bool("contiguous"),
 				}
 				vmName := c.VirtualMachineName("server")
-				ips, err := global.Client.AddIP(vmName, ipcr)
+				ips, err := c.Client().AddIP(vmName, ipcr)
 				if err != nil {
 					return err
 				}

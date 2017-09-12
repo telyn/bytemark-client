@@ -54,20 +54,20 @@ Defaults to connecting to the serial console for the given server.`,
 				return ctx.Help("You must only specify one of --serial and --panel!")
 			}
 
-			vm, err := global.Client.GetVirtualMachine(vmName)
+			vm, err := ctx.Client().GetVirtualMachine(vmName)
 			if err != nil {
 				return
 			}
 			if ctx.Bool("no-connect") {
-				serialConsoleInstructions(vm)
+				serialConsoleInstructions(ctx, vm)
 				log.Log()
-				vncConsoleInstructions(vm)
+				vncConsoleInstructions(ctx, vm)
 				return nil
 			}
 			if ctx.Bool("panel") {
-				err = openPanelConsole(vm)
+				err = openPanelConsole(ctx, vm)
 			} else {
-				err = connectSerialConsole(vm, ctx.String("ssh-args"))
+				err = connectSerialConsole(ctx, vm)
 			}
 			return
 
@@ -79,7 +79,7 @@ func shortEndpoint(endpoint string) string {
 	return strings.Split(endpoint, ".")[0]
 }
 
-func vncConsoleInstructions(vm brain.VirtualMachine) {
+func vncConsoleInstructions(c *Context, vm brain.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -89,13 +89,13 @@ func vncConsoleInstructions(vm brain.VirtualMachine) {
 	log.Log()
 	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
-	log.Logf("Then set up a tunnel using SSH: ssh -L 9999:%s:5900 %s@%s\r\n", mgmtAddress, global.Client.GetSessionUser(), mgmtAddress)
+	log.Logf("Then set up a tunnel using SSH: ssh -L 9999:%s:5900 %s@%s\r\n", mgmtAddress, c.Client().GetSessionUser(), mgmtAddress)
 	log.Log()
 	log.Log("You will then be able to connect to vnc://localhost:9999/")
 	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
 }
 
-func serialConsoleInstructions(vm brain.VirtualMachine) {
+func serialConsoleInstructions(c *Context, vm brain.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -104,14 +104,14 @@ func serialConsoleInstructions(vm brain.VirtualMachine) {
 	log.Log()
 	log.Logf("Ensure that your public key (contained in %s/.ssh/id_rsa.pub or %s/.ssh/id_dsa.pub) is present in your Bytemark user's keys (see `bytemark show keys`, `bytemark add key`)", os.Getenv("HOME"), os.Getenv("HOME"))
 	log.Log()
-	log.Logf("Then connect to %s@%s\r\n", global.Client.GetSessionUser(), mgmtAddress)
+	log.Logf("Then connect to %s@%s\r\n", c.Client().GetSessionUser(), mgmtAddress)
 
 }
 
-func openPanelConsole(vm brain.VirtualMachine) error {
-	ep := global.Config.EndpointName()
-	token := global.Config.GetIgnoreErr("token")
-	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", global.Config.PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
+func openPanelConsole(c *Context, vm brain.VirtualMachine) error {
+	ep := c.Config().EndpointName()
+	token := c.Config().GetIgnoreErr("token")
+	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", c.Config().PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
 	log.Logf("Opening %s in a browser.\r\n", url)
 	return util.CallBrowser(url)
 }
@@ -153,8 +153,9 @@ func collectArgs(args string) (slice []string) {
 	return
 }
 
-func connectSerialConsole(vm brain.VirtualMachine, sshargs string) error {
-	host := fmt.Sprintf("%s@%s", global.Client.GetSessionUser(), vm.ManagementAddress)
+func connectSerialConsole(c *Context, vm brain.VirtualMachine) error {
+	sshargs := c.String("ssh-args")
+	host := fmt.Sprintf("%s@%s", c.Client().GetSessionUser(), vm.ManagementAddress)
 	log.Logf("ssh %s\r\n", host)
 
 	bin, err := exec.LookPath("ssh")

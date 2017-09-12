@@ -14,19 +14,23 @@ import (
 )
 
 func TestConfigAccountValidation(t *testing.T) {
-	config, client := baseTestSetup(t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
 	config.When("GetIgnoreErr", "token").Return("test-token")
 
-	ctx := Context{}
+	ctx := Context{
+		Context: cliContextWrapper{&cli.Context{
+			App: app,
+		}},
+	}
 
 	runAccountTests(t, &ctx, client, getValidationTests()["account"], validateAccountForConfig)
 }
 
 func TestConfigGroupValidation(t *testing.T) {
-	config, client := baseTestSetup(t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -36,7 +40,7 @@ func TestConfigGroupValidation(t *testing.T) {
 	flagset.Bool("force", false, "")
 
 	ctx := Context{
-		Context: cliContextWrapper{cli.NewContext(global.App, flagset, nil)},
+		Context: cliContextWrapper{cli.NewContext(app, flagset, nil)},
 	}
 	t.Logf("Testing validateGroupForConfig\r\n")
 	runGroupTests(t, &ctx, client, getValidationTests()["group"], validateGroupForConfig)
@@ -48,7 +52,7 @@ func TestConfigEndpointValidation(t *testing.T) {
 }
 
 func TestConfigValidations(t *testing.T) {
-	config, client := baseTestSetup(t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -58,7 +62,7 @@ func TestConfigValidations(t *testing.T) {
 	flagset.Bool("force", false, "")
 
 	ctx := Context{
-		Context: cliContextWrapper{cli.NewContext(global.App, flagset, nil)},
+		Context: cliContextWrapper{cli.NewContext(app, flagset, nil)},
 	}
 
 	tests := getValidationTests()
@@ -86,7 +90,7 @@ func TestConfigValidations(t *testing.T) {
 
 func TestCommandConfigSet(t *testing.T) {
 	is := is.New(t)
-	config, client := baseTestSetup(t, false)
+	config, client, app := baseTestSetup(t, false)
 
 	// setup sets up all the necessary config defaulty stuff for all our tests
 
@@ -111,14 +115,14 @@ func TestCommandConfigSet(t *testing.T) {
 
 	config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
 
-	err := global.App.Run(strings.Split("bytemark config set user test-user", " "))
+	err := app.Run(strings.Split("bytemark config set user test-user", " "))
 	is.Nil(err)
 
 	if ok, vErr := config.Verify(); !ok {
 		t.Fatal(vErr)
 	}
 
-	err = global.App.Run(strings.Split("bytemark config set flimflam test-user", " "))
+	err = app.Run(strings.Split("bytemark config set flimflam test-user", " "))
 	is.NotNil(err)
 
 	// test setting all the other variables
@@ -138,7 +142,7 @@ func TestCommandConfigSet(t *testing.T) {
 				config.When("SetPersistent", varname, value, "CMD set").Times(1)
 			}
 
-			err = global.App.Run([]string{"bytemark", "config", "set", varname, value})
+			err = app.Run([]string{"bytemark", "config", "set", varname, value})
 			if errSpec.shouldErr && err == nil {
 				t.Errorf("bytemark config set %s %s should've errored but didn't.\r\n", varname, value)
 			} else if !errSpec.shouldErr && err != nil {
@@ -158,7 +162,7 @@ func TestCommandConfigSet(t *testing.T) {
 			config.When("GetIgnoreErr", varname).Return("")
 			config.When("SetPersistent", varname, value, "CMD set").Times(1)
 
-			err = global.App.Run([]string{"bytemark", "config", "set", "--force", varname, value})
+			err = app.Run([]string{"bytemark", "config", "set", "--force", varname, value})
 			if err != nil {
 				t.Errorf("bytemark config set %s %s should've succeeded but didn't: %s\r\n", varname, value, err.Error())
 			}

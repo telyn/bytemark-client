@@ -16,12 +16,49 @@ type ProviderFunc func(*Context) error
 
 // With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
 func With(providers ...ProviderFunc) func(c *cli.Context) error {
+	providers = append(providers, providers[len(providers)-1])
+	providers[len(providers)-2] = Preprocess
 	return func(cliContext *cli.Context) error {
 		c := Context{Context: cliContextWrapper{cliContext}}
+		defer cleanup(&c)
+
 		err := foldProviders(&c, providers...)
-		cleanup(&c)
 		return err
 	}
+}
+
+// Preprocess runs the Preprocess methods on all flags that implement Preprocessor
+func Preprocess(c *Context) error {
+	if c.preprocessHasRun {
+		return nil
+	}
+	c.Debug("Preprocessing\n")
+	for _, flag := range c.Command().Flags {
+		if gf, ok := flag.(cli.GenericFlag); ok {
+			if pp, ok := gf.Value.(Preprocesser); ok {
+				c.Debug("Doing some shit to %s\n", flag.GetName())
+				c.Debug("b4: %#v ", gf.Value)
+				err := pp.Preprocess(c)
+				if err != nil {
+					return err
+				}
+				c.Debug("after: %#v\n", gf.Value)
+			}
+		}
+	}
+	c.preprocessHasRun = true
+	return nil
+}
+
+// preflight runs AuthProvider and Preprocess (if needed).
+// it's useful because every other *Provider needs to make sure these are run (if needed)
+func preflight(c *Context) (err error) {
+	err = AuthProvider(c)
+	if err != nil {
+		return
+	}
+	err = Preprocess(c)
+	return
 }
 
 // cleanup resets the value of special flags between invocations of global.App.Run so that the tests pass.
@@ -56,11 +93,17 @@ func cleanup(c *Context) {
 	if ok {
 		*group = GroupNameFlag{}
 	}
+
+	account, ok := c.Context.Generic("account").(*AccountNameFlag)
+	if ok {
+		*account = AccountNameFlag{}
+	}
 }
 
 // foldProviders runs all the providers with the given context, stopping if there's an error
 func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
-	for _, provider := range providers {
+	for i, provider := range providers {
+		c.Debug("Provider #%d (%v)n\n", i, provider)
 		err = provider(c)
 		if err != nil {
 			return
@@ -129,11 +172,11 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
 		case *VirtualMachineNameFlag:
-			return value.VirtualMachine != ""
+			return value.VirtualMachineName != nil
 		case *GroupNameFlag:
-			return value.Group != ""
+			return value.GroupName != nil
 		case *AccountNameFlag:
-			return *value != ""
+			return value.AccountName != ""
 		case *util.SizeSpecFlag:
 			return *value != 0
 		case *PrivilegeFlag:
@@ -151,6 +194,12 @@ func flagValueIsOK(c *Context, flag cli.Flag) bool {
 // (or that VirtualMachineName / GroupName flags have the full complement of values needed)
 func RequiredFlags(flagNames ...string) ProviderFunc {
 	return func(c *Context) (err error) {
+		if !c.preprocessHasRun {
+			err = Preprocess(c)
+			if err != nil {
+				return
+			}
+		}
 		for _, flag := range c.Command().Flags {
 			if isIn(flag.GetName(), flagNames) && !flagValueIsOK(c, flag) {
 				return fmt.Errorf("--%s not set (or should not be blank/zero)", flag.GetName())
@@ -163,16 +212,18 @@ func RequiredFlags(flagNames ...string) ProviderFunc {
 // AccountProvider gets an account name from a flag, then the account details from the API, then stitches it to the context
 func AccountProvider(flagName string) ProviderFunc {
 	return func(c *Context) (err error) {
-		err = AuthProvider(c)
+		err = preflight(c)
 		if err != nil {
 			return
 		}
 		accName := c.String(flagName)
+		c.Debug("flagName: %s accName: %s\n", flagName, accName)
 		if accName == "" {
-			accName = global.Config.GetIgnoreErr("account")
+			accName = c.Config().GetIgnoreErr("account")
 		}
+		c.Debug("flagName: %s a4tName: %s\n", flagName, accName)
 
-		acc, err := global.Client.GetAccount(accName)
+		acc, err := c.Client().GetAccount(accName)
 		if err != nil {
 			return
 		}
@@ -184,7 +235,7 @@ func AccountProvider(flagName string) ProviderFunc {
 // AuthProvider makes sure authentication has been successfully completed, attempting it if necessary.
 func AuthProvider(c *Context) (err error) {
 	if !c.Authed {
-		err = EnsureAuth()
+		err = EnsureAuth(c.Client(), c.Config())
 		if err != nil {
 			return
 		}
@@ -199,14 +250,14 @@ func DiscProvider(vmFlagName, discFlagName string) ProviderFunc {
 		if c.Group != nil {
 			return
 		}
-		err = AuthProvider(c)
+		err = preflight(c)
 		if err != nil {
 			return
 		}
 
 		vmName := c.VirtualMachineName(vmFlagName)
 		discLabel := c.String(discFlagName)
-		disc, err := global.Client.GetDisc(vmName, discLabel)
+		disc, err := c.Client().GetDisc(vmName, discLabel)
 		if err != nil {
 			return
 		}
@@ -220,7 +271,7 @@ func DefinitionsProvider(c *Context) (err error) {
 	if c.Definitions != nil {
 		return
 	}
-	defs, err := global.Client.ReadDefinitions()
+	defs, err := c.Client().ReadDefinitions()
 	if err != nil {
 		return
 	}
@@ -234,16 +285,16 @@ func GroupProvider(flagName string) ProviderFunc {
 		if c.Group != nil {
 			return
 		}
-		err = AuthProvider(c)
+		err = preflight(c)
 		if err != nil {
 			return
 		}
 
 		groupName := c.GroupName(flagName)
 		if groupName.Account == "" {
-			groupName.Account = global.Config.GetIgnoreErr("account")
+			groupName.Account = c.Config().GetIgnoreErr("account")
 		}
-		group, err := global.Client.GetGroup(groupName)
+		group, err := c.Client().GetGroup(groupName)
 		// this if is a guard against tricky-to-debug nil-pointer errors
 		if err != nil {
 			return
@@ -281,22 +332,22 @@ func PrivilegeProvider(flagName string) ProviderFunc {
 			Username: pf.Username,
 			Level:    level,
 		}
-		err = AuthProvider(c)
+		err = preflight(c)
 		if err != nil {
 			return
 		}
 		switch c.Privilege.TargetType() {
 		case brain.PrivilegeTargetTypeVM:
 			var vm brain.VirtualMachine
-			vm, err = global.Client.GetVirtualMachine(*pf.VirtualMachineName)
+			vm, err = c.Client().GetVirtualMachine(*pf.VirtualMachineName)
 			c.Privilege.VirtualMachineID = vm.ID
 		case brain.PrivilegeTargetTypeGroup:
 			var group brain.Group
-			group, err = global.Client.GetGroup(*pf.GroupName)
+			group, err = c.Client().GetGroup(*pf.GroupName)
 			c.Privilege.GroupID = group.ID
 		case brain.PrivilegeTargetTypeAccount:
 			var acc lib.Account
-			acc, err = global.Client.GetAccount(pf.AccountName)
+			acc, err = c.Client().GetAccount(pf.AccountName)
 			c.Privilege.AccountID = acc.BrainID
 		}
 		return
@@ -309,15 +360,15 @@ func UserProvider(flagName string) ProviderFunc {
 		if c.User != nil {
 			return
 		}
-		if err = AuthProvider(c); err != nil {
+		if err = preflight(c); err != nil {
 			return
 		}
 		username := c.String(flagName)
 		if username == "" {
-			username = global.Client.GetSessionUser()
+			username = c.Client().GetSessionUser()
 		}
 
-		user, err := global.Client.GetUser(username)
+		user, err := c.Client().GetUser(username)
 		if err != nil {
 			return
 		}
@@ -332,12 +383,12 @@ func VirtualMachineProvider(flagName string) ProviderFunc {
 		if c.VirtualMachine != nil {
 			return
 		}
-		err = AuthProvider(c)
+		err = preflight(c)
 		if err != nil {
 			return
 		}
 		vmName := c.VirtualMachineName(flagName)
-		vm, err := global.Client.GetVirtualMachine(vmName)
+		vm, err := c.Client().GetVirtualMachine(vmName)
 		if err != nil {
 			return
 		}

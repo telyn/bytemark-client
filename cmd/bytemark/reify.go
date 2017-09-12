@@ -21,7 +21,7 @@ func init() {
 					},
 				},
 				Action: With(OptionalArgs("disc"), RequiredFlags("disc"), AuthProvider, func(c *Context) (err error) {
-					if err := global.Client.ReifyDisc(c.Int("disc")); err != nil {
+					if err := c.Client().ReifyDisc(c.Int("disc")); err != nil {
 						return err
 					}
 
