@@ -466,7 +466,7 @@ func TestShowPrivileges(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+		_, c, app := testutil.BaseTestAuthSetup(t, true, commands)
 		c.When("GetPrivileges", test.user).Return(test.privs, nil)
 
 		err := app.Run(strings.Split(test.args, " "))
