@@ -17,7 +17,7 @@ func init() {
 
 		If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
 		Flags: app.OutputFlags("account details", "object"),
-		Action: app.With(with.Auth, func(c *app.Context) error {
+		Action: app.Action(with.Auth, func(c *app.Context) error {
 
 			allAccs, err := c.Client().GetAccounts()
 			if err != nil {

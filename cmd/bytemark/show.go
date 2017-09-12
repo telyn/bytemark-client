@@ -33,7 +33,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					Usage: "The account to view",
 					Value: new(app.AccountNameFlag),
 				}),
-			Action: app.With(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
 				c.Debug("show account command output")
 				c.Debug("acc: %s", c.Account.String())
 				return c.OutputInDesiredForm(c.Account)
@@ -54,7 +54,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					Usage: "The label or ID of the disc to show",
 				},
 			),
-			Action: app.With(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Disc("server", "disc"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Disc("server", "disc"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.Disc)
 			}),
 		}, {
@@ -70,7 +70,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Value: new(app.GroupNameFlag),
 				},
 			),
-			Action: app.With(args.Optional("group"), with.Group("group"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("group"), with.Group("group"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.Group)
 			}),
 		}, {
@@ -85,7 +85,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			),
-			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.VirtualMachine)
 			}),
 		}, {
@@ -99,7 +99,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Usage: "The user to show the details of",
 				},
 			},
-			Action: app.With(args.Optional("user"), with.RequiredFlags("user"), with.User("user"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("user"), with.RequiredFlags("user"), with.User("user"), func(c *app.Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
@@ -139,7 +139,7 @@ Privileges will be output in no particular order.`,
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			),
-			Action: app.With(with.Auth, func(c *app.Context) (err error) {
+			Action: app.Action(with.Auth, func(c *app.Context) (err error) {
 				account := c.String("account")
 				group := c.GroupName("group")
 				server := c.VirtualMachineName("server")
@@ -190,7 +190,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows available VLANs",
 				UsageText: "bytemark --admin show vlans [--json]",
 				Flags:     app.OutputFlags("VLANs", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vlans, err := c.Client().GetVLANs()
 					if err != nil {
 						return err
@@ -209,7 +209,7 @@ Privileges will be output in no particular order.`,
 						Usage: "the disc to display",
 					},
 				),
-				Action: app.With(with.Auth, args.Optional("disc"), with.RequiredFlags("disc"), func(c *app.Context) error {
+				Action: app.Action(with.Auth, args.Optional("disc"), with.RequiredFlags("disc"), func(c *app.Context) error {
 					disc, err := c.Client().GetDiscByID(c.Int("disc"))
 					if err != nil {
 						return err
@@ -228,7 +228,7 @@ Privileges will be output in no particular order.`,
 						Usage: "the num of the VLAN to display",
 					},
 				),
-				Action: app.With(args.Optional("num"), with.RequiredFlags("num"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("num"), with.RequiredFlags("num"), with.Auth, func(c *app.Context) error {
 					vlan, err := c.Client().GetVLAN(c.Int("num"))
 					if err != nil {
 						return err
@@ -241,7 +241,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows all IP ranges",
 				UsageText: "bytemark --admin show ip ranges [--json]",
 				Flags:     app.OutputFlags("ip ranges", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					ipRanges, err := c.Client().GetIPRanges()
 					if err != nil {
 						return err
@@ -259,7 +259,7 @@ Privileges will be output in no particular order.`,
 						Usage: "the ID or CIDR representation of the IP range to display",
 					},
 				),
-				Action: app.With(args.Optional("ip-range"), with.RequiredFlags("ip-range"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("ip-range"), with.RequiredFlags("ip-range"), with.Auth, func(c *app.Context) error {
 					ipRange, err := c.Client().GetIPRange(c.String("ip-range"))
 					if err != nil {
 						return err
@@ -272,7 +272,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows the details of all heads",
 				UsageText: "bytemark --admin show heads [--json]",
 				Flags:     app.OutputFlags("heads", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					heads, err := c.Client().GetHeads()
 					if err != nil {
 						return err
@@ -290,7 +290,7 @@ Privileges will be output in no particular order.`,
 						Usage: "the ID of the head to display",
 					},
 				),
-				Action: app.With(args.Optional("head"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("head"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
 					head, err := c.Client().GetHead(c.String("head"))
 					if err != nil {
 						return err
@@ -303,7 +303,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows the details of all tails",
 				UsageText: "bytemark --admin show tails [--json]",
 				Flags:     app.OutputFlags("tails", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					tails, err := c.Client().GetTails()
 					if err != nil {
 						return err
@@ -321,7 +321,7 @@ Privileges will be output in no particular order.`,
 						Usage: "the ID of the tail to display",
 					},
 				),
-				Action: app.With(args.Optional("tail"), with.RequiredFlags("tail"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("tail"), with.RequiredFlags("tail"), with.Auth, func(c *app.Context) error {
 					tail, err := c.Client().GetTail(c.String("tail"))
 					if err != nil {
 						return err
@@ -334,7 +334,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows the details of all storage pools",
 				UsageText: "bytemark --admin show storage pools [--json]",
 				Flags:     app.OutputFlags("storage pools", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					storagePools, err := c.Client().GetStoragePools()
 					if err != nil {
 						return err
@@ -352,7 +352,7 @@ Privileges will be output in no particular order.`,
 						Usage: "The ID or label of the storage pool to display",
 					},
 				),
-				Action: app.With(args.Optional("storage-pool"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("storage-pool"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 					storagePool, err := c.Client().GetStoragePool(c.String("storage-pool"))
 					if err != nil {
 						return err
@@ -365,7 +365,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows a list of migrating discs",
 				UsageText: "bytemark --admin show migrating_discs [--json]",
 				Flags:     app.OutputFlags("migrating discs", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					discs, err := c.Client().GetMigratingDiscs()
 					if err != nil {
 						return err
@@ -378,7 +378,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows a list of migrating servers",
 				UsageText: "bytemark --admin show migrating_vms [--json]",
 				Flags:     app.OutputFlags("migrating servers", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vms, err := c.Client().GetMigratingVMs()
 					if err != nil {
 						return err
@@ -391,7 +391,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
 				Flags:     app.OutputFlags("servers", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vms, err := c.Client().GetStoppedEligibleVMs()
 					if err != nil {
 						return err
@@ -404,7 +404,7 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
 				Flags:     app.OutputFlags("servers", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
+				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vms, err := c.Client().GetRecentVMs()
 					if err != nil {
 						return err

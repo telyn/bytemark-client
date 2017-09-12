@@ -8,11 +8,11 @@ import (
 	"github.com/urfave/cli"
 )
 
-// ProviderFunc is the function type that can be passed to With()
+// ProviderFunc is the function type that can be passed to Action()
 type ProviderFunc func(*Context) error
 
-// With is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
-func With(providers ...ProviderFunc) func(c *cli.Context) error {
+// Action is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
+func Action(providers ...ProviderFunc) func(c *cli.Context) error {
 	providers = append(providers, providers[len(providers)-1])
 	providers[len(providers)-2] = (*Context).Preprocess
 	return func(cliContext *cli.Context) error {

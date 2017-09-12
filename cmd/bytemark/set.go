@@ -35,7 +35,7 @@ func init() {
 						Usage: "the limit to set",
 					},
 				},
-				Action: app.With(args.Optional("server", "disc", "iops-limit"), with.RequiredFlags("server", "disc", "iops-limit"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("server", "disc", "iops-limit"), with.RequiredFlags("server", "disc", "iops-limit"), with.Auth, func(c *app.Context) error {
 					iopsLimit := c.Int("iops-limit")
 					if iopsLimit < 1 {
 						return fmt.Errorf("IOPS limit must be at least 1")
@@ -75,7 +75,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						Usage: "an HTTP(S) URL for an ISO image file to attach. If not set or set to the empty string, will 'eject' the current CD",
 					},
 				},
-				Action: app.With(args.Optional("server", "cd-url"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("server", "cd-url"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 					vmName := c.VirtualMachineName("server")
 					err := c.Client().SetVirtualMachineCDROM(vmName, c.String("cd-url"))
 					if _, ok := err.(lib.InternalServerError); ok {
@@ -101,7 +101,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						Usage: "the number of cores that should be available to the VM",
 					},
 				},
-				Action: app.With(args.Optional("server", "cores"), with.RequiredFlags("server", "cores"), with.VirtualMachine("server"), func(c *app.Context) error {
+				Action: app.Action(args.Optional("server", "cores"), with.RequiredFlags("server", "cores"), with.VirtualMachine("server"), func(c *app.Context) error {
 					// cores should be a flag
 					vmName := c.VirtualMachineName("server")
 					cores := c.Int("cores")
@@ -137,7 +137,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						Usage: "the hardware profile to use",
 					},
 				},
-				Action: app.With(args.Optional("server", "profile"), with.RequiredFlags("server", "profile"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("server", "profile"), with.RequiredFlags("server", "profile"), with.Auth, func(c *app.Context) error {
 					if c.Bool("lock") && c.Bool("unlock") {
 						return c.Help("Ambiguous command, both lock and unlock specified")
 					}
@@ -173,7 +173,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						Value: new(util.SizeSpecFlag),
 					},
 				},
-				Action: app.With(args.Optional("server", "memory"), with.RequiredFlags("server", "memory"), with.VirtualMachine("server"), func(c *app.Context) error {
+				Action: app.Action(args.Optional("server", "memory"), with.RequiredFlags("server", "memory"), with.VirtualMachine("server"), func(c *app.Context) error {
 					memory := c.Size("memory")
 
 					if c.VirtualMachine.Memory < memory {

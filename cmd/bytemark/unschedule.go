@@ -44,7 +44,7 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 						Usage: "the ID of the schedule to remove. See the output of `show disc` to find out schedule IDs.",
 					},
 				},
-				Action: app.With(args.Optional("server", "disc", "schedule-id"), with.RequiredFlags("server", "disc", "schedule-id"), with.Auth, func(c *app.Context) (err error) {
+				Action: app.Action(args.Optional("server", "disc", "schedule-id"), with.RequiredFlags("server", "disc", "schedule-id"), with.Auth, func(c *app.Context) (err error) {
 					if c.Int("schedule-id") < 1 {
 						return fmt.Errorf("schedule-id not specified or invalid")
 					}

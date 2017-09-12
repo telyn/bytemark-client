@@ -37,7 +37,7 @@ EXAMPLES
 				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: app.With(args.Optional("from", "to"), with.RequiredFlags("from", "to"), with.Auth, func(c *app.Context) (err error) {
+		Action: app.Action(args.Optional("from", "to"), with.RequiredFlags("from", "to"), with.Auth, func(c *app.Context) (err error) {
 			from := c.VirtualMachineName("from")
 			to := c.VirtualMachineName("to")
 

@@ -27,7 +27,7 @@ func init() {
 								Usage: "the ID of the disc that is migrating",
 							},
 						},
-						Action: app.With(args.Optional("disc"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) error {
+						Action: app.Action(args.Optional("disc"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) error {
 							if err := c.Client().CancelDiscMigration(c.Int("disc")); err != nil {
 								return err
 							}
@@ -48,7 +48,7 @@ func init() {
 								Usage: "the ID of the server that is migrating",
 							},
 						},
-						Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
+						Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 							if err := c.Client().CancelVMMigration(c.Int("server")); err != nil {
 								return err
 							}

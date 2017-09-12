@@ -28,7 +28,7 @@ func init() {
 				Value: new(app.PrivilegeFlag),
 			},
 		},
-		Action: app.With(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {
+		Action: app.Action(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {
 			pf := c.PrivilegeFlag("privilege")
 			c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 

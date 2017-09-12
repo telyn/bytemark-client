@@ -27,7 +27,7 @@ func init() {
 						Usage: "the new grade of the disc",
 					},
 				},
-				Action: app.With(args.Optional("disc", "new-grade"), with.RequiredFlags("disc", "new-grade"), with.Auth, func(c *app.Context) (err error) {
+				Action: app.Action(args.Optional("disc", "new-grade"), with.RequiredFlags("disc", "new-grade"), with.Auth, func(c *app.Context) (err error) {
 					if err := c.Client().RegradeDisc(c.Int("disc"), c.String("new-grade")); err != nil {
 						return err
 					}
