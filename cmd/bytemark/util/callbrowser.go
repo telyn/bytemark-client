@@ -40,8 +40,6 @@ func CallBrowser(url string) error {
 		}
 	}
 
-	log.Logf("Running a browser to open %s...\r\n", url)
-
 	var attr os.ProcAttr
 
 	log.Debugf(log.LvlOutline, "Executing %s \"%s\"", bin, url)
