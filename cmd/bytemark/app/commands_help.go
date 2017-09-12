@@ -19,7 +19,7 @@ func GenerateCommandsHelp(cmds []cli.Command) string {
 	return "   " + strings.Join(commandsUsage, "\r\n   ")
 }
 
-// GenerateSubcommandsHelp provides a list of usage information recursively for each subcommand, or just for this command if it has no subcommands.
+// GenerateSubcommandsUsage provides a list of usage information recursively for each subcommand, or just for this command if it has no subcommands.
 func GenerateSubcommandsUsage(cmd cli.Command, prefix string) (commandsUsage []string) {
 	if cmd.Subcommands == nil || len(cmd.Subcommands) == 0 {
 		fullName := prefix + cmd.Name
