@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
@@ -22,20 +23,20 @@ func TestScheduleBackups(t *testing.T) {
 		ShouldErr  bool
 		ShouldCall bool
 		CreateErr  error
-		BaseTestFn func(*testing.T, bool) (*mocks.Config, *mocks.Client, *cli.App)
+		BaseTestFn func(*testing.T, bool, []cli.Command) (*mocks.Config, *mocks.Client, *cli.App)
 	}
 
 	tests := []ScheduleTest{
 		{
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name"},
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
@@ -45,7 +46,7 @@ func TestScheduleBackups(t *testing.T) {
 			Interval:   86400,
 			ShouldCall: true,
 			ShouldErr:  false,
-			BaseTestFn: baseTestAuthSetup,
+			BaseTestFn: testutil.BaseTestAuthSetup,
 		},
 		{
 			ShouldCall: true,
@@ -54,7 +55,7 @@ func TestScheduleBackups(t *testing.T) {
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   3600,
-			BaseTestFn: baseTestAuthSetup,
+			BaseTestFn: testutil.BaseTestAuthSetup,
 		},
 		{
 			Args:       []string{"--start", "thursday", "vm-name", "disc-label", "3235"},
@@ -65,7 +66,7 @@ func TestScheduleBackups(t *testing.T) {
 			ShouldCall: true,
 			ShouldErr:  true,
 			CreateErr:  fmt.Errorf("intermittent failure"),
-			BaseTestFn: baseTestAuthSetup,
+			BaseTestFn: testutil.BaseTestAuthSetup,
 		},
 	}
 
@@ -80,7 +81,7 @@ func TestScheduleBackups(t *testing.T) {
 	for i, test = range tests {
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 
-		config, client, app := test.BaseTestFn(t, false)
+		config, client, app := test.BaseTestFn(t, false, commands)
 		config.When("GetVirtualMachine").Return(defVM)
 
 		retSched := brain.BackupSchedule{

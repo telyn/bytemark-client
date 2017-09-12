@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"strings"
 
+	bmapp "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -29,36 +30,6 @@ var commands = make([]cli.Command, 0)
 // it gets merged in to commands
 var adminCommands = make([]cli.Command, 0)
 
-func baseAppSetup(flags []cli.Flag, config util.ConfigManager) (app *cli.App, err error) {
-	app = cli.NewApp()
-	app.Version = lib.Version
-	app.Flags = flags
-
-	// add admin commands if --admin is set
-	wantAdminCmds, err := config.GetBool("admin")
-	if err != nil {
-		return app, err
-	}
-	if wantAdminCmds {
-		app.Commands = cliutil.MergeCommands(commands, adminCommands)
-	} else {
-		app.Commands = commands
-	}
-	// last minute alterations to commands
-	// used for modifying help descriptions, mostly.
-	for idx, cmd := range app.Commands {
-		switch cmd.Name {
-		case "admin":
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(adminCommands)
-		case "commands":
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + generateCommandsHelp(app.Commands)
-		}
-	}
-	app.Commands = cliutil.CreateMultiwordCommands(app.Commands)
-	return
-
-}
-
 func main() {
 	// watch for interrupts (Ctrl-C) and exit "gracefully" if they are encountered.
 	ch := make(chan os.Signal, 1)
@@ -76,7 +47,20 @@ func main() {
 
 	overrideHelp()
 	flags, args, config := prepConfig()
-	app, err := baseAppSetup(flags, config)
+
+	// add admin commands if --admin is set
+	wantAdminCmds, err := config.GetBool("admin")
+	if err != nil {
+		os.Exit(int(util.ProcessError(err)))
+	}
+	myCommands := []cli.Command{}
+	if wantAdminCmds {
+		myCommands = cliutil.MergeCommands(commands, adminCommands)
+	} else {
+		myCommands = commands
+	}
+
+	app, err := bmapp.BaseAppSetup(flags, config, myCommands)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
@@ -162,69 +146,6 @@ OPTIONS:
 `
 }
 
-func globalFlags() (flags []cli.Flag) {
-	return []cli.Flag{
-		cli.StringFlag{
-			Name:  "account",
-			Usage: "account name to use when no other accounts are specified",
-		},
-		cli.StringFlag{
-			Name:  "api-endpoint",
-			Usage: "URL where the domains service can be found. Set to blank in environments without a domains service.",
-		},
-		cli.StringFlag{
-			Name:  "auth-endpoint",
-			Usage: "URL where the auth service can be found",
-		},
-		cli.StringFlag{
-			Name:  "billing-endpoint",
-			Usage: "URL where bmbilling can be found. Set to blank in environments without bmbilling",
-		},
-		cli.BoolFlag{
-			Name:  "admin",
-			Usage: "allows admin commands in the client. see bytemark --admin --help",
-		},
-		cli.BoolFlag{
-			Name:  "yubikey",
-			Usage: "use a yubikey to authenticate",
-		},
-		cli.IntFlag{
-			Name:  "debug-level",
-			Usage: "how much debug output to print to the terminal",
-		},
-		cli.StringFlag{
-			Name:  "endpoint",
-			Usage: "URL of the brain",
-		},
-		cli.StringFlag{
-			Name:  "config-dir",
-			Usage: "directory in which bytemark-client's configuration resides. see bytemark help config, bytemark help profiles",
-		},
-		cli.StringFlag{
-			Name:  "spp-endpoint",
-			Usage: "URL of SPP. set to blank in environments without an SPP.",
-		},
-		cli.StringFlag{
-			Name:  "output-format",
-			Usage: "The output format to use. Currently defined output formats are human (default for most commands), json (machine readable format), table (human-readable table format)",
-		},
-		cli.StringFlag{
-			Name:  "user",
-			Usage: "user you wish to log in as",
-		},
-		cli.StringFlag{
-			Name:  "yubikey-otp",
-			Usage: "one-time password from your yubikey to use to login",
-		},
-		cli.IntFlag{
-			Name:  "session-validity",
-			Usage: "seconds until your session is automatically invalidated (max 3600)",
-			Value: util.DefaultSessionValidity,
-			// TODO(telyn): add more defaults to these flags
-		},
-	}
-}
-
 func prepConfig() (flags []cli.Flag, args []string, config util.ConfigManager) {
 	// set up our global flags because we need some config before we can set up our App
 	flagset := flag.NewFlagSet("flags", flag.ContinueOnError)
@@ -233,7 +154,7 @@ func prepConfig() (flags []cli.Flag, args []string, config util.ConfigManager) {
 	version := flagset.Bool("version", false, "")
 	v := flagset.Bool("v", false, "")
 
-	flags = globalFlags()
+	flags = bmapp.GlobalFlags()
 	for _, f := range flags {
 		f.Apply(flagset)
 	}

@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestApproveVM(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -28,7 +29,7 @@ func TestApproveVM(t *testing.T) {
 
 func TestApproveVMAndPowerOn(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -46,7 +47,7 @@ func TestApproveVMAndPowerOn(t *testing.T) {
 
 func TestApproveVMError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 

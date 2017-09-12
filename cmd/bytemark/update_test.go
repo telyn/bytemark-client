@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -30,7 +31,7 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 
 func TestUpdateVMMigrationError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -45,7 +46,7 @@ func TestUpdateVMMigrationError(t *testing.T) {
 
 func TestUpdateHead(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateHead{}
 
@@ -62,7 +63,7 @@ func TestUpdateHead(t *testing.T) {
 
 func TestUpdateHeadError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateHead{}
 
@@ -79,7 +80,7 @@ func TestUpdateHeadError(t *testing.T) {
 
 func TestUpdateTail(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateTail{}
 
@@ -96,7 +97,7 @@ func TestUpdateTail(t *testing.T) {
 
 func TestUpdateTailError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateTail{}
 
@@ -113,7 +114,7 @@ func TestUpdateTailError(t *testing.T) {
 
 func TestUpdateStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateStoragePool{}
 
@@ -130,7 +131,7 @@ func TestUpdateStoragePool(t *testing.T) {
 
 func TestUpdateStoragePoolError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateStoragePool{}
 

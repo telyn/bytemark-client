@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/cheekybits/is"
 )
 
 func TestReapVMs(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("ReapVMs").Return(nil).Times(1)
 
@@ -24,7 +25,7 @@ func TestReapVMs(t *testing.T) {
 
 func TestReapVMsAlias(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("ReapVMs").Return(nil).Times(1)
 
@@ -39,7 +40,7 @@ func TestReapVMsAlias(t *testing.T) {
 
 func TestReapVMsError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("ReapVMs").Return(fmt.Errorf("Error reaping VMs")).Times(1)
 

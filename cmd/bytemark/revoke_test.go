@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
@@ -168,7 +169,7 @@ func TestRevokePrivilege(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		config, c, app := baseTestAuthSetup(t, false)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		test.Setup(config, c)
 
 		fmt.Println(test.Input)

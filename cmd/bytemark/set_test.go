@@ -4,13 +4,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestSetCDROM(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -30,7 +31,7 @@ func TestSetCDROM(t *testing.T) {
 
 func TestSetCores(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -53,7 +54,7 @@ func TestSetCores(t *testing.T) {
 
 func TestSetMemory(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -73,7 +74,7 @@ func TestSetMemory(t *testing.T) {
 		t.Fatal(vErr)
 	}
 
-	config, c, app = baseTestAuthSetup(t, false)
+	config, c, app = testutil.BaseTestAuthSetup(t, false, commands)
 	config.When("GetVirtualMachine").Return(defVM)
 
 	c.When("GetVirtualMachine", vmname).Return(vm)
@@ -91,7 +92,7 @@ func TestSetMemory(t *testing.T) {
 
 func TestSetHWProfileCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestSetup(t, false)
+	config, c, app := testutil.BaseTestSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -116,7 +117,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 	// test hardware profile only
 
-	config, c, app = baseTestAuthSetup(t, false)
+	config, c, app = testutil.BaseTestAuthSetup(t, false, commands)
 	config.When("GetVirtualMachine").Return(defVM)
 
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool(nil)).Return(nil).Times(1)
@@ -129,7 +130,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	}
 
 	// test --lock flag
-	config, c, app = baseTestAuthSetup(t, false)
+	config, c, app = testutil.BaseTestAuthSetup(t, false, commands)
 	config.When("GetVirtualMachine").Return(defVM)
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{true}).Return(nil).Times(1)
 
@@ -141,7 +142,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 	}
 
 	// test --unlock flag
-	config, c, app = baseTestAuthSetup(t, false)
+	config, c, app = testutil.BaseTestAuthSetup(t, false, commands)
 	config.When("GetVirtualMachine").Return(defVM)
 	c.When("SetVirtualMachineHardwareProfile", vmname, "virtio123", []bool{false}).Return(nil).Times(1)
 
@@ -155,7 +156,7 @@ func TestSetHWProfileCommand(t *testing.T) {
 
 func TestSetDiscIOPSLimit(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("Force").Return(true)
 

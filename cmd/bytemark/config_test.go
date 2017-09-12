@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -15,7 +16,7 @@ import (
 )
 
 func TestConfigAccountValidation(t *testing.T) {
-	config, client, cliapp := baseTestSetup(t, false)
+	config, client, cliapp := testutil.BaseTestSetup(t, false, commands)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "default-group", Account: "default-account"})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -31,7 +32,7 @@ func TestConfigAccountValidation(t *testing.T) {
 }
 
 func TestConfigGroupValidation(t *testing.T) {
-	config, client, cliapp := baseTestSetup(t, false)
+	config, client, cliapp := testutil.BaseTestSetup(t, false, commands)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -53,7 +54,7 @@ func TestConfigEndpointValidation(t *testing.T) {
 }
 
 func TestConfigValidations(t *testing.T) {
-	config, client, cliapp := baseTestSetup(t, false)
+	config, client, cliapp := testutil.BaseTestSetup(t, false, commands)
 
 	config.When("GetGroup").Return(lib.GroupName{Group: "", Account: ""})
 	config.When("GetIgnoreErr", "account").Return("")
@@ -91,7 +92,7 @@ func TestConfigValidations(t *testing.T) {
 
 func TestCommandConfigSet(t *testing.T) {
 	is := is.New(t)
-	config, client, app := baseTestSetup(t, false)
+	config, client, app := testutil.BaseTestSetup(t, false, commands)
 
 	// setup sets up all the necessary config defaulty stuff for all our tests
 

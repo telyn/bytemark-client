@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	"github.com/urfave/cli"
 )
 
 func TestOutput(t *testing.T) {
@@ -94,7 +95,7 @@ func TestOutput(t *testing.T) {
 
 	for i, test := range tests {
 		t.Logf("TestOutput %d\n", i)
-		config, _, app := baseTestSetup(t, true)
+		config, _, app := baseTestSetup(t, true, []cli.Command{})
 		config.Reset()
 
 		cliContext := &mocks.CliContext{}

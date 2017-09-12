@@ -4,13 +4,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestResetCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("GetVirtualMachine").Return(defVM)
@@ -25,7 +26,7 @@ func TestResetCommand(t *testing.T) {
 }
 func TestRestartCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
@@ -41,7 +42,7 @@ func TestRestartCommand(t *testing.T) {
 }
 func TestShutdownCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("GetVirtualMachine").Return(defVM)
@@ -56,7 +57,7 @@ func TestShutdownCommand(t *testing.T) {
 }
 func TestStartCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
 	config.When("GetVirtualMachine").Return(defVM)
@@ -71,7 +72,7 @@ func TestStartCommand(t *testing.T) {
 }
 func TestStopCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 

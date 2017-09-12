@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/cheekybits/is"
 )
 
 func TestReifyDisc(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("ReifyDisc", 111).Return(nil).Times(1)
 
@@ -24,7 +25,7 @@ func TestReifyDisc(t *testing.T) {
 
 func TestReifyDiscError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("ReifyDisc", 112).Return(fmt.Errorf("Could not reify disc")).Times(1)
 

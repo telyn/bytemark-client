@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -13,7 +14,7 @@ import (
 
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -34,7 +35,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 func TestCreateGroupCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetGroup").Return(defGroup)
 
@@ -93,7 +94,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 }
 
 func TestCreateServerCommand(t *testing.T) {
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	// where most commands use &defVM to make sure the VirtualMachineName has all three components (and to avoid calls to GetDefaultAccount, presumably), I have singled out TestCreateServerCommand to also test that unqualified server names will work in practice without account & group set in the config.
 	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{Group: "default"})
@@ -173,7 +174,7 @@ func TestCreateServerCommand(t *testing.T) {
 }
 
 func TestCreateServerNoImage(t *testing.T) {
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -227,7 +228,7 @@ func TestCreateServerNoImage(t *testing.T) {
 
 func TestCreateServer(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -268,7 +269,7 @@ func TestCreateServer(t *testing.T) {
 
 func TestCreateBackup(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -290,7 +291,7 @@ func TestCreateBackup(t *testing.T) {
 }
 func TestCreateVLANGroup(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetGroup").Return(defGroup).Times(1)
 
@@ -309,7 +310,7 @@ func TestCreateVLANGroup(t *testing.T) {
 
 func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetGroup").Return(defGroup).Times(1)
 
@@ -328,7 +329,7 @@ func TestCreateVLANGroupWithVLANNum(t *testing.T) {
 
 func TestCreateVLANGroupError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetGroup").Return(defGroup).Times(1)
 
@@ -347,7 +348,7 @@ func TestCreateVLANGroupError(t *testing.T) {
 
 func TestCreateIPRange(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("CreateIPRange", "192.168.3.0/28", 14).Return(nil).Times(1)
 
@@ -360,7 +361,7 @@ func TestCreateIPRange(t *testing.T) {
 
 func TestCreateIPRangeError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("CreateIPRange", "192.168.3.0/28", 18).Return(fmt.Errorf("Error creating IP range")).Times(1)
 
@@ -373,7 +374,7 @@ func TestCreateIPRangeError(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("CreateUser", "uname", "cluster_su").Return(nil).Times(1)
 
@@ -386,7 +387,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestCreateUserError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("CreateUser", "uname", "cluster_su").Return(fmt.Errorf("Error creating user")).Times(1)
 

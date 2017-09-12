@@ -6,7 +6,10 @@ import (
 	"os"
 	"testing"
 
+	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/urfave/cli"
 )
 
 func TestEnsureAuth(t *testing.T) {
@@ -56,7 +59,7 @@ func TestEnsureAuth(t *testing.T) {
 	}
 
 	for _, test := range tt {
-		_, c, _ := baseTestSetup(t, false)
+		_, c, _ := testutil.BaseTestSetup(t, false, []cli.Command{})
 
 		configDir, err := ioutil.TempDir("", "")
 		if err != nil {

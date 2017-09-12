@@ -7,12 +7,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	_, c, app := baseTestAuthSetup(t, false)
+	_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	err := ioutil.WriteFile("testkey.pub", []byte("ssh-rsa aaaaawhartevervAsde fake key"), 0600)
 	if err != nil {
@@ -69,7 +70,7 @@ func TestAddKeyCommand(t *testing.T) {
 }
 
 func TestAddIPCommand(t *testing.T) {
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -12,7 +13,7 @@ import (
 
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("Force").Return(true)
 	config.When("GetVirtualMachine").Return(defVM)
@@ -49,7 +50,7 @@ func TestDeleteServer(t *testing.T) {
 
 func TestDeleteDisc(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("Force").Return(true)
 	config.When("GetVirtualMachine").Return(defVM)
@@ -71,7 +72,7 @@ func TestDeleteDisc(t *testing.T) {
 
 func TestDeleteKey(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	usr := brain.User{
 		Username: "test-user",
@@ -95,7 +96,7 @@ func TestDeleteKey(t *testing.T) {
 		t.Fatal(vErr)
 	}
 
-	config, c, app = baseTestAuthSetup(t, false)
+	config, c, app = testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("Force").Return(true)
 	config.When("GetIgnoreErr", "user").Return("test-user")
@@ -116,7 +117,7 @@ func TestDeleteKey(t *testing.T) {
 
 func TestDeleteBackup(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -139,7 +140,7 @@ func TestDeleteBackup(t *testing.T) {
 
 func TestDeleteVLAN(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("ReapVMs").Return(nil).Times(1)
 
@@ -154,7 +155,7 @@ func TestDeleteVLAN(t *testing.T) {
 
 func TestDeleteVLANError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("ReapVMs").Return(fmt.Errorf("Could not delete VLAN")).Times(1)
 
