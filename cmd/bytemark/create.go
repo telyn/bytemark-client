@@ -1,12 +1,14 @@
 package main
 
 import (
+	"os"
+	"time"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
-	"os"
 )
 
 func init() {
@@ -93,7 +95,7 @@ Used when setting up a private VLAN for a customer.`,
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,
 		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
-		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed.
+		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and nightly backups of the first disc.
 		
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
@@ -143,6 +145,10 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			cli.BoolFlag{
 				Name:  "no-image",
 				Usage: "Specifies that the server should not be imaged.",
+			},
+			cli.BoolFlag{
+				Name:  "no-backup-schedules",
+				Usage: "Prevents backup schedules from being automatically created",
 			},
 			cli.BoolFlag{
 				Name:  "stopped",
@@ -248,6 +254,19 @@ Multiple --disc flags can be used to create multiple discs`,
 	})
 }
 
+// defaultBackupSchedule returns a schedule that will backup every day (well - every 86400 seconds)
+// starting from midnight tonight.
+func defaultBackupSchedule() brain.BackupSchedule {
+	tomorrow := time.Now().Add(86400)
+	y, m, d := tomorrow.Date()
+	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05")
+	return brain.BackupSchedule{
+		StartDate: defaultStartDate,
+		Interval:  86400,
+	}
+}
+
 func createDiscs(c *Context) (err error) {
 	discs := c.Discs("disc")
 
@@ -282,7 +301,7 @@ func createGroup(c *Context) (err error) {
 	return
 }
 
-// createServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags, then reads in positional arguments for the command line.
+// createServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags
 func createServerReadArgs(c *Context) (discs []brain.Disc, cores, memory int, err error) {
 	discs = c.Discs("disc")
 	cores = c.Int("cores")
@@ -325,14 +344,7 @@ func createServerReadIPs(c *Context) (ipspec *brain.IPSpec, err error) {
 	return
 }
 
-func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error) {
-	noImage := c.Bool("no-image")
-
-	discs, cores, memory, err := createServerReadArgs(c)
-	if err != nil {
-		return
-	}
-
+func createServerPrepDiscs(backupSchedules bool, discs []brain.Disc) ([]brain.Disc, error) {
 	if len(discs) == 0 {
 		discs = append(discs, brain.Disc{Size: 25600})
 	}
@@ -340,9 +352,32 @@ func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error)
 	for i := range discs {
 		d, discErr := discs[i].Validate()
 		if discErr != nil {
-			return spec, discErr
+			return discs, discErr
 		}
 		discs[i] = *d
+	}
+
+	if backupSchedules {
+		if discs != nil && len(discs) > 0 {
+			bs := defaultBackupSchedule()
+			discs[0].BackupSchedules = brain.BackupSchedules{&bs}
+		}
+	}
+	return discs, nil
+}
+
+func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error) {
+	noImage := c.Bool("no-image")
+	backupSchedules := !c.Bool("no-backup-schedules")
+
+	discs, cores, memory, err := createServerReadArgs(c)
+	if err != nil {
+		return
+	}
+
+	discs, err = createServerPrepDiscs(backupSchedules, discs)
+	if err != nil {
+		return
 	}
 
 	ipspec, err := createServerReadIPs(c)

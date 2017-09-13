@@ -5,6 +5,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -102,6 +103,11 @@ func TestCreateServer(t *testing.T) {
 		ShouldErr            bool
 	}
 
+	tomorrow := time.Now().Add(86400)
+	y, m, d := tomorrow.Date()
+	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05")
+
 	tests := []createTest{
 		{
 			Spec: brain.VirtualMachineSpec{
@@ -109,6 +115,10 @@ func TestCreateServer(t *testing.T) {
 					brain.Disc{
 						Size:         25 * 1024,
 						StorageGrade: "sata",
+						BackupSchedules: brain.BackupSchedules{{
+							StartDate: defaultStartDate,
+							Interval:  86400,
+						}},
 					},
 					brain.Disc{
 						Size:         50 * 1024,
@@ -157,8 +167,7 @@ func TestCreateServer(t *testing.T) {
 				"--zone", "test-zone",
 				"test-server",
 			},
-		},
-		{
+		}, {
 			ConfigVirtualMachine: defVM,
 			Spec: brain.VirtualMachineSpec{
 				VirtualMachine: &brain.VirtualMachine{
@@ -170,6 +179,10 @@ func TestCreateServer(t *testing.T) {
 					brain.Disc{
 						Size:         25600,
 						StorageGrade: "sata",
+						BackupSchedules: brain.BackupSchedules{{
+							StartDate: defaultStartDate,
+							Interval:  86400,
+						}},
 					},
 				},
 			},
@@ -186,8 +199,7 @@ func TestCreateServer(t *testing.T) {
 				"--no-image",
 				"test-server",
 			},
-		},
-		{
+		}, {
 			ConfigVirtualMachine: defVM,
 			GroupName: lib.GroupName{
 				Group:   "default",
@@ -209,6 +221,7 @@ func TestCreateServer(t *testing.T) {
 				"bytemark", "create", "server",
 				"--force",
 				"--no-image",
+				"--no-backup-schedules",
 				"test-server", "3", "6565m", "archive:34",
 			},
 		},
