@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -20,7 +23,7 @@ func init() {
 						Usage: "the ID or label of the storage pool to be emptied",
 					},
 				},
-				Action: With(OptionalArgs("storage-pool"), RequiredFlags("storage-pool"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("storage-pool"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 					if err := c.Client().EmptyStoragePool(c.String("storage-pool")); err != nil {
 						return err
 					}
@@ -40,7 +43,7 @@ func init() {
 						Usage: "the ID or label of the head to be emptied",
 					},
 				},
-				Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("head"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
 					if err := c.Client().EmptyHead(c.String("head")); err != nil {
 						return err
 					}

@@ -3,6 +3,9 @@ package main
 import (
 	"strings"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -37,7 +40,7 @@ func init() {
 					Value: &publicKeyFile,
 				},
 			},
-			Action: With(JoinArgs("public-key"), AuthProvider, func(ctx *Context) (err error) {
+			Action: app.With(args.Join("public-key"), with.Auth, func(ctx *app.Context) (err error) {
 				user := ctx.String("user")
 				if user == "" {
 					user = ctx.Config().GetIgnoreErr("user")
@@ -94,10 +97,10 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "The server to add IPs to",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 				addrs := c.Int("ips")
 				if addrs < 1 {
 					addrs = 1

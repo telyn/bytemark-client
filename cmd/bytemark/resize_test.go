@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -11,7 +12,7 @@ import (
 
 func TestResizeDisk(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("Force").Return(true)
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
@@ -21,26 +22,26 @@ func TestUnscheduleBackups(t *testing.T) {
 		ShouldErr  bool
 		ShouldCall bool
 		CreateErr  error
-		BaseTestFn func(*testing.T, bool) (*mocks.Config, *mocks.Client, *cli.App)
+		BaseTestFn func(*testing.T, bool, []cli.Command) (*mocks.Config, *mocks.Client, *cli.App)
 	}{
 		{
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name"},
 			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
 			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			ShouldCall: true,
@@ -48,12 +49,12 @@ func TestUnscheduleBackups(t *testing.T) {
 			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			DiscLabel:  "disc-label",
 			ID:         324,
-			BaseTestFn: baseTestAuthSetup,
+			BaseTestFn: testutil.BaseTestAuthSetup,
 		},
 	}
 
 	for i, test := range tests {
-		config, client, app := test.BaseTestFn(t, false)
+		config, client, app := test.BaseTestFn(t, false, commands)
 		config.When("GetVirtualMachine").Return(defVM)
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 

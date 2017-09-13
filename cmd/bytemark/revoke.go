@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -22,10 +25,10 @@ func init() {
 			cli.GenericFlag{
 				Name:  "privilege",
 				Usage: "the privilege to revoke",
-				Value: new(PrivilegeFlag),
+				Value: new(app.PrivilegeFlag),
 			},
 		},
-		Action: With(JoinArgs("privilege"), RequiredFlags("privilege"), PrivilegeProvider("privilege"), func(c *Context) (err error) {
+		Action: app.With(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {
 			pf := c.PrivilegeFlag("privilege")
 			c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 

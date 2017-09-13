@@ -5,6 +5,9 @@ import (
 	"io"
 	"os"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -32,8 +35,8 @@ func init() {
 						Usage: "The privilege to grant to the new user",
 					},
 				},
-				Action: With(OptionalArgs("username", "privilege"), RequiredFlags("username", "privilege"), AuthProvider, func(c *Context) error {
-					// Privilege is just a string and not a PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
+				Action: app.With(args.Optional("username", "privilege"), with.RequiredFlags("username", "privilege"), with.Auth, func(c *app.Context) error {
+					// Privilege is just a string and not a app.PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
 					if err := c.Client().CreateUser(c.String("username"), c.String("privilege")); err != nil {
 						return err
 					}
@@ -52,14 +55,14 @@ Used when setting up a private VLAN for a customer.`,
 					cli.GenericFlag{
 						Name:  "group",
 						Usage: "the name of the group to create",
-						Value: new(GroupNameFlag),
+						Value: new(app.GroupNameFlag),
 					},
 					cli.IntFlag{
 						Name:  "vlan-num",
 						Usage: "The VLAN number to add the group to",
 					},
 				},
-				Action: With(OptionalArgs("group", "vlan-num"), RequiredFlags("group"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("group", "vlan-num"), with.RequiredFlags("group"), with.Auth, func(c *app.Context) error {
 					gp := c.GroupName("group")
 					if err := c.Client().AdminCreateGroup(gp, c.Int("vlan-num")); err != nil {
 						return err
@@ -82,7 +85,7 @@ Used when setting up a private VLAN for a customer.`,
 						Usage: "The VLAN number to add the IP range to",
 					},
 				},
-				Action: With(OptionalArgs("ip-range", "vlan-num"), RequiredFlags("ip-range", "vlan-num"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("ip-range", "vlan-num"), with.RequiredFlags("ip-range", "vlan-num"), with.Auth, func(c *app.Context) error {
 					if err := c.Client().CreateIPRange(c.String("ip-range"), c.Int("vlan-num")); err != nil {
 						return err
 					}
@@ -105,7 +108,7 @@ If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs
 
 If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags: append(OutputFlags("server", "object"),
+		Flags: append(app.OutputFlags("server", "object"),
 			cli.IntFlag{
 				Name:  "cores",
 				Value: 1,
@@ -142,7 +145,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			cli.GenericFlag{
 				Name:  "name",
 				Usage: "The new server's name",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 			cli.BoolFlag{
 				Name:  "no-image",
@@ -157,7 +160,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Usage: "Which zone the server will be created in. See `bytemark zones` for the choices.",
 			},
 		),
-		Action: With(OptionalArgs("name", "cores", "memory", "disc"), RequiredFlags("name"), AuthProvider, createServer),
+		Action: app.With(args.Optional("name", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createServer),
 	}
 	createServerCmd.Flags = append(createServerCmd.Flags, imageInstallFlags...)
 
@@ -174,7 +177,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to add the disc to",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
 		Usage:     "create virtual discs attached to one of your cloud servers",
@@ -183,7 +186,7 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
-		Action: With(OptionalArgs("server", "cores", "memory", "disc"), AuthProvider, createDiscs),
+		Action: app.With(args.Optional("server", "cores", "memory", "disc"), with.Auth, createDiscs),
 	}
 
 	createGroupCmd := cli.Command{
@@ -195,10 +198,10 @@ Multiple --disc flags can be used to create multiple discs`,
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the name of the group to create",
-				Value: new(GroupNameFlag),
+				Value: new(app.GroupNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("group"), RequiredFlags("group"), AuthProvider, createGroup),
+		Action: app.With(args.Optional("group"), with.RequiredFlags("group"), with.Auth, createGroup),
 	}
 
 	createBackupCmd := cli.Command{
@@ -214,10 +217,10 @@ Multiple --disc flags can be used to create multiple discs`,
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server whose disk you wish to backup",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) error {
+		Action: app.With(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) error {
 			backup, err := c.Client().CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
 			if err != nil {
 				return err
@@ -252,7 +255,7 @@ Multiple --disc flags can be used to create multiple discs`,
 	})
 }
 
-func createDiscs(c *Context) (err error) {
+func createDiscs(c *app.Context) (err error) {
 	discs := c.Discs("disc")
 
 	for i := range discs {
@@ -277,7 +280,7 @@ func createDiscs(c *Context) (err error) {
 	return
 }
 
-func createGroup(c *Context) (err error) {
+func createGroup(c *app.Context) (err error) {
 	gp := c.GroupName("group")
 	err = c.Client().CreateGroup(gp)
 	if err == nil {
@@ -287,7 +290,7 @@ func createGroup(c *Context) (err error) {
 }
 
 // createServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags, then reads in positional arguments for the command line.
-func createServerReadArgs(c *Context) (discs []brain.Disc, cores, memory int, err error) {
+func createServerReadArgs(c *app.Context) (discs []brain.Disc, cores, memory int, err error) {
 	discs = c.Discs("disc")
 	cores = c.Int("cores")
 	memory = c.Size("memory")
@@ -298,7 +301,7 @@ func createServerReadArgs(c *Context) (discs []brain.Disc, cores, memory int, er
 }
 
 // createServerReadIPs reads the IP flags and creates an IPSpec
-func createServerReadIPs(c *Context) (ipspec *brain.IPSpec, err error) {
+func createServerReadIPs(c *app.Context) (ipspec *brain.IPSpec, err error) {
 	ips := c.IPs("ip")
 
 	if len(ips) > 2 {
@@ -329,7 +332,7 @@ func createServerReadIPs(c *Context) (ipspec *brain.IPSpec, err error) {
 	return
 }
 
-func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error) {
+func createServerPrepSpec(c *app.Context) (spec brain.VirtualMachineSpec, err error) {
 	noImage := c.Bool("no-image")
 
 	discs, cores, memory, err := createServerReadArgs(c)
@@ -386,7 +389,7 @@ func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error)
 	return
 }
 
-func createServer(c *Context) (err error) {
+func createServer(c *app.Context) (err error) {
 	name := c.VirtualMachineName("name")
 	spec, err := createServerPrepSpec(c)
 	if err != nil {

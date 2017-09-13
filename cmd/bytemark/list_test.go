@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -11,7 +12,7 @@ import (
 
 func TestListAccounts(t *testing.T) {
 	is := is.New(t)
-	_, c, app := baseTestAuthSetup (t, false)
+	_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	c.When("GetAccounts").Return([]lib.Account{lib.Account{BrainID: 1, Name: "dr-evil"}}).Times(1)
 
@@ -25,7 +26,7 @@ func TestListAccounts(t *testing.T) {
 
 func TestListDiscs(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -54,7 +55,7 @@ func TestListDiscs(t *testing.T) {
 
 func TestListGroups(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
 
@@ -75,7 +76,7 @@ func TestListGroups(t *testing.T) {
 
 func TestListServers(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 	config.When("GetGroup").Return(defGroup)
@@ -101,7 +102,7 @@ func TestListServers(t *testing.T) {
 
 func TestListBackups(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",

@@ -7,6 +7,9 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -45,10 +48,10 @@ Defaults to connecting to the serial console for the given server.`,
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "The server whose console will be connected to",
-				Value: new(VirtualMachineNameFlag),
+				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: With(OptionalArgs("server"), RequiredFlags("server"), AuthProvider, func(ctx *Context) (err error) {
+		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(ctx *app.Context) (err error) {
 			vmName := ctx.VirtualMachineName("server")
 			if ctx.Bool("serial") && ctx.Bool("panel") {
 				return ctx.Help("You must only specify one of --serial and --panel!")
@@ -79,7 +82,7 @@ func shortEndpoint(endpoint string) string {
 	return strings.Split(endpoint, ".")[0]
 }
 
-func vncConsoleInstructions(c *Context, vm brain.VirtualMachine) {
+func vncConsoleInstructions(c *app.Context, vm brain.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -95,7 +98,7 @@ func vncConsoleInstructions(c *Context, vm brain.VirtualMachine) {
 	log.Log("Any port may be substituted for 9999 as long as the same port is used in both commands")
 }
 
-func serialConsoleInstructions(c *Context, vm brain.VirtualMachine) {
+func serialConsoleInstructions(c *app.Context, vm brain.VirtualMachine) {
 	mgmtAddress := vm.ManagementAddress.String()
 	if vm.ManagementAddress.To4() == nil {
 		mgmtAddress = "[" + mgmtAddress + "]"
@@ -108,7 +111,7 @@ func serialConsoleInstructions(c *Context, vm brain.VirtualMachine) {
 
 }
 
-func openPanelConsole(c *Context, vm brain.VirtualMachine) error {
+func openPanelConsole(c *app.Context, vm brain.VirtualMachine) error {
 	ep := c.Config().EndpointName()
 	token := c.Config().GetIgnoreErr("token")
 	url := fmt.Sprintf("%s/vnc/?auth_token=%s&endpoint=%s&management_ip=%s", c.Config().PanelURL(), token, shortEndpoint(ep), vm.ManagementAddress)
@@ -153,7 +156,7 @@ func collectArgs(args string) (slice []string) {
 	return
 }
 
-func connectSerialConsole(c *Context, vm brain.VirtualMachine) error {
+func connectSerialConsole(c *app.Context, vm brain.VirtualMachine) error {
 	sshargs := c.String("ssh-args")
 	host := fmt.Sprintf("%s@%s", c.Client().GetSessionUser(), vm.ManagementAddress)
 	log.Logf("ssh %s\r\n", host)

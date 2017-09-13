@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -19,14 +22,14 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "The server to approve",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.BoolFlag{
 						Name:  "power-on",
 						Usage: "If set, powers on the server.",
 					},
 				},
-				Action: With(OptionalArgs("server", "power-on"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("server", "power-on"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 					vm := c.VirtualMachineName("server")
 
 					if err := c.Client().ApproveVM(vm, c.Bool("power-on")); err != nil {

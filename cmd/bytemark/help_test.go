@@ -5,6 +5,7 @@ import (
 	"testing"
 	"unicode"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -84,7 +85,7 @@ func TestFlagsHaveUsage(t *testing.T) {
 			}
 		}
 	})
-	for _, flag := range globalFlags() {
+	for _, flag := range app.GlobalFlags() {
 		if checkFlagUsage(flag, isEmpty) {
 			t.Errorf("Global flag %s doesn't have usage.", flag.GetName())
 		}

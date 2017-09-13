@@ -3,13 +3,14 @@ package main
 import (
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestMove(t *testing.T) {
 	is := is.New(t)
-	config, c, app := baseTestAuthSetup (t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	oldName := lib.VirtualMachineName{
 		VirtualMachine: "old-name",
