@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"math/big"
 	"net/http"
@@ -10,6 +8,9 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
 )
 
 type simpleGetTestFn func(Client) (interface{}, error)
@@ -341,12 +342,12 @@ func TestGetHeads(t *testing.T) {
 			Architecture: "x86_64",
 			// because of the way json Unmarshals net.IPs different to specifying them in this way this line is commented out
 			// CCAddress:     &net.IP{214, 233, 32, 31},
-			Note:          "melons",
-			Memory:        241000,
+			LastNote:      "melons",
+			TotalMemory:   241000,
 			UsageStrategy: "",
 			Models:        []string{"generic", "intel"},
 
-			MemoryFree:          123400,
+			FreeMemory:          123400,
 			IsOnline:            true,
 			UsedCores:           9,
 			VirtualMachineCount: 3,
@@ -359,12 +360,12 @@ func TestGetHeads(t *testing.T) {
 			Architecture: "x86_64",
 			// because of the way json Unmarshals net.IPs different to specifying them in this way this line is commented out
 			// CCAddress:     &net.IP{24, 43, 32, 49},
-			Note:          "more than a hundred years old",
-			Memory:        241000,
+			LastNote:      "more than a hundred years old",
+			TotalMemory:   241000,
 			UsageStrategy: "",
 			Models:        []string{"generic", "intel"},
 
-			MemoryFree:          234000,
+			FreeMemory:          234000,
 			IsOnline:            true,
 			UsedCores:           1,
 			VirtualMachineCount: 1,
@@ -386,12 +387,12 @@ func TestGetHead(t *testing.T) {
 		Architecture: "x86_64",
 		// because of the way json Unmarshals net.IPs different to specifying them in this way this line is commented out
 		// CCAddress:     &net.IP{24, 43, 32, 49},
-		Note:          "more than a hundred years old",
-		Memory:        241000,
+		LastNote:      "more than a hundred years old",
+		TotalMemory:   241000,
 		UsageStrategy: "",
 		Models:        []string{"generic", "intel"},
 
-		MemoryFree:          234000,
+		FreeMemory:          234000,
 		IsOnline:            true,
 		UsedCores:           1,
 		VirtualMachineCount: 1,
