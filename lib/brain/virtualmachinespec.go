@@ -2,10 +2,11 @@ package brain
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
 	"math"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // VirtualMachineSpec represents the specification for a VM that is passed to the create_vm endpoint
