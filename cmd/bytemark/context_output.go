@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/BytemarkHosting/row"
 	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli"
-	"reflect"
-	"strings"
 )
 
 // OutputJSON is an OutputFn which outputs a nicely-indented JSON object that represents obj
@@ -115,7 +116,7 @@ const (
 	DefaultServerTableFields = "ID, Hostname, ManagementAddress, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
 
 	// DefaultHeadTableFields is the default for --table-fields for brain.Head
-	DefaultHeadTableFields = "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, VirtualMachineCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
+	DefaultHeadTableFields = "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, CountVirtualMachines, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
 	// DefaultTailTableFields is the default for --table-fields for brain.Tail
 	DefaultTailTableFields = "ID, Label, IsOnline, UUID, CCAddress, StoragePools, ZoneName"
 	// DefaultStoragePoolTableFields is the default for --table-fields for brain.StoragePool
