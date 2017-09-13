@@ -358,7 +358,7 @@ func createServerPrepDiscs(backupSchedules bool, discs []brain.Disc) ([]brain.Di
 	}
 
 	if backupSchedules {
-		if discs != nil && len(discs) > 0 {
+		if len(discs) > 0 {
 			bs := defaultBackupSchedule()
 			discs[0].BackupSchedules = brain.BackupSchedules{&bs}
 		}
