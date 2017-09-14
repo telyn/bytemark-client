@@ -101,13 +101,14 @@ func TestCreateServer(t *testing.T) {
 		ConfigVirtualMachine lib.VirtualMachineName
 		GroupName            lib.GroupName
 		Args                 []string
+		Output               string
 		ShouldErr            bool
 	}
 
-	tomorrow := time.Now().Add(86400)
+	tomorrow := time.Now().Add(24 * time.Hour)
 	y, m, d := tomorrow.Date()
-	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
-	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05")
+	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
+	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05 MST")
 
 	tests := []createTest{
 		{
@@ -118,7 +119,8 @@ func TestCreateServer(t *testing.T) {
 						StorageGrade: "sata",
 						BackupSchedules: brain.BackupSchedules{{
 							StartDate: defaultStartDate,
-							Interval:  86400,
+							Interval:  7 * 86400,
+							Capacity:  1,
 						}},
 					},
 					brain.Disc{
@@ -182,7 +184,8 @@ func TestCreateServer(t *testing.T) {
 						StorageGrade: "sata",
 						BackupSchedules: brain.BackupSchedules{{
 							StartDate: defaultStartDate,
-							Interval:  86400,
+							Interval:  7 * 86400,
+							Capacity:  1,
 						}},
 					},
 				},
@@ -222,7 +225,7 @@ func TestCreateServer(t *testing.T) {
 				"bytemark", "create", "server",
 				"--force",
 				"--no-image",
-				"--no-backup-schedules",
+				"--backup", "never",
 				"test-server", "3", "6565m", "archive:34",
 			},
 		},
@@ -247,6 +250,9 @@ func TestCreateServer(t *testing.T) {
 			Account:        test.GroupName.Account,
 		}
 
+		postGpName := test.GroupName
+		_ = c.EnsureGroupName(&postGpName)
+
 		discs := make([]*brain.Disc, len(test.Spec.Discs))
 		for i, d := range test.Spec.Discs {
 			discs[i] = &d
@@ -255,7 +261,7 @@ func TestCreateServer(t *testing.T) {
 		getvm.Discs = discs
 		getvm.Hostname = "test-server.test-group.test-account.tld"
 
-		c.When("CreateVirtualMachine", &test.GroupName, test.Spec).Return(test.Spec.VirtualMachine, nil).Times(1)
+		c.When("CreateVirtualMachine", &postGpName, test.Spec).Return(test.Spec.VirtualMachine, nil).Times(1)
 		c.When("GetVirtualMachine", &vmname).Return(&getvm, nil).Times(1)
 
 		err := global.App.Run(test.Args)

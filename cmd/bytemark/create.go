@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"math"
 	"os"
 	"time"
 
@@ -102,7 +104,13 @@ The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs
 
-If hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
+If --backup is set then a backup of the first disk will be taken at the
+frequency specified - never, daily, weekly or monthly. This backup will be free if
+it's below a certain threshold of size. By default, a backup is taken every week.
+This may cost money if your first disk is larger than the default.
+See the price list for more details at http://www.bytemark.co.uk/prices
+
+If --hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
 		Flags: append(OutputFlags("server", "object", ""),
 			cli.IntFlag{
 				Name:  "cores",
@@ -146,9 +154,10 @@ If hwprofile-locked is set then the cloud server's virtual hardware won't be cha
 				Name:  "no-image",
 				Usage: "Specifies that the server should not be imaged.",
 			},
-			cli.BoolFlag{
-				Name:  "no-backup-schedules",
-				Usage: "Prevents backup schedules from being automatically created",
+			cli.StringFlag{
+				Name:  "backup",
+				Usage: "Add a backup schedule for the first disk at the given frequency (daily, weekly, monthly, or never)",
+				Value: "weekly",
 			},
 			cli.BoolFlag{
 				Name:  "stopped",
@@ -257,13 +266,14 @@ Multiple --disc flags can be used to create multiple discs`,
 // defaultBackupSchedule returns a schedule that will backup every day (well - every 86400 seconds)
 // starting from midnight tonight.
 func defaultBackupSchedule() brain.BackupSchedule {
-	tomorrow := time.Now().Add(86400)
+	tomorrow := time.Now().Add(24 * time.Hour)
 	y, m, d := tomorrow.Date()
-	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
-	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05")
+	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
+	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05 MST")
 	return brain.BackupSchedule{
 		StartDate: defaultStartDate,
-		Interval:  86400,
+		Interval:  7 * 86400,
+		Capacity:  1,
 	}
 }
 
@@ -344,7 +354,22 @@ func createServerReadIPs(c *Context) (ipspec *brain.IPSpec, err error) {
 	return
 }
 
-func createServerPrepDiscs(backupSchedules bool, discs []brain.Disc) ([]brain.Disc, error) {
+func backupScheduleIntervalFromWords(words string) (freq int, err error) {
+	switch words {
+	case "daily":
+		freq = 86400
+	case "weekly":
+		freq = 7 * 86400
+	case "never":
+		freq = math.MaxInt32
+	default:
+		err = fmt.Errorf("invalid backup frequency '%s'", words)
+	}
+	return
+
+}
+
+func createServerPrepDiscs(backupFrequency string, discs []brain.Disc) ([]brain.Disc, error) {
 	if len(discs) == 0 {
 		discs = append(discs, brain.Disc{Size: 25600})
 	}
@@ -357,9 +382,15 @@ func createServerPrepDiscs(backupSchedules bool, discs []brain.Disc) ([]brain.Di
 		discs[i] = *d
 	}
 
-	if backupSchedules {
+	interval, err := backupScheduleIntervalFromWords(backupFrequency)
+	if err != nil {
+		return discs, err
+	}
+
+	if interval != math.MaxInt32 {
 		if len(discs) > 0 {
 			bs := defaultBackupSchedule()
+			bs.Interval = interval
 			discs[0].BackupSchedules = brain.BackupSchedules{&bs}
 		}
 	}
@@ -368,14 +399,14 @@ func createServerPrepDiscs(backupSchedules bool, discs []brain.Disc) ([]brain.Di
 
 func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error) {
 	noImage := c.Bool("no-image")
-	backupSchedules := !c.Bool("no-backup-schedules")
+	backupFrequency := c.String("backup")
 
 	discs, cores, memory, err := createServerReadArgs(c)
 	if err != nil {
 		return
 	}
 
-	discs, err = createServerPrepDiscs(backupSchedules, discs)
+	discs, err = createServerPrepDiscs(backupFrequency, discs)
 	if err != nil {
 		return
 	}
@@ -426,9 +457,13 @@ func createServer(c *Context) (err error) {
 	}
 
 	groupName := name.GroupName()
+	err = global.Client.EnsureGroupName(groupName)
+	if err != nil {
+		return
+	}
 
-	log.Log("The following server will be created:")
-	err = spec.PrettyPrint(os.Stderr, prettyprint.Full)
+	log.Logf("The following server will be created in %s:\r\n", groupName)
+	err = spec.PrettyPrint(global.App.Writer, prettyprint.Full)
 	if err != nil {
 		return err
 	}
