@@ -54,6 +54,7 @@ func TestCreateGroupCommand(t *testing.T) {
 }
 
 func TestCreateServerHasCorrectFlags(t *testing.T) {
+	// I'm not sure why this test exists
 	is := is.New(t)
 	seenCmd := false
 	seenAuthKeys := false

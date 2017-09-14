@@ -2,6 +2,7 @@ package lib
 
 import (
 	"errors"
+
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
@@ -210,15 +211,15 @@ func (c *bytemarkClient) validateAccountName(account *string) error {
 				log.Debugf(log.LvlArgs, "validateAccountName using the first account returned from bigv (%s) as the default\r\n", brainAccs[0].Name)
 				*account = brainAccs[0].Name
 			}
-			return nil
-		}
-		log.Debug(log.LvlArgs, "validateAccountName finding the default billing account")
-		billAcc, err := c.getDefaultBillingAccount()
-		if err == nil && billAcc != nil {
-			log.Debugf(log.LvlArgs, "validateAccountName found the default billing account - %s\r\n", billAcc.Name)
-			*account = billAcc.Name
-		} else if err != nil {
-			return err
+		} else {
+			log.Debug(log.LvlArgs, "validateAccountName finding the default billing account")
+			billAcc, err := c.getDefaultBillingAccount()
+			if err == nil && billAcc != nil {
+				log.Debugf(log.LvlArgs, "validateAccountName found the default billing account - %s\r\n", billAcc.Name)
+				*account = billAcc.Name
+			} else if err != nil {
+				return err
+			}
 		}
 	}
 	if *account == "" {
