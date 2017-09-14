@@ -169,9 +169,9 @@ func (c *bytemarkClient) AllowInsecureRequests() {
 	c.allowInsecure = true
 }
 
-func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) error {
+func (c *bytemarkClient) EnsureVirtualMachineName(vm *VirtualMachineName) error {
 	if vm.Account == "" {
-		if err := c.validateAccountName(&vm.Account); err != nil {
+		if err := c.EnsureAccountName(&vm.Account); err != nil {
 			return err
 		}
 	}
@@ -185,9 +185,9 @@ func (c *bytemarkClient) validateVirtualMachineName(vm *VirtualMachineName) erro
 	return nil
 }
 
-func (c *bytemarkClient) validateGroupName(group *GroupName) error {
+func (c *bytemarkClient) EnsureGroupName(group *GroupName) error {
 	if group.Account == "" {
-		if err := c.validateAccountName(&group.Account); err != nil {
+		if err := c.EnsureAccountName(&group.Account); err != nil {
 			return err
 		}
 	}
@@ -197,7 +197,7 @@ func (c *bytemarkClient) validateGroupName(group *GroupName) error {
 	return nil
 }
 
-func (c *bytemarkClient) validateAccountName(account *string) error {
+func (c *bytemarkClient) EnsureAccountName(account *string) error {
 	if *account == "" && c.authSession != nil {
 		log.Debug(log.LvlArgs, "validateAccountName called with empty name and a valid auth session - will try to figure out the default by talking to APIs.")
 		if c.urls.Billing == "" {
