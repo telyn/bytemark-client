@@ -29,6 +29,8 @@ func (sched BackupSchedule) PrettyPrint(wr io.Writer, detail prettyprint.DetailL
 	return prettyprint.Run(wr, scheduleTpl, "schedule"+string(detail), sched)
 }
 
+// IntervalInWords returns a nice human readable version of the interval for this BackupSchedule
+// Formats include "every %d weeks/days/hours/seconds", "weekly", "daily", and "hourly"
 func (sched BackupSchedule) IntervalInWords() string {
 	week := 7 * 86400
 	if sched.Interval%week == 0 {

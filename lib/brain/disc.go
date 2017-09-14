@@ -49,7 +49,7 @@ func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, tmpl, "disc"+string(detail), d)
 }
 
-// EstimateBackupSchedule returns an estimate for the maximum amount of iceberg
+// EstimateBackupScheduleSize returns an estimate for the maximum amount of iceberg
 // storage this disk will use for its backups, in MiB
 func (d Disc) EstimateBackupScheduleSize() int {
 	totalBackups := 0
