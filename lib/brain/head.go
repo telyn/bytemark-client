@@ -16,18 +16,18 @@ type Head struct {
 
 	// descriptive information that can be modified
 
-	Architecture  string   `json:"arch"`
-	CCAddress     *net.IP  `json:"cnc_address"`
-	Note          string   `json:"note"`
-	Memory        int      `json:"memory,omitempty"`
+	Architecture  string   `json:"arch,omitempty"`
+	CCAddress     *net.IP  `json:"cnc_address,omitempty"`
+	LastNote      string   `json:"last_note, omitempty"`
+	TotalMemory   int      `json:"total_memory,omitempty"`
 	UsageStrategy string   `json:"usage_strategy,omitempty"`
 	Models        []string `json:"models,omitempty"`
 
 	// state
 
-	MemoryFree int  `json:"memory_free,omitempty"`
+	FreeMemory int  `json:"free_memory,omitempty"`
 	IsOnline   bool `json:"online,omitempty"`
-	UsedCores  int  `json:"used_cores"`
+	UsedCores  int  `json:"used_cores,omitempty"`
 
 	// You may have one or the other.
 
@@ -36,7 +36,7 @@ type Head struct {
 }
 
 // CountVirtualMachines returns the number of virtual machines running on this head
-func (h *Head) CountVirtualMachines() int {
+func (h Head) CountVirtualMachines() int {
 	if h.VirtualMachines != nil {
 		return len(h.VirtualMachines)
 	}
