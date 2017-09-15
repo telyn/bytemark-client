@@ -1,0 +1,128 @@
+How to hack on bytemark-client
+==============================
+
+bytemark-client is a big go project with a lot of code (>  20,000 SLOC at last
+count) and a lot of packages. It's divided up into two main big chunks - 
+the command-line client in cmd/bytemark, and the API client library in lib.
+
+The API client library is based around go's built-in http package with very
+little exciting about it. We have an interface called PrettyPrinter which all
+of our wire types implement, and is used by the command-line client for output.
+
+The command-line client is based around github.com/urfave/cli - it's very 
+useful to understand urfave/cli before you start working on bytemark-client.
+In particular, focus on understanding the App and Command types within it.
+
+==============
+Control flow
+==============
+
+Here is an approximate description of what goes on during an invocation of the
+client:
+
+1. Before cmd/bytemark.main is run, all the init functions are run, which
+   compile two []cli.Command objects - one called commands, and one called
+   adminCommands.
+2. cmd/bytemark.main() is run, which runs some other functions in
+   cmd/bytemark to set up a cmd/bytemark/util.Config and flag.FlagSet
+3. cmd/bytemark.main combines adminCommands with commands if the --global flag
+   is set, then creates a urfave/cli.App
+4. cmd/bytemark.main creates a new lib.Client, then attaches that and the Config
+   to the urfave/cli.App.
+5. cmd/bytemark.main runs the cli.App, which calls the relevant command's Action
+   or returns help, whatever is needed.
+6. Most command actions are made using cmd/bytemark/app.With, chaining together
+   functions from cmd/bytemark/app/args and cmd/bytemark/app/with - which are
+   used to collect and parse data from the command line and to get data from the
+   API. 
+7. The final function in the command's Action chain then performs whatever task
+   the purpose of the command is.
+8. Any errors in the cmd/bytemark/app.With chain bubble back up through the
+   original invocation of urfave/cli.App.Run to cmd/bytemark.main()
+9. cmd/bytemark.main() then calls cmd/bytemark/util.ProcessError, which attempts
+   to understand and present the error (if there was one) in a nice,
+   human-readable form.
+
+Steps 1, 6 and 7 kind of gloss over a lot of detail. Let's look at a more
+specific example.
+
+`bytemark show account` is a command which shows the end-user details about
+their account and the groups and servers it contains. It's a pretty simple and
+pretty normal command, in terms of its implementation. It's defined in show.go
+
+Here's the source for its Action. (app here being cmd/bytemark/app)
+
+Action: app.With(args.Optional("account"), with.Account("account"),
+         func(c *app.Context) error {
+	     return c.OutputInDesiredForm(c.Account)
+         }
+),
+
+app.With returns a `func(c *cli.Context) error`, and takes 
+`(func(c *app.Context) error)...` as arguments. The function returned by
+app.With wraps the cli.Context in an app.Context, then exectutes each function
+in order, stopping at the first error. args.Optional("account") reads the next
+command line argument if there is one and sets the flag named "account" with 
+it. with.Account("account") takes the "account" flag and attaches it to the
+app.Context which is being passed to each of the providers - this sets c.Account
+which is then used by the final function in this chain, which runs
+c.OutputInDesiredForm.
+
+app.Context.OutputInDesiredForm is a complicated function which looks at the
+--output-type global flag to determine how to output the account, and then does
+so. 
+
+==============
+Code overview
+==============
+
+Here's a tree of the folders in this repo bytemark-client with descriptions of
+what they're for
+
+.
+├── cmd - empty package
+│   └── bytemark - the main package - glue code to stick the commands together
+│       │          and run an app
+│       ├── app - setup functions for our cliApp
+│       │   │      github.com/urfave/cli, plus our Context which is full of
+│       │   │      useful methods for dealing with flags & output 
+│       │   ├── args - functions for chaining together using app.With to parse
+│       │   │          arguments into flags
+│       │   └── with - functions for chaining together using app.With to attach
+│       │                       things to the Context by parsing flag values.
+│       ├── cliutil - workarounds for deficiencies in urfave/cli
+│       ├── commands
+│       │   └── admin
+│       ├── output
+│       ├── testutil
+│       └── util - various utilities which should be their own packages.
+│           │      including: Config - which manages configuration from the
+│	    │                          environment, global flags and config dir
+│	    │                 CallBrowser - a function for opening a browser
+│	    │                               to a given page on any OS
+│	    │                 Some additional parsing functions and flag types
+│	    │         	           that don't require access to an app.Context
+│           │	      
+│           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
+├── doc - folder of documentation stuff. 
+│         Also includes the manpage source (bytemark.asciidoc)
+├── gen
+├── lib
+│   ├── billing - types for using when connecting to the bmbilling server
+│   ├── brain - types for using with the Bytemark Cloud Servers brain
+│   ├── output - Functions and types related to human-readable output of the
+│   │   │        other types in lib.
+│   │	│        DefaultFieldsHaver interface defined and tested-for here
+│   │	│        (required for table & list output types)
+│   │   └── prettyprint - PrettyPrinter interface and a helper function for 
+│   │                     writing PrettyPrinters
+│   │                     All the types in lib/billing, lib/brain and lib/spp 
+│   │                     should implement PrettyPrinter
+│   └── spp - types for using when connecting to the spp server
+├── mocks - mock types used for testing in various packages
+└── util - empty package
+    └── log - mostly-deprecated logging functions. Needs some refactoring,
+              should still be used by lib but not by cmd/bytemark and
+	      subpackages.
+
+# tree -dI 'vendor' | sha256sum: 59b07f9063b13b6fb9ce1558ec11b1d6630811a02d58d6bb675a3cafd30e41f8 
