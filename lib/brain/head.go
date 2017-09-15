@@ -36,7 +36,7 @@ type Head struct {
 }
 
 // CountVirtualMachines returns the number of virtual machines running on this head
-func (h *Head) CountVirtualMachines() int {
+func (h Head) CountVirtualMachines() int {
 	if h.VirtualMachines != nil {
 		return len(h.VirtualMachines)
 	}
