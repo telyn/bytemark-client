@@ -2,14 +2,15 @@ package mocks
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
+
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	mock "github.com/maraino/go-mock"
-	"net/http"
-	"net/url"
 )
 
 type Client struct {
@@ -498,4 +499,32 @@ func (c *Client) GetMigratingDiscs() ([]brain.Disc, error) {
 	r := c.Called()
 	discs := r.Get(0).([]brain.Disc)
 	return discs, r.Error(1)
+}
+
+func (c *Client) EnsureAccountName(name *string) error {
+	*name = "blank-account-name"
+	return nil
+}
+
+func (c *Client) EnsureGroupName(name *lib.GroupName) error {
+	if name.Account == "" {
+		name.Account = "blank-account-name"
+	}
+	if name.Group == "" {
+		name.Group = "blank-group-name"
+	}
+	return nil
+}
+
+func (c *Client) EnsureVirtualMachineName(name *lib.VirtualMachineName) error {
+	if name.Account == "" {
+		name.Account = "blank-account-name"
+	}
+	if name.Group == "" {
+		name.Group = "blank-group-name"
+	}
+	if name.VirtualMachine == "" {
+		name.VirtualMachine = "blank-vm-name"
+	}
+	return nil
 }

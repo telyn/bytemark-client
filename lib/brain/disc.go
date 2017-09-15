@@ -2,8 +2,9 @@ package brain
 
 import (
 	"bytes"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // Disc is a representation of a VM's disc.
@@ -48,6 +49,17 @@ func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, tmpl, "disc"+string(detail), d)
 }
 
+// EstimateBackupScheduleSize returns an estimate for the maximum amount of iceberg
+// storage this disk will use for its backups, in MiB
+func (d Disc) EstimateBackupScheduleSize() int {
+	totalBackups := 0
+	for _, bs := range d.BackupSchedules {
+		totalBackups += bs.Capacity
+	}
+	return d.Size * totalBackups
+}
+
+// String returns the disc formatted as a string (the same as PrettyPrint with prettyprint.SingleLine detail)
 func (d Disc) String() string {
 	buf := new(bytes.Buffer)
 	_ = d.PrettyPrint(buf, prettyprint.SingleLine)
