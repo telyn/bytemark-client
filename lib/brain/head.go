@@ -17,18 +17,18 @@ type Head struct {
 
 	// descriptive information that can be modified
 
-	Architecture  string   `json:"arch"`
-	CCAddress     net.IP   `json:"cnc_address"`
-	Note          string   `json:"note"`
-	Memory        int      `json:"memory,omitempty"`
+	Architecture  string   `json:"arch,omitempty"`
+	CCAddress     *net.IP  `json:"cnc_address,omitempty"`
+	LastNote      string   `json:"last_note, omitempty"`
+	TotalMemory   int      `json:"total_memory,omitempty"`
 	UsageStrategy string   `json:"usage_strategy,omitempty"`
 	Models        []string `json:"models,omitempty"`
 
 	// state
 
-	MemoryFree int  `json:"memory_free,omitempty"`
+	FreeMemory int  `json:"free_memory,omitempty"`
 	IsOnline   bool `json:"online,omitempty"`
-	UsedCores  int  `json:"used_cores"`
+	UsedCores  int  `json:"used_cores,omitempty"`
 
 	// You may have one or the other.
 
@@ -40,9 +40,9 @@ type Head struct {
 func (h Head) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
-		return "ID, Label, ZoneName, Architecture, VirtualMachineCount, MemoryFree, MemoryFree, UsageStrategy"
+		return "ID, Label, ZoneName, Architecture, CountVirtualMachines, FreeMemory, TotalMemory, UsageStrategy"
 	}
-	return "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, VirtualMachineCount, MemoryFree, UsedCores, Memory, Note, Architecture, Models, ZoneName"
+	return "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, CountVirtualMachines, FreeMemory, UsedCores, TotalMemory, LastNote, Architecture, Models, ZoneName"
 
 }
 
