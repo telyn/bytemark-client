@@ -3,11 +3,13 @@
 package util
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
 	"syscall"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 func openCommand() string {
@@ -38,25 +40,33 @@ func CallBrowser(url string) error {
 		}
 	}
 
-	log.Logf("Running a browser to open %s...\r\n", url)
-
 	var attr os.ProcAttr
 
 	log.Debugf(log.LvlOutline, "Executing %s \"%s\"", bin, url)
 
 	proc, err := os.StartProcess(bin, []string{bin, url}, &attr)
-	subprocErr := SubprocessFailedError{Args: []string{bin, url}}
 	if err != nil {
-		subprocErr.Err = err
-		return subprocErr
+		return SubprocessFailedError{Args: []string{bin, url}, Err: err}
 	}
 	state, err := proc.Wait()
+	if err != nil {
+		return SubprocessFailedError{
+			Args: []string{bin, url},
+			Err:  err,
+		}
+	}
 
-	subprocErr.Err = err
 	waitStatus, ok := state.Sys().(syscall.WaitStatus)
 	if ok {
-		subprocErr.ExitCode = waitStatus.ExitStatus()
+		exitCode := waitStatus.ExitStatus()
+		if exitCode != 0 {
+			return SubprocessFailedError{
+				Args:     []string{bin, url},
+				Err:      fmt.Errorf("subprocess failed with exit code %d", exitCode),
+				ExitCode: exitCode,
+			}
+		}
 	}
-	return subprocErr
+	return nil
 
 }
