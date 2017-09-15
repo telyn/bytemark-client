@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"time"
 
@@ -97,7 +96,7 @@ Used when setting up a private VLAN for a customer.`,
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,
 		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
-		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and nightly backups of the first disc.
+		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and weekly backups of the first disc.
 		
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
@@ -263,7 +262,7 @@ Multiple --disc flags can be used to create multiple discs`,
 	})
 }
 
-// defaultBackupSchedule returns a schedule that will backup every day (well - every 86400 seconds)
+// defaultBackupSchedule returns a schedule that will backup every week (well - every 604800 seconds)
 // starting from midnight tonight.
 func defaultBackupSchedule() brain.BackupSchedule {
 	tomorrow := time.Now().Add(24 * time.Hour)
@@ -361,7 +360,9 @@ func backupScheduleIntervalFromWords(words string) (freq int, err error) {
 	case "weekly":
 		freq = 7 * 86400
 	case "never":
-		freq = math.MaxInt32
+		// the brain will reject a -1 - so even if the frequency accidentally
+		// makes it to the brain the schedule won't be made
+		freq = -1
 	default:
 		err = fmt.Errorf("invalid backup frequency '%s'", words)
 	}
@@ -387,7 +388,7 @@ func createServerPrepDiscs(backupFrequency string, discs []brain.Disc) ([]brain.
 		return discs, err
 	}
 
-	if interval != math.MaxInt32 {
+	if interval > 0 {
 		if len(discs) > 0 {
 			bs := defaultBackupSchedule()
 			bs.Interval = interval
