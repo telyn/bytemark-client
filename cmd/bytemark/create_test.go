@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"runtime/debug"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"github.com/urfave/cli"
-	"strings"
-	"testing"
 )
 
 func TestCreateDiskCommand(t *testing.T) {
@@ -51,6 +54,7 @@ func TestCreateGroupCommand(t *testing.T) {
 }
 
 func TestCreateServerHasCorrectFlags(t *testing.T) {
+	// I'm not sure why this test exists
 	is := is.New(t)
 	seenCmd := false
 	seenAuthKeys := false
@@ -91,180 +95,182 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 
 }
 
-func TestCreateServerCommand(t *testing.T) {
-	config, c := baseTestAuthSetup(t, false)
-
-	// where most commands use &defVM to make sure the VirtualMachineName has all three components (and to avoid calls to GetDefaultAccount, presumably), I have singled out TestCreateServerCommand to also test that unqualified server names will work in practice without account & group set in the config.
-	config.When("GetVirtualMachine").Return(&lib.VirtualMachineName{Group: "default"})
-
-	vm := brain.VirtualMachineSpec{
-		Discs: []brain.Disc{
-			brain.Disc{
-				Size:         25 * 1024,
-				StorageGrade: "sata",
-			},
-			brain.Disc{
-				Size:         50 * 1024,
-				StorageGrade: "archive",
-			},
-		},
-		VirtualMachine: &brain.VirtualMachine{
-			Name:                  "test-server",
-			Autoreboot:            true,
-			Cores:                 1,
-			Memory:                1024,
-			CdromURL:              "https://example.com/example.iso",
-			HardwareProfile:       "test-profile",
-			HardwareProfileLocked: true,
-			ZoneName:              "test-zone",
-		},
-		Reimage: &brain.ImageInstall{
-			Distribution:    "test-image",
-			RootPassword:    "test-password",
-			PublicKeys:      "test-pubkey",
-			FirstbootScript: "test-script",
-		},
-		IPs: &brain.IPSpec{
-			IPv4: "192.168.1.123",
-			IPv6: "fe80::123",
-		},
-	}
-
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
-	getvm.Discs = make([]*brain.Disc, 2)
-	getvm.Discs[0] = &vm.Discs[0]
-	getvm.Discs[1] = &vm.Discs[1]
-	getvm.Hostname = "test-server.test-group.test-account.tld"
-
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "default",
-	}
-
-	c.When("CreateVirtualMachine", &lib.GroupName{Group: "default"}, vm).Return(vm, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
-
-	err := global.App.Run([]string{
-		"bytemark", "create", "server",
-		"--authorized-keys", "test-pubkey",
-		"--firstboot-script", "test-script",
-		"--cdrom", "https://example.com/example.iso",
-		"--cores", "1",
-		"--disc", "25",
-		"--disc", "archive:50",
-		"--force",
-		"--hwprofile", "test-profile",
-		"--hwprofile-locked",
-		"--image", "test-image",
-		"--ip", "192.168.1.123",
-		"--ip", "fe80::123",
-		"--memory", "1",
-		"--root-password", "test-password",
-		"--zone", "test-zone",
-		"test-server",
-	})
-	if err != nil {
-		t.Error(err)
-	}
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
-func TestCreateServerNoImage(t *testing.T) {
-	config, c := baseTestAuthSetup(t, false)
-
-	config.When("GetVirtualMachine").Return(&defVM)
-
-	vm := brain.VirtualMachineSpec{
-		VirtualMachine: &brain.VirtualMachine{
-			Name:   "test-server",
-			Cores:  1,
-			Memory: 1024,
-		},
-		Discs: []brain.Disc{
-			brain.Disc{
-				Size:         25600,
-				StorageGrade: "sata",
-			},
-		},
-	}
-
-	// TODO(telyn): refactor this getvm crap into a function someplace
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
-	getvm.Hostname = "test-server.test-group.test-account.tld"
-
-	group := lib.GroupName{
-		Group:   "default",
-		Account: "default-account",
-	}
-
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
-	}
-
-	c.When("CreateVirtualMachine", &group, vm).Return(vm, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
-
-	err := global.App.Run([]string{
-		"bytemark", "create", "server",
-		"--cores", "1",
-		"--force",
-		"--memory", "1",
-		"--no-image",
-		"test-server",
-	})
-	if err != nil {
-		t.Error(err)
-	}
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
 func TestCreateServer(t *testing.T) {
-	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
-
-	config.When("GetVirtualMachine").Return(&defVM)
-
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
+	type createTest struct {
+		Spec                 brain.VirtualMachineSpec
+		ConfigVirtualMachine lib.VirtualMachineName
+		GroupName            lib.GroupName
+		Args                 []string
+		Output               string
+		ShouldErr            bool
 	}
 
-	vm := brain.VirtualMachineSpec{
-		VirtualMachine: &brain.VirtualMachine{
-			Name:   "test-server",
-			Cores:  3,
-			Memory: 6565,
+	tomorrow := time.Now().Add(24 * time.Hour)
+	y, m, d := tomorrow.Date()
+	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
+	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05 MST")
+
+	tests := []createTest{
+		{
+			Spec: brain.VirtualMachineSpec{
+				Discs: []brain.Disc{
+					brain.Disc{
+						Size:         25 * 1024,
+						StorageGrade: "sata",
+						BackupSchedules: brain.BackupSchedules{{
+							StartDate: defaultStartDate,
+							Interval:  7 * 86400,
+							Capacity:  1,
+						}},
+					},
+					brain.Disc{
+						Size:         50 * 1024,
+						StorageGrade: "archive",
+					},
+				},
+				VirtualMachine: &brain.VirtualMachine{
+					Name:                  "test-server",
+					Autoreboot:            true,
+					Cores:                 1,
+					Memory:                1024,
+					CdromURL:              "https://example.com/example.iso",
+					HardwareProfile:       "test-profile",
+					HardwareProfileLocked: true,
+					ZoneName:              "test-zone",
+				},
+				Reimage: &brain.ImageInstall{
+					Distribution:    "test-image",
+					RootPassword:    "test-password",
+					PublicKeys:      "test-pubkey",
+					FirstbootScript: "test-script",
+				},
+				IPs: &brain.IPSpec{
+					IPv4: "192.168.1.123",
+					IPv6: "fe80::123",
+				},
+			},
+			ConfigVirtualMachine: lib.VirtualMachineName{Group: "default"},
+			GroupName:            lib.GroupName{Group: "default"},
+			Args: []string{
+				"bytemark", "create", "server",
+				"--authorized-keys", "test-pubkey",
+				"--firstboot-script", "test-script",
+				"--cdrom", "https://example.com/example.iso",
+				"--cores", "1",
+				"--disc", "25",
+				"--disc", "archive:50",
+				"--force",
+				"--hwprofile", "test-profile",
+				"--hwprofile-locked",
+				"--image", "test-image",
+				"--ip", "192.168.1.123",
+				"--ip", "fe80::123",
+				"--memory", "1",
+				"--root-password", "test-password",
+				"--zone", "test-zone",
+				"test-server",
+			},
+		}, {
+			ConfigVirtualMachine: defVM,
+			Spec: brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{
+					Name:   "test-server",
+					Cores:  1,
+					Memory: 1024,
+				},
+				Discs: []brain.Disc{
+					brain.Disc{
+						Size:         25600,
+						StorageGrade: "sata",
+						BackupSchedules: brain.BackupSchedules{{
+							StartDate: defaultStartDate,
+							Interval:  7 * 86400,
+							Capacity:  1,
+						}},
+					},
+				},
+			},
+
+			GroupName: lib.GroupName{
+				Group:   "default",
+				Account: "default-account",
+			},
+			Args: []string{
+				"bytemark", "create", "server",
+				"--cores", "1",
+				"--force",
+				"--memory", "1",
+				"--no-image",
+				"test-server",
+			},
+		}, {
+			ConfigVirtualMachine: defVM,
+			GroupName: lib.GroupName{
+				Group:   "default",
+				Account: "default-account",
+			},
+
+			Spec: brain.VirtualMachineSpec{
+				VirtualMachine: &brain.VirtualMachine{
+					Name:   "test-server",
+					Cores:  3,
+					Memory: 6565,
+				},
+				Discs: []brain.Disc{{
+					Size:         34 * 1024,
+					StorageGrade: "archive",
+				}},
+			},
+			Args: []string{
+				"bytemark", "create", "server",
+				"--force",
+				"--no-image",
+				"--backup", "never",
+				"test-server", "3", "6565m", "archive:34",
+			},
 		},
-		Discs: []brain.Disc{{
-			Size:         34 * 1024,
-			StorageGrade: "archive",
-		}},
 	}
-	getvm := new(brain.VirtualMachine)
-	*getvm = *vm.VirtualMachine
-	getvm.Hostname = "test-server.test-group.test-account.tld"
 
-	c.When("CreateVirtualMachine", &defGroup, vm).Return(vm.VirtualMachine, nil).Times(1)
-	c.When("GetVirtualMachine", &vmname).Return(getvm, nil).Times(1)
+	var i int
+	var test createTest
+	defer func() {
+		if r := recover(); r != nil {
+			t.Errorf("TestCreateVirtualMachine %d panicked.\r\n%v\r\n%v", i, r, string(debug.Stack()))
+		}
+	}()
 
-	err := global.App.Run([]string{
-		"bytemark", "create", "server",
-		"--force",
-		"--no-image",
-		"test-server", "3", "6565m", "archive:34",
-	})
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+	for i, test = range tests {
+		t.Logf("TestCreateVirtualMachine %d", i)
+		config, c := baseTestAuthSetup(t, false)
+		config.When("GetVirtualMachine").Return(&test.ConfigVirtualMachine)
+
+		vmname := lib.VirtualMachineName{
+			VirtualMachine: test.Spec.VirtualMachine.Name,
+			Group:          test.GroupName.Group,
+			Account:        test.GroupName.Account,
+		}
+
+		postGpName := test.GroupName
+		_ = c.EnsureGroupName(&postGpName)
+
+		discs := make([]*brain.Disc, len(test.Spec.Discs))
+		for i, d := range test.Spec.Discs {
+			discs[i] = &d
+		}
+		getvm := *test.Spec.VirtualMachine
+		getvm.Discs = discs
+		getvm.Hostname = "test-server.test-group.test-account.tld"
+
+		c.When("CreateVirtualMachine", &postGpName, test.Spec).Return(test.Spec.VirtualMachine, nil).Times(1)
+		c.When("GetVirtualMachine", &vmname).Return(&getvm, nil).Times(1)
+
+		err := global.App.Run(test.Args)
+		if err != nil {
+			t.Error(err)
+		}
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
 	}
 }
 
