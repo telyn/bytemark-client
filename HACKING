@@ -126,4 +126,4 @@ what they're for
               should still be used by lib but not by cmd/bytemark and
 	      subpackages.
 
-# tree -dAI 'vendor' | sha256sum: 59b07f9063b13b6fb9ce1558ec11b1d6630811a02d58d6bb675a3cafd30e41f8
+# tree -dAI 'vendor' | sha256sum: 1e803f55ce730122d6de86f0086d3e6279479dfea3d47165bb46a840f121a0a4
