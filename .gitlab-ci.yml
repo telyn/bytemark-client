@@ -126,10 +126,10 @@ release-check:
 
 doc-check:
   stage: test
-  image: alpine
+  image: debian:stretch
   before_script:
-    - apk update
-    - apk add coreutils bash
+    - apt-get update
+    - apt-get install tree
   script:
     - |
       if ! ./gen/test-HACKING.sh; then
