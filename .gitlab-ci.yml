@@ -124,6 +124,19 @@ release-check:
   only:
   - /^v\d+(\.\d+)+$/
 
+doc-check:
+  stage: test
+  image: alpine
+  before_script:
+    - apk update
+    - apk add coreutils
+  script:
+    - |
+      if ! ./gen/test-HACKING.sh; then
+        echo "HACKING has not been updated to match the new folder structure!"
+        exit 1
+      fi
+
 release-branch-check:
   stage: test
   image: alpine

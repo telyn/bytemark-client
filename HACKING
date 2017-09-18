@@ -106,7 +106,8 @@ what they're for
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff. 
 │         Also includes the manpage source (bytemark.asciidoc)
-├── gen
+├── gen - scripts to aid the building/distributing process.
+|         changelog.
 ├── lib
 │   ├── billing - types for using when connecting to the bmbilling server
 │   ├── brain - types for using with the Bytemark Cloud Servers brain
@@ -125,4 +126,4 @@ what they're for
               should still be used by lib but not by cmd/bytemark and
 	      subpackages.
 
-# tree -dI 'vendor' | sha256sum: 59b07f9063b13b6fb9ce1558ec11b1d6630811a02d58d6bb675a3cafd30e41f8 
+# tree -dI 'vendor' | sha256sum: 59b07f9063b13b6fb9ce1558ec11b1d6630811a02d58d6bb675a3cafd30e41f9 
