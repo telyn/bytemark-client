@@ -150,9 +150,9 @@ func TestShowAccountCommand(t *testing.T) {
 			} else {
 				buf, err := testutil.GetBuf(app)
 				if err != nil {
-					t.Errorf("TestShowAccountCommand %d didn't have an expected %s output. Maybe it should be %q", i, format, buf.String())
-				} else {
 					t.Errorf("TestShowAccountCommand %d didn't have an expected %s output. Also %s", i, format, err.Error())
+				} else {
+					t.Errorf("TestShowAccountCommand %d didn't have an expected %s output. Maybe it should be %q", i, format, buf.String())
 				}
 			}
 		}
