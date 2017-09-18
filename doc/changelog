@@ -1,3 +1,18 @@
+bytemark-client (2.5) UNRELEASED; urgency=low
+
+  Changes:
+  * Fix SIGSEGV when launching a browser (bytemark console --panel)
+  * Remove duplicate notice that a browser is going to be launched
+  * A backup schedule is now added to a server's first disc by default, set
+    --backup-schedules to 'none' to disable it.
+
+  Admin-only changes:
+  * Improve output for show migrating_discs, show head, show heads
+  * Add MigrationProgress, MigrationEta and MigrationSpeed fields on discs
+
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 18 Sep 2017 21:26:37 +0100
+
 bytemark-client (2.4) UNRELEASED; urgency=low
 
   New features:
