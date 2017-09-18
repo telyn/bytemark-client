@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"runtime/debug"
 	"strings"
@@ -27,7 +26,7 @@ type showAccountTest struct {
 }
 
 // mkExpectedOutput loops over every value in template, running fmt.Sprintf to replace all %s with substitute
-// in this way it can be used to prepare an expected output array. See showTestAccountOutput and TestShowAccountCommand for some overly complicated example usage.
+// in this way it can be used to prepare an expected output array. See showTestAccountOutput and TestShowAccount for some overly complicated example usage.
 func mkExpectedOutput(template map[string]string, substitute string) map[string]string {
 	m := make(map[string]string)
 	for k, v := range template {
@@ -47,7 +46,7 @@ var showAccountTestOutput = map[string]string{
 	"human": "213 - %s\n",
 }
 
-func TestShowAccountCommand(t *testing.T) {
+func TestShowAccount(t *testing.T) {
 	baseShowAccountSetup := func(c *mocks.Client, config *mocks.Config, configAccount, outputFormat string) {
 		config.Mock.Functions = resetOneMockedFunction(config.Mock.Functions, "GetV", "output-format")
 		config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", outputFormat, "FLAG output-format"})
@@ -135,9 +134,6 @@ func TestShowAccountCommand(t *testing.T) {
 				}).Times(1)
 			}
 
-			buf := bytes.Buffer{}
-			app.Writer = &buf
-			app.ErrWriter = &buf
 			args := fmt.Sprintf("bytemark --output-format=%s %s", format, test.Input)
 			//t.Logf("TestShowAccountCommand %d args: %s", i, args)
 			err := app.Run(strings.Split(args, " "))
@@ -150,12 +146,14 @@ func TestShowAccountCommand(t *testing.T) {
 				t.Errorf("TestShowAccountCommand %d client failed to verify: %s", i, vErr.Error())
 			}
 			if expected, ok := expectedOutput[format]; ok {
-				actual := buf.String()
-				if expected != actual {
-					t.Errorf("TestShowAccountCommand %d didn't match expected %s output.\r\nExpected: %q\r\nActual %q", i, format, expected, actual)
-				}
+				testutil.AssertOutput(t, fmt.Sprintf("TestShowAccountCommand %d (%s)", i, format), app, expected)
 			} else {
-				t.Errorf("TestShowAccountCommand %d didn't have an expected %s output. Maybe it should be %q", i, format, buf.String())
+				buf, err := testutil.GetBuf(app)
+				if err != nil {
+					t.Errorf("TestShowAccountCommand %d didn't have an expected %s output. Also %s", i, format, err.Error())
+				} else {
+					t.Errorf("TestShowAccountCommand %d didn't have an expected %s output. Maybe it should be %q", i, format, buf.String())
+				}
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"testing"
 
@@ -10,6 +11,36 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 )
+
+// GetBuf returns the buffer in app's metadata, or an error if there isn't one.
+func GetBuf(app *cli.App) (buf *bytes.Buffer, err error) {
+	if bufInterface, ok := app.Metadata["buf"]; ok {
+		if buf, ok = bufInterface.(*bytes.Buffer); ok {
+			return
+		}
+		err = errors.New("couldn't recover the buffer - use BaseTestSetup to create your cli.Apps")
+		return
+	}
+	err = errors.New("couldn't recover the buffer - use BaseTestSetup to create your cli.Apps")
+	return
+}
+
+// AssertOutput fails the test unless the app under test has output the
+// expected string. identifier is a string used to identify the test - usually
+// the function name of the test, plus some integer for the index of the test
+// in the test-table. See show_test.go's TestShowAccountCommand for example usage
+func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string) {
+	buf, err := GetBuf(app)
+
+	if err == nil {
+		actual := buf.String()
+		if actual != expected {
+			t.Errorf("expected %q, got %q", expected, actual)
+		}
+	} else {
+		t.Error("Couldn't recover the buffer - use BaseTestSetup to create your cli.Apps!")
+	}
+}
 
 // BaseTestSetup constructs mock config and client and produces a cli.App with the given commands.
 func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
