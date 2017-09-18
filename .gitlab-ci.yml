@@ -129,11 +129,12 @@ doc-check:
   image: debian:stretch
   before_script:
     - apt-get update
-    - apt-get install tree
+    - apt-get install -qq -y tree
   script:
     - |
       if ! ./gen/test-HACKING.sh; then
         echo "HACKING has not been updated to match the new folder structure!"
+        echo "Run tree -d 'vendor' | sha256sum and paste the shasum over the one in HACKING"
         exit 1
       fi
 
