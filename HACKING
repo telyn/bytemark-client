@@ -126,4 +126,15 @@ what they're for
               should still be used by lib but not by cmd/bytemark and
 	      subpackages.
 
-# tree -dSnI 'vendor' | sha256sum: 4b616f0c2c6406dd017c5b2657562a379fe9f44a510ea6c53474bc394bea7bc9
+==============
+Making sure we update this document
+==============
+
+At the end of this file is a hash generated from the list of directories
+that make up the client. This document should be updated whenever any
+are added or removed. The hash is tested every time gitlab-ci runs.
+To generate the hash, use the following command.
+
+  find . -type d \! -path './.*' \! -path './vendor/*' | sha256sum
+
+# sha256sum: a549ef4fc1780cd68becff76ac6979d587983c5c0851d1bc803792b67b2bd75f

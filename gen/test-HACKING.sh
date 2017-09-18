@@ -4,7 +4,7 @@ set -x
 EXPECTED=$(grep 'sha256sum:' HACKING)
 EXPECTED=$(echo -e "${EXPECTED##*sha256sum: }" | tr -d '[[:space:]]')
 
-TREE=$(tree -dSnI 'vendor')
+TREE=$(find . -type d \! -path './vendor/*' \! -path './.*' | sort)
 echo -e "$TREE"
 
 ACTUAL=$(echo -e "$TREE" | sha256sum)
