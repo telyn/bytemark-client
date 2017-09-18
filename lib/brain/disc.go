@@ -21,6 +21,10 @@ type Disc struct {
 	BackupSchedules BackupSchedules `json:"backup_schedules,omitempty"`
 	BackupsEnabled  bool            `json:"backups_enabled,omitempty"`
 
+	MigrationProgress int `json:"migration_progress,omitempty"`
+	MigrationEta      int `json:"migration_eta,omitempty"`
+	MigrationSpeed    int `json:"migration_speed,omitempty"`
+
 	NewStorageGrade string `json:"new_storage_grade,omitempty"`
 	NewStoragePool  string `json:"new_storage_pool,omitempty"`
 }

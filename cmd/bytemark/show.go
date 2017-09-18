@@ -434,7 +434,7 @@ Privileges will be output in no particular order.`,
 				Name:      "migrating_discs",
 				Usage:     "shows a list of migrating discs",
 				UsageText: "bytemark --admin show migrating_discs [--json]",
-				Flags:     OutputFlags("migrating discs", "array", DefaultDiscTableFields),
+				Flags:     OutputFlags("migrating discs", "array", DefaultDiscTableFields+", MigrationProgress, MigrationEta, MigrationSpeed"),
 				Action: With(AuthProvider, func(c *Context) error {
 					discs, err := global.Client.GetMigratingDiscs()
 					if err != nil {
