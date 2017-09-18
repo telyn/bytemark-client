@@ -137,4 +137,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sha256sum
 
-# sha256sum: a549ef4fc1780cd68becff76ac6979d587983c5c0851d1bc803792b67b2bd75f
+# sha256sum: 77bfeae54ad286e611237e9102bd0deb0e9d78d83e0cf690ea3b729da38ad4b7
