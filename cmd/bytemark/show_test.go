@@ -26,7 +26,7 @@ type showAccountTest struct {
 }
 
 // mkExpectedOutput loops over every value in template, running fmt.Sprintf to replace all %s with substitute
-// in this way it can be used to prepare an expected output array. See showTestAccountOutput and TestShowAccountCommand for some overly complicated example usage.
+// in this way it can be used to prepare an expected output array. See showTestAccountOutput and TestShowAccount for some overly complicated example usage.
 func mkExpectedOutput(template map[string]string, substitute string) map[string]string {
 	m := make(map[string]string)
 	for k, v := range template {
@@ -46,7 +46,7 @@ var showAccountTestOutput = map[string]string{
 	"human": "213 - %s\n",
 }
 
-func TestShowAccountCommand(t *testing.T) {
+func TestShowAccount(t *testing.T) {
 	baseShowAccountSetup := func(c *mocks.Client, config *mocks.Config, configAccount, outputFormat string) {
 		config.Mock.Functions = resetOneMockedFunction(config.Mock.Functions, "GetV", "output-format")
 		config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", outputFormat, "FLAG output-format"})
