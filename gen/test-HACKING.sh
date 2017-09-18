@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 EXPECTED=$(grep 'sha256sum:' HACKING)
 EXPECTED=$(echo -e "${EXPECTED##*sha256sum: }" | tr -d '[[:space:]]')
