@@ -129,7 +129,7 @@ doc-check:
   image: alpine
   before_script:
     - apk update
-    - apk add coreutils bash
+    - apk add coreutils bash vim
   script:
     - |
       if ! ./gen/test-HACKING.sh; then
