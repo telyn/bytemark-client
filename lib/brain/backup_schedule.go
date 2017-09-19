@@ -6,13 +6,9 @@ import (
 	"text/template"
 
 	"fmt"
-	"io"
-	"text/template"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // BackupSchedule represents a schedule to take backups on. It is represented as a start date in YYYY-MM-DD hh:mm:ss format (and assuming UK timezones of some kind.)

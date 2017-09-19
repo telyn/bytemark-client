@@ -8,7 +8,6 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // VirtualMachineSpec represents the specification for a VM that is passed to the create_vm endpoint

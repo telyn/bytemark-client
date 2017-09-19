@@ -5,7 +5,6 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 func TestBackupSchedulePrettyPrint(t *testing.T) {
