@@ -116,7 +116,7 @@ This may cost money if your first disk is larger than the default.
 See the price list for more details at http://www.bytemark.co.uk/prices
 
 If --hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags: append(OutputFlags("server", "object"),
+		Flags: append(app.OutputFlags("server", "object"),
 			cli.IntFlag{
 				Name:  "cores",
 				Value: 1,
@@ -282,7 +282,7 @@ func defaultBackupSchedule() brain.BackupSchedule {
 	}
 }
 
-func createDiscs(c *Context) (err error) {
+func createDiscs(c *app.Context) (err error) {
 	discs := c.Discs("disc")
 
 	for i := range discs {
@@ -317,7 +317,7 @@ func createGroup(c *app.Context) (err error) {
 }
 
 // createServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags
-func createServerReadArgs(c *Context) (discs []brain.Disc, cores, memory int, err error) {
+func createServerReadArgs(c *app.Context) (discs []brain.Disc, cores, memory int, err error) {
 	discs = c.Discs("disc")
 	cores = c.Int("cores")
 	memory = c.Size("memory")
@@ -398,13 +398,13 @@ func createServerPrepDiscs(backupFrequency string, discs []brain.Disc) ([]brain.
 		if len(discs) > 0 {
 			bs := defaultBackupSchedule()
 			bs.Interval = interval
-			discs[0].BackupSchedules = brain.BackupSchedules{&bs}
+			discs[0].BackupSchedules = brain.BackupSchedules{bs}
 		}
 	}
 	return discs, nil
 }
 
-func createServerPrepSpec(c *Context) (spec brain.VirtualMachineSpec, err error) {
+func createServerPrepSpec(c *app.Context) (spec brain.VirtualMachineSpec, err error) {
 	noImage := c.Bool("no-image")
 	backupFrequency := c.String("backup")
 
@@ -463,13 +463,13 @@ func createServer(c *app.Context) (err error) {
 	}
 
 	groupName := name.GroupName()
-	err = global.Client.EnsureGroupName(groupName)
+	err = c.Client().EnsureGroupName(&groupName)
 	if err != nil {
 		return
 	}
 
 	log.Logf("The following server will be created in %s:\r\n", groupName)
-	err = spec.PrettyPrint(global.App.Writer, prettyprint.Full)
+	err = spec.PrettyPrint(c.App().Writer, prettyprint.Full)
 	if err != nil {
 		return err
 	}

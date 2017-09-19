@@ -2,16 +2,12 @@ package main
 
 import (
 	"fmt"
-	"strings"
-	"testing"
-
 	"runtime/debug"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -246,7 +242,7 @@ func TestCreateServer(t *testing.T) {
 
 	for i, test = range tests {
 		t.Logf("TestCreateVirtualMachine %d", i)
-		config, c, app := testutil.baseTestAuthSetup(t, false)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		config.When("GetVirtualMachine").Return(test.ConfigVirtualMachine)
 
 		vmname := lib.VirtualMachineName{

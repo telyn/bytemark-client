@@ -375,13 +375,13 @@ Privileges will be output in no particular order.`,
 					}
 					// this is super horrid :|
 					if ctx.String("table-fields") == "" {
-						err := ctx.Set("table-fields", "ID, StoragePool, NewStoragePool, StorageGrade, NewStorageGrade, Size, MigrationProgress, MigrationEta, MigrationSpeed")
+						err := ctx.Context.Set("table-fields", "ID, StoragePool, NewStoragePool, StorageGrade, NewStorageGrade, Size, MigrationProgress, MigrationEta, MigrationSpeed")
 						if err != nil {
 							return err
 						}
 					}
 					fmt.Fprintln(ctx.App().Writer, "Storage sizes are in MB, speeds in MB/s, and times in seconds.")
-					return c.OutputInDesiredForm(discs, output.Table)
+					return ctx.OutputInDesiredForm(discs, output.Table)
 
 				}),
 			},

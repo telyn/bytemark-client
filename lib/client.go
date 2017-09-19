@@ -189,7 +189,7 @@ func (c *bytemarkClient) EnsureAccountName(account *string) error {
 		} else {
 			log.Debug(log.LvlArgs, "validateAccountName finding the default billing account")
 			billAcc, err := c.getDefaultBillingAccount()
-			if err == nil && billAcc != nil {
+			if err == nil && billAcc.IsValid() {
 				log.Debugf(log.LvlArgs, "validateAccountName found the default billing account - %s\r\n", billAcc.Name)
 				*account = billAcc.Name
 			} else if err != nil {
