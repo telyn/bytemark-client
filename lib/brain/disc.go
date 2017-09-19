@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // Disc is a representation of a VM's disc.
@@ -21,6 +22,11 @@ type Disc struct {
 	BackupCount     int             `json:"backup_count,omitempty"`
 	BackupSchedules BackupSchedules `json:"backup_schedules,omitempty"`
 	BackupsEnabled  bool            `json:"backups_enabled,omitempty"`
+
+	ResourceName      string `json:"resource_name,omitempty"`
+	MigrationProgress int    `json:"migration_progress,omitempty"`
+	MigrationEta      int    `json:"migration_eta,omitempty"`
+	MigrationSpeed    int    `json:"migration_speed,omitempty"`
 
 	NewStorageGrade string `json:"new_storage_grade,omitempty"`
 	NewStoragePool  string `json:"new_storage_pool,omitempty"`
@@ -59,6 +65,17 @@ func (d Disc) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, tmpl, "disc"+string(detail), d)
 }
 
+// EstimateBackupScheduleSize returns an estimate for the maximum amount of iceberg
+// storage this disk will use for its backups, in MiB
+func (d Disc) EstimateBackupScheduleSize() int {
+	totalBackups := 0
+	for _, bs := range d.BackupSchedules {
+		totalBackups += bs.Capacity
+	}
+	return d.Size * totalBackups
+}
+
+// String returns the disc formatted as a string (the same as PrettyPrint with prettyprint.SingleLine detail)
 func (d Disc) String() string {
 	buf := new(bytes.Buffer)
 	_ = d.PrettyPrint(buf, prettyprint.SingleLine)

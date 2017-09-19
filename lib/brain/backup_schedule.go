@@ -5,8 +5,14 @@ import (
 	"io"
 	"text/template"
 
+	"fmt"
+	"io"
+	"text/template"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // BackupSchedule represents a schedule to take backups on. It is represented as a start date in YYYY-MM-DD hh:mm:ss format (and assuming UK timezones of some kind.)
@@ -14,6 +20,8 @@ type BackupSchedule struct {
 	ID        int    `json:"id,omitempty"`
 	StartDate string `json:"start_at"`
 	Interval  int    `json:"interval_seconds"`
+	// Capacity is how many backups will be kept
+	Capacity int `json:"capacity"`
 }
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
@@ -29,11 +37,36 @@ func (sched BackupSchedule) DefaultFields(f output.Format) string {
 // All the detail levels are the same.
 func (sched BackupSchedule) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	// TODO(telyn): really ought to be nicer.
-	scheduleTpl := `{{ define "schedule_sgl" }}{{ printf "#%d: Every %d seconds starting from %s" .ID .Interval .StartDate }}{{ end }}
+	scheduleTpl := `{{ define "schedule_sgl" }}#{{ .ID }}: {{ capitalize .IntervalInWords }} starting from {{ .StartDate }}{{ end }}
 {{ define "schedule_medium" }}{{ template "schedule_sgl" . }}{{ end }}
 {{ define "schedule_full" }}{{ template "schedule_medium" . }}{{ end }}
 `
 	return prettyprint.Run(wr, scheduleTpl, "schedule"+string(detail), sched)
+}
+
+// IntervalInWords returns a nice human readable version of the interval for this BackupSchedule
+// Formats include "every %d weeks/days/hours/seconds", "weekly", "daily", and "hourly"
+func (sched BackupSchedule) IntervalInWords() string {
+	week := 7 * 86400
+	if sched.Interval%week == 0 {
+		if sched.Interval/week == 1 {
+			return "weekly"
+		}
+		return fmt.Sprintf("every %d weeks", sched.Interval/week)
+	}
+	if sched.Interval%86400 == 0 {
+		if sched.Interval/86400 == 1 {
+			return "daily"
+		}
+		return fmt.Sprintf("every %d days", sched.Interval/86400)
+	}
+	if sched.Interval%3600 == 0 {
+		if sched.Interval/3600 == 1 {
+			return "hourly"
+		}
+		return fmt.Sprintf("every %d hours", sched.Interval/3600)
+	}
+	return fmt.Sprintf("every %d seconds", sched.Interval)
 }
 
 func (sched BackupSchedule) String() string {

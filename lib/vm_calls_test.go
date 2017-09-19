@@ -271,6 +271,10 @@ func TestCreateVirtualMachine(t *testing.T) {
 					{
 						Size:         25600,
 						StorageGrade: "archive",
+						BackupSchedules: brain.BackupSchedules{{
+							StartDate: "2017-09-13 16:35:00",
+							Interval:  86400,
+						}},
 					},
 					{
 						Label: "gav",
@@ -289,6 +293,10 @@ func TestCreateVirtualMachine(t *testing.T) {
 						Size:         25600,
 						StorageGrade: "archive",
 						Label:        "disc-2",
+						BackupSchedules: brain.BackupSchedules{{
+							StartDate: "2017-09-13 16:35:00",
+							Interval:  86400,
+						}},
 					},
 					{
 						Label:        "gav",

@@ -8,6 +8,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 )
 
 // VirtualMachineSpec represents the specification for a VM that is passed to the create_vm endpoint
@@ -98,10 +99,17 @@ func (spec VirtualMachineSpec) PrettyPrint(wr io.Writer, detail prettyprint.Deta
 			}
 
 			output = append(output, fmt.Sprintf("    %s %d GiB, %s grade", desc, disc.Size/1024, disc.StorageGrade))
+			if len(disc.BackupSchedules) > 0 {
+				bs := disc.BackupSchedules[0]
+				output = append(output, fmt.Sprintf("      with automated backups %s starting at %s", bs.IntervalInWords(), bs.StartDate))
+				output = append(output, fmt.Sprintf("      keeping up to %d backups (%d GiB backup usage at maximum)", bs.Capacity, bs.Capacity*disc.Size/1024))
+			} else {
+				output = append(output, fmt.Sprintf("      without automated backups"))
+			}
 		}
 	} else {
 		output = append(output, "No discs specified")
 	}
-	_, err := wr.Write([]byte(strings.Join(output, "\r\n") + "\r\n"))
+	_, err := wr.Write([]byte(strings.Join(output, "\r\n") + "\r\n\r\n"))
 	return err
 }

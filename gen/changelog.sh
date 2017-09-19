@@ -12,7 +12,7 @@ fi
 mv $CHANGELOG $CHANGELOG.bak
 head -n 1 $CHANGELOG.bak > $CHANGELOG
 echo "" >> $CHANGELOG
-git log --oneline master..develop | sed -e 's/^[a-f0-9]* /  * /' >> $CHANGELOG
+git log --oneline master..HEAD | sed -e 's/^[a-f0-9]* /  * /' >> $CHANGELOG
 echo "" >> $CHANGELOG
 echo " -- `git config --get user.name` <`git config --get user.email`>  `$DATE -R`" >> $CHANGELOG
 echo "" >> $CHANGELOG
