@@ -290,9 +290,17 @@ package-windows-amd64:
     - mkdir -p choco/tools
     - sed -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
     - mv bytemark-amd64-windows choco/tools/bytemark.exe
-    - cd choco
+    - unix2dos LICENSE > choco/tools/LICENSE.txt
+    - cd choco/tools
+    - echo -en "The following is a sha256 hash of the contents of bytemark.exe. It should be\r\n" > VERIFICATION.txt
+    - echo -en "possible to run sha256sum -c VERIFICATION.txt to check the hash.\r\n" >> VERIFICATION.txt
+    - echo -en "Though it will complain about these top lines not being valid checksums.\r\n" >> VERIFICATION.txt
+    - echo -en "sha256sum can be installed on windows using cygwin, or you could use any other\r\n" >> VERIFICATION.txt
+    - echo -en "sha256 utility to hash the file.\r\n\r\n" >> VERIFICATION.txt
+    - sha256sum bytemark.exe >> VERIFICATION.txt
+    - cd .. # back to choco/
     - mono /usr/bin/choco.exe pack bytemark-client.nuspec
-    - cd ..
+    - cd .. # back to bytemark-client
     - mv choco/*.nupkg .
     artifacts:
       paths:
