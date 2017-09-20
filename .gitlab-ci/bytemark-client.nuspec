@@ -31,5 +31,7 @@
   </metadata>
   <files>
     <file src="tools/bytemark.exe" target="tools" />
+    <file src="tools/VERIFICATION.txt" target="tools" />
+    <file src="tools/LICENSE.txt" target="tools" />
   </files>
 </package>
