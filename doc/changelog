@@ -1,3 +1,12 @@
+bytemark-client (2.5.1) UNRELEASED; urgency=low
+
+  Added tools/LICENSE.txt and tools/VERIFICATION.txt to the Chocolatey
+  package. This update only affects windows, and is necessary because
+  Chocolatey's automated validation now requires them, and bytemark-client 2.5
+  was not published as a result
+
+ -- telyn <telyn@bytemark.co.uk>  Wed, 20 Sep 2017 14:25:41 +0100
+
 bytemark-client (2.5) UNRELEASED; urgency=low
 
   Changes:
