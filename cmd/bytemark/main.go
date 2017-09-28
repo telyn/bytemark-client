@@ -247,6 +247,10 @@ func globalFlags() (flags []cli.Flag) {
 			Usage: "account name to use when no other accounts are specified",
 			Value: new(AccountNameFlag),
 		},
+		cli.BoolFlag{
+			Name:  "admin",
+			Usage: "allows admin commands in the client. see bytemark --admin --help",
+		},
 		cli.StringFlag{
 			Name:  "api-endpoint",
 			Usage: "URL where the domains service can be found. Set to blank in environments without a domains service.",
@@ -259,25 +263,17 @@ func globalFlags() (flags []cli.Flag) {
 			Name:  "billing-endpoint",
 			Usage: "URL where bmbilling can be found. Set to blank in environments without bmbilling",
 		},
-		cli.BoolFlag{
-			Name:  "admin",
-			Usage: "allows admin commands in the client. see bytemark --admin --help",
-		},
-		cli.BoolFlag{
-			Name:  "yubikey",
-			Usage: "use a yubikey to authenticate",
-		},
 		cli.IntFlag{
 			Name:  "debug-level",
 			Usage: "how much debug output to print to the terminal",
 		},
 		cli.StringFlag{
-			Name:  "endpoint",
-			Usage: "URL of the brain",
-		},
-		cli.StringFlag{
 			Name:  "config-dir",
 			Usage: "directory in which bytemark-client's configuration resides. see bytemark help config, bytemark help profiles",
+		},
+		cli.StringFlag{
+			Name:  "endpoint",
+			Usage: "URL of the brain",
 		},
 		cli.StringFlag{
 			Name:  "spp-endpoint",
@@ -286,6 +282,10 @@ func globalFlags() (flags []cli.Flag) {
 		cli.StringFlag{
 			Name:  "user",
 			Usage: "user you wish to log in as",
+		},
+		cli.BoolFlag{
+			Name:  "yubikey",
+			Usage: "use a yubikey to authenticate",
 		},
 		cli.StringFlag{
 			Name:  "yubikey-otp",
