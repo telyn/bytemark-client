@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/cheekybits/is"
 )
 
 func TestEmptyStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("EmptyStoragePool", "pool1").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "empty", "storage_pool", "pool1"})
+	err := app.Run([]string{"bytemark", "empty", "storage", "pool", "pool1"})
 
 	is.Nil(err)
 
@@ -24,11 +25,11 @@ func TestEmptyStoragePool(t *testing.T) {
 
 func TestEmptyStoragePoolError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("EmptyStoragePool", "pool1").Return(fmt.Errorf("Could not empty storage pool")).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "empty", "storage_pool", "pool1"})
+	err := app.Run([]string{"bytemark", "empty", "storage", "pool", "pool1"})
 
 	is.NotNil(err)
 
@@ -39,11 +40,11 @@ func TestEmptyStoragePoolError(t *testing.T) {
 
 func TestEmptyHead(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("EmptyHead", "pool1").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "empty", "head", "pool1"})
+	err := app.Run([]string{"bytemark", "empty", "head", "pool1"})
 
 	is.Nil(err)
 
@@ -54,11 +55,11 @@ func TestEmptyHead(t *testing.T) {
 
 func TestEmptyHeadError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("EmptyHead", "pool1").Return(fmt.Errorf("Could not empty storage pool")).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "empty", "head", "pool1"})
+	err := app.Run([]string{"bytemark", "empty", "head", "pool1"})
 
 	is.NotNil(err)
 

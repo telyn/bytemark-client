@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -19,7 +20,7 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	downtime := 15
 	c.When("UpdateVMMigration", vmName, &speed, &downtime).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "vm", "migration", "vm123.group.account", "8500000000000", "15"})
+	err := app.Run([]string{"bytemark", "update", "vm", "migration", "vm123.group.account", "8500000000000", "15"})
 
 	is.Nil(err)
 
@@ -30,11 +31,11 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 
 func TestUpdateVMMigrationError(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
-	err := global.App.Run([]string{"bytemark", "update", "vm", "migration", "vm124.group.account"})
+	err := app.Run([]string{"bytemark", "update", "vm", "migration", "vm124.group.account"})
 
 	is.NotNil(err)
 
@@ -45,13 +46,13 @@ func TestUpdateVMMigrationError(t *testing.T) {
 
 func TestUpdateHead(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateHead{}
 
 	c.When("UpdateHead", "1", options).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "head", "1"})
+	err := app.Run([]string{"bytemark", "update", "head", "1"})
 
 	is.Nil(err)
 
@@ -62,13 +63,13 @@ func TestUpdateHead(t *testing.T) {
 
 func TestUpdateHeadError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateHead{}
 
 	c.When("UpdateHead", "1", options).Return(fmt.Errorf("Could not update head")).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "head", "1"})
+	err := app.Run([]string{"bytemark", "update", "head", "1"})
 
 	is.NotNil(err)
 
@@ -79,13 +80,13 @@ func TestUpdateHeadError(t *testing.T) {
 
 func TestUpdateTail(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateTail{}
 
 	c.When("UpdateTail", "1", options).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "tail", "1"})
+	err := app.Run([]string{"bytemark", "update", "tail", "1"})
 
 	is.Nil(err)
 
@@ -96,13 +97,13 @@ func TestUpdateTail(t *testing.T) {
 
 func TestUpdateTailError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateTail{}
 
 	c.When("UpdateTail", "1", options).Return(fmt.Errorf("Could not update tail")).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "tail", "1"})
+	err := app.Run([]string{"bytemark", "update", "tail", "1"})
 
 	is.NotNil(err)
 
@@ -113,13 +114,13 @@ func TestUpdateTailError(t *testing.T) {
 
 func TestUpdateStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateStoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "storage_pool", "1"})
+	err := app.Run([]string{"bytemark", "update", "storage", "pool", "1"})
 
 	is.Nil(err)
 
@@ -130,13 +131,13 @@ func TestUpdateStoragePool(t *testing.T) {
 
 func TestUpdateStoragePoolError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	options := lib.UpdateStoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(fmt.Errorf("Could not update storage pool")).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "update", "storage_pool", "1"})
+	err := app.Run([]string{"bytemark", "update", "storage", "pool", "1"})
 
 	is.NotNil(err)
 

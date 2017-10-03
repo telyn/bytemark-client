@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -12,7 +13,7 @@ import (
 
 func TestReimage(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -31,7 +32,7 @@ func TestReimage(t *testing.T) {
 
 	c.When("ReimageVirtualMachine", vmname, image).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "reimage", "--force", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
+	err := app.Run([]string{"bytemark", "reimage", "--force", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
 
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
@@ -41,7 +42,7 @@ func TestReimage(t *testing.T) {
 
 func TestReimageFileFlags(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -69,7 +70,7 @@ func TestReimageFileFlags(t *testing.T) {
 
 	c.When("ReimageVirtualMachine", vmname, image).Return(nil).Times(1)
 
-	err = global.App.Run([]string{"bytemark", "reimage", "--force", "--image", "image", "--root-password", "test-pass", "--firstboot-script-file", "firstboot", "--authorized-keys-file", "authorized-keys", "test-server.test-group.test-account"})
+	err = app.Run([]string{"bytemark", "reimage", "--force", "--image", "image", "--root-password", "test-pass", "--firstboot-script-file", "firstboot", "--authorized-keys-file", "authorized-keys", "test-server.test-group.test-account"})
 
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {

@@ -3,13 +3,16 @@ package main
 import (
 	"errors"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
 func init() {
-	readUpdateFlags := func(c *Context) (usageStrategy *string, overcommitRatio *int, label *string) {
+	readUpdateFlags := func(c *app.Context) (usageStrategy *string, overcommitRatio *int, label *string) {
 		if c.Context.IsSet("usage-strategy") {
 			v := c.String("usage-strategy")
 			usageStrategy = &v
@@ -54,7 +57,7 @@ func init() {
 						Usage: "the label of the head",
 					},
 				},
-				Action: With(OptionalArgs("head", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("head", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateHead{
@@ -63,7 +66,7 @@ func init() {
 						Label:           label,
 					}
 
-					if err := global.Client.UpdateHead(c.String("head"), options); err != nil {
+					if err := c.Client().UpdateHead(c.String("head"), options); err != nil {
 						return err
 					}
 
@@ -94,7 +97,7 @@ func init() {
 						Usage: "the label of the tail",
 					},
 				},
-				Action: With(OptionalArgs("tail", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("tail"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("tail", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("tail"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateTail{
@@ -103,7 +106,7 @@ func init() {
 						Label:           label,
 					}
 
-					if err := global.Client.UpdateTail(c.String("tail"), options); err != nil {
+					if err := c.Client().UpdateTail(c.String("tail"), options); err != nil {
 						return err
 					}
 
@@ -113,12 +116,12 @@ func init() {
 				}),
 			},
 			{
-				Name:      "storage_pool",
+				Name:      "storage pool",
 				Usage:     "update the settings of a storage pool",
-				UsageText: "bytemark --admin update storage_pool <storage_pool> [--usage-strategy] [--overcommit-ratio] [--label]",
+				UsageText: "bytemark --admin update storage pool <storage-pool> [--usage-strategy] [--overcommit-ratio] [--label]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
-						Name:  "storage_pool",
+						Name:  "storage-pool",
 						Usage: "the ID or label of the storage pool to be updated",
 					},
 					cli.StringFlag{
@@ -134,7 +137,7 @@ func init() {
 						Usage: "the label of the storage pool",
 					},
 				},
-				Action: With(OptionalArgs("storage_pool", "usage-strategy", "overcommit-ratio", "label"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateStoragePool{
@@ -143,11 +146,11 @@ func init() {
 						Label:           label,
 					}
 
-					if err := global.Client.UpdateStoragePool(c.String("storage_pool"), options); err != nil {
+					if err := c.Client().UpdateStoragePool(c.String("storage-pool"), options); err != nil {
 						return err
 					}
 
-					log.Outputf("Storage pool %s updated\n", c.String("storage_pool"))
+					log.Outputf("Storage pool %s updated\n", c.String("storage-pool"))
 
 					return nil
 				}),
@@ -166,7 +169,7 @@ func init() {
 							cli.GenericFlag{
 								Name:  "server",
 								Usage: "the server to migrate",
-								Value: new(VirtualMachineNameFlag),
+								Value: new(app.VirtualMachineNameFlag),
 							},
 							cli.Int64Flag{
 								Name:  "migrate-speed",
@@ -177,7 +180,7 @@ func init() {
 								Usage: "the max allowed downtime",
 							},
 						},
-						Action: With(OptionalArgs("server", "migrate-speed", "migrate-downtime"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+						Action: app.With(args.Optional("server", "migrate-speed", "migrate-downtime"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 							vm := c.VirtualMachineName("server")
 
 							var speed *int64
@@ -196,7 +199,7 @@ func init() {
 								return errors.New("Nothing to update")
 							}
 
-							if err := global.Client.UpdateVMMigration(vm, speed, downtime); err != nil {
+							if err := c.Client().UpdateVMMigration(vm, speed, downtime); err != nil {
 								return err
 							}
 

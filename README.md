@@ -1,7 +1,7 @@
 Bytemark command-line client
 ============================
 
-[![Build Status](https://travis-ci.org/BytemarkHosting/bytemark-client.svg)](https://travis-ci.org/BytemarkHosting/bytemark-client) [![Coverage Status](https://coveralls.io/repos/github/BytemarkHosting/bytemark-client/badge.svg?branch=develop)](https://coveralls.io/github/BytemarkHosting/bytemark-client?branch=develop)
+[![Build Status](https://travis-ci.org/BytemarkHosting/bytemark-client.svg)](https://travis-ci.org/BytemarkHosting/bytemark-client) [![Coverage Status](https://coveralls.io/repos/github/BytemarkHosting/bytemark-client/badge.svg?branch=develop)](https://coveralls.io/github/BytemarkHosting/bytemark-client?branch=develop) [![Go Report Card](https://goreportcard.com/badge/github.com/BytemarkHosting/bytemark-client)](https://goreportcard.com/report/github.com/BytemarkHosting/bytemark-client)
 
 Installation
 ------------

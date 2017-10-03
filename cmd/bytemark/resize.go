@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -32,20 +35,20 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server that the disc is attached to",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 				cli.GenericFlag{
 					Name:  "new-size",
 					Usage: "the new size for the disc. Prefix with + to indicate 'increase by'",
-					Value: new(ResizeFlag),
+					Value: new(app.ResizeFlag),
 				},
 			},
-			Action: With(OptionalArgs("server", "disc", "new-size"), RequiredFlags("server", "disc", "new-size"), DiscProvider("server", "disc"), func(c *Context) (err error) {
+			Action: app.With(args.Optional("server", "disc", "new-size"), with.RequiredFlags("server", "disc", "new-size"), with.Disc("server", "disc"), func(c *app.Context) (err error) {
 				vmName := c.VirtualMachineName("server")
 				size := c.ResizeFlag("new-size")
 				newSize := size.Size
 
-				if size.Mode == ResizeModeIncrease {
+				if size.Mode == app.ResizeModeIncrease {
 					newSize += c.Disc.Size
 				}
 				log.Logf("Resizing %s from %dGiB to %dGiB...", c.Disc.Label, c.Disc.Size/1024, newSize/1024)
@@ -54,7 +57,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					return util.UserRequestedExit{}
 				}
 
-				err = global.Client.ResizeDisc(vmName, c.String("disc"), newSize)
+				err = c.Client().ResizeDisc(vmName, c.String("disc"), newSize)
 				if err != nil {
 					log.Logf("Failed!\r\n")
 					return

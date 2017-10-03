@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
@@ -11,7 +12,7 @@ import (
 
 func TestRestoreBackup(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -23,7 +24,7 @@ func TestRestoreBackup(t *testing.T) {
 
 	c.When("RestoreBackup", vmname, "test-disc", "test-backup").Return(nil).Times(1)
 
-	err := global.App.Run([]string{
+	err := app.Run([]string{
 		"bytemark", "restore", "backup", "test-server", "test-disc", "test-backup",
 	})
 	is.Nil(err)

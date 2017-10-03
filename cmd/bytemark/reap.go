@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -15,8 +17,8 @@ func init() {
 				Aliases:   []string{"vm", "vms"},
 				Usage:     "triggers server reaping, purging all deleted servers and discs",
 				UsageText: "bytemark --admin reap servers",
-				Action: With(AuthProvider, func(c *Context) error {
-					if err := global.Client.ReapVMs(); err != nil {
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					if err := c.Client().ReapVMs(); err != nil {
 						return err
 					}
 

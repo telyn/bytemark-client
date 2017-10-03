@@ -1,6 +1,12 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -24,13 +30,15 @@ func init() {
 If no account is specified, it uses your default account.
 			
 If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-			Flags: append(OutputFlags("account details", "object"),
+			Flags: append(app.OutputFlags("account details", "object"),
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
-					Value: new(AccountNameFlag),
+					Value: new(app.AccountNameFlag),
 				}),
-			Action: With(OptionalArgs("account"), AccountProvider("account"), func(c *Context) error {
+			Action: app.With(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
+				c.Debug("show account command output")
+				c.Debug("acc: %s", c.Account.String())
 				return c.OutputInDesiredForm(c.Account)
 			}),
 		}, {
@@ -38,18 +46,18 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			Usage:       "outputs info about a disc",
 			UsageText:   "bytemark show disc [--json | --table] [--table-fields help | <fields>] <server> <disc label>",
 			Description: `This command displays information about a disc including any backups and backup schedules on the disc`,
-			Flags: append(OutputFlags("disc details", "object"),
+			Flags: append(app.OutputFlags("disc details", "object"),
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 				cli.StringFlag{
 					Name:  "disc",
 					Usage: "The label or ID of the disc to show",
 				},
 			),
-			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), DiscProvider("server", "disc"), func(c *Context) error {
+			Action: app.With(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Disc("server", "disc"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.Disc)
 			}),
 		}, {
@@ -58,14 +66,14 @@ If the --json flag is specified, prints a complete overview of the account in JS
 			UsageText: "bytemark show group [--json] [name]",
 			Description: `This command displays information about how many servers are in the given group.
 If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
-			Flags: append(OutputFlags("group details", "object"),
+			Flags: append(app.OutputFlags("group details", "object"),
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The name of the group to show",
-					Value: new(GroupNameFlag),
+					Value: new(app.GroupNameFlag),
 				},
 			),
-			Action: With(OptionalArgs("group"), GroupProvider("group"), func(c *Context) error {
+			Action: app.With(args.Optional("group"), with.Group("group"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.Group)
 			}),
 		}, {
@@ -73,14 +81,14 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 			Usage:       "displays details about a server",
 			UsageText:   "bytemark show server [--json] <name>",
 			Description: `Displays a collection of details about the server, including its full hostname, CPU and memory allocation, power status, disc capacities and IP addresses.`,
-			Flags: append(OutputFlags("server details", "object"),
+			Flags: append(app.OutputFlags("server details", "object"),
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			),
-			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), func(c *Context) error {
+			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.VirtualMachine)
 			}),
 		}, {
@@ -94,7 +102,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 					Usage: "The user to show the details of",
 				},
 			},
-			Action: With(OptionalArgs("user"), RequiredFlags("user"), UserProvider("user"), func(c *Context) error {
+			Action: app.With(args.Optional("user"), with.RequiredFlags("user"), with.User("user"), func(c *app.Context) error {
 				log.Outputf("User %s:\n\nAuthorized keys:\n", c.User.Username)
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
@@ -110,7 +118,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 Setting --recursive will cause a lot of extra requests to be made and may take a long time to run.
 
 Privileges will be output in no particular order.`,
-			Flags: append(OutputFlags("privileges", "array"),
+			Flags: append(app.OutputFlags("privileges", "array"),
 				cli.BoolFlag{
 					Name:  "recursive",
 					Usage: "for account & group, will also find all privileges for all groups in the account and virtual machines in the group",
@@ -126,22 +134,22 @@ Privileges will be output in no particular order.`,
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The group to show the privileges of",
-					Value: new(GroupNameFlag),
+					Value: new(app.GroupNameFlag),
 				},
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "The server to show the privileges of",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			),
-			Action: With(AuthProvider, func(c *Context) (err error) {
+			Action: app.With(with.Auth, func(c *app.Context) (err error) {
 				account := c.String("account")
 				group := c.GroupName("group")
 				server := c.VirtualMachineName("server")
 
 				privs := make(brain.Privileges, 0)
 				if account != "" {
-					newPrivs, err := findPrivilegesForAccount(account, c.Bool("recursive"))
+					newPrivs, err := findPrivilegesForAccount(c, account, c.Bool("recursive"))
 					if err != nil {
 						return err
 					}
@@ -149,7 +157,7 @@ Privileges will be output in no particular order.`,
 				}
 
 				if group.Group != "" {
-					newPrivs, err := findPrivilegesForGroup(group, c.Bool("recursive"))
+					newPrivs, err := findPrivilegesForGroup(c, group, c.Bool("recursive"))
 					if err != nil {
 						return err
 					}
@@ -157,7 +165,7 @@ Privileges will be output in no particular order.`,
 				}
 
 				if server.VirtualMachine != "" {
-					newPrivs, err := global.Client.GetPrivilegesForVirtualMachine(server)
+					newPrivs, err := c.Client().GetPrivilegesForVirtualMachine(server)
 					if err != nil {
 						return err
 					}
@@ -165,7 +173,7 @@ Privileges will be output in no particular order.`,
 				}
 				if c.String("user") != "" || (server.VirtualMachine == "" && group.Group == "" && account == "") {
 
-					privs, err = global.Client.GetPrivileges(c.String("user"))
+					privs, err = c.Client().GetPrivileges(c.String("user"))
 					if err != nil {
 						return
 					}
@@ -184,9 +192,9 @@ Privileges will be output in no particular order.`,
 				Name:      "vlans",
 				Usage:     "shows available VLANs",
 				UsageText: "bytemark --admin show vlans [--json]",
-				Flags:     OutputFlags("VLANs", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					vlans, err := global.Client.GetVLANs()
+				Flags:     app.OutputFlags("VLANs", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					vlans, err := c.Client().GetVLANs()
 					if err != nil {
 						return err
 					}
@@ -194,18 +202,18 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:        "disc_by_id",
+				Name:        "disc by id",
 				Usage:       "displays details about a disc",
-				UsageText:   "bytemark show disc_by_id [--json] <id>",
+				UsageText:   "bytemark show disc by id [--json] <id>",
 				Description: `Displays a collection of details about the disc.`,
-				Flags: append(OutputFlags("disc details", "object"),
+				Flags: append(app.OutputFlags("disc details", "object"),
 					cli.IntFlag{
 						Name:  "disc",
 						Usage: "the disc to display",
 					},
 				),
-				Action: With(AuthProvider, OptionalArgs("disc"), RequiredFlags("disc"), func(c *Context) error {
-					disc, err := global.Client.GetDiscByID(c.Int("disc"))
+				Action: app.With(with.Auth, args.Optional("disc"), with.RequiredFlags("disc"), func(c *app.Context) error {
+					disc, err := c.Client().GetDiscByID(c.Int("disc"))
 					if err != nil {
 						return err
 					}
@@ -217,14 +225,14 @@ Privileges will be output in no particular order.`,
 				Name:      "vlan",
 				Usage:     "shows the details of a VLAN",
 				UsageText: "bytemark --admin show vlan [--json] <num>",
-				Flags: append(OutputFlags("VLAN", "object"),
+				Flags: append(app.OutputFlags("VLAN", "object"),
 					cli.IntFlag{
 						Name:  "num",
 						Usage: "the num of the VLAN to display",
 					},
 				),
-				Action: With(OptionalArgs("num"), RequiredFlags("num"), AuthProvider, func(c *Context) error {
-					vlan, err := global.Client.GetVLAN(c.Int("num"))
+				Action: app.With(args.Optional("num"), with.RequiredFlags("num"), with.Auth, func(c *app.Context) error {
+					vlan, err := c.Client().GetVLAN(c.Int("num"))
 					if err != nil {
 						return err
 					}
@@ -232,12 +240,12 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "ip_ranges",
+				Name:      "ip ranges",
 				Usage:     "shows all IP ranges",
-				UsageText: "bytemark --admin show ip_ranges [--json]",
-				Flags:     OutputFlags("ip ranges", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					ipRanges, err := global.Client.GetIPRanges()
+				UsageText: "bytemark --admin show ip ranges [--json]",
+				Flags:     app.OutputFlags("ip ranges", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					ipRanges, err := c.Client().GetIPRanges()
 					if err != nil {
 						return err
 					}
@@ -245,17 +253,17 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "ip_range",
+				Name:      "ip range",
 				Usage:     "shows the details of an IP range",
-				UsageText: "bytemark --admin show ip_range [--json] <ip_range>",
-				Flags: append(OutputFlags("ip range details", "object"),
+				UsageText: "bytemark --admin show ip range [--json] <ip-range>",
+				Flags: append(app.OutputFlags("ip range details", "object"),
 					cli.StringFlag{
-						Name:  "ip_range",
+						Name:  "ip-range",
 						Usage: "the ID or CIDR representation of the IP range to display",
 					},
 				),
-				Action: With(OptionalArgs("ip_range"), RequiredFlags("ip_range"), AuthProvider, func(c *Context) error {
-					ipRange, err := global.Client.GetIPRange(c.String("ip_range"))
+				Action: app.With(args.Optional("ip-range"), with.RequiredFlags("ip-range"), with.Auth, func(c *app.Context) error {
+					ipRange, err := c.Client().GetIPRange(c.String("ip-range"))
 					if err != nil {
 						return err
 					}
@@ -266,9 +274,9 @@ Privileges will be output in no particular order.`,
 				Name:      "heads",
 				Usage:     "shows the details of all heads",
 				UsageText: "bytemark --admin show heads [--json]",
-				Flags:     OutputFlags("heads", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					heads, err := global.Client.GetHeads()
+				Flags:     app.OutputFlags("heads", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					heads, err := c.Client().GetHeads()
 					if err != nil {
 						return err
 					}
@@ -279,14 +287,14 @@ Privileges will be output in no particular order.`,
 				Name:      "head",
 				Usage:     "shows the details of the specified head",
 				UsageText: "bytemark --admin show head <head> [--json]",
-				Flags: append(OutputFlags("head details", "object"),
+				Flags: append(app.OutputFlags("head details", "object"),
 					cli.StringFlag{
 						Name:  "head",
 						Usage: "the ID of the head to display",
 					},
 				),
-				Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
-					head, err := global.Client.GetHead(c.String("head"))
+				Action: app.With(args.Optional("head"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
+					head, err := c.Client().GetHead(c.String("head"))
 					if err != nil {
 						return err
 					}
@@ -297,9 +305,9 @@ Privileges will be output in no particular order.`,
 				Name:      "tails",
 				Usage:     "shows the details of all tails",
 				UsageText: "bytemark --admin show tails [--json]",
-				Flags:     OutputFlags("tails", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					tails, err := global.Client.GetTails()
+				Flags:     app.OutputFlags("tails", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					tails, err := c.Client().GetTails()
 					if err != nil {
 						return err
 					}
@@ -310,14 +318,14 @@ Privileges will be output in no particular order.`,
 				Name:      "tail",
 				Usage:     "shows the details of the specified tail",
 				UsageText: "bytemark --admin show tail <tail> [--json]",
-				Flags: append(OutputFlags("tail details", "object"),
+				Flags: append(app.OutputFlags("tail details", "object"),
 					cli.StringFlag{
 						Name:  "tail",
 						Usage: "the ID of the tail to display",
 					},
 				),
-				Action: With(OptionalArgs("tail"), RequiredFlags("tail"), AuthProvider, func(c *Context) error {
-					tail, err := global.Client.GetTail(c.String("tail"))
+				Action: app.With(args.Optional("tail"), with.RequiredFlags("tail"), with.Auth, func(c *app.Context) error {
+					tail, err := c.Client().GetTail(c.String("tail"))
 					if err != nil {
 						return err
 					}
@@ -325,12 +333,12 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "storage_pools",
+				Name:      "storage pools",
 				Usage:     "shows the details of all storage pools",
-				UsageText: "bytemark --admin show storage_pools [--json]",
-				Flags:     OutputFlags("storage pools", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					storagePools, err := global.Client.GetStoragePools()
+				UsageText: "bytemark --admin show storage pools [--json]",
+				Flags:     app.OutputFlags("storage pools", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					storagePools, err := c.Client().GetStoragePools()
 					if err != nil {
 						return err
 					}
@@ -338,17 +346,17 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "storage_pool",
+				Name:      "storage pool",
 				Usage:     "shows the details of the specified storage pool",
-				UsageText: "bytemark --admin show storage_pools [--json] <storage_pool>",
-				Flags: append(OutputFlags("storage pool", "object"),
+				UsageText: "bytemark --admin show storage pool [--json] <storage-pool>",
+				Flags: append(app.OutputFlags("storage pool", "object"),
 					cli.StringFlag{
-						Name:  "storage_pool",
+						Name:  "storage-pool",
 						Usage: "The ID or label of the storage pool to display",
 					},
 				),
-				Action: With(OptionalArgs("storage_pool"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
-					storagePool, err := global.Client.GetStoragePool(c.String("storage_pool"))
+				Action: app.With(args.Optional("storage-pool"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
+					storagePool, err := c.Client().GetStoragePool(c.String("storage-pool"))
 					if err != nil {
 						return err
 					}
@@ -356,25 +364,34 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "migrating_discs",
+				Name:      "migrating discs",
 				Usage:     "shows a list of migrating discs",
 				UsageText: "bytemark --admin show migrating_discs [--json]",
-				Flags:     OutputFlags("migrating discs", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					discs, err := global.Client.GetMigratingDiscs()
+				Flags:     app.OutputFlags("migrating discs", "array"),
+				Action: app.With(with.Auth, func(ctx *app.Context) error {
+					discs, err := ctx.Client().GetMigratingDiscs()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(discs, output.Table)
+					// this is super horrid :|
+					if ctx.String("table-fields") == "" {
+						err := ctx.Context.Set("table-fields", "ID, StoragePool, NewStoragePool, StorageGrade, NewStorageGrade, Size, MigrationProgress, MigrationEta, MigrationSpeed")
+						if err != nil {
+							return err
+						}
+					}
+					fmt.Fprintln(ctx.App().Writer, "Storage sizes are in MB, speeds in MB/s, and times in seconds.")
+					return ctx.OutputInDesiredForm(discs, output.Table)
+
 				}),
 			},
 			{
-				Name:      "migrating_vms",
+				Name:      "migrating vms",
 				Usage:     "shows a list of migrating servers",
 				UsageText: "bytemark --admin show migrating_vms [--json]",
-				Flags:     OutputFlags("migrating servers", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					vms, err := global.Client.GetMigratingVMs()
+				Flags:     app.OutputFlags("migrating servers", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					vms, err := c.Client().GetMigratingVMs()
 					if err != nil {
 						return err
 					}
@@ -382,12 +399,12 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "stopped_eligible_vms",
+				Name:      "stopped eligible vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
-				Flags:     OutputFlags("servers", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					vms, err := global.Client.GetStoppedEligibleVMs()
+				Flags:     app.OutputFlags("servers", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					vms, err := c.Client().GetStoppedEligibleVMs()
 					if err != nil {
 						return err
 					}
@@ -395,12 +412,12 @@ Privileges will be output in no particular order.`,
 				}),
 			},
 			{
-				Name:      "recent_vms",
+				Name:      "recent vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
-				Flags:     OutputFlags("servers", "array"),
-				Action: With(AuthProvider, func(c *Context) error {
-					vms, err := global.Client.GetRecentVMs()
+				Flags:     app.OutputFlags("servers", "array"),
+				Action: app.With(with.Auth, func(c *app.Context) error {
+					vms, err := c.Client().GetRecentVMs()
 					if err != nil {
 						return err
 					}
@@ -411,18 +428,18 @@ Privileges will be output in no particular order.`,
 	})
 }
 
-func findPrivilegesForAccount(account string, recurse bool) (privs brain.Privileges, err error) {
-	privs, err = global.Client.GetPrivilegesForAccount(account)
+func findPrivilegesForAccount(c *app.Context, account string, recurse bool) (privs brain.Privileges, err error) {
+	privs, err = c.Client().GetPrivilegesForAccount(account)
 	if !recurse || err != nil {
 		return
 	}
-	acc, err := global.Client.GetAccount(account)
+	acc, err := c.Client().GetAccount(account)
 	if err != nil {
 		return
 	}
 
 	for _, group := range acc.Groups {
-		newPrivs, err := findPrivilegesForGroup(lib.GroupName{
+		newPrivs, err := findPrivilegesForGroup(c, lib.GroupName{
 			Group:   group.Name,
 			Account: account,
 		}, recurse) // recurse is always true at this point but maybe I'd like to make two flags? recurse-account and recurse-group?
@@ -434,12 +451,12 @@ func findPrivilegesForAccount(account string, recurse bool) (privs brain.Privile
 	return
 }
 
-func findPrivilegesForGroup(name lib.GroupName, recurse bool) (privs brain.Privileges, err error) {
-	privs, err = global.Client.GetPrivilegesForGroup(name)
+func findPrivilegesForGroup(c *app.Context, name lib.GroupName, recurse bool) (privs brain.Privileges, err error) {
+	privs, err = c.Client().GetPrivilegesForGroup(name)
 	if !recurse || err != nil {
 		return
 	}
-	group, err := global.Client.GetGroup(name)
+	group, err := c.Client().GetGroup(name)
 	if err != nil {
 		return
 	}
@@ -449,7 +466,7 @@ func findPrivilegesForGroup(name lib.GroupName, recurse bool) (privs brain.Privi
 			Group:          name.Group,
 			Account:        name.Account,
 		}
-		newPrivs, err := global.Client.GetPrivilegesForVirtualMachine(vmName)
+		newPrivs, err := c.Client().GetPrivilegesForVirtualMachine(vmName)
 		if err != nil {
 			return privs, err
 		}

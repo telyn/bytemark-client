@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
@@ -14,32 +17,32 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
-				Name:      "iops_limit",
+				Name:      "iops limit",
 				Usage:     "set the IOPS limit of a disc",
-				UsageText: "bytemark --admin set disc iops_limit <server> <disc> <limit>",
+				UsageText: "bytemark --admin set disc iops limit <server> <disc> <limit>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "disc",
-						Usage: "the name of the disc to alter the iops_limit of",
+						Usage: "the name of the disc to alter the iops limit of",
 					},
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server the disc belongs to",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.IntFlag{
 						Name:  "iops-limit",
 						Usage: "the limit to set",
 					},
 				},
-				Action: With(OptionalArgs("server", "disc", "iops-limit"), RequiredFlags("server", "disc", "iops-limit"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("server", "disc", "iops-limit"), with.RequiredFlags("server", "disc", "iops-limit"), with.Auth, func(c *app.Context) error {
 					iopsLimit := c.Int("iops-limit")
 					if iopsLimit < 1 {
 						return fmt.Errorf("IOPS limit must be at least 1")
 					}
 					vmName := c.VirtualMachineName("server")
 
-					return global.Client.SetDiscIopsLimit(vmName, c.String("disc"), iopsLimit)
+					return c.Client().SetDiscIopsLimit(vmName, c.String("disc"), iopsLimit)
 				}),
 			},
 		},
@@ -65,16 +68,16 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to attach the CD to",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.StringFlag{
 						Name:  "cd-url",
 						Usage: "an HTTP(S) URL for an ISO image file to attach. If not set or set to the empty string, will 'eject' the current CD",
 					},
 				},
-				Action: With(OptionalArgs("server", "cd-url"), RequiredFlags("server"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("server", "cd-url"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 					vmName := c.VirtualMachineName("server")
-					err := global.Client.SetVirtualMachineCDROM(vmName, c.String("cd-url"))
+					err := c.Client().SetVirtualMachineCDROM(vmName, c.String("cd-url"))
 					if _, ok := err.(lib.InternalServerError); ok {
 						return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
 					}
@@ -91,14 +94,14 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to alter",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.IntFlag{
 						Name:  "cores",
 						Usage: "the number of cores that should be available to the VM",
 					},
 				},
-				Action: With(OptionalArgs("server", "cores"), RequiredFlags("server", "cores"), VirtualMachineProvider("server"), func(c *Context) error {
+				Action: app.With(args.Optional("server", "cores"), with.RequiredFlags("server", "cores"), with.VirtualMachine("server"), func(c *app.Context) error {
 					// cores should be a flag
 					vmName := c.VirtualMachineName("server")
 					cores := c.Int("cores")
@@ -108,7 +111,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 							return util.UserRequestedExit{}
 						}
 					}
-					return global.Client.SetVirtualMachineCores(vmName, cores)
+					return c.Client().SetVirtualMachineCores(vmName, cores)
 				}),
 			}, {
 				Name:        "hwprofile",
@@ -127,14 +130,14 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server whose hardware profile you wish to alter",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.StringFlag{
 						Name:  "profile",
 						Usage: "the hardware profile to use",
 					},
 				},
-				Action: With(OptionalArgs("server", "profile"), RequiredFlags("server", "profile"), AuthProvider, func(c *Context) error {
+				Action: app.With(args.Optional("server", "profile"), with.RequiredFlags("server", "profile"), with.Auth, func(c *app.Context) error {
 					if c.Bool("lock") && c.Bool("unlock") {
 						return c.Help("Ambiguous command, both lock and unlock specified")
 					}
@@ -145,11 +148,11 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					}
 					vmName := c.VirtualMachineName("server")
 					if c.Bool("lock") {
-						return global.Client.SetVirtualMachineHardwareProfile(vmName, profile, true)
+						return c.Client().SetVirtualMachineHardwareProfile(vmName, profile, true)
 					} else if c.Bool("unlock") {
-						return global.Client.SetVirtualMachineHardwareProfile(vmName, profile, false)
+						return c.Client().SetVirtualMachineHardwareProfile(vmName, profile, false)
 					} else {
-						return global.Client.SetVirtualMachineHardwareProfile(vmName, profile)
+						return c.Client().SetVirtualMachineHardwareProfile(vmName, profile)
 					}
 				}),
 			}, {
@@ -162,7 +165,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to alter",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.GenericFlag{
 						Name:  "memory",
@@ -170,7 +173,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						Value: new(util.SizeSpecFlag),
 					},
 				},
-				Action: With(OptionalArgs("server", "memory"), RequiredFlags("server", "memory"), VirtualMachineProvider("server"), func(c *Context) error {
+				Action: app.With(args.Optional("server", "memory"), with.RequiredFlags("server", "memory"), with.VirtualMachine("server"), func(c *app.Context) error {
 					memory := c.Size("memory")
 
 					if c.VirtualMachine.Memory < memory {
@@ -180,7 +183,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					}
 
 					vmName := c.VirtualMachineName("server")
-					return global.Client.SetVirtualMachineMemory(vmName, memory)
+					return c.Client().SetVirtualMachineMemory(vmName, memory)
 				}),
 			}},
 	})

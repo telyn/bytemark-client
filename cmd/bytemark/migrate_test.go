@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestMigrateDiscWithNewStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("MigrateDisc", 123, "t6-sata1").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "disc", "123", "t6-sata1"})
+	err := app.Run([]string{"bytemark", "migrate", "disc", "123", "t6-sata1"})
 
 	is.Nil(err)
 
@@ -25,11 +26,11 @@ func TestMigrateDiscWithNewStoragePool(t *testing.T) {
 
 func TestMigrateDiscWithoutNewStoragePool(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	c.When("MigrateDisc", 123, "").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "disc", "123"})
+	err := app.Run([]string{"bytemark", "migrate", "disc", "123"})
 
 	is.Nil(err)
 
@@ -40,12 +41,12 @@ func TestMigrateDiscWithoutNewStoragePool(t *testing.T) {
 
 func TestMigrateDiscError(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, true)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	migrateErr := fmt.Errorf("Error migrating")
 	c.When("MigrateDisc", 123, "t6-sata1").Return(migrateErr).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "disc", "123", "t6-sata1"})
+	err := app.Run([]string{"bytemark", "migrate", "disc", "123", "t6-sata1"})
 
 	is.Equal(err, migrateErr)
 
@@ -56,14 +57,14 @@ func TestMigrateDiscError(t *testing.T) {
 
 func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	c.When("MigrateVirtualMachine", vmName, "stg-h1").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm123.group.account", "stg-h1"})
+	err := app.Run([]string{"bytemark", "migrate", "vm", "vm123.group.account", "stg-h1"})
 
 	is.Nil(err)
 
@@ -74,14 +75,14 @@ func TestMigrateVirtualMachineWithNewHead(t *testing.T) {
 
 func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm122", Group: "group", Account: "account"}
 	c.When("MigrateVirtualMachine", vmName, "").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm122.group.account"})
+	err := app.Run([]string{"bytemark", "migrate", "vm", "vm122.group.account"})
 
 	is.Nil(err)
 
@@ -92,7 +93,7 @@ func TestMigrateVirtualMachineWithoutNewHead(t *testing.T) {
 
 func TestMigrateVirtualMachineError(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -100,7 +101,7 @@ func TestMigrateVirtualMachineError(t *testing.T) {
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}
 	c.When("MigrateVirtualMachine", vmName, "stg-h2").Return(migrateErr).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "migrate", "vm", "vm121.group.account", "stg-h2"})
+	err := app.Run([]string{"bytemark", "migrate", "vm", "vm121.group.account", "stg-h2"})
 
 	is.Equal(err, migrateErr)
 

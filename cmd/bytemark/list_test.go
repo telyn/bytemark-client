@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
@@ -11,11 +12,11 @@ import (
 
 func TestListAccounts(t *testing.T) {
 	is := is.New(t)
-	_, c := baseTestAuthSetup(t, false)
+	_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	c.When("GetAccounts").Return([]lib.Account{lib.Account{BrainID: 1, Name: "dr-evil"}}).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark list accounts", " "))
+	err := app.Run(strings.Split("bytemark list accounts", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -25,7 +26,7 @@ func TestListAccounts(t *testing.T) {
 
 func TestListDiscs(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -45,7 +46,7 @@ func TestListDiscs(t *testing.T) {
 	}
 	c.When("GetVirtualMachine", name).Return(&vm).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark list discs spooky-vm", " "))
+	err := app.Run(strings.Split("bytemark list discs spooky-vm", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
@@ -54,7 +55,7 @@ func TestListDiscs(t *testing.T) {
 
 func TestListGroups(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetIgnoreErr", "account").Return("spooky-steve-other-account")
 
@@ -65,7 +66,7 @@ func TestListGroups(t *testing.T) {
 		},
 	}).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark list groups spooky-steve", " "))
+	err := app.Run(strings.Split("bytemark list groups spooky-steve", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -75,7 +76,7 @@ func TestListGroups(t *testing.T) {
 
 func TestListServers(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 	config.When("GetGroup").Return(defGroup)
@@ -91,7 +92,7 @@ func TestListServers(t *testing.T) {
 		}},
 	}).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark list servers spooky-steve", " "))
+	err := app.Run(strings.Split("bytemark list servers spooky-steve", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -101,7 +102,7 @@ func TestListServers(t *testing.T) {
 
 func TestListBackups(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -113,7 +114,7 @@ func TestListBackups(t *testing.T) {
 
 	c.When("GetBackups", vmname, "test-disc").Return(nil).Times(1)
 
-	err := global.App.Run([]string{
+	err := app.Run([]string{
 		"bytemark", "list", "backups", "test-server", "test-disc",
 	})
 	is.Nil(err)

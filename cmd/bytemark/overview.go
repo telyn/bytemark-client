@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
 )
@@ -14,24 +16,24 @@ func init() {
 		Description: `This command displays an overview of the hosting you have with Bytemark.
 
 		If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
-		Flags: OutputFlags("account details", "object"),
-		Action: With(AuthProvider, func(c *Context) error {
+		Flags: app.OutputFlags("account details", "object"),
+		Action: app.With(with.Auth, func(c *app.Context) error {
 
-			allAccs, err := global.Client.GetAccounts()
+			allAccs, err := c.Client().GetAccounts()
 			if err != nil {
 				return err
 			}
 
-			accName := global.Config.GetIgnoreErr("account")
+			accName := c.Config().GetIgnoreErr("account")
 			var def lib.Account
 			if accName != "" {
-				def, err = global.Client.GetAccount(accName)
+				def, err = c.Client().GetAccount(accName)
 				if err != nil {
 					return err
 				}
 			} else {
 
-				def, err = global.Client.GetDefaultAccount()
+				def, err = c.Client().GetDefaultAccount()
 				if err != nil {
 					return err
 				}
@@ -48,7 +50,7 @@ func init() {
 			overview := lib.Overview{
 				Accounts:       allAccs,
 				DefaultAccount: def,
-				Username:       global.Client.GetSessionUser(),
+				Username:       c.Client().GetSessionUser(),
 			}
 
 			return c.OutputInDesiredForm(overview)

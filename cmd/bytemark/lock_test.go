@@ -4,13 +4,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestLockHWProfileCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -21,7 +22,7 @@ func TestLockHWProfileCommand(t *testing.T) {
 
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, true).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark lock hwprofile test-server.test-group.test-account", " "))
+	err := app.Run(strings.Split("bytemark lock hwprofile test-server.test-group.test-account", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {
@@ -31,7 +32,7 @@ func TestLockHWProfileCommand(t *testing.T) {
 
 func TestUnlockHWProfileCommand(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -42,7 +43,7 @@ func TestUnlockHWProfileCommand(t *testing.T) {
 
 	c.When("SetVirtualMachineHardwareProfileLock", vmname, false).Return(nil).Times(1)
 
-	err := global.App.Run(strings.Split("bytemark unlock hwprofile test-server.test-group.test-account", " "))
+	err := app.Run(strings.Split("bytemark unlock hwprofile test-server.test-group.test-account", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

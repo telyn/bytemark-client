@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -11,17 +14,17 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
-				Name:      "storage_pool",
+				Name:      "storage pool",
 				Usage:     "empty a storage pool",
-				UsageText: "bytemark --admin empty storage_pool <storage_pool>",
+				UsageText: "bytemark --admin empty storage pool <storage-pool>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
-						Name:  "storage_pool",
+						Name:  "storage-pool",
 						Usage: "the ID or label of the storage pool to be emptied",
 					},
 				},
-				Action: With(OptionalArgs("storage_pool"), RequiredFlags("storage_pool"), AuthProvider, func(c *Context) error {
-					if err := global.Client.EmptyStoragePool(c.String("storage_pool")); err != nil {
+				Action: app.With(args.Optional("storage-pool"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
+					if err := c.Client().EmptyStoragePool(c.String("storage-pool")); err != nil {
 						return err
 					}
 
@@ -40,8 +43,8 @@ func init() {
 						Usage: "the ID or label of the head to be emptied",
 					},
 				},
-				Action: With(OptionalArgs("head"), RequiredFlags("head"), AuthProvider, func(c *Context) error {
-					if err := global.Client.EmptyHead(c.String("head")); err != nil {
+				Action: app.With(args.Optional("head"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
+					if err := c.Client().EmptyHead(c.String("head")); err != nil {
 						return err
 					}
 

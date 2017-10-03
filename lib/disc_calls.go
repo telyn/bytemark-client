@@ -42,7 +42,7 @@ func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc brain.Disc) (e
 
 // DeleteDisc removes the specified disc from the given virtual machine
 func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string) (err error) {
-	err = c.validateVirtualMachineName(&vm)
+	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return
 	}
@@ -59,7 +59,7 @@ func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string)
 
 // ResizeDisc resizes the specified disc to the given size in megabytes
 func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
-	err = c.validateVirtualMachineName(&vm)
+	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string,
 
 // SetDiscIopsLimit sets the IOPS limit of the specified disc
 func (c *bytemarkClient) SetDiscIopsLimit(vm VirtualMachineName, discLabelOrID string, iopsLimit int) (err error) {
-	err = c.validateVirtualMachineName(&vm)
+	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func (c *bytemarkClient) SetDiscIopsLimit(vm VirtualMachineName, discLabelOrID s
 
 // GetDisc returns the specified disc from the given virtual machine.
 func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc brain.Disc, err error) {
-	err = c.validateVirtualMachineName(&vm)
+	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return
 	}

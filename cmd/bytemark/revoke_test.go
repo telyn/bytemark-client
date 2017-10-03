@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
@@ -168,11 +169,11 @@ func TestRevokePrivilege(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		config, c := baseTestAuthSetup(t, false)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		test.Setup(config, c)
 
 		fmt.Println(test.Input)
-		err := global.App.Run(strings.Split(test.Input, " "))
+		err := app.Run(strings.Split(test.Input, " "))
 		if test.ShouldErr && err == nil {
 			t.Errorf("TestRevokePrivilege %d should err and didn't", i)
 		} else if !test.ShouldErr && err != nil {

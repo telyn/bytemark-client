@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
 
 func TestRejectVM(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
 	c.When("RejectVM", vmName, "reason text").Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "reject", "vm", "vm123.group.account", "reason text"})
+	err := app.Run([]string{"bytemark", "reject", "vm", "vm123.group.account", "reason text"})
 
 	is.Nil(err)
 
@@ -28,7 +29,7 @@ func TestRejectVM(t *testing.T) {
 
 func TestRejectVMError(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, true)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -36,7 +37,7 @@ func TestRejectVMError(t *testing.T) {
 	vmName := lib.VirtualMachineName{VirtualMachine: "vm121", Group: "group", Account: "account"}
 	c.When("RejectVM", vmName, "reason text").Return(rejectErr).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "reject", "vm", "vm121.group.account", "reason text"})
+	err := app.Run([]string{"bytemark", "reject", "vm", "vm121.group.account", "reason text"})
 
 	is.Equal(err, rejectErr)
 
