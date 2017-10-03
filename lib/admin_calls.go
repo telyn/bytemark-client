@@ -255,7 +255,7 @@ func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
 }
 
 func (c *bytemarkClient) AdminCreateGroup(name GroupName, vlanNum int) (err error) {
-	err = c.validateGroupName(&name)
+	err = c.EnsureGroupName(&name)
 	if err != nil {
 		return
 	}

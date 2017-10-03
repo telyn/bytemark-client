@@ -49,7 +49,7 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []billing.Account, err e
 
 // getBrainAccount gets the brain account with the given name.
 func (c *bytemarkClient) getBrainAccount(name string) (account brain.Account, err error) {
-	err = c.validateAccountName(&name)
+	err = c.EnsureAccountName(&name)
 	if err != nil {
 		return
 	}

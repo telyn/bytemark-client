@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -365,12 +368,21 @@ Privileges will be output in no particular order.`,
 				Usage:     "shows a list of migrating discs",
 				UsageText: "bytemark --admin show migrating_discs [--json]",
 				Flags:     app.OutputFlags("migrating discs", "array"),
-				Action: app.With(with.Auth, func(c *app.Context) error {
-					discs, err := c.Client().GetMigratingDiscs()
+				Action: app.With(with.Auth, func(ctx *app.Context) error {
+					discs, err := ctx.Client().GetMigratingDiscs()
 					if err != nil {
 						return err
 					}
-					return c.OutputInDesiredForm(discs, output.Table)
+					// this is super horrid :|
+					if ctx.String("table-fields") == "" {
+						err := ctx.Context.Set("table-fields", "ID, StoragePool, NewStoragePool, StorageGrade, NewStorageGrade, Size, MigrationProgress, MigrationEta, MigrationSpeed")
+						if err != nil {
+							return err
+						}
+					}
+					fmt.Fprintln(ctx.App().Writer, "Storage sizes are in MB, speeds in MB/s, and times in seconds.")
+					return ctx.OutputInDesiredForm(discs, output.Table)
+
 				}),
 			},
 			{
