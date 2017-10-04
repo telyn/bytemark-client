@@ -506,3 +506,31 @@ func (c *Client) GetMigratingDiscs() (brain.Discs, error) {
 	discs := r.Get(0).(brain.Discs)
 	return discs, r.Error(1)
 }
+
+func (c *Client) EnsureAccountName(name *string) error {
+	*name = "blank-account-name"
+	return nil
+}
+
+func (c *Client) EnsureGroupName(name *lib.GroupName) error {
+	if name.Account == "" {
+		name.Account = "blank-account-name"
+	}
+	if name.Group == "" {
+		name.Group = "blank-group-name"
+	}
+	return nil
+}
+
+func (c *Client) EnsureVirtualMachineName(name *lib.VirtualMachineName) error {
+	if name.Account == "" {
+		name.Account = "blank-account-name"
+	}
+	if name.Group == "" {
+		name.Group = "blank-group-name"
+	}
+	if name.VirtualMachine == "" {
+		name.VirtualMachine = "blank-vm-name"
+	}
+	return nil
+}

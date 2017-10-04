@@ -31,6 +31,14 @@ type Client interface {
 	SetDebugLevel(int)
 
 	//
+	// Ensurers
+	//
+
+	EnsureVirtualMachineName(vm *VirtualMachineName) error
+	EnsureGroupName(group *GroupName) error
+	EnsureAccountName(account *string) error
+
+	//
 	// Auth
 	//
 

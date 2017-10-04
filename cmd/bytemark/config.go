@@ -168,13 +168,12 @@ The set and unset subcommands can be used to set and unset such variables.
 			},
 		},
 		Action: app.Action(func(ctx *app.Context) (err error) {
-			/* TODO(telyn): put this back. Phil - if you see this, I hecked up.
 			if ctx.Bool("help") {
 				if ccw, ok := ctx.Context.(cliContextWrapper); ok {
 					err = cli.ShowSubcommandHelp(ccw.Context)
 					return
 				}
-			}*/
+			}
 			vars, err := ctx.Config().GetAll()
 			if err != nil {
 				return

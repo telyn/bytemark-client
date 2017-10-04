@@ -26,7 +26,7 @@ func Action(providers ...ProviderFunc) func(c *cli.Context) error {
 
 // Preprocess runs the Preprocess methods on all flags that implement Preprocessor
 func (c *Context) Preprocess() error {
-	if c.preproDone {
+	if c.preprocessHasRun {
 		return nil
 	}
 	c.Debug("Preprocessing\n")
@@ -43,7 +43,7 @@ func (c *Context) Preprocess() error {
 			}
 		}
 	}
-	c.preproDone = true
+	c.preprocessHasRun = true
 	return nil
 }
 
