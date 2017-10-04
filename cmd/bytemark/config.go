@@ -169,7 +169,7 @@ The set and unset subcommands can be used to set and unset such variables.
 		},
 		Action: app.Action(func(ctx *app.Context) (err error) {
 			if ctx.Bool("help") {
-				if ccw, ok := ctx.Context.(cliContextWrapper); ok {
+				if ccw, ok := ctx.Context.(app.CliContextWrapper); ok {
 					err = cli.ShowSubcommandHelp(ccw.Context)
 					return
 				}
