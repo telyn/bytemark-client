@@ -8,6 +8,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 )
@@ -42,6 +43,13 @@ func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string
 	}
 }
 
+func mkMetadata(client lib.Client, config util.ConfigManager) map[string]interface{} {
+	return map[string]interface{}{
+		"client": client,
+		"config": config,
+	}
+}
+
 // BaseTestSetup constructs mock config and client and produces a cli.App with the given commands.
 func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
 	config = new(mocks.Config)
@@ -53,11 +61,10 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 	if err != nil {
 		t.Fatal(err)
 	}
-	cliapp.Metadata = map[string]interface{}{
-		"client": client,
-		"config": config,
-	}
-
+	// mkMetdata is used to ensure that the mocks implement the interfaces
+	// without it - it's just assigning to an interface{} which will always succeed,
+	// and which results in null pointer errors down the line.
+	cliapp.Metadata = mkMetadata(client, config)
 	cliapp.Writer = ioutil.Discard
 	for _, c := range commands {
 		//config.When("Get", "token").Return("no-not-a-token")

@@ -534,3 +534,7 @@ func (c *Client) EnsureVirtualMachineName(name *lib.VirtualMachineName) error {
 	}
 	return nil
 }
+
+func (c *Client) Smezmorg() string {
+	return ""
+}
