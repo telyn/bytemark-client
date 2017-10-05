@@ -76,10 +76,7 @@ func main() {
 	}
 	client.SetDebugLevel(config.GetDebugLevel())
 
-	app.Metadata = map[string]interface{}{
-		"client": client,
-		"config": config,
-	}
+	bmapp.SetClientAndConfig(app, client, config)
 
 	outputDebugInfo(config)
 
