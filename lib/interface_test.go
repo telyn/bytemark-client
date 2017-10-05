@@ -127,7 +127,6 @@ func TestQualityInterfaceHasntGrown(t *testing.T) {
 				t.Errorf("New method on the Client interface called %s. The Client interface is not allowed to get any bigger - instead, define a function that receives a Client as an argument, and place it in a relevant package. See billing.UpdateDefinitions as an example.", name)
 			}
 		}
-		t.Fail()
 	} else {
 		t.Fatalf("Couldn't cast %s to types.Interface", obj)
 	}
