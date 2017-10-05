@@ -1,5 +1,9 @@
-// +build quality
-
+// do not add the quality build tag to this file - it requires access to the
+// unexported commands variable, so has to be in package main rather than
+// main_test. For some reason this seems to mess up build tags.
+// This test doesn't add any prerequisites for running 'go test' anyway, unlike
+// the other ones, and doesn't take long to run. So it's fine to keep it in the
+// main test job.
 package main
 
 import (
@@ -30,7 +34,7 @@ type s struct {
 // Actually, just making PromptYesNo a variable in util will do. Set it to the actual impl of PromptYesNo by default, mock it in the test.
 
 // Ensure all destructive commands have a --force flag, to skip through prompting.
-func TestQualityDestructiveCommandsHaveForceFlags(t *testing.T) {
+func TestDestructiveCommandsHaveForceFlags(t *testing.T) {
 	// it would be nice to also check that they have prompting, but that can't be done via reflection, only by building an ast from the source or by running tests.
 	cmds := make(map[string]*s)
 	for _, cmd := range destructiveCommands {
