@@ -7,17 +7,10 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 )
 
-func (bc *bytemarkClient) Smezmorg() string {
-	return "aw"
-
-}
-
 // Client provides the interface which all API clients should implement.
 type Client interface {
 	// Getters
 	//
-
-	Smezmorg() string
 
 	// GetEndpoint returns the API endpoint currently in use.
 	GetEndpoint() string
