@@ -93,6 +93,7 @@ quality-test:
   script: 
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - export GOPATH
+    - go install ./...
     - go generate github.com/BytemarkHosting/bytemark-client/lib/output
     - go test -run 'TestQuality.*' -tags quality ./...
 
