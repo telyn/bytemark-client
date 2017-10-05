@@ -115,17 +115,14 @@ func TestQualityInterfaceHasntGrown(t *testing.T) {
 		t.Fatal(err)
 	}
 	obj := pkg.Scope().Lookup("Client")
-	t.Logf("allowed[0]: %s", allowed[0])
 	// I don't know why we need the underlying type in order to cast it
 	// to a *types.Interface, but we do... soo...
 
 	// #GoTypesIsBlackMagic
 	// i guess that makes me a witch. i'm ok with that
 	if iface, ok := obj.Type().Underlying().(*types.Interface); ok {
-		t.Logf("lib.Client has %d methods", iface.NumMethods())
 		for i := 0; i < iface.NumMethods(); i++ {
 			name := iface.Method(i).Name()
-			t.Logf("is %s allowed?", name)
 			if allowed[allowed.Search(name)] != name {
 				t.Errorf("New method on the Client interface called %s. The Client interface is not allowed to get any bigger - instead, define a function that receives a Client as an argument, and place it in a relevant package. See billing.UpdateDefinitions as an example.", name)
 			}
