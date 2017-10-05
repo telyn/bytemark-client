@@ -1,3 +1,5 @@
+// +build quality
+
 package output_test
 
 // This file is used by go_generate to create a test from types_test.go.inc

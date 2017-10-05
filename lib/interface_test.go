@@ -1,3 +1,5 @@
+// +build quality
+
 package lib_test
 
 import (
@@ -7,10 +9,10 @@ import (
 	"testing"
 )
 
-// TestInterfaceHasntGrown will fail if the Client interface has gained any new
+// TestQualityInterfaceHasntGrown will fail if the Client interface has gained any new
 // functions since the 5th Oct 2017. See billing/updatedefinitions.go for an
 // example of how functions should be written from now.
-func TestInterfaceHasntGrown(t *testing.T) {
+func TestQualityInterfaceHasntGrown(t *testing.T) {
 	allowed := sort.StringSlice{
 		"AddIP",
 		"AddUserAuthorizedKey",

@@ -1,3 +1,5 @@
+// +build quality
+
 package main
 
 import (
@@ -28,7 +30,7 @@ type s struct {
 // Actually, just making PromptYesNo a variable in util will do. Set it to the actual impl of PromptYesNo by default, mock it in the test.
 
 // Ensure all destructive commands have a --force flag, to skip through prompting.
-func TestDestructiveCommandsHaveForceFlags(t *testing.T) {
+func TestQualityDestructiveCommandsHaveForceFlags(t *testing.T) {
 	// it would be nice to also check that they have prompting, but that can't be done via reflection, only by building an ast from the source or by running tests.
 	cmds := make(map[string]*s)
 	for _, cmd := range destructiveCommands {

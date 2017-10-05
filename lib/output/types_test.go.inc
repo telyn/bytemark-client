@@ -1,3 +1,5 @@
+// +build quality
+
 package output_test
 
 // this file gets used to generate a valid go source file which is
@@ -57,7 +59,7 @@ func isArrayType(typ reflect.Type) bool {
 	return false
 }
 
-func TestEveryTypeIsDefaultFieldsHaver(t *testing.T) {
+func TestQualityEveryTypeIsDefaultFieldsHaver(t *testing.T) {
 	// weird trick we have to do to get a reflect.Type for output.DefaultFieldsHaver and prettyprint.PrettyPrinter
 	dfhType := reflect.TypeOf((*output.DefaultFieldsHaver)(nil)).Elem()
 	ppType := reflect.TypeOf((*prettyprint.PrettyPrinter)(nil)).Elem()
