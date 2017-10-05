@@ -2,12 +2,38 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
 )
+
+func TestUpdateBmbilling(t *testing.T) {
+	is := is.New(t)
+	tests := []struct {
+		Command string
+	}{
+		{
+			Command: "bytemark update bmbilling --trial-days 7",
+		}, {
+			Command: "bytemark update bmbilling --trial-pence 2000",
+		}, {
+			Command: "bytemark update bmbilling --trial-days 7 --trial-pence 2000",
+		},
+	}
+	for _, test := range tests {
+		_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+
+		err := app.Run(strings.Split(test.Command, " "))
+		is.Nil(err)
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	}
+
+}
 
 func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	is := is.New(t)

@@ -7,6 +7,8 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+// TODO: we need to clean this file up. 500 SLOC is 400 too many.
+
 // UpdateHead is a struct with all the possible settings that can be updated on a head
 type UpdateHead struct {
 	UsageStrategy   *string

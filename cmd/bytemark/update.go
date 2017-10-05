@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -36,6 +37,24 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
+				Name:      "bmbilling",
+				Usage:     "update bmbilling's definitions",
+				UsageText: "bytemark --admin update bmbilling [--trial-days <days>] [--trial-pence <pence>]",
+				Flags: []cli.Flag{
+					cli.IntFlag{
+						Name:  "trial-days",
+						Usage: "the number of days in future trials",
+					},
+					cli.IntFlag{
+						Name:  "trial-pence",
+						Usage: "the maximum spend, in pence, of future trials",
+					},
+				},
+				Action: app.Action(with.Auth, func(ctx *app.Context) error {
+					billingDefinitions := billing.Definitions{}
+					return ctx.Client().SetBillingDefinitions()
+				}),
+			}, {
 				Name:      "head",
 				Usage:     "update the settings of a head",
 				UsageText: "bytemark --admin update head <head> [--usage-strategy] [--overcommit-ratio] [--label]",
