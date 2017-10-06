@@ -90,6 +90,12 @@
 			"path": "github.com/urfave/cli",
 			"revision": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6",
 			"revisionTime": "2016-11-22T04:36:10Z"
+		},
+		{
+			"checksumSHA1": "K9vpXHZGTKXmQt8mJuo0Knjlzqc=",
+			"path": "gitlab.bytemark.co.uk/auth/client",
+			"revision": "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf",
+			"revisionTime": "2017-09-22T09:40:02Z"
 		}
 	],
 	"rootPath": "github.com/BytemarkHosting/bytemark-client"
