@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	auth3 "github.com/BytemarkHosting/auth-client"
+	auth3 "gitlab.bytemark.co.uk/auth/client"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
