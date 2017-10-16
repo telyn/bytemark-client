@@ -1,15 +1,17 @@
-package lib
+package lib_test
 
 import (
 	"bytes"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 )
 
 func TestFormatOverview(t *testing.T) {
-	overrideLogWriters(t)
+	testutil.OverrideLogWriters(t)
 	b := new(bytes.Buffer)
 
 	gp := getFixtureGroup()
@@ -25,12 +27,12 @@ func TestFormatOverview(t *testing.T) {
 		},
 	}
 	tests := []struct {
-		Accounts []Account
+		Accounts []lib.Account
 		Expected string
 	}{
 		{
-			Accounts: []Account{
-				Account{
+			Accounts: []lib.Account{
+				{
 					BillingID: 2402,
 					BrainID:   234,
 					Name:      "test-account",
@@ -47,7 +49,7 @@ func TestFormatOverview(t *testing.T) {
 					},
 					IsDefaultAccount: true,
 				},
-				Account{
+				{
 					BrainID:   234,
 					BillingID: 2403,
 					Name:      "test-account-2",
@@ -63,14 +65,14 @@ func TestFormatOverview(t *testing.T) {
 						megaGroup,
 					},
 				},
-				Account{
+				{
 					BrainID: 345,
 					Name:    "test-unowned-account",
 					Groups: []brain.Group{
 						gp,
 					},
 				},
-				Account{
+				{
 					BillingID: 2406,
 				},
 			},
@@ -90,15 +92,15 @@ Your default account (2402 - test-account)
 
 `,
 		}, {
-			Accounts: []Account{
-				Account{
+			Accounts: []lib.Account{
+				{
 					BrainID: 345,
 					Name:    "test-unowned-account",
 					Groups: []brain.Group{
 						gp,
 					},
 				},
-				Account{
+				{
 					BillingID: 2406,
 				},
 			},
@@ -112,8 +114,8 @@ It was not possible to determine your default account. Please set one using byte
 
 `,
 		}, {
-			Accounts: []Account{
-				Account{
+			Accounts: []lib.Account{
+				{
 					BrainID: 234,
 					Name:    "test-account",
 					Groups: []brain.Group{
@@ -147,7 +149,7 @@ Your default account (test-account)
 	}
 
 	for i, test := range tests {
-		err := FormatOverview(b, test.Accounts, "test-user")
+		err := lib.FormatOverview(b, test.Accounts, "test-user")
 		if err != nil {
 			t.Fatal(err)
 		}

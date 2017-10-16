@@ -1,18 +1,18 @@
-package lib
+package lib_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
 	"reflect"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
+	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
 func TestCreateBackup(t *testing.T) {
-
-	vm := VirtualMachineName{
+	vm := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account",
@@ -33,15 +33,11 @@ func TestCreateBackup(t *testing.T) {
 		Manual:       true,
 	}
 
-	client, servers, err := mkTestClientAndServers(t, Handlers{
-		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups" {
-				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-			}
-			if req.Method != "POST" {
-				t.Fatalf("Wrong method %s", req.Method)
-			}
-			_, err := w.Write([]byte(`
+	rts := testutil.RequestTestSpec{
+		Method:   "POST",
+		Endpoint: lib.BrainEndpoint,
+		URL:      "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups",
+		Response: json.RawMessage(`
 			{
 				"id": 506,
 				"label": "philtesting-backup-20161122134250",
@@ -52,32 +48,22 @@ func TestCreateBackup(t *testing.T) {
 				"storage_pool": "t5-sata1",
 				"type": "application/vnd.bigv.disc",
 				"virtual_machine_id": 9
-			}`))
-			if err != nil {
-				t.Fatal(err)
-			}
-		}),
+			}`),
+	}
+
+	rts.Run(t, testutil.Name(0), true, func(client lib.Client) {
+		backup, err := client.CreateBackup(vm, disc)
+		if err != nil {
+			t.Errorf("TestCreateBackup ERR: %s", err)
+		}
+		if !reflect.DeepEqual(backup, testBackup) {
+			t.Errorf("TestCreateBackup FAIL: expected %#v but got %#v", testBackup, backup)
+		}
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	backup, err := client.CreateBackup(vm, disc)
-	if err != nil {
-		t.Errorf("TestCreateBackup ERR: %s", err)
-	}
-	if !reflect.DeepEqual(backup, testBackup) {
-		t.Errorf("TestCreateBackup FAIL: expected %#v but got %#v", testBackup, backup)
-	}
 }
 
 func TestDeleteBackup(t *testing.T) {
-
-	vm := VirtualMachineName{
+	vm := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account",
@@ -85,35 +71,23 @@ func TestDeleteBackup(t *testing.T) {
 
 	disc := "test-disc"
 
-	client, servers, err := mkTestClientAndServers(t, Handlers{
-		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups/test-backup" {
-				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-			}
-			if req.Method != "DELETE" {
-				t.Fatalf("Wrong method %s", req.Method)
-			}
-			if req.URL.Query().Get("purge") != "true" { // TODO(telyn): should really be parsing this with url.Values and checking that "purge" == "true"
-				t.Errorf("Didn't incude the purge parameter")
-			}
-		}),
+	rts := testutil.RequestTestSpec{
+		Method:        "DELETE",
+		URL:           "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups/test-backup",
+		Endpoint:      lib.BrainEndpoint,
+		AssertRequest: assert.QueryValue("purge", "true"),
+	}
+
+	rts.Run(t, testutil.Name(0), true, func(client lib.Client) {
+		err := client.DeleteBackup(vm, disc, "test-backup")
+		if err != nil {
+			t.Error(err)
+		}
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.DeleteBackup(vm, disc, "test-backup")
-	if err != nil {
-		t.Error(err)
-	}
 }
 
 func TestGetBackups(t *testing.T) {
-	vm := VirtualMachineName{
+	vm := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account",
@@ -121,15 +95,11 @@ func TestGetBackups(t *testing.T) {
 
 	disc := "test-disc"
 
-	client, servers, err := mkTestClientAndServers(t, Handlers{
-		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups" {
-				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-			}
-			if req.Method != "GET" {
-				t.Fatalf("Wrong method %s", req.Method)
-			}
-			_, err := w.Write([]byte(`[
+	rts := testutil.RequestTestSpec{
+		Method:   "GET",
+		URL:      "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups",
+		Endpoint: lib.BrainEndpoint,
+		Response: json.RawMessage(`[
 			{
 				"id": 509,
 				"label": "backup-509"
@@ -137,32 +107,22 @@ func TestGetBackups(t *testing.T) {
 				"id": 533,
 				"label": "backup-533"
 			}
-			]
-			`))
-			if err != nil {
-				t.Fatal(err)
-			}
-		}),
+			]`),
+	}
+
+	rts.Run(t, testutil.Name(0), true, func(client lib.Client) {
+		backups, err := client.GetBackups(vm, disc)
+		if err != nil {
+			t.Error(err)
+		}
+		if len(backups) != 2 {
+			t.Errorf("Wrong number of backups - %d expected, got %d", 2, len(backups))
+		}
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	backups, err := client.GetBackups(vm, disc)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(backups) != 2 {
-		t.Errorf("Wrong number of backups - %d expected, got %d", 2, len(backups))
-	}
 }
 
 func TestRestoreBackup(t *testing.T) {
-	vm := VirtualMachineName{
+	vm := lib.VirtualMachineName{
 		VirtualMachine: "test-vm",
 		Group:          "test-group",
 		Account:        "test-account",
@@ -170,43 +130,22 @@ func TestRestoreBackup(t *testing.T) {
 
 	disc := "test-disc"
 
-	client, servers, err := mkTestClientAndServers(t, Handlers{
-		brain: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path != "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups/test-backup" {
-				t.Fatalf("Unexpected HTTP request to %s", req.URL.String())
-			}
-			if req.Method != "PUT" {
-				t.Fatalf("Wrong method %s", req.Method)
-			}
-			bytes, err := ioutil.ReadAll(req.Body)
-			if err != nil {
-				t.Fatal(err)
-			}
-			obj := make(map[string]bool)
-			err = json.Unmarshal(bytes, &obj)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if restore, ok := obj["restore"]; !ok || !restore {
-				t.Error("Restore not found or was not true")
-			}
-			_, err = w.Write([]byte(``)) // TODO(telyn): in the future asking for a restore will return a backup (disc state prior to the restore), but not yet
-			if err != nil {
-				t.Fatal(err)
+	result := make(map[string]bool)
+
+	rts := testutil.RequestTestSpec{
+		Method:   "PUT",
+		Endpoint: lib.BrainEndpoint,
+		URL:      "/accounts/test-account/groups/test-group/virtual_machines/test-vm/discs/test-disc/backups/test-backup",
+		AssertRequest: assert.BodyUnmarshal(&result, func(_ *testing.T, testName string) {
+			if restore, ok := result["restore"]; !ok || !restore {
+				t.Errorf("%s request body: restore wasn't set or was not true", testName)
 			}
 		}),
+	}
+	rts.Run(t, testutil.Name(0), true, func(client lib.Client) {
+		_, err := client.RestoreBackup(vm, disc, "test-backup")
+		if err != nil {
+			t.Error(err)
+		}
 	})
-	defer servers.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = client.AuthWithCredentials(map[string]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = client.RestoreBackup(vm, disc, "test-backup")
-	if err != nil {
-		t.Error(err)
-	}
-	// TODO(telyn): no tests for the first return value of RestoreBackup because it's always nil until we get back a backup
 }
