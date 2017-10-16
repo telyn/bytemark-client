@@ -14,10 +14,6 @@ import (
 type sppTokenResponse struct {
 	Token string `json:"token"`
 }
-type sppTokenRequest struct {
-	Owner      billing.Person `json:"owner,omitempty"`
-	CardEnding string         `json:"card_ending"`
-}
 
 // GetSPPToken requests a token to use with SPP from bmbilling.
 // If owner is nil, authenticates against bmbilling.
@@ -29,14 +25,16 @@ func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner billing.Person) (t
 
 	// i'm not really interested in whether a card number is valid, just whether it's long enough to have a last 4 digits.
 	if len(cc.Number) < 4 {
-		return "", errors.New("credit card number too short")
+		err = errors.New("credit card number too short")
+		return
 	}
 
-	tokenRequest := sppTokenRequest{
-		Owner:      owner,
+	tokenRequest := billing.SPPTokenRequest{
+		Owner:      &owner,
 		CardEnding: cc.Number[len(cc.Number)-4:],
 	}
 	if !owner.IsValid() {
+		tokenRequest.Owner = nil
 		r.authenticate = true
 	}
 

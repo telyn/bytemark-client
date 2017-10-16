@@ -14,6 +14,14 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
+func TokenType(ep Endpoint) string {
+	switch ep {
+	case BillingEndpoint:
+		return "token"
+	}
+	return "bearer"
+}
+
 // RequestAlreadyRunError is returned if the Run method was already called for this Request.
 type RequestAlreadyRunError struct {
 	Request *Request
@@ -124,9 +132,10 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 		}
 		// if we could settle on a single standard
 		// rather than two basically-identical ones that'd be cool
-		if r.endpoint == BillingEndpoint {
+		switch TokenType(r.endpoint) {
+		case "token":
 			req.Header.Add("Authorization", "Token token="+r.client.GetSessionToken())
-		} else {
+		case "bearer":
 			req.Header.Add("Authorization", "Bearer "+r.client.GetSessionToken())
 		}
 	}

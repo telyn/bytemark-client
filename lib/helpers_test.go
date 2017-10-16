@@ -4,15 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"testing"
 )
-
-func assertMethod(t *testing.T, r *http.Request, expected string) {
-	if r.Method != expected {
-		t.Errorf("Wrong method %s", r.Method)
-	}
-}
 
 // writeJSON marshals the object as JSON and writes it to the writer
 func writeJSON(t *testing.T, wr io.Writer, object interface{}) {
