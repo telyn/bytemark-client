@@ -2,7 +2,6 @@ package lib_test
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -51,14 +50,13 @@ func TestCreateBackup(t *testing.T) {
 			}`),
 	}
 
-	rts.Run(t, testutil.Name(0), true, func(client lib.Client) {
+	testName := testutil.Name(0)
+	rts.Run(t, testName, true, func(client lib.Client) {
 		backup, err := client.CreateBackup(vm, disc)
 		if err != nil {
 			t.Errorf("TestCreateBackup ERR: %s", err)
 		}
-		if !reflect.DeepEqual(backup, testBackup) {
-			t.Errorf("TestCreateBackup FAIL: expected %#v but got %#v", testBackup, backup)
-		}
+		assert.Equal(t, testName, backup, testBackup)
 	})
 }
 

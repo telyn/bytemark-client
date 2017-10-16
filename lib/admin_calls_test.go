@@ -93,10 +93,7 @@ func simpleGetTest(t *testing.T, url string, testObject interface{}, runTest fun
 			t.Errorf("%s errored: %s", testName, err.Error())
 		}
 
-		if !reflect.DeepEqual(testObject, object) {
-			t.Errorf("%s didn't get expected object.\r\nExpected: %#v\r\nActual:   %#v", testName, testObject, object)
-		}
-
+		assert.Equal(t, testName, testObject, object)
 	})
 }
 
@@ -182,7 +179,7 @@ func TestGetVLANS(t *testing.T) {
 		if err != nil {
 			t.Errorf("%s - Unexpected error %s", testName, err)
 		}
-		assert.Response(t, testName, vlans, testVLANs)
+		assert.Equal(t, testName, vlans, testVLANs)
 	})
 }
 
