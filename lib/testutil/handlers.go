@@ -3,6 +3,7 @@ package testutil
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -75,7 +76,7 @@ func (mh *MuxHandlers) AddMux(ep lib.Endpoint, m Mux) (err error) {
 func closeBodyAfter(h http.HandlerFunc) http.HandlerFunc {
 	return func(wr http.ResponseWriter, r *http.Request) {
 		h.ServeHTTP(wr, r)
-		_, _ = r.Body.Close()
+		_ = r.Body.Close()
 	}
 }
 
@@ -123,14 +124,14 @@ func (h Handlers) MakeServers(t *testing.T) (s Servers) {
 	h.Fill(t)
 
 	if h.auth != nil {
-		s.auth = NewServer(h.auth)
+		s.auth = httptest.NewServer(h.auth)
 	} else {
 		s.auth = NewAuthServer()
 	}
-	s.brain = NewServer(h.brain)
-	s.billing = NewServer(h.billing)
-	s.api = NewServer(h.api)
-	s.spp = NewServer(h.spp)
+	s.brain = httptest.NewServer(h.brain)
+	s.billing = httptest.NewServer(h.billing)
+	s.api = httptest.NewServer(h.api)
+	s.spp = httptest.NewServer(h.spp)
 
 	return
 }
