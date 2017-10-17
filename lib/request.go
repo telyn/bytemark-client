@@ -14,6 +14,9 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
+// TokenType returns what kind of token is used for the given endpoint.
+// token for endpoints which expect an authorization header like "Token token=blah"
+// bearer for endpoints which expect one like "Bearer blah"
 func TokenType(ep Endpoint) string {
 	switch ep {
 	case BillingEndpoint:

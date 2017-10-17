@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// BodyString returns a RequestAssertFunc that asserts that the request body
 func BodyString(expected string) RequestAssertFunc {
 	return Body(func(t *testing.T, testName string, body string) {
 		if body != strings.TrimSpace(expected) {
@@ -17,7 +18,8 @@ func BodyString(expected string) RequestAssertFunc {
 	})
 }
 
-// BodyUnmarshal attempts to unmarshal the request body into object, then runs assertFunc.
+// BodyUnmarshal returns a RequestAssertFunc that unmarshals the request body
+// into object, then runs assertFunc.
 // Note that assertFunc does not accept an object - this is because it is intended that you write
 // assertFunc as a closure over your object.
 func BodyUnmarshal(object interface{}, assertFunc func(*testing.T, string)) RequestAssertFunc {
@@ -56,6 +58,8 @@ func Body(assertFunc func(t *testing.T, testName string, body string)) RequestAs
 	}
 }
 
+// BodyFormValue returns a RequestAssertFunc that asserts that the body is
+// form-encoded and has the key-value pair given.
 func BodyFormValue(key, expectedValue string) RequestAssertFunc {
 	return func(t *testing.T, testName string, r *http.Request) {
 		err := r.ParseForm()

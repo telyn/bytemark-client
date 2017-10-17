@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// URLValue asserts that key->expectedValue is a key-value pair in the urlValues.
 func URLValue(t *testing.T, testName string, urlValues url.Values, key, expectedValue string) {
 	values := urlValues[key]
 	if values == nil || len(values) == 0 {

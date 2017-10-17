@@ -52,13 +52,13 @@ func TestCreateDisc(t *testing.T) {
 						//TODO assert.BodyUnmarshal
 						//TODO to whoever has this MR: if you see this, make me write an ACTUAL test here.
 					)
-					w.Write([]byte(`{}`))
+					testutil.WriteJSON(t, w, map[string]interface{}{})
 				},
 				"/accounts/account/groups/group/virtual_machines/vm": func(w http.ResponseWriter, r *http.Request) {
 					// TODO: request test
 					// TODO: meaningful response
 					// TODO to whoever has this MR: if you see this, make me write an ACTUAL test here.
-					w.Write([]byte(`{}`))
+					testutil.WriteJSON(t, w, map[string]interface{}{})
 				},
 			},
 		},
