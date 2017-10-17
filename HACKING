@@ -166,6 +166,6 @@ that make up the client. This document should be updated whenever any
 are added or removed. The hash is tested every time gitlab-ci runs.
 To generate the hash, use the following command.
 
-  find . -type d \! -path './.*' \! -path './vendor/*' | sha256sum
+  find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum
 
-# sha256sum: a40eb81676d021152c670f65e29834ea6eb13022ca680c27616712a4fe0b14e2
+# sha256sum: 94dae55306a4eb9b459135822ba40921a4416968e8366b764580f0548bbe5377
