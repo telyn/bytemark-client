@@ -65,7 +65,7 @@ func (rts *RequestTestSpec) handlerFunc(t *testing.T, testName string, auth bool
 
 // mkMuxHandlers makes a MuxHandlers which contains one endpoint (specified by this RequestTestSpec)
 // which validates the Method and ExpectedRequest, then writes the Response
-func (rts *RequestTestSpec) mkMuxHandlers(t *testing.T, testName string, auth bool) (mh MuxHandlers) {
+func (rts *RequestTestSpec) mkMuxHandlers(t *testing.T, testName string, auth bool) (mh MuxHandlers, err error) {
 	return NewMuxHandlers(rts.Endpoint, rts.URL, rts.handlerFunc(t, testName, auth))
 }
 
@@ -73,7 +73,10 @@ func (rts *RequestTestSpec) mkMuxHandlers(t *testing.T, testName string, auth bo
 // fn should run some request method using the client & test the results of that function.
 func (rts *RequestTestSpec) Run(t *testing.T, testName string, auth bool, fn RequestTestFunc) {
 	if rts.MuxHandlers == nil {
-		mh := rts.mkMuxHandlers(t, testName, auth)
+		mh, err := rts.mkMuxHandlers(t, testName, auth)
+		if err != nil {
+			t.Fatalf("Couldn't create MuxHandlers - %s", err)
+		}
 		rts.MuxHandlers = &mh
 	}
 
