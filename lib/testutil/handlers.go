@@ -54,7 +54,7 @@ func (mh MuxHandlers) MakeServers(t *testing.T) (s Servers) {
 	return h.MakeServers(t)
 }
 
-func (mh *MuxHandlers) AddMux(ep lib.Endpoint, m Mux) {
+func (mh *MuxHandlers) AddMux(ep lib.Endpoint, m Mux) (err error) {
 	switch ep {
 	case lib.AuthEndpoint:
 		mh.Auth = m
@@ -80,8 +80,8 @@ func closeBodyAfter(h http.HandlerFunc) http.HandlerFunc {
 }
 
 // NewMuxHandlers creates a MuxHandler which will respond on the given endpoint URL with the handler provided, after which the request body will be automatically closed.
-func NewMuxHandlers(endpoint lib.Endpoint, url string, h http.HandlerFunc) (mh MuxHandlers) {
-	mh.AddMux(endpoint, Mux{
+func NewMuxHandlers(endpoint lib.Endpoint, url string, h http.HandlerFunc) (mh MuxHandlers, err error) {
+	err = mh.AddMux(endpoint, Mux{
 		url: closeBodyAfter(h),
 	})
 	return
