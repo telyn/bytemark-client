@@ -125,7 +125,7 @@ func TestCreateCreditCard(t *testing.T) {
 						assert.BodyFormValue("postcode", testCard.Postcode),
 						assert.BodyFormValue("country", testCard.Country),
 					)(t, testName, r)
-					w.Write([]byte("cool-card-ref"))
+					_, _ = w.Write([]byte("cool-card-ref"))
 				},
 			},
 		},

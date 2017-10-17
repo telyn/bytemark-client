@@ -54,7 +54,7 @@ func (mh MuxHandlers) MakeServers(t *testing.T) (s Servers) {
 	return h.MakeServers(t)
 }
 
-func (mh *MuxHandlers) AddMux(ep lib.Endpoint, m Mux) (err error) {
+func (mh *MuxHandlers) AddMux(ep lib.Endpoint, m Mux) {
 	switch ep {
 	case lib.AuthEndpoint:
 		mh.Auth = m
@@ -75,7 +75,7 @@ func (mh *MuxHandlers) AddMux(ep lib.Endpoint, m Mux) (err error) {
 func closeBodyAfter(h http.HandlerFunc) http.HandlerFunc {
 	return func(wr http.ResponseWriter, r *http.Request) {
 		h.ServeHTTP(wr, r)
-		r.Body.Close()
+		_, _ = r.Body.Close()
 	}
 }
 
@@ -87,6 +87,11 @@ func NewMuxHandlers(endpoint lib.Endpoint, url string, h http.HandlerFunc) (mh M
 	return
 }
 
+// Handlers is a struct which holds a http.Handler for each endpoint the client
+// could possibly talk to. It gets converted to a Servers by MakeServers, which
+// is the structure that's used in tests.
+// Due to the existence of RequestTestSpec, most if not all the tests in lib
+// and lib/requests should use RequestTestSpec instead of directly getting a Servers
 type Handlers struct {
 	auth    http.Handler
 	brain   http.Handler
@@ -95,6 +100,8 @@ type Handlers struct {
 	api     http.Handler
 }
 
+// Fill ensures each endpoint has an http.Handler - except auth.
+// auth is allowed to be nil.
 func (h *Handlers) Fill(t *testing.T) {
 	if h.brain == nil {
 		h.brain = NilHandler(t)
@@ -110,6 +117,8 @@ func (h *Handlers) Fill(t *testing.T) {
 	}
 }
 
+// MakeServers creates a Servers object from this Handlers.
+// if auth is nil, creates the default auth server with NewAuthServer.
 func (h Handlers) MakeServers(t *testing.T) (s Servers) {
 	h.Fill(t)
 

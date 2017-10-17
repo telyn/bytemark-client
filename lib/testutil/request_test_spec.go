@@ -95,5 +95,4 @@ func (rts *RequestTestSpec) Run(t *testing.T, testName string, auth bool, fn Req
 			t.Errorf("%s never called the HTTP endpoint", testName)
 		}
 	}
-	return
 }
