@@ -43,34 +43,47 @@ func getFixtureDiscSet() []brain.Disc {
 func TestCreateDisc(t *testing.T) {
 	testName := testutil.Name(0)
 
+	server := brain.VirtualMachine{
+		Discs: []brain.Disc{
+			{
+				Label: "disc-3",
+			},
+		},
+	}
+	expected := brain.Disc{
+		Label:        "disc-4",
+		StorageGrade: "sata",
+		Size:         26400,
+	}
+	disc := brain.Disc{}
 	rts := testutil.RequestTestSpec{
 		MuxHandlers: &testutil.MuxHandlers{
 			Brain: testutil.Mux{
 				"/accounts/account/groups/group/virtual_machines/vm/discs": func(w http.ResponseWriter, r *http.Request) {
 					assert.All(
 						assert.Method("POST"),
-						//TODO assert.BodyUnmarshal
-						//TODO to whoever has this MR: if you see this, make me write an ACTUAL test here.
-					)
+						assert.BodyUnmarshal(&disc, func(_ *testing.T, _ string) {
+							assert.Equal(t, testName, expected, disc)
+						}),
+					)(t, testName, r)
 					testutil.WriteJSON(t, w, map[string]interface{}{})
 				},
 				"/accounts/account/groups/group/virtual_machines/vm": func(w http.ResponseWriter, r *http.Request) {
-					// TODO: request test
-					// TODO: meaningful response
-					// TODO to whoever has this MR: if you see this, make me write an ACTUAL test here.
-					testutil.WriteJSON(t, w, map[string]interface{}{})
+					assert.Method("GET")(t, testName, r)
+					testutil.WriteJSON(t, w, server)
 				},
 			},
 		},
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		err := client.CreateDisc(lib.VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, getFixtureDisc())
+		err := client.CreateDisc(lib.VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, brain.Disc{
+			StorageGrade: "sata",
+			Size:         26400,
+		})
 		if err != nil {
 			t.Fatalf("%s err %s", testName, err)
 		}
-		// TODO response validation
-		//TODO to whoever has this MR: if you see this, make me write an ACTUAL test here.
 	})
 }
 
