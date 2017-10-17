@@ -26,7 +26,7 @@ func findTestName() (name string) {
 	return
 }
 
-// TestName returns a good name for the current test.
+// Name returns a good name for the current test.
 func Name(testNum int) string {
 	if testNum < 0 {
 		return findTestName()

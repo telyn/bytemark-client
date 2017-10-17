@@ -52,7 +52,7 @@ func Body(assertFunc func(t *testing.T, testName string, body string)) RequestAs
 		if err != nil {
 			t.Fatalf("%s couldn't read request body - %s", testName, err)
 		}
-		r.Body.Close()
+		_ = r.Body.Close()
 		r.Body = &fakeBody{bytes.NewBuffer(body)}
 		assertFunc(t, testName, strings.TrimSpace(string(body)))
 	}

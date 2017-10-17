@@ -64,7 +64,7 @@ func (s Servers) Client() (c lib.Client, err error) {
 	return
 }
 
-// ServersFactor is an interface used for convenience - so that Handlers or MuxHandlers can be passed to NewClientAndServers
+// ServersFactory is an interface used for convenience - so that Handlers or MuxHandlers can be passed to NewClientAndServers
 type ServersFactory interface {
 	MakeServers(t *testing.T) (s Servers)
 }

@@ -8,7 +8,7 @@ import (
 // URLValue asserts that key->expectedValue is a key-value pair in the urlValues.
 func URLValue(t *testing.T, testName string, urlValues url.Values, key, expectedValue string) {
 	values := urlValues[key]
-	if values == nil || len(values) == 0 {
+	if len(values) == 0 {
 		t.Errorf("%s %s parameter was not set", testName, key)
 		return
 	}
