@@ -136,8 +136,15 @@ run the following commands:
   go install github.com/BytemarkHosting/bytemark-client/...
   go test -run 'TestQuality.*' -tags quality
 
+The quality build tag is used to signify that the `go install` step is needed.
+It's needed to ensure that compiled code ends up in the $GOPATH/pkg dir, where
+it can be read by the `go/importer` package.
+
 Here's a probably-not-comprehensive description of the quality tests that are
 performed:
+
+lib/interface_test.go ensures that the lib.Client interface doesn't have any
+new methods added to it. 
 
 lib/output/types_test.go generates a test from lib/output/types_test.go.inc and
 runs it. This test ensures that all types in lib/brain, lib/billing and lib/spp
