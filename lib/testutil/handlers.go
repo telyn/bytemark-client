@@ -41,6 +41,7 @@ type MuxHandlers struct {
 	API     Mux
 }
 
+// MakeServers creates a Servers whose httptest.Server elements are handled by these Muxes
 func (mh MuxHandlers) MakeServers(t *testing.T) (s Servers) {
 	h := Handlers{
 		auth:    mh.Auth.ToHandler(),
@@ -55,6 +56,7 @@ func (mh MuxHandlers) MakeServers(t *testing.T) (s Servers) {
 	return h.MakeServers(t)
 }
 
+// AddMux adds a Mux for the endpoint passed. Returns an error if it didn't recognise that endpoint
 func (mh *MuxHandlers) AddMux(ep lib.Endpoint, m Mux) (err error) {
 	switch ep {
 	case lib.AuthEndpoint:
