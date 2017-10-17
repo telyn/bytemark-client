@@ -127,6 +127,52 @@ what they're for
 	      subpackages.
 
 ==============
+Quality testing
+==============
+
+Some automated quality tests are performed by gitlab-ci. To run them yourself,
+run the following commands:
+
+  go install github.com/BytemarkHosting/bytemark-client/...
+  go test -run 'TestQuality.*' -tags quality
+
+Here's a probably-not-comprehensive description of the quality tests that are
+performed:
+
+lib/output/types_test.go generates a test from lib/output/types_test.go.inc and
+runs it. This test ensures that all types in lib/brain, lib/billing and lib/spp
+implement DefaultFieldsHaver and PrettyPrinter, with a few exceptions which are
+specified near the top of lib/output/types_test.go.inc
+
+==============
+Notes on the direction we're trying to take
+==============
+
+In the early days of bytemark-client we were simply trying to achieve feature-
+parity with the panel & the old bigv-client.
+
+2.0 wasn't a huge change - just a few small breaking changes in lib.
+
+During 2.x we started adding a lot of admin commands, which exacerbated a
+problem we already knew existed - that cmd/bytemark and lib were both getting
+kinda bloated - many multiple-hundred-line files per package.
+
+Between 2.x and 3.0 we split out a lot of the utility-functions from
+cmd/bytemark to allow it to be split up. We also declared a moratorium on
+adding more methods to the lib.Client interface and cleaned up the tests to
+allow requests to be written in any package.
+
+The focus of 4.0 is going to be carving up cmd/bytemark and lib into multiple
+smaller packages, and splitting the files within up into smaller ones - one per
+request type.
+
+Maybe in 4.0 we'll also split the bytemark-client repo up in two:
+
+github.com/BytemarkHosting/client - which will contain the current cmd/bytemark
+                                    package and subpackages.
+github.com/BytemarkHosting/bmapi  - which will contain the current lib package.
+
+==============
 Making sure we update this document
 ==============
 
