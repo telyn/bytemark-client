@@ -9,7 +9,7 @@ import (
 func TestRequest(t *testing.T) {
 	var testMap map[string]string
 	r := mocks.Request{
-		t:              t,
+		T:              t,
 		ResponseObject: map[string]string{"hello": "hi"},
 	}
 	r.MarshalAndRun(nil, &testMap)
