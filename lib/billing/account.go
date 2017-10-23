@@ -9,6 +9,10 @@ type Account struct {
 	OwnerID            int    `json:"owner_id,omitempty"`
 	CardReference      string `json:"card_reference,omitempty"`
 	TechnicalContactID int    `json:"tech_id,omitempty"`
+
+	InvoiceTerms     int    `json:"invoice_terms,omitempty"`
+	PaymentMethod    string `json:"payment_method,omitempty"`
+	EarliestActivity string `json:"earliest_activity,omitempty"`
 }
 
 // IsValid returns true if the account is valid - whether its fields are set, or it should be considered a null account

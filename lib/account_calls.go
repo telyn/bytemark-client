@@ -172,8 +172,9 @@ func (c *bytemarkClient) GetDefaultAccount() (acc Account, err error) {
 		var brainAcc brain.Account
 
 		brainAcc, err = c.getBrainAccount(billAcc.Name)
+
 		if err != nil {
-			return
+			return acc, err
 		}
 		acc.fillBrain(brainAcc)
 	} else {

@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytes"
+	"net"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
@@ -14,7 +15,29 @@ func TestFormatAccount(t *testing.T) {
 	is := is.New(t)
 	b := new(bytes.Buffer)
 
-	gp := getFixtureGroup()
+	ip := net.IPv4(127, 0, 0, 1)
+	gp := brain.Group{
+		ID:   1,
+		Name: "default",
+		VirtualMachines: []brain.VirtualMachine{{
+			Name:    "valid-vm",
+			GroupID: 1,
+
+			Autoreboot:            true,
+			CdromURL:              "",
+			Cores:                 1,
+			Memory:                1,
+			PowerOn:               true,
+			HardwareProfile:       "fake-hardwareprofile",
+			HardwareProfileLocked: false,
+			ZoneName:              "default",
+			ID:                    1,
+			ManagementAddress:     ip,
+			Deleted:               false,
+			Hostname:              "valid-vm.default.account.fake-endpoint.example.com",
+			Head:                  "fakehead",
+		}},
+	}
 	acc := Account{
 		BillingID: 2402,
 		Name:      "test-account",
