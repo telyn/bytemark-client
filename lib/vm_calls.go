@@ -67,7 +67,7 @@ func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge boo
 
 // GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
 func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm brain.VirtualMachine, err error) {
-	var r *Request
+	var r Request
 
 	// If the VM name is numeric, it means it is an internal Bytemark ID,
 	// so we should use a different endpoint
@@ -216,7 +216,7 @@ func (c *bytemarkClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff
 	if err != nil {
 		return
 	}
-	var r *Request
+	var r Request
 	if stayoff {
 		r, err = c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
 		if err != nil {

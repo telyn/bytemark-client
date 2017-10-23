@@ -14,6 +14,18 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
+// Request is the lower-level type that makes HTTP calls
+type Request interface {
+	// GetURL gets the URL this request will be / has been made to
+	GetURL() url.URL
+	// AllowInsecure allows the Request to be made over http instead of https
+	AllowInsecure()
+	// JSON-marshals the input and runs the request, unmarshalling the response to out if it's not nil
+	MarshalAndRun(in interface{}, out interface{}) (statusCode int, responseBody []byte, err error)
+	// Runs the request, reading the request body to reader and unmarshalling the response to responseObject (if not nil)
+	Run(body io.Reader, responseObject interface{}) (statusCode int, responseBody []byte, err error)
+}
+
 // TokenType returns what kind of token is used for the given endpoint.
 // token for endpoints which expect an authorization header like "Token token=blah"
 // bearer for endpoints which expect one like "Bearer blah"
@@ -27,12 +39,12 @@ func TokenType(ep Endpoint) string {
 
 // RequestAlreadyRunError is returned if the Run method was already called for this Request.
 type RequestAlreadyRunError struct {
-	Request *Request
+	Request Request
 }
 
 // InsecureConnectionError is returned if the endpoint isn't https but AllowInsecure was not called.
 type InsecureConnectionError struct {
-	Request *Request
+	Request Request
 }
 
 func (e RequestAlreadyRunError) Error() string {
@@ -43,8 +55,8 @@ func (e InsecureConnectionError) Error() string {
 	return "A Request to an insecure endpoint was attempted when AllowInsecureRequests had not been called."
 }
 
-// Request is the workhorse of the bytemark-client/lib - it builds up a request, then Run can be called to get its results.
-type Request struct {
+// internalRequest is the workhorse of the bytemark-client/lib - it builds up a request, then Run can be called to get its results.
+type internalRequest struct {
 	authenticate  bool
 	client        Client
 	endpoint      Endpoint
@@ -56,7 +68,7 @@ type Request struct {
 }
 
 // GetURL returns the URL that the Request is for.
-func (r *Request) GetURL() url.URL {
+func (r *internalRequest) GetURL() url.URL {
 	if r.url == nil {
 		return url.URL{}
 	}
@@ -64,12 +76,12 @@ func (r *Request) GetURL() url.URL {
 }
 
 // BuildRequestNoAuth creates a new Request with the intention of not authenticating.
-func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
+func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r Request, err error) {
 	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
 		return
 	}
-	return &Request{
+	return &internalRequest{
 		client:        c,
 		endpoint:      endpoint,
 		url:           url,
@@ -79,12 +91,12 @@ func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, pa
 }
 
 // BuildRequest builds a request that will be authenticated by the endpoint given.
-func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (r *Request, err error) {
+func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (r Request, err error) {
 	url, err := c.BuildURL(endpoint, path, parts...)
 	if err != nil {
 		return
 	}
-	return &Request{
+	return &internalRequest{
 		authenticate:  true,
 		client:        c,
 		endpoint:      endpoint,
@@ -95,12 +107,12 @@ func (c *bytemarkClient) BuildRequest(method string, endpoint Endpoint, path str
 }
 
 // AllowInsecure tells the Request that it's ok if the endpoint isn't communicated with over HTTPS.
-func (r *Request) AllowInsecure() {
+func (r *internalRequest) AllowInsecure() {
 	r.allowInsecure = true
 }
 
 // mkHTTPClient creates an http.Client for this request. If the staging endpoint is used, InsecureSkipVerify is used because I guess we don't have a good cert for that brain.
-func (r *Request) mkHTTPClient() (c *http.Client) {
+func (r *internalRequest) mkHTTPClient() (c *http.Client) {
 	c = new(http.Client)
 	if r.url.Host == "staging.bigv.io" {
 		c.Transport = &http.Transport{
@@ -115,7 +127,7 @@ func (r *Request) mkHTTPClient() (c *http.Client) {
 }
 
 // mkHTTPRequest assembles an http.Request for this Request, adding Authorization headers as needed, setting the Content-Type correctly for whichever endpoint it's talking to.
-func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
+func (r *internalRequest) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 	req, err = http.NewRequest(r.method, r.url.String(), body)
 	if err != nil {
 		return nil, err
@@ -146,7 +158,7 @@ func (r *Request) mkHTTPRequest(body io.Reader) (req *http.Request, err error) {
 }
 
 // MarshalAndRun marshals the 'in' object and passes that and 'out' to Run as the body and responseObject, respectively.
-func (r *Request) MarshalAndRun(in interface{}, out interface{}) (statusCode int, responseBody []byte, err error) {
+func (r *internalRequest) MarshalAndRun(in interface{}, out interface{}) (statusCode int, responseBody []byte, err error) {
 	var b bytes.Buffer
 	err = json.NewEncoder(&b).Encode(in)
 	if err != nil {
@@ -157,7 +169,7 @@ func (r *Request) MarshalAndRun(in interface{}, out interface{}) (statusCode int
 }
 
 // Run performs the request with the given body, and attempts to unmarshal a successful response into responseObject
-func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode int, responseBody []byte, err error) {
+func (r *internalRequest) Run(body io.Reader, responseObject interface{}) (statusCode int, responseBody []byte, err error) {
 	if r.hasRun {
 		err = RequestAlreadyRunError{r}
 		return
@@ -201,7 +213,7 @@ func (r *Request) Run(body io.Reader, responseObject interface{}) (statusCode in
 }
 
 // handleResponse deals with the response coming back from the request - creating an error if required, unmarshalling responseObject if necessary
-func (r *Request) handleResponse(req *http.Request, requestBody []byte, res *http.Response, responseObject interface{}) (body []byte, err error) {
+func (r *internalRequest) handleResponse(req *http.Request, requestBody []byte, res *http.Response, responseObject interface{}) (body []byte, err error) {
 	body, err = ioutil.ReadAll(res.Body)
 	log.Debugf(log.LvlHTTPData, "response body: '%s'\r\n", body)
 	if err != nil {
