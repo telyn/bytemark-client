@@ -60,7 +60,7 @@ func (c *bytemarkClient) GetIPRanges() (ipRanges brain.IPRanges, err error) {
 
 func (c *bytemarkClient) GetIPRange(idOrCIDR string) (ipRange brain.IPRange, err error) {
 	if _, err = strconv.Atoi(idOrCIDR); err == nil {
-		var r *Request
+		var r Request
 		// Numeric means it is just an ID
 		r, err = c.BuildRequest("GET", BrainEndpoint, "/admin/ip_ranges/%s", idOrCIDR)
 		if err != nil {

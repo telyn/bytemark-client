@@ -1,10 +1,10 @@
 package lib
 
 import (
-	auth3 "gitlab.bytemark.co.uk/auth/client"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
+	auth3 "gitlab.bytemark.co.uk/auth/client"
 )
 
 // Client provides the interface which all API clients should implement.
@@ -52,8 +52,8 @@ type Client interface {
 	//
 
 	AllowInsecureRequests()
-	BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
-	BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (*Request, error)
+	BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (Request, error)
+	BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (Request, error)
 
 	///////////////////////
 	////// SPP STUFF //////

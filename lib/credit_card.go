@@ -35,7 +35,11 @@ func (c *bytemarkClient) GetSPPToken(cc spp.CreditCard, owner billing.Person) (t
 	}
 	if !owner.IsValid() {
 		tokenRequest.Owner = nil
-		r.authenticate = true
+		// rebuild the request so it has auth
+		r, err = c.BuildRequest("POST", BillingEndpoint, "/api/v1/accounts/spp_token")
+		if err != nil {
+			return
+		}
 	}
 
 	js, err := json.Marshal(&tokenRequest)
