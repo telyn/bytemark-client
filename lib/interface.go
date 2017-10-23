@@ -1,7 +1,7 @@
 package lib
 
 import (
-	auth3 "github.com/BytemarkHosting/auth-client"
+	auth3 "gitlab.bytemark.co.uk/auth/client"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"

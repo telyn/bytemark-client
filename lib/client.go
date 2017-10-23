@@ -1,9 +1,10 @@
 package lib
 
 import (
+"context"
 	"errors"
 
-	auth3 "github.com/BytemarkHosting/auth-client"
+	auth3 "gitlab.bytemark.co.uk/auth/client"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
@@ -79,7 +80,7 @@ func NewWithURLs(urls EndpointURLs) (c Client, err error) {
 
 // AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
 func (c *bytemarkClient) AuthWithCredentials(credentials auth3.Credentials) error {
-	session, err := c.auth.CreateSession(credentials)
+	session, err := c.auth.CreateSession(context.TODO(), credentials)
 	if err == nil {
 		c.authSession = session
 	}
@@ -92,7 +93,7 @@ func (c *bytemarkClient) AuthWithToken(token string) error {
 		return errors.New("No token provided")
 	}
 
-	session, err := c.auth.ReadSession(token)
+	session, err := c.auth.ReadSession(context.TODO(), token)
 	if err == nil {
 		c.authSession = session
 	}

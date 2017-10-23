@@ -93,8 +93,7 @@ what they're for
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
 │       ├── commands
 │       │   └── admin
-│       ├── output
-│       ├── testutil
+│       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
 │           │      including: Config - which manages configuration from the
 │	    │                          environment, global flags and config dir
@@ -102,15 +101,17 @@ what they're for
 │	    │                               to a given page on any OS
 │	    │                 Some additional parsing functions and flag types
 │	    │         	           that don't require access to an app.Context
-│           │	      
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff. 
 │         Also includes the manpage source (bytemark.asciidoc)
 ├── gen - scripts to aid the building/distributing process.
-|         changelog.
-├── lib
-│   ├── billing - types for using when connecting to the bmbilling server
-│   ├── brain - types for using with the Bytemark Cloud Servers brain
+│         changelog.
+├── lib - the main API client object, which makes requests.
+│   │     At the moment, loads of requests are defined as methods on lib.Client,
+│   │     but we want to move away from that and towards requests being
+│   │     functions which take a lib.Client.
+│   ├── billing - types & requests for use with the bmbilling server
+│   ├── brain - types & requests for use with the Bytemark Cloud Servers brain
 │   ├── output - Functions and types related to human-readable output of the
 │   │   │        other types in lib.
 │   │	│        DefaultFieldsHaver interface defined and tested-for here
@@ -119,7 +120,9 @@ what they're for
 │   │                     writing PrettyPrinters
 │   │                     All the types in lib/billing, lib/brain and lib/spp 
 │   │                     should implement PrettyPrinter
-│   └── spp - types for using when connecting to the spp server
+│   ├── spp - types & requests for use with the spp server
+│   └── testutil - helpers for HTTP tests in lib
+│       └── assert - assertion helpers for tests. with emphasis on HTTP tests from testutil.
 ├── mocks - mock types used for testing in various packages
 └── util - empty package
     └── log - mostly-deprecated logging functions. Needs some refactoring,
@@ -188,6 +191,6 @@ that make up the client. This document should be updated whenever any
 are added or removed. The hash is tested every time gitlab-ci runs.
 To generate the hash, use the following command.
 
-  find . -type d \! -path './.*' \! -path './vendor/*' | sha256sum
+  find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum
 
-# sha256sum: 77bfeae54ad286e611237e9102bd0deb0e9d78d83e0cf690ea3b729da38ad4b7
+# sha256sum: 94dae55306a4eb9b459135822ba40921a4416968e8366b764580f0548bbe5377

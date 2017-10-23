@@ -10,7 +10,7 @@ import (
 	"strings"
 	"syscall"
 
-	auth3 "github.com/BytemarkHosting/auth-client"
+	auth3 "gitlab.bytemark.co.uk/auth/client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
@@ -177,7 +177,7 @@ func ProcessError(err error, message ...string) ExitCode {
 	if err != nil {
 		switch e := err.(type) {
 		case *auth3.Error:
-			// TODO(telyn): I feel like this entire chunk should be in github.com/BytemarkHosting/auth-client
+			// TODO(telyn): I feel like this entire chunk should be in gitlab.bytemark.co.uk/auth/client
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)

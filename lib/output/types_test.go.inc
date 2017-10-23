@@ -39,6 +39,9 @@ func isIgnoredType(t string) bool {
 	// billing.Accounts should ALWAYS be dressed as lib.Accounts
 	case "billing.Account":
 		return true
+	// billing.SPPTokenRequests will only be sent, never received.
+	case "billing.SPPTokenRequest":
+		return true
 	// as if spp would return credit card details to us :]
 	case "spp.CreditCard":
 		return true
