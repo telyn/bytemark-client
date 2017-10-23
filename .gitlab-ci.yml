@@ -74,7 +74,6 @@ test:
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - export GOPATH
-    - go generate github.com/BytemarkHosting/bytemark-client/lib/output
     - |
       for pkg in $(go list ./... | grep -v vendor/); do
         shortpkg="${pkg##github.com/BytemarkHosting/}"
@@ -88,6 +87,15 @@ test:
     paths:
     - coverage.html
     expire_in: '1 week'
+
+quality-test:
+  <<: *test
+  script: 
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - export GOPATH
+    - go install ./...
+    - go generate -tags quality $(go list ./... | grep -v vendor)
+    - go test -run 'TestQuality.*' -tags quality ./...
 
 # release-check makes sure that if we're on a release tag then the changelog and lib/version.go have been updated.
 release-check:

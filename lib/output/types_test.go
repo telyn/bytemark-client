@@ -1,3 +1,5 @@
+// +build quality
+
 package output_test
 
 // This file is used by go_generate to create a test from types_test.go.inc
@@ -13,5 +15,5 @@ package output_test
 // the go install step is needed because gen/list_types.go uses the compiled libraries
 // and is not able to use the source.
 
-//go:generate go install "github.com/BytemarkHosting/bytemark-client/lib/brain" "github.com/BytemarkHosting/bytemark-client/lib/billing" "github.com/BytemarkHosting/bytemark-client/lib/spp"
+//go:generate go install "github.com/BytemarkHosting/bytemark-client/lib" "github.com/BytemarkHosting/bytemark-client/lib/..."
 //go:generate go run ../../gen/list_types.go -f "(*%s)(nil)," -o generated_types_test.go -t types_test.go.inc "github.com/BytemarkHosting/bytemark-client/lib/brain" "github.com/BytemarkHosting/bytemark-client/lib/billing" "github.com/BytemarkHosting/bytemark-client/lib/spp"

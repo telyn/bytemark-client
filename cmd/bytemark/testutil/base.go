@@ -53,11 +53,7 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 	if err != nil {
 		t.Fatal(err)
 	}
-	cliapp.Metadata = map[string]interface{}{
-		"client": client,
-		"config": config,
-	}
-
+	app.SetClientAndConfig(cliapp, client, config)
 	cliapp.Writer = ioutil.Discard
 	for _, c := range commands {
 		//config.When("Get", "token").Return("no-not-a-token")

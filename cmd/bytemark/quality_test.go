@@ -1,3 +1,9 @@
+// do not add the quality build tag to this file - it requires access to the
+// unexported commands variable, so has to be in package main rather than
+// main_test. For some reason this seems to mess up build tags.
+// This test doesn't add any prerequisites for running 'go test' anyway, unlike
+// the other ones, and doesn't take long to run. So it's fine to keep it in the
+// main test job.
 package main
 
 import (
