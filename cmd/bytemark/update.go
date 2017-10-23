@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	billingRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -47,12 +48,15 @@ func init() {
 					},
 					cli.IntFlag{
 						Name:  "trial-pence",
-						Usage: "the maximum spend, in pence, of future trials",
+						Usage: "the maximum monthly cost, in pence, of future trials",
 					},
 				},
 				Action: app.Action(with.Auth, func(ctx *app.Context) error {
-					billingDefinitions := billing.Definitions{}
-					return ctx.Client().SetBillingDefinitions()
+					billingDefinitions := billing.Definitions{
+						TrialDays:  ctx.Int("trial-days"),
+						TrialPence: ctx.Int("trial-pence"),
+					}
+					return billingRequests.UpdateDefinitions(ctx.Client(), billingDefinitions)
 				}),
 			}, {
 				Name:      "head",

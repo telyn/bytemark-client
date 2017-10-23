@@ -7,24 +7,37 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
 
 func TestUpdateBmbilling(t *testing.T) {
 	is := is.New(t)
 	tests := []struct {
-		Command string
+		Command  string
+		Expected interface{}
 	}{
 		{
-			Command: "bytemark update bmbilling --trial-days 7",
+			Command:  "bytemark update bmbilling --trial-days 7",
+			Expected: billing.Definitions{TrialDays: 7},
 		}, {
-			Command: "bytemark update bmbilling --trial-pence 2000",
+			Command:  "bytemark update bmbilling --trial-pence 2000",
+			Expected: billing.Definitions{TrialPence: 2000},
 		}, {
 			Command: "bytemark update bmbilling --trial-days 7 --trial-pence 2000",
+			Expected: billing.Definitions{
+				TrialDays:  7,
+				TrialPence: 2000,
+			},
 		},
 	}
 	for _, test := range tests {
 		_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+		c.MockRequest = &mocks.Request{
+			T:          t,
+			StatusCode: 200,
+		}
 
 		err := app.Run(strings.Split(test.Command, " "))
 		is.Nil(err)
