@@ -8,7 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
-	billingRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
+	billingMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -38,25 +38,42 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
-				Name:      "bmbilling",
-				Usage:     "update bmbilling's definitions",
-				UsageText: "bytemark --admin update bmbilling [--trial-days <days>] [--trial-pence <pence>]",
+				Name:      "billing-definition",
+				Usage:     "update a bmbilling definition",
+				UsageText: "bytemark --admin update billing-definition [flags] [name] [value]",
 				Flags: []cli.Flag{
-					cli.IntFlag{
-						Name:  "trial-days",
-						Usage: "the number of days in future trials",
+					cli.StringFlag{
+						Name:  "name",
+						Usage: "the name of the definition to set",
 					},
-					cli.IntFlag{
-						Name:  "trial-pence",
-						Usage: "the maximum monthly cost, in pence, of future trials",
+					cli.StringFlag{
+						Name:  "value",
+						Usage: "the value of the definition to set",
+					},
+					cli.StringFlag{
+						Name:  "group",
+						Usage: "the group a user must be in to update the definition",
 					},
 				},
-				Action: app.Action(with.Auth, func(ctx *app.Context) error {
-					billingDefinitions := billing.Definitions{
-						TrialDays:  ctx.Int("trial-days"),
-						TrialPence: ctx.Int("trial-pence"),
+				Action: app.Action(args.Optional("name", "value"), with.RequiredFlags("name", "value"), with.Auth, func(ctx *app.Context) error {
+					def := billing.Definition{
+						Name:           ctx.String("name"),
+						Value:          ctx.String("value"),
+						UpdateGroupReq: ctx.String("group"),
 					}
-					return billingRequests.UpdateDefinitions(ctx.Client(), billingDefinitions)
+					if _, err := billingMethods.GetDefinition(ctx.Client(), def.Name); err != nil {
+						if _, ok := err.(lib.NotFoundError); ok {
+							ctx.LogErr("Couldn't find a definition called %s - aborting.", def.Name)
+							return nil
+						}
+						return err
+					}
+					err := billingMethods.UpdateDefinition(ctx.Client(), def)
+					if err == nil {
+						ctx.LogErr("Updated %s to %s", def.Name, def.Value)
+					}
+					return err
+
 				}),
 			}, {
 				Name:      "head",

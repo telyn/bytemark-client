@@ -1,9 +1,13 @@
 package app
 
 import (
+	"io"
+	"os"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -13,6 +17,14 @@ func BaseAppSetup(flags []cli.Flag, commands []cli.Command) (app *cli.App, err e
 	app.Version = lib.Version
 	app.Flags = flags
 	app.Commands = commands
+	app.Writer = io.MultiWriter(
+		log.LogFile,
+		os.Stdout,
+	)
+	app.ErrWriter = io.MultiWriter(
+		log.LogFile,
+		os.Stderr,
+	)
 
 	/* TODO(telyn): move this clump over to main, probably.
 	   Phil - if you see this, I've messed up
