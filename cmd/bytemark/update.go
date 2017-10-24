@@ -80,7 +80,7 @@ func init() {
 						Usage: "the label of the head",
 					},
 				},
-				Action: app.With(args.Optional("head", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("head", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateHead{
@@ -120,7 +120,7 @@ func init() {
 						Usage: "the label of the tail",
 					},
 				},
-				Action: app.With(args.Optional("tail", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("tail"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("tail", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("tail"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateTail{
@@ -160,7 +160,7 @@ func init() {
 						Usage: "the label of the storage pool",
 					},
 				},
-				Action: app.With(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
 					options := lib.UpdateStoragePool{
@@ -203,7 +203,7 @@ func init() {
 								Usage: "the max allowed downtime",
 							},
 						},
-						Action: app.With(args.Optional("server", "migrate-speed", "migrate-downtime"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
+						Action: app.Action(args.Optional("server", "migrate-speed", "migrate-downtime"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 							vm := c.VirtualMachineName("server")
 
 							var speed *int64

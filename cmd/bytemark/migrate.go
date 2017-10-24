@@ -28,7 +28,7 @@ func init() {
 						Usage: "the storage pool to move the disc to",
 					},
 				},
-				Action: app.With(args.Optional("disc", "new-storage-pool"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) (err error) {
+				Action: app.Action(args.Optional("disc", "new-storage-pool"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) (err error) {
 					disc := c.Int("disc")
 					storagePool := c.String("new-storage-pool")
 
@@ -58,7 +58,7 @@ func init() {
 						Usage: "the head to move the server to",
 					},
 				},
-				Action: app.With(args.Optional("server", "new-head"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
+				Action: app.Action(args.Optional("server", "new-head"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 					vm := c.VirtualMachineName("server")
 					head := c.String("new-head")
 

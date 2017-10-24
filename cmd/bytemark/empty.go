@@ -23,7 +23,7 @@ func init() {
 						Usage: "the ID or label of the storage pool to be emptied",
 					},
 				},
-				Action: app.With(args.Optional("storage-pool"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("storage-pool"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 					if err := c.Client().EmptyStoragePool(c.String("storage-pool")); err != nil {
 						return err
 					}
@@ -43,7 +43,7 @@ func init() {
 						Usage: "the ID or label of the head to be emptied",
 					},
 				},
-				Action: app.With(args.Optional("head"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("head"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
 					if err := c.Client().EmptyHead(c.String("head")); err != nil {
 						return err
 					}

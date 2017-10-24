@@ -28,7 +28,7 @@ This command locks the given server's hardware profile in place, preventing it f
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 				vmName := c.VirtualMachineName("server")
 				return c.Client().SetVirtualMachineHardwareProfileLock(vmName, true)
 			}),
@@ -53,7 +53,7 @@ This command locks the given server's hardware profile in place, preventing it f
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 				vmName := c.VirtualMachineName("server")
 				return c.Client().SetVirtualMachineHardwareProfileLock(vmName, false)
 			}),

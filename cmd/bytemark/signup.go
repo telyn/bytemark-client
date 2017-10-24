@@ -32,7 +32,7 @@ If you have previously used the client, you'll have a login and will need to add
 				Usage: "sign up for a new account & login despite already having a login.",
 			},
 		},
-		Action: app.With(func(c *app.Context) error {
+		Action: app.Action(func(c *app.Context) error {
 
 			// TODO(telyn): check a terminal is attached to stdin to try to help prevent fraudy/spammy crap just in case
 			ssoExists := false

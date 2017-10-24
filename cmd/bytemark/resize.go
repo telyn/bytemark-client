@@ -43,7 +43,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 					Value: new(app.ResizeFlag),
 				},
 			},
-			Action: app.With(args.Optional("server", "disc", "new-size"), with.RequiredFlags("server", "disc", "new-size"), with.Disc("server", "disc"), func(c *app.Context) (err error) {
+			Action: app.Action(args.Optional("server", "disc", "new-size"), with.RequiredFlags("server", "disc", "new-size"), with.Disc("server", "disc"), func(c *app.Context) (err error) {
 				vmName := c.VirtualMachineName("server")
 				size := c.ResizeFlag("new-size")
 				newSize := size.Size

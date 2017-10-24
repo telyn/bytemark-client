@@ -36,7 +36,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 				Usage: "Send the request to the billing endpoint instead of the brain.",
 			},
 		},
-		Action: app.With(func(c *app.Context) error {
+		Action: app.Action(func(c *app.Context) error {
 			shouldAuth := c.Bool("auth")
 
 			endpoint := lib.BrainEndpoint
