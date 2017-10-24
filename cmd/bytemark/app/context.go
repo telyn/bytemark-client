@@ -51,10 +51,12 @@ func (c *Context) Args() []string {
 	return c.args()[c.currentArgIndex:]
 }
 
+// Writer returns the app writer. just a convenience method for c.App().Writer
 func (c *Context) Writer() io.Writer {
 	return c.App().Writer
 }
 
+// ErrWriter returns the app writer. just a convenience method for c.App().ErrWriter
 func (c *Context) ErrWriter() io.Writer {
 	return c.App().ErrWriter
 }
