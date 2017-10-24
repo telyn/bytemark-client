@@ -34,5 +34,5 @@ Value: {{ .Value }}
 Update Group Requirement: {{ .UpdateGroupReq }}
 		{{- end }}
 	`
-	prettyprint.Run(wr, definitionTpl, "definition"+detail)
+	prettyprint.Run(wr, definitionTpl, "definition"+detail, d)
 }
