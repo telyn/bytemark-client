@@ -23,7 +23,7 @@ func (d Definition) DefaultFields(f output.Format) string {
 }
 
 // PrettyPrint writes the Definition in a human-readable form at the given detail level to wr
-func (d Definition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) {
+func (d Definition) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	definitionTpl := `
 		{{ define "definition_sgl" }}{{ .Name }}: {{ .Value }}{{ end }}
 		{{ define "definition_medium" }}{{ template "definition_sgl" . }}{{ end }}
@@ -34,5 +34,5 @@ Value: {{ .Value }}
 Update Group Requirement: {{ .UpdateGroupReq }}
 		{{- end }}
 	`
-	prettyprint.Run(wr, definitionTpl, "definition"+string(detail), d)
+	return prettyprint.Run(wr, definitionTpl, "definition"+string(detail), d)
 }
