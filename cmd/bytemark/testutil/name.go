@@ -4,6 +4,7 @@ import (
 	ltu "github.com/BytemarkHosting/bytemark-client/lib/testutil"
 )
 
-func Name(test int) string {
-	return ltu.Name(test)
+// Name returns a sensible name for this test
+func Name(iteration int) string {
+	return ltu.Name(iteration)
 }
