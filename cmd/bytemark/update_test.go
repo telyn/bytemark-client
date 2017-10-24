@@ -8,31 +8,36 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
 
-func TestUpdateBmbilling(t *testing.T) {
-	is := is.New(t)
+func TestUpdateBillingDefinition(t *testing.T) {
 	tests := []struct {
-		Command  string
-		Expected interface{}
+		Command   string
+		Expected  interface{}
+		ShouldErr bool
 	}{
 		{
-			Command:  "bytemark update bmbilling --trial-days 7",
-			Expected: billing.Definitions{TrialDays: 7},
+			Command:   "bytemark update billing-definition",
+			ShouldErr: true,
 		}, {
-			Command:  "bytemark update bmbilling --trial-pence 2000",
-			Expected: billing.Definitions{TrialPence: 2000},
+			Command: "bytemark update billing-definition --name trial_pence --value 2000",
+			Expected: billing.Definition{
+				Name:  "trial_pence",
+				Value: "2000",
+			},
 		}, {
-			Command: "bytemark update bmbilling --trial-days 7 --trial-pence 2000",
-			Expected: billing.Definitions{
-				TrialDays:  7,
-				TrialPence: 2000,
+			Command: "bytemark update billing-definition --name trial_pence --value 2000 --group senior",
+			Expected: billing.Definition{
+				Name:           "trial_pence",
+				Value:          "2000",
+				UpdateGroupReq: "senior",
 			},
 		},
 	}
-	for _, test := range tests {
+	for i, test := range tests {
 		_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
 		c.MockRequest = &mocks.Request{
 			T:          t,
@@ -40,8 +45,13 @@ func TestUpdateBmbilling(t *testing.T) {
 		}
 
 		err := app.Run(strings.Split(test.Command, " "))
-		is.Nil(err)
-		if ok, err := c.Verify(); !ok {
+		if err != nil && !test.ShouldErr {
+			t.Errorf("TestUpdateBillingDefinition %d ERR: %s", i, err)
+		} else if err == nil && test.ShouldErr {
+			t.Errorf("TestUpdateBillingDefinition %d didn't err but should've", i)
+		}
+		assert.Equal(t, testutil.Name(i), test.Expected, c.MockRequest.RequestObject)
+		if ok, err := c.Verify(); !ok && !test.ShouldErr {
 			t.Fatal(err)
 		}
 	}
