@@ -45,6 +45,14 @@ func (fb *fakeBody) Close() error {
 	return nil
 }
 
+// BodyUnmarshalEqual makes a RequestAssertFunc that reads the request body, unmarshals it, and checks the unmarshalled object is equal to expected.
+func BodyUnmarshalEqual(expected map[string]interface{}) RequestAssertFunc {
+	body := make(map[string]interface{})
+	return BodyUnmarshal(&body, func(t *testing.T, testName string) {
+		Equal(t, testName, expected, body)
+	})
+}
+
 // Body reads the request's body and checks it's the same as expected
 func Body(assertFunc func(t *testing.T, testName string, body string)) RequestAssertFunc {
 	return func(t *testing.T, testName string, r *http.Request) {

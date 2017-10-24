@@ -51,17 +51,14 @@ func (c *Context) Args() []string {
 	return c.args()[c.currentArgIndex:]
 }
 
-// Debug runs fmt.Fprintf on the args, outputting to the App's debugWriter.
-// In tests, this is a TestWriter. Otherwise it's nil for now - but might be
-// changed to the debug.log File in the future.
-func (c *Context) Debug(format string, values ...interface{}) {
-	dw, ok := c.App().Metadata["debugWriter"]
-	if !ok {
-		return
-	}
-	if wr, ok := dw.(io.Writer); ok {
-		fmt.Fprintf(wr, format, values...)
-	}
+// Writer returns the app writer. just a convenience method for c.App().Writer
+func (c *Context) Writer() io.Writer {
+	return c.App().Writer
+}
+
+// ErrWriter returns the app writer. just a convenience method for c.App().ErrWriter
+func (c *Context) ErrWriter() io.Writer {
+	return c.App().ErrWriter
 }
 
 // Command returns the cli.Command this context is for

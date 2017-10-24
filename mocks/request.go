@@ -9,6 +9,8 @@ import (
 
 type Request struct {
 	StatusCode     int
+	RequestBody    io.Reader
+	RequestObject  interface{}
 	ResponseBody   []byte
 	ResponseObject interface{}
 	Err            error
@@ -43,10 +45,12 @@ func (r *Request) fillOut(out interface{}) {
 }
 
 func (r *Request) MarshalAndRun(in interface{}, out interface{}) (statusCode int, responseBody []byte, err error) {
+	r.RequestObject = in
 	r.fillOut(out)
 	return r.StatusCode, r.ResponseBody, r.Err
 }
 func (r *Request) Run(body io.Reader, out interface{}) (statusCode int, responseBody []byte, err error) {
 	r.fillOut(out)
+	r.RequestBody = body
 	return r.StatusCode, r.ResponseBody, r.Err
 }

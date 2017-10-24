@@ -31,13 +31,13 @@ client:
    to the urfave/cli.App.
 5. cmd/bytemark.main runs the cli.App, which calls the relevant command's Action
    or returns help, whatever is needed.
-6. Most command actions are made using cmd/bytemark/app.With, chaining together
+6. Most command actions are made using cmd/bytemark/app.Action, chaining together
    functions from cmd/bytemark/app/args and cmd/bytemark/app/with - which are
    used to collect and parse data from the command line and to get data from the
    API. 
 7. The final function in the command's Action chain then performs whatever task
    the purpose of the command is.
-8. Any errors in the cmd/bytemark/app.With chain bubble back up through the
+8. Any errors in the cmd/bytemark/app.Action chain bubble back up through the
    original invocation of urfave/cli.App.Run to cmd/bytemark.main()
 9. cmd/bytemark.main() then calls cmd/bytemark/util.ProcessError, which attempts
    to understand and present the error (if there was one) in a nice,
@@ -52,15 +52,15 @@ pretty normal command, in terms of its implementation. It's defined in show.go
 
 Here's the source for its Action. (app here being cmd/bytemark/app)
 
-Action: app.With(args.Optional("account"), with.Account("account"),
+Action: app.Action(args.Optional("account"), with.Account("account"),
          func(c *app.Context) error {
 	     return c.OutputInDesiredForm(c.Account)
          }
 ),
 
-app.With returns a `func(c *cli.Context) error`, and takes 
+app.Action returns a `func(c *cli.Context) error`, and takes 
 `(func(c *app.Context) error)...` as arguments. The function returned by
-app.With wraps the cli.Context in an app.Context, then exectutes each function
+app.Action wraps the cli.Context in an app.Context, then exectutes each function
 in order, stopping at the first error. args.Optional("account") reads the next
 command line argument if there is one and sets the flag named "account" with 
 it. with.Account("account") takes the "account" flag and attaches it to the
@@ -86,9 +86,9 @@ what they're for
 │       ├── app - setup functions for our cliApp
 │       │   │      github.com/urfave/cli, plus our Context which is full of
 │       │   │      useful methods for dealing with flags & output 
-│       │   ├── args - functions for chaining together using app.With to parse
+│       │   ├── args - functions for chaining together using app.Action to parse
 │       │   │          arguments into flags
-│       │   └── with - functions for chaining together using app.With to attach
+│       │   └── with - functions for chaining together using app.Action to attach
 │       │                       things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
 │       ├── commands
@@ -110,8 +110,8 @@ what they're for
 │   │     At the moment, loads of requests are defined as methods on lib.Client,
 │   │     but we want to move away from that and towards requests being
 │   │     functions which take a lib.Client.
-│   ├── billing - types & requests for use with the bmbilling server
-│   ├── brain - types & requests for use with the Bytemark Cloud Servers brain
+│   ├── billing - types for use with the bmbilling server
+│   ├── brain - types for use with the Bytemark Cloud Servers brain
 │   ├── output - Functions and types related to human-readable output of the
 │   │   │        other types in lib.
 │   │	│        DefaultFieldsHaver interface defined and tested-for here
@@ -120,6 +120,8 @@ what they're for
 │   │                     writing PrettyPrinters
 │   │                     All the types in lib/billing, lib/brain and lib/spp 
 │   │                     should implement PrettyPrinter
+│   ├── requests - empty package
+│   │   └── billing - functions that make requests against the billing endpoint
 │   ├── spp - types & requests for use with the spp server
 │   └── testutil - helpers for HTTP tests in lib
 │       └── assert - assertion helpers for tests. with emphasis on HTTP tests from testutil.
@@ -170,7 +172,10 @@ kinda bloated - many multiple-hundred-line files per package.
 Between 2.x and 3.0 we split out a lot of the utility-functions from
 cmd/bytemark to allow it to be split up. We also declared a moratorium on
 adding more methods to the lib.Client interface and cleaned up the tests to
-allow requests to be written in any package.
+allow requests to be written in any package. See the 'update
+billing-definition' command in update.go and the UpdateDefinition and 
+GetDefinition functions in lib/requests/billing, and the tests for those, for
+examples on how to structure code in this new way.
 
 The focus of 4.0 is going to be carving up cmd/bytemark and lib into multiple
 smaller packages, and splitting the files within up into smaller ones - one per
@@ -193,4 +198,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum
 
-# sha256sum: 94dae55306a4eb9b459135822ba40921a4416968e8366b764580f0548bbe5377
+# sha256sum: 637f80e460c59e13de9e4f5d506a46c7a45405a460ef3edfc35f908141db9a2d
+

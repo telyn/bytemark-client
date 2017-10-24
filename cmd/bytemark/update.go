@@ -7,6 +7,8 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	billingMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -36,6 +38,44 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
+				Name:      "billing-definition",
+				Usage:     "update a bmbilling definition",
+				UsageText: "bytemark --admin update billing-definition [flags] [name] [value]",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "name",
+						Usage: "the name of the definition to set",
+					},
+					cli.StringFlag{
+						Name:  "value",
+						Usage: "the value of the definition to set",
+					},
+					cli.StringFlag{
+						Name:  "group",
+						Usage: "the group a user must be in to update the definition",
+					},
+				},
+				Action: app.Action(args.Optional("name", "value"), with.RequiredFlags("name", "value"), with.Auth, func(ctx *app.Context) error {
+					def := billing.Definition{
+						Name:           ctx.String("name"),
+						Value:          ctx.String("value"),
+						UpdateGroupReq: ctx.String("group"),
+					}
+					if _, err := billingMethods.GetDefinition(ctx.Client(), def.Name); err != nil {
+						if _, ok := err.(lib.NotFoundError); ok {
+							ctx.LogErr("Couldn't find a definition called %s - aborting.", def.Name)
+							return nil
+						}
+						return err
+					}
+					err := billingMethods.UpdateDefinition(ctx.Client(), def)
+					if err == nil {
+						ctx.LogErr("Updated %s to %s", def.Name, def.Value)
+					}
+					return err
+
+				}),
+			}, {
 				Name:      "head",
 				Usage:     "update the settings of a head",
 				UsageText: "bytemark --admin update head <head> [--usage-strategy] [--overcommit-ratio] [--label]",

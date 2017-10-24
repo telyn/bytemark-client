@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -12,6 +13,29 @@ func trimAllSpace(strs []string) {
 	for i, s := range strs {
 		strs[i] = strings.TrimSpace(s)
 	}
+}
+
+// Debug runs fmt.Fprintf on the args, outputting to the App's debugWriter.
+// In tests, this is a TestWriter. Otherwise it's nil for now - but might be
+// changed to the debug.log File in the future.
+func (c *Context) Debug(format string, values ...interface{}) {
+	dw, ok := c.App().Metadata["debugWriter"]
+	if !ok {
+		return
+	}
+	if wr, ok := dw.(io.Writer); ok {
+		fmt.Fprintf(wr, format, values...)
+	}
+}
+
+// Log runs fmt.Fprintf on the args, outputting to the App's Writer
+func (c *Context) Log(format string, values ...interface{}) {
+	fmt.Fprintf(c.App().Writer, format+"\n", values...)
+}
+
+// LogErr runs fmt.Fprintf on the args, outputting to the App's Writer
+func (c *Context) LogErr(format string, values ...interface{}) {
+	fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
 }
 
 func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.Format, error) {
