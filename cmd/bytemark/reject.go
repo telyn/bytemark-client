@@ -29,7 +29,7 @@ func init() {
 						Usage: "The reason why the server is being rejected.",
 					},
 				},
-				Action: app.With(args.Optional("server"), args.Join("reason"), with.RequiredFlags("server", "reason"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("server"), args.Join("reason"), with.RequiredFlags("server", "reason"), with.Auth, func(c *app.Context) error {
 					vm := c.VirtualMachineName("server")
 
 					if err := c.Client().RejectVM(vm, c.String("reason")); err != nil {

@@ -59,7 +59,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 			Usage: "the server to reimage",
 			Value: new(app.VirtualMachineNameFlag),
 		}),
-		Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
+		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
 			imageInstall, defaulted, err := prepareImageInstall(c)
 			if err != nil {

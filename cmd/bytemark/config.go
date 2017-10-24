@@ -107,7 +107,7 @@ The set and unset subcommands can be used to set and unset such variables.
 						Usage: "Don't run any validation checks against the value",
 					},
 				},
-				Action: app.With(func(ctx *app.Context) error {
+				Action: app.Action(func(ctx *app.Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {
 						return err
@@ -157,7 +157,7 @@ The set and unset subcommands can be used to set and unset such variables.
 				UsageText:   "bytemark config unset <variable>",
 				Usage:       "unsets a bytemark client configuration option",
 				Description: "Unsets the named variable.",
-				Action: app.With(func(ctx *app.Context) error {
+				Action: app.Action(func(ctx *app.Context) error {
 					varname, err := ctx.NextArg()
 					if err != nil {
 						return err
@@ -167,7 +167,13 @@ The set and unset subcommands can be used to set and unset such variables.
 				}),
 			},
 		},
-		Action: app.With(func(ctx *app.Context) (err error) {
+		Action: app.Action(func(ctx *app.Context) (err error) {
+			if ctx.Bool("help") {
+				if ccw, ok := ctx.Context.(app.CliContextWrapper); ok {
+					err = cli.ShowSubcommandHelp(ccw.Context)
+					return
+				}
+			}
 			vars, err := ctx.Config().GetAll()
 			if err != nil {
 				return

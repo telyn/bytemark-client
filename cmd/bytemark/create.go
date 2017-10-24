@@ -37,7 +37,7 @@ func init() {
 						Usage: "The privilege to grant to the new user",
 					},
 				},
-				Action: app.With(args.Optional("username", "privilege"), with.RequiredFlags("username", "privilege"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("username", "privilege"), with.RequiredFlags("username", "privilege"), with.Auth, func(c *app.Context) error {
 					// Privilege is just a string and not a app.PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
 					if err := c.Client().CreateUser(c.String("username"), c.String("privilege")); err != nil {
 						return err
@@ -64,7 +64,7 @@ Used when setting up a private VLAN for a customer.`,
 						Usage: "The VLAN number to add the group to",
 					},
 				},
-				Action: app.With(args.Optional("group", "vlan-num"), with.RequiredFlags("group"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("group", "vlan-num"), with.RequiredFlags("group"), with.Auth, func(c *app.Context) error {
 					gp := c.GroupName("group")
 					if err := c.Client().AdminCreateGroup(gp, c.Int("vlan-num")); err != nil {
 						return err
@@ -87,7 +87,7 @@ Used when setting up a private VLAN for a customer.`,
 						Usage: "The VLAN number to add the IP range to",
 					},
 				},
-				Action: app.With(args.Optional("ip-range", "vlan-num"), with.RequiredFlags("ip-range", "vlan-num"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("ip-range", "vlan-num"), with.RequiredFlags("ip-range", "vlan-num"), with.Auth, func(c *app.Context) error {
 					if err := c.Client().CreateIPRange(c.String("ip-range"), c.Int("vlan-num")); err != nil {
 						return err
 					}
@@ -173,7 +173,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 				Usage: "Which zone the server will be created in. See `bytemark zones` for the choices.",
 			},
 		),
-		Action: app.With(args.Optional("name", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createServer),
+		Action: app.Action(args.Optional("name", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createServer),
 	}
 	createServerCmd.Flags = append(createServerCmd.Flags, imageInstallFlags...)
 
@@ -199,7 +199,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
 Multiple --disc flags can be used to create multiple discs`,
-		Action: app.With(args.Optional("server", "cores", "memory", "disc"), with.Auth, createDiscs),
+		Action: app.Action(args.Optional("server", "cores", "memory", "disc"), with.Auth, createDiscs),
 	}
 
 	createGroupCmd := cli.Command{
@@ -214,7 +214,7 @@ Multiple --disc flags can be used to create multiple discs`,
 				Value: new(app.GroupNameFlag),
 			},
 		},
-		Action: app.With(args.Optional("group"), with.RequiredFlags("group"), with.Auth, createGroup),
+		Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Auth, createGroup),
 	}
 
 	createBackupCmd := cli.Command{
@@ -233,7 +233,7 @@ Multiple --disc flags can be used to create multiple discs`,
 				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Action: app.With(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) error {
+		Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) error {
 			backup, err := c.Client().CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
 			if err != nil {
 				return err

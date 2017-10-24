@@ -28,7 +28,7 @@ func init() {
 						Usage: "the ID of the VLAN to delete",
 					},
 				},
-				Action: app.With(args.Optional("id"), with.RequiredFlags("id"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("id"), with.RequiredFlags("id"), with.Auth, func(c *app.Context) error {
 					if err := c.Client().DeleteVLAN(c.Int("id")); err != nil {
 						return err
 					}
@@ -69,7 +69,7 @@ func init() {
 				},
 			},
 			Aliases: []string{"disk"},
-			Action: app.With(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
+			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
 				if !c.Bool("force") && !util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.") {
 					return util.UserRequestedExit{}
 				}
@@ -94,7 +94,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				},
 				forceFlag,
 			},
-			Action: app.With(args.Optional("group"), with.RequiredFlags("group"), with.Group("group"), deleteGroup),
+			Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Group("group"), deleteGroup),
 		}, {
 			Name:        "key",
 			Usage:       "deletes the specified key",
@@ -110,7 +110,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Usage: "The public key to delete. Can be the comment part or the whole public key",
 				},
 			},
-			Action: app.With(args.Join("public-key"), with.RequiredFlags("public-key"), with.Auth, func(c *app.Context) (err error) {
+			Action: app.Action(args.Join("public-key"), with.RequiredFlags("public-key"), with.Auth, func(c *app.Context) (err error) {
 				user := c.String("user")
 				if user == "" {
 					user = c.Config().GetIgnoreErr("user")
@@ -144,7 +144,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), deleteServer),
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), deleteServer),
 		}, {
 			Name:        "backup",
 			Usage:       "delete the given backup",
@@ -165,7 +165,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Usage: "the name or ID of the backup to delete",
 				},
 			},
-			Action: app.With(args.Optional("server", "disc", "backup"), with.RequiredFlags("server", "disc", "backup"), with.Auth, deleteBackup),
+			Action: app.Action(args.Optional("server", "disc", "backup"), with.RequiredFlags("server", "disc", "backup"), with.Auth, deleteBackup),
 		}},
 	})
 }

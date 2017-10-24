@@ -35,7 +35,7 @@ This command will list the kind of object you request, one per line. Perfect for
 			UsageText:   "bytemark list accounts",
 			Description: `This will list all the accounts that your authentication token has some form of access to.`,
 			Flags:       app.OutputFlags("accounts", "array"),
-			Action: app.With(with.Auth, func(c *app.Context) error {
+			Action: app.Action(with.Auth, func(c *app.Context) error {
 				accounts, err := c.Client().GetAccounts()
 
 				if err != nil {
@@ -59,7 +59,7 @@ This command will list the kind of object you request, one per line. Perfect for
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			),
-			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.VirtualMachine.Discs, output.List)
 			}),
 		}, {
@@ -74,7 +74,7 @@ This command will list the kind of object you request, one per line. Perfect for
 					Value: new(app.AccountNameFlag),
 				},
 			),
-			Action: app.With(args.Optional("account"), with.RequiredFlags("account"), with.Account("account"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("account"), with.RequiredFlags("account"), with.Account("account"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.Account.Groups, output.List)
 			}),
 		}, {
@@ -82,7 +82,7 @@ This command will list the kind of object you request, one per line. Perfect for
 			Usage:       "list all the SSH public keys associated with a user",
 			UsageText:   "bytemark list keys [user]",
 			Description: "Lists all the SSH public keys associated with a user, defaulting to your log-in user.",
-			Action: app.With(args.Optional("user"), with.User("user"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("user"), with.User("user"), func(c *app.Context) error {
 				// TODO(telyn): could this be rewritten using OutputInDesiredForm / is it desirable to?
 				for _, k := range c.User.AuthorizedKeys {
 					log.Output(k)
@@ -103,7 +103,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 					Value: new(app.AccountNameFlag),
 				},
 			),
-			Action: app.With(args.Optional("account"), with.Account("account"), with.Auth, func(c *app.Context) error {
+			Action: app.Action(args.Optional("account"), with.Account("account"), with.Auth, func(c *app.Context) error {
 				servers := brain.VirtualMachines{}
 
 				for _, g := range c.Account.Groups {
@@ -127,7 +127,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			),
-			Action: app.With(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
+			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
 				vmName := c.VirtualMachineName("server")
 				label := c.String("disc")
 				var backups brain.Backups

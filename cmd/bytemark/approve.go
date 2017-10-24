@@ -29,7 +29,7 @@ func init() {
 						Usage: "If set, powers on the server.",
 					},
 				},
-				Action: app.With(args.Optional("server", "power-on"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("server", "power-on"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 					vm := c.VirtualMachineName("server")
 
 					if err := c.Client().ApproveVM(vm, c.Bool("power-on")); err != nil {

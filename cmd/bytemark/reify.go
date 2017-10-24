@@ -23,7 +23,7 @@ func init() {
 						Usage: "the ID of the disc to reify",
 					},
 				},
-				Action: app.With(args.Optional("disc"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) (err error) {
+				Action: app.Action(args.Optional("disc"), with.RequiredFlags("disc"), with.Auth, func(c *app.Context) (err error) {
 					if err := c.Client().ReifyDisc(c.Int("disc")); err != nil {
 						return err
 					}

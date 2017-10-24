@@ -40,7 +40,7 @@ func init() {
 					Value: &publicKeyFile,
 				},
 			},
-			Action: app.With(args.Join("public-key"), with.Auth, func(ctx *app.Context) (err error) {
+			Action: app.Action(args.Join("public-key"), with.Auth, func(ctx *app.Context) (err error) {
 				user := ctx.String("user")
 				if user == "" {
 					user = ctx.Config().GetIgnoreErr("user")
@@ -100,7 +100,7 @@ func init() {
 					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: app.With(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
 				addrs := c.Int("ips")
 				if addrs < 1 {
 					addrs = 1
