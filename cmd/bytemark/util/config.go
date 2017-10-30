@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -245,7 +246,7 @@ func NewConfig(configDir string) (config *Config, err error) {
 }
 
 // ImportFlags reads all the flags from the passed FlagSet that have the same name as a valid configVar, and sets the configVar to that.
-func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
+func (config *Config) ImportFlags(flags *flag.FlagSet) (args []string) {
 	if flags != nil {
 		if flags.Parsed() {
 			// dump all the flags into the memo
@@ -266,11 +267,11 @@ func (config *Config) ImportFlags(flags *flag.FlagSet) []string {
 				log.DebugLevel = int(debugLevel)
 			}
 
-			return flags.Args()
+			args = flags.Args()
 		}
 	}
 	config.endpointOverrides()
-	return nil
+	return
 }
 
 func (config *Config) massageFlagValue(name string, val string) string {
@@ -283,8 +284,12 @@ func (config *Config) massageFlagValue(name string, val string) string {
 }
 
 func (config *Config) endpointOverrides() {
-	switch config.GetIgnoreErr("endpoint") {
-	case "https://int.bigv.io":
+	url, err := url.Parse(config.GetIgnoreErr("endpoint"))
+	if err != nil {
+		// we don't actually _care_ if there is an err - it's not int.
+		return
+	}
+	if url.Host == "int.bigv.io" {
 		config.Set("billing-endpoint", "", "CODE nullify billing-endpoint when using int")
 		config.Set("spp-endpoint", "", "CODE nullify spp-endpoint when using int")
 		config.Set("account", "bytemark", "CODE use bytemark account as default on int")
