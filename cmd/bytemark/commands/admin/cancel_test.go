@@ -1,16 +1,17 @@
-package main
+package admin_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/cheekybits/is"
 )
 
 func TestCancelDiscMigration(t *testing.T) {
 	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	c.When("CancelDiscMigration", 123).Return(nil).Times(1)
 
@@ -25,7 +26,7 @@ func TestCancelDiscMigration(t *testing.T) {
 
 func TestCancelDiscMigrationError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	c.When("CancelDiscMigration", 122).Return(fmt.Errorf("Error canceling migrations")).Times(1)
 
@@ -40,7 +41,7 @@ func TestCancelDiscMigrationError(t *testing.T) {
 
 func TestCancelVMMigration(t *testing.T) {
 	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	c.When("CancelVMMigration", 129).Return(nil).Times(1)
 
@@ -55,7 +56,7 @@ func TestCancelVMMigration(t *testing.T) {
 
 func TestCancelVMMigrationAlias(t *testing.T) {
 	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	c.When("CancelVMMigration", 128).Return(nil).Times(1)
 
@@ -69,7 +70,7 @@ func TestCancelVMMigrationAlias(t *testing.T) {
 }
 func TestCancelVMMigrationError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	c.When("CancelVMMigration", 127).Return(fmt.Errorf("Error canceling migrations")).Times(1)
 

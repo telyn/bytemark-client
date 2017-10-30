@@ -1,9 +1,10 @@
-package main
+package admin_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/cheekybits/is"
@@ -11,7 +12,7 @@ import (
 
 func TestApproveVM(t *testing.T) {
 	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -29,7 +30,7 @@ func TestApproveVM(t *testing.T) {
 
 func TestApproveVMAndPowerOn(t *testing.T) {
 	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
@@ -47,7 +48,7 @@ func TestApproveVMAndPowerOn(t *testing.T) {
 
 func TestApproveVMError(t *testing.T) {
 	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	config, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 

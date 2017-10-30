@@ -10,6 +10,7 @@ import (
 
 	bmapp "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -25,10 +26,6 @@ var forceFlag = cli.BoolFlag{
 
 //commands is assembled during init()
 var commands = make([]cli.Command, 0)
-
-//adminCommands is assembled during init() and has the commands that're only available when --admin is specified.
-// it gets merged in to commands
-var adminCommands = make([]cli.Command, 0)
 
 func main() {
 	// watch for interrupts (Ctrl-C) and exit "gracefully" if they are encountered.
@@ -56,7 +53,7 @@ func main() {
 
 	myCommands := commands
 	if wantAdminCmds {
-		myCommands = cliutil.MergeCommands(commands, adminCommands)
+		myCommands = cliutil.MergeCommands(commands, admin.Commands)
 	}
 
 	app, err := bmapp.BaseAppSetup(flags, myCommands)
