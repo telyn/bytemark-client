@@ -21,12 +21,12 @@ Here is an approximate description of what goes on during an invocation of the
 client:
 
 1. Before cmd/bytemark.main is run, all the init functions are run, which
-   compile two []cli.Command objects - one called commands, and one called
-   adminCommands.
+   compile slices of cli.Commands in the commands/* packages and cmd/bytemark.
 2. cmd/bytemark.main() is run, which runs some other functions in
    cmd/bytemark to set up a cmd/bytemark/util.Config and flag.FlagSet
-3. cmd/bytemark.main combines adminCommands with commands if the --global flag
-   is set, then creates a urfave/cli.App
+3. cmd/bytemark.main combines the commands slices together, with 
+   cmd/bytemark/commands/admin if the --admin flag is set, then creates a
+   urfave/cli.App using cmd/bytemark/app.BaseAppSetup
 4. cmd/bytemark.main creates a new lib.Client, then attaches that and the Config
    to the urfave/cli.App.
 5. cmd/bytemark.main runs the cli.App, which calls the relevant command's Action
@@ -60,7 +60,7 @@ Action: app.Action(args.Optional("account"), with.Account("account"),
 
 app.Action returns a `func(c *cli.Context) error`, and takes 
 `(func(c *app.Context) error)...` as arguments. The function returned by
-app.Action wraps the cli.Context in an app.Context, then exectutes each function
+app.Action wraps the cli.Context in an app.Context, then executes each function
 in order, stopping at the first error. args.Optional("account") reads the next
 command line argument if there is one and sets the flag named "account" with 
 it. with.Account("account") takes the "account" flag and attaches it to the
@@ -91,8 +91,8 @@ what they're for
 │       │   └── with - functions for chaining together using app.Action to attach
 │       │                       things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
-│       ├── commands
-│       │   └── admin
+│       ├── commands - empty package
+│       │   └── admin - contains all the admin commands in admin.Commands
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
 │           │      including: Config - which manages configuration from the
@@ -198,5 +198,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum
 
-# sha256sum: 637f80e460c59e13de9e4f5d506a46c7a45405a460ef3edfc35f908141db9a2d
+# sha256sum: e2059827b17f5155fb98d8fcf72ae4954054edfe049c46152467e489e246aee3
 
