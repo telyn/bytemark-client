@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/hex"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -415,4 +416,51 @@ func TestConfigUnset(t *testing.T) {
 
 	err = config.Unset("endpoint")
 	is.Nil(err)
+}
+
+func TestConfigEndpointOverrides(t *testing.T) {
+	tests := []struct {
+		Args             []string
+		ExpectedEndpoint string
+		ExpectedBilling  string
+	}{{
+		Args:             []string{},
+		ExpectedEndpoint: "https://uk0.bigv.io",
+		ExpectedBilling:  "https://bmbilling.bytemark.co.uk",
+	}, {
+		Args:             []string{"--endpoint", "https://int.bigv.io"},
+		ExpectedEndpoint: "https://int.bigv.io",
+		ExpectedBilling:  "",
+	}}
+
+	for i, test := range tests {
+		fs := flag.NewFlagSet("test-config-endpoint-overrides", flag.ContinueOnError)
+		fs.String("endpoint", "", "")
+		fs.String("billing-endpoint", "", "")
+		fs.String("auth-endpoint", "", "")
+		fs.String("spp-endpoint", "", "")
+
+		err := fs.Parse(test.Args)
+		if err != nil {
+			t.Fatal(err)
+		}
+		CleanEnv()
+		dir, err := CleanDir()
+		if err != nil {
+			t.Fatal(err)
+		}
+		config, err := NewConfig(dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		config.ImportFlags(fs)
+		if test.ExpectedEndpoint != config.GetIgnoreErr("endpoint") {
+			t.Errorf("%d %q != %q", i, test.ExpectedEndpoint, config.GetIgnoreErr("endpoint"))
+		}
+		if test.ExpectedBilling != config.GetIgnoreErr("billing-endpoint") {
+			t.Errorf("%d %q != %q", i, test.ExpectedBilling, config.GetIgnoreErr("billing-endpoint"))
+		}
+
+	}
 }

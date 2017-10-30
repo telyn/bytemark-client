@@ -402,6 +402,7 @@ func (config *Config) GetDefault(name string) ConfigVar {
 		}
 		return v
 	case "billing-endpoint":
+		// this is here instead of in endpointOverrides bc u can't override endpointOverrides - and maybe staging will get a bmbilling. maybe it already has one? bmbilling.dev.bytemark.co.uk?
 		if config.GetIgnoreErr("endpoint") == "https://staging.bigv.io" {
 			return ConfigVar{"billing-endpoint", "", "CODE nullify billing-endpoint on bigv-staging"}
 		}
