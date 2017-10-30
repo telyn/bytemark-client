@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -27,14 +26,6 @@ func BaseAppSetup(flags []cli.Flag, commands []cli.Command) (app *cli.App, err e
 		os.Stderr,
 	)
 
-	for idx, cmd := range app.Commands {
-		switch cmd.Name {
-		case "admin":
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + GenerateCommandsHelp(admin.Commands)
-		case "commands":
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + GenerateCommandsHelp(app.Commands)
-		}
-	}
 	app.Commands = cliutil.CreateMultiwordCommands(app.Commands)
 	return
 

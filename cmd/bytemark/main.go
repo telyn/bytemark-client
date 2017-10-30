@@ -55,6 +55,7 @@ func main() {
 	if wantAdminCmds {
 		myCommands = cliutil.MergeCommands(commands, admin.Commands)
 	}
+	generateHelp(myCommands)
 
 	app, err := bmapp.BaseAppSetup(flags, myCommands)
 	if err != nil {
