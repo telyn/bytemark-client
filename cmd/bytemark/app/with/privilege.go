@@ -53,6 +53,11 @@ func Privilege(flagName string) func(*app.Context) error {
 		case brain.PrivilegeTargetTypeAccount:
 			var acc lib.Account
 			acc, err = c.Client().GetAccount(pf.AccountName)
+			if err != nil {
+				if _, ok := err.(lib.BillingAccountNotFound); ok {
+					err = nil
+				}
+			}
 			c.Privilege.AccountID = acc.BrainID
 		}
 		return
