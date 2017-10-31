@@ -1,15 +1,14 @@
-package main
+package admin
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
 func init() {
-	adminCommands = append(adminCommands, cli.Command{
+	Commands = append(Commands, cli.Command{
 		Name:   "regrade",
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
@@ -32,7 +31,7 @@ func init() {
 						return err
 					}
 
-					log.Outputf("Regrade started for disc %d to %s\n", c.Int("disc"), c.String("new-grade"))
+					c.Log("Regrade started for disc %d to %s\n", c.Int("disc"), c.String("new-grade"))
 
 					return nil
 				}),

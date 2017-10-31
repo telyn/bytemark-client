@@ -1,4 +1,4 @@
-package main
+package admin
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	adminCommands = append(adminCommands, cli.Command{
+	Commands = append(Commands, cli.Command{
 		Name:   "approve",
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{

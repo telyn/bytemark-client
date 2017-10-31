@@ -1,15 +1,14 @@
-package main
+package admin
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
 func init() {
-	adminCommands = append(adminCommands, cli.Command{
+	Commands = append(Commands, cli.Command{
 		Name:   "reify",
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
@@ -28,7 +27,7 @@ func init() {
 						return err
 					}
 
-					log.Outputf("Reification started for disc %d\n", c.Int("disc"))
+					c.Log("Reification started for disc %d\n", c.Int("disc"))
 
 					return nil
 				}),

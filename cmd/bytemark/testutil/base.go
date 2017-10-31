@@ -44,6 +44,7 @@ func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string
 
 // BaseTestSetup constructs mock config and client and produces a cli.App with the given commands.
 func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
+	cli.OsExiter = func(_ int) {}
 	config = new(mocks.Config)
 	client = new(mocks.Client)
 	config.When("GetBool", "admin").Return(admin, nil)

@@ -26,19 +26,6 @@ func BaseAppSetup(flags []cli.Flag, commands []cli.Command) (app *cli.App, err e
 		os.Stderr,
 	)
 
-	/* TODO(telyn): move this clump over to main, probably.
-	   Phil - if you see this, I've messed up
-	// last minute alterations to commands
-	// used for modifying help descriptions, mostly.
-	for idx, cmd := range app.Commands {
-		switch cmd.Name {
-		case "admin":
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + GenerateCommandsHelp(adminCommands)
-		case "commands":
-			app.Commands[idx].Description = cmd.Description + "\r\n\r\n" + GenerateCommandsHelp(app.Commands)
-		}
-	}
-	*/
 	app.Commands = cliutil.CreateMultiwordCommands(app.Commands)
 	return
 

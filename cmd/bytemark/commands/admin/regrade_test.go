@@ -1,16 +1,17 @@
-package main
+package admin_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/cheekybits/is"
 )
 
 func TestRegradeDisc(t *testing.T) {
 	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	c.When("RegradeDisc", 111, "newg").Return(nil).Times(1)
 
@@ -25,7 +26,7 @@ func TestRegradeDisc(t *testing.T) {
 
 func TestRegradeDiscError(t *testing.T) {
 	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
+	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	c.When("RegradeDisc", 112, "newg").Return(fmt.Errorf("Could not regrade disc")).Times(1)
 

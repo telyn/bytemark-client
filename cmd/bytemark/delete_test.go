@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -133,36 +132,6 @@ func TestDeleteBackup(t *testing.T) {
 		"bytemark", "delete", "backup", "test-server", "test-disc", "test-backup",
 	})
 	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
-func TestDeleteVLAN(t *testing.T) {
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
-
-	c.When("ReapVMs").Return(nil).Times(1)
-
-	err := app.Run([]string{"bytemark", "reap", "servers"})
-
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
-func TestDeleteVLANError(t *testing.T) {
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, adminCommands)
-
-	c.When("ReapVMs").Return(fmt.Errorf("Could not delete VLAN")).Times(1)
-
-	err := app.Run([]string{"bytemark", "reap", "servers"})
-
-	is.NotNil(err)
-
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
 	}
