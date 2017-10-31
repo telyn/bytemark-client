@@ -14,6 +14,11 @@ import (
 
 }*/
 
+// BillingAccountNotFound is returned when the named billing account could not be found.
+// It's not an APIError or a 404 because we find billing accounts by getting the full list
+// and searching it. Also, having a billing account as part of an Account isn't necessary
+// for all uses of the API, so we return the error and the Account and let the consumer
+// decide what to do.
 type BillingAccountNotFound string
 
 func (e BillingAccountNotFound) Error() string {
