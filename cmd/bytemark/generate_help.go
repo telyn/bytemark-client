@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func generateHelp([]cli.Command) {
+func generateHelp(commands []cli.Command) {
 	for idx, cmd := range commands {
 		switch cmd.Name {
 		case "admin":
