@@ -137,7 +137,7 @@ func TestShowDisc(t *testing.T) {
 	rts := testutil.RequestTestSpec{
 		Method:   "GET",
 		Endpoint: lib.BrainEndpoint,
-		URL:      "/accounts/account/groups/group/virtual_machines/vm/discs/666",
+		URL:      "/discs/666",
 		Response: getFixtureDisc(),
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
