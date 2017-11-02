@@ -232,3 +232,78 @@ func TestShowPrivileges(t *testing.T) {
 		}
 	}
 }
+
+func TestShowDisc(t *testing.T) {
+	tests := []struct {
+		disc          brain.Disc
+		err           error
+		shouldErr     bool
+		args          string
+		vm            lib.VirtualMachineName
+		discLabelOrID string
+	}{
+		{ // 0 - fully specified flags
+			disc: brain.Disc{
+				ID:           42,
+				Label:        "faff",
+				StorageGrade: "sata",
+			},
+			args:          "bytemark show disc --server fliff --disc faff",
+			vm:            lib.VirtualMachineName{VirtualMachine: "fliff", Group: "default", Account: "default-account"},
+			discLabelOrID: "faff",
+		}, { // 1 - flags from args
+			disc: brain.Disc{
+				ID:           42,
+				Label:        "faff",
+				StorageGrade: "sata",
+			},
+			args:          "bytemark show disc fliff faff",
+			vm:            lib.VirtualMachineName{VirtualMachine: "fliff", Group: "default", Account: "default-account"},
+			discLabelOrID: "faff",
+		}, { // 2 - no disc
+			args:      "bytemark show disc fliff",
+			shouldErr: true,
+		}, { // 3 --server but no --disc
+			args:      "bytemark show disc --server fliff",
+			shouldErr: true,
+		}, { // 4 - numeric --disc with no server
+			disc: brain.Disc{
+				ID:           42,
+				Label:        "faff",
+				StorageGrade: "sata",
+			},
+			vm:            lib.VirtualMachineName{},
+			args:          "bytemark show disc --disc 42",
+			discLabelOrID: "42",
+		},
+	}
+	var i = 0
+	var test = tests[0]
+
+	defer func() {
+		if msg := recover(); msg != nil {
+			t.Errorf("TestShowDisc %d panic: %v", i, msg)
+		}
+	}()
+
+	for i, test = range tests {
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		if test.shouldErr && test.err == nil {
+			config, c, app = testutil.BaseTestSetup(t, false, commands)
+		}
+		config.When("GetVirtualMachine").Return(defVM)
+		c.When("GetDisc", test.vm, test.discLabelOrID).Return(test.disc, test.err)
+
+		err := app.Run(strings.Split(test.args, " "))
+		if test.shouldErr != (err != nil) {
+			nt := ""
+			if test.shouldErr {
+				nt = "n't"
+			}
+			t.Errorf("%s should%s error, got %s", testutil.Name(i), nt, err)
+		}
+		if ok, vErr := c.Verify(); !ok {
+			t.Errorf("%s client failed to verify: %s", testutil.Name(i), vErr.Error())
+		}
+	}
+}
