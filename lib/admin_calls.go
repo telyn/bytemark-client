@@ -28,7 +28,7 @@ type UpdateTail struct {
 type UpdateStoragePool struct {
 	UsageStrategy   *string
 	OvercommitRatio *int
-	IOPSLimit       *string
+	IOPSLimit       *int
 	Label           *string
 }
 

@@ -96,6 +96,10 @@ func (c *Context) Help(whatsyourproblem string) (err error) {
 	return util.UsageDisplayedError{TheProblem: whatsyourproblem, Command: c.Command().FullName()}
 }
 
+func (c *Context) IsSet(flagName string) bool {
+	return c.Context.IsSet(flagName)
+}
+
 // flags below
 
 // Bool returns the value of the named flag as a bool
