@@ -96,6 +96,7 @@ func (c *Context) Help(whatsyourproblem string) (err error) {
 	return util.UsageDisplayedError{TheProblem: whatsyourproblem, Command: c.Command().FullName()}
 }
 
+// IsSet returns true if the specified flag has been set.
 func (c *Context) IsSet(flagName string) bool {
 	return c.Context.IsSet(flagName)
 }
