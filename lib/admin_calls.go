@@ -24,9 +24,11 @@ type UpdateTail struct {
 }
 
 // UpdateStoragePool is a struct with all the possible settings that can be updated on a storage pool
+// it's the worst thing ever but it's necessary because usage_strategy sometimes needs to be null.
 type UpdateStoragePool struct {
 	UsageStrategy   *string
 	OvercommitRatio *int
+	IOPSLimit       *string
 	Label           *string
 }
 
