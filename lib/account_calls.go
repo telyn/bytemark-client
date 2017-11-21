@@ -2,7 +2,6 @@ package lib
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"net/http"
 
@@ -14,6 +13,17 @@ import (
 /*func (c *Client) RegisterAccount() {
 
 }*/
+
+// BillingAccountNotFound is returned when the named billing account could not be found.
+// It's not an APIError or a 404 because we find billing accounts by getting the full list
+// and searching it. Also, having a billing account as part of an Account isn't necessary
+// for all uses of the API, so we return the error and the Account and let the consumer
+// decide what to do.
+type BillingAccountNotFound string
+
+func (e BillingAccountNotFound) Error() string {
+	return "Couldn't find a billing account called " + string(e)
+}
 
 // getBillingAccount gets the billing account with the given name.
 // Due to the way the billing API is implemented this is done by grabbing them all and looping *shrug*
@@ -27,7 +37,7 @@ func (c *bytemarkClient) getBillingAccount(name string) (account billing.Account
 			return
 		}
 	}
-	err = fmt.Errorf("Couldn't find a billing account called %s", name)
+	err = BillingAccountNotFound(name)
 	return
 }
 
@@ -107,17 +117,23 @@ func (c *bytemarkClient) GetAccount(name string) (account Account, err error) {
 	if name == "" {
 		return c.GetDefaultAccount()
 	}
-	billingAccount, err := c.getBillingAccount(name)
-	if err != nil {
-		return Account{}, err
+	billingAccount, billErr := c.getBillingAccount(name)
+	if err == nil {
+		account.fillBilling(billingAccount)
+	} else {
+		// don't return on a CantFindAccountErr
+		if _, ok := billErr.(BillingAccountNotFound); !ok {
+			return Account{}, billErr
+		}
 	}
 	brainAccount, err := c.getBrainAccount(name)
 	if err != nil {
 		return Account{}, err
 	}
 	account.fillBrain(brainAccount)
-	account.fillBilling(billingAccount)
-
+	if billErr != nil {
+		return account, billErr
+	}
 	return
 
 }
