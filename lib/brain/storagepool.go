@@ -9,17 +9,19 @@ import (
 
 // StoragePool represents a Bytemark Cloud Servers disk storage pool, as returned by the admin API.
 type StoragePool struct {
-	Name            string   `json:"name"`
-	Label           string   `json:"label"`
-	Zone            string   `json:"zone"`
-	Size            int      `json:"size"`
-	FreeSpace       int      `json:"free_space"`
-	AllocatedSpace  int      `json:"alloc"`
-	Discs           []string `json:"discs"`
-	OvercommitRatio int      `json:"overcommit_ratio"`
-	UsageStrategy   string   `json:"usage_strategy"`
-	StorageGrade    string   `json:"grade"`
-	Note            string   `json:"note"`
+	Name            string `json:"name"`
+	Label           string `json:"label"`
+	Zone            string `json:"zone"`
+	Size            int    `json:"size"`
+	FreeSpace       int    `json:"free_space"`
+	Ceiling         int    `json:"ceiling"`
+	AllocatedSpace  int    `json:"alloc"`
+	Discs           int    `json:"discs"`
+	Backups         int    `json:"backups"`
+	OvercommitRatio int    `json:"overcommit_ratio"`
+	UsageStrategy   string `json:"usage_strategy"`
+	StorageGrade    string `json:"grade"`
+	Note            string `json:"note"`
 
 	// These were defined, but aren't returned by the API
 	// ID        int
@@ -31,9 +33,9 @@ type StoragePool struct {
 func (sp StoragePool) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
-		return "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
+		return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
 	}
-	return "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
+	return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
 }
 
 // PercentFull gives us the (numeric) percentage of how full the disc is
