@@ -1,9 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -36,7 +41,7 @@ func init() {
 		Name:        "restart",
 		Usage:       "power off a server and start it again",
 		UsageText:   "bytemark restart <server>",
-		Description: "This command will power down a server, cleanly if possible, and then start it back up again. For cloud servers this can cause the server to be started on a different head to the one it was running on, but this is not guaranteed.",
+		Description: "This command will power down a server and then start it back up again.",
 		Flags: []cli.Flag{
 			cli.GenericFlag{
 				Name:  "server",
@@ -46,13 +51,19 @@ func init() {
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
-			log.Logf("Attempting to restart %v...\r\n", vmName)
-			err = c.Client().RestartVirtualMachine(vmName)
+			fmt.Fprintf(c.App().Writer, "Shutting down %v...", vmName)
+			err = c.Client().ShutdownVirtualMachine(vmName, true)
+			if err != nil {
+				return
+			}
+			err = waitForShutdown(c, vmName)
 			if err != nil {
 				return
 			}
 
-			log.Logf("%s restarted successfully.\r\n", vmName)
+			c.Log("Done!\n\nStarting %s back up.", vmName)
+			c.Client().StartVirtualMachine(vmName)
+
 			return
 		}),
 	}, cli.Command{
@@ -69,13 +80,18 @@ func init() {
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
-			log.Logf("Attempting to shutdown %v...\r\n", vmName)
+			fmt.Fprintf(c.App().Writer, "Shutting down %v...", vmName)
 			err = c.Client().ShutdownVirtualMachine(vmName, true)
 			if err != nil {
 				return
 			}
 
-			log.Logf("%s was shutdown successfully.\r\n", vmName)
+			err = waitForShutdown(c, vmName)
+			if err != nil {
+				return
+			}
+
+			c.Log("Done!", vmName)
 			return
 		}),
 	}, cli.Command{
@@ -125,4 +141,18 @@ func init() {
 			return
 		}),
 	})
+}
+func waitForShutdown(c *app.Context, name lib.VirtualMachineName) (err error) {
+	vm := brain.VirtualMachine{PowerOn: true}
+
+	for vm.PowerOn {
+		time.Sleep(5 * time.Second)
+		fmt.Fprint(c.App().Writer, ".")
+
+		vm, err = c.Client().GetVirtualMachine(name)
+		if err != nil {
+			return
+		}
+	}
+	return
 }
