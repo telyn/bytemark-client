@@ -88,7 +88,7 @@ func cleanup(c *Context) {
 // foldProviders runs all the providers with the given context, stopping if there's an error
 func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
 	for i, provider := range providers {
-		c.Debug("Provider #%d (%v)n\n", i, provider)
+		c.Debug("Provider #%d (%v)\n", i, provider)
 		err = provider(c)
 		if err != nil {
 			return
