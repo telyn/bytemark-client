@@ -29,12 +29,11 @@ func (c *Context) Preprocess() error {
 	if c.preprocessHasRun {
 		return nil
 	}
-	c.Debug("Preprocessing\n")
+	c.Debug("Preprocessing")
 	for _, flag := range c.Command().Flags {
 		if gf, ok := flag.(cli.GenericFlag); ok {
 			if pp, ok := gf.Value.(Preprocesser); ok {
-				c.Debug("Doing some shit to %s\n", flag.GetName())
-				c.Debug("b4: %#v ", gf.Value)
+				c.Debug("--%s b4: %#v", gf.Value)
 				err := pp.Preprocess(c)
 				if err != nil {
 					return err

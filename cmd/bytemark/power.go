@@ -62,7 +62,7 @@ func init() {
 			}
 
 			c.Log("Done!\n\nStarting %s back up.", vmName)
-			c.Client().StartVirtualMachine(vmName)
+			err = c.Client().StartVirtualMachine(vmName)
 
 			return
 		}),
