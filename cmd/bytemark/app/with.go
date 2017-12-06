@@ -33,7 +33,7 @@ func (c *Context) Preprocess() error {
 	for _, flag := range c.Command().Flags {
 		if gf, ok := flag.(cli.GenericFlag); ok {
 			if pp, ok := gf.Value.(Preprocesser); ok {
-				c.Debug("--%s b4: %#v", gf.Value)
+				c.Debug("--%s b4: %#v", gf.Name, gf.Value)
 				err := pp.Preprocess(c)
 				if err != nil {
 					return err
