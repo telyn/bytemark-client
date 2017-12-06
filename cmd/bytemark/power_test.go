@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 )
 
@@ -32,7 +33,9 @@ func TestRestartCommand(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("RestartVirtualMachine", vmn).Times(1)
+	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
+	c.When("GetVirtualMachine", vmn).Return(brain.VirtualMachine{PowerOn: false})
+	c.When("StartVirtualMachine", vmn).Times(1)
 
 	err := app.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
 	is.Nil(err)
@@ -48,6 +51,7 @@ func TestShutdownCommand(t *testing.T) {
 	config.When("GetVirtualMachine").Return(defVM)
 
 	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
+	c.When("GetVirtualMachine", vmn).Return(brain.VirtualMachine{PowerOn: false})
 
 	err := app.Run(strings.Split("bytemark shutdown test-server.test-group.test-account", " "))
 	is.Nil(err)
