@@ -68,7 +68,7 @@ func main() {
 
 	}
 
-	err = fmt.Fprintf(wr, tmpl, strings.Join(types, "\n"))
+	_, err = fmt.Fprintf(wr, tmpl, strings.Join(types, "\n"))
 	if err != nil {
 		fmt.Println(err)
 		hasFailed = true
