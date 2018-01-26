@@ -6,5 +6,6 @@ type Assent struct {
 	AccountID   int
 	PersonID    int
 	// Name is the full name of the person
-	Name string
+	Name  string
+	Email string
 }

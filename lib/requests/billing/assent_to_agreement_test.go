@@ -23,11 +23,13 @@ func TestAssentToAgreement(t *testing.T) {
 				AccountID:   123456,
 				PersonID:    789101,
 				Name:        "geoff",
+				Email:       "geoff@bytemark.com",
 			},
 			expected: map[string]interface{}{
 				"account_id": 123456.0,
 				"person_id":  789101.0,
 				"name":       "geoff",
+				"email":      "geoff@bytemark.com",
 			},
 		},
 	}
@@ -39,7 +41,6 @@ func TestAssentToAgreement(t *testing.T) {
 			Endpoint:      lib.BillingEndpoint,
 			URL:           fmt.Sprintf("/api/v1/agreements/%s/assents", test.assent.AgreementID),
 			AssertRequest: assert.BodyUnmarshalEqual(test.expected),
-			Response:      nil,
 		}
 		rts.Run(t, testName, true, func(client lib.Client) {
 			err := billingMethods.AssentToAgreement(client, test.assent)
@@ -50,5 +51,4 @@ func TestAssentToAgreement(t *testing.T) {
 			}
 		})
 	}
-
 }

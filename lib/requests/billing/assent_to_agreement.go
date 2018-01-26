@@ -15,6 +15,7 @@ func AssentToAgreement(client lib.Client, assent types.Assent) (err error) {
 		"account_id": assent.AccountID,
 		"person_id":  assent.PersonID,
 		"name":       assent.Name,
+		"email":      assent.Email,
 	}, nil)
 	return
 }
