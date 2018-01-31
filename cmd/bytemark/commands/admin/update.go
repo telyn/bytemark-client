@@ -158,7 +158,7 @@ func init() {
 			{
 				Name:      "storage pool",
 				Usage:     "update the settings of a storage pool",
-				UsageText: "bytemark --admin update storage pool <storage-pool> [--usage-strategy] [--overcommit-ratio] [--label]",
+				UsageText: "bytemark --admin update storage pool [--usage-strategy new-strategy] [--overcommit-ratio new-ratio] [--label new-label] [[--storage-pool] storage-pool]>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "storage-pool",
