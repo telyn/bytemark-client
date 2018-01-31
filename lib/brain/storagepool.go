@@ -16,6 +16,7 @@ type StoragePool struct {
 	FreeSpace       int      `json:"free_space,omitempty"`
 	AllocatedSpace  int      `json:"alloc,omitempty"`
 	Discs           []string `json:"discs,omitempty"`
+	Backups         int      `json:"backups,omitempty"`
 	OvercommitRatio int      `json:"overcommit_ratio,omitempty"`
 	UsageStrategy   string   `json:"usage_strategy,omitempty"`
 	StorageGrade    string   `json:"grade,omitempty"`
@@ -31,9 +32,9 @@ type StoragePool struct {
 func (sp StoragePool) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
-		return "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
+		return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
 	}
-	return "Label, Discs, Name, Size, FreeSpace, StorageGrade, UsageStrategy, OvercommitRatio, Note, Zone"
+	return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
 }
 
 // PercentFull gives us the (numeric) percentage of how full the disc is

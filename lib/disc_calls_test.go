@@ -131,7 +131,7 @@ func TestResizeDisc(t *testing.T) {
 
 }
 
-func TestShowDisc(t *testing.T) {
+func TestGetDisc(t *testing.T) {
 	is := is.New(t)
 	testName := testutil.Name(0)
 	rts := testutil.RequestTestSpec{
@@ -157,7 +157,7 @@ func TestShowDisc(t *testing.T) {
 	})
 }
 
-func TestShowDiscByID(t *testing.T) {
+func TestGetDiscByID(t *testing.T) {
 	is := is.New(t)
 	testName := testutil.Name(0)
 	rts := testutil.RequestTestSpec{
