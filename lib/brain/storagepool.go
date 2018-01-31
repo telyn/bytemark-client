@@ -14,6 +14,7 @@ type StoragePool struct {
 	Zone            string `json:"zone,omitempty"`
 	Size            int    `json:"size,omitempty"`
 	FreeSpace       int    `json:"free_space,omitempty"`
+	Ceiling         int    `json:"ceiling,omitempty"`
 	AllocatedSpace  int    `json:"alloc,omitempty"`
 	Discs           int    `json:"discs,omitempty"`
 	Backups         int    `json:"backups,omitempty"`
