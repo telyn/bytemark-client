@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"io"
 	"net"
 
@@ -136,11 +135,9 @@ func (c *Context) FileContents(flagname string) string {
 func (c *Context) GroupName(flagname string) (gp lib.GroupName) {
 	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
 	if !ok {
-		fmt.Println("WRONGO")
 		return lib.GroupName{}
 	}
 	if gpNameFlag.GroupName == nil {
-		fmt.Println("NILO")
 		return lib.GroupName{}
 	}
 	return *gpNameFlag.GroupName
@@ -205,11 +202,9 @@ func (c *Context) ResizeFlag(flagname string) ResizeFlag {
 func (c *Context) VirtualMachineName(flagname string) (vm lib.VirtualMachineName) {
 	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
 	if !ok {
-		fmt.Println("WRONGO")
 		return c.Config().GetVirtualMachine()
 	}
 	if vmNameFlag.VirtualMachineName == nil {
-		fmt.Println("NILO")
 		return lib.VirtualMachineName{}
 	}
 
