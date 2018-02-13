@@ -6,10 +6,12 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
 
 	bmapp "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
+	commandsPkg "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -26,6 +28,17 @@ var forceFlag = cli.BoolFlag{
 
 //commands is assembled during init()
 var commands = make([]cli.Command, 0)
+
+func Commands(wantAdminCmds bool) []cli.Command {
+	myCommands := cliutil.AssembleCommands(commands, commandsPkg.Commands)
+	if wantAdminCmds {
+		myCommands = cliutil.MergeCommands(myCommands, admin.Commands)
+	}
+	generateHelp(myCommands)
+	sorted := cli.CommandsByName(myCommands)
+	sort.Sort(sorted)
+	return sorted
+}
 
 func main() {
 	// watch for interrupts (Ctrl-C) and exit "gracefully" if they are encountered.
@@ -51,11 +64,7 @@ func main() {
 		os.Exit(int(util.ProcessError(err)))
 	}
 
-	myCommands := commands
-	if wantAdminCmds {
-		myCommands = cliutil.MergeCommands(commands, admin.Commands)
-	}
-	generateHelp(myCommands)
+	myCommands := Commands(wantAdminCmds)
 
 	app, err := bmapp.BaseAppSetup(flags, myCommands)
 	if err != nil {
