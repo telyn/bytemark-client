@@ -28,6 +28,7 @@ func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	}
 }
 
+// add a little context (parent command) to commands so we can find the offender easier
 func traverseAllCommandsWithContext(cmds []cli.Command, name string, fn func(string, cli.Command)) {
 	if cmds == nil {
 		return
