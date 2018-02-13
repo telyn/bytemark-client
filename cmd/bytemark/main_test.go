@@ -28,6 +28,17 @@ func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	}
 }
 
+func traverseAllCommandsWithContext(cmds []cli.Command, name string, fn func(string, cli.Command)) {
+	if cmds == nil {
+		return
+	}
+	for _, c := range cmds {
+		subName := name + " " + c.FullName()
+		fn(subName, c)
+		traverseAllCommandsWithContext(c.Subcommands, subName, fn)
+	}
+}
+
 func getFixtureVM() brain.VirtualMachine {
 	return brain.VirtualMachine{
 		Name:     "test-server",
