@@ -70,7 +70,8 @@ func main() {
 
 	_, err = fmt.Fprintf(wr, tmpl, strings.Join(types, "\n"))
 	if err != nil {
-		fmt.Printf("Couldn't write types: %s\n", err)
+		fmt.Println(err)
+		hasFailed = true
 	}
 	err = wr.Close()
 	if err != nil {

@@ -42,7 +42,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 		}, {
 			Name:        "disc",
 			Usage:       "outputs info about a disc",
-			UsageText:   "bytemark show disc [--json | --table] [--table-fields help | <fields>] <server> <disc label>",
+			UsageText:   "bytemark show disc [--json | --table] [--table-fields help | <fields>] [server [disc label]]",
 			Description: `This command displays information about a disc including any backups and backup schedules on the disc`,
 			Flags: append(app.OutputFlags("disc details", "object"),
 				cli.GenericFlag{
@@ -55,7 +55,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 					Usage: "The label or ID of the disc to show",
 				},
 			),
-			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Disc("server", "disc"), func(c *app.Context) error {
+			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("disc"), with.Disc("server", "disc"), func(c *app.Context) error {
 				return c.OutputInDesiredForm(c.Disc)
 			}),
 		}, {
