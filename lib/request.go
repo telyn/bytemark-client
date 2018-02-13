@@ -192,6 +192,7 @@ func (r *internalRequest) Run(body io.Reader, responseObject interface{}) (statu
 
 	cli := r.mkHTTPClient()
 
+	// This isnt actually returning errors if not authenticated. (when Auth or preflight has not been run, NilAuthError)
 	req, err := r.mkHTTPRequest(bytes.NewBuffer(rb))
 	if err != nil {
 		return
