@@ -51,7 +51,7 @@ func init() {
 				return personErr
 			}
 			// cant use with.Account() because this gets the account details of the person currently signed in, even if staff
-			account, accountErr := billingRequests.GetBillingAccountID(ctx.Client(), ctx.String("account"))
+			account, accountErr := billingRequests.AccountStatus(ctx.Client(), ctx.String("account"))
 			if accountErr != nil {
 				return accountErr
 			}
