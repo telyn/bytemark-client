@@ -10,7 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
-func TestGetBillingAccountID(t *testing.T) {
+func TestGetAccountStatus(t *testing.T) {
 	tests := []struct {
 		body      []billing.DefferedStatus
 		username  string
@@ -18,12 +18,12 @@ func TestGetBillingAccountID(t *testing.T) {
 	}{
 		{
 			body:      []billing.DefferedStatus{},
-			username:  "bwagg",
+			username:  "",
 			shouldErr: true,
 		},
 		{
 			body: []billing.DefferedStatus{{
-				ID:       101,
+				ID:       139,
 				Deffered: false,
 			}},
 			username:  "bwagg",
@@ -36,12 +36,12 @@ func TestGetBillingAccountID(t *testing.T) {
 		rts := testutil.RequestTestSpec{
 			Method:        "GET",
 			Endpoint:      lib.BillingEndpoint,
-			URL:           "/api/v1/accounts/status?username=%s",
+			URL:           "/api/v1/accounts/status",
 			Response:      test.body,
 			AssertRequest: assert.QueryValue("username", test.username),
 		}
 		rts.Run(t, testutil.Name(i), true, func(client lib.Client) {
-			account, err := billingMethods.GetBillingAccountID(client, test.username)
+			account, err := billingMethods.GetAccountStatus(client, test.username)
 			if len(test.body) > 0 {
 				assert.Equal(t, testutil.Name(i), test.body[0], account)
 			}
