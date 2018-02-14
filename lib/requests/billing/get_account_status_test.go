@@ -41,7 +41,7 @@ func TestGetAccountDefferedStatus(t *testing.T) {
 			AssertRequest: assert.QueryValue("username", test.username),
 		}
 		rts.Run(t, testutil.Name(i), true, func(client lib.Client) {
-			account, err := billingMethods.GetAccountStatus(client, test.username)
+			account, err := billingMethods.GetAccountDefferedStatus(client, test.username)
 			if len(test.body) > 0 {
 				assert.Equal(t, testutil.Name(i), test.body[0], account)
 			}
