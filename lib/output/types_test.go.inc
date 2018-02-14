@@ -39,6 +39,12 @@ func isIgnoredType(t string) bool {
 	// billing.Accounts should ALWAYS be dressed as lib.Accounts
 	case "billing.Account":
 		return true
+	// billing.Assent will only be sent, never received.
+	case "billing.Assent":
+		return true
+	// billing.DefferedStatus will not be output.
+	case "billing.DefferedStatus":
+		return true
 	// billing.SPPTokenRequests will only be sent, never received.
 	case "billing.SPPTokenRequest":
 		return true
