@@ -7,9 +7,9 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 )
 
-// GetAccountStatus gets the ID and Deffered status of a specified account
+// GetAccountDefferedStatus gets the ID and Deffered status of a specified account
 // at the moment, we are only intrested in the ID of this, as it converts a username into a billingID.
-func GetAccountStatus(client lib.Client, username string) (account billing.DefferedStatus, err error) {
+func GetAccountDefferedStatus(client lib.Client, username string) (account billing.DefferedStatus, err error) {
 	req, err := client.BuildRequest("GET", lib.BillingEndpoint, "/api/v1/accounts/status?username=%s", username)
 	if err != nil {
 		return

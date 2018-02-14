@@ -10,7 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
-func TestGetAccountStatus(t *testing.T) {
+func TestGetAccountDefferedStatus(t *testing.T) {
 	tests := []struct {
 		body      []billing.DefferedStatus
 		username  string
