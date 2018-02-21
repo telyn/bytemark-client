@@ -53,8 +53,6 @@ func TestShowAccount(t *testing.T) {
 		config.When("GetIgnoreErr", "account").Return(configAccount)
 	}
 
-	// These tests dont actually work, probably something more to do with the mocking of server than anything as you cannot get account that isnt your own
-	// TODO: Fix these tests or remove the ones that are useless?
 	tests := []showAccountTest{
 		{ // 0
 			Input:         "show account",
