@@ -8,7 +8,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	billingRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
-	// "github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -16,12 +15,16 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "assent",
 		Usage:       "assent to Bytemark terms and conditions",
-		UsageText:   "bytemark assent --agreement <agreement id> --account <account> --person <username> [--name <full name> --email <email>]",
+		UsageText:   "bytemark assent --agreement <agreement id> --person <username> --account <account>|--accountid <account id> [--name <full name> --email <email>]",
 		Description: "Assent to Bytemark terms and conditions.",
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "agreement",
 				Usage: "the agreement id to assent to",
+			},
+			cli.StringFlag{
+				Name:  "person",
+				Usage: "the username of the person who is assenting",
 			},
 			cli.GenericFlag{
 				Name:  "account",
@@ -31,10 +34,6 @@ func init() {
 			cli.IntFlag{
 				Name:  "accountid",
 				Usage: "the account id of the account which is assenting",
-			},
-			cli.StringFlag{
-				Name:  "person",
-				Usage: "the username of the person who is assenting",
 			},
 			cli.StringFlag{
 				Name:  "name",
