@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	billingRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
+	// "github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -27,6 +28,10 @@ func init() {
 				Usage: "the account which is assenting",
 				Value: new(app.AccountNameFlag),
 			},
+			cli.IntFlag{
+				Name:  "accountid",
+				Usage: "the account id of the account which is assenting",
+			},
 			cli.StringFlag{
 				Name:  "person",
 				Usage: "the username of the person who is assenting",
@@ -40,21 +45,36 @@ func init() {
 				Usage: "the email address of the person who is assenting. defaults to the full name of the person specified by the person flag",
 			},
 		},
-		Action: app.Action(with.RequiredFlags("agreement", "account", "person"), func(ctx *app.Context) error {
+		Action: app.Action(with.RequiredFlags("agreement", "person"), func(ctx *app.Context) error {
+			accountString := ctx.String("account")
+			accountID := ctx.Int("accountid")
+			var account billing.Account
+
+			if accountString == "" && accountID == 0 {
+				return fmt.Errorf("Neither --account or --accountid was set (or should not be blank/zero)")
+			} else if accountString != "" && accountID != 0 {
+				return fmt.Errorf("--account and --accountid have both been set when only one is required")
+			}
+
 			err := with.Auth(ctx)
 			if err != nil {
 				return err
+			}
+
+			if accountString != "" {
+				// cant use with.Account() because this gets the account details of the person currently signed in, even if staff
+				account, err = billingRequests.GetAccountByBigVName(ctx.Client(), accountString)
+				if err != nil {
+					return err
+				}
+				accountID = account.ID
 			}
 
 			person, personErr := billingRequests.GetPerson(ctx.Client(), ctx.String("person"))
 			if personErr != nil {
 				return personErr
 			}
-			// cant use with.Account() because this gets the account details of the person currently signed in, even if staff
-			account, accountErr := billingRequests.GetAccountDeferredStatus(ctx.Client(), ctx.String("account"))
-			if accountErr != nil {
-				return accountErr
-			}
+
 			name := ctx.String("name")
 			email := ctx.String("email")
 			prompt := ""
@@ -80,7 +100,7 @@ func init() {
 
 			err = billingRequests.AssentToAgreement(ctx.Client(), billing.Assent{
 				AgreementID: ctx.String("agreement"),
-				AccountID:   account.ID,
+				AccountID:   accountID,
 				PersonID:    person.ID,
 				Name:        name,
 				Email:       email,
