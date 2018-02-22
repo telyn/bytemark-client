@@ -17,37 +17,42 @@ func TestAssent(t *testing.T) {
 	tests := []struct {
 		name      string
 		input     string
-		expected  interface{}
+		account   string
 		shouldErr bool
 	}{
 		{
 			name:      "MissingArguments",
 			input:     "",
+			account:   "accountFromConfig",
 			shouldErr: true,
 		},
 		{
-			name:  "SuccessfullyAssentsWithAccountID",
-			input: "--agreement 1 --person bwagg --accountid 101 --name BryanWagg --email geoff@jeff.com",
+			name:    "SuccessfullyAssentsWithAccountID",
+			input:   "--agreement 1 --person bwagg --accountid 101 --name BryanWagg --email geoff@jeff.com",
+			account: "bwagg",
 		},
 		{
-			name:  "SuccessfullyAssentsWithAccount",
-			input: "--agreement 1 --person bwagg --account bwagg --name BryanWagg --email geoff@jeff.com",
+			name:    "SuccessfullyAssentsWithAccount",
+			input:   "--agreement 1 --person bwagg --account bwagg --name BryanWagg --email geoff@jeff.com",
+			account: "bwagg",
 		},
 		{
 			name:      "AmbiguousAccount",
 			input:     "--agreement 1 --person bwagg --account bwagg --accountid 1234",
+			account:   "bwagg",
 			shouldErr: true,
 		},
 		{
-			name:  "SuccessfullyAssentsWithAccountFromConfig",
-			input: "--agreement 1 --person bwagg --name BryanWagg --email geoff@jeff.com",
+			name:    "SuccessfullyAssentsWithAccountFromConfig",
+			account: "accountFromConfig",
+			input:   "--agreement 1 --person bwagg --name BryanWagg --email geoff@jeff.com",
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
-			config.When("GetIgnoreErr", "account").Return("configAccount")
-			client.When("BuildRequest", "GET", lib.BillingEndpoint, "/api/v1/accounts?bigv_account_name=%s", []string{"bwagg"}).Return(&mocks.Request{
+			config.When("GetIgnoreErr", "account").Return("accountFromConfig")
+			client.When("BuildRequest", "GET", lib.BillingEndpoint, "/api/v1/accounts?bigv_account_name=%s", []string{test.account}).Return(&mocks.Request{
 				T:          t,
 				StatusCode: 200,
 				ResponseObject: []billing.Account{{

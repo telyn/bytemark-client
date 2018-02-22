@@ -60,8 +60,7 @@ func init() {
 			if err != nil {
 				return err
 			}
-
-			if accountString != "" && accountNameFlag.SetFromCommandLine {
+			if accountString != "" && accountID == 0 {
 				// cant use with.Account() because this gets the account details of the person currently signed in, even if staff
 				account, err = billingRequests.GetAccountByBigVName(ctx.Client(), accountString)
 				if err != nil {
