@@ -46,12 +46,13 @@ func init() {
 		},
 		Action: app.Action(with.RequiredFlags("agreement", "person"), func(ctx *app.Context) error {
 			accountString := ctx.String("account")
+			accountNameFlag := ctx.Context.Generic("account").(*app.AccountNameFlag)
 			accountID := ctx.Int("accountid")
 			var account billing.Account
 
 			if accountString == "" && accountID == 0 {
 				return fmt.Errorf("Neither --account or --accountid was set (or should not be blank/zero)")
-			} else if accountString != "" && accountID != 0 {
+			} else if accountNameFlag.SetFromCommandLine && accountString != "" && accountID != 0 {
 				return fmt.Errorf("--account and --accountid have both been set when only one is required")
 			}
 
@@ -60,7 +61,7 @@ func init() {
 				return err
 			}
 
-			if accountString != "" {
+			if accountString != "" && accountNameFlag.SetFromCommandLine {
 				// cant use with.Account() because this gets the account details of the person currently signed in, even if staff
 				account, err = billingRequests.GetAccountByBigVName(ctx.Client(), accountString)
 				if err != nil {
