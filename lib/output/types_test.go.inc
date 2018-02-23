@@ -42,9 +42,6 @@ func isIgnoredType(t string) bool {
 	// billing.Assent will only be sent, never received.
 	case "billing.Assent":
 		return true
-	// billing.DeferredStatus will not be output.
-	case "billing.DeferredStatus":
-		return true
 	// billing.SPPTokenRequests will only be sent, never received.
 	case "billing.SPPTokenRequest":
 		return true
