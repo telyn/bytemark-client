@@ -58,8 +58,7 @@ func TestAssent(t *testing.T) {
 				ResponseObject: []billing.Account{{
 					Name: "bwagg",
 					ID:   101,
-				},
-				},
+				}},
 			})
 			client.When("BuildRequest", "GET", lib.BillingEndpoint, "/api/v1/people?username=%s", []string{"bwagg"}).Return(&mocks.Request{
 				T:          t,
@@ -69,18 +68,16 @@ func TestAssent(t *testing.T) {
 					LastName:  "Wagg",
 					ID:        201,
 					Email:     "geoff@jeff.com",
-				},
-				},
+				}},
 			})
 			client.When("BuildRequest", "POST", lib.BillingEndpoint, "/api/v1/agreements/%s/assents", []string{"1"}).Return(&mocks.Request{
 				T:          t,
 				StatusCode: 200,
 				RequestObject: billing.Assent{
-					AgreementID: "1",
-					AccountID:   101,
-					PersonID:    201,
-					Name:        "BryanWagg",
-					Email:       "geoff@jeff.com",
+					AccountID: 101,
+					PersonID:  201,
+					Name:      "BryanWagg",
+					Email:     "geoff@jeff.com",
 				},
 			}).Times(1)
 
