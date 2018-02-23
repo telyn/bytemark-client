@@ -29,7 +29,9 @@ var forceFlag = cli.BoolFlag{
 //commands is assembled during init()
 var commands = make([]cli.Command, 0)
 
-// Commands returns the list of commands that are comprised up from normal and admin commands if requested
+// Commands returns the full list of commands that are available to a user
+// (including admin commands if requested), sorts them into alphabetical order,
+// and then generates the help section for each command
 func Commands(wantAdminCmds bool) []cli.Command {
 	myCommands := cliutil.AssembleCommands(commands, commandsPkg.Commands)
 	if wantAdminCmds {
