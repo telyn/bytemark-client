@@ -27,9 +27,8 @@ func TestAssent(t *testing.T) {
 			shouldErr: true,
 		},
 		{
-			name:    "SuccessfullyAssentsWithAccountID",
-			input:   "--agreement 1 --person bwagg --accountid 101 --name BryanWagg --email geoff@jeff.com",
-			account: "bwagg",
+			name:  "SuccessfullyAssentsWithAccountID",
+			input: "--agreement 1 --person bwagg --accountid 101 --name BryanWagg --email geoff@jeff.com",
 		},
 		{
 			name:    "SuccessfullyAssentsWithAccount",
