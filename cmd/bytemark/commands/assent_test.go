@@ -51,14 +51,16 @@ func TestAssent(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 			config.When("GetIgnoreErr", "account").Return("accountFromConfig")
-			client.When("BuildRequest", "GET", lib.BillingEndpoint, "/api/v1/accounts?bigv_account_name=%s", []string{test.account}).Return(&mocks.Request{
-				T:          t,
-				StatusCode: 200,
-				ResponseObject: []billing.Account{{
-					Name: "bwagg",
-					ID:   101,
-				}},
-			})
+			if test.account != "" {
+				client.When("BuildRequest", "GET", lib.BillingEndpoint, "/api/v1/accounts?bigv_account_name=%s", []string{test.account}).Return(&mocks.Request{
+					T:          t,
+					StatusCode: 200,
+					ResponseObject: []billing.Account{{
+						Name: "bwagg",
+						ID:   101,
+					}},
+				})
+			}
 			client.When("BuildRequest", "GET", lib.BillingEndpoint, "/api/v1/people?username=%s", []string{"bwagg"}).Return(&mocks.Request{
 				T:          t,
 				StatusCode: 200,
