@@ -26,10 +26,11 @@ func TestAssentToAgreement(t *testing.T) {
 				Email:       "geoff@bytemark.com",
 			},
 			expected: map[string]interface{}{
-				"account_id": 123456.0,
-				"person_id":  789101.0,
-				"name":       "geoff",
-				"email":      "geoff@bytemark.com",
+				"agreement_id": "jeff",
+				"account_id":   123456.0,
+				"person_id":    789101.0,
+				"name":         "geoff",
+				"email":        "geoff@bytemark.com",
 			},
 		},
 	}
