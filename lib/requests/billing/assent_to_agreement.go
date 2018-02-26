@@ -11,11 +11,6 @@ func AssentToAgreement(client lib.Client, assent types.Assent) (err error) {
 	if err != nil {
 		return
 	}
-	_, _, err = req.MarshalAndRun(map[string]interface{}{
-		"account_id": assent.AccountID,
-		"person_id":  assent.PersonID,
-		"name":       assent.Name,
-		"email":      assent.Email,
-	}, nil)
+	_, _, err = req.MarshalAndRun(assent, nil)
 	return
 }
