@@ -71,16 +71,11 @@ func TestAssent(t *testing.T) {
 					Email:     "geoff@jeff.com",
 				}},
 			})
-			client.When("BuildRequest", "POST", lib.BillingEndpoint, "/api/v1/agreements/%s/assents", []string{"1"}).Return(&mocks.Request{
+			postReq := &mocks.Request{
 				T:          t,
 				StatusCode: 200,
-				RequestObject: billing.Assent{
-					AccountID: 101,
-					PersonID:  201,
-					Name:      "BryanWagg",
-					Email:     "geoff@jeff.com",
-				},
-			}).Times(1)
+			}
+			client.When("BuildRequest", "POST", lib.BillingEndpoint, "/api/v1/agreements/%s/assents", []string{"1"}).Return(postReq).Times(1)
 
 			args := fmt.Sprintf("bytemark assent %s", test.input)
 			err := app.Run(strings.Split(args, " "))
@@ -89,9 +84,19 @@ func TestAssent(t *testing.T) {
 			} else if test.shouldErr && err == nil {
 				t.Errorf("should err, but didn't")
 			}
-			if ok, err := client.Verify(); !ok && !test.shouldErr {
-				t.Fatal(err)
+			if !test.shouldErr {
+				if ok, err := client.Verify(); !ok {
+					t.Fatal(err)
+				}
+				postReq.AssertRequestObjectEqual(billing.Assent{
+					AgreementID: "1",
+					AccountID:   101,
+					PersonID:    201,
+					Name:        "BryanWagg",
+					Email:       "geoff@jeff.com",
+				})
 			}
+
 		})
 	}
 
