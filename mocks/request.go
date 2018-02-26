@@ -48,7 +48,7 @@ func (r *Request) AssertRequestBodyEqual(expected string) {
 
 func (r *Request) AssertRequestObjectEqual(expected interface{}) {
 	if !reflect.DeepEqual(expected, r.requestObject) {
-		r.T.Fatalf("Request body did not equal expected:\nexpected: %q \n  actual: %q", expected, r.requestObject)
+		r.T.Fatalf("Request body did not equal expected:\nexpected: %#v \n  actual: %#v", expected, r.requestObject)
 	}
 }
 
