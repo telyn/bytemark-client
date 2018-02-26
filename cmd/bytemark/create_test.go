@@ -64,7 +64,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 	seenImage := false
 	seenRootPassword := false
 
-	traverseAllCommands(commands, func(cmd cli.Command) {
+	traverseAllCommands(Commands(true), func(cmd cli.Command) {
 		if cmd.FullName() == "create server" {
 			seenCmd = true
 			for _, f := range cmd.Flags {

@@ -40,7 +40,7 @@ func TestDestructiveCommandsHaveForceFlags(t *testing.T) {
 	for _, cmd := range destructiveCommands {
 		cmds[cmd] = &s{}
 	}
-	traverseAllCommands(commands, func(c cli.Command) {
+	traverseAllCommands(Commands(true), func(c cli.Command) {
 		for _, cmd := range destructiveCommands {
 			if c.FullName() == cmd {
 				cmds[cmd].Seen = true

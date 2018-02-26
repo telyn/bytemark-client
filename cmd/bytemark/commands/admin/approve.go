@@ -26,7 +26,7 @@ func init() {
 					},
 					cli.BoolFlag{
 						Name:  "power-on",
-						Usage: "If set, powers on the server.",
+						Usage: "If set, powers on the server",
 					},
 				},
 				Action: app.Action(args.Optional("server", "power-on"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {

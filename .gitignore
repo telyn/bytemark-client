@@ -16,3 +16,4 @@ bytemark.exe
 ports/chocolatey/package
 ports/chocolatey/VERSION
 ports/chocolatey/choco.exe
+*.DS_Store
