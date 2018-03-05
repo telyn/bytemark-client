@@ -93,7 +93,7 @@ func (tw *TestWriter) Write(p []byte) (n int, err error) {
 
 // BaseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
 // user is test-user
-func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, c *mocks.Client, cliapp *cli.App) {
+func BaseTestAuthSetup(t mocks.TestingT, admin bool, commands []cli.Command) (config *mocks.Config, c *mocks.Client, cliapp *cli.App) {
 	config, c, cliapp = BaseTestSetup(t, admin, commands)
 
 	config.When("Get", "account").Return("test-account")

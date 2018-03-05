@@ -22,7 +22,7 @@ func TestUnscheduleBackups(t *testing.T) {
 		ShouldErr  bool
 		ShouldCall bool
 		CreateErr  error
-		BaseTestFn func(*testing.T, bool, []cli.Command) (*mocks.Config, *mocks.Client, *cli.App)
+		BaseTestFn func(mocks.TestingT, bool, []cli.Command) (*mocks.Config, *mocks.Client, *cli.App)
 	}{
 		{
 			ShouldCall: false,
