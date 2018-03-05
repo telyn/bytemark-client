@@ -5,23 +5,31 @@ import (
 	"io/ioutil"
 	"net/url"
 	"reflect"
-	"testing"
 )
 
+// Request allows bytemark-client developers to stub out requests to bytemark APIs
+// in the simple case where a test will only make one API request, Client.MockRequest can be used
+// in cases where multiple APIs may be called, use Client.When("BuildRequest").Returns(Request{}) to stub out
+// each request individually.
+// See the example functions in request_examples_test.go
 type Request struct {
-	T *testing.T
+	// testingT is an interface that *testing.T implements. See ExampleSingleRequest / ExampleMultiRequest in request_examples_test.go
+	T TestingT
 
+	// StatusCode is the status code to be returned by Run / MarshalAndRun
 	StatusCode int
 	// ResponseBody is the bytes that will be returned from Run/MarshalAndRun.
-	// all JSON requests should use ResponseObject instead since ResponseBody
-	// will not be unmarshalled into `out`
+	// all requests which expect JSON back should use ResponseObject instead
+	// since ResponseBody will not be unmarshalled into `out`
 	ResponseBody []byte
 	// ResponseObject is the object that will be assigned to `out` when
-	// MarshalAndRun is called.
-	// All non-JSON requests should use ResponseBody instead since
-	// ResponseObject will not be marshalled and returned as responseBody.
+	// MarshalAndRun / Run is called.
+	// All requests  which expect a non-JSON response should use ResponseBody
+	// instead since ResponseObject cannot be automatically marshalled into
+	// the response.
 	ResponseObject interface{}
-	Err            error
+	// Err is an error for Run/MarshalAndRun to return to simulate network or API errors
+	Err error
 
 	// requestBody and requestObject are set by Run and MarshalAndRun respectively.
 	// make assertions against them with AssertRequestBodyEqual or
@@ -65,7 +73,11 @@ func (r *Request) AllowInsecure() {
 }
 
 func (r *Request) fillOut(out interface{}) {
-	if out == nil || r.ResponseObject == nil {
+	if out == nil {
+		return
+	}
+	if r.ResponseObject == nil {
+		r.T.Errorf("mocks.Request.Run tried to set 'out' object, but the Request.ResponseObject was nil - specify a ResponseObject in your test")
 		return
 	}
 	resVal := reflect.ValueOf(r.ResponseObject)

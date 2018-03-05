@@ -43,7 +43,7 @@ func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string
 }
 
 // BaseTestSetup constructs mock config and client and produces a cli.App with the given commands.
-func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
+func BaseTestSetup(t mocks.TestingT, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
 	cli.OsExiter = func(_ int) {}
 	config = new(mocks.Config)
 	client = new(mocks.Client)
@@ -82,7 +82,7 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 // TestWriter is a writer which writes to the test log.
 // This ruins formatting on e.g. text/template renders, but at least it forces all the output to be in order
 type TestWriter struct {
-	t *testing.T
+	t mocks.TestingT
 }
 
 // Write pushes out the bytes as a string to the testing.T instance stored by the TestWriter using t.Log
