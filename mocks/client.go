@@ -260,7 +260,6 @@ func (c *Client) RestartVirtualMachine(name lib.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
-
 func (c *Client) SetVirtualMachineCDROM(name lib.VirtualMachineName, url string) error {
 	r := c.Called(name, url)
 	return r.Error(0)
@@ -283,10 +282,6 @@ func (c *Client) SetVirtualMachineMemory(name lib.VirtualMachineName, memory int
 }
 func (c *Client) StartVirtualMachine(name lib.VirtualMachineName) error {
 	r := c.Called(name)
-	return r.Error(0)
-}
-func (c *Client) StartVirtualMachineWithAppliance(vmName lib.VirtualMachineName, applianceName string) error {
-	r := c.Called(vmName, applianceName)
 	return r.Error(0)
 }
 func (c *Client) StopVirtualMachine(name lib.VirtualMachineName) error {
