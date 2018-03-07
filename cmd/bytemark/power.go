@@ -41,7 +41,7 @@ func init() {
 	}, cli.Command{
 		Name:        "restart",
 		Usage:       "power off a server and start it again",
-		UsageText:   "bytemark restart <server> [--appliance <appliance> || --rescue]",
+		UsageText:   "bytemark restart <server> [--rescue || --appliance <appliance>]",
 		Description: "This command will power down a server and then start it back up again.",
 		Flags: []cli.Flag{
 			cli.GenericFlag{
@@ -49,13 +49,13 @@ func init() {
 				Usage: "the server to restart",
 				Value: new(app.VirtualMachineNameFlag),
 			},
-			cli.StringFlag{
-				Name:  "appliance",
-				Usage: "the appliance to boot into when the server starts",
-			},
 			cli.BoolFlag{
 				Name:  "rescue",
 				Usage: "boots the server using the rescue appliance",
+			},
+			cli.StringFlag{
+				Name:  "appliance",
+				Usage: "the appliance to boot into when the server starts",
 			},
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
