@@ -52,21 +52,21 @@ func init() {
 				Name:  "appliance",
 				Usage: "the appliance to boot into when the server starts",
 			},
-			cli.StringFlag{
+			cli.BoolFlag{
 				Name:  "rescue",
 				Usage: "boots the server using the rescue appliance",
 			},
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
-			applianceBoot := false
-			applianceName := ""
+			appliance := c.String("appliance")
 
-			// only want the applianceName set once
-			if c.String("appliance") != "" && c.Context.IsSet("rescue") {
-				return fmt.Errorf("--appliance and --rescue have both been set when only one is required")
-			} else if c.String("appliance") != "" || c.Context.IsSet("rescue") {
-				// set the applianceName to whatever is specified in appliance flag or set it to rescue if the flag --rescue is present
+			if appliance != "" && c.Context.IsSet("rescue") {
+				return fmt.Errorf("--appliance and --rescue have both been set when only one is allowed")
+			}
+
+			if c.Bool("rescue") {
+				appliance = "rescue"
 			}
 
 			fmt.Fprintf(c.App().Writer, "Shutting down %v...", vmName)
@@ -80,8 +80,8 @@ func init() {
 			}
 
 			c.Log("Done!\n\nStarting %s back up.", vmName)
-			if applianceBoot == true {
-				err = c.Client().StartVirtualMachineWithAppliance(vmName, applianceName)
+			if appliance != "" {
+				err = c.Client().StartVirtualMachineWithAppliance(vmName, appliance)
 			} else {
 				err = c.Client().StartVirtualMachine(vmName)
 			}
