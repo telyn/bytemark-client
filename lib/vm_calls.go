@@ -193,6 +193,24 @@ func (c *bytemarkClient) StartVirtualMachine(name VirtualMachineName) (err error
 	return err
 }
 
+// StartVirtualMachineWithAppliance starts the named virtual machine using the named appliance.
+// returns nil on success or an error otherwise.
+func (c *bytemarkClient) StartVirtualMachineWithAppliance(vmName VirtualMachineName, applianceName string) (err error) {
+	err = c.EnsureVirtualMachineName(&vmName)
+	if err != nil {
+		return err
+	}
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", vmName.Account, vmName.Group, vmName.VirtualMachine)
+	if err != nil {
+		return err
+	}
+
+	body := fmt.Sprintf(`{"autoreboot_on":true, "power_on": true, "appliance":{"name":"%s", "permanent": false}}`, applianceName)
+
+	_, _, err = r.Run(bytes.NewBufferString(body), nil)
+	return err
+}
+
 // StopVirtualMachine starts the named virtual machine.
 // returns nil on success or an error otherwise.
 func (c *bytemarkClient) StopVirtualMachine(name VirtualMachineName) (err error) {

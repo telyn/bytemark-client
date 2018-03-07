@@ -186,6 +186,10 @@ type Client interface {
 	// returns nil on success or an error otherwise.
 	StartVirtualMachine(name VirtualMachineName) (err error)
 
+	// StartVirtualMachineWithAppliance starts the named virtual machine with the named appliance.
+	// returns nil on success or an error otherwise.
+	StartVirtualMachineWithAppliance(vmName VirtualMachineName, applianceName string) (err error)
+
 	// StopVirtualMachine starts the named virtual machine.
 	// returns nil on success or an error otherwise.
 	StopVirtualMachine(name VirtualMachineName) (err error)
