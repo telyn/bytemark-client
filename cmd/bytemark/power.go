@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -81,7 +82,7 @@ func init() {
 
 			c.Log("Done!\n\nStarting %s back up.", vmName)
 			if appliance != "" {
-				err = c.Client().StartVirtualMachineWithAppliance(vmName, appliance)
+				err = brainMethods.StartVirtualMachineWithAppliance(c.Client(), vmName, appliance)
 			} else {
 				err = c.Client().StartVirtualMachine(vmName)
 			}
