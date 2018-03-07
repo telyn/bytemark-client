@@ -9,7 +9,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
-	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
@@ -51,7 +50,7 @@ func TestUpdateBillingDefinition(t *testing.T) {
 		} else if err == nil && test.ShouldErr {
 			t.Errorf("TestUpdateBillingDefinition %d didn't err but should've", i)
 		}
-		assert.Equal(t, testutil.Name(i), test.Expected, c.MockRequest.RequestObject)
+		c.MockRequest.AssertRequestObjectEqual(test.Expected)
 		if ok, err := c.Verify(); !ok && !test.ShouldErr {
 			t.Fatal(err)
 		}

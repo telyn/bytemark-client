@@ -11,7 +11,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -88,14 +87,14 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					return err
 				}
 				reqURL := req.GetURL()
-				log.Logf("%s %s: %d\r\n", method, reqURL.String(), statusCode)
+				c.LogErr("%s %s: %d\r\n", method, reqURL.String(), statusCode)
 
 				buf := new(bytes.Buffer)
 				err = json.Indent(buf, body, "", "    ")
 				if err != nil {
 					return err
 				}
-				log.Log(buf.String())
+				c.Log("%s", buf.String())
 				return nil
 			}
 			return c.Help("Unexpected debug command '" + method + "'")
