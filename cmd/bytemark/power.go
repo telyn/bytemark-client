@@ -40,7 +40,7 @@ func init() {
 	}, cli.Command{
 		Name:        "restart",
 		Usage:       "power off a server and start it again",
-		UsageText:   "bytemark restart <server>",
+		UsageText:   "bytemark restart <server> [--appliance <appliance> || --rescue]",
 		Description: "This command will power down a server and then start it back up again.",
 		Flags: []cli.Flag{
 			cli.GenericFlag{
@@ -48,9 +48,27 @@ func init() {
 				Usage: "the server to restart",
 				Value: new(app.VirtualMachineNameFlag),
 			},
+			cli.StringFlag{
+				Name:  "appliance",
+				Usage: "the appliance to boot into when the server starts",
+			},
+			cli.StringFlag{
+				Name:  "rescue",
+				Usage: "boots the server using the rescue appliance",
+			},
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
+			applianceBoot := false
+			applianceName := ""
+
+			// only want the applianceName set once
+			if c.String("appliance") != "" && c.Context.IsSet("rescue") {
+				return fmt.Errorf("--appliance and --rescue have both been set when only one is required")
+			} else if c.String("appliance") != "" || c.Context.IsSet("rescue") {
+				// set the applianceName to whatever is specified in appliance flag or set it to rescue if the flag --rescue is present
+			}
+
 			fmt.Fprintf(c.App().Writer, "Shutting down %v...", vmName)
 			err = c.Client().ShutdownVirtualMachine(vmName, true)
 			if err != nil {
@@ -62,7 +80,11 @@ func init() {
 			}
 
 			c.Log("Done!\n\nStarting %s back up.", vmName)
-			err = c.Client().StartVirtualMachine(vmName)
+			if applianceBoot == true {
+				err = c.Client().StartVirtualMachineWithAppliance(vmName, applianceName)
+			} else {
+				err = c.Client().StartVirtualMachine(vmName)
+			}
 
 			return
 		}),
