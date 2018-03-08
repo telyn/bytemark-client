@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -25,6 +26,49 @@ func TestResetCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+func TestRestartCommandTable(t *testing.T) {
+	tests := []struct {
+		name      string
+		input     string
+		vmname    lib.VirtualMachineName
+		shouldErr bool
+	}{
+		{
+			name:  "RestartWithoutApplianceTest",
+			input: "test-server",
+			vmname: lib.VirtualMachineName{
+				VirtualMachine: "test-server",
+				Group:          "test-group",
+				Account:        "test-account",
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			config, client, app := testutil.BaseTestAuthSetup(t, false, commands)
+			// config.When("GetIgnoreErr", "account").Return("accountFromConfig")
+			config.When("GetVirtualMachine").Return(defVM)
+
+			client.When("ShutdownVirtualMachine", test.vmname, true).Times(1)
+			client.When("GetVirtualMachine", test.vmname).Return(brain.VirtualMachine{PowerOn: false})
+			client.When("StartVirtualMachine", test.vmname).Times(1)
+
+			args := fmt.Sprintf("bytemark restart %s", test.input)
+			err := app.Run(strings.Split(args, " "))
+			if !test.shouldErr && err != nil {
+				t.Errorf("shouldn't err, but did: %T{%s}", err, err.Error())
+			} else if test.shouldErr && err == nil {
+				t.Errorf("should err, but didn't")
+			}
+			if !test.shouldErr {
+				if ok, err := client.Verify(); !ok {
+					t.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
 func TestRestartCommand(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
