@@ -27,7 +27,7 @@ func TestResetCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-func TestRestartCommandTable(t *testing.T) {
+func TestRestartCommand(t *testing.T) {
 	tests := []struct {
 		name          string
 		input         string
@@ -135,24 +135,6 @@ func TestRestartCommandTable(t *testing.T) {
 	}
 }
 
-// func TestRestartCommand(t *testing.T) {
-// 	is := is.New(t)
-// 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
-// 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
-
-// 	config.When("GetVirtualMachine").Return(defVM)
-
-// 	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
-// 	c.When("GetVirtualMachine", vmn).Return(brain.VirtualMachine{PowerOn: false})
-// 	c.When("StartVirtualMachine", vmn).Times(1)
-
-// 	err := app.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
-// 	is.Nil(err)
-// 	if ok, err := c.Verify(); !ok {
-// 		t.Fatal(err)
-// 	}
-// }
 func TestShutdownCommand(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
