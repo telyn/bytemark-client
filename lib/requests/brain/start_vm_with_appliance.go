@@ -1,9 +1,6 @@
 package brain
 
 import (
-	"bytes"
-	"fmt"
-
 	"github.com/BytemarkHosting/bytemark-client/lib"
 )
 
