@@ -106,20 +106,18 @@ func TestRestartCommandTable(t *testing.T) {
 			client.When("GetVirtualMachine", test.vmname).Return(brain.VirtualMachine{PowerOn: false})
 
 			if test.applianceBoot == true {
-				client.When("StartVirtualMachineWithAppliance", test.vmname).Times(1)
+				client.When("BuildRequest", "PUT", lib.Endpoint(1),
+					"/accounts/%s/groups/%s/virtual_machines/%s",
+					[]string{
+						"default-account",
+						"default",
+						"test-server"}).Return(&mocks.Request{
+					T:          t,
+					StatusCode: 200,
+				}).Times(1)
 			} else {
 				client.When("StartVirtualMachine", test.vmname).Times(1)
 			}
-
-			client.When("BuildRequest", "PUT", lib.Endpoint(1),
-				"/accounts/%s/groups/%s/virtual_machines/%s",
-				[]string{
-					"default-account",
-					"default",
-					"test-server"}).Return(&mocks.Request{
-				T:          t,
-				StatusCode: 200,
-			})
 
 			args := fmt.Sprintf("bytemark restart %s", test.input)
 			err := app.Run(strings.Split(args, " "))
