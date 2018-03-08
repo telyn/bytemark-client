@@ -62,7 +62,7 @@ func init() {
 			vmName := c.VirtualMachineName("server")
 			appliance := c.String("appliance")
 
-			if appliance != "" && c.Context.IsSet("rescue") {
+			if appliance != "" && c.Bool("rescue") {
 				return fmt.Errorf("--appliance and --rescue have both been set when only one is allowed")
 			}
 
