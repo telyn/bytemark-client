@@ -105,7 +105,7 @@ func TestRestartCommandTable(t *testing.T) {
 			client.When("ShutdownVirtualMachine", test.vmname, true).Times(1)
 			client.When("GetVirtualMachine", test.vmname).Return(brain.VirtualMachine{PowerOn: false})
 
-			if test.applianceBoot == true {
+			if test.applianceBoot {
 				client.When("BuildRequest", "PUT", lib.Endpoint(1),
 					"/accounts/%s/groups/%s/virtual_machines/%s",
 					[]string{
