@@ -19,8 +19,15 @@ func StartVirtualMachineWithAppliance(client lib.Client, vmName lib.VirtualMachi
 		return err
 	}
 
-	body := fmt.Sprintf(`{"autoreboot_on":true, "power_on": true, "appliance":{"name":"%s", "permanent": false}}`, applianceName)
+	update := map[string]interface{}{
+		"autoreboot_on": true,
+		"power_on":      true,
+		"appliance": map[string]interface{}{
+			"name":      applianceName,
+			"permanent": false,
+		},
+	}
+	_, _, err = r.MarshalAndRun(update, nil)
 
-	_, _, err = r.Run(bytes.NewBufferString(body), nil)
 	return err
 }
