@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
 
@@ -28,10 +29,11 @@ func TestResetCommand(t *testing.T) {
 }
 func TestRestartCommandTable(t *testing.T) {
 	tests := []struct {
-		name      string
-		input     string
-		vmname    lib.VirtualMachineName
-		shouldErr bool
+		name          string
+		input         string
+		vmname        lib.VirtualMachineName
+		shouldErr     bool
+		applianceBoot bool
 	}{
 		{
 			name:  "RestartWithoutAppliance",
@@ -68,12 +70,13 @@ func TestRestartCommandTable(t *testing.T) {
 			shouldErr: true,
 		}, {
 			name:  "RestartWithApplianceFlag",
-			input: "test-server -- appliance rescue",
+			input: "test-server --appliance rescue",
 			vmname: lib.VirtualMachineName{
 				VirtualMachine: "test-server",
 				Group:          "default",
 				Account:        "default-account",
 			},
+			applianceBoot: true,
 		}, {
 			name:  "RestartWithRescueFlag",
 			input: "test-server --rescue",
@@ -82,6 +85,7 @@ func TestRestartCommandTable(t *testing.T) {
 				Group:          "default",
 				Account:        "default-account",
 			},
+			applianceBoot: true,
 		}, {
 			name:  "RestartWithApplianceAndRescueFlag",
 			input: "test-server --appliance a --rescue",
@@ -96,21 +100,26 @@ func TestRestartCommandTable(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands)
-			// config.When("GetIgnoreErr", "account").Return("accountFromConfig")
 			config.When("GetVirtualMachine").Return(defVM)
 
 			client.When("ShutdownVirtualMachine", test.vmname, true).Times(1)
 			client.When("GetVirtualMachine", test.vmname).Return(brain.VirtualMachine{PowerOn: false})
-			client.When("StartVirtualMachine", test.vmname).Times(1)
+
+			if test.applianceBoot == true {
+				client.When("StartVirtualMachineWithAppliance", test.vmname).Times(1)
+			} else {
+				client.When("StartVirtualMachine", test.vmname).Times(1)
+			}
 
 			client.When("BuildRequest", "PUT", lib.Endpoint(1),
 				"/accounts/%s/groups/%s/virtual_machines/%s",
 				[]string{
 					"default-account",
 					"default",
-					"test-server"}).Return(
-			// need to return something here but dont know what just yet
-			)
+					"test-server"}).Return(&mocks.Request{
+				T:          t,
+				StatusCode: 200,
+			})
 
 			args := fmt.Sprintf("bytemark restart %s", test.input)
 			err := app.Run(strings.Split(args, " "))
@@ -128,24 +137,24 @@ func TestRestartCommandTable(t *testing.T) {
 	}
 }
 
-func TestRestartCommand(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+// func TestRestartCommand(t *testing.T) {
+// 	is := is.New(t)
+// 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
+// 	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
 
-	config.When("GetVirtualMachine").Return(defVM)
+// 	config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
-	c.When("GetVirtualMachine", vmn).Return(brain.VirtualMachine{PowerOn: false})
-	c.When("StartVirtualMachine", vmn).Times(1)
+// 	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
+// 	c.When("GetVirtualMachine", vmn).Return(brain.VirtualMachine{PowerOn: false})
+// 	c.When("StartVirtualMachine", vmn).Times(1)
 
-	err := app.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
+// 	err := app.Run(strings.Split("bytemark restart test-server.test-group.test-account", " "))
+// 	is.Nil(err)
+// 	if ok, err := c.Verify(); !ok {
+// 		t.Fatal(err)
+// 	}
+// }
 func TestShutdownCommand(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
