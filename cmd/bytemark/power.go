@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -40,7 +41,7 @@ func init() {
 	}, cli.Command{
 		Name:        "restart",
 		Usage:       "power off a server and start it again",
-		UsageText:   "bytemark restart <server>",
+		UsageText:   "bytemark restart <server> [--rescue || --appliance <appliance>]",
 		Description: "This command will power down a server and then start it back up again.",
 		Flags: []cli.Flag{
 			cli.GenericFlag{
@@ -48,9 +49,27 @@ func init() {
 				Usage: "the server to restart",
 				Value: new(app.VirtualMachineNameFlag),
 			},
+			cli.BoolFlag{
+				Name:  "rescue",
+				Usage: "boots the server using the rescue appliance",
+			},
+			cli.StringFlag{
+				Name:  "appliance",
+				Usage: "the appliance to boot into when the server starts",
+			},
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
+			appliance := c.String("appliance")
+
+			if appliance != "" && c.Bool("rescue") {
+				return fmt.Errorf("--appliance and --rescue have both been set when only one is allowed")
+			}
+
+			if c.Bool("rescue") {
+				appliance = "rescue"
+			}
+
 			fmt.Fprintf(c.App().Writer, "Shutting down %v...", vmName)
 			err = c.Client().ShutdownVirtualMachine(vmName, true)
 			if err != nil {
@@ -62,7 +81,11 @@ func init() {
 			}
 
 			c.Log("Done!\n\nStarting %s back up.", vmName)
-			err = c.Client().StartVirtualMachine(vmName)
+			if appliance != "" {
+				err = brainMethods.StartVirtualMachineWithAppliance(c.Client(), vmName, appliance)
+			} else {
+				err = c.Client().StartVirtualMachine(vmName)
+			}
 
 			return
 		}),
