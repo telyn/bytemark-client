@@ -134,7 +134,6 @@ func TestRestartCommand(t *testing.T) {
 		})
 	}
 }
-
 func TestShutdownCommand(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
