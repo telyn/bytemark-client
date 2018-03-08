@@ -34,13 +34,63 @@ func TestRestartCommandTable(t *testing.T) {
 		shouldErr bool
 	}{
 		{
-			name:  "RestartWithoutApplianceTest",
-			input: "test-server",
+			name:  "RestartWithoutAppliance",
+			input: "test-server.test-group.test-account",
 			vmname: lib.VirtualMachineName{
 				VirtualMachine: "test-server",
 				Group:          "test-group",
 				Account:        "test-account",
 			},
+		}, {
+			name:  "RestartWithoutApplianceWithDefaultAccount",
+			input: "test-server.test-group",
+			vmname: lib.VirtualMachineName{
+				VirtualMachine: "test-server",
+				Group:          "test-group",
+				Account:        "default-account",
+			},
+		}, {
+			name:  "RestartWithoutApplianceWithDefaultGroup",
+			input: "test-server",
+			vmname: lib.VirtualMachineName{
+				VirtualMachine: "test-server",
+				Group:          "default",
+				Account:        "default-account",
+			},
+		}, {
+			name:  "RestartWithApplianceFlagWithoutAppliance",
+			input: "test-server --appliance",
+			vmname: lib.VirtualMachineName{
+				VirtualMachine: "test-server",
+				Group:          "default",
+				Account:        "default-account",
+			},
+			shouldErr: true,
+		}, {
+			name:  "RestartWithApplianceFlag",
+			input: "test-server -- appliance rescue",
+			vmname: lib.VirtualMachineName{
+				VirtualMachine: "test-server",
+				Group:          "default",
+				Account:        "default-account",
+			},
+		}, {
+			name:  "RestartWithRescueFlag",
+			input: "test-server --rescue",
+			vmname: lib.VirtualMachineName{
+				VirtualMachine: "test-server",
+				Group:          "default",
+				Account:        "default-account",
+			},
+		}, {
+			name:  "RestartWithApplianceAndRescueFlag",
+			input: "test-server --appliance a --rescue",
+			vmname: lib.VirtualMachineName{
+				VirtualMachine: "test-server",
+				Group:          "default",
+				Account:        "default-account",
+			},
+			shouldErr: true,
 		},
 	}
 	for _, test := range tests {
@@ -52,6 +102,15 @@ func TestRestartCommandTable(t *testing.T) {
 			client.When("ShutdownVirtualMachine", test.vmname, true).Times(1)
 			client.When("GetVirtualMachine", test.vmname).Return(brain.VirtualMachine{PowerOn: false})
 			client.When("StartVirtualMachine", test.vmname).Times(1)
+
+			client.When("BuildRequest", "PUT", lib.Endpoint(1),
+				"/accounts/%s/groups/%s/virtual_machines/%s",
+				[]string{
+					"default-account",
+					"default",
+					"test-server"}).Return(
+			// need to return something here but dont know what just yet
+			)
 
 			args := fmt.Sprintf("bytemark restart %s", test.input)
 			err := app.Run(strings.Split(args, " "))
