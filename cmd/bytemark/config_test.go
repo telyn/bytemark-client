@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -92,113 +93,132 @@ func TestConfigValidations(t *testing.T) {
 
 func TestCommandConfigSet(t *testing.T) {
 	is := is.New(t)
-	config, client, app := testutil.BaseTestSetup(t, false, commands)
 
 	// setup sets up all the necessary config defaulty stuff for all our tests
 
-	setup := func() {
-		config.Reset()
-		client.Reset()
+	//	setup := func() {
+	//		config.Reset()
+	//		client.Reset()
+	//		config.When("GetV", "user").Return(util.ConfigVar{"user", "old-test-user", "config"})
+	//		config.When("GetV", "account").Return(util.ConfigVar{"account", "", ""})
+	//		config.When("GetV", "endpoint").Return(util.ConfigVar{"endpoint", "", ""})
+	//		config.When("GetV", "group").Return(util.ConfigVar{"group", "", ""})
+	//		config.When("GetV", "debug-level").Return(util.ConfigVar{"debug-level", "", ""})
+	//		config.When("GetIgnoreErr", "token").Return("test-token")
+	//		config.When("GetIgnoreErr", "user").Return("old-test-user")
+	//		config.When("GetIgnoreErr", "yubikey").Return("")
+	//		config.When("GetIgnoreErr", "2fa-otp").Return("")
+	//		config.When("GetIgnoreErr", "account").Return("")
+	//		config.When("GetGroup").Return(lib.GroupName{})
+	//		client.When("AuthWithToken", "test-token").Return(nil)
+	//	}
+
+	t.Run("set user", func(t *testing.T) {
+		config, _, app := testutil.BaseTestSetup(t, false, commands)
 		config.When("GetV", "user").Return(util.ConfigVar{"user", "old-test-user", "config"})
-		config.When("GetV", "account").Return(util.ConfigVar{"account", "", ""})
-		config.When("GetV", "endpoint").Return(util.ConfigVar{"endpoint", "", ""})
-		config.When("GetV", "group").Return(util.ConfigVar{"group", "", ""})
-		config.When("GetV", "debug-level").Return(util.ConfigVar{"debug-level", "", ""})
-		config.When("GetIgnoreErr", "token").Return("test-token")
 		config.When("GetIgnoreErr", "user").Return("old-test-user")
-		config.When("GetIgnoreErr", "yubikey").Return("")
-		config.When("GetIgnoreErr", "2fa-otp").Return("")
-		config.When("GetIgnoreErr", "account").Return("")
-		config.When("GetGroup").Return(lib.GroupName{})
-		client.When("AuthWithToken", "test-token").Return(nil)
-	}
 
-	setup()
+		config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
 
-	config.When("SetPersistent", "user", "test-user", "CMD set").Times(1)
+		err := app.Run(strings.Split("bytemark config set user test-user", " "))
+		is.Nil(err)
 
-	err := app.Run(strings.Split("bytemark config set user test-user", " "))
-	is.Nil(err)
+		if ok, vErr := config.Verify(); !ok {
+			t.Fatal(vErr)
+		}
+	})
 
-	if ok, vErr := config.Verify(); !ok {
-		t.Fatal(vErr)
-	}
+	t.Run("set flimflam", func(t *testing.T) {
+		config, _, app := testutil.BaseTestSetup(t, false, commands)
 
-	err = app.Run(strings.Split("bytemark config set flimflam test-user", " "))
-	is.NotNil(err)
+		err := app.Run(strings.Split("bytemark config set flimflam test-user", " "))
+		is.NotNil(err)
+		if ok, vErr := config.Verify(); !ok {
+			t.Fatal(vErr)
+		}
+	})
 
 	// test setting all the other variables
 
 	tests := getValidationTests()
 	for varname := range tests {
 		for value, errSpec := range tests[varname] {
-			setup()
-			switch varname {
-			case "account":
-				setupAccountTest(client, value, errSpec.err)
-			case "group":
-				setupGroupTest(client, value, errSpec.err)
-			}
-			if !errSpec.shouldErr {
-				config.When("GetIgnoreErr", varname).Return("")
-				config.When("SetPersistent", varname, value, "CMD set").Times(1)
-			}
+			t.Run(fmt.Sprintf("set %s %s", varname, value), func(t *testing.T) {
+				config, client, app := testutil.BaseTestSetup(t, false, commands)
 
-			err = app.Run([]string{"bytemark", "config", "set", varname, value})
-			if errSpec.shouldErr && err == nil {
-				t.Errorf("bytemark config set %s %s should've errored but didn't.\r\n", varname, value)
-			} else if !errSpec.shouldErr && err != nil {
-				t.Errorf("bytemark config set %s %s should've succeeded but didn't: %s\r\n", varname, value, err.Error())
-			}
-			if ok, vErr := config.Verify(); !ok {
-				t.Errorf("bytemark config set %s %s - config.Verify error: %s\r\n", varname, value, vErr)
-			}
+				switch varname {
+				case "account":
+					config, client, app = testutil.BaseTestAuthSetup(t, false, commands)
+					client.When("GetAccount", value).Return(&lib.Account{}, errSpec.err)
+				case "group":
+					config, client, app = testutil.BaseTestAuthSetup(t, false, commands)
+					groupName := lib.GroupName{Group: value}
+					config.When("GetGroup").Return(lib.GroupName{Group: "not-real"})
+					client.When("GetGroup", groupName).Return(&brain.Group{}, errSpec.err).Times(1)
+				}
+
+				config.When("GetV", varname).Return(util.ConfigVar{varname, "old-test-" + varname, "config"})
+				if !errSpec.shouldErr {
+					config.When("GetIgnoreErr", varname).Return("")
+					config.When("SetPersistent", varname, value, "CMD set").Times(1)
+				}
+
+				err := app.Run([]string{"bytemark", "config", "set", varname, value})
+				if errSpec.shouldErr && err == nil {
+					t.Errorf("bytemark config set %s %s should've errored but didn't.\r\n", varname, value)
+				} else if !errSpec.shouldErr && err != nil {
+					t.Errorf("bytemark config set %s %s should've succeeded but didn't: %s\r\n", varname, value, err.Error())
+				}
+				if ok, vErr := config.Verify(); !ok {
+					t.Errorf("bytemark config set %s %s - config.Verify error: %s\r\n", varname, value, vErr)
+				}
+			})
 		}
 	}
 
 	// now test that --force works.
-
 	for varname := range tests {
-		for value := range tests[varname] {
-			setup()
-			config.When("GetIgnoreErr", varname).Return("")
-			config.When("SetPersistent", varname, value, "CMD set").Times(1)
+		for value, errSpec := range tests[varname] {
+			t.Run(fmt.Sprintf("force set %s %s", varname, value), func(t *testing.T) {
+				config, client, app := testutil.BaseTestSetup(t, false, commands)
 
-			err = app.Run([]string{"bytemark", "config", "set", "--force", varname, value})
-			if err != nil {
-				t.Errorf("bytemark config set %s %s should've succeeded but didn't: %s\r\n", varname, value, err.Error())
-			}
-			if ok, vErr := config.Verify(); !ok {
-				t.Errorf("bytemark config set %s %s - config.Verify error: %s\r\n", varname, value, vErr)
-			}
+				switch varname {
+				case "account":
+					config, client, app = testutil.BaseTestAuthSetup(t, false, commands)
+					client.When("GetAccount", value).Return(&lib.Account{}, errSpec.err)
+				case "group":
+					config, client, app = testutil.BaseTestAuthSetup(t, false, commands)
+					groupName := lib.GroupName{Group: value}
+					config.When("GetGroup").Return(lib.GroupName{Group: "not-real"})
+					client.When("GetGroup", groupName).Return(&brain.Group{}, errSpec.err).Times(1)
+				}
+				config.When("GetV", varname).Return(util.ConfigVar{varname, "old-test-" + varname, "config"})
+				config.When("GetIgnoreErr", varname).Return("test-old-" + varname)
+				config.When("SetPersistent", varname, value, "CMD set").Times(1)
+
+				err := app.Run([]string{"bytemark", "config", "set", "--force", varname, value})
+				if err != nil {
+					t.Errorf("bytemark config set %s %s should've succeeded but didn't: %s\r\n", varname, value, err.Error())
+				}
+				if ok, vErr := config.Verify(); !ok {
+					t.Errorf("bytemark config set %s %s - config.Verify error: %s\r\n", varname, value, vErr)
+				}
+			})
 		}
 	}
 
 }
 
-func setupAccountTest(c *mocks.Client, name string, err error) {
-
-	if err != nil {
-		c.When("GetAccount", name).Return(nil, err)
-	} else {
-		c.When("GetAccount", name).Return(&lib.Account{}, nil)
-	}
-}
-
 func setupGroupTest(c *mocks.Client, name string, err error) {
 	groupName := lib.GroupName{Group: name}
-	if err != nil {
-		c.When("GetGroup", groupName).Return(nil, err).Times(1)
-	} else {
-		c.When("GetGroup", groupName).Return(&brain.Group{}, nil).Times(1)
-	}
+	c.When("GetGroup", groupName).Return(&brain.Group{}, err).Times(1)
 }
 
 type validationFn func(ctx *app.Context, name string) error
 
 func runAccountTests(t *testing.T, ctx *app.Context, c *mocks.Client, accounts map[string]errSpec, fnUnderTest validationFn) {
 	for a, spec := range accounts {
-		setupAccountTest(c, a, spec.err)
+		c.When("GetAccount", a).Return(&lib.Account{}, spec.err)
 		err := fnUnderTest(ctx, a)
 		if spec.shouldErr && err == nil {
 			t.Errorf("testing set account %s: should error, but didn't\r\n", a)

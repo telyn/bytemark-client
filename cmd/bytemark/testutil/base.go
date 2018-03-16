@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -55,7 +56,27 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 		t.Fatal(err)
 	}
 	app.SetClientAndConfig(cliapp, client, config)
+
+	buf := bytes.Buffer{}
+	cliapp.Metadata["buf"] = &buf
+	cliapp.Metadata["debugWriter"] = &TestWriter{t}
+
+	fixCommandFullName(cliapp, commands)
+
+	cliapp.Writer = &buf
+	log.Writer = &buf
+	log.ErrWriter = &buf
+
+	return
+}
+
+// fixCommandFullName ensures that Command.FullName works for all commands in the slice.
+// see the comment inside for the
+func fixCommandFullName(cliapp *cli.App, commands []cli.Command) {
+	// discard output during this setup
+	oldWriter := cliapp.Writer
 	cliapp.Writer = ioutil.Discard
+
 	for _, c := range commands {
 		//config.When("Get", "token").Return("no-not-a-token")
 
@@ -69,14 +90,7 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 			_ = cliapp.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
-
-	buf := bytes.Buffer{}
-	cliapp.Metadata["buf"] = &buf
-	cliapp.Metadata["debugWriter"] = &TestWriter{t}
-
-	cliapp.Writer = &buf
-
-	return
+	cliapp.Writer = oldWriter
 }
 
 // TestWriter is a writer which writes to the test log.
@@ -101,7 +115,10 @@ func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "2fa-otp").Return("")
+	config.When("GetIgnoreErr", "impersonate").Return("")
 
+	c.When("GetSessionFactors").Return([]string{"username", "password"})
+	c.When("GetSessionUser").Return("test-user")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	return
 }

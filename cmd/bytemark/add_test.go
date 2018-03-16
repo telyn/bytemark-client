@@ -13,7 +13,6 @@ import (
 )
 
 func TestAddKeyCommand(t *testing.T) {
-	_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	err := ioutil.WriteFile("testkey.pub", []byte("ssh-rsa aaaaawhartevervAsde fake key"), 0600)
 	if err != nil {
@@ -24,46 +23,55 @@ func TestAddKeyCommand(t *testing.T) {
 		t.Error(err)
 	}
 
-	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
-	err = app.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
-	if err != nil {
-		t.Error(err)
-	}
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
+	t.Run("Key in command line", func(t *testing.T) {
+		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+		err = app.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
+		if err != nil {
+			t.Error(err)
+		}
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
 
-	c.Reset()
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
-	err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "testkey.pub"})
-	if err != nil {
-		t.Error(err)
-	}
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
+	})
+	t.Run("Key in file", func(t *testing.T) {
+		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	c.Reset()
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
-	err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey.pub"})
-	if err != nil {
-		t.Error(err)
-	}
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
+		c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+		err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "testkey.pub"})
+		if err != nil {
+			t.Error(err)
+		}
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
 
-	c.Reset()
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey"})
-	if err == nil {
-		t.Error("Expected an error")
-	}
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
+	})
+
+	t.Run("ummm what", func(t *testing.T) {
+		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+		err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey.pub"})
+		if err != nil {
+			t.Error(err)
+		}
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+
+	})
+
+	t.Run("dont allow private key", func(t *testing.T) {
+		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey"})
+		if err == nil {
+			t.Error("Expected an error")
+		}
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	})
 
 	_ = os.Remove("testkey.pub")
 	_ = os.Remove("testkey")

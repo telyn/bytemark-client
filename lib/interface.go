@@ -46,6 +46,8 @@ type Client interface {
 	AuthWithToken(string) error
 	// AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
 	AuthWithCredentials(auth3.Credentials) error
+	// Impersonate requests impersonation of a given user. Authentication must have already occurred.
+	Impersonate(user string) error
 
 	//
 	// Requests

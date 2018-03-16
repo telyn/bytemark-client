@@ -6,14 +6,15 @@ import (
 	"os"
 	"testing"
 
-	auth3 "gitlab.bytemark.co.uk/auth/client"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/urfave/cli"
+	auth3 "gitlab.bytemark.co.uk/auth/client"
 )
 
 func TestEnsureAuth(t *testing.T) {
 	tt := []struct {
+		name                      string
 		InputUsername             string
 		InputPassword             string
 		Input2FA                  string
@@ -22,18 +23,21 @@ func TestEnsureAuth(t *testing.T) {
 		ExpectedError             bool
 	}{
 		{
+			name:                      "UserAndPassOK",
 			InputUsername:             "input-user",
 			InputPassword:             "input-pass",
 			AuthWithCredentialsErrors: []error{nil},
 			ExpectedError:             false,
 		},
 		{
+			name:                      "UserAndPassErr",
 			InputUsername:             "input-user",
 			InputPassword:             "input-pass",
 			AuthWithCredentialsErrors: []error{fmt.Errorf("{}")},
 			ExpectedError:             true,
 		},
 		{
+			name:                      "2faOK",
 			InputUsername:             "input-user",
 			InputPassword:             "input-pass",
 			Input2FA:                  "123456",
@@ -42,6 +46,7 @@ func TestEnsureAuth(t *testing.T) {
 			ExpectedError:             false,
 		},
 		{
+			name:                      "Invalid2faTokenErr",
 			InputUsername:             "input-user",
 			InputPassword:             "input-pass",
 			Input2FA:                  "123456",
@@ -49,6 +54,8 @@ func TestEnsureAuth(t *testing.T) {
 			ExpectedError:             true,
 		},
 		{
+			// TODO(telyn): what does this test actually test? that the missing-2fa-factor causes an err?
+			name:                      "Missing2faFactorErr",
 			InputUsername:             "input-user",
 			InputPassword:             "input-pass",
 			Input2FA:                  "123456",
@@ -59,64 +66,72 @@ func TestEnsureAuth(t *testing.T) {
 	}
 
 	for _, test := range tt {
-		_, c, _ := testutil.BaseTestSetup(t, false, []cli.Command{})
-
-		configDir, err := ioutil.TempDir("", "")
-		if err != nil {
-			t.Errorf("Unexpected error when setting up config temp directory: %v", err)
-		}
-		defer func() {
-			removeErr := os.RemoveAll(configDir)
-			if removeErr != nil {
-				t.Errorf("Could not clean up config dir: %v", removeErr)
+		t.Run(test.name, func(t *testing.T) {
+			_, c, _ := testutil.BaseTestSetup(t, false, []cli.Command{})
+			c.When("GetSessionUser").Return(test.InputUsername)
+			factors := test.Factors
+			if factors == nil {
+				factors = []string{"username", "password"}
 			}
-		}()
+			c.When("GetSessionFactors").Return(factors)
 
-		config, err := util.NewConfig(configDir)
-		if err != nil {
-			t.Errorf("Unexpected error when setting up config temp directory: %v", err)
-		}
+			configDir, err := ioutil.TempDir("", "")
+			if err != nil {
+				t.Errorf("Unexpected error when setting up config temp directory: %v", err)
+			}
+			defer func() {
+				removeErr := os.RemoveAll(configDir)
+				if removeErr != nil {
+					t.Errorf("Could not clean up config dir: %v", removeErr)
+				}
+			}()
 
-		// Pretending the input comes from terminal
-		config.Set("user", test.InputUsername, "INTERACTION")
-		config.Set("pass", test.InputPassword, "TESTING")
-		config.Set("2fa-otp", test.Input2FA, "TESTING")
+			config, err := util.NewConfig(configDir)
+			if err != nil {
+				t.Errorf("Unexpected error when setting up config temp directory: %v", err)
+			}
 
-		c.When("AuthWithToken", "").Return(fmt.Errorf("Not logged in")).Times(1)
+			// Pretending the input comes from terminal
+			config.Set("user", test.InputUsername, "INTERACTION")
+			config.Set("pass", test.InputPassword, "TESTING")
+			config.Set("2fa-otp", test.Input2FA, "TESTING")
 
-		credentials := auth3.Credentials{
-			"username": test.InputUsername,
-			"password": test.InputPassword,
-			"validity": "1800",
-		}
+			c.When("AuthWithToken", "").Return(fmt.Errorf("Not logged in")).Times(1)
 
-		c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[0]).Times(1)
-
-		// We are supplying a 2FA token, so we want to test that flow
-		if test.Input2FA != "" {
 			credentials := auth3.Credentials{
 				"username": test.InputUsername,
 				"password": test.InputPassword,
 				"validity": "1800",
-				"2fa":      test.Input2FA,
 			}
-			c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[1]).Times(1) // Returns nil means success
-		}
 
-		// Only called if the login succeeded, so always return a token
-		c.When("GetSessionToken").Return("test-token")
+			c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[0]).Times(1)
 
-		c.When("GetSessionFactors").Return(test.Factors)
+			// We are supplying a 2FA token, so we want to test that flow
+			if test.Input2FA != "" {
+				credentials := auth3.Credentials{
+					"username": test.InputUsername,
+					"password": test.InputPassword,
+					"validity": "1800",
+					"2fa":      test.Input2FA,
+				}
+				c.When("AuthWithCredentials", credentials).Return(test.AuthWithCredentialsErrors[1]).Times(1) // Returns nil means success
+			}
 
-		err = EnsureAuth(c, config)
-		if test.ExpectedError && err == nil {
-			t.Error("Expecting EnsureAuth to error, but it didn't")
-		} else if !test.ExpectedError && err != nil {
-			t.Errorf("Not expecting EnsureAuth to error, but got %v", err)
-		}
+			// Only called if the login succeeded, so always return a token
+			c.When("GetSessionToken").Return("test-token")
 
-		if ok, err := c.Verify(); !ok {
-			t.Fatal(err)
-		}
+			c.When("GetSessionFactors").Return(test.Factors)
+
+			err = EnsureAuth(c, config)
+			if test.ExpectedError && err == nil {
+				t.Error("Expecting EnsureAuth to error, but it didn't")
+			} else if !test.ExpectedError && err != nil {
+				t.Errorf("Not expecting EnsureAuth to error, but got %v", err)
+			}
+
+			if ok, err := c.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
 	}
 }

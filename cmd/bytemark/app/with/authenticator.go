@@ -87,17 +87,15 @@ func (a Authenticator) tryCredentials() (err error) {
 			_ = a.config.SetPersistent("token", a.client.GetSessionToken(), "AUTH")
 
 			// Check that the 2fa factor was set if --2fa-otp was specified.
-			// Checking here rather than in checkFactors as it is only relevant
+			// Checking here rather than in checkSession as it is only relevant
 			// during the initial login, not subsequent validations of the
 			// token (as opposed to yubikey)
 			if a.config.GetIgnoreErr("2fa-otp") != "" {
 				factors := a.client.GetSessionFactors()
 
-				if a.config.GetIgnoreErr("2fa-otp") != "" {
-					if !factorExists(factors, "2fa") {
-						// Should never happen, as long as auth correctly returns the factors
-						return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
-					}
+				if !factorExists(factors, "2fa") {
+					// Should never happen, as long as auth correctly returns the factors
+					return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
 				}
 			}
 		}
@@ -111,32 +109,53 @@ func (a Authenticator) tryToken() error {
 	return a.client.AuthWithToken(token)
 }
 
-func (a Authenticator) checkFactors() error {
+func (a Authenticator) checkSession(shortCircuit bool) error {
 	factors := a.client.GetSessionFactors()
+
+	// make sure that we authenticated with a yubikey if we requested to do so
 	if a.config.GetIgnoreErr("yubikey") != "" {
+		// yubikey factor isn't included when we impersonate, so && !factorExists("impersonate")
+		if !factorExists(factors, "yubikey") && !factorExists(factors, "impersonate") {
+			// prompt the user to login again with yubikey
 
-		if a.config.GetIgnoreErr("yubikey") != "" {
-			if !factorExists(factors, "yubikey") {
-				// Current auth token doesn't have a yubikey,
-				// so prompt the user to login again with yubikey
+			// This happens when someone has logged in already,
+			// but then tries to run a command with the
+			// "yubikey" flag set
 
-				// This happens when someone has logged in already,
-				// but then tries to run a command with the
-				// "yubikey" flag set
+			a.config.Set("token", "", "FLAG yubikey")
 
-				a.config.Set("token", "", "FLAG yubikey")
-
-				return EnsureAuth(a.client, a.config)
-			}
+			return EnsureAuth(a.client, a.config)
 		}
 	}
+
+	currentUser := a.client.GetSessionUser()
+	requestedUser := a.config.GetIgnoreErr("impersonate")
+	if requestedUser != "" && currentUser != requestedUser {
+		// if our token is already an impersonated one then we need to unset it
+		// and start over
+		if factorExists(factors, "impersonate") {
+			return retryErr(fmt.Sprintf("Impersonation as %s requested but already impersonating %s", requestedUser, currentUser))
+		} else {
+			// if not then we need to run the impersonation - but if we already tried it we should just give up
+			if shortCircuit {
+				return fmt.Errorf("Impersonation as %s requested, but unable to impersonate as them - got %s instead", requestedUser, currentUser)
+			}
+			err := a.client.Impersonate(requestedUser)
+			if err != nil {
+				return err
+			}
+			// check that we got the right user this time
+			return a.checkSession(true)
+		}
+	}
+
 	if a.config.GetIgnoreErr("impersonate") == "" {
 		if factorExists(factors, "impersonate") {
+			err := a.config.Unset("impersonate")
+			if err != nil {
+				return fmt.Errorf("Couldn't edit config directory")
+			}
 			return retryErr("Impersonation was not requested but impersonation still happened")
-		}
-	} else {
-		if !factorExists(factors, "impersonate") {
-			return fmt.Errorf("Impersonation was requested but not achieved")
 		}
 	}
 	return nil
@@ -159,9 +178,11 @@ func (a Authenticator) Authenticate() error {
 			return err
 		}
 	}
-	err = a.checkFactors()
+
+	err = a.checkSession(false)
 	if _, ok := err.(retryErr); ok {
 		fmt.Printf("%s. Retrying\n\n", err.Error())
+		err = a.Authenticate()
 	}
 	return err
 }
