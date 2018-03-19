@@ -686,21 +686,21 @@ func TestPostUpdateTail(t *testing.T) {
 func TestPostUpdateStoragePool(t *testing.T) {
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":"empty"}`, func(client lib.Client) error {
 		v := "empty"
-		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{UsageStrategy: &v})
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{UsageStrategy: v})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":null}`, func(client lib.Client) error {
 		v := ""
-		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{UsageStrategy: &v})
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{UsageStrategy: v})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"overcommit_ratio":115}`, func(client lib.Client) error {
 		v := 115
-		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{OvercommitRatio: &v})
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{OvercommitRatio: v})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"label":"t3-sata2"}`, func(client lib.Client) error {
 		v := "t3-sata2"
-		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{Label: &v})
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{Label: v})
 	})
 }
