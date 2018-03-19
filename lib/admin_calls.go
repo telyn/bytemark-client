@@ -23,15 +23,6 @@ type UpdateTail struct {
 	Label           *string
 }
 
-// UpdateStoragePool is a struct with all the possible settings that can be updated on a storage pool
-// it's the worst thing ever but it's necessary because usage_strategy sometimes needs to be null.
-type UpdateStoragePool struct {
-	UsageStrategy   *string
-	OvercommitRatio *int
-	IOPSLimit       *int
-	Label           *string
-}
-
 func (c *bytemarkClient) GetVLANs() (vlans brain.VLANs, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/vlans")
 	if err != nil {
@@ -492,29 +483,12 @@ func (c *bytemarkClient) UpdateTail(idOrLabel string, options UpdateTail) (err e
 	return
 }
 
-func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options UpdateStoragePool) (err error) {
+func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options brain.StoragePool) (err error) {
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/storage_pools/%s", idOrLabel)
 	if err != nil {
 		return
 	}
 
-	obj := map[string]interface{}{}
-
-	if options.OvercommitRatio != nil {
-		obj["overcommit_ratio"] = *options.OvercommitRatio
-	}
-	if options.Label != nil {
-		obj["label"] = *options.Label
-	}
-	if options.UsageStrategy != nil {
-		// It is set, but we need to translate an empty string to nil
-		if *options.UsageStrategy == "" {
-			obj["usage_strategy"] = nil
-		} else {
-			obj["usage_strategy"] = *options.UsageStrategy
-		}
-	}
-
-	_, _, err = r.MarshalAndRun(obj, nil)
+	_, _, err = r.MarshalAndRun(options, nil)
 	return
 }
