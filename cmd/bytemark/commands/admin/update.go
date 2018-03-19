@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	billingMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -178,12 +179,11 @@ func init() {
 					},
 				},
 				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
-					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
 
-					options := lib.UpdateStoragePool{
-						UsageStrategy:   usageStrategy,
-						OvercommitRatio: overcommitRatio,
-						Label:           label,
+					options := brain.StoragePool{
+						UsageStrategy:   c.String("usage-strategy"),
+						OvercommitRatio: c.Int("overcommit-ratio"),
+						Label:           c.String("label"),
 					}
 
 					if err := c.Client().UpdateStoragePool(c.String("storage-pool"), options); err != nil {
