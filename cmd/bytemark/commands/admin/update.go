@@ -177,13 +177,18 @@ func init() {
 						Name:  "label",
 						Usage: "the label of the storage pool",
 					},
+					cli.IntFlag{
+						Name:  "migration-concurrency",
+						Usage: "the number of concurrent migrations the storage pool can handle",
+					},
 				},
-				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label", "migration-concurrency"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 
 					options := brain.StoragePool{
-						UsageStrategy:   c.String("usage-strategy"),
-						OvercommitRatio: c.Int("overcommit-ratio"),
-						Label:           c.String("label"),
+						UsageStrategy:        c.String("usage-strategy"),
+						OvercommitRatio:      c.Int("overcommit-ratio"),
+						Label:                c.String("label"),
+						MigrationConcurrency: c.Int("migration-concurrency"),
 					}
 
 					if err := c.Client().UpdateStoragePool(c.String("storage-pool"), options); err != nil {
