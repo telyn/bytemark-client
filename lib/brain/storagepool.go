@@ -34,9 +34,9 @@ type StoragePool struct {
 func (sp StoragePool) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
-		return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
+		return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, MigrationConcurrency, Note"
 	}
-	return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
+	return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, MigrationConcurrency, Note"
 }
 
 // PercentFull gives us the (numeric) percentage of how full the disc is
