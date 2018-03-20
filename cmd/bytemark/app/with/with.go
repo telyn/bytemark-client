@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
 )
 
@@ -84,10 +85,12 @@ func Account(flagName string) func(*app.Context) error {
 
 		acc, err := c.Client().GetAccount(accName)
 		if err != nil {
-			return
+			if _, ok := err.(lib.BillingAccountNotFound); !ok {
+				return
+			}
 		}
 		c.Account = &acc
-		return
+		return nil
 	}
 }
 

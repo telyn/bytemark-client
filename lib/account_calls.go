@@ -118,7 +118,7 @@ func (c *bytemarkClient) GetAccount(name string) (account Account, err error) {
 		return c.GetDefaultAccount()
 	}
 	billingAccount, billErr := c.getBillingAccount(name)
-	if err == nil {
+	if billErr == nil {
 		account.fillBilling(billingAccount)
 	} else {
 		// don't return on a CantFindAccountErr
