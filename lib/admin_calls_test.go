@@ -692,6 +692,10 @@ func TestPostUpdateStoragePool(t *testing.T) {
 		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{UsageStrategy: "default"})
 	})
 
+	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":"default"}`, func(client lib.Client) error {
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{MigrationConcurrency: 5})
+	})
+
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"overcommit_ratio":115}`, func(client lib.Client) error {
 		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{OvercommitRatio: 115})
 	})
