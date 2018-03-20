@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
-	"testing"
 
 	"github.com/kr/pretty"
 )
@@ -24,6 +24,8 @@ type Mock struct {
 	Functions []*MockFunction
 	inorder   bool
 	order     uint
+
+	mutex sync.Mutex
 }
 
 type MockCountCheckType int
@@ -48,6 +50,7 @@ type MockFunction struct {
 	times             [2]int
 	order             uint
 	timeout           time.Duration
+	call              reflect.Value
 }
 
 // MockReturnToArgument defines the function arguments used as return parameters.
@@ -99,6 +102,85 @@ func AnyIf(f func(interface{}) bool) AnyIfType {
 	return AnyIfType(f)
 }
 
+// RestType indicates there may optionally be one or more remaining elements.
+type RestType string
+
+// Rest indicates there may optionally be one or more remaining elements.
+//
+// Example:
+//     mock.When("MyMethod", mock.Slice(123, mock.Rest)).Return(0)
+const Rest RestType = "mock.rest"
+
+func match(actual, expected interface{}) bool {
+	switch expected := expected.(type) {
+	case AnyType:
+		return true
+
+	case AnyIfType:
+		return expected(actual)
+
+	case AnythingOfType:
+		return reflect.TypeOf(actual).String() == string(expected)
+
+	default:
+		if expected == nil {
+			if actual == nil {
+				return true
+			} else {
+				var v = reflect.ValueOf(actual)
+
+				return v.CanInterface() && v.IsNil()
+			}
+		} else {
+			if reflect.DeepEqual(actual, expected) {
+				return true
+			} else {
+				return reflect.ValueOf(actual) == reflect.ValueOf(expected)
+			}
+		}
+	}
+
+	return false
+}
+
+// Slice is a helper to define AnyIfType arguments for slices and their elements.
+//
+// Example:
+//     mock.When("MyMethod", mock.Slice(123, mock.Rest)).Return(0)
+func Slice(elements ...interface{}) AnyIfType {
+	return AnyIf(func(argument interface{}) bool {
+		var v = reflect.ValueOf(argument)
+
+		if v.Kind() != reflect.Slice {
+			return false
+		}
+
+		var el, al = len(elements), v.Len()
+
+		if el == 0 {
+			return al == 0
+		}
+
+		if elements[el-1] == Rest {
+			el--
+
+			if al < el {
+				return false
+			}
+		} else if al != el {
+			return false
+		}
+
+		for i := 0; i < el; i++ {
+			if !match(v.Index(i).Interface(), elements[i]) {
+				return false
+			}
+		}
+
+		return true
+	})
+}
+
 // Verify verifies the restrictions set in the stubbing.
 func (m *Mock) Verify() (bool, error) {
 	for i, f := range m.Functions {
@@ -139,8 +221,14 @@ func VerifyMocks(mocks ...HasVerify) (bool, error) {
 	return true, nil
 }
 
+// Used to represent a test we can fail, without importing the testing package
+// Importing "testing" in a file not named *_test.go results in tons of test.* flags being added to any compiled binary including this package
+type HasError interface {
+	Error(...interface{})
+}
+
 // Fail the test if any of the mocks fail verification
-func AssertVerifyMocks(t *testing.T, mocks ...HasVerify) {
+func AssertVerifyMocks(t HasError, mocks ...HasVerify) {
 	if ok, err := VerifyMocks(mocks...); !ok {
 		t.Error(err)
 	}
@@ -148,6 +236,9 @@ func AssertVerifyMocks(t *testing.T, mocks ...HasVerify) {
 
 // Reset removes all stubs defined.
 func (m *Mock) Reset() *Mock {
+	defer m.mutex.Unlock()
+	m.mutex.Lock()
+
 	m.Functions = nil
 	m.order = 0
 	return m
@@ -156,6 +247,9 @@ func (m *Mock) Reset() *Mock {
 // When defines an stub of one method with some specific arguments. It returns a *MockFunction
 // that can be configured with Return, ReturnToArgument, Panic, ...
 func (m *Mock) When(name string, arguments ...interface{}) *MockFunction {
+	defer m.mutex.Unlock()
+	m.mutex.Lock()
+
 	f := &MockFunction{
 		Name:      name,
 		Arguments: arguments,
@@ -173,6 +267,15 @@ func (m *Mock) When(name string, arguments ...interface{}) *MockFunction {
 //			return r.Int(0), r.String(1), r.Error(2)
 // 		}
 func (m *Mock) Called(arguments ...interface{}) *MockResult {
+	var timeout time.Duration
+	defer func() {
+		m.mutex.Unlock()
+		if timeout > 0 {
+			time.Sleep(timeout)
+		}
+	}()
+	m.mutex.Lock()
+
 	pc, _, _, ok := runtime.Caller(1)
 	if !ok {
 		panic("Could not get the caller information")
@@ -188,9 +291,34 @@ func (m *Mock) Called(arguments ...interface{}) *MockResult {
 		f.order = m.order
 		m.order++
 
-		if f.timeout > 0 {
-			time.Sleep(f.timeout)
+		if f.call.IsValid() {
+			typ := f.call.Type()
+			numIn := typ.NumIn()
+			numArgs := len(arguments)
+
+			// Assign arguments in order.
+			// Not all of them are strictly required.
+			values := make([]reflect.Value, numIn)
+			for i := 0; i < numIn; i++ {
+				if i < numArgs {
+					values[i] = reflect.ValueOf(arguments[i])
+				} else {
+					values[i] = reflect.Zero(typ.In(i))
+				}
+			}
+
+			if typ.IsVariadic() {
+				values = f.call.CallSlice(values)
+			} else {
+				values = f.call.Call(values)
+			}
+
+			for i := range values {
+				f.ReturnValues = append(f.ReturnValues, values[i].Interface())
+			}
 		}
+
+		timeout = f.timeout
 
 		if f.PanicValue != nil {
 			panic(f.PanicValue)
@@ -353,6 +481,20 @@ func (f *MockFunction) Between(a, b int) *MockFunction {
 // Timeout defines a timeout to sleep before returning the value of a function.
 func (f *MockFunction) Timeout(d time.Duration) *MockFunction {
 	f.timeout = d
+	return f
+}
+
+// Call executes a function passed as an argument using the arguments pased to the stub.
+// If the function returns any output parameters they will be used as a return arguments
+// when the stub is called. If the call argument is not a function it will panic when
+// the stub is executed.
+//
+// Example:
+// 		mock.When("MyMethod", mock.Any, mock.Any).Call(func(a int, b int) int {
+// 			return a+b
+// 		})
+func (f *MockFunction) Call(call interface{}) *MockFunction {
+	f.call = reflect.ValueOf(call)
 	return f
 }
 
