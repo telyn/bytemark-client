@@ -159,7 +159,7 @@ func init() {
 			{
 				Name:      "storage pool",
 				Usage:     "update the settings of a storage pool",
-				UsageText: "bytemark --admin update storage pool [--usage-strategy new-strategy] [--overcommit-ratio new-ratio] [--label new-label] [[--storage-pool] storage-pool]>",
+				UsageText: "bytemark --admin update storage pool [--usage-strategy new-strategy] [--overcommit-ratio new-ratio] [--label new-label] [--migration-concurrency new-limit] [[--storage-pool] storage-pool]>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "storage-pool",
@@ -182,7 +182,7 @@ func init() {
 						Usage: "the number of concurrent migrations the storage pool can handle",
 					},
 				},
-				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label", "migration-concurrency"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
+				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 
 					options := brain.StoragePool{
 						UsageStrategy:        c.String("usage-strategy"),
