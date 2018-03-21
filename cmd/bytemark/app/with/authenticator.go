@@ -130,11 +130,12 @@ func (a Authenticator) tryToken() error {
 func (a Authenticator) checkSession(shortCircuit bool) error {
 	fmt.Printf("checkSession(%v)\n", shortCircuit)
 	factors := a.client.GetSessionFactors()
+	fmt.Println("factors: ", factors)
 
 	// make sure that we authenticated with a yubikey if we requested to do so
 	if a.config.GetIgnoreErr("yubikey") != "" {
-		// yubikey factor isn't included when we impersonate, so && !factorExists("impersonate")
-		if !factorExists(factors, "yubikey") && !factorExists(factors, "impersonate") {
+		// yubikey factor isn't included when we impersonate, so && !factorExists("impersonated")
+		if !factorExists(factors, "yubikey") && !factorExists(factors, "impersonated") {
 			// prompt the user to login again with yubikey
 
 			// This happens when someone has logged in already,
@@ -159,7 +160,7 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 		}
 		// if our token is already an impersonated one then we need to unset it
 		// and start over
-		if factorExists(factors, "impersonate") {
+		if factorExists(factors, "impersonated") {
 			err := a.config.Unset("token")
 			if err != nil {
 				return fmt.Errorf("Couldn't unset token: %v", err)
@@ -176,7 +177,7 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 		}
 	} else if requestedUser == "" {
 		// we didn't want to impersonate
-		if factorExists(factors, "impersonate") {
+		if factorExists(factors, "impersonated") {
 			// but we got an impersonated token anyway, so unset token and retry
 			err := a.config.Unset("token")
 			if err != nil {

@@ -1011,7 +1011,7 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         unexpect{},
 				}, {
 					user:                   "identity-theft-michael",
-					factors:                []string{"password", "impersonate"},
+					factors:                []string{"password", "impersonated"},
 					authWithTokenErr:       unexpect{},
 					authWithCredentialsErr: unexpect{},
 					impersonateErr:         unexpect{},
@@ -1032,7 +1032,7 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         unexpect{},
 				}, { // state 1 - huh, we're identity theft michael. relog with credents
 					user:                   "identity-theft-michael",
-					factors:                []string{"password", "impersonate"},
+					factors:                []string{"password", "impersonated"},
 					authWithTokenErr:       unexpect{},
 					authWithCredentialsErr: nil,
 					impersonateErr:         unexpect{},
@@ -1063,7 +1063,7 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         nil,
 				}, { // state 2 - authenticated as identity-theft-michael
 					user:                   "identity-theft-michael",
-					factors:                []string{"password", "impersonate"},
+					factors:                []string{"password", "impersonated"},
 					authWithTokenErr:       unexpect{},
 					authWithCredentialsErr: unexpect{},
 					impersonateErr:         unexpect{},
@@ -1095,7 +1095,7 @@ func TestAuthenticate(t *testing.T) {
 			},
 			expectingError: true,
 		}, {
-			name: "G impersonation already done but wanted to impersonate someone else",
+			name: "GI impersonation already done but wanted to impersonate someone else",
 			input: authInput{
 				user:        "input-user",
 				pass:        "input-pass",
@@ -1109,7 +1109,7 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         unexpect{},
 				}, { // state 1 - huh, we're identity theft svetlana. relog with credents
 					user:                   "identity-theft-svetlana",
-					factors:                []string{"password", "impersonate"},
+					factors:                []string{"password", "impersonated"},
 					authWithTokenErr:       unexpect{},
 					authWithCredentialsErr: nil,
 					impersonateErr:         unexpect{},
@@ -1120,7 +1120,7 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         nil,
 				}, { // state 3 - now we are michael
 					user:                   "identity-theft-michael",
-					factors:                []string{"password", "impersonate"},
+					factors:                []string{"password", "impersonated"},
 					authWithTokenErr:       unexpect{},
 					authWithCredentialsErr: unexpect{},
 					impersonateErr:         unexpect{},
@@ -1128,7 +1128,7 @@ func TestAuthenticate(t *testing.T) {
 			},
 			expectingError: false,
 		}, {
-			name: "G impersonation already done but wanted to impersonate someone else and auth is kinda broken causes error",
+			name: "GI impersonation already done but wanted to impersonate someone else and auth is kinda broken causes error",
 			input: authInput{
 				user:        "input-user",
 				pass:        "input-pass",
@@ -1142,7 +1142,7 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         unexpect{},
 				}, { // state 1 - huh, we're identity theft svetlana. relog with credents
 					user:                   "identity-theft-svetlana",
-					factors:                []string{"password", "impersonate"},
+					factors:                []string{"password", "impersonated"},
 					authWithTokenErr:       unexpect{},
 					authWithCredentialsErr: nil,
 					impersonateErr:         unexpect{},
@@ -1153,13 +1153,40 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         nil,
 				}, { // state 3 - now we are kayfabe because auth is being RATHER worrying
 					user:                   "identity-theft-kayfabe",
-					factors:                []string{"password", "impersonate"},
+					factors:                []string{"password", "impersonated"},
 					authWithTokenErr:       unexpect{},
 					authWithCredentialsErr: unexpect{},
 					impersonateErr:         unexpect{},
 				},
 			},
 			expectingError: true,
+		}, {
+			name: "GYI impersonation successful",
+			input: authInput{
+				user:        "input-user",
+				pass:        "input-pass",
+				yubikey:     "yubikey",
+				impersonate: "identity-theft-michael",
+			},
+			states: []authState{
+				{ // state 0
+					authWithTokenErr:       unexpect{},
+					authWithCredentialsErr: nil,
+					impersonateErr:         unexpect{},
+				}, { // state 1 - authenticated as input user, try impersonating as identity-theft-michael
+					factors:                []string{"password", "yubikey"},
+					authWithTokenErr:       unexpect{},
+					authWithCredentialsErr: unexpect{},
+					impersonateErr:         nil,
+				}, { // state 2 - authenticated as identity-theft-michael
+					user:                   "identity-theft-michael",
+					factors:                []string{"password", "impersonated"},
+					authWithTokenErr:       unexpect{},
+					authWithCredentialsErr: unexpect{},
+					impersonateErr:         unexpect{},
+				},
+			},
+			expectingError: false,
 		},
 	}
 
