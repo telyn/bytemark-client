@@ -60,6 +60,13 @@ func (c *Context) ErrWriter() io.Writer {
 	return c.App().ErrWriter
 }
 
+func (c *Context) Prompter() util.Prompter {
+	if prompter, ok := c.App().Metadata["prompter"].(util.Prompter); ok {
+		return prompter
+	}
+	return nil
+}
+
 // Command returns the cli.Command this context is for
 func (c *Context) Command() cli.Command {
 	return c.Context.Command()

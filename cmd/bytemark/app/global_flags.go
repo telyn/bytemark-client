@@ -33,6 +33,10 @@ func GlobalFlags() (flags []cli.Flag) {
 			Name:  "yubikey",
 			Usage: "use a yubikey to authenticate",
 		},
+		cli.StringFlag{
+			Name:  "impersonate",
+			Usage: "a user to request impersonation of",
+		},
 		cli.IntFlag{
 			Name:  "debug-level",
 			Usage: "how much debug output to print to the terminal",
