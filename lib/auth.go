@@ -30,7 +30,9 @@ func (c *bytemarkClient) AuthWithToken(token string) error {
 
 }
 
-//TODO: implement this
-func (c *bytemarkClient) Impersonate(user string) error {
-	return nil
+// Impersonate creates a session for the given user (assuming the client has already authenticated as someone who can)
+func (c *bytemarkClient) Impersonate(user string) (err error) {
+	c.authSession, err = c.auth.CreateImpersonatedSession(context.TODO(), c.authSession.Token, user)
+
+	return
 }

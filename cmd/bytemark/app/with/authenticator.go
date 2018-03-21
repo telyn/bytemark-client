@@ -19,18 +19,26 @@ func (r retryErr) Error() string {
 }
 
 type Authenticator struct {
-	client lib.Client
-	config util.ConfigManager
+	client       lib.Client
+	config       util.ConfigManager
+	prompter     util.Prompter
+	passPrompter passPrompter
 }
 
 func NewAuthenticator(client lib.Client, config util.ConfigManager) Authenticator {
-	return Authenticator{client: client, config: config}
+	return Authenticator{
+		client:       client,
+		config:       config,
+		prompter:     util.NewPrompter(),
+		passPrompter: speakeasyWrapper{},
+	}
 }
 
 func (a Authenticator) get2FAOTP() (otp string) {
+	fmt.Printf("get2FAOTP()\n")
 	otp = a.config.GetIgnoreErr("2fa-otp")
 	for otp == "" {
-		token := util.Prompt("Enter 2FA token: ")
+		token := a.prompter.Prompt("Enter 2FA token: ")
 		a.config.Set("2fa-otp", strings.TrimSpace(token), "INTERACTION")
 		otp = a.config.GetIgnoreErr("2fa-otp")
 	}
@@ -38,7 +46,8 @@ func (a Authenticator) get2FAOTP() (otp string) {
 }
 
 func (a Authenticator) tryCredentialsAttempt() error {
-	credents, err := makeCredentials(a.config)
+	fmt.Printf("tryCredentialsAttempt()\n")
+	credents, err := a.makeCredentials()
 
 	if err != nil {
 		return err
@@ -50,13 +59,16 @@ func (a Authenticator) tryCredentialsAttempt() error {
 		otp := a.get2FAOTP()
 
 		credents["2fa"] = otp
+		fmt.Println("trying again with 2fa", credents)
 
 		err = a.client.AuthWithCredentials(credents)
+		fmt.Println("tryCredentialsAttempt's second go:", err)
 	}
 	return err
 }
 
 func (a Authenticator) tryCredentials() (err error) {
+	fmt.Printf("tryCredentials()\n")
 	attempts := 3
 	err = fmt.Errorf("fake error")
 
@@ -65,12 +77,14 @@ func (a Authenticator) tryCredentials() (err error) {
 		err = a.tryCredentialsAttempt()
 
 		if err != nil {
-			if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") {
+			if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") || strings.Contains(err.Error(), "Authentication failed") {
 				// if the credentials are bad in some way, make another attempt.
 				if attempts <= 0 {
 					return err
 				}
 				log.Errorf("Invalid credentials, please try again\r\n")
+				// reset all credentials and set the default user to
+				// whoever the last login attempt was for to make the prompt nicer
 				a.config.Set("user", a.config.GetIgnoreErr("user"), "PRIOR INTERACTION")
 				a.config.Set("pass", "", "INVALID")
 				a.config.Set("yubikey-otp", "", "INVALID")
@@ -104,12 +118,17 @@ func (a Authenticator) tryCredentials() (err error) {
 }
 
 func (a Authenticator) tryToken() error {
+	fmt.Printf("tryToken()\n")
 	token := a.config.GetIgnoreErr("token")
+	if token == "" {
+		return fmt.Errorf("blank token")
+	}
 
 	return a.client.AuthWithToken(token)
 }
 
 func (a Authenticator) checkSession(shortCircuit bool) error {
+	fmt.Printf("checkSession(%v)\n", shortCircuit)
 	factors := a.client.GetSessionFactors()
 
 	// make sure that we authenticated with a yubikey if we requested to do so
@@ -130,16 +149,24 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 
 	currentUser := a.client.GetSessionUser()
 	requestedUser := a.config.GetIgnoreErr("impersonate")
+
+	// if we want to impersonate someone and we're not currently them
 	if requestedUser != "" && currentUser != requestedUser {
+		// if we already tried impersonating we should just give up
+		if shortCircuit {
+			a.config.Unset("token")
+			return fmt.Errorf("Impersonation as %s requested, but unable to impersonate as them - got %s instead", requestedUser, currentUser)
+		}
 		// if our token is already an impersonated one then we need to unset it
 		// and start over
 		if factorExists(factors, "impersonate") {
+			err := a.config.Unset("token")
+			if err != nil {
+				return fmt.Errorf("Couldn't unset token: %v", err)
+			}
 			return retryErr(fmt.Sprintf("Impersonation as %s requested but already impersonating %s", requestedUser, currentUser))
 		} else {
-			// if not then we need to run the impersonation - but if we already tried it we should just give up
-			if shortCircuit {
-				return fmt.Errorf("Impersonation as %s requested, but unable to impersonate as them - got %s instead", requestedUser, currentUser)
-			}
+			// if not, run impersonation and see
 			err := a.client.Impersonate(requestedUser)
 			if err != nil {
 				return err
@@ -147,21 +174,33 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 			// check that we got the right user this time
 			return a.checkSession(true)
 		}
-	}
-
-	if a.config.GetIgnoreErr("impersonate") == "" {
+	} else if requestedUser == "" {
+		// we didn't want to impersonate
 		if factorExists(factors, "impersonate") {
-			err := a.config.Unset("impersonate")
+			// but we got an impersonated token anyway, so unset token and retry
+			err := a.config.Unset("token")
 			if err != nil {
-				return fmt.Errorf("Couldn't edit config directory")
+				return fmt.Errorf("Couldn't unset token: %v", err)
 			}
 			return retryErr("Impersonation was not requested but impersonation still happened")
 		}
+		// and we didn't impersonate but we aren't logged in as who we want to be
+		if currentUser != a.config.GetIgnoreErr("user") {
+			// we didn't want to impersonate anyone and we're not ourselves
+			// so unset the token and cry about it
+			err := a.config.Unset("token")
+			if err != nil {
+				return fmt.Errorf("Couldn't unset token: %v", err)
+			}
+			return fmt.Errorf("Expected to log in as %s but logged in as %s", a.config.GetIgnoreErr("user"), currentUser)
+		}
 	}
+
 	return nil
 }
 
 func (a Authenticator) Authenticate() error {
+	fmt.Printf("Authenticate()\n")
 	err := a.tryToken()
 	if err != nil {
 		// check for url.Error cause that indicates something worse than a simple auth fail.
