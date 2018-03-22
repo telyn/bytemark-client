@@ -18,7 +18,7 @@ type MigrationJobLocations struct {
 	Tails []json.Number `json:"tails,omitempty"`
 }
 
-// MigrationJobLocations represents available desintations for a migration
+// MigrationJobDestinations represents available desintations for a migration
 // job. Unlike MigrationJobLocations, these are represented using ID number
 // only.
 type MigrationJobDestinations struct {
