@@ -169,7 +169,9 @@ func waitForShutdown(c *app.Context, name lib.VirtualMachineName) (err error) {
 	vm := brain.VirtualMachine{PowerOn: true}
 
 	for vm.PowerOn {
-		time.Sleep(5 * time.Second)
+		if !c.IsTest() {
+			time.Sleep(5 * time.Second)
+		}
 		fmt.Fprint(c.App().Writer, ".")
 
 		vm, err = c.Client().GetVirtualMachine(name)

@@ -88,6 +88,16 @@ func (c *Context) Client() lib.Client {
 	return nil
 }
 
+// IsTest returns whether this app is being run as part of a test
+// It uses the "buf" on the App's Metadata - which is added by
+// app_test.BaseTestSetup and used to capture output for later assertions
+func (c *Context) IsTest() bool {
+	if _, ok := c.App().Metadata["buf"]; ok {
+		return true
+	}
+	return false
+}
+
 // NextArg returns the next unused argument, and marks it as used.
 func (c *Context) NextArg() (string, error) {
 	if len(c.args()) <= c.currentArgIndex {
