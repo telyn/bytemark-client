@@ -19,7 +19,10 @@ type realPrompter struct {
 }
 
 func (rp realPrompter) Prompt(prompt string) string {
-	_, _ = fmt.Fprint(rp.wr, prompt)
+	_, err = fmt.Fprint(rp.wr, prompt)
+	if err != nil {
+		panic("couldn't prompt. bailing")
+	}
 
 	reader := bufio.NewReader(rp.r)
 	res, err := reader.ReadString('\n')
