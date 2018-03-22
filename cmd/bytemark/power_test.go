@@ -101,6 +101,7 @@ func TestRestartCommand(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands)
 			config.When("GetVirtualMachine").Return(defVM)
+			config.When("PanelURL").Return("something.com")
 
 			client.When("ShutdownVirtualMachine", test.vmname, true).Times(1)
 			client.When("GetVirtualMachine", test.vmname).Return(brain.VirtualMachine{PowerOn: false})
