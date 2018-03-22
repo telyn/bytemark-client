@@ -60,6 +60,7 @@ func (c *Context) ErrWriter() io.Writer {
 	return c.App().ErrWriter
 }
 
+// Prompter returns the prompter which is used by this Context for prompting the user for input
 func (c *Context) Prompter() util.Prompter {
 	if prompter, ok := c.App().Metadata["prompter"].(util.Prompter); ok {
 		return prompter

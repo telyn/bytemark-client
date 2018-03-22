@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
+// Prompter is an object responsible for prompting the user for input
 type Prompter interface {
-	Prompt(string) string
+	Prompt(prompt string) (input string)
 }
 
 type realPrompter struct {
@@ -18,7 +19,7 @@ type realPrompter struct {
 }
 
 func (rp realPrompter) Prompt(prompt string) string {
-	fmt.Fprint(rp.wr, prompt)
+	_, _ = fmt.Fprint(rp.wr, prompt)
 
 	reader := bufio.NewReader(rp.r)
 	res, err := reader.ReadString('\n')
@@ -32,6 +33,7 @@ func (rp realPrompter) Prompt(prompt string) string {
 	return strings.TrimSpace(res)
 }
 
+// NewPrompter creates a Prompter which uses stderr and stdin for output and input respectively.
 func NewPrompter() Prompter {
 	return realPrompter{wr: os.Stderr, r: os.Stdin}
 }

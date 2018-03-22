@@ -67,7 +67,7 @@ func (ai authInput) Credentials() auth3.Credentials {
 func stubClientAuth(t *testing.T, state *int, c *mocks.Client, input authInput, states []authState) {
 
 	nextState := func(fn string) {
-		*state += 1
+		*state++
 		fmt.Printf("Moving to state #%d\n", *state)
 		t.Logf("Moving to state #%d", *state)
 		if *state >= len(states) {
@@ -146,7 +146,7 @@ func stubPromptResponses(t *testing.T, counter *int, prompter *testPrompter, res
 			t.Fatal("ran out of prompt responses")
 		}
 		r := resp[*counter]
-		*counter += 1
+		*counter++
 		return r
 	}
 	prompter.When("Prompt", mock.Any).Call(func(_ string) string {
@@ -564,7 +564,7 @@ func TestAuthenticate(t *testing.T) {
 						Err: &url.Error{
 							Op:  "GET",
 							URL: "fake-url",
-							Err: fmt.Errorf("pretending that there was some kind of URL parsing / transport error!"),
+							Err: fmt.Errorf("pretending that there was some kind of URL parsing / transport error"),
 						},
 					},
 					impersonateErr: unexpect{},

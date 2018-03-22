@@ -18,6 +18,11 @@ func (r retryErr) Error() string {
 	return string(r)
 }
 
+// Authenticator is an object which is temporarily created during the authentication phase of the client
+// (i.e. during with.Auth) and is responsible for making requests to the auth server,
+// making sure the user is logged in as who they want to be, performing impersonation,
+// and prompting the user for any missing credentials.
+// TODO(telyn): ensure prompts / output comes out on app.ErrWriter.
 type Authenticator struct {
 	client       lib.Client
 	config       util.ConfigManager
@@ -25,6 +30,7 @@ type Authenticator struct {
 	passPrompter passPrompter
 }
 
+// NewAuthenticator creates a new authenticator which will prompt on stderr (expecting input on stdin) and using speakeasy for password prompts.
 func NewAuthenticator(client lib.Client, config util.ConfigManager) Authenticator {
 	return Authenticator{
 		client:       client,
@@ -35,7 +41,6 @@ func NewAuthenticator(client lib.Client, config util.ConfigManager) Authenticato
 }
 
 func (a Authenticator) get2FAOTP() (otp string) {
-	fmt.Printf("get2FAOTP()\n")
 	otp = a.config.GetIgnoreErr("2fa-otp")
 	for otp == "" {
 		token := a.prompter.Prompt("Enter 2FA token: ")
@@ -46,7 +51,6 @@ func (a Authenticator) get2FAOTP() (otp string) {
 }
 
 func (a Authenticator) tryCredentialsAttempt() error {
-	fmt.Printf("tryCredentialsAttempt()\n")
 	credents, err := a.makeCredentials()
 
 	if err != nil {
@@ -59,16 +63,13 @@ func (a Authenticator) tryCredentialsAttempt() error {
 		otp := a.get2FAOTP()
 
 		credents["2fa"] = otp
-		fmt.Println("trying again with 2fa", credents)
 
 		err = a.client.AuthWithCredentials(credents)
-		fmt.Println("tryCredentialsAttempt's second go:", err)
 	}
 	return err
 }
 
 func (a Authenticator) tryCredentials() (err error) {
-	fmt.Printf("tryCredentials()\n")
 	attempts := 3
 	err = fmt.Errorf("fake error")
 
@@ -118,7 +119,6 @@ func (a Authenticator) tryCredentials() (err error) {
 }
 
 func (a Authenticator) tryToken() error {
-	fmt.Printf("tryToken()\n")
 	token := a.config.GetIgnoreErr("token")
 	if token == "" {
 		return fmt.Errorf("blank token")
@@ -128,9 +128,7 @@ func (a Authenticator) tryToken() error {
 }
 
 func (a Authenticator) checkSession(shortCircuit bool) error {
-	fmt.Printf("checkSession(%v)\n", shortCircuit)
 	factors := a.client.GetSessionFactors()
-	fmt.Println("factors: ", factors)
 
 	// make sure that we authenticated with a yubikey if we requested to do so
 	if a.config.GetIgnoreErr("yubikey") != "" {
@@ -155,7 +153,10 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 	if requestedUser != "" && currentUser != requestedUser {
 		// if we already tried impersonating we should just give up
 		if shortCircuit {
-			a.config.Unset("token")
+			err := a.config.Unset("token")
+			if err != nil {
+				return fmt.Errorf("Couldn't unset token: %v", err)
+			}
 			return fmt.Errorf("Impersonation as %s requested, but unable to impersonate as them - got %s instead", requestedUser, currentUser)
 		}
 		// if our token is already an impersonated one then we need to unset it
@@ -166,15 +167,14 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 				return fmt.Errorf("Couldn't unset token: %v", err)
 			}
 			return retryErr(fmt.Sprintf("Impersonation as %s requested but already impersonating %s", requestedUser, currentUser))
-		} else {
-			// if not, run impersonation and see
-			err := a.client.Impersonate(requestedUser)
-			if err != nil {
-				return err
-			}
-			// check that we got the right user this time
-			return a.checkSession(true)
 		}
+		// if not, run impersonation and see
+		err := a.client.Impersonate(requestedUser)
+		if err != nil {
+			return err
+		}
+		// check that we got the right user this time
+		return a.checkSession(true)
 	} else if requestedUser == "" {
 		// we didn't want to impersonate
 		if factorExists(factors, "impersonated") {
@@ -200,8 +200,8 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 	return nil
 }
 
+// Authenticate performs authentication, checks and impersonation.
 func (a Authenticator) Authenticate() error {
-	fmt.Printf("Authenticate()\n")
 	err := a.tryToken()
 	if err != nil {
 		// check for url.Error cause that indicates something worse than a simple auth fail.
@@ -221,7 +221,6 @@ func (a Authenticator) Authenticate() error {
 
 	err = a.checkSession(false)
 	if _, ok := err.(retryErr); ok {
-		fmt.Printf("%s. Retrying\n\n", err.Error())
 		err = a.Authenticate()
 	}
 	return err
