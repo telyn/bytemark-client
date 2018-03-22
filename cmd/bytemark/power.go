@@ -83,6 +83,7 @@ func init() {
 			c.Log("Done!\n\nStarting %s back up.", vmName)
 			if appliance != "" {
 				err = brainMethods.StartVirtualMachineWithAppliance(c.Client(), vmName, appliance)
+				c.Log("Server has now started. Please use bytemark console or visit the panel to connect.\n\n")
 			} else {
 				err = c.Client().StartVirtualMachine(vmName)
 			}
