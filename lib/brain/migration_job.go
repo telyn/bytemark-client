@@ -43,7 +43,7 @@ type MigrationJobStatus struct {
 }
 
 // MigrationJobSpec is a specification of a migration job to be created
-type MigrationJob struct {
+type MigrationJobSpec struct {
 	Options      MigrationJobOptions   `json:"options,imotempty"`
 	Sources      MigrationJobLocations `json:"sources,omitempty"`
 	Destinations MigrationJobLocations `json:"destinations,omitempty"`
