@@ -292,7 +292,6 @@ func (m *Mock) Called(arguments ...interface{}) *MockResult {
 		m.order++
 
 		if f.call.IsValid() {
-			f.ReturnValues = []interface{}{}
 			typ := f.call.Type()
 			numIn := typ.NumIn()
 			numArgs := len(arguments)
