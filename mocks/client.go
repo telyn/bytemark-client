@@ -187,6 +187,12 @@ func (c *Client) GetGroup(name lib.GroupName) (brain.Group, error) {
 	return group, r.Error(1)
 }
 
+func (c *Client) GetMigrationJob(id int) (brain.MigrationJob, error) {
+	r := c.Called(id)
+	mj, _ := r.Get(0).(brain.MigrationJob)
+	return mj, r.Error(1)
+}
+
 func (c *Client) DeleteDisc(name lib.VirtualMachineName, disc string) error {
 	r := c.Called(name, disc)
 	return r.Error(0)
