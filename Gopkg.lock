@@ -32,7 +32,7 @@
   branch = "master"
   name = "github.com/maraino/go-mock"
   packages = ["."]
-  revision = "c0658195ada54274d527cb1b09ff1d31765509d6"
+  revision = "4c74c434cd3a9e9a70ed1eeb56646a1d3fac372f"
 
 [[projects]]
   name = "github.com/mattn/go-isatty"
