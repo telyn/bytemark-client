@@ -1,5 +1,9 @@
 package brain
 
+import (
+    "encoding/json"
+)
+
 // MigrationJobQueue is a list of disc IDs that are still to be migrated as
 // part of a migration job.
 type MigrationJobQueue struct {
@@ -9,9 +13,9 @@ type MigrationJobQueue struct {
 // MigrationJobLocations represents source or target locations for a migration
 // job. Discs, pools and tails maybe represented by ID number, label or UUID.
 type MigrationJobLocations struct {
-	Discs []string `json:"discs,omitempty"`
-	Pools []string `json:"pools,omitempty"`
-	Tails []string `json:"tails,omitempty"`
+	Discs []json.Number `json:"discs,omitempty"`
+	Pools []json.Number `json:"pools,omitempty"`
+	Tails []json.Number `json:"tails,omitempty"`
 }
 
 // MigrationJobLocations represents available desintations for a migration

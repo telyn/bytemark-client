@@ -236,6 +236,7 @@ type Client interface {
 	GetMigratingVMs() (brain.VirtualMachines, error)
 	GetStoppedEligibleVMs() (brain.VirtualMachines, error)
 	GetRecentVMs() (brain.VirtualMachines, error)
+	GetMigrationJob(id int) (brain.MigrationJob, error)
 	MigrateDisc(disc int, newStoragePool string) error
 	MigrateVirtualMachine(vmName VirtualMachineName, newHead string) error
 	ReapVMs() error
