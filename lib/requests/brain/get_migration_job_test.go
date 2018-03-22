@@ -1,4 +1,4 @@
-package lib_test
+package brain_test
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
@@ -80,7 +81,7 @@ func TestGetMigrationJob(t *testing.T) {
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		migrationJob, err := client.GetMigrationJob(123)
+		migrationJob, err := brainMethods.GetMigrationJob(client, 123)
 		if err != nil {
 			t.Fatal(err)
 		}
