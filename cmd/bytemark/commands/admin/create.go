@@ -35,11 +35,11 @@ func init() {
 					log.Logf("User %s has been created with %s privileges\r\n", c.String("username"), c.String("privilege"))
 					return nil
 				}),
-			},
-			{
-				Name:      "vlan-group",
+			}, {
+				Name:      "vlan group",
+				Aliases:   []string{"vlan-group"},
 				Usage:     "creates groups for private VLANs",
-				UsageText: "bytemark --admin create vlan-group <group> [vlan-num]",
+				UsageText: "bytemark --admin create vlan group <group> [vlan-num]",
 				Description: `Create a group in the specified account, with an optional VLAN specified.
 
 Used when setting up a private VLAN for a customer.`,
