@@ -185,6 +185,14 @@ func (c *Context) String(flagname string) string {
 	return c.Context.GlobalString(flagname)
 }
 
+// StringSlice returns the values of the named flag as a []string
+func (c *Context) StringSlice(flagname string) []string {
+	if c.Context.IsSet(flagname) || c.Context.String(flagname) != "" {
+		return c.Context.StringSlice(flagname)
+	}
+	return c.Context.GlobalStringSlice(flagname)
+}
+
 // Size returns the value of the named SizeSpecFlag as an int in megabytes
 func (c *Context) Size(flagname string) int {
 	size, ok := c.Context.Generic(flagname).(*util.SizeSpecFlag)
