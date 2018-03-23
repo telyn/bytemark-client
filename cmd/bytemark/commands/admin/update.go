@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	billingMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -158,7 +159,7 @@ func init() {
 			{
 				Name:      "storage pool",
 				Usage:     "update the settings of a storage pool",
-				UsageText: "bytemark --admin update storage pool [--usage-strategy new-strategy] [--overcommit-ratio new-ratio] [--label new-label] [[--storage-pool] storage-pool]>",
+				UsageText: "bytemark --admin update storage pool [--usage-strategy new-strategy] [--overcommit-ratio new-ratio] [--label new-label] [--migration-concurrency new-limit] <storage pool>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "storage-pool",
@@ -176,14 +177,18 @@ func init() {
 						Name:  "label",
 						Usage: "the label of the storage pool",
 					},
+					cli.IntFlag{
+						Name:  "migration-concurrency",
+						Usage: "the number of concurrent migrations the storage pool can handle",
+					},
 				},
-				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
-					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
+				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 
-					options := lib.UpdateStoragePool{
-						UsageStrategy:   usageStrategy,
-						OvercommitRatio: overcommitRatio,
-						Label:           label,
+					options := brain.StoragePool{
+						UsageStrategy:        c.String("usage-strategy"),
+						OvercommitRatio:      c.Int("overcommit-ratio"),
+						Label:                c.String("label"),
+						MigrationConcurrency: c.Int("migration-concurrency"),
 					}
 
 					if err := c.Client().UpdateStoragePool(c.String("storage-pool"), options); err != nil {
