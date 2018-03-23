@@ -49,7 +49,7 @@ func TestAddKeyCommand(t *testing.T) {
 
 	})
 
-	t.Run("ummm what", func(t *testing.T) {
+	t.Run("Key in file using flag", func(t *testing.T) {
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
 		err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey.pub"})
