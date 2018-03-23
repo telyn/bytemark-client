@@ -41,4 +41,5 @@ func SetClientAndConfig(app *cli.App, client lib.Client, config util.ConfigManag
 	}
 	app.Metadata["client"] = client
 	app.Metadata["config"] = config
+	app.Metadata["prompter"] = util.NewPrompter()
 }

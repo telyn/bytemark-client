@@ -115,9 +115,9 @@ func init() {
 				reason := c.String("reason")
 				if reason == "" {
 					if addrs == 1 {
-						reason = util.Prompt("Enter the purpose for this extra IP: ")
+						reason = c.Prompter().Prompt("Enter the purpose for this extra IP: ")
 					} else {
-						reason = util.Prompt("Enter the purpose for these extra IPs: ")
+						reason = c.Prompter().Prompt("Enter the purpose for these extra IPs: ")
 					}
 				}
 				ipcr := brain.IPCreateRequest{

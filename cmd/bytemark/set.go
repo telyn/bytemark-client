@@ -72,7 +72,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					cores := c.Int("cores")
 
 					if c.VirtualMachine.Cores < cores {
-						if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
+						if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
 							return util.UserRequestedExit{}
 						}
 					}
@@ -142,7 +142,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					memory := c.Size("memory")
 
 					if c.VirtualMachine.Memory < memory {
-						if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("You're increasing the memory by %dGiB - this may cost more, are you sure?", (memory-c.VirtualMachine.Memory)/1024)) {
+						if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You're increasing the memory by %dGiB - this may cost more, are you sure?", (memory-c.VirtualMachine.Memory)/1024)) {
 							return util.UserRequestedExit{}
 						}
 					}
