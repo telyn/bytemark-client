@@ -14,6 +14,28 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
+				Name:      "ip range",
+				Usage:     "create a new IP range in a VLAN",
+				UsageText: "bytemark --admin create ip range <ip-range> <vlan-num>",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "ip-range",
+						Usage: "the IP range to add",
+					},
+					cli.IntFlag{
+						Name:  "vlan-num",
+						Usage: "The VLAN number to add the IP range to",
+					},
+				},
+				Action: app.Action(args.Optional("ip-range", "vlan-num"), with.RequiredFlags("ip-range", "vlan-num"), with.Auth, func(c *app.Context) error {
+					if err := c.Client().CreateIPRange(c.String("ip-range"), c.Int("vlan-num")); err != nil {
+						return err
+					}
+					log.Logf("IP range created\r\n")
+					return nil
+				}),
+			},
+			{
 				Name:      "user",
 				Usage:     "creates a new cluster admin or cluster superuser",
 				UsageText: "bytemark --admin create user <username> <privilege>",
@@ -60,28 +82,6 @@ Used when setting up a private VLAN for a customer.`,
 						return err
 					}
 					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
-					return nil
-				}),
-			},
-			{
-				Name:      "ip range",
-				Usage:     "create a new IP range in a VLAN",
-				UsageText: "bytemark --admin create ip range <ip-range> <vlan-num>",
-				Flags: []cli.Flag{
-					cli.StringFlag{
-						Name:  "ip-range",
-						Usage: "the IP range to add",
-					},
-					cli.IntFlag{
-						Name:  "vlan-num",
-						Usage: "The VLAN number to add the IP range to",
-					},
-				},
-				Action: app.Action(args.Optional("ip-range", "vlan-num"), with.RequiredFlags("ip-range", "vlan-num"), with.Auth, func(c *app.Context) error {
-					if err := c.Client().CreateIPRange(c.String("ip-range"), c.Int("vlan-num")); err != nil {
-						return err
-					}
-					log.Logf("IP range created\r\n")
 					return nil
 				}),
 			},
