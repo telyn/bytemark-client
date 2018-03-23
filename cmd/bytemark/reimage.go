@@ -76,7 +76,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 				return
 			}
 
-			if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
+			if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), "Are you certain you wish to continue?") {
 				log.Error("Exiting")
 				return util.UserRequestedExit{}
 			}

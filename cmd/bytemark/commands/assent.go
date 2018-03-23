@@ -92,7 +92,7 @@ func init() {
 				}
 			}
 
-			if prompt != "" && !util.PromptYesNo(prompt) {
+			if prompt != "" && !util.PromptYesNo(ctx.Prompter(), prompt) {
 				ctx.LogErr("Exiting. Please explicitly state Name and Email using the --name and --email options")
 				return util.UserRequestedExit{}
 			}

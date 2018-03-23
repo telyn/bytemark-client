@@ -39,6 +39,11 @@ func (c *Client) BuildRequest(method string, endpoint lib.Endpoint, path string,
 	}
 }
 
+func (c *Client) Impersonate(user string) error {
+	r := c.Called(user)
+	return r.Error(0)
+}
+
 func (c *Client) GetEndpoint() string {
 	r := c.Called()
 	return r.String(0)
@@ -493,7 +498,7 @@ func (c *Client) UpdateTail(idOrLabel string, options lib.UpdateTail) error {
 	r := c.Called(idOrLabel, options)
 	return r.Error(0)
 }
-func (c *Client) UpdateStoragePool(idOrLabel string, options lib.UpdateStoragePool) error {
+func (c *Client) UpdateStoragePool(idOrLabel string, options brain.StoragePool) error {
 	r := c.Called(idOrLabel, options)
 	return r.Error(0)
 }
