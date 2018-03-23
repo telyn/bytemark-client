@@ -493,7 +493,7 @@ func (c *Client) UpdateTail(idOrLabel string, options lib.UpdateTail) error {
 	r := c.Called(idOrLabel, options)
 	return r.Error(0)
 }
-func (c *Client) UpdateStoragePool(idOrLabel string, options lib.UpdateStoragePool) error {
+func (c *Client) UpdateStoragePool(idOrLabel string, options brain.StoragePool) error {
 	r := c.Called(idOrLabel, options)
 	return r.Error(0)
 }

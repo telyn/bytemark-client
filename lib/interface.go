@@ -254,5 +254,5 @@ type Client interface {
 	CreateUser(username string, privilege string) error
 	UpdateHead(idOrLabel string, options UpdateHead) error
 	UpdateTail(idOrLabel string, options UpdateTail) error
-	UpdateStoragePool(idOrLabel string, options UpdateStoragePool) error
+	UpdateStoragePool(idOrLabel string, options brain.StoragePool) error
 }

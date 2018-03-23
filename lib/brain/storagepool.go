@@ -9,20 +9,21 @@ import (
 
 // StoragePool represents a Bytemark Cloud Servers disk storage pool, as returned by the admin API.
 type StoragePool struct {
-	Name            string `json:"name,omitempty"`
-	Label           string `json:"label,omitempty"`
-	Zone            string `json:"zone,omitempty"`
-	Size            int    `json:"size,omitempty"`
-	FreeSpace       int    `json:"free_space,omitempty"`
-	Ceiling         int    `json:"ceiling,omitempty"`
-	AllocatedSpace  int    `json:"alloc,omitempty"`
-	Discs           int    `json:"discs,omitempty"`
-	Backups         int    `json:"backups,omitempty"`
-	OvercommitRatio int    `json:"overcommit_ratio,omitempty"`
-	UsageStrategy   string `json:"usage_strategy,omitempty"`
-	StorageGrade    string `json:"grade,omitempty"`
-	Note            string `json:"note,omitempty"`
-	IOPSLimit       int    `json:"iops_limit,omitempty"`
+	Name                 string `json:"name,omitempty"`
+	Label                string `json:"label,omitempty"`
+	Zone                 string `json:"zone,omitempty"`
+	Size                 int    `json:"size,omitempty"`
+	FreeSpace            int    `json:"free_space,omitempty"`
+	Ceiling              int    `json:"ceiling,omitempty"`
+	AllocatedSpace       int    `json:"alloc,omitempty"`
+	Discs                int    `json:"discs,omitempty"`
+	Backups              int    `json:"backups,omitempty"`
+	OvercommitRatio      int    `json:"overcommit_ratio,omitempty"`
+	MigrationConcurrency int    `json:"migration_concurrency,omitempty"`
+	UsageStrategy        string `json:"usage_strategy,omitempty"`
+	StorageGrade         string `json:"grade,omitempty"`
+	Note                 string `json:"note,omitempty"`
+	IOPSLimit            int    `json:"iops_limit,omitempty"`
 
 	// These were defined, but aren't returned by the API
 	// ID        int
@@ -33,9 +34,9 @@ type StoragePool struct {
 func (sp StoragePool) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
-		return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
+		return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, MigrationConcurrency, Note"
 	}
-	return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, Note"
+	return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, MigrationConcurrency, Note"
 }
 
 // PercentFull gives us the (numeric) percentage of how full the disc is
