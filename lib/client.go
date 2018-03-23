@@ -1,11 +1,11 @@
 package lib
 
 import (
-"context"
+	"context"
 	"errors"
 
-	auth3 "gitlab.bytemark.co.uk/auth/client"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
+	auth3 "gitlab.bytemark.co.uk/auth/client"
 )
 
 // EndpointURLs are the URLs stored by the client for the various API endpoints the client touches.
