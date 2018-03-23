@@ -4,6 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -86,6 +87,26 @@ EXAMPLES:
 						Usage: "an optional priority to set - bigger is higher priority",
 					},
 				},
+				Action: app.Action(with.Auth, func(ctx *app.Context) err {
+					jobRequest := brain.MigrationJob{
+						Sources: brain.MigrationJobLocations{
+							Discs: ctx.StringSlice("disc"),
+							Pools: ctx.StringSlice("pool"),
+							Tails: ctx.StringSlice("tail"),
+						},
+						Destinations: brain.MigrationJobDestinations{
+							Pools: ctx.StringSlice("to-pool"),
+						},
+						Priority: ctx.Int("priority"),
+					}
+					job, err := adminRequests.CreateMigrationJob(jobRequest)
+					if err != nil {
+						ctx.Output("Migration job created")
+						return ctx.OutputInDesiredForm(job)
+					}
+					ctx.Output("Couldn't create migration job")
+					return err
+				}),
 			}, {
 				Name:        "user",
 				Usage:       "creates a new cluster admin or cluster superuser",
