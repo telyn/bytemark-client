@@ -1,6 +1,7 @@
 package with
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -71,7 +72,7 @@ func (a Authenticator) tryCredentialsAttempt() error {
 
 func (a Authenticator) tryCredentials() (err error) {
 	attempts := 3
-	err = fmt.Errorf("fake error")
+	err = errors.New("fake error")
 
 	for err != nil {
 		attempts--
@@ -81,7 +82,7 @@ func (a Authenticator) tryCredentials() (err error) {
 			if strings.Contains(err.Error(), "Badly-formed parameters") || strings.Contains(err.Error(), "Bad login credentials") || strings.Contains(err.Error(), "Authentication failed") {
 				// if the credentials are bad in some way, make another attempt.
 				if attempts <= 0 {
-					return err
+					return
 				}
 				log.Errorf("Invalid credentials, please try again\r\n")
 				// reset all credentials and set the default user to
@@ -93,7 +94,7 @@ func (a Authenticator) tryCredentials() (err error) {
 				continue
 			} else {
 				// if the credentials were okay and login still failed, let the user know
-				return err
+				return
 			}
 		} else {
 			// we have successfully authenticated!
@@ -110,7 +111,7 @@ func (a Authenticator) tryCredentials() (err error) {
 
 				if !factorExists(factors, "2fa") {
 					// Should never happen, as long as auth correctly returns the factors
-					return fmt.Errorf("Unexpected error with 2FA login. Please report this as a bug")
+					return errors.New("Unexpected error with 2FA login. Please report this as a bug")
 				}
 			}
 		}
@@ -121,7 +122,7 @@ func (a Authenticator) tryCredentials() (err error) {
 func (a Authenticator) tryToken() error {
 	token := a.config.GetIgnoreErr("token")
 	if token == "" {
-		return fmt.Errorf("blank token")
+		return errors.New("blank token")
 	}
 
 	return a.client.AuthWithToken(token)
