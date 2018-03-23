@@ -94,25 +94,6 @@ func TestConfigValidations(t *testing.T) {
 func TestCommandConfigSet(t *testing.T) {
 	is := is.New(t)
 
-	// setup sets up all the necessary config defaulty stuff for all our tests
-
-	//	setup := func() {
-	//		config.Reset()
-	//		client.Reset()
-	//		config.When("GetV", "user").Return(util.ConfigVar{"user", "old-test-user", "config"})
-	//		config.When("GetV", "account").Return(util.ConfigVar{"account", "", ""})
-	//		config.When("GetV", "endpoint").Return(util.ConfigVar{"endpoint", "", ""})
-	//		config.When("GetV", "group").Return(util.ConfigVar{"group", "", ""})
-	//		config.When("GetV", "debug-level").Return(util.ConfigVar{"debug-level", "", ""})
-	//		config.When("GetIgnoreErr", "token").Return("test-token")
-	//		config.When("GetIgnoreErr", "user").Return("old-test-user")
-	//		config.When("GetIgnoreErr", "yubikey").Return("")
-	//		config.When("GetIgnoreErr", "2fa-otp").Return("")
-	//		config.When("GetIgnoreErr", "account").Return("")
-	//		config.When("GetGroup").Return(lib.GroupName{})
-	//		client.When("AuthWithToken", "test-token").Return(nil)
-	//	}
-
 	t.Run("set user", func(t *testing.T) {
 		config, _, app := testutil.BaseTestSetup(t, false, commands)
 		config.When("GetV", "user").Return(util.ConfigVar{"user", "old-test-user", "config"})
