@@ -2,6 +2,7 @@ package admin
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
@@ -10,6 +11,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	billingMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
+	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -254,6 +256,82 @@ func init() {
 						}),
 					},
 				},
+			},
+			{
+				Name:        "migration",
+				Usage:       "update a migration",
+				UsageText:   "bbytemark --admin update migration --id 123 --priority 10 --cancel-disc disc1 --cancel-pool pool2 --cancel-tail tail3 | --cancel-all",
+				Description: `This command allows you to update an ongoing migration job by altering its priority, cancelling migrating discs, pools, tails, or canceling everything for the current job`,
+				Flags: []cli.Flag{
+					cli.IntFlag{
+						Name:  "id",
+						Usage: "the id of the migration job",
+					},
+					cli.IntFlag{
+						Name:  "priority",
+						Usage: "the priority of the current job",
+					},
+					cli.StringSliceFlag{
+						Name:  "cancel-disc",
+						Usage: "the disc(s) to cancel migration of",
+					},
+					cli.StringSliceFlag{
+						Name:  "cancel-pool",
+						Usage: "the pool(s) to cancel migration of",
+					},
+					cli.StringSliceFlag{
+						Name:  "cancel-tail",
+						Usage: "the tail(s) to cancel migration of",
+					},
+					cli.BoolFlag{
+						Name:  "cancel-all",
+						Usage: "cancel the all migrations of the job",
+					},
+				},
+				Action: app.Action(with.RequiredFlags("id"), with.Auth, func(c *app.Context) error {
+					// read all flags?
+					discs := c.Context.StringSlice("cancel-disc")
+					pools := c.Context.StringSlice("cancel-pool")
+					tails := c.Context.StringSlice("cancel-tail")
+
+					totalLength := append(discs, pools...)
+					totalLength = append(totalLength, tails...)
+
+					// check the presence of cancel all first
+					if c.Context.IsSet("cancel-all") {
+						if len(totalLength) > 0 {
+
+							return fmt.Errorf("You have set additional flags as well as --cancel-all. Nothing else can be specified when --cancel-all has been set.")
+						}
+						if err := brainMethods.CancelMigrationJob(c.Client(), c.Context.Int("id")); err != nil {
+							return err
+						}
+
+						// make the call to the cancel all migration.
+					}
+
+					modifications := brain.MigrationJobModification{
+						Cancel: brain.MigrationJobLocations{
+							Discs: stringsToJsonNumbers(discs),
+							Pools: stringsToJsonNumbers(pools),
+							Tails: stringsToJsonNumbers(tails),
+						},
+						Options: brain.MigrationJobOptions{
+							Priority: c.Context.Int("priority"),
+						},
+					}
+
+					err := brainMethods.EditMigrationJob(c.Client(), c.Context.Int("id"), modifications)
+					if err != nil {
+						return err
+					}
+
+					// if we have set a new priority, show a message.
+					c.LogErr("Priority updated for Job %d", c.Context.Int("id"))
+
+					// not really sure if we should be showing a confirmation message for all individual things that have been cancelled.
+					return err
+				}),
 			},
 		},
 	})
