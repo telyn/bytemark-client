@@ -289,19 +289,16 @@ func init() {
 					},
 				},
 				Action: app.Action(with.RequiredFlags("id"), with.Auth, func(c *app.Context) error {
-					// read all flags?
 					id := c.Context.Int("id")
 					discs := c.Context.StringSlice("cancel-disc")
 					pools := c.Context.StringSlice("cancel-pool")
 					tails := c.Context.StringSlice("cancel-tail")
 
-					totalLength := append(discs, pools...)
-					totalLength = append(totalLength, tails...)
+					allCancelled := append(discs, pools...)
+					allCancelled = append(allCancelled, tails...)
 
-					// check the presence of cancel all first
 					if c.Context.IsSet("cancel-all") {
-						if len(totalLength) > 0 {
-
+						if len(allCancelled) > 0 {
 							return fmt.Errorf("You have set additional flags as well as --cancel-all. Nothing else can be specified when --cancel-all has been set.")
 						}
 
@@ -310,8 +307,7 @@ func init() {
 							return err
 						}
 						c.LogErr("All migrations for job %d have been cancelled.", id)
-
-						// make the call to the cancel all migration.
+						return err
 					}
 
 					modifications := brain.MigrationJobModification{
@@ -330,10 +326,14 @@ func init() {
 						return err
 					}
 
-					// if we have set a new priority, show a message.
-					c.LogErr("Priority updated for Job %d", id)
+					if c.Context.IsSet("priority") {
+						c.LogErr("Priority updated for job %d", id)
+					}
 
-					// not really sure if we should be showing a confirmation message for all individual things that have been cancelled.
+					for _, cancelled := range allCancelled {
+						c.LogErr("Migration cancelled for %s on job %d", cancelled, id)
+					}
+
 					return err
 				}),
 			},
