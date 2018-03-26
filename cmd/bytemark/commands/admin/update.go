@@ -303,7 +303,9 @@ func init() {
 
 							return fmt.Errorf("You have set additional flags as well as --cancel-all. Nothing else can be specified when --cancel-all has been set.")
 						}
-						if err := brainMethods.CancelMigrationJob(c.Client(), c.Context.Int("id")); err != nil {
+
+						err := brainMethods.CancelMigrationJob(c.Client(), c.Context.Int("id"))
+						if err != nil {
 							return err
 						}
 
