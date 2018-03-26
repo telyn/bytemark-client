@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-//MigrationJobModify represents the modifications possible on a migration job
+//MigrationJobModification represents the modifications possible on a migration job
 type MigrationJobModification struct {
 	Cancel  MigrationJobLocations `json:"cancel,omitempty"`
 	Options MigrationJobOptions   `json:"options,omitempty"`
