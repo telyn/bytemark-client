@@ -4,7 +4,7 @@ import "testing"
 
 func TestStringsToJsonNumbers(t *testing.T) {
 	in := []string{"hello", "world", "8092"}
-	out := stringsToJsonNumbers(in)
+	out := stringsToJSONNumbers(in)
 	if len(out) != 3 {
 		t.Fatalf("len(out) = %d, expected 3", len(out))
 	}
