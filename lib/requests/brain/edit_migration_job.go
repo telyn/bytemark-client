@@ -7,7 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// EditMigrationJob returns a single migration job, given its ID
+// EditMigrationJob allows you to cancel individual or multiples discs, pools, or tails and change the priority for a job, given its ID
 func EditMigrationJob(client lib.Client, id int, migrationEdit brain.MigrationJobModification) (err error) {
 	r, err := client.BuildRequest("PUT", lib.BrainEndpoint, "/admin/migration_jobs/%s", strconv.Itoa(id))
 	if err != nil {
@@ -18,7 +18,7 @@ func EditMigrationJob(client lib.Client, id int, migrationEdit brain.MigrationJo
 	return
 }
 
-// GetMigrationJob returns a single migration job, given its ID
+// CancelMigrationJob cancels all migrations on a job, given its ID
 func CancelMigrationJob(client lib.Client, id int) (err error) {
 	r, err := client.BuildRequest("PUT", lib.BrainEndpoint, "/admin/migration_jobs/%s", strconv.Itoa(id))
 	if err != nil {
