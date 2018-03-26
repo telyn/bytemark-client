@@ -1,7 +1,11 @@
 package brain
 
 import (
-    "encoding/json"
+	"encoding/json"
+	"io"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // MigrationJobQueue is a list of disc IDs that are still to be migrated as
@@ -65,4 +69,68 @@ type MigrationJob struct {
 	FinishedAt   string                   `json:"finished_at,omitempty"`
 	CreatedAt    string                   `json:"created_at,omitempty"`
 	UpdatedAt    string                   `json:"updated_at,omitempty"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (mj MigrationJob) DefaultFields(f output.Format) string {
+	return "ID, Queue, Destinations, Status, Priority, StartedAt, FinishedAt, CreatedAt, UpdatedAt"
+}
+
+func (mjq MigrationJobQueue) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const template = `{{ define "migration_job_queue_full" }}
+{{- with .Discs }}
+     discs:
+{{- range . }}
+       • {{.}}
+{{- end }}
+{{- end -}}
+{{- end -}}{{- define "migration_job_queue_sgl" -}}{{ range .Discs }} {{.}}{{ end }}{{- end -}}`
+	return prettyprint.Run(wr, template, "migration_job_queue"+string(detail), mjq)
+}
+
+func (mjs MigrationJobStatus) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const template = `{{- define "migration_job_status_full" -}}
+{{- with .Discs -}}
+{{- with .Done }}
+     done:
+    {{- range . }}
+       • {{.}}
+    {{- end }}
+{{- end -}}
+{{- with .Errored }}
+     errored:
+    {{- range . }}
+       • {{.}}
+    {{- end }}
+{{- end -}}
+{{- with .Cancelled }}
+     cancelled:
+    {{- range . }}
+       • {{.}}
+    {{- end }}
+{{- end -}}
+{{- with .Skipped }}
+     skipped:
+    {{- range . }}
+       • {{.}}
+    {{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}`
+	return prettyprint.Run(wr, template, "migration_job_status"+string(detail), mjs)
+}
+
+// PrettyPrint outputs a nice human-readable overview of the migration
+func (mj MigrationJob) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const template = `{{ define "migration_job_full" }} ▸ {{ .ID }}
+{{ with .Queue }}   queue: {{ prettysprint . "_full" }}
+{{ end -}}{{- with .Status }}   status: {{ prettysprint . "_full" }}
+{{ end -}}{{- with .Priority }}   priority: {{ . }}
+{{ end -}}{{- with .StartedAt }}   started_at: {{ . }}
+{{ end -}}{{- with .FinishedAt }}   finished_at: {{ . }}
+{{ end -}}{{- with .CreatedAt }}   created_at: {{ . }}
+{{ end -}}{{- with .UpdatedAt }}   updated_at: {{ . }}
+{{ end -}}{{- end -}}{{- define "migration_job_medium" }} ▸ {{ .ID }} queue:{{ prettysprint .Queue "_sgl" }}
+{{- end -}}{{- define "migration_job_sgl" -}}{{ template "migration_job_medium" . }}{{- end -}}`
+	return prettyprint.Run(wr, template, "migration_job"+string(detail), mj)
 }
