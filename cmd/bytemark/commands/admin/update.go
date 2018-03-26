@@ -260,7 +260,7 @@ func init() {
 			{
 				Name:        "migration",
 				Usage:       "update a migration",
-				UsageText:   "bbytemark --admin update migration --id 123 --priority 10 --cancel-disc disc1 --cancel-pool pool2 --cancel-tail tail3 | --cancel-all",
+				UsageText:   "bytemark --admin update migration --id <id> --priority <priority> --cancel-disc <disc> --cancel-pool <pool> --cancel-tail <tail> | --cancel-all",
 				Description: `This command allows you to update an ongoing migration job by altering its priority, cancelling migrating discs, pools, tails, or canceling everything for the current job`,
 				Flags: []cli.Flag{
 					cli.IntFlag{
