@@ -290,6 +290,7 @@ func init() {
 				},
 				Action: app.Action(with.RequiredFlags("id"), with.Auth, func(c *app.Context) error {
 					// read all flags?
+					id := c.Context.Int("id")
 					discs := c.Context.StringSlice("cancel-disc")
 					pools := c.Context.StringSlice("cancel-pool")
 					tails := c.Context.StringSlice("cancel-tail")
@@ -304,11 +305,11 @@ func init() {
 							return fmt.Errorf("You have set additional flags as well as --cancel-all. Nothing else can be specified when --cancel-all has been set.")
 						}
 
-						err := brainMethods.CancelMigrationJob(c.Client(), c.Context.Int("id"))
+						err := brainMethods.CancelMigrationJob(c.Client(), id)
 						if err != nil {
 							return err
 						}
-						c.LogErr("All migrations for job %d have been cancelled.", c.Context.Int("id"))
+						c.LogErr("All migrations for job %d have been cancelled.", id)
 
 						// make the call to the cancel all migration.
 					}
@@ -324,13 +325,13 @@ func init() {
 						},
 					}
 
-					err := brainMethods.EditMigrationJob(c.Client(), c.Context.Int("id"), modifications)
+					err := brainMethods.EditMigrationJob(c.Client(), id, modifications)
 					if err != nil {
 						return err
 					}
 
 					// if we have set a new priority, show a message.
-					c.LogErr("Priority updated for Job %d", c.Context.Int("id"))
+					c.LogErr("Priority updated for Job %d", id)
 
 					// not really sure if we should be showing a confirmation message for all individual things that have been cancelled.
 					return err
