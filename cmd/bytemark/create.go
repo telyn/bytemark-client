@@ -397,7 +397,7 @@ func createServer(c *app.Context) (err error) {
 	}
 
 	// If we're not forcing, prompt. If the prompt comes back false, exit.
-	if !c.Bool("force") && !util.PromptYesNo("Are you certain you wish to continue?") {
+	if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), "Are you certain you wish to continue?") {
 		log.Error("Exiting.")
 		return util.UserRequestedExit{}
 	}

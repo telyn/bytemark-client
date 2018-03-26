@@ -60,6 +60,14 @@ func (c *Context) ErrWriter() io.Writer {
 	return c.App().ErrWriter
 }
 
+// Prompter returns the prompter which is used by this Context for prompting the user for input
+func (c *Context) Prompter() util.Prompter {
+	if prompter, ok := c.App().Metadata["prompter"].(util.Prompter); ok {
+		return prompter
+	}
+	return nil
+}
+
 // Command returns the cli.Command this context is for
 func (c *Context) Command() cli.Command {
 	return c.Context.Command()
@@ -79,6 +87,16 @@ func (c *Context) Client() lib.Client {
 		return client
 	}
 	return nil
+}
+
+// IsTest returns whether this app is being run as part of a test
+// It uses the "buf" on the App's Metadata - which is added by
+// app_test.BaseTestSetup and used to capture output for later assertions
+func (c *Context) IsTest() bool {
+	if _, ok := c.App().Metadata["buf"]; ok {
+		return true
+	}
+	return false
 }
 
 // NextArg returns the next unused argument, and marks it as used.
