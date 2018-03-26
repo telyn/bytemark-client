@@ -308,6 +308,7 @@ func init() {
 						if err != nil {
 							return err
 						}
+						c.LogErr("All migrations for job %d have been cancelled.", c.Context.Int("id"))
 
 						// make the call to the cancel all migration.
 					}
