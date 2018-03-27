@@ -74,12 +74,12 @@ func TestCreateMigrationJob(t *testing.T) {
 		"updated_at": "2018-03-15T15:28:28.244Z"
 	    }`),
 		AssertRequest: assert.Body(func(t *testing.T, testName string, body string) {
-		    var req brain.MigrationJobSpec
-		    err := json.Unmarshal([]byte(body), &req)
-		    if err != nil {
-			t.Fatalf("failed to unmarshal request body: %v", err)
-		    }
-		    assert.Equal(t, testName, req, testMigrationJobSpec)
+			var req brain.MigrationJobSpec
+			err := json.Unmarshal([]byte(body), &req)
+			if err != nil {
+				t.Fatalf("failed to unmarshal request body: %v", err)
+			}
+			assert.Equal(t, testName, req, testMigrationJobSpec)
 		}),
 	}
 

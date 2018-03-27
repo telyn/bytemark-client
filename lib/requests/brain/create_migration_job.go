@@ -11,7 +11,7 @@ import (
 func CreateMigrationJob(client lib.Client, mjs brain.MigrationJobSpec) (mj brain.MigrationJob, err error) {
 	req, err := client.BuildRequest("POST", lib.BrainEndpoint, "/admin/migration_jobs%s", "")
 	if err != nil {
-	    return
+		return
 	}
 	_, _, err = req.MarshalAndRun(mjs, &mj)
 	return
