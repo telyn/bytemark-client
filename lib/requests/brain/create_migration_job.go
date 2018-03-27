@@ -9,7 +9,7 @@ import (
 // specification, returning the newly created job on success or an error
 // otherwise.
 func CreateMigrationJob(client lib.Client, mjs brain.MigrationJobSpec) (mj brain.MigrationJob, err error) {
-	r, err := client.BuildRequest("POST", lib.BrainEndpoint, "/admin/migration_jobs")
+	req, err := client.BuildRequest("POST", lib.BrainEndpoint, "/admin/migration_jobs")
 	_, _, err = req.MarshalAndRun(mjs, &mj)
 	return
 }
