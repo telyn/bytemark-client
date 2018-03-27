@@ -297,8 +297,12 @@ func init() {
 					allCancelled := append(discs, pools...)
 					allCancelled = append(allCancelled, tails...)
 
+					if len(allCancelled) == 0 && !c.Context.IsSet("priority") && !c.Context.IsSet("cancel-all") {
+						return fmt.Errorf("No Flags have been set. Please specify a priority, ")
+					}
+
 					if c.Context.IsSet("cancel-all") {
-						if len(allCancelled) > 0 {
+						if len(allCancelled) > 0 || c.Context.IsSet("priority") {
 							return fmt.Errorf("You have set additional flags as well as --cancel-all. Nothing else can be specified when --cancel-all has been set")
 						}
 
