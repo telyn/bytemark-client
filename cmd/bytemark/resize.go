@@ -53,7 +53,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 				}
 				log.Logf("Resizing %s from %dGiB to %dGiB...", c.Disc.Label, c.Disc.Size/1024, newSize/1024)
 
-				if !c.Bool("force") && !util.PromptYesNo(fmt.Sprintf("Are you certain you wish to perform this resize?")) {
+				if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to perform this resize?")) {
 					return util.UserRequestedExit{}
 				}
 

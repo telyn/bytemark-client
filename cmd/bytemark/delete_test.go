@@ -12,10 +12,6 @@ import (
 
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
-	config.When("Force").Return(true)
-	config.When("GetVirtualMachine").Return(defVM)
 
 	name := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
@@ -25,26 +21,35 @@ func TestDeleteServer(t *testing.T) {
 
 	vm := getFixtureVM()
 
-	c.When("GetVirtualMachine", name).Return(vm).Times(1)
-	c.When("DeleteVirtualMachine", name, false).Return(nil).Times(1)
+	t.Run("force delete", func(t *testing.T) {
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	err := app.Run(strings.Split("bytemark delete server --force test-server", " "))
-	is.Nil(err)
-	if ok, vErr := c.Verify(); !ok {
-		t.Fatal(vErr)
-	}
-	c.Reset()
+		config.When("Force").Return(true)
+		config.When("GetVirtualMachine").Return(defVM)
 
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	c.When("GetVirtualMachine", name).Return(vm).Times(1)
-	c.When("DeleteVirtualMachine", name, true).Return(nil).Times(1)
+		c.When("GetVirtualMachine", name).Return(vm).Times(1)
+		c.When("DeleteVirtualMachine", name, false).Return(nil).Times(1)
 
-	err = app.Run(strings.Split("bytemark delete server --force --purge test-server", " "))
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
+		err := app.Run(strings.Split("bytemark delete server --force test-server", " "))
+		is.Nil(err)
+		if ok, vErr := c.Verify(); !ok {
+			t.Fatal(vErr)
+		}
+	})
+	t.Run("force purge", func(t *testing.T) {
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config.When("Force").Return(true)
+		config.When("GetVirtualMachine").Return(defVM)
 
+		c.When("GetVirtualMachine", name).Return(vm).Times(1)
+		c.When("DeleteVirtualMachine", name, true).Return(nil).Times(1)
+
+		err := app.Run(strings.Split("bytemark delete server --force --purge test-server", " "))
+		is.Nil(err)
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	})
 }
 
 func TestDeleteDisc(t *testing.T) {

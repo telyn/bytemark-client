@@ -46,6 +46,8 @@ type Client interface {
 	AuthWithToken(string) error
 	// AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
 	AuthWithCredentials(auth3.Credentials) error
+	// Impersonate requests impersonation of a given user. Authentication must have already occurred.
+	Impersonate(user string) error
 
 	//
 	// Requests
@@ -254,5 +256,5 @@ type Client interface {
 	CreateUser(username string, privilege string) error
 	UpdateHead(idOrLabel string, options UpdateHead) error
 	UpdateTail(idOrLabel string, options UpdateTail) error
-	UpdateStoragePool(idOrLabel string, options UpdateStoragePool) error
+	UpdateStoragePool(idOrLabel string, options brain.StoragePool) error
 }

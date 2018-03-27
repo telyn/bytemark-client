@@ -44,7 +44,7 @@ func init() {
 			},
 			Aliases: []string{"disk"},
 			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
-				if !c.Bool("force") && !util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.") {
+				if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), "Are you sure you wish to delete this disc? It is impossible to recover.") {
 					return util.UserRequestedExit{}
 				}
 				vmName := c.VirtualMachineName("server")
@@ -159,7 +159,7 @@ func deleteServer(c *app.Context) (err error) {
 
 	}
 
-	if !c.Bool("force") && !util.PromptYesNo(fstr) {
+	if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fstr) {
 		err = util.UserRequestedExit{}
 		return
 	}
@@ -201,7 +201,7 @@ func deleteGroup(c *app.Context) (err error) {
 			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.Group.Name, running, andStopped)
 		}
 
-		if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
+		if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), prompt+" - are you sure you wish to delete this group?") {
 			return util.UserRequestedExit{}
 		}
 		err = recursiveDeleteGroup(c, &groupName, c.Group)

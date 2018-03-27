@@ -78,29 +78,6 @@ func NewWithURLs(urls EndpointURLs) (c Client, err error) {
 	return &client, nil
 }
 
-// AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
-func (c *bytemarkClient) AuthWithCredentials(credentials auth3.Credentials) error {
-	session, err := c.auth.CreateSession(context.TODO(), credentials)
-	if err == nil {
-		c.authSession = session
-	}
-	return err
-}
-
-// AuthWithToken attempts to read sessiondata from auth for the given token. Returns nil on success or an error otherwise.
-func (c *bytemarkClient) AuthWithToken(token string) error {
-	if token == "" {
-		return errors.New("No token provided")
-	}
-
-	session, err := c.auth.ReadSession(context.TODO(), token)
-	if err == nil {
-		c.authSession = session
-	}
-	return err
-
-}
-
 // GetEndpoint returns the Bytemark API endpoint currently in use.
 func (c *bytemarkClient) GetEndpoint() string {
 	return c.urls.Brain
@@ -109,6 +86,7 @@ func (c *bytemarkClient) GetEndpoint() string {
 // GetBillingEndpoint returns the Bytemark Billing API endpoint in use.
 // This function is deprecated and will be removed in a point release.
 // DO NOT DEPEND ON IT
+// TODO(telyn): remove this
 func (c *bytemarkClient) GetBillingEndpoint() string {
 	return c.urls.Billing
 }

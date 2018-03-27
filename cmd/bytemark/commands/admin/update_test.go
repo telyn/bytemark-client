@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
@@ -165,7 +166,7 @@ func TestUpdateStoragePool(t *testing.T) {
 	is := is.New(t)
 	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-	options := lib.UpdateStoragePool{}
+	options := brain.StoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(nil).Times(1)
 
@@ -182,7 +183,7 @@ func TestUpdateStoragePoolError(t *testing.T) {
 	is := is.New(t)
 	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-	options := lib.UpdateStoragePool{}
+	options := brain.StoragePool{}
 
 	c.When("UpdateStoragePool", "1", options).Return(fmt.Errorf("Could not update storage pool")).Times(1)
 

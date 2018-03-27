@@ -95,7 +95,7 @@ type ConfigManager interface {
 	GetGroup() lib.GroupName
 	GetAll() ([]ConfigVar, error)
 	Set(string, string, string)
-	SetPersistent(string, string, string) error
+	SetPersistent(varname string, value string, source string) error
 	Unset(string) error
 	GetDebugLevel() int
 	EndpointName() string

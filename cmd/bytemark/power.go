@@ -83,6 +83,7 @@ func init() {
 			c.Log("Done!\n\nStarting %s back up.", vmName)
 			if appliance != "" {
 				err = brainMethods.StartVirtualMachineWithAppliance(c.Client(), vmName, appliance)
+				c.Log("Server has now started. Use bytemark console %v` or visit https://%v to connect.", c.String("server"), c.Config().PanelURL())
 			} else {
 				err = c.Client().StartVirtualMachine(vmName)
 			}
@@ -169,7 +170,9 @@ func waitForShutdown(c *app.Context, name lib.VirtualMachineName) (err error) {
 	vm := brain.VirtualMachine{PowerOn: true}
 
 	for vm.PowerOn {
-		time.Sleep(5 * time.Second)
+		if !c.IsTest() {
+			time.Sleep(5 * time.Second)
+		}
 		fmt.Fprint(c.App().Writer, ".")
 
 		vm, err = c.Client().GetVirtualMachine(name)
