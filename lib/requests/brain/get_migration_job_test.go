@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/util"
 	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
@@ -18,10 +19,10 @@ func TestGetMigrationJob(t *testing.T) {
 		ID: 123,
 		Args: brain.MigrationJobSpec{
 			Sources: brain.MigrationJobLocations{
-				Discs: []json.Number{"3"},
+				Discs: []util.NumberOrString{"3"},
 			},
 			Destinations: brain.MigrationJobLocations{
-				Pools: []json.Number{"pool.21"},
+				Pools: []util.NumberOrString{"pool.21"},
 			},
 		},
 		Queue: brain.MigrationJobQueue{
