@@ -1,9 +1,6 @@
 package lib
 
 import (
-	"context"
-	"errors"
-
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	auth3 "gitlab.bytemark.co.uk/auth/client"
 )
