@@ -252,6 +252,7 @@ func TestUpdateMigration(t *testing.T) {
 				Options: brain.MigrationJobOptions{
 					Priority: 10,
 				},
+				// TODO: More tests once we figure out a type to use for piscs pools and tails.
 			},
 		},
 	}
