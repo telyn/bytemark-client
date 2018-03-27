@@ -10,6 +10,7 @@ import (
 	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
+	"github.com/BytemarkHosting/bytemark-client/lib/util"
 )
 
 func TestEditMigrationJob(t *testing.T) {
@@ -23,9 +24,9 @@ func TestEditMigrationJob(t *testing.T) {
 			id: 1,
 			modifications: brain.MigrationJobModification{
 				Cancel: brain.MigrationJobLocations{
-					Discs: []json.Number{"disc.sata-1.8912"},
-					Pools: []json.Number{"t1-archive1"},
-					Tails: []json.Number{"tail2"}},
+					Discs: []util.NumberOrString{"disc.sata-1.8912"},
+					Pools: []util.NumberOrString{"t1-archive1"},
+					Tails: []util.NumberOrString{"tail2"}},
 				Options: brain.MigrationJobOptions{
 					Priority: 10,
 				},

@@ -11,6 +11,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/util"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
@@ -220,9 +221,9 @@ func TestUpdateMigration(t *testing.T) {
 			input: "--id 1 --priority 10",
 			modifications: brain.MigrationJobModification{
 				Cancel: brain.MigrationJobLocations{
-					Discs: []json.Number{},
-					Pools: []json.Number{},
-					Tails: []json.Number{}},
+					Discs: []util.NumberOrString{},
+					Pools: []util.NumberOrString{},
+					Tails: []util.NumberOrString{}},
 				Options: brain.MigrationJobOptions{
 					Priority: 10,
 				},
@@ -233,9 +234,9 @@ func TestUpdateMigration(t *testing.T) {
 			input: "--id 1 --priority 10 --cancel-pool t1-archive1 --cancel-disc disc.sata-1.8912 --cancel-tail tail2",
 			modifications: brain.MigrationJobModification{
 				Cancel: brain.MigrationJobLocations{
-					Discs: []json.Number{"disc.sata-1.8912"},
-					Pools: []json.Number{"t1-archive1"},
-					Tails: []json.Number{"tail2"}},
+					Discs: []util.NumberOrString{"disc.sata-1.8912"},
+					Pools: []util.NumberOrString{"t1-archive1"},
+					Tails: []util.NumberOrString{"tail2"}},
 				Options: brain.MigrationJobOptions{
 					Priority: 10,
 				},
@@ -246,9 +247,9 @@ func TestUpdateMigration(t *testing.T) {
 			input: "--id 1 --priority 10 --cancel-pool t1-archive1 --cancel-pool 679 --cancel-pool 2001:41c8:50:2::3a7 --cancel-disc disc.sata-1.8912 --cancel-disc 798 --cancel-disc 2001:41c8:50:2::3a6 --cancel-tail tail2 --cancel-tail 2001:41c8:50:2::3a8",
 			modifications: brain.MigrationJobModification{
 				Cancel: brain.MigrationJobLocations{
-					Discs: []json.Number{"disc.sata-1.8912", "798", "2001:41c8:50:2::3a6"},
-					Pools: []json.Number{"t1-archive1", "679", "2001:41c8:50:2::3a7"},
-					Tails: []json.Number{"tail2", "2001:41c8:50:2::3a8"}},
+					Discs: []util.NumberOrString{"disc.sata-1.8912", "798", "2001:41c8:50:2::3a6"},
+					Pools: []util.NumberOrString{"t1-archive1", "679", "2001:41c8:50:2::3a7"},
+					Tails: []util.NumberOrString{"tail2", "2001:41c8:50:2::3a8"}},
 				Options: brain.MigrationJobOptions{
 					Priority: 10,
 				},
