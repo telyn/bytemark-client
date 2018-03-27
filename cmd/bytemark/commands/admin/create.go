@@ -108,7 +108,7 @@ EXAMPLES:
 						},
 					}
 					job, err := brainRequests.CreateMigrationJob(ctx.Client(), jobRequest)
-					if err != nil {
+					if err == nil {
 						return ctx.OutputInDesiredForm(job)
 					}
 					return err
