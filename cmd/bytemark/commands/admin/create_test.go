@@ -9,7 +9,10 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/util"
 	"github.com/cheekybits/is"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
 func TestCreateVLANGroup(t *testing.T) {
@@ -114,5 +117,59 @@ func TestCreateUserError(t *testing.T) {
 	is.NotNil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
+	}
+}
+
+func TestCreateMigration(t *testing.T) {
+	tests := []struct {
+		name      string
+		args      string
+		exp       brain.MigrationJob
+		shouldErr bool
+	}{
+		{
+			name: "OneDisc",
+			args: "--disc 1",
+			exp: brain.MigrationJob{
+				Args: brain.MigrationJobSpec{
+					Sources: brain.MigrationJobLocations{
+						Discs: []util.NumberOrString{"1"},
+						Pools: []util.NumberOrString{},
+						Tails: []util.NumberOrString{},
+					},
+					Destinations: brain.MigrationJobLocations{
+						Pools: []util.NumberOrString{},
+						Tails: []util.NumberOrString{},
+					},
+				},
+				Queue: brain.MigrationJobQueue{
+					Discs: []int{1},
+				},
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(y *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+			postReq := &mocks.Request{
+				T:              t,
+				StatusCode:     201,
+				ResponseObject: test.exp,
+			}
+			client.When("BuildRequest", "POST", lib.BrainEndpoint, "/admin/migration_jobs%s", []string{""}).Return(postReq).Times(1)
+			args := strings.Split("bytemark --admin create migration "+test.args, " ")
+			err := app.Run(args)
+			if !test.shouldErr && err != nil {
+				t.Errorf("shouldn't err, but did: %T{%s}", err, err.Error())
+			} else if test.shouldErr && err == nil {
+				t.Fatal("should err, but didn't")
+				return
+			}
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+			postReq.AssertRequestObjectEqual(test.exp.Args)
+
+		})
 	}
 }
