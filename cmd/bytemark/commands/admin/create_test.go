@@ -11,8 +11,8 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/util"
-	"github.com/cheekybits/is"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	"github.com/cheekybits/is"
 )
 
 func TestCreateVLANGroup(t *testing.T) {
@@ -145,6 +145,90 @@ func TestCreateMigration(t *testing.T) {
 				Queue: brain.MigrationJobQueue{
 					Discs: []int{1},
 				},
+			},
+		},
+		{
+			name: "OnePool",
+			args: "--pool 1",
+			exp: brain.MigrationJob{
+				Args: brain.MigrationJobSpec{
+					Sources: brain.MigrationJobLocations{
+						Discs: []util.NumberOrString{},
+						Pools: []util.NumberOrString{"1"},
+						Tails: []util.NumberOrString{},
+					},
+					Destinations: brain.MigrationJobLocations{
+						Pools: []util.NumberOrString{},
+						Tails: []util.NumberOrString{},
+					},
+				},
+				Queue: brain.MigrationJobQueue{
+					Discs: []int{1},
+				},
+			},
+		},
+		{
+			name: "OneTail",
+			args: "--tail 1",
+			exp: brain.MigrationJob{
+				Args: brain.MigrationJobSpec{
+					Sources: brain.MigrationJobLocations{
+						Discs: []util.NumberOrString{},
+						Pools: []util.NumberOrString{},
+						Tails: []util.NumberOrString{"1"},
+					},
+					Destinations: brain.MigrationJobLocations{
+						Pools: []util.NumberOrString{},
+						Tails: []util.NumberOrString{},
+					},
+				},
+				Queue: brain.MigrationJobQueue{
+					Discs: []int{1},
+				},
+			},
+		},
+		{
+			name: "TwoDiscsToOnePool",
+			args: "--disc 1 --disc 2 --to-pool 1",
+			exp: brain.MigrationJob{
+				Args: brain.MigrationJobSpec{
+					Sources: brain.MigrationJobLocations{
+						Discs: []util.NumberOrString{"1", "2"},
+						Pools: []util.NumberOrString{},
+						Tails: []util.NumberOrString{},
+					},
+					Destinations: brain.MigrationJobLocations{
+						Pools: []util.NumberOrString{"1"},
+						Tails: []util.NumberOrString{},
+					},
+				},
+				Queue: brain.MigrationJobQueue{
+					Discs: []int{1, 2},
+				},
+			},
+		},
+		{
+			name: "OneDiscAndTwoPoolsToOneTailHighPriority",
+			args: "--priority 100 --disc 1 --pool 1 --pool 2 --to-tail 1",
+			exp: brain.MigrationJob{
+				Args: brain.MigrationJobSpec{
+					Sources: brain.MigrationJobLocations{
+						Discs: []util.NumberOrString{"1"},
+						Pools: []util.NumberOrString{"1", "2"},
+						Tails: []util.NumberOrString{},
+					},
+					Destinations: brain.MigrationJobLocations{
+						Pools: []util.NumberOrString{},
+						Tails: []util.NumberOrString{"1"},
+					},
+					Options: brain.MigrationJobOptions{
+						Priority: 100,
+					},
+				},
+				Queue: brain.MigrationJobQueue{
+					Discs: []int{1, 2, 3},
+				},
+				Priority: 100,
 			},
 		},
 	}
