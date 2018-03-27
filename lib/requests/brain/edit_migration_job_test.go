@@ -1,7 +1,6 @@
 package brain_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 
