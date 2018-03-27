@@ -227,7 +227,7 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	}
 }
 
-func TestAdminShowMigrate(t *testing.T) {
+func TestAdminShowMigration(t *testing.T) {
 	tests := []struct {
 		name      string
 		id        int
