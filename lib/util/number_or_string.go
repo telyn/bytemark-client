@@ -30,7 +30,6 @@ func (nos NumberOrString) MarshalJSON() ([]byte, error) {
 	} else {
 		return json.Marshal(nos.String())
 	}
-	return nil, nil
 }
 
 // UnmarshalJSON unmarshals a NumberOrString accepting either a json number
