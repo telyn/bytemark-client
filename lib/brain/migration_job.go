@@ -1,11 +1,11 @@
 package brain
 
 import (
-	"encoding/json"
 	"io"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/util"
 )
 
 // MigrationJobQueue is a list of disc IDs that are still to be migrated as
@@ -17,9 +17,9 @@ type MigrationJobQueue struct {
 // MigrationJobLocations represents source or target locations for a migration
 // job. Discs, pools and tails maybe represented by ID number, label or UUID.
 type MigrationJobLocations struct {
-	Discs []json.Number `json:"discs,omitempty"`
-	Pools []json.Number `json:"pools,omitempty"`
-	Tails []json.Number `json:"tails,omitempty"`
+	Discs []util.NumberOrString `json:"discs,omitempty"`
+	Pools []util.NumberOrString `json:"pools,omitempty"`
+	Tails []util.NumberOrString `json:"tails,omitempty"`
 }
 
 // MigrationJobDestinations represents available desintations for a migration
@@ -137,63 +137,62 @@ func (mj MigrationJob) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel)
 	return prettyprint.Run(wr, template, "migration_job"+string(detail), mj)
 }
 
-
 // DefaultFields appeases quality tests
 func (x MigrationJobDestinations) DefaultFields(f output.Format) string {
-    return ""
+	return ""
 }
 
 // PrettyPrint appeases quality tests
 func (x MigrationJobDestinations) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-    return nil
+	return nil
 }
 
 // DefaultFields appeases quality tests
 func (x MigrationJobDiscStatus) DefaultFields(f output.Format) string {
-    return ""
+	return ""
 }
 
 // PrettyPrint appeases quality tests
 func (x MigrationJobDiscStatus) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-    return nil
+	return nil
 }
 
 // DefaultFields appeases quality tests
 func (x MigrationJobLocations) DefaultFields(f output.Format) string {
-    return ""
+	return ""
 }
 
 // PrettyPrint appeases quality tests
 func (x MigrationJobLocations) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-    return nil
+	return nil
 }
 
 // DefaultFields appeases quality tests
 func (x MigrationJobOptions) DefaultFields(f output.Format) string {
-    return ""
+	return ""
 }
 
 // PrettyPrint appeases quality tests
 func (x MigrationJobOptions) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-    return nil
+	return nil
 }
 
 // DefaultFields appeases quality tests
 func (mjq MigrationJobQueue) DefaultFields(f output.Format) string {
-    return ""
+	return ""
 }
 
 // DefaultFields appeases quality tests
 func (x MigrationJobSpec) DefaultFields(f output.Format) string {
-    return ""
+	return ""
 }
 
 // PrettyPrint appeases quality tests
 func (x MigrationJobSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-    return nil
+	return nil
 }
 
 // DefaultFields appeases quality tests
 func (mjs MigrationJobStatus) DefaultFields(f output.Format) string {
-    return ""
+	return ""
 }
