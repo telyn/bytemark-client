@@ -124,8 +124,10 @@ what they're for
 │   │   └── billing - functions that make requests against the billing endpoint
 │   │   └── brain - functions that make requests against the brain endpoint
 │   ├── spp - types & requests for use with the spp server
-│   └── testutil - helpers for HTTP tests in lib
-│       └── assert - assertion helpers for tests. with emphasis on HTTP tests from testutil.
+│   ├── testutil - helpers for HTTP tests in lib
+│   |   └── assert - assertion helpers for tests. with emphasis on HTTP tests
+|   |                from testutil.
+│   └── util - helpers for lib
 ├── mocks - mock types used for testing in various packages
 └── util - empty package
     └── log - mostly-deprecated logging functions. Needs some refactoring,
