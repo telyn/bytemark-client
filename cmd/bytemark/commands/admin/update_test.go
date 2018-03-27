@@ -204,6 +204,7 @@ func TestUpdateMigration(t *testing.T) {
 		input         string
 		modifications brain.MigrationJobModification
 		shouldErr     bool
+		cancelAll     bool
 	}{
 		{
 			name:      "UpdateMigrationWithoutSpecifyingAnything",
@@ -243,16 +244,47 @@ func TestUpdateMigration(t *testing.T) {
 		},
 		{
 			name:  "UpdateMigrationCancellingMultiplesOfEach",
-			input: "--id 1 --priority 10 --cancel-pool t1-archive1 --cancel-pool 679 --cancel-pool 2001:41c8:50:2::3a7 --cancel-disc disc.sata-1.8912 --cancel-disc 798 --cancel-disc 2001:41c8:50:2::3a6 --cancel-tail tail2 --cancel-tail 2001:41c8:50:2::3a8",
+			input: "--id 1 --cancel-pool t1-archive1 --cancel-pool 679 --cancel-pool 2001:41c8:50:2::3a7 --cancel-disc disc.sata-1.8912 --cancel-disc 798 --cancel-disc 2001:41c8:50:2::3a6 --cancel-tail tail2 --cancel-tail 2001:41c8:50:2::3a8",
 			modifications: brain.MigrationJobModification{
 				Cancel: brain.MigrationJobLocations{
 					Discs: []util.NumberOrString{"disc.sata-1.8912", "798", "2001:41c8:50:2::3a6"},
 					Pools: []util.NumberOrString{"t1-archive1", "679", "2001:41c8:50:2::3a7"},
 					Tails: []util.NumberOrString{"tail2", "2001:41c8:50:2::3a8"}},
-				Options: brain.MigrationJobOptions{
-					Priority: 10,
-				},
-				// TODO: More tests once we figure out a type to use for piscs pools and tails.
+			},
+		},
+		{
+			name:      "UpdateMigrationCancelAll",
+			input:     "--id 1 --cancel-all",
+			cancelAll: true,
+		},
+		{
+			name:  "UpdateMigrationCancelDisc",
+			input: "--id 1 --cancel-disc disc.sata-1.8912",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{"disc.sata-1.8912"},
+					Pools: []util.NumberOrString{},
+					Tails: []util.NumberOrString{}},
+			},
+		},
+		{
+			name:  "UpdateMigrationCancelPool",
+			input: "--id 1 --cancel-pool t1-archive1",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{},
+					Pools: []util.NumberOrString{"t1-archive1"},
+					Tails: []util.NumberOrString{}},
+			},
+		},
+		{
+			name:  "UpdateMigrationCancelTail",
+			input: "--id 1 --cancel-tail tail2",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{},
+					Pools: []util.NumberOrString{},
+					Tails: []util.NumberOrString{"tail2"}},
 			},
 		},
 	}
@@ -279,7 +311,16 @@ func TestUpdateMigration(t *testing.T) {
 				if ok, err := client.Verify(); !ok {
 					t.Fatal(err)
 				}
-				putReq.AssertRequestObjectEqual(test.modifications)
+				if test.cancelAll {
+					putReq.AssertRequestObjectEqual(map[string]interface{}{
+						"cancel": map[string]interface{}{
+							"all": true,
+						},
+					})
+				} else {
+					putReq.AssertRequestObjectEqual(test.modifications)
+				}
+
 			}
 
 		})
