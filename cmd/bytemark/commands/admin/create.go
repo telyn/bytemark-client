@@ -5,6 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -80,31 +81,36 @@ EXAMPLES:
 					},
 					cli.StringSliceFlag{
 						Name:  "to-pool",
-						Usage: "a disc to migrate to some other destination. Can be specified multiple times to migrate multiple discs",
+						Usage: "a target pool for migrations. Can be specified multiple times to migrate multiple discs",
+					},
+					cli.StringSliceFlag{
+						Name:  "to-tail",
+						Usage: "a target tail for migrations. Can be specified multiple times to migrate multiple discs",
 					},
 					cli.IntFlag{
 						Name:  "priority",
 						Usage: "an optional priority to set - bigger is higher priority",
 					},
 				},
-				Action: app.Action(with.Auth, func(ctx *app.Context) err {
-					jobRequest := brain.MigrationJob{
+				Action: app.Action(with.Auth, func(ctx *app.Context) error {
+					jobRequest := brain.MigrationJobSpec{
 						Sources: brain.MigrationJobLocations{
-							Discs: ctx.StringSlice("disc"),
-							Pools: ctx.StringSlice("pool"),
-							Tails: ctx.StringSlice("tail"),
+							Discs: stringsToNumberOrStrings(ctx.StringSlice("disc")),
+							Pools: stringsToNumberOrStrings(ctx.StringSlice("pool")),
+							Tails: stringsToNumberOrStrings(ctx.StringSlice("tail")),
 						},
-						Destinations: brain.MigrationJobDestinations{
-							Pools: ctx.StringSlice("to-pool"),
+						Destinations: brain.MigrationJobLocations{
+							Pools: stringsToNumberOrStrings(ctx.StringSlice("to-pool")),
+							Tails: stringsToNumberOrStrings(ctx.StringSlice("to-tail")),
 						},
-						Priority: ctx.Int("priority"),
+						Options: brain.MigrationJobOptions{
+							Priority: ctx.Int("priority"),
+						},
 					}
-					job, err := adminRequests.CreateMigrationJob(jobRequest)
+					job, err := brainRequests.CreateMigrationJob(ctx.Client(), jobRequest)
 					if err != nil {
-						ctx.Output("Migration job created")
 						return ctx.OutputInDesiredForm(job)
 					}
-					ctx.Output("Couldn't create migration job")
 					return err
 				}),
 			}, {
