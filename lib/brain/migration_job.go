@@ -137,59 +137,12 @@ func (mj MigrationJob) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel)
 	return prettyprint.Run(wr, template, "migration_job"+string(detail), mj)
 }
 
-// DefaultFields appeases quality tests
-func (x MigrationJobDestinations) DefaultFields(f output.Format) string {
-	return ""
-}
 
-// PrettyPrint appeases quality tests
-func (x MigrationJobDestinations) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	return nil
-}
 
-// DefaultFields appeases quality tests
-func (x MigrationJobDiscStatus) DefaultFields(f output.Format) string {
-	return ""
-}
-
-// PrettyPrint appeases quality tests
-func (x MigrationJobDiscStatus) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	return nil
-}
-
-// DefaultFields appeases quality tests
-func (x MigrationJobLocations) DefaultFields(f output.Format) string {
-	return ""
-}
-
-// PrettyPrint appeases quality tests
-func (x MigrationJobLocations) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	return nil
-}
-
-// DefaultFields appeases quality tests
-func (x MigrationJobOptions) DefaultFields(f output.Format) string {
-	return ""
-}
-
-// PrettyPrint appeases quality tests
-func (x MigrationJobOptions) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	return nil
-}
 
 // DefaultFields appeases quality tests
 func (mjq MigrationJobQueue) DefaultFields(f output.Format) string {
 	return ""
-}
-
-// DefaultFields appeases quality tests
-func (x MigrationJobSpec) DefaultFields(f output.Format) string {
-	return ""
-}
-
-// PrettyPrint appeases quality tests
-func (x MigrationJobSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	return nil
 }
 
 // DefaultFields appeases quality tests
