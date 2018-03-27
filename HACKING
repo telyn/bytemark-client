@@ -124,8 +124,10 @@ what they're for
 │   │   └── billing - functions that make requests against the billing endpoint
 │   │   └── brain - functions that make requests against the brain endpoint
 │   ├── spp - types & requests for use with the spp server
-│   └── testutil - helpers for HTTP tests in lib
-│       └── assert - assertion helpers for tests. with emphasis on HTTP tests from testutil.
+│   ├── testutil - helpers for HTTP tests in lib
+│   |   └── assert - assertion helpers for tests. with emphasis on HTTP tests
+|   |                from testutil.
+│   └── util - helpers for lib
 ├── mocks - mock types used for testing in various packages
 └── util - empty package
     └── log - mostly-deprecated logging functions. Needs some refactoring,
@@ -203,5 +205,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: d84e7e7e97782b09248c610c353dd101087d2c9b5a4fa25411a4c3eae450c95f
+# sha256sum: c398af57eea3c352dac1ed42c6d261fcb5f7fe36730b55ce1c9b3109d6e3ee39
 
