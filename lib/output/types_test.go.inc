@@ -42,6 +42,9 @@ func isIgnoredType(t string) bool {
 	// billing.Assent will only be sent, never received.
 	case "billing.Assent":
 		return true
+	// brain.MigrationJobModification will only be sent, never received.
+	case "brain.MigrationJobModification":
+		return true
 	// billing.SPPTokenRequests will only be sent, never received.
 	case "billing.SPPTokenRequest":
 		return true
