@@ -1,6 +1,7 @@
 package mocks
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/url"
@@ -48,6 +49,9 @@ func (r *Request) AssertRequestBodyEqual(expected string) {
 
 func (r *Request) AssertRequestObjectEqual(expected interface{}) {
 	if !reflect.DeepEqual(expected, r.requestObject) {
+		// FIXME: the Fatalf panics - using Printf for now to get
+		// usable debug output
+		fmt.Printf("Request body did not equal expected:\nexpected: %#v \n  actual: %#v\n", expected, r.requestObject)
 		r.T.Fatalf("Request body did not equal expected:\nexpected: %#v \n  actual: %#v", expected, r.requestObject)
 	}
 }
