@@ -10,6 +10,9 @@ import (
 // otherwise.
 func CreateMigrationJob(client lib.Client, mjs brain.MigrationJobSpec) (mj brain.MigrationJob, err error) {
 	req, err := client.BuildRequest("POST", lib.BrainEndpoint, "/admin/migration_jobs")
+	if err != nil {
+	    return
+	}
 	_, _, err = req.MarshalAndRun(mjs, &mj)
 	return
 }
