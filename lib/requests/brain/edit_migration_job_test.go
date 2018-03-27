@@ -60,3 +60,34 @@ func TestEditMigrationJob(t *testing.T) {
 		})
 	}
 }
+
+func TestCancelMigrationJob(t *testing.T) {
+	tests := []struct {
+		id        int
+		expected  map[string]interface{}
+		shouldErr bool
+	}{
+		expected: map[string]interface{}{
+			"Cancel": map[string]interface{}{
+				"all": true,
+			},
+		},
+	}
+	for i, test := range tests {
+		testName := testutil.Name(i)
+		rts := testutil.RequestTestSpec{
+			Method:        "PUT",
+			Endpoint:      lib.BrainEndpoint,
+			URL:           fmt.Sprintf("/admin/migration_jobs/%s", test.id),
+			AssertRequest: assert.BodyUnmarshalEqual(test.expected),
+		}
+		rts.Run(t, testName, true, func(client lib.Client) {
+			err := brainMethods.CancelMigrationJob(client, test.id)
+			if test.shouldErr {
+				assert.NotEqual(t, testName, nil, err)
+			} else {
+				assert.Equal(t, testName, nil, err)
+			}
+		})
+	}
+}
