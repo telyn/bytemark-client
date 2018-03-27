@@ -179,7 +179,7 @@ func (x MigrationJobOptions) PrettyPrint(wr io.Writer, detail prettyprint.Detail
 }
 
 // DefaultFields appeases quality tests
-func (x MigrationJobQueue) DefaultFields(f output.Format) string {
+func (mjq MigrationJobQueue) DefaultFields(f output.Format) string {
     return ""
 }
 
@@ -194,6 +194,6 @@ func (x MigrationJobSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLev
 }
 
 // DefaultFields appeases quality tests
-func (x MigrationJobStatus) DefaultFields(f output.Format) string {
+func (mjs MigrationJobStatus) DefaultFields(f output.Format) string {
     return ""
 }
