@@ -1,7 +1,6 @@
 package brain
 
 import (
-	"encoding/json"
 	"io"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
