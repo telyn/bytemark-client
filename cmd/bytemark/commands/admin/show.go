@@ -246,6 +246,19 @@ func init() {
 				}),
 			},
 			{
+				Name:      "migrations",
+				Usage:     "shows all unfinished migration jobs",
+				UsageText: "bytemark --admin show migrations",
+				Action: app.Action(with.Auth, func(c *app.Context) error {
+					mjs, err := brainRequests.GetMigrationJobs(c.Client())
+					if err != nil {
+						return err
+					}
+
+					return c.OutputInDesiredForm(mjs)
+				}),
+			},
+			{
 				Name:      "stopped eligible vms",
 				Usage:     "shows a list of stopped VMs that should be running",
 				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
