@@ -17,8 +17,7 @@ func TestUpdateMigration(t *testing.T) {
 	tests := []struct {
 		id            int
 		modifications brain.MigrationJobModification
-		// expected      map[string]interface{}
-		shouldErr bool
+		shouldErr     bool
 	}{
 		{
 			id: 1,
@@ -32,7 +31,7 @@ func TestUpdateMigration(t *testing.T) {
 					Priority: 10,
 				},
 			},
-		}, //end of the test
+		},
 	}
 	for i, test := range tests {
 		testName := testutil.Name(i)
