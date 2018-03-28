@@ -15,7 +15,7 @@ func (mjs MigrationJobs) DefaultFields(f output.Format) string {
 	return (MigrationJob{}).DefaultFields(f)
 }
 
-// PrettyPrint writes a human-readable summary of the virtual machines to writer at the given detail level.
+// PrettyPrint writes a human-readable summary of the migration jobs to writer at the given detail level.
 func (mjs MigrationJobs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	migrationjobsTpl := `
 {{ define "migrationjobs_sgl" }}{{ len . }} servers{{ end }}
