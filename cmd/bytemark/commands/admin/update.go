@@ -331,11 +331,11 @@ func init() {
 					}
 
 					if c.Context.IsSet("priority") {
-						c.LogErr("Priority updated for job %d", id)
+						c.Log("Priority updated for job %d", id)
 					}
 
 					for _, cancelled := range allCancelled {
-						c.LogErr("Migration cancelled for %s on job %d", cancelled, id)
+						c.Log("Migration cancelled for %s on job %d", cancelled, id)
 					}
 
 					return err
