@@ -6,7 +6,7 @@ import (
 )
 
 // GetMigrationJobs returns an array of unfinished migration jobs
-func GetMigrationJobs(client lib.Client) (mjs []brain.MigrationJob, err error) {
+func GetMigrationJobs(client lib.Client) (mjs brain.MigrationJobs, err error) {
 	r, err := client.BuildRequest("GET", lib.BrainEndpoint, "/admin/migration_jobs?unfinished=1%s", "")
 	if err != nil {
 		return

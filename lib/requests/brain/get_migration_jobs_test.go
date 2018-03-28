@@ -15,7 +15,7 @@ import (
 func TestGetMigrationJobs(t *testing.T) {
 	testName := testutil.Name(0)
 
-	testMigrationJobs := []brain.MigrationJob{{
+	testMigrationJobs := brain.MigrationJobs{{
 		ID: 123,
 		Args: brain.MigrationJobSpec{
 			Sources: brain.MigrationJobLocations{
