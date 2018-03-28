@@ -316,9 +316,9 @@ func init() {
 
 					modifications := brain.MigrationJobModification{
 						Cancel: brain.MigrationJobLocations{
-							Discs: stringsToJSONNumbers(discs),
-							Pools: stringsToJSONNumbers(pools),
-							Tails: stringsToJSONNumbers(tails),
+							Discs: stringsToNumberOrStrings(discs),
+							Pools: stringsToNumberOrStrings(pools),
+							Tails: stringsToNumberOrStrings(tails),
 						},
 						Options: brain.MigrationJobOptions{
 							Priority: c.Context.Int("priority"),
