@@ -1,12 +1,15 @@
 package admin_test
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
 
@@ -221,6 +224,48 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
+	}
+}
+
+func TestAdminShowMigration(t *testing.T) {
+	tests := []struct {
+		name      string
+		id        int
+		shouldErr bool
+	}{
+		{
+			name:      "MissingID",
+			shouldErr: true,
+		},
+		{
+			name: "Successful",
+			id:   123,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+			args := []string{"bytemark", "--admin", "show", "migration"}
+			if test.id > 0 {
+				client.When("BuildRequest", "GET", lib.BrainEndpoint, "/admin/migration_jobs/%s", []string{strconv.Itoa(test.id)}).Return(&mocks.Request{
+					T:              t,
+					StatusCode:     200,
+					ResponseObject: brain.MigrationJob{ID: test.id},
+				}).Times(1)
+				args = append(args, "--id", strconv.Itoa(test.id))
+			}
+			err := app.Run(args)
+			if !test.shouldErr && err != nil {
+				t.Errorf("shouldn't err, but did: %T{%s}", err, err.Error())
+			} else if test.shouldErr && err == nil {
+				t.Errorf("should err, but didn't")
+			}
+			if !test.shouldErr {
+				if ok, err := client.Verify(); !ok {
+					t.Fatal(err)
+				}
+			}
+		})
 	}
 }
 

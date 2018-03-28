@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/urfave/cli"
 )
 
@@ -223,6 +224,25 @@ func init() {
 						return err
 					}
 					return c.OutputInDesiredForm(vms, output.Table)
+				}),
+			},
+			{
+				Name:      "migration",
+				Usage:     "shows a migration job",
+				UsageText: "bytemark --admin show migration [--json] <id>",
+				Flags: append(app.OutputFlags("migration job", "object"),
+					cli.IntFlag{
+						Name:  "id",
+						Usage: "the ID of the migration job",
+					},
+				),
+				Action: app.Action(with.Auth, args.Optional("id"), with.RequiredFlags("id"), func(c *app.Context) error {
+					mj, err := brainRequests.GetMigrationJob(c.Client(), c.Int("id"))
+					if err != nil {
+						return err
+					}
+
+					return c.OutputInDesiredForm(mj)
 				}),
 			},
 			{
