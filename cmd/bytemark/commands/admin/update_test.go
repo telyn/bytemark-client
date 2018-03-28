@@ -217,6 +217,16 @@ func TestUpdateMigration(t *testing.T) {
 			shouldErr: true,
 		},
 		{
+			name:      "UpdateMigrationCancelAllAndChangePriority",
+			input:     "--id 1 --cancel-all --priority 5",
+			shouldErr: true,
+		},
+		{
+			name:      "UpdateMigrationCancelAllAndCancelAPool",
+			input:     "--id 1 --cancel-all --cancel-pool t3-sata2",
+			shouldErr: true,
+		},
+		{
 			name:  "UpdateMigrationPriority",
 			input: "--id 1 --priority 10",
 			modifications: brain.MigrationJobModification{
