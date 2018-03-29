@@ -78,23 +78,22 @@ func init() {
 		Name:      "config",
 		Usage:     "manage the bytemark client's configuration",
 		UsageText: "config [ set | unset ]",
-		Description: `view and manipulate the bytemark-client configuration
+		Description: `When invoked with no subcommand, outputs the current values of all variables and what source they were derived from.
+   The set and unset subcommands can be used to set and unset such variables.
 		
-When invoked with no subcommand, outputs the current values of all variables and what source they were derived from.
-The set and unset subcommands can be used to set and unset such variables.
-		
-    Available variables:
-        account - the default account, used when you do not explicitly state an account - defaults to the same as your user name
-        token - the token used for authentication
-        user - the user that you log in as by default
-        group - the default group, used when you do not explicitly state a group (defaults to 'default')
+   Available variables:
+       account - the default account, used when you do not explicitly state an account - defaults to the same as your user name
+       token - the token used for authentication
+       user - the user that you log in as by default
+       group - the default group, used when you do not explicitly state a group (defaults to 'default')
 
-        debug-level - the default debug level. Set to 0 unless you like lots of output.
-	api-endpoint - the endpoint for domains (among other things?)
-        auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.
-        endpoint - the brain endpoint to connect to. https://uk0.bigv.io is the default.
-        billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.
-        spp-endpoint - the SPP endpoint to use. https://spp-submissions.bytemark.co.uk is the default.`,
+       debug-level - the default debug level. Set to 0 unless you like lots of output.
+
+       endpoint - the brain endpoint to connect to. https://uk0.bigv.io is the default.
+       api-endpoint - the endpoint for domains (among other things?)
+       auth-endpoint - the endpoint to authenticate to. https://auth.bytemark.co.uk is the default.
+       billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.
+       spp-endpoint - the SPP endpoint to use. https://spp-submissions.bytemark.co.uk is the default.`,
 		Subcommands: []cli.Command{
 			{
 				Name:        "set",
