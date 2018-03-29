@@ -368,7 +368,7 @@ func TestGetStoragePools(t *testing.T) {
 	testStoragePools := brain.StoragePools{
 		{
 			Label:           "swimming-pool",
-			Zone:            "frozone",
+			ZoneName:        "frozone",
 			Size:            244500,
 			FreeSpace:       43355,
 			AllocatedSpace:  20000,
@@ -379,7 +379,7 @@ func TestGetStoragePools(t *testing.T) {
 			Note:            "probably best to avoid using this one",
 		}, {
 			Label:           "useful-pool",
-			Zone:            "serious-zone",
+			ZoneName:        "serious-zone",
 			Size:            244500000,
 			FreeSpace:       43355000,
 			AllocatedSpace:  20000000,
@@ -398,7 +398,7 @@ func TestGetStoragePools(t *testing.T) {
 func TestGetStoragePool(t *testing.T) {
 	testStoragePool := brain.StoragePool{
 		Label:           "useful-pool",
-		Zone:            "serious-zone",
+		ZoneName:        "serious-zone",
 		Size:            244500000,
 		FreeSpace:       43355000,
 		AllocatedSpace:  20000000,
