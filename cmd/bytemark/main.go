@@ -121,15 +121,18 @@ func overrideHelp() {
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} command{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}
+   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} command{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{ if .Description }}
 
-COMMANDS:{{range .VisibleCategories}}{{if .Name}}
-   {{.Name}}:{{end}}{{range .VisibleCommands}}
-     {{join .Names ", "}}{{"\t"}}{{.Usage}}{{end}}
-{{end}}{{if .VisibleFlags}}
+   {{ .Description }}
+{{ end }}
+{{if .VisibleFlags}}
 OPTIONS:
    {{range .VisibleFlags}}{{.}}
    {{end}}{{end}}
+COMMANDS:{{range .VisibleCategories}}{{if .Name}}
+   {{.Name}}:{{end}}{{range .VisibleCommands}}
+     {{join .Names ", "}}{{"\t"}}{{.Usage}}{{end}}
+{{end}}
 `
 
 	cli.CommandHelpTemplate = `NAME:
