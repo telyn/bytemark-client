@@ -10,6 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/util"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
@@ -193,5 +194,145 @@ func TestUpdateStoragePoolError(t *testing.T) {
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
+	}
+}
+
+func TestUpdateMigration(t *testing.T) {
+	// is := is.New(t)
+	tests := []struct {
+		name          string
+		input         string
+		modifications brain.MigrationJobModification
+		shouldErr     bool
+		cancelAll     bool
+	}{
+		{
+			name:      "UpdateMigrationWithoutSpecifyingAnything",
+			input:     "",
+			shouldErr: true,
+		},
+		{
+			name:      "UpdateMigrationWithJustID",
+			input:     "--id 1",
+			shouldErr: true,
+		},
+		{
+			name:      "UpdateMigrationCancelAllAndChangePriority",
+			input:     "--id 1 --cancel-all --priority 5",
+			shouldErr: true,
+		},
+		{
+			name:      "UpdateMigrationCancelAllAndCancelAPool",
+			input:     "--id 1 --cancel-all --cancel-pool t3-sata2",
+			shouldErr: true,
+		},
+		{
+			name:  "UpdateMigrationPriority",
+			input: "--id 1 --priority 10",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{},
+					Pools: []util.NumberOrString{},
+					Tails: []util.NumberOrString{}},
+				Options: brain.MigrationJobOptions{
+					Priority: 10,
+				},
+			},
+		},
+		{
+			name:  "UpdateMigrationPriorityAndCancelling",
+			input: "--id 1 --priority 10 --cancel-pool t1-archive1 --cancel-disc disc.sata-1.8912 --cancel-tail tail2",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{"disc.sata-1.8912"},
+					Pools: []util.NumberOrString{"t1-archive1"},
+					Tails: []util.NumberOrString{"tail2"}},
+				Options: brain.MigrationJobOptions{
+					Priority: 10,
+				},
+			},
+		},
+		{
+			name:  "UpdateMigrationCancellingMultiplesOfEach",
+			input: "--id 1 --cancel-pool t1-archive1 --cancel-pool 679 --cancel-pool 2001:41c8:50:2::3a7 --cancel-disc disc.sata-1.8912 --cancel-disc 798 --cancel-disc 2001:41c8:50:2::3a6 --cancel-tail tail2 --cancel-tail 2001:41c8:50:2::3a8",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{"disc.sata-1.8912", "798", "2001:41c8:50:2::3a6"},
+					Pools: []util.NumberOrString{"t1-archive1", "679", "2001:41c8:50:2::3a7"},
+					Tails: []util.NumberOrString{"tail2", "2001:41c8:50:2::3a8"}},
+			},
+		},
+		{
+			name:      "UpdateMigrationCancelAll",
+			input:     "--id 1 --cancel-all",
+			cancelAll: true,
+		},
+		{
+			name:  "UpdateMigrationCancelDisc",
+			input: "--id 1 --cancel-disc disc.sata-1.8912",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{"disc.sata-1.8912"},
+					Pools: []util.NumberOrString{},
+					Tails: []util.NumberOrString{}},
+			},
+		},
+		{
+			name:  "UpdateMigrationCancelPool",
+			input: "--id 1 --cancel-pool t1-archive1",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{},
+					Pools: []util.NumberOrString{"t1-archive1"},
+					Tails: []util.NumberOrString{}},
+			},
+		},
+		{
+			name:  "UpdateMigrationCancelTail",
+			input: "--id 1 --cancel-tail tail2",
+			modifications: brain.MigrationJobModification{
+				Cancel: brain.MigrationJobLocations{
+					Discs: []util.NumberOrString{},
+					Pools: []util.NumberOrString{},
+					Tails: []util.NumberOrString{"tail2"}},
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, false, admin.Commands)
+
+			putReq := &mocks.Request{
+				T:          t,
+				StatusCode: 200,
+			}
+
+			client.When("BuildRequest", "PUT", lib.Endpoint(1),
+				"/admin/migration_jobs/%s", []string{"1"}).Return(putReq).Times(1)
+
+			args := fmt.Sprintf("bytemark --admin update migration %s", test.input)
+			err := app.Run(strings.Split(args, " "))
+			if !test.shouldErr && err != nil {
+				t.Errorf("shouldn't err, but did: %T{%s}", err, err.Error())
+			} else if test.shouldErr && err == nil {
+				t.Errorf("should err, but didn't")
+			}
+			if !test.shouldErr {
+				if ok, err := client.Verify(); !ok {
+					t.Fatal(err)
+				}
+				if test.cancelAll {
+					putReq.AssertRequestObjectEqual(map[string]interface{}{
+						"cancel": map[string]interface{}{
+							"all": true,
+						},
+					})
+				} else {
+					putReq.AssertRequestObjectEqual(test.modifications)
+				}
+
+			}
+
+		})
 	}
 }
