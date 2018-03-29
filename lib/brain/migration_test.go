@@ -1,7 +1,6 @@
 package brain
 
 import (
-"fmt"
 	"bytes"
 	"testing"
 
@@ -25,7 +24,7 @@ func TestFormatMigration(t *testing.T) {
 				MigrationJobID: 77,
 			},
 			detail: prettyprint.Full,
-			exp:    ` ▸ 123
+			exp: ` ▸ 123
      migration_job_id: 77
      tail_id: 2
      disc_id: 1
@@ -42,7 +41,6 @@ func TestFormatMigration(t *testing.T) {
 			t.Error(err)
 		}
 		if b.String() != test.exp {
-			fmt.Printf(">>>%s<<<", b.String())
 			t.Errorf("unexpected output: %s", b.String())
 		}
 	}
