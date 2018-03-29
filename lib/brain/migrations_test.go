@@ -32,7 +32,7 @@ func TestFormatMigrations(t *testing.T) {
 				MigrationJobID: 77,
 			}},
 			detail: prettyprint.Full,
-			exp:    ` ▸ 123 disc: 1` + "\n",
+			exp:    `     ▸ 123 disc: 1` + "\n",
 		},
 	}
 	for _, test := range tests {

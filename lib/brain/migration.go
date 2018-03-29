@@ -34,6 +34,6 @@ func (m Migration) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) err
      port: {{ .Port }}
      created_at: {{ .CreatedAt }}
      updated_at: {{ .UpdatedAt }}
-{{ end -}}{{- define "migration_sgl" }} ▸ {{ .ID }} disc: {{ .DiscID }}{{- end -}}`
+{{ end -}}{{- define "migration_sgl" }}     ▸ {{ .ID }} disc: {{ .DiscID }}{{- end -}}`
 	return prettyprint.Run(wr, template, "migration"+string(detail), m)
 }

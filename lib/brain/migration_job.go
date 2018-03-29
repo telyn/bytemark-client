@@ -69,6 +69,7 @@ type MigrationJob struct {
 	Args         MigrationJobSpec         `json:"args,omitempty"`
 	Queue        MigrationJobQueue        `json:"queue,omitempty"`
 	Destinations MigrationJobDestinations `json:"destinations,omitempty"`
+	Active       Migrations               `json:"active,omitempty"`
 	Status       MigrationJobStatus       `json:"status,omitempty"`
 	Priority     int                      `json:"priority,omitempty"`
 	StartedAt    string                   `json:"started_at,omitempty"`
@@ -132,7 +133,9 @@ func (mjs MigrationJobStatus) PrettyPrint(wr io.Writer, detail prettyprint.Detai
 func (mj MigrationJob) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	const template = `{{ define "migration_job_full" }} ▸ {{ .ID }}
 {{ with .Queue }}   queue: {{ prettysprint . "_full" }}
-{{ end -}}{{- with .Status }}   status: {{ prettysprint . "_full" }}
+{{ end -}}{{- with .Active }}   active:
+{{ prettysprint . "_full" }}
+{{- end -}}{{- with .Status }}   status: {{ prettysprint . "_full" }}
 {{ end -}}{{- with .Priority }}   priority: {{ . }}
 {{ end -}}{{- with .StartedAt }}   started_at: {{ . }}
 {{ end -}}{{- with .FinishedAt }}   finished_at: {{ . }}

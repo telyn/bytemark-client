@@ -32,6 +32,20 @@ func TestFormatMigrationJob(t *testing.T) {
 				Queue: MigrationJobQueue{
 					Discs: []int{1, 2},
 				},
+				Active: Migrations{
+					{
+						ID:             1,
+						TailID:         1,
+						DiscID:         4,
+						MigrationJobID: 123,
+					},
+					{
+						ID:             2,
+						TailID:         1,
+						DiscID:         6,
+						MigrationJobID: 123,
+					},
+				},
 				Status: MigrationJobStatus{
 					Discs: MigrationJobDiscStatus{
 						Done:    []int{3},
@@ -46,6 +60,9 @@ func TestFormatMigrationJob(t *testing.T) {
      discs:
        • 1
        • 2
+   active:
+     ▸ 1 disc: 4
+     ▸ 2 disc: 6
    status: 
      done:
        • 3
