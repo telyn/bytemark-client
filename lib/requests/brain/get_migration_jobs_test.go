@@ -45,10 +45,10 @@ func TestGetMigrationJobs(t *testing.T) {
 	}}
 
 	rts := testutil.RequestTestSpec{
-		Method:   "GET",
-		URL:      "/admin/migration_jobs",
+		Method:        "GET",
+		URL:           "/admin/migration_jobs",
 		AssertRequest: assert.QueryValue("unfinished", "1"),
-		Endpoint: lib.BrainEndpoint,
+		Endpoint:      lib.BrainEndpoint,
 		Response: json.RawMessage(`[{
 		"id": 123,
 		"args": {
