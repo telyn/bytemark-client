@@ -286,6 +286,11 @@ func TestAdminShowMigration(t *testing.T) {
 					StatusCode:     200,
 					ResponseObject: brain.MigrationJob{ID: test.id},
 				}).Times(1)
+				client.When("BuildRequest", "GET", lib.BrainEndpoint, "/admin/migration_jobs/%s/migrations", []string{strconv.Itoa(test.id)}).Return(&mocks.Request{
+					T:              t,
+					StatusCode:     200,
+					ResponseObject: brain.Migrations{},
+				}).Times(1)
 				args = append(args, "--id", strconv.Itoa(test.id))
 			}
 			err := app.Run(args)

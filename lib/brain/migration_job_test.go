@@ -9,11 +9,13 @@ import (
 
 func TestFormatMigrationJob(t *testing.T) {
 	tests := []struct {
+		name   string
 		in     MigrationJob
 		detail prettyprint.DetailLevel
 		exp    string
 	}{
 		{
+			name: "SingleLine",
 			in: MigrationJob{
 				ID: 456,
 				Queue: MigrationJobQueue{
@@ -24,10 +26,25 @@ func TestFormatMigrationJob(t *testing.T) {
 			exp:    ` ▸ 456 queue: 100 101`,
 		},
 		{
+			name: "FullDetail",
 			in: MigrationJob{
 				ID: 123,
 				Queue: MigrationJobQueue{
 					Discs: []int{1, 2},
+				},
+				Active: Migrations{
+					{
+						ID:             1,
+						TailID:         1,
+						DiscID:         4,
+						MigrationJobID: 123,
+					},
+					{
+						ID:             2,
+						TailID:         1,
+						DiscID:         6,
+						MigrationJobID: 123,
+					},
 				},
 				Status: MigrationJobStatus{
 					Discs: MigrationJobDiscStatus{
@@ -43,6 +60,9 @@ func TestFormatMigrationJob(t *testing.T) {
      discs:
        • 1
        • 2
+   active:
+     ▸ 1 disc: 4
+     ▸ 2 disc: 6
    status: 
      done:
        • 3
@@ -54,13 +74,15 @@ func TestFormatMigrationJob(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		b := new(bytes.Buffer)
-		err := test.in.PrettyPrint(b, test.detail)
-		if err != nil {
-			t.Error(err)
-		}
-		if b.String() != test.exp {
-			t.Errorf("unexpected output: %s", b.String())
-		}
+		t.Run(test.name, func(t *testing.T) {
+			b := new(bytes.Buffer)
+			err := test.in.PrettyPrint(b, test.detail)
+			if err != nil {
+				t.Error(err)
+			}
+			if b.String() != test.exp {
+				t.Errorf("unexpected output: %s", b.String())
+			}
+		})
 	}
 }

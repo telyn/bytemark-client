@@ -7,7 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
-// MigrationJobs represents more than one account in output.Outputtable form.
+// MigrationJobs represents more than one migration job in output.Outputtable form.
 type MigrationJobs []MigrationJob
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as MigrationJob.DefaultFields.
