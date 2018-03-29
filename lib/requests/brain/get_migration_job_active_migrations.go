@@ -7,7 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// GetMigrationJobActive Migrations returns a list of active migrations
+// GetMigrationJobActiveMigrations returns a list of active migrations
 // associated with the given migration job.
 func GetMigrationJobActiveMigrations(client lib.Client, id int) (ms brain.Migrations, err error) {
 	r, err := client.BuildRequest("GET", lib.BrainEndpoint, "/admin/migration_jobs/%s/migrations", strconv.Itoa(id))
