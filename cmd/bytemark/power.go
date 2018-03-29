@@ -81,14 +81,7 @@ func init() {
 			}
 
 			c.Log("Done!\n\nStarting %s back up.", vmName)
-			if appliance != "" {
-				err = brainMethods.StartVirtualMachineWithAppliance(c.Client(), vmName, appliance)
-				c.Log("Server has now started. Use bytemark console %v` or visit https://%v to connect.", c.String("server"), c.Config().PanelURL())
-			} else {
-				err = c.Client().StartVirtualMachine(vmName)
-			}
-
-			return
+			return startServer(c, vmName, appliance)
 		}),
 	}, cli.Command{
 		Name:        "shutdown",
@@ -129,17 +122,28 @@ func init() {
 				Usage: "the server to start",
 				Value: new(app.VirtualMachineNameFlag),
 			},
+			cli.BoolFlag{
+				Name:  "rescue",
+				Usage: "boots the server using the rescue appliance",
+			},
+			cli.StringFlag{
+				Name:  "appliance",
+				Usage: "the appliance to boot into when the server starts",
+			},
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 			vmName := c.VirtualMachineName("server")
-			log.Logf("Attempting to start %s...\r\n", vmName)
-			err = c.Client().StartVirtualMachine(vmName)
-			if err != nil {
-				return
+			appliance := c.String("appliance")
+
+			if appliance != "" && c.Bool("rescue") {
+				return fmt.Errorf("--appliance and --rescue have both been set when only one is allowed")
 			}
 
-			log.Logf("%s started successfully.\r\n", vmName)
-			return
+			if c.Bool("rescue") {
+				appliance = "rescue"
+			}
+			c.LogErr("Attempting to start %s...\r\n", vmName)
+			return startServer(c, vmName, appliance)
 		}),
 	}, cli.Command{
 		Name:        "stop",
@@ -178,6 +182,21 @@ func waitForShutdown(c *app.Context, name lib.VirtualMachineName) (err error) {
 		vm, err = c.Client().GetVirtualMachine(name)
 		if err != nil {
 			return
+		}
+	}
+	return
+}
+
+func startServer(c *app.Context, vmName lib.VirtualMachineName, appliance string) (err error) {
+	if appliance != "" {
+		err = brainMethods.StartVirtualMachineWithAppliance(c.Client(), vmName, appliance)
+	} else {
+		err = c.Client().StartVirtualMachine(vmName)
+	}
+	if err == nil {
+		c.Log("Server has been started.")
+		if appliance != "" {
+			c.Log("Use `bytemark console %v` or visit %v to connect.", c.String("server"), c.Config().PanelURL())
 		}
 	}
 	return
