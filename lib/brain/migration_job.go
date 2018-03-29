@@ -143,9 +143,6 @@ func (mj MigrationJob) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel)
 	return prettyprint.Run(wr, template, "migration_job"+string(detail), mj)
 }
 
-
-
-
 // DefaultFields appeases quality tests
 func (mjq MigrationJobQueue) DefaultFields(f output.Format) string {
 	return ""

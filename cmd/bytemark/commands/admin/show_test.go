@@ -227,6 +227,40 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	}
 }
 
+func TestAdminShowMigrations(t *testing.T) {
+	tests := []struct {
+		name string
+		mjs  brain.MigrationJobs
+	}{
+		{
+			name: "NoJobs",
+			mjs:  brain.MigrationJobs{},
+		},
+		{
+			name: "OneJob",
+			mjs: brain.MigrationJobs{
+				{ID: 123},
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			is := is.New(t)
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, "/admin/migration_jobs?unfinished=1%s", []string{""}).Return(&mocks.Request{
+				T:              t,
+				StatusCode:     200,
+				ResponseObject: test.mjs,
+			}).Times(1)
+			err := app.Run(strings.Split("bytemark --admin show migrations", " "))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
 func TestAdminShowMigration(t *testing.T) {
 	tests := []struct {
 		name      string
