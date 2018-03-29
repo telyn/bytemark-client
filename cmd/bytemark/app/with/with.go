@@ -68,29 +68,6 @@ func RequiredFlags(flagNames ...string) func(*app.Context) error {
 	}
 }
 
-// Account gets an account name from a flag, then the account details from the API, then stitches it to the context
-func Account(flagName string) func(*app.Context) error {
-	return func(c *app.Context) (err error) {
-		err = preflight(c)
-		if err != nil {
-			return
-		}
-		accName := c.String(flagName)
-		c.Debug("flagName: %s accName: %s\n", flagName, accName)
-		if accName == "" {
-			accName = c.Config().GetIgnoreErr("account")
-		}
-		c.Debug("flagName: %s a4tName: %s\n", flagName, accName)
-
-		acc, err := c.Client().GetAccount(accName)
-		if err != nil {
-			return
-		}
-		c.Account = &acc
-		return
-	}
-}
-
 // Auth makes sure authentication has been successfully completed, attempting it if necessary.
 func Auth(c *app.Context) (err error) {
 	if !c.Authed {

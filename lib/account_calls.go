@@ -37,6 +37,7 @@ func (c *bytemarkClient) getBillingAccount(name string) (account billing.Account
 			return
 		}
 	}
+	account = billing.Account{}
 	err = BillingAccountNotFound(name)
 	return
 }
