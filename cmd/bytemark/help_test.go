@@ -45,8 +45,7 @@ func TestCommandsComplete(t *testing.T) {
 			emptyThings = append(emptyThings, "Action")
 		}
 		if len(emptyThings) > 0 {
-			t.Fail()
-			log.Logf("Command %s has empty %s.\r\n", c.FullName(), strings.Join(emptyThings, ", "))
+			t.Errorf("Command %s has empty %s.\r\n", c.FullName(), strings.Join(emptyThings, ", "))
 		}
 	})
 
@@ -111,48 +110,58 @@ func TestFlagsHaveUsage(t *testing.T) {
 
 func TestUsageStyleConformance(t *testing.T) {
 	traverseAllCommandsWithContext(Commands(true), "", func(name string, c cli.Command) {
-		// TODO: see if this will actually just ruin tests. pretty sure it will
+		t.Run(name, func(t *testing.T) {
+			if firstIsUpper(c.Usage) {
+				t.Error("Usage should be lowercase but begins with an uppercase letter")
+			}
 
-		if firstIsUpper(c.Usage) {
-			t.Errorf("Command %s's Usage begins with an uppercase letter. Please change it - Usages should be lowercase.\r\n", name)
-		}
+			if hasFullStop(c.Usage) {
+				t.Errorf("Usage should not have full stop")
+			}
 
-		if hasFullStop(c.Usage) {
-			t.Errorf("Command %s's Usage has a full-stop. Get rid of it.\r\n", name)
-		}
+			if c.UsageText == "" {
+				t.Error("UsageText is blank")
+			}
+			if strings.HasPrefix(c.UsageText, "bytemark ") {
+				t.Error("UsageText starts with 'bytemark' - shouldn't anymore")
+			}
+			if hasPositionalArgBeforeFlag(c.UsageText) {
+				t.Errorf("UsageText has a positional argument before a flag. Positional arguments must be after ALL flags.")
+			}
+			if c.Description == "" {
+				t.Errorf("Description is blank")
+			}
+		})
 	})
 }
 
-// Tests for commands which have subcommands having the correct Description format
-// the first line should start lowercase and end without a full stop, and the second
-// should be blank
-func TestSubcommandStyleConformance(t *testing.T) {
-	traverseAllCommands(Commands(true), func(c cli.Command) {
-		if c.Subcommands == nil {
-			return
+func hasPositionalArgBeforeFlag(usageText string) bool {
+	var inSquare, inAngle int
+	var seenPositional bool
+	var last = '\x00'
+	for _, c := range usageText {
+		switch c {
+		case '[':
+			inSquare++
+		case ']':
+			inSquare--
+		case '<':
+			inAngle++
+		case '>':
+			inAngle--
 		}
-		if len(c.Subcommands) == 0 {
-			return
+		if inAngle > 0 && inSquare == 0 {
+			seenPositional = true
 		}
-		if c.Description == "" {
-			return
-		}
-		lines := strings.Split(c.Description, "\n")
-		desc := []rune(lines[0])
-		if unicode.IsUpper(desc[0]) {
-			log.Logf("Command %s's Description begins with an uppercase letter, but it has subcommands, so should be lowercase.\r\n", c.FullName())
-			t.Fail()
-		}
-		if strings.Contains(lines[0], ".") {
-			log.Logf("The first line of Command %s's Description contains a full stop. It shouldn't.\r\n", c.FullName())
-			t.Fail()
-		}
-		if len(lines) > 1 {
-			if len(strings.TrimSpace(lines[1])) > 0 {
-				log.Logf("The second line of Command %s's Description should be blank.\r\n", c.FullName())
-				t.Fail()
+		// check to see if we're starting a flag
+		switch last {
+		case '[', ' ', '\x00':
+			// if we've already seen a positional arg, and we're starting a flag then we have our answer
+			if c == '-' && seenPositional {
+				return true
 			}
 		}
-
-	})
+		last = c
+	}
+	return false
 }
