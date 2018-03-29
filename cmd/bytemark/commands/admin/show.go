@@ -242,6 +242,11 @@ func init() {
 						return err
 					}
 
+					mj.Active, err = brainRequests.GetMigrationJobActiveMigrations(c.Client(), c.Int("id"))
+					if err != nil {
+						return err
+					}
+
 					return c.OutputInDesiredForm(mj)
 				}),
 			},
