@@ -9,11 +9,13 @@ import (
 
 func TestFormatMigrationJob(t *testing.T) {
 	tests := []struct {
+		name   string
 		in     MigrationJob
 		detail prettyprint.DetailLevel
 		exp    string
 	}{
 		{
+			name: "SingleLine",
 			in: MigrationJob{
 				ID: 456,
 				Queue: MigrationJobQueue{
@@ -24,6 +26,7 @@ func TestFormatMigrationJob(t *testing.T) {
 			exp:    ` ▸ 456 queue: 100 101`,
 		},
 		{
+			name: "FullDetail",
 			in: MigrationJob{
 				ID: 123,
 				Queue: MigrationJobQueue{
@@ -54,13 +57,15 @@ func TestFormatMigrationJob(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		b := new(bytes.Buffer)
-		err := test.in.PrettyPrint(b, test.detail)
-		if err != nil {
-			t.Error(err)
-		}
-		if b.String() != test.exp {
-			t.Errorf("unexpected output: %s", b.String())
-		}
+		t.Run(test.name, func(t *testing.T) {
+			b := new(bytes.Buffer)
+			err := test.in.PrettyPrint(b, test.detail)
+			if err != nil {
+				t.Error(err)
+			}
+			if b.String() != test.exp {
+				t.Errorf("unexpected output: %s", b.String())
+			}
+		})
 	}
 }

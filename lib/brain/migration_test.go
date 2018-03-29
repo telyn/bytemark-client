@@ -9,11 +9,13 @@ import (
 
 func TestFormatMigration(t *testing.T) {
 	tests := []struct {
+		name   string
 		in     Migration
 		detail prettyprint.DetailLevel
 		exp    string
 	}{
 		{
+			name: "FullDetail",
 			in: Migration{
 				ID:             123,
 				DiscID:         1,
@@ -35,13 +37,15 @@ func TestFormatMigration(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		b := new(bytes.Buffer)
-		err := test.in.PrettyPrint(b, test.detail)
-		if err != nil {
-			t.Error(err)
-		}
-		if b.String() != test.exp {
-			t.Errorf("unexpected output: %s", b.String())
-		}
+		t.Run(test.name, func(t *testing.T) {
+			b := new(bytes.Buffer)
+			err := test.in.PrettyPrint(b, test.detail)
+			if err != nil {
+				t.Error(err)
+			}
+			if b.String() != test.exp {
+				t.Errorf("unexpected output: %s", b.String())
+			}
+		})
 	}
 }
