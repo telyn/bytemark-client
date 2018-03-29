@@ -12,24 +12,21 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/util"
 )
 
-func TestGetMigrationJob(t *testing.T) {
+func TestCreateMigrationJob(t *testing.T) {
 	testName := testutil.Name(0)
-
-	testMigrationJob := brain.MigrationJob{
-		ID: 123,
-		Args: brain.MigrationJobSpec{
-			Sources: brain.MigrationJobLocations{
-				Discs: []util.NumberOrString{"3"},
-			},
-			Destinations: brain.MigrationJobLocations{
-				Pools: []util.NumberOrString{"pool.21"},
-			},
+	testMigrationJobSpec := brain.MigrationJobSpec{
+		Sources: brain.MigrationJobLocations{
+			Tails: []util.NumberOrString{"1"},
 		},
+	}
+	testMigrationJob := brain.MigrationJob{
+		ID:   123,
+		Args: testMigrationJobSpec,
 		Queue: brain.MigrationJobQueue{
-			Discs: []int{3},
+			Discs: []int{1},
 		},
 		Destinations: brain.MigrationJobDestinations{
-			Pools: []int{21},
+			Pools: []int{1},
 		},
 		Status: brain.MigrationJobStatus{
 			Discs: brain.MigrationJobDiscStatus{
@@ -45,25 +42,22 @@ func TestGetMigrationJob(t *testing.T) {
 	}
 
 	rts := testutil.RequestTestSpec{
-		Method:   "GET",
-		URL:      "/admin/migration_jobs/123",
+		Method:   "POST",
+		URL:      "/admin/migration_jobs",
 		Endpoint: lib.BrainEndpoint,
 		Response: json.RawMessage(`{
 		"id": 123,
 		"args": {
 		    "options": {},
 		    "sources": {
-			"discs": [3]
-		    },
-		    "destinations": {
-			"pools": ["pool.21"]
+			"tails": [1]
 		    }
 		},
 		"queue": {
-		    "discs": [3]
+		    "discs": [1]
 		},
 		"destinations": {
-		    "pools": [21]
+		    "pools": [1]
 		},
 		"status": {
 		    "discs": {
@@ -79,10 +73,18 @@ func TestGetMigrationJob(t *testing.T) {
 		"created_at": "2018-03-15T14:23:00.579Z",
 		"updated_at": "2018-03-15T15:28:28.244Z"
 	    }`),
+		AssertRequest: assert.Body(func(t *testing.T, testName string, body string) {
+			var req brain.MigrationJobSpec
+			err := json.Unmarshal([]byte(body), &req)
+			if err != nil {
+				t.Fatalf("failed to unmarshal request body: %v", err)
+			}
+			assert.Equal(t, testName, req, testMigrationJobSpec)
+		}),
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		migrationJob, err := brainMethods.GetMigrationJob(client, 123)
+		migrationJob, err := brainMethods.CreateMigrationJob(client, testMigrationJobSpec)
 		if err != nil {
 			t.Fatal(err)
 		}
