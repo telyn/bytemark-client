@@ -117,7 +117,10 @@ func init() {
 						return err
 					}
 					if c.Context.IsSet("note") {
-						brainMethods.CreateAdminNote(c.Client(), "head", c.Context.String("head"), c.Context.String("note"))
+						noteErr := brainMethods.CreateAdminNote(c.Client(), "head", c.Context.String("head"), c.Context.String("note"))
+						if noteErr != nil {
+							return noteErr
+						}
 					}
 					log.Outputf("Head %s updated\n", c.String("head"))
 
@@ -208,7 +211,10 @@ func init() {
 					}
 
 					if c.Context.IsSet("note") {
-						brainMethods.CreateAdminNote(c.Client(), "storage_pool", c.Context.String("storage-pool"), c.Context.String("note"))
+						noteErr := brainMethods.CreateAdminNote(c.Client(), "storage_pool", c.Context.String("storage-pool"), c.Context.String("note"))
+						if noteErr != nil {
+							return noteErr
+						}
 					}
 
 					log.Outputf("Storage pool %s updated\n", c.String("storage-pool"))
