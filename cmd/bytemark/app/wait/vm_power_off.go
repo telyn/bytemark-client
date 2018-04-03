@@ -9,6 +9,9 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+// VMPowerOff waits for the named virtual machine to power off before returning
+// a nil error. This is done by frequently polling the brain for info about the
+// VM. If any calls fail, the error is returned.
 func VMPowerOff(c *app.Context, name lib.VirtualMachineName) (err error) {
 	vm := brain.VirtualMachine{PowerOn: true}
 
