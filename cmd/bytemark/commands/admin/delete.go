@@ -15,7 +15,7 @@ func init() {
 			{
 				Name:      "vlan",
 				Usage:     "delete a given VLAN",
-				UsageText: "bytemark --admin delete vlan <id>",
+				UsageText: "--admin delete vlan <id>",
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "id",

@@ -23,7 +23,7 @@ func init() {
 	createServerCmd := cli.Command{
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,
-		UsageText: "bytemark create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
+		UsageText: "create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
 		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and weekly backups of the first disc.
 		
 A disc spec looks like the following: label:grade:size
@@ -116,7 +116,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 			},
 		},
 		Usage:     "create virtual discs attached to one of your cloud servers",
-		UsageText: "bytemark create discs [--disc <disc spec>]... <cloud server>",
+		UsageText: "create discs [--disc <disc spec>]... <cloud server>",
 		Description: `A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
@@ -127,7 +127,7 @@ Multiple --disc flags can be used to create multiple discs`,
 	createGroupCmd := cli.Command{
 		Name:        "group",
 		Usage:       "create a group for organising your servers",
-		UsageText:   "bytemark create group <group name>",
+		UsageText:   "create group <group name>",
 		Description: `Groups are part of your server's fqdn`,
 		Flags: []cli.Flag{
 			cli.GenericFlag{
@@ -142,7 +142,7 @@ Multiple --disc flags can be used to create multiple discs`,
 	createBackupCmd := cli.Command{
 		Name:        "backup",
 		Usage:       "create a backup of a disc's current state",
-		UsageText:   "bytemark create backup <cloud server> <disc label>",
+		UsageText:   "create backup <cloud server> <disc label>",
 		Description: `Creates a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
 		Flags: []cli.Flag{
 			cli.StringFlag{
@@ -168,7 +168,7 @@ Multiple --disc flags can be used to create multiple discs`,
 	commands = append(commands, cli.Command{
 		Name:      "create",
 		Usage:     "creates servers, discs, etc - see `bytemark help create <kind of thing> `",
-		UsageText: "bytemark create server|group|disc|backup",
+		UsageText: "create server|group|disc|backup",
 		Description: `create a new group, server, disc or backup
 
 	create disc[s] [--disc <disc spec>]... <cloud server>

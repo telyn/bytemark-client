@@ -20,7 +20,7 @@ func init() {
 					{
 						Name:      "disc",
 						Usage:     "cancel a disc migration",
-						UsageText: "bytemark --admin cancel migration disc <disc>",
+						UsageText: "--admin cancel migration disc <disc>",
 						Flags: []cli.Flag{
 							cli.IntFlag{
 								Name:  "disc",
@@ -41,7 +41,7 @@ func init() {
 						Name:      "server",
 						Aliases:   []string{"vm"},
 						Usage:     "cancel a server migration",
-						UsageText: "bytemark --admin cancel migration server <disc>",
+						UsageText: "--admin cancel migration server <disc>",
 						Flags: []cli.Flag{
 							cli.IntFlag{
 								Name:  "server",

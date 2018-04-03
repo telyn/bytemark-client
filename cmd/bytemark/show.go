@@ -18,12 +18,12 @@ func init() {
 		Name:        "show",
 		Action:      cli.ShowSubcommandHelp,
 		Usage:       `displays information about the given server, group, or account`,
-		UsageText:   "bytemark show account|server|group|user [flags] <name>",
+		UsageText:   "show account|server|group|user [flags] <name>",
 		Description: `displays information about the given server, group, or account`,
 		Subcommands: []cli.Command{{
 			Name:      "account",
 			Usage:     `displays information about the given account`,
-			UsageText: "bytemark show account [--json] [name]",
+			UsageText: "show account [--json] [name]",
 			Description: `This command displays information about the given account, including contact details and how many servers are in it across its groups.
 If no account is specified, it uses your default account.
 			
@@ -42,7 +42,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 		}, {
 			Name:        "disc",
 			Usage:       "outputs info about a disc",
-			UsageText:   "bytemark show disc [--json | --table] [--table-fields help | <fields>] [server [disc label]]",
+			UsageText:   "show disc [--json | --table] [--table-fields help | <fields>] [server [disc label]]",
 			Description: `This command displays information about a disc including any backups and backup schedules on the disc`,
 			Flags: append(app.OutputFlags("disc details", "object"),
 				cli.GenericFlag{
@@ -61,7 +61,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 		}, {
 			Name:      "group",
 			Usage:     "outputs info about a group",
-			UsageText: "bytemark show group [--json] [name]",
+			UsageText: "show group [--json] [name]",
 			Description: `This command displays information about how many servers are in the given group.
 If the --json flag is specified, prints a complete overview of the group in JSON format, including all servers.`,
 			Flags: append(app.OutputFlags("group details", "object"),
@@ -77,7 +77,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 		}, {
 			Name:        "server",
 			Usage:       "displays details about a server",
-			UsageText:   "bytemark show server [--json] <name>",
+			UsageText:   "show server [--json] <name>",
 			Description: `Displays a collection of details about the server, including its full hostname, CPU and memory allocation, power status, disc capacities and IP addresses.`,
 			Flags: append(app.OutputFlags("server details", "object"),
 				cli.GenericFlag{
@@ -92,7 +92,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 		}, {
 			Name:        "user",
 			Usage:       "displays info about a user",
-			UsageText:   "bytemark show user <name>",
+			UsageText:   "show user <name>",
 			Description: `Currently the only details are what SSH keys are authorised for this user`,
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -110,7 +110,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 		}, {
 			Name:      "privileges",
 			Usage:     "shows privileges for a given account, group, server, or user",
-			UsageText: "bytemark show privileges",
+			UsageText: "show privileges",
 			Description: `Displays a list of all the privileges for a given account, group, server or user. If none are specified, shows the privileges for your user.
 
 Setting --recursive will cause a lot of extra requests to be made and may take a long time to run.

@@ -16,7 +16,7 @@ func init() {
 			{
 				Name:      "storage pool",
 				Usage:     "empty a storage pool",
-				UsageText: "bytemark --admin empty storage pool <storage-pool>",
+				UsageText: "--admin empty storage pool <storage-pool>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "storage-pool",
@@ -36,7 +36,7 @@ func init() {
 			{
 				Name:      "head",
 				Usage:     "empty a head",
-				UsageText: "bytemark --admin empty head <head>",
+				UsageText: "--admin empty head <head>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "head",

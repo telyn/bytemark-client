@@ -16,7 +16,7 @@ func init() {
 			{
 				Name:      "user",
 				Usage:     "creates a new cluster admin or cluster superuser",
-				UsageText: "bytemark --admin create user <username> <privilege>",
+				UsageText: "--admin create user <username> <privilege>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "username",
@@ -39,7 +39,7 @@ func init() {
 				Name:      "vlan group",
 				Aliases:   []string{"vlan-group"},
 				Usage:     "creates groups for private VLANs",
-				UsageText: "bytemark --admin create vlan group <group> [vlan-num]",
+				UsageText: "--admin create vlan group <group> [vlan-num]",
 				Description: `Create a group in the specified account, with an optional VLAN specified.
 
 Used when setting up a private VLAN for a customer.`,
@@ -66,7 +66,7 @@ Used when setting up a private VLAN for a customer.`,
 			{
 				Name:      "ip range",
 				Usage:     "create a new IP range in a VLAN",
-				UsageText: "bytemark --admin create ip range <ip-range> <vlan-num>",
+				UsageText: "--admin create ip range <ip-range> <vlan-num>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "ip-range",

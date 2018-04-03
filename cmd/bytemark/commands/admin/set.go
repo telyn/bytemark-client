@@ -18,7 +18,7 @@ func init() {
 			{
 				Name:      "iops limit",
 				Usage:     "set the IOPS limit of a disc",
-				UsageText: "bytemark --admin set disc iops limit <server> <disc> <limit>",
+				UsageText: "--admin set disc iops limit <server> <disc> <limit>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "disc",
