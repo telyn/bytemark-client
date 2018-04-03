@@ -26,6 +26,9 @@ func isIgnoredType(t string) bool {
 	// the brain will never send us an IPSpec - we will never Output it.
 	case "brain.IPSpec":
 		return true
+	//add a note is something that is only ever sent, not receieved. not being output
+	case "brain.AdminNote":
+		return true
 	// IPs are always part of a NetworkInterface
 	case "brain.IPs":
 		return true
