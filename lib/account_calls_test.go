@@ -13,7 +13,6 @@ import (
 )
 
 func TestGetAccount(t *testing.T) {
-	is := is.New(t)
 	testName := testutil.Name(0)
 	rts := testutil.RequestTestSpec{
 		MuxHandlers: &testutil.MuxHandlers{
@@ -31,6 +30,19 @@ func TestGetAccount(t *testing.T) {
 						t.Fatal(err)
 					}
 				},
+				"/accounts/brain_only": func(w http.ResponseWriter, r *http.Request) {
+					assert.All(
+						assert.Method("GET"),
+						assert.Auth(lib.TokenType(lib.BrainEndpoint)),
+					)(t, testName, r)
+					_, err := w.Write([]byte(`{
+						"name": "brain_only",
+						"id": 204
+					}`))
+					if err != nil {
+						t.Fatal(err)
+					}
+				},
 			},
 			Billing: testutil.Mux{
 				"/api/v1/accounts": func(w http.ResponseWriter, r *http.Request) {
@@ -40,9 +52,13 @@ func TestGetAccount(t *testing.T) {
 					)(t, testName, r)
 					_, err := w.Write([]byte(`[
 						{
-							"bigv_account_subscription": "account"
+							"bigv_account_subscription": "account",
+							"id": 651
 						},
-						{ "bigv_account_subscription": "wrong-account" }
+						{
+							"bigv_account_subscription": "wrong-account",
+							"id": 842
+					    }
 					]`))
 					if err != nil {
 						t.Fatal(err)
@@ -52,23 +68,49 @@ func TestGetAccount(t *testing.T) {
 		},
 	}
 	rts.Run(t, testutil.Name(0), true, func(client lib.Client) {
-		t.Log("Testing an invalid account!")
-		acc, err := client.GetAccount("invalid-account")
-		is.NotNil(err)
+		t.Run("no account", func(t *testing.T) {
+			is := is.New(t)
 
-		t.Log("Testing the default account!")
-		acc, err = client.GetAccount("")
-		is.Nil(err)
-		is.Equal("account", acc.Name)
-		is.Equal(1, acc.BrainID)
+			acc, err := client.GetAccount("invalid-account")
+			is.NotNil(err)
+			is.False(acc.IsValid())
+		})
 
-		t.Log("Testing a named account!")
-		acc, err = client.GetAccount("account")
-		is.Nil(err)
-		if !acc.IsValid() {
-			t.Fatal("account isn't valid")
-		}
-		is.Equal("account", acc.Name)
+		t.Run("default", func(t *testing.T) {
+			is := is.New(t)
+
+			acc, err := client.GetAccount("")
+			is.Nil(err)
+			is.Equal("account", acc.Name)
+			is.Equal(1, acc.BrainID)
+			is.Equal(651, acc.BillingID)
+		})
+
+		t.Run("named account", func(t *testing.T) {
+			is := is.New(t)
+
+			acc, err := client.GetAccount("account")
+			is.Nil(err)
+			if !acc.IsValid() {
+				t.Fatal("account isn't valid")
+			}
+			is.Equal("account", acc.Name)
+			is.Equal(1, acc.BrainID)
+			is.Equal(651, acc.BillingID)
+		})
+
+		t.Run("no billing", func(t *testing.T) {
+			is := is.New(t)
+
+			acc, err := client.GetAccount("brain_only")
+			is.NotNil(err)
+			if !acc.IsValid() {
+				t.Fatal("account isn't valid")
+			}
+			is.Equal("brain_only", acc.Name)
+			is.Equal(204, acc.BrainID)
+			is.Equal(0, acc.BillingID)
+		})
 	})
 
 }
