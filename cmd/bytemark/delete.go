@@ -18,7 +18,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "delete",
 		Usage:     "delete a given server, disc, group, account or key",
-		UsageText: "bytemark delete account|disc|group|key|server",
+		UsageText: "delete account|disc|group|key|server",
 		Description: `delete a given server, disc, group, account or key
 
    Only empty groups and accounts can be deleted.
@@ -28,7 +28,7 @@ func init() {
 		Subcommands: []cli.Command{{
 			Name:        "disc",
 			Usage:       "delete the given disc",
-			UsageText:   "bytemark delete disc <virtual machine name> <disc label>",
+			UsageText:   "delete disc <virtual machine name> <disc label>",
 			Description: "Deletes the given disc. To find out a disc's label you can use the `bytemark show server` command or `bytemark list discs` command.",
 			Flags: []cli.Flag{
 				forceFlag,
@@ -53,7 +53,7 @@ func init() {
 		}, {
 			Name:      "group",
 			Usage:     "deletes the given group",
-			UsageText: "bytemark delete group [--force] [--recursive] <group name>",
+			UsageText: "delete group [--force] [--recursive] <group name>",
 			Description: `Deletes the given group.
 If --recursive is specified, all servers in the group will be purged. Otherwise, if there are servers in the group, will return an error.`,
 			Flags: []cli.Flag{
@@ -72,7 +72,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 		}, {
 			Name:        "key",
 			Usage:       "deletes the specified key",
-			UsageText:   "bytemark delete key [--user <user>] <key>",
+			UsageText:   "delete key [--user <user>] <key>",
 			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -104,7 +104,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 		}, {
 			Name:        "server",
 			Usage:       "delete the given server",
-			UsageText:   `bytemark delete server [--purge] <server name>`,
+			UsageText:   `delete server [--purge] <server name>`,
 			Description: "Deletes the given server. Deleted servers still exist and can be restored. To ensure a server is fully deleted, use the --purge flag.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -122,7 +122,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 		}, {
 			Name:        "backup",
 			Usage:       "delete the given backup",
-			UsageText:   `bytemark delete backup <server name> <disc label> <backup label>`,
+			UsageText:   `delete backup <server name> <disc label> <backup label>`,
 			Description: "Deletes the given backup. Backups cannot be recovered after deletion.",
 			Flags: []cli.Flag{
 				cli.StringFlag{

@@ -43,7 +43,7 @@ func init() {
 			{
 				Name:      "billing-definition",
 				Usage:     "update a bmbilling definition",
-				UsageText: "bytemark --admin update billing-definition [flags] [name] [value]",
+				UsageText: "--admin update billing-definition [flags] [name] [value]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "name",
@@ -81,7 +81,7 @@ func init() {
 			}, {
 				Name:      "head",
 				Usage:     "update the settings of a head",
-				UsageText: "bytemark --admin update head <head> [--usage-strategy] [--overcommit-ratio] [--label]",
+				UsageText: "--admin update head <head> [--usage-strategy] [--overcommit-ratio] [--label]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "head",
@@ -121,7 +121,7 @@ func init() {
 			{
 				Name:      "tail",
 				Usage:     "update the settings of a tail",
-				UsageText: "bytemark --admin update tail <tail> [--usage-strategy] [--overcommit-ratio] [--label]",
+				UsageText: "--admin update tail <tail> [--usage-strategy] [--overcommit-ratio] [--label]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "tail",
@@ -161,7 +161,7 @@ func init() {
 			{
 				Name:      "storage pool",
 				Usage:     "update the settings of a storage pool",
-				UsageText: "bytemark --admin update storage pool [--usage-strategy new-strategy] [--overcommit-ratio new-ratio] [--label new-label] [--migration-concurrency new-limit] <storage pool>",
+				UsageText: "--admin update storage pool [--usage-strategy new-strategy] [--overcommit-ratio new-ratio] [--label new-label] [--migration-concurrency new-limit] <storage pool>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "storage-pool",
@@ -210,7 +210,7 @@ func init() {
 					{
 						Name:        "migration",
 						Usage:       "update the settings of an in-progress migration",
-						UsageText:   "bytemark --admin update server migration <name> [--migrate-speed] [--migrate-downtime]",
+						UsageText:   "--admin update server migration <name> [--migrate-speed] [--migrate-downtime]",
 						Description: `This command migrates a server to a new head. If a new head isn't supplied, a new one is picked automatically.`,
 						Flags: []cli.Flag{
 							cli.GenericFlag{

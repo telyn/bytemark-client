@@ -16,7 +16,7 @@ func init() {
 			{
 				Name:        "disc",
 				Usage:       "migrate a disc to a new storage pool",
-				UsageText:   "bytemark --admin migrate disc <disc> [new-storage-pool]",
+				UsageText:   "--admin migrate disc <disc> [new-storage-pool]",
 				Description: `This command migrates a disc to a new storage pool. If a new storage pool isn't supplied, a new one is picked automatically.`,
 				Flags: []cli.Flag{
 					cli.IntFlag{
@@ -45,7 +45,7 @@ func init() {
 				Name:        "server",
 				Aliases:     []string{"vm"},
 				Usage:       "migrate a server to a new head",
-				UsageText:   "bytemark --admin migrate server <name> [new-head]",
+				UsageText:   "--admin migrate server <name> [new-head]",
 				Description: `This command migrates a server to a new head. If a new head isn't supplied, a new one is picked automatically.`,
 				Flags: []cli.Flag{
 					cli.GenericFlag{

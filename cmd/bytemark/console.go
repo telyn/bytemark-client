@@ -20,7 +20,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "console",
 		Usage:     "connect to a server's serial or graphical console - as though physically plugging in",
-		UsageText: "bytemark console [--serial | --vnc | --panel] [--no-connect] <server>",
+		UsageText: "console [--serial | --vnc | --panel] [--no-connect] <server>",
 		Description: `Out-of-band access to a server's serial or graphical (VNC) console.
 Under systems with no GUI, sometimes errors will output to the graphical console and not the serial console.
 Defaults to connecting to the serial console for the given server.`,

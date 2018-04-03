@@ -15,7 +15,7 @@ func init() {
 			{
 				Name:      "disc",
 				Usage:     "regrade a disc",
-				UsageText: "bytemark --admin regrade disc <disc> [--new-grade]",
+				UsageText: "--admin regrade disc <disc> [--new-grade]",
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "disc",

@@ -17,7 +17,7 @@ func init() {
 				Name:      "server",
 				Aliases:   []string{"vm"},
 				Usage:     "reject a server, and specify the reason for the rejection",
-				UsageText: "bytemark --admin reject server <name> <reason>",
+				UsageText: "--admin reject server <name> <reason>",
 				Flags: []cli.Flag{
 					cli.GenericFlag{
 						Name:  "server",

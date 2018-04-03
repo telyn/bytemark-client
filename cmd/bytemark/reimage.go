@@ -48,7 +48,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "reimage",
 		Usage:     "install a fresh operating system on a server from bytemark's images",
-		UsageText: "bytemark reimage [flags] <server>",
+		UsageText: "reimage [flags] <server>",
 		Description: `Image the given server with the specified image, prompting for confirmation.
 Specify --force to prevent prompting.
 

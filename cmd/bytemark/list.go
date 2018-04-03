@@ -24,7 +24,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "list",
 		Usage:     "scripting-friendly lists of your assets at Bytemark",
-		UsageText: "bytemark list accounts|discs|groups|keys|servers",
+		UsageText: "list accounts|discs|groups|keys|servers",
 		Description: `scripting-friendly lists of your assets at Bytemark
 
 This command will list the kind of object you request, one per line. Perfect for piping into a bash while loop!`,
@@ -32,7 +32,7 @@ This command will list the kind of object you request, one per line. Perfect for
 		Subcommands: []cli.Command{{
 			Name:        "accounts",
 			Usage:       "list all the accounts you're able to see",
-			UsageText:   "bytemark list accounts",
+			UsageText:   "list accounts",
 			Description: `This will list all the accounts that your authentication token has some form of access to.`,
 			Flags:       app.OutputFlags("accounts", "array"),
 			Action: app.Action(with.Auth, func(c *app.Context) error {
@@ -46,7 +46,7 @@ This command will list the kind of object you request, one per line. Perfect for
 		}, {
 			Name:        "discs",
 			Usage:       "list all the discs attached to a given virtual machine",
-			UsageText:   "bytemark list discs <virtual machine>",
+			UsageText:   "list discs <virtual machine>",
 			Description: `This command lists all the discs attached to the given virtual machine. They're presented in the following format: 'LABEL: SIZE GRADE', where size is an integer number of megabytes. Add the --human flag to output the size in GiB (rounded down to the nearest GiB)`,
 			Flags: append(app.OutputFlags("discs", "array"),
 				cli.BoolFlag{
@@ -65,7 +65,7 @@ This command will list the kind of object you request, one per line. Perfect for
 		}, {
 			Name:        "groups",
 			Usage:       "list all the groups in an account",
-			UsageText:   "bytemark list groups [account]",
+			UsageText:   "list groups [account]",
 			Description: `This command lists all the groups in the given account, or in your default account if not specified.`,
 			Flags: append(app.OutputFlags("groups", "array"),
 				cli.GenericFlag{
@@ -80,7 +80,7 @@ This command will list the kind of object you request, one per line. Perfect for
 		}, {
 			Name:        "keys",
 			Usage:       "list all the SSH public keys associated with a user",
-			UsageText:   "bytemark list keys [user]",
+			UsageText:   "list keys [user]",
 			Description: "Lists all the SSH public keys associated with a user, defaulting to your log-in user.",
 			Action: app.Action(args.Optional("user"), with.User("user"), func(c *app.Context) error {
 				// TODO(telyn): could this be rewritten using OutputInDesiredForm / is it desirable to?
@@ -93,7 +93,7 @@ This command will list the kind of object you request, one per line. Perfect for
 		}, {
 			Name:      "servers",
 			Usage:     "list all the servers in an account",
-			UsageText: "bytemark list servers [account]",
+			UsageText: "list servers [account]",
 			Description: `This command lists all the servers in the given account, or in your default account if not specified.
 Deleted servers are included in the list, with ' (deleted)' appended.`,
 			Flags: append(app.OutputFlags("servers", "array"),
@@ -114,7 +114,7 @@ Deleted servers are included in the list, with ' (deleted)' appended.`,
 		}, {
 			Name:        "backups",
 			Usage:       "list all the backups of a server or disc",
-			UsageText:   "bytemark list backups <server name> [disc label]",
+			UsageText:   "list backups <server name> [disc label]",
 			Description: "Lists all the backups of all the discs in the given server, or if you also give a disc label, just the backups of that disc.",
 			Flags: append(app.OutputFlags("backups", "array"),
 				cli.StringFlag{

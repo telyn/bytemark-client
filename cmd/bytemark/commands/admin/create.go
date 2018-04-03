@@ -18,7 +18,7 @@ func init() {
 			{
 				Name:      "ip range",
 				Usage:     "create a new IP range in a VLAN",
-				UsageText: "bytemark --admin create ip range <ip-range> <vlan-num>",
+				UsageText: "--admin create ip range <ip-range> <vlan-num>",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "ip-range",
@@ -39,7 +39,7 @@ func init() {
 			}, {
 				Name:      "migration",
 				Usage:     "creates a new migration job",
-				UsageText: "bytemark --admin create migration [--priority <number>] [--disc <disc>]... [--pool <pool>]... [--tail <tail>]... [--to-pool <pool>]...",
+				UsageText: "--admin create migration [--priority <number>] [--disc <disc>]... [--pool <pool>]... [--tail <tail>]... [--to-pool <pool>]...",
 				Description: `Requests that the brain starts a migration from the various discs, pools and tails specified to the various pools specified.
 				
    If no --to-pools are specified, the brain will decide destinations on its own. To migrate multiple discs, pools, or tails, or to distribute migrating discs across multiple storage pools, simply specify those flags multiple times.
@@ -116,7 +116,7 @@ EXAMPLES:
 			}, {
 				Name:        "user",
 				Usage:       "creates a new cluster admin or cluster superuser",
-				UsageText:   "bytemark --admin create user <username> <privilege>",
+				UsageText:   "--admin create user <username> <privilege>",
 				Description: `creates a new cluster admin or superuser. The privilege field must be either cluster_admin or cluster_su.`,
 				Flags: []cli.Flag{
 					cli.StringFlag{
@@ -140,7 +140,7 @@ EXAMPLES:
 				Name:      "vlan group",
 				Aliases:   []string{"vlan-group"},
 				Usage:     "creates groups for private VLANs",
-				UsageText: "bytemark --admin create vlan group <group> [vlan-num]",
+				UsageText: "--admin create vlan group <group> [vlan-num]",
 				Description: `Create a group in the specified account, with an optional VLAN specified.
 
 Used when setting up a private VLAN for a customer.`,

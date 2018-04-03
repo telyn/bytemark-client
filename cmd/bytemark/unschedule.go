@@ -14,7 +14,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "unschedule",
 		Usage:     "unschedule automated backups",
-		UsageText: "bytemark unschedule backups <server> <disc> <schedule id>",
+		UsageText: "unschedule backups <server> <disc> <schedule id>",
 		Description: `unschedules automated backups so that they are no longer taken
 	
 The <schedule id> is a number that can be found out using 'bytemark show disc <server> <disc>'
@@ -24,7 +24,7 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 			{
 				Name:      "backups",
 				Usage:     "unschedule automated backups",
-				UsageText: "bytemark unschedule backups <server> <disc> <schedule id>",
+				UsageText: "unschedule backups <server> <disc> <schedule id>",
 				Description: `unschedules automated backups so that they are no longer taken
 	
 The <schedule id> is a number that can be found out using 'bytemark show disc <server> <disc>'

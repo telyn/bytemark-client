@@ -16,7 +16,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "signup",
 		Usage:     "sign up for Bytemark's hosting service",
-		UsageText: "bytemark signup",
+		UsageText: "signup",
 		Description: `This will create a new SSO and billing account and set your credit card details.
 
 If you are creating an account on behalf of an organisation needing a different payment method, you'll need to email Bytemark support instead.
