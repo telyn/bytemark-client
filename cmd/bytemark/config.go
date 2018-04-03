@@ -98,7 +98,7 @@ The set and unset subcommands can be used to set and unset such variables.
 		Subcommands: []cli.Command{
 			{
 				Name:        "set",
-				UsageText:   "bytemark config set <variable> <value>",
+				UsageText:   "config set <variable> <value>",
 				Usage:       "sets a bytemark client configuration request",
 				Description: "Sets the named variable to the given value. See `bytemark help config` for which variables are available",
 				Flags: []cli.Flag{
@@ -154,7 +154,7 @@ The set and unset subcommands can be used to set and unset such variables.
 				}),
 			}, {
 				Name:        "unset",
-				UsageText:   "bytemark config unset <variable>",
+				UsageText:   "config unset <variable>",
 				Usage:       "unsets a bytemark client configuration option",
 				Description: "Unsets the named variable.",
 				Action: app.Action(func(ctx *app.Context) error {

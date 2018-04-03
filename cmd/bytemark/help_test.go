@@ -111,15 +111,19 @@ func TestFlagsHaveUsage(t *testing.T) {
 
 func TestUsageStyleConformance(t *testing.T) {
 	traverseAllCommandsWithContext(Commands(true), "", func(name string, c cli.Command) {
-		// TODO: see if this will actually just ruin tests. pretty sure it will
+		t.Run(name, func(t *testing.T) {
+			if firstIsUpper(c.Usage) {
+				t.Error("Usage should be lowercase but begins with an uppercase letter")
+			}
 
-		if firstIsUpper(c.Usage) {
-			t.Errorf("Command %s's Usage begins with an uppercase letter. Please change it - Usages should be lowercase.\r\n", name)
-		}
+			if hasFullStop(c.Usage) {
+				t.Errorf("Usage should not have full stop")
+			}
 
-		if hasFullStop(c.Usage) {
-			t.Errorf("Command %s's Usage has a full-stop. Get rid of it.\r\n", name)
-		}
+			if strings.HasPrefix(c.UsageText, "bytemark ") {
+				t.Error("UsageText starts with 'bytemark' - shouldn't anymore")
+			}
+		})
 	})
 }
 

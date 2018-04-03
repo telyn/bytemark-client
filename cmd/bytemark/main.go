@@ -56,7 +56,8 @@ func main() {
 
 	}()
 
-	overrideHelp()
+	name := os.Args[0]
+	overrideHelp(name)
 	flags, args, config := prepConfig()
 
 	// add admin commands if --admin is set
@@ -116,12 +117,12 @@ func outputDebugInfo(config util.ConfigManager) {
 }
 
 // overrideHelp writes our own help templates into urfave/cli
-func overrideHelp() {
+func overrideHelp(name string) {
 	cli.SubcommandHelpTemplate = `NAME:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} command{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}
+   ` + name + ` {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} command{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}
 
 COMMANDS:{{range .VisibleCategories}}{{if .Name}}
    {{.Name}}:{{end}}{{range .VisibleCommands}}
@@ -136,13 +137,12 @@ OPTIONS:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
+   ` + name + `{{.UsageText}}{{if .Description}}
+
+   {{.Description}}{{end}}{{if .Category}}
 
 CATEGORY:
-   {{.Category}}{{end}}{{if .Description}}
-
-DESCRIPTION:
-   {{.Description}}{{end}}{{if .VisibleFlags}}
+   {{.Category}}{{end}}{{if .VisibleFlags}}
 
 OPTIONS:
    {{range .VisibleFlags}}{{.}}

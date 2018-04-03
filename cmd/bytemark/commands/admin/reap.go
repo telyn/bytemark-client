@@ -16,7 +16,7 @@ func init() {
 				Name:      "servers",
 				Aliases:   []string{"vm", "vms"},
 				Usage:     "triggers server reaping, purging all deleted servers and discs",
-				UsageText: "bytemark --admin reap servers",
+				UsageText: "--admin reap servers",
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					if err := c.Client().ReapVMs(); err != nil {
 						return err

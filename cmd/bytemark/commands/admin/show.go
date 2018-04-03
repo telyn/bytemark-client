@@ -19,7 +19,7 @@ func init() {
 			{
 				Name:      "vlans",
 				Usage:     "shows available VLANs",
-				UsageText: "bytemark --admin show vlans [--json]",
+				UsageText: "--admin show vlans [--json]",
 				Flags:     app.OutputFlags("VLANs", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vlans, err := c.Client().GetVLANs()
@@ -32,7 +32,7 @@ func init() {
 			{
 				Name:        "disc by id",
 				Usage:       "displays details about a disc",
-				UsageText:   "bytemark show disc by id [--json] <id>",
+				UsageText:   "show disc by id [--json] <id>",
 				Description: `Displays a collection of details about the disc.`,
 				Flags: append(app.OutputFlags("disc details", "object"),
 					cli.IntFlag{
@@ -52,7 +52,7 @@ func init() {
 			{
 				Name:      "vlan",
 				Usage:     "shows the details of a VLAN",
-				UsageText: "bytemark --admin show vlan [--json] <num>",
+				UsageText: "--admin show vlan [--json] <num>",
 				Flags: append(app.OutputFlags("VLAN", "object"),
 					cli.IntFlag{
 						Name:  "num",
@@ -70,7 +70,7 @@ func init() {
 			{
 				Name:      "ip ranges",
 				Usage:     "shows all IP ranges",
-				UsageText: "bytemark --admin show ip ranges [--json]",
+				UsageText: "--admin show ip ranges [--json]",
 				Flags:     app.OutputFlags("ip ranges", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					ipRanges, err := c.Client().GetIPRanges()
@@ -83,7 +83,7 @@ func init() {
 			{
 				Name:      "ip range",
 				Usage:     "shows the details of an IP range",
-				UsageText: "bytemark --admin show ip range [--json] <ip-range>",
+				UsageText: "--admin show ip range [--json] <ip-range>",
 				Flags: append(app.OutputFlags("ip range details", "object"),
 					cli.StringFlag{
 						Name:  "ip-range",
@@ -101,7 +101,7 @@ func init() {
 			{
 				Name:      "heads",
 				Usage:     "shows the details of all heads",
-				UsageText: "bytemark --admin show heads [--json]",
+				UsageText: "--admin show heads [--json]",
 				Flags:     app.OutputFlags("heads", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					heads, err := c.Client().GetHeads()
@@ -114,7 +114,7 @@ func init() {
 			{
 				Name:      "head",
 				Usage:     "shows the details of the specified head",
-				UsageText: "bytemark --admin show head <head> [--json]",
+				UsageText: "--admin show head <head> [--json]",
 				Flags: append(app.OutputFlags("head details", "object"),
 					cli.StringFlag{
 						Name:  "head",
@@ -132,7 +132,7 @@ func init() {
 			{
 				Name:      "tails",
 				Usage:     "shows the details of all tails",
-				UsageText: "bytemark --admin show tails [--json]",
+				UsageText: "--admin show tails [--json]",
 				Flags:     app.OutputFlags("tails", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					tails, err := c.Client().GetTails()
@@ -145,7 +145,7 @@ func init() {
 			{
 				Name:      "tail",
 				Usage:     "shows the details of the specified tail",
-				UsageText: "bytemark --admin show tail <tail> [--json]",
+				UsageText: "--admin show tail <tail> [--json]",
 				Flags: append(app.OutputFlags("tail details", "object"),
 					cli.StringFlag{
 						Name:  "tail",
@@ -163,7 +163,7 @@ func init() {
 			{
 				Name:      "storage pools",
 				Usage:     "shows the details of all storage pools",
-				UsageText: "bytemark --admin show storage pools [--json]",
+				UsageText: "--admin show storage pools [--json]",
 				Flags:     app.OutputFlags("storage pools", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					storagePools, err := c.Client().GetStoragePools()
@@ -176,7 +176,7 @@ func init() {
 			{
 				Name:      "storage pool",
 				Usage:     "shows the details of the specified storage pool",
-				UsageText: "bytemark --admin show storage pool [--json] <storage-pool>",
+				UsageText: "--admin show storage pool [--json] <storage-pool>",
 				Flags: append(app.OutputFlags("storage pool", "object"),
 					cli.StringFlag{
 						Name:  "storage-pool",
@@ -194,7 +194,7 @@ func init() {
 			{
 				Name:      "migrating discs",
 				Usage:     "shows a list of migrating discs",
-				UsageText: "bytemark --admin show migrating_discs [--json]",
+				UsageText: "--admin show migrating_discs [--json]",
 				Flags:     app.OutputFlags("migrating discs", "array"),
 				Action: app.Action(with.Auth, func(ctx *app.Context) error {
 					discs, err := ctx.Client().GetMigratingDiscs()
@@ -216,7 +216,7 @@ func init() {
 			{
 				Name:      "migrating vms",
 				Usage:     "shows a list of migrating servers",
-				UsageText: "bytemark --admin show migrating_vms [--json]",
+				UsageText: "--admin show migrating_vms [--json]",
 				Flags:     app.OutputFlags("migrating servers", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vms, err := c.Client().GetMigratingVMs()
@@ -229,7 +229,7 @@ func init() {
 			{
 				Name:      "migration",
 				Usage:     "shows a migration job",
-				UsageText: "bytemark --admin show migration [--json] <id>",
+				UsageText: "--admin show migration [--json] <id>",
 				Flags: append(app.OutputFlags("migration job", "object"),
 					cli.IntFlag{
 						Name:  "id",
@@ -253,7 +253,7 @@ func init() {
 			{
 				Name:      "migrations",
 				Usage:     "shows all unfinished migration jobs",
-				UsageText: "bytemark --admin show migrations",
+				UsageText: "--admin show migrations",
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					mjs, err := brainRequests.GetMigrationJobs(c.Client())
 					if err != nil {
@@ -266,7 +266,7 @@ func init() {
 			{
 				Name:      "stopped eligible vms",
 				Usage:     "shows a list of stopped VMs that should be running",
-				UsageText: "bytemark --admin show stopped_eligible_vms [--json]",
+				UsageText: "--admin show stopped_eligible_vms [--json]",
 				Flags:     app.OutputFlags("servers", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vms, err := c.Client().GetStoppedEligibleVMs()
@@ -279,7 +279,7 @@ func init() {
 			{
 				Name:      "recent vms",
 				Usage:     "shows a list of stopped VMs that should be running",
-				UsageText: "bytemark --admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
+				UsageText: "--admin show recent_vms [--json | --table] [--table-fields <fields> | --table-fields help]",
 				Flags:     app.OutputFlags("servers", "array"),
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					vms, err := c.Client().GetRecentVMs()

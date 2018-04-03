@@ -22,7 +22,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:        "grant",
 		Usage:       "grant privileges on bytemark self-service objects to other users",
-		UsageText:   "bytemark grant <privilege> [on] <object> [to] <user>\r\nbytemark grant cluster_admin [to] <user>",
+		UsageText:   "grant <privilege> [on] <object> [to] <user>\r\nbytemark grant cluster_admin [to] <user>",
 		Description: "Grant a privilege to a user for a particular bytemark object\r\n\r\n" + privilegeText,
 		Flags: []cli.Flag{
 			cli.BoolFlag{

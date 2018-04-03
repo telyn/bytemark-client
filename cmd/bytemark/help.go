@@ -8,7 +8,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "profiles",
 		Usage:     "information on using multiple bytemark client configurations",
-		UsageText: "bytemark profiles",
+		UsageText: "profiles",
 		Action:    cli.ShowSubcommandHelp,
 		Description: `Having multiple configurations with Bytemark client is useful if you regularly log in as two different users,
 or to different instances of the Bytemark API. One can set up and use different configurations with the --config-dir global flag.
@@ -29,7 +29,7 @@ Sorted.`,
 	}, cli.Command{
 		Name:      "scripting",
 		Usage:     "information on scripting with the client",
-		UsageText: "bytemark scripting",
+		UsageText: "scripting",
 		Action:    cli.ShowSubcommandHelp,
 		Description: `The Bytemark client has been programmed from the beginning to attempt to make it easy for users to script with it.
 

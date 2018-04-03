@@ -15,7 +15,7 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "assent",
 		Usage:       "assent to Bytemark terms and conditions",
-		UsageText:   "bytemark assent --agreement <agreement id> --person <username> --account <account>|--accountid <account id> [--name <full name> --email <email>]",
+		UsageText:   "assent [--agreement <agreement id>] [--person <username>] [--account <account>|--account-id <account id>] [--name <full name>] [--email <email>]",
 		Description: "Assent to Bytemark terms and conditions.",
 		Flags: []cli.Flag{
 			cli.StringFlag{

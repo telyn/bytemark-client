@@ -17,7 +17,7 @@ func init() {
 				Name:      "server",
 				Aliases:   []string{"vm"},
 				Usage:     "approve a server, and optionally power it on",
-				UsageText: "bytemark --admin approve server <name> [--power-on]",
+				UsageText: "--admin approve server <name> [--power-on]",
 				Flags: []cli.Flag{
 					cli.GenericFlag{
 						Name:  "server",

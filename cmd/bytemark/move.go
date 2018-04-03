@@ -12,7 +12,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "move",
 		Usage:     "rename a server and move it across groups and accounts",
-		UsageText: "bytemark move <old name> <new name>",
+		UsageText: "move <old name> <new name>",
 		Description: `This command renames a server and moves it between groups/accounts. You may only move servers between accounts you are an administrator of.
 		
 EXAMPLES

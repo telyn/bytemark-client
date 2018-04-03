@@ -15,7 +15,7 @@ func init() {
 			{
 				Name:      "disc",
 				Usage:     "reify a disc",
-				UsageText: "bytemark --admin reify disc <disc>",
+				UsageText: "--admin reify disc <disc>",
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "disc",
