@@ -99,6 +99,10 @@ func init() {
 						Name:  "label",
 						Usage: "the label of the head",
 					},
+					cli.StringFlag{
+						Name:  "note",
+						Usage: "a note to be applied to the specified head",
+					},
 				},
 				Action: app.Action(args.Optional("head", "usage-strategy", "overcommit-ratio", "label"), with.RequiredFlags("head"), with.Auth, func(c *app.Context) error {
 					usageStrategy, overcommitRatio, label := readUpdateFlags(c)
@@ -112,7 +116,9 @@ func init() {
 					if err := c.Client().UpdateHead(c.String("head"), options); err != nil {
 						return err
 					}
-
+					if c.Context.IsSet("note") {
+						brainMethods.CreateAdminNote(c.Client(), "head", c.Context.String("head"), c.Context.String("note"))
+					}
 					log.Outputf("Head %s updated\n", c.String("head"))
 
 					return nil
@@ -183,6 +189,10 @@ func init() {
 						Name:  "migration-concurrency",
 						Usage: "the number of concurrent migrations the storage pool can handle",
 					},
+					cli.StringFlag{
+						Name:  "note",
+						Usage: "a note to be applied to the storage pool",
+					},
 				},
 				Action: app.Action(args.Optional("storage-pool", "usage-strategy", "overcommit-ratio"), with.RequiredFlags("storage-pool"), with.Auth, func(c *app.Context) error {
 
@@ -195,6 +205,10 @@ func init() {
 
 					if err := c.Client().UpdateStoragePool(c.String("storage-pool"), options); err != nil {
 						return err
+					}
+
+					if c.Context.IsSet("note") {
+						brainMethods.CreateAdminNote(c.Client(), "storage_pool", c.Context.String("storage-pool"), c.Context.String("note"))
 					}
 
 					log.Outputf("Storage pool %s updated\n", c.String("storage-pool"))
