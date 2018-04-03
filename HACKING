@@ -212,5 +212,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 7d71a1e1fb02885a3b4eb5e136113596e6a26536eb52146a47a36aa497e31e5b
+# sha256sum: 7aaaa9300a37ce267a61d1f7cc842ad119972cfe2986c6c729a2b82b1bb6fa7e
 
