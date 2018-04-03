@@ -16,32 +16,9 @@ import (
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:        "reset",
-		Usage:       "restart a server as though the reset button had been pushed",
-		UsageText:   "reset <server>",
-		Description: "For cloud servers, this does not cause the qemu process to be restarted. This means that the server will remain on the same head and will not notice hardware changes.",
-		Flags: []cli.Flag{
-			cli.GenericFlag{
-				Name:  "server",
-				Usage: "the server to reset",
-				Value: new(app.VirtualMachineNameFlag),
-			},
-		},
-		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
-			vmName := c.VirtualMachineName("server")
-			log.Logf("Attempting to reset %v...\r\n", vmName)
-			err = c.Client().ResetVirtualMachine(vmName)
-			if err != nil {
-				return err
-			}
-
-			log.Errorf("%v reset successfully.\r\n", vmName)
-			return
-		}),
-	}, cli.Command{
 		Name:        "restart",
 		Usage:       "power off a server and start it again",
-		UsageText:   "restart <server> [--rescue || --appliance <appliance>]",
+		UsageText:   "restart [--rescue | --appliance <appliance>] <server>",
 		Description: "This command will power down a server and then start it back up again.",
 		Flags: []cli.Flag{
 			cli.GenericFlag{
