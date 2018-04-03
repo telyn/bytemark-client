@@ -253,7 +253,7 @@ func init() {
 			{
 				Name:      "migrations",
 				Usage:     "shows all unfinished migration jobs",
-				UsageText: "bytemark --admin show migrations",
+				UsageText: "--admin show migrations",
 				Action: app.Action(with.Auth, func(c *app.Context) error {
 					mjs, err := brainRequests.GetMigrationJobs(c.Client())
 					if err != nil {
