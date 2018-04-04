@@ -1,7 +1,6 @@
 package update_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -14,6 +13,11 @@ func TestUpdateServer(t *testing.T) {
 	defVM := lib.VirtualMachineName{
 		Group:   "default",
 		Account: "default-account",
+	}
+	testVM := lib.VirtualMachineName{
+		VirtualMachine: "test",
+		Group:          "default",
+		Account:        "default-account",
 	}
 	type move struct {
 		expected bool
@@ -29,13 +33,9 @@ func TestUpdateServer(t *testing.T) {
 		shouldErr     bool
 	}{
 		{
-			name: "RenameVM",
-			args: "--new-name new --server test",
-			vmName: lib.VirtualMachineName{
-				VirtualMachine: "test",
-				Group:          "default",
-				Account:        "default-account",
-			},
+			name:   "RenameVM",
+			args:   "--new-name new --server test",
+			vmName: testVM,
 			move: move{
 				expected: true,
 				newName: lib.VirtualMachineName{
@@ -46,19 +46,14 @@ func TestUpdateServer(t *testing.T) {
 			},
 		},
 		{
-			name: "ChangeHWProfile",
-			args: "--hw-profile foo --server test",
-			vmName: lib.VirtualMachineName{
-				VirtualMachine: "test",
-				Group:          "default",
-				Account:        "default-account",
-			},
+			name:      "ChangeHWProfile",
+			args:      "--hw-profile foo --server test",
+			vmName:    testVM,
 			hwProfile: "foo",
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			fmt.Printf("TEST %s\n", test.name)
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 			config.When("GetVirtualMachine").Return(defVM)
 			config.When("Force").Return(true)
@@ -68,12 +63,10 @@ func TestUpdateServer(t *testing.T) {
 			}
 
 			if test.move.expected {
-				fmt.Printf("set up expectation\n")
 				client.When("MoveVirtualMachine", test.vmName, test.move.newName).Return(nil).Times(1)
 			}
 
 			args := strings.Split("bytemark update server "+test.args, " ")
-			fmt.Printf("ARGS %+v\n", args)
 			err := app.Run(args)
 			if test.shouldErr && err == nil {
 				t.Fatal("should error")
