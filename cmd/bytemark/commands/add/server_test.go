@@ -2,7 +2,6 @@ package add_test
 
 import (
 	"runtime/debug"
-	"strings"
 	"testing"
 	"time"
 
@@ -25,7 +24,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 	seenImage := false
 	seenRootPassword := false
 
-	testutil.TraverseAllCommands(Commands(true), func(cmd cli.Command) {
+	testutil.TraverseAllCommands(commands.Commands, func(cmd cli.Command) {
 		if cmd.FullName() == "create server" {
 			seenCmd = true
 			for _, f := range cmd.Flags {
