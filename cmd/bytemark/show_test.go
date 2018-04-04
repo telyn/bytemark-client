@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -47,10 +47,10 @@ var showAccountTestOutput = map[string]string{
 }
 
 func TestShowAccount(t *testing.T) {
-	baseShowAccountSetup := func(c *mocks.Client, config *mocks.Config, configAccount, outputFormat string) {
-		config.Mock.Functions = resetOneMockedFunction(config.Mock.Functions, "GetV", "output-format")
-		config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", outputFormat, "FLAG output-format"})
-		config.When("GetIgnoreErr", "account").Return(configAccount)
+	baseShowAccountSetup := func(c *mocks.Client, conf *mocks.Config, configAccount, outputFormat string) {
+		conf.Mock.Functions = resetOneMockedFunction(conf.Mock.Functions, "GetV", "output-format")
+		conf.When("GetV", "output-format").Return(config.Var{"output-format", outputFormat, "FLAG output-format"})
+		conf.When("GetIgnoreErr", "account").Return(configAccount)
 	}
 
 	tests := []showAccountTest{

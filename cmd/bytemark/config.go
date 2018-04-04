@@ -9,7 +9,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -114,7 +114,7 @@ The set and unset subcommands can be used to set and unset such variables.
 					}
 					varname = strings.ToLower(varname)
 
-					if !util.IsConfigVar(varname) {
+					if !config.IsConfigVar(varname) {
 						return ctx.Help(fmt.Sprintf("%s is not a valid variable name", varname))
 					}
 

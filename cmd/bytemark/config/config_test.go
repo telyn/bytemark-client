@@ -1,4 +1,4 @@
-package util
+package config
 
 import (
 	"encoding/hex"
@@ -123,7 +123,7 @@ func TestConfigDefaultConfigDir(t *testing.T) {
 
 	CleanEnv()
 
-	config, err := NewConfig("")
+	config, err := New("")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +139,7 @@ func TestConfigEnvConfigDir(t *testing.T) {
 	expected := "/tmp"
 	_ = os.Setenv("BM_CONFIG_DIR", expected)
 
-	config, err := NewConfig("")
+	config, err := New("")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,7 +152,7 @@ func TestConfigPassedConfigDir(t *testing.T) {
 	JunkEnv()
 
 	expected := "/home"
-	config, err := NewConfig(expected)
+	config, err := New(expected)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,7 +176,7 @@ func TestConfigConfigDefaultsCleanEnv(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,7 +203,7 @@ func TestConfigDefaultsWithEnvUser(t *testing.T) {
 	expected := "test-username"
 	_ = os.Setenv("BM_USER", expected)
 
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -235,7 +235,7 @@ func TestConfigDefaultsFixtureEnv(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -264,7 +264,7 @@ func TestConfigDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -292,7 +292,7 @@ func TestConfigSet(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -322,7 +322,7 @@ func TestConfigSetPersistent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -348,7 +348,7 @@ func TestConfigSetPersistent(t *testing.T) {
 
 	CleanEnv()
 	//create a new config (blanking the memo) to test the file in the directory has changed.
-	config2, err := NewConfig(dir)
+	config2, err := New(dir)
 	is.Nil(err)
 
 	is.Equal(fixture["endpoint"], config2.GetIgnoreErr("endpoint"))
@@ -373,7 +373,7 @@ func TestConfigCorrectDefaultingAccountAndUserBug14038(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	is.Nil(err)
 
 	v, err := config.GetV("account")
@@ -397,7 +397,7 @@ func TestConfigUnset(t *testing.T) {
 
 	is.NotEqual("", fx["endpoint"])
 
-	config, err := NewConfig(dir)
+	config, err := New(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -449,7 +449,7 @@ func TestConfigEndpointOverrides(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		config, err := NewConfig(dir)
+		config, err := New(dir)
 		if err != nil {
 			t.Fatal(err)
 		}
