@@ -24,7 +24,7 @@ func TestUpdateServer(t *testing.T) {
 		Name:     "test",
 		Hostname: "test.default",
 		GroupID:  1,
-		Memory:   1024,
+		Memory:   2048,
 	}
 	type move struct {
 		expected bool
@@ -106,18 +106,42 @@ func TestUpdateServer(t *testing.T) {
 			hwProfileLock: true,
 		},
 		{
-			name:   "ChangeMemory",
-			args:   "--force --memory 10 --server test",
+			name:   "ChangeMemoryDoesNotNeedForceToDecrease",
+			args:   "--memory 1 --server test",
 			vmName: testVMName,
 			vm:     testVM,
-			memory: 10,
+			memory: 1,
+		},
+		{
+			name:      "ChangeMemoryNeedsForceToIncrease",
+			args:      "--memory 10 --server test",
+			vmName:    testVMName,
+			vm:        testVM,
+			memory:    10,
+			shouldErr: true,
+		},
+		{
+			name:      "CombinedChanges",
+			args:      "--new-name new --memory 1 --hw-profile foo --server test",
+			vmName:    testVMName,
+			vm:        testVM,
+			hwProfile: "foo",
+			memory:    1,
+			move: move{
+				expected: true,
+				newName: lib.VirtualMachineName{
+					VirtualMachine: "new",
+					Group:          "default",
+					Account:        "default-account",
+				},
+			},
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 			config.When("GetVirtualMachine").Return(defVM)
-			client.When("GetVirtualMachine", test.vmName).Return(&test.vm).Times(1)
+			client.When("GetVirtualMachine", test.vmName).Return(test.vm).Times(1)
 			config.When("Force").Return(true)
 
 			if test.hwProfile != "" {
@@ -128,8 +152,8 @@ func TestUpdateServer(t *testing.T) {
 				client.When("MoveVirtualMachine", test.vmName, test.move.newName).Return(nil).Times(1)
 			}
 
-			if test.memory > 0 {
-				client.When("SetVirtualMachineMemory", test.vmName, test.memory * 1024).Return(nil).Times(1)
+			if test.memory > 0 && !test.shouldErr {
+				client.When("SetVirtualMachineMemory", test.vmName, test.memory*1024).Return(nil).Times(1)
 			}
 
 			args := strings.Split("bytemark update server "+test.args, " ")

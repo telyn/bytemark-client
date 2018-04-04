@@ -21,6 +21,10 @@ func init() {
 
 Note that for changes to memory or hardware profile to take effect you will need to restart the server.
 
+--hw-profile the hardware profile used. Hardware profiles can be simply thought of as what virtual motherboard you're using - generally you want a pretty recent one for maximum speed, but if you're running a very old or experimental OS (e.g. DOS or OS/2 or something) you may require the compatibility one. See "bytemark hwprofiles" for which ones are currently available.
+
+Memory is specified in GiB by default, but can be suffixed with an M to indicate that it is provided in MiB.
+
 Updating a server's name also allows it to be moved between groups and accounts you administer.
 
 EXAMPLES
