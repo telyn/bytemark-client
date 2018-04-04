@@ -132,31 +132,31 @@ func TestUsageStyleConformance(t *testing.T) {
 // should be blank
 func TestSubcommandStyleConformance(t *testing.T) {
 	traverseAllCommands(Commands(true), func(c cli.Command) {
-		if c.Subcommands == nil {
-			return
-		}
-		if len(c.Subcommands) == 0 {
-			return
-		}
-		if c.Description == "" {
-			return
-		}
-		lines := strings.Split(c.Description, "\n")
-		desc := []rune(lines[0])
-		if unicode.IsUpper(desc[0]) {
-			log.Logf("Command %s's Description begins with an uppercase letter, but it has subcommands, so should be lowercase.\r\n", c.FullName())
-			t.Fail()
-		}
-		if strings.Contains(lines[0], ".") {
-			log.Logf("The first line of Command %s's Description contains a full stop. It shouldn't.\r\n", c.FullName())
-			t.Fail()
-		}
-		if len(lines) > 1 {
-			if len(strings.TrimSpace(lines[1])) > 0 {
-				log.Logf("The second line of Command %s's Description should be blank.\r\n", c.FullName())
-				t.Fail()
+		t.Run(c.UsageText, func(t *testing.T) {
+			if c.Subcommands == nil {
+				return
 			}
-		}
+			if len(c.Subcommands) == 0 {
+				return
+			}
+			if c.Description == "" {
+				return
+			}
+			lines := strings.Split(c.Description, "\n")
+			desc := []rune(lines[0])
+			if unicode.IsUpper(desc[0]) {
+			    t.Errorf("Subcommands: %+v", c.Subcommands)
+				t.Errorf("Command %s's Description begins with an uppercase letter, but it has subcommands, so should be lowercase.\r\n", c.FullName())
+			}
+			if strings.Contains(lines[0], ".") {
+				t.Errorf("The first line of Command %s's Description contains a full stop. It shouldn't.\r\n", c.FullName())
+			}
+			if len(lines) > 1 {
+				if len(strings.TrimSpace(lines[1])) > 0 {
+					t.Errorf("The second line of Command %s's Description should be blank.\r\n", c.FullName())
+				}
+			}
+		})
 
 	})
 }
