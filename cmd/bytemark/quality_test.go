@@ -20,7 +20,6 @@ var destructiveCommands = [...]string{
 	"delete disc",   // can destroy data
 	"reimage",       // can destroy data
 	"resize disc",   // can increase cost
-	"set memory",    // can increase cost
 	"set cores",     // can increase cost
 
 }
