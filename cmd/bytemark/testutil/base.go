@@ -123,6 +123,7 @@ func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config
 	return
 }
 
+// TraverseAllCommands goes through all the commands it is supplied.
 func TraverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	if cmds == nil {
 		return
@@ -133,7 +134,7 @@ func TraverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	}
 }
 
-// add a little context (parent command) to commands so we can find the offender easier
+// TraverseAllCommandsWithContext adds a more details such as the parent command to commands so we can find the offender easier.
 func TraverseAllCommandsWithContext(cmds []cli.Command, name string, fn func(fullCommandString string, command cli.Command)) {
 	if cmds == nil {
 		return

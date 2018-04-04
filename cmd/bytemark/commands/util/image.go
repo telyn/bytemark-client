@@ -9,6 +9,8 @@ import (
 	"github.com/urfave/cli"
 )
 
+// ImageInstallFlags is common to a few commands and contains additonial flags
+// that get stitched the commands that use it.
 var ImageInstallFlags = []cli.Flag{
 	cli.StringFlag{
 		Name:  "authorized-keys",
@@ -38,7 +40,7 @@ var ImageInstallFlags = []cli.Flag{
 	},
 }
 
-// export and move to commands / util
+// PrepareImageInstall is a funcion that prepares an image to be imaged on a server.
 func PrepareImageInstall(c *app.Context) (imageInstall brain.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
