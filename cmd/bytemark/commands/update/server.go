@@ -97,6 +97,7 @@ func updateName(c *app.Context) error {
 	if newName.VirtualMachine == "" {
 		return nil
 	}
+	fmt.Printf("GOT HERE! %v %+v\n", vmName, newName)
 	return c.Client().MoveVirtualMachine(vmName, newName)
 }
 
