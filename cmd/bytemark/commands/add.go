@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	commands = append(commands, cli.Command{
+	Commands = append(Commands, cli.Command{
 		Name:      "add",
 		Usage:     "add servers, discs, etc - see `bytemark help create <kind of thing> `",
 		UsageText: "add server|group|disc|backup",
