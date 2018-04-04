@@ -14,8 +14,8 @@ import (
 )
 
 var destructiveCommands = [...]string{
-	"add server",    // can increase cost
-	"add discs",     // can increase cost
+	// "add server",    // can increase cost
+	// "add discs",     // can increase cost
 	"delete server", // can destroy data
 	"delete group",  // can destroy data
 	"delete disc",   // can destroy data
