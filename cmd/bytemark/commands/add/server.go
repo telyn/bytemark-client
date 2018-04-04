@@ -52,7 +52,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 				Usage: "One or more disc specifications. Defaults to a single 25GiB sata-grade disc",
 				Value: new(util.DiscSpecFlag),
 			},
-			forceFlag,
+			commandsUtil.ForceFlag,
 			cli.StringFlag{
 				Name:  "hwprofile",
 				Usage: "The hardware profile to use. Defaults to the current modern profile. See `bytemark profiles` for a list of hardware profiles available.",

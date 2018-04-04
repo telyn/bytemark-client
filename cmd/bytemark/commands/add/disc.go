@@ -4,6 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+	commandsUtil "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/util"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -19,7 +20,7 @@ func init() {
 				Usage: "A disc to add. You can specify as many discs as you like by adding more --disc flags.",
 				Value: new(util.DiscSpecFlag),
 			},
-			forceFlag,
+			commandsUtil.ForceFlag,
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to add the disc to",
