@@ -123,12 +123,24 @@ func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config
 	return
 }
 
-func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
+func TraverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	if cmds == nil {
 		return
 	}
 	for _, c := range cmds {
 		fn(c)
-		traverseAllCommands(c.Subcommands, fn)
+		TraverseAllCommands(c.Subcommands, fn)
+	}
+}
+
+// add a little context (parent command) to commands so we can find the offender easier
+func TraverseAllCommandsWithContext(cmds []cli.Command, name string, fn func(fullCommandString string, command cli.Command)) {
+	if cmds == nil {
+		return
+	}
+	for _, c := range cmds {
+		subName := name + " " + c.FullName()
+		fn(subName, c)
+		TraverseAllCommandsWithContext(c.Subcommands, subName, fn)
 	}
 }
