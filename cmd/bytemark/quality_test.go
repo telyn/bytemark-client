@@ -9,6 +9,7 @@ package main
 import (
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/urfave/cli"
 )
 
@@ -40,7 +41,7 @@ func TestDestructiveCommandsHaveForceFlags(t *testing.T) {
 	for _, cmd := range destructiveCommands {
 		cmds[cmd] = &s{}
 	}
-	traverseAllCommands(Commands(true), func(c cli.Command) {
+	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		for _, cmd := range destructiveCommands {
 			if c.FullName() == cmd {
 				cmds[cmd].Seen = true

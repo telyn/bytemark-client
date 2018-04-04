@@ -8,6 +8,7 @@ import (
 	"unicode"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -18,7 +19,7 @@ func TestCommandsComplete(t *testing.T) {
 
 	// TODO: Add descriptions to admin commands. it's necessary now
 	t.Skip("Need to add descriptions for admin commands.")
-	traverseAllCommands(Commands(true), func(c cli.Command) {
+	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		emptyThings := make([]string, 0, 4)
 		if c.Name == "" {
 			log.Log("There is a command with an empty Name.")
@@ -95,7 +96,7 @@ func hasFullStop(s string) bool {
 }
 
 func TestFlagsHaveUsage(t *testing.T) {
-	traverseAllCommands(Commands(true), func(c cli.Command) {
+	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		for _, f := range c.Flags {
 			if checkFlagUsage(f, isEmpty) {
 				t.Errorf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.GetName())
@@ -110,7 +111,7 @@ func TestFlagsHaveUsage(t *testing.T) {
 }
 
 func TestUsageStyleConformance(t *testing.T) {
-	traverseAllCommandsWithContext(Commands(true), "", func(name string, c cli.Command) {
+	testutil.TraverseAllCommandsWithContext(Commands(true), "", func(name string, c cli.Command) {
 		t.Run(name, func(t *testing.T) {
 			if firstIsUpper(c.Usage) {
 				t.Error("Usage should be lowercase but begins with an uppercase letter")
@@ -131,7 +132,7 @@ func TestUsageStyleConformance(t *testing.T) {
 // the first line should start lowercase and end without a full stop, and the second
 // should be blank
 func TestSubcommandStyleConformance(t *testing.T) {
-	traverseAllCommands(Commands(true), func(c cli.Command) {
+	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		if c.Subcommands == nil {
 			return
 		}
