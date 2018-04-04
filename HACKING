@@ -92,7 +92,9 @@ what they're for
 │       │                       things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
 │       ├── commands - empty package
-│       │   └── admin - contains all the admin commands in admin.Commands
+│       │   ├── admin - contains all the admin commands in admin.Commands
+│       │   ├── update - contains all the update commands
+│       │   └── util - common code shared between commands
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
 │           │      including: Config - which manages configuration from the
@@ -205,5 +207,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: c398af57eea3c352dac1ed42c6d261fcb5f7fe36730b55ce1c9b3109d6e3ee39
+# sha256sum: 2ac601b671fe19146c4e9618e154de18aaa469c0918b18a0ee58b6d49d7f21ed
 
