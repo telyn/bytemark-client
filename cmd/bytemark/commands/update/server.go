@@ -1,7 +1,7 @@
 package update
 
 import (
-"fmt"
+	"fmt"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
@@ -13,10 +13,25 @@ import (
 
 func init() {
 	Commands = append(Commands, cli.Command{
-		Name:        "server",
-		Usage:       "update a server's configuration",
-		UsageText:   "update server [flags] <server>",
-		Description: `Updates the configuration of an existing Cloud Server.`,
+		Name:      "server",
+		Usage:     "update a server's configuration",
+		UsageText: "update server [flags] <server>",
+		Description: `Updates the configuration of an existing Cloud Server.
+
+Note that for changes to memory or hardware profile to take effect you will need to restart the server.
+
+Updating a server's name also allows it to be moved between groups and accounts you administer.
+
+EXAMPLES
+
+        bytemark update server --new-name boron oxygen
+	        This will rename the server called oxygen in your default group to boron, still in your default group.
+
+	bytemark update server --new-name sunglasses.development sunglasses
+		This will move the server called sunglasses into the development group, keeping its name as sunglasses,
+
+	bytemark update server --new-name rennes.bretagne.france charata.chaco.argentina
+		This will move the server called charata in the chaco group in the argentina account, placing it in the bretagne group in the france account and rename it to rennes.`,
 		Flags: append(app.OutputFlags("server", "object"),
 			cli.GenericFlag{
 				Name:  "memory",
@@ -50,7 +65,7 @@ func updateMemory(c *app.Context) error {
 	vmName := c.VirtualMachineName("server")
 	memory := c.Size("memory")
 
-	if memory != 0 {
+	if memory == 0 {
 		return nil
 	}
 	if c.VirtualMachine.Memory < memory {
