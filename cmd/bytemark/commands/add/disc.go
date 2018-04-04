@@ -27,12 +27,12 @@ func init() {
 				Value: new(app.VirtualMachineNameFlag),
 			},
 		},
-		Usage:     "create virtual discs attached to one of your cloud servers",
+		Usage:     "add virtual discs attached to one of your cloud servers",
 		UsageText: "add discs [--disc <disc spec>]... <cloud server>",
 		Description: `A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
-Multiple --disc flags can be used to create multiple discs`,
+Multiple --disc flags can be used to add multiple discs`,
 		Action: app.Action(args.Optional("server", "cores", "memory", "disc"), with.Auth, createDiscs),
 	})
 }

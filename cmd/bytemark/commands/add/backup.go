@@ -11,9 +11,9 @@ import (
 func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "backup",
-		Usage:       "create a backup of a disc's current state",
+		Usage:       "add a backup of a disc's current state",
 		UsageText:   "add backup <cloud server> <disc label>",
-		Description: `Creates a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
+		Description: `Add a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "disc",

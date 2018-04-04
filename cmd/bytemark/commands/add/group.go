@@ -12,13 +12,13 @@ import (
 func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "group",
-		Usage:       "create a group for organising your servers",
+		Usage:       "add a group for organising your servers",
 		UsageText:   "add group <group name>",
 		Description: `Groups are part of your server's fqdn`,
 		Flags: []cli.Flag{
 			cli.GenericFlag{
 				Name:  "group",
-				Usage: "the name of the group to create",
+				Usage: "the name of the group to add",
 				Value: new(app.GroupNameFlag),
 			},
 		},

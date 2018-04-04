@@ -21,14 +21,14 @@ import (
 func init() {
 	createServerCmd := cli.Command{
 		Name:      "server",
-		Usage:     `create a new server with bytemark`,
+		Usage:     `add a new server with bytemark`,
 		UsageText: "add server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
-		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and weekly backups of the first disc.
+		Description: `Adds a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and weekly backups of the first disc.
     
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.
-Multiple --disc flags can be used to create multiple discs
+Multiple --disc flags can be used to add multiple discs
 
 If --backup is set then a backup of the first disk will be taken at the
 frequency specified - never, daily, weekly or monthly. This backup will be free if
