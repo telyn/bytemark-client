@@ -10,7 +10,7 @@ func init() {
 		Name:        "update",
 		Usage:       "updates server etc - see `bytemark help update <kind of thing> `",
 		UsageText:   "update server",
-		Description: `Update an existing server`,
+		Description: `update an existing server`,
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: update.Commands,
 	})
