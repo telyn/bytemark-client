@@ -128,7 +128,7 @@ func TestConfigDefaultConfigDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	expected := filepath.Join(os.Getenv("HOME"), "/.bytemark")
-	is.Equal(expected, config.Dir)
+	is.Equal(expected, config.ConfigDir())
 }
 
 func TestConfigEnvConfigDir(t *testing.T) {
@@ -143,7 +143,7 @@ func TestConfigEnvConfigDir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	is.Equal(expected, config.Dir)
+	is.Equal(expected, config.ConfigDir())
 }
 
 func TestConfigPassedConfigDir(t *testing.T) {
@@ -156,7 +156,7 @@ func TestConfigPassedConfigDir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	is.Equal(expected, config.Dir)
+	is.Equal(expected, config.ConfigDir())
 }
 
 /*

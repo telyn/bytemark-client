@@ -33,8 +33,8 @@ type config struct {
 }
 
 // New sets up a new config struct. Pass in an empty string to default to ~/.bytemark
-func New(configDir string) (conf *config, err error) {
-	conf = new(config)
+func New(configDir string) (manager Manager, err error) {
+	conf := new(config)
 	conf.Memo = make(map[string]Var)
 	home := os.Getenv("HOME")
 	if runtime.GOOS == "windows" {
