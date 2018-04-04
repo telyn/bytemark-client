@@ -27,7 +27,7 @@ func init() {
 			},
 		},
 		Usage:     "create virtual discs attached to one of your cloud servers",
-		UsageText: "create discs [--disc <disc spec>]... <cloud server>",
+		UsageText: "add discs [--disc <disc spec>]... <cloud server>",
 		Description: `A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
 If there are two fields, they are assumed to be grade and size.

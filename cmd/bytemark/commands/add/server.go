@@ -9,7 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-
+	commandsUtil "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/util"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -22,7 +22,7 @@ func init() {
 	createServerCmd := cli.Command{
 		Name:      "server",
 		Usage:     `create a new server with bytemark`,
-		UsageText: "create server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
+		UsageText: "add server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
 		Description: `Creates a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and weekly backups of the first disc.
     
 A disc spec looks like the following: label:grade:size
@@ -96,7 +96,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 		),
 		Action: app.Action(args.Optional("name", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createServer),
 	}
-	createServerCmd.Flags = append(createServerCmd.Flags, imageInstallFlags...)
+	createServerCmd.Flags = append(createServerCmd.Flags, commandsUtil.ImageInstallFlags...)
 	Commands = append(Commands, createServerCmd)
 }
 
@@ -157,7 +157,7 @@ func createServerPrepSpec(c *app.Context) (spec brain.VirtualMachineSpec, err er
 		return
 	}
 
-	imageInstall, _, err := prepareImageInstall(c)
+	imageInstall, _, err := commandsUtil.PrepareImageInstall(c)
 	if err != nil {
 		return
 	}
