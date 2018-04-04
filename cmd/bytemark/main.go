@@ -137,7 +137,7 @@ OPTIONS:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-   ` + name + `{{.UsageText}}{{if .Description}}
+   ` + name + ` {{.UsageText}}{{if .Description}}
 
    {{.Description}}{{end}}{{if .Category}}
 
