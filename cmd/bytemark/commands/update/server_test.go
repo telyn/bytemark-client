@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 func TestUpdateServer(t *testing.T) {
@@ -14,10 +15,16 @@ func TestUpdateServer(t *testing.T) {
 		Group:   "default",
 		Account: "default-account",
 	}
-	testVM := lib.VirtualMachineName{
+	testVMName := lib.VirtualMachineName{
 		VirtualMachine: "test",
 		Group:          "default",
 		Account:        "default-account",
+	}
+	testVM := brain.VirtualMachine{
+		Name:     "test",
+		Hostname: "test.default",
+		GroupID:  1,
+		Memory:   1024,
 	}
 	type move struct {
 		expected bool
@@ -27,6 +34,8 @@ func TestUpdateServer(t *testing.T) {
 		name          string
 		args          string
 		vmName        lib.VirtualMachineName
+		vm            brain.VirtualMachine
+		memory        int
 		hwProfile     string
 		hwProfileLock bool
 		move          move
@@ -35,7 +44,8 @@ func TestUpdateServer(t *testing.T) {
 		{
 			name:   "RenameVM",
 			args:   "--new-name new --server test",
-			vmName: testVM,
+			vmName: testVMName,
+			vm:     testVM,
 			move: move{
 				expected: true,
 				newName: lib.VirtualMachineName{
@@ -46,16 +56,68 @@ func TestUpdateServer(t *testing.T) {
 			},
 		},
 		{
+			name:   "MoveVMGroup",
+			args:   "--new-name test.foo --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			move: move{
+				expected: true,
+				newName: lib.VirtualMachineName{
+					VirtualMachine: "test",
+					Group:          "foo",
+					Account:        "default-account",
+				},
+			},
+		},
+		{
+			name:   "MoveVMAccount",
+			args:   "--new-name test.default.other-account --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			move: move{
+				expected: true,
+				newName: lib.VirtualMachineName{
+					VirtualMachine: "test",
+					Group:          "default",
+					Account:        "other-account",
+				},
+			},
+		},
+		{
+			name:      "HWProfileLockErrorsWithoutHWProfile",
+			args:      "--hw-profile-lock --server test",
+			vmName:    testVMName,
+			vm:        testVM,
+			shouldErr: true,
+		},
+		{
 			name:      "ChangeHWProfile",
 			args:      "--hw-profile foo --server test",
-			vmName:    testVM,
+			vmName:    testVMName,
+			vm:        testVM,
 			hwProfile: "foo",
+		},
+		{
+			name:          "ChangeHWProfileWithLock",
+			args:          "--hw-profile-lock --hw-profile foo --server test",
+			vmName:        testVMName,
+			vm:            testVM,
+			hwProfile:     "foo",
+			hwProfileLock: true,
+		},
+		{
+			name:   "ChangeMemory",
+			args:   "--force --memory 10 --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			memory: 10,
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 			config.When("GetVirtualMachine").Return(defVM)
+			client.When("GetVirtualMachine", test.vmName).Return(&test.vm).Times(1)
 			config.When("Force").Return(true)
 
 			if test.hwProfile != "" {
@@ -64,6 +126,10 @@ func TestUpdateServer(t *testing.T) {
 
 			if test.move.expected {
 				client.When("MoveVirtualMachine", test.vmName, test.move.newName).Return(nil).Times(1)
+			}
+
+			if test.memory > 0 {
+				client.When("SetVirtualMachineMemory", test.vmName, test.memory * 1024).Return(nil).Times(1)
 			}
 
 			args := strings.Split("bytemark update server "+test.args, " ")

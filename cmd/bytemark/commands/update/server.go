@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 
+	cutil "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/util"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/urfave/cli"
 )
@@ -33,6 +34,7 @@ EXAMPLES
 	bytemark update server --new-name rennes.bretagne.france charata.chaco.argentina
 		This will move the server called charata in the chaco group in the argentina account, placing it in the bretagne group in the france account and rename it to rennes.`,
 		Flags: append(app.OutputFlags("server", "object"),
+			cutil.ForceFlag,
 			cli.GenericFlag{
 				Name:  "memory",
 				Value: new(util.SizeSpecFlag),
@@ -57,7 +59,7 @@ EXAMPLES
 				Value: new(app.VirtualMachineNameFlag),
 			},
 		),
-		Action: app.Action(args.Optional("new-name", "hwprofile", "memory"), with.RequiredFlags("server"), with.Auth, updateServer),
+		Action: app.Action(args.Optional("new-name", "hwprofile", "memory"), with.RequiredFlags("server"), with.VirtualMachine("server"), with.Auth, updateServer),
 	})
 }
 
