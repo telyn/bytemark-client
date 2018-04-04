@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -24,7 +25,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 	seenImage := false
 	seenRootPassword := false
 
-	traverseAllCommands(Commands(true), func(cmd cli.Command) {
+	testutil.TraverseAllCommands(Commands(true), func(cmd cli.Command) {
 		if cmd.FullName() == "create server" {
 			seenCmd = true
 			for _, f := range cmd.Flags {
@@ -201,7 +202,7 @@ func TestCreateServer(t *testing.T) {
 
 	for i, test = range tests {
 		t.Logf("TestCreateVirtualMachine %d", i)
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 		config.When("GetVirtualMachine").Return(test.ConfigVirtualMachine)
 
 		vmname := lib.VirtualMachineName{

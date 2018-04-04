@@ -1,21 +1,18 @@
 package add_test
 
 import (
-	"runtime/debug"
-	"strings"
-	"testing"
-	"time"
-
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
-	"github.com/urfave/cli"
+	"strings"
+	"testing"
 )
 
 func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
