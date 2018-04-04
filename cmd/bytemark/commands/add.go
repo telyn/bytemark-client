@@ -9,13 +9,12 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:      "add",
 		Usage:     "add servers, discs, etc - see `bytemark help add <kind of thing> `",
-		UsageText: "add server|group|disc|backup",
-		Description: `add a new group, server, disc or backup
+		UsageText: "add server|group|disc",
+		Description: `add a new group, server or disc
 
   add disc[s] [--disc <disc spec>]... <cloud server>
   add group [--account <name>] <name>
   add server (see bytemark help create server)
-  add backup <cloud server> <disc label>
 
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
