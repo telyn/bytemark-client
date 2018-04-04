@@ -23,7 +23,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 	c.When("CreateDisc", name, disc).Return(nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark create disc --force --disc archive:35 test-server", " "))
+	err := app.Run(strings.Split("bytemark add disc --force --disc archive:35 test-server", " "))
 	is.Nil(err)
 
 	if ok, err := c.Verify(); !ok {

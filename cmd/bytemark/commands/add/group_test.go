@@ -22,7 +22,7 @@ func TestCreateGroupCommand(t *testing.T) {
 	}
 	c.When("CreateGroup", group).Return(nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark create group test-group", " "))
+	err := app.Run(strings.Split("bytemark add group test-group", " "))
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)

@@ -25,7 +25,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 	seenRootPassword := false
 
 	testutil.TraverseAllCommands(commands.Commands, func(cmd cli.Command) {
-		if cmd.FullName() == "create server" {
+		if cmd.FullName() == "add server" {
 			seenCmd = true
 			for _, f := range cmd.Flags {
 				switch f.GetName() {
@@ -112,7 +112,7 @@ func TestCreateServer(t *testing.T) {
 			ConfigVirtualMachine: lib.VirtualMachineName{Group: "default"},
 			GroupName:            lib.GroupName{Group: "default"},
 			Args: []string{
-				"bytemark", "create", "server",
+				"bytemark", "add", "server",
 				"--authorized-keys", "test-pubkey",
 				"--firstboot-script", "test-script",
 				"--cdrom", "https://example.com/example.iso",
@@ -156,7 +156,7 @@ func TestCreateServer(t *testing.T) {
 				Account: "default-account",
 			},
 			Args: []string{
-				"bytemark", "create", "server",
+				"bytemark", "add", "server",
 				"--cores", "1",
 				"--force",
 				"--memory", "1",
@@ -182,7 +182,7 @@ func TestCreateServer(t *testing.T) {
 				}},
 			},
 			Args: []string{
-				"bytemark", "create", "server",
+				"bytemark", "add", "server",
 				"--force",
 				"--no-image",
 				"--backup", "never",

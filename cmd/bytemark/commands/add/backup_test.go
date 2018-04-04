@@ -25,7 +25,7 @@ func TestCreateBackup(t *testing.T) {
 	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)
 
 	err := app.Run([]string{
-		"bytemark", "create", "backup", "test-server", "test-disc",
+		"bytemark", "add", "backup", "test-server", "test-disc",
 	})
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
