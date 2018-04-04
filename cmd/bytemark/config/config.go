@@ -63,7 +63,7 @@ func New(configDir string) (manager Manager, err error) {
 	}
 
 	if !stat.IsDir() {
-		return nil, &ConfigDirInvalidError{conf.Dir}
+		return nil, &DirInvalidError{conf.Dir}
 	}
 
 	dbgLog := conf.GetPath("debug.log")
@@ -350,7 +350,7 @@ func (config *config) read(name string) (Var, error) {
 			return config.GetDefault(name), nil
 		}
 
-		return config.GetDefault(name), &ConfigReadError{Name: name, Path: path, Err: err}
+		return config.GetDefault(name), &ReadError{Name: name, Path: path, Err: err}
 	}
 
 	return Var{name, strings.TrimSpace(string(contents)), "FILE " + path}, nil
@@ -376,7 +376,7 @@ func (config *config) SetPersistent(name, value, source string) error {
 	config.Set(name, value, source)
 	err := ioutil.WriteFile(path, []byte(value), 0600)
 	if err != nil {
-		return &ConfigWriteError{Name: name, Path: path, Err: err}
+		return &WriteError{Name: name, Path: path, Err: err}
 	}
 	return nil
 }
@@ -398,7 +398,7 @@ func (config *config) Unset(name string) (err error) {
 		info, statErr := os.Stat(config.Dir)
 		if statErr != nil {
 			if !info.IsDir() {
-				return &ConfigDirInvalidError{config.Dir} // config dir is not a dir.
+				return &DirInvalidError{config.Dir} // config dir is not a dir.
 			}
 			return nil // file didn't exist, so was already unset => success
 		}

@@ -5,12 +5,12 @@ import (
 	"strings"
 )
 
-// ConfigDirInvalidError is returned when the path specified as the config dir was not a directory.
-type ConfigDirInvalidError struct {
+// DirInvalidError is returned when the path specified as the config dir was not a directory.
+type DirInvalidError struct {
 	Path string
 }
 
-func (e *ConfigDirInvalidError) Error() string {
+func (e *DirInvalidError) Error() string {
 	return fmt.Sprintf("The config directory is '%s' but it doesn't seem to be a directory.", e.Path)
 }
 
@@ -23,28 +23,28 @@ func (e *CannotLoadDefinitionsError) Error() string {
 	return fmt.Sprintf("Unable to load the definitions file from the Bytemark API.")
 }
 
-// ConfigReadError is returned when a file containing a value for a configVar couldn't be read.
-type ConfigReadError struct {
+// ReadError is returned when a file containing a value for a Var couldn't be read.
+type ReadError struct {
 	Name string
 	Path string
 	Err  error
 }
 
-func (e *ConfigReadError) Error() string {
+func (e *ReadError) Error() string {
 	if e.Err != nil {
 		return fmt.Sprintf("Unable to read config for %s from %s - %v", e.Name, e.Path, e.Err)
 	}
 	return fmt.Sprintf("Unable to read config for %s from %s.", e.Name, e.Path)
 }
 
-// ConfigWriteError is returned when a file containing a value for a configVar couldn't be written to.
-type ConfigWriteError struct {
+// WriteError is returned when a file containing a value for a Var couldn't be written to.
+type WriteError struct {
 	Name string
 	Path string
 	Err  error
 }
 
-func (e *ConfigWriteError) Error() string {
+func (e *WriteError) Error() string {
 	if e.Err != nil {
 		return fmt.Sprintf("Unable to write config for %s to %s.", e.Name, e.Path)
 	}
@@ -53,10 +53,10 @@ func (e *ConfigWriteError) Error() string {
 
 // InvalidVarError is used to inform the user that they variable they attempted to set / get doesn't exist
 type InvalidVarError struct {
-	ConfigVar string
+	Var string
 }
 
 func (e InvalidVarError) Error() string {
 	vs := "'" + strings.Join(configVars[:], "','") + "'"
-	return fmt.Sprintf("'%s' is not a valid config var. Valid config vars are: %s", e.ConfigVar, vs)
+	return fmt.Sprintf("'%s' is not a valid config var. Valid config vars are: %s", e.Var, vs)
 }
