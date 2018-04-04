@@ -2,7 +2,6 @@ package add_test
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
