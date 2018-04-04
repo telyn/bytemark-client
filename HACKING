@@ -91,16 +91,21 @@ what they're for
 │       │   └── with - functions for chaining together using app.Action to attach
 │       │                       things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
-│       ├── commands - empty package
-│       │   └── admin - contains all the admin commands in admin.Commands
+│       ├── commands - top-level command skeletons and those which contain no
+│       │   │          subcommands or only one subcommand
+│       │   ├── admin - contains all the admin commands in admin.Commands
+│       │   ├── add - contains commands for adding or creating extra resources to
+│       │   │         and within your bytemark account.
+│       │   ├── admin - contains all the admin commands in admin.Commands
+│       │   └── util - common code shared between commands
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
 │           │      including: Config - which manages configuration from the
-│	    │                          environment, global flags and config dir
-│	    │                 CallBrowser - a function for opening a browser
-│	    │                               to a given page on any OS
-│	    │                 Some additional parsing functions and flag types
-│	    │         	           that don't require access to an app.Context
+│	          │                          environment, global flags and config dir
+│	          │                 CallBrowser - a function for opening a browser
+│	          │                               to a given page on any OS
+│	          │                 Some additional parsing functions and flag types
+│	          │         	           that don't require access to an app.Context
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff. 
 │         Also includes the manpage source (bytemark.asciidoc)
@@ -114,8 +119,8 @@ what they're for
 │   ├── brain - types for use with the Bytemark Cloud Servers brain
 │   ├── output - Functions and types related to human-readable output of the
 │   │   │        other types in lib.
-│   │	│        DefaultFieldsHaver interface defined and tested-for here
-│   │	│        (required for table & list output types)
+│   │	  │        DefaultFieldsHaver interface defined and tested-for here
+│   │	  │        (required for table & list output types)
 │   │   └── prettyprint - PrettyPrinter interface and a helper function for 
 │   │                     writing PrettyPrinters
 │   │                     All the types in lib/billing, lib/brain and lib/spp 
@@ -205,5 +210,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: c398af57eea3c352dac1ed42c6d261fcb5f7fe36730b55ce1c9b3109d6e3ee39
+# sha256sum: 366767d30e0d053f2f3a3665e5f4ba2084a898967e87f5ef8be61a8fdb4bac22
 
