@@ -12,6 +12,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	commandsPkg "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -94,7 +95,7 @@ func main() {
 	os.Exit(int(util.ProcessError(err)))
 }
 
-func outputDebugInfo(config util.ConfigManager) {
+func outputDebugInfo(config config.Manager) {
 	log.Debugf(log.LvlOutline, "bytemark-client %s\r\n\r\n", lib.Version)
 	// assemble a string of config vars (excluding token)
 	vars, err := config.GetAll()
@@ -150,7 +151,7 @@ OPTIONS:
 `
 }
 
-func prepConfig() (flags []cli.Flag, args []string, config util.ConfigManager) {
+func prepConfig() (flags []cli.Flag, args []string, conf config.Manager) {
 	// set up our global flags because we need some config before we can set up our App
 	flagset := flag.NewFlagSet("flags", flag.ContinueOnError)
 	help := flagset.Bool("help", false, "")
@@ -170,11 +171,11 @@ func prepConfig() (flags []cli.Flag, args []string, config util.ConfigManager) {
 		os.Exit(int(util.ProcessError(err)))
 	}
 	configDir := flagset.Lookup("config-dir").Value.String()
-	config, err = util.NewConfig(configDir)
+	conf, err = config.New(configDir)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
-	flargs := config.ImportFlags(flagset)
+	flargs := conf.ImportFlags(flagset)
 
 	//juggle the arguments in order to get the executable on the beginning
 	args = make([]string, len(flargs)+1)

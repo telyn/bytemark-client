@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/urfave/cli"
 )
 
@@ -68,7 +68,7 @@ func GlobalFlags() (flags []cli.Flag) {
 		cli.IntFlag{
 			Name:  "session-validity",
 			Usage: "seconds until your session is automatically invalidated (max 3600)",
-			Value: util.DefaultSessionValidity,
+			Value: config.DefaultSessionValidity,
 			// TODO(telyn): add more defaults to these flags
 		},
 	}

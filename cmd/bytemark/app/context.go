@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -74,8 +75,8 @@ func (c *Context) Command() cli.Command {
 }
 
 // Config returns the config attached to the App this Context is for
-func (c *Context) Config() util.ConfigManager {
-	if config, ok := c.App().Metadata["config"].(util.ConfigManager); ok {
+func (c *Context) Config() config.Manager {
+	if config, ok := c.App().Metadata["config"].(config.Manager); ok {
 		return config
 	}
 	return nil

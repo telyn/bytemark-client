@@ -9,8 +9,8 @@ import (
 	"runtime/debug"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
@@ -169,27 +169,27 @@ func stubPromptResponses(t *testing.T, counter *int, prompter *testPrompter, res
 // need that to actually happen, so that it can later do the right thing
 // alternative would be keeping a fake config around with multiple states
 // like the auth states but that seems like work
-func setupAuthConfig(t *testing.T, input authInput) (config util.ConfigManager) {
+func setupAuthConfig(t *testing.T, input authInput) (conf config.Manager) {
 	configDir, err := ioutil.TempDir("", "")
 	if err != nil {
 		t.Errorf("Unexpected error when setting up config temp directory: %v", err)
 	}
 
-	config, err = util.NewConfig(configDir)
+	conf, err = config.New(configDir)
 	if err != nil {
 		t.Errorf("Unexpected error when setting up config temp directory: %v", err)
 	}
 
 	// Pretending the input comes from terminal so as not to cause a prompt
-	config.Set("user", input.user, "INTERACTION")
-	config.Set("pass", input.pass, "TESTING")
-	config.Set("impersonate", input.impersonate, "TESTING")
-	config.Set("2fa-otp", input.otp, "TESTING")
+	conf.Set("user", input.user, "INTERACTION")
+	conf.Set("pass", input.pass, "TESTING")
+	conf.Set("impersonate", input.impersonate, "TESTING")
+	conf.Set("2fa-otp", input.otp, "TESTING")
 	if input.yubikey != "" {
-		config.Set("yubikey", "true", "TESTING")
-		config.Set("yubikey-otp", input.yubikey, "INTERACTION")
+		conf.Set("yubikey", "true", "TESTING")
+		conf.Set("yubikey-otp", input.yubikey, "INTERACTION")
 	}
-	err = config.SetPersistent("token", input.token, "TESTING")
+	err = conf.SetPersistent("token", input.token, "TESTING")
 	if err != nil {
 		t.Errorf(fmt.Sprintf("Unexpected error when setting up config temp directory: %v", err))
 	}
