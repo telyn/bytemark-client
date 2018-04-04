@@ -1,6 +1,8 @@
 package update
 
 import (
+"fmt"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
@@ -13,7 +15,7 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "server",
 		Usage:       "update a server's configuration",
-		UsageText:   "update server [flags] <name>",
+		UsageText:   "update server [flags] <server>",
 		Description: `Updates the configuration of an existing Cloud Server.`,
 		Flags: append(app.OutputFlags("server", "object"),
 			cli.GenericFlag{
@@ -22,11 +24,15 @@ func init() {
 				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units.",
 			},
 			cli.StringFlag{
-				Name:  "hwprofile",
+				Name:  "hw-profile",
 				Usage: "The hardware profile to use. See `bytemark profiles` for a list of hardware profiles available.",
 			},
+			cli.BoolFlag{
+				Name:  "hw-profile-lock",
+				Usage: "Locks the hardware profile (prevents it from being automatically upgraded when we release a newer version)",
+			},
 			cli.GenericFlag{
-				Name:  "newname",
+				Name:  "new-name",
 				Usage: "A new name for the server",
 				Value: new(app.VirtualMachineNameFlag),
 			},
@@ -36,11 +42,58 @@ func init() {
 				Value: new(app.VirtualMachineNameFlag),
 			},
 		),
-		Action: app.Action(args.Optional("newname", "hwprofile", "memory"), with.RequiredFlags("server"), with.Auth, updateServer),
+		Action: app.Action(args.Optional("new-name", "hwprofile", "memory"), with.RequiredFlags("server"), with.Auth, updateServer),
 	})
 }
 
-func updateServer(c *app.Context) (err error) {
-	//FIXME: stuff here
+func updateMemory(c *app.Context) error {
+	vmName := c.VirtualMachineName("server")
+	memory := c.Size("memory")
+
+	if memory != 0 {
+		return nil
+	}
+	if c.VirtualMachine.Memory < memory {
+		if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You're increasing the memory by %dGiB - this may cost more, are you sure?", (memory-c.VirtualMachine.Memory)/1024)) {
+			return util.UserRequestedExit{}
+		}
+	}
+	return c.Client().SetVirtualMachineMemory(vmName, memory)
+}
+
+func updateHwProfile(c *app.Context) error {
+	vmName := c.VirtualMachineName("server")
+	hwProfile := c.String("hw-profile")
+	hwProfileLock := c.Bool("hw-profile-lock")
+
+	if hwProfile == "" {
+		if hwProfileLock {
+			return c.Help("Must specify a hardware profile to lock")
+		}
+		return nil
+	}
+	return c.Client().SetVirtualMachineHardwareProfile(vmName, hwProfile, hwProfileLock)
+}
+
+func updateName(c *app.Context) error {
+	vmName := c.VirtualMachineName("server")
+	newName := c.VirtualMachineName("new-name")
+
+	if newName.VirtualMachine == "" {
+		return nil
+	}
+	return c.Client().MoveVirtualMachine(vmName, newName)
+}
+
+func updateServer(c *app.Context) error {
+	for _, err := range []error{
+		updateMemory(c),
+		updateHwProfile(c),
+		updateName(c), // needs to be last
+	} {
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
