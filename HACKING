@@ -52,11 +52,9 @@ pretty normal command, in terms of its implementation. It's defined in show.go
 
 Here's the source for its Action. (app here being cmd/bytemark/app)
 
-Action: app.Action(args.Optional("account"), with.Account("account"),
-         func(c *app.Context) error {
-	     return c.OutputInDesiredForm(c.Account)
-         }
-),
+Action: app.Action(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
+	return c.OutputInDesiredForm(c.Account)
+}),
 
 app.Action returns a `func(c *cli.Context) error`, and takes 
 `(func(c *app.Context) error)...` as arguments. The function returned by
