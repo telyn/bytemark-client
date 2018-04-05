@@ -101,12 +101,12 @@ what they're for
 │       │            and config dir. 
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
-│           │      including: Config - which manages configuration from the
-│	    │                          environment, global flags and config dir
-│	    │                 CallBrowser - a function for opening a browser
-│	    │                               to a given page on any OS
-│	    │                 Some additional parsing functions and flag types
-│	    │         	           that don't require access to an app.Context
+│           │      including: CallBrowser - a function for opening a browser
+│	    │                                     to a given page on any OS
+│	    │                       Prompter - utility interface for prompting
+│	    │                                  for input including passwords
+│	    │                       Some additional parsing functions and flag types
+│	    │         	                 that don't require access to an app.Context
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff. 
 │         Also includes the manpage source (bytemark.asciidoc)
