@@ -14,7 +14,7 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:      "vlan group",
 		Aliases:   []string{"vlan-group"},
-		Usage:     "creates groups for private VLANs",
+		Usage:     "adds groups for private VLANs",
 		UsageText: "--admin add vlan group <group> [vlan-num]",
 		Description: `Add a group in the specified account, with an optional VLAN specified.
 
