@@ -17,7 +17,8 @@ func init() {
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "disc",
-			Usage:       "backup disc <server> <disc label>",
+			Usage:       "create a backup of a disc",
+			UsageText:   "backup disc <server> <disc label>",
 			Description: `create a backup of the disc's current state. The backup is moved to another tail in the "iceberg" storage grade.`,
 			Flags: []cli.Flag{
 				cli.StringFlag{
