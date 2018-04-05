@@ -8,7 +8,7 @@ import (
 func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "update",
-		Usage:       "updates server etc - see `bytemark help update <kind of thing> `",
+		Usage:       "modify servers and other Bytemark Cloud resources",
 		UsageText:   "update server",
 		Description: `update an existing server`,
 		Action:      cli.ShowSubcommandHelp,
