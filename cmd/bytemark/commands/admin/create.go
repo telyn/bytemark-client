@@ -72,13 +72,13 @@ EXAMPLES:
 				Action: app.Action(with.Auth, func(ctx *app.Context) error {
 					jobRequest := brain.MigrationJobSpec{
 						Sources: brain.MigrationJobLocations{
-							Discs: StringsToNumberOrStrings(ctx.StringSlice("disc")),
-							Pools: StringsToNumberOrStrings(ctx.StringSlice("pool")),
-							Tails: StringsToNumberOrStrings(ctx.StringSlice("tail")),
+							Discs: stringsToNumberOrStrings(ctx.StringSlice("disc")),
+							Pools: stringsToNumberOrStrings(ctx.StringSlice("pool")),
+							Tails: stringsToNumberOrStrings(ctx.StringSlice("tail")),
 						},
 						Destinations: brain.MigrationJobLocations{
-							Pools: StringsToNumberOrStrings(ctx.StringSlice("to-pool")),
-							Tails: StringsToNumberOrStrings(ctx.StringSlice("to-tail")),
+							Pools: stringsToNumberOrStrings(ctx.StringSlice("to-pool")),
+							Tails: stringsToNumberOrStrings(ctx.StringSlice("to-tail")),
 						},
 						Options: brain.MigrationJobOptions{
 							Priority: ctx.Int("priority"),
