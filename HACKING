@@ -96,11 +96,11 @@ what they're for
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
 │           │      including: Config - which manages configuration from the
-│	    │                          environment, global flags and config dir
-│	    │                 CallBrowser - a function for opening a browser
-│	    │                               to a given page on any OS
-│	    │                 Some additional parsing functions and flag types
-│	    │         	           that don't require access to an app.Context
+│           │                          environment, global flags and config dir
+│           │                 CallBrowser - a function for opening a browser
+│           │                               to a given page on any OS
+│           │                 Some additional parsing functions and flag types
+│           │                 that don't require access to an app.Context
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff. 
 │         Also includes the manpage source (bytemark.asciidoc)
@@ -114,8 +114,8 @@ what they're for
 │   ├── brain - types for use with the Bytemark Cloud Servers brain
 │   ├── output - Functions and types related to human-readable output of the
 │   │   │        other types in lib.
-│   │	│        DefaultFieldsHaver interface defined and tested-for here
-│   │	│        (required for table & list output types)
+│   │   │        DefaultFieldsHaver interface defined and tested-for here
+│   │   │        (required for table & list output types)
 │   │   └── prettyprint - PrettyPrinter interface and a helper function for 
 │   │                     writing PrettyPrinters
 │   │                     All the types in lib/billing, lib/brain and lib/spp 
@@ -132,7 +132,7 @@ what they're for
 └── util - empty package
     └── log - mostly-deprecated logging functions. Needs some refactoring,
               should still be used by lib but not by cmd/bytemark and
-	      subpackages.
+              subpackages.
 
 ==============
 Quality testing
