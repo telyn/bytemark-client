@@ -52,11 +52,9 @@ pretty normal command, in terms of its implementation. It's defined in show.go
 
 Here's the source for its Action. (app here being cmd/bytemark/app)
 
-Action: app.Action(args.Optional("account"), with.Account("account"),
-         func(c *app.Context) error {
-	     return c.OutputInDesiredForm(c.Account)
-         }
-),
+Action: app.Action(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
+	return c.OutputInDesiredForm(c.Account)
+}),
 
 app.Action returns a `func(c *cli.Context) error`, and takes 
 `(func(c *app.Context) error)...` as arguments. The function returned by
@@ -92,17 +90,19 @@ what they're for
 │       │                       things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
 │       ├── commands - empty package
-│       │   └── admin - contains all the admin commands in admin.Commands
+│       │   ├── admin - contains all the admin commands in admin.Commands
+│       │   └── show - commands for extracting information from bytemark and
+│       │              displaying it in human-readable or JSON formats
 │       ├── config - manages configuration from the environment, global flags
 │       │            and config dir. 
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
-│	    │      including: CallBrowser - a function for opening a browser
-│	    │                               to a given page on any OS
-│	    │                 Prompter - utility interface for prompting
-│	    │                            for input including passwords
-│	    │                 Some additional parsing functions and flag types
-│	    │         	           that don't require access to an app.Context
+│           │      including: CallBrowser - a function for opening a browser
+│           │                               to a given page on any OS
+│           │                 Prompter - utility interface for prompting
+│           │                            for input including passwords
+│           │                 Some additional parsing functions and flag types
+│           │                 that don't require access to an app.Context
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff. 
 │         Also includes the manpage source (bytemark.asciidoc)
@@ -116,8 +116,8 @@ what they're for
 │   ├── brain - types for use with the Bytemark Cloud Servers brain
 │   ├── output - Functions and types related to human-readable output of the
 │   │   │        other types in lib.
-│   │	│        DefaultFieldsHaver interface defined and tested-for here
-│   │	│        (required for table & list output types)
+│   │   │        DefaultFieldsHaver interface defined and tested-for here
+│   │   │        (required for table & list output types)
 │   │   └── prettyprint - PrettyPrinter interface and a helper function for 
 │   │                     writing PrettyPrinters
 │   │                     All the types in lib/billing, lib/brain and lib/spp 
@@ -134,7 +134,7 @@ what they're for
 └── util - empty package
     └── log - mostly-deprecated logging functions. Needs some refactoring,
               should still be used by lib but not by cmd/bytemark and
-	      subpackages.
+              subpackages.
 
 ==============
 Quality testing
@@ -207,5 +207,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: b59d945b10e35a07ea41d65ef0168fb6ca85f1cb8cfa7b637001e663d5d27619
+# sha256sum: a783fd38893a47e36f234513f7a5df81c69de04ab0a3b8772f905bb8fa11acfe
 
