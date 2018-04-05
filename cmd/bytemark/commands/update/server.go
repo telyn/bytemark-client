@@ -19,7 +19,7 @@ func init() {
 		UsageText: "update server [flags] <server>",
 		Description: `Updates the configuration of an existing Cloud Server.
 
-Note that for changes to memory or hardware profile to take effect you will need to restart the server.
+Note that for changes to cores, memory or hardware profile to take effect you will need to restart the server.
 
 --hw-profile the hardware profile used. Hardware profiles can be simply thought of as what virtual motherboard you're using - generally you want a pretty recent one for maximum speed, but if you're running a very old or experimental OS (e.g. DOS or OS/2 or something) you may require the compatibility one. See "bytemark hwprofiles" for which ones are currently available.
 
@@ -56,6 +56,10 @@ EXAMPLES
 				Name:  "new-name",
 				Usage: "A new name for the server",
 				Value: new(app.VirtualMachineNameFlag),
+			},
+			cli.IntFlag{
+				Name:  "cores",
+				Usage: "the number of cores that should be available to the VM",
 			},
 			cli.GenericFlag{
 				Name:  "server",
@@ -96,6 +100,21 @@ func updateHwProfile(c *app.Context) error {
 	return c.Client().SetVirtualMachineHardwareProfile(vmName, hwProfile, hwProfileLock)
 }
 
+func updateCores(c *app.Context) error {
+	vmName := c.VirtualMachineName("server")
+	cores := c.Int("cores")
+
+	if cores == 0 {
+		return nil
+	}
+	if c.VirtualMachine.Cores < cores {
+		if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
+			return util.UserRequestedExit{}
+		}
+	}
+	return c.Client().SetVirtualMachineCores(vmName, cores)
+}
+
 func updateName(c *app.Context) error {
 	vmName := c.VirtualMachineName("server")
 	newName := c.VirtualMachineName("new-name")
@@ -110,6 +129,7 @@ func updateServer(c *app.Context) error {
 	for _, err := range []error{
 		updateMemory(c),
 		updateHwProfile(c),
+		updateCores(c),
 		updateName(c), // needs to be last
 	} {
 		if err != nil {
