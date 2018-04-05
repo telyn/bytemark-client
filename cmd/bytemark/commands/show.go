@@ -10,7 +10,7 @@ func init() {
 		Name:      "show",
 		Usage:     "displays information about your account and of your assets at Bytemark",
 		UsageText: "show accounts, discs, groups, etc - see `bytemark help show <kind of thing> `",
-		Description: `displays information about the given server, group, or account.
+		Description: `displays information about the given server, group, or account
 
 Plurals are scripting-friendly lists of your assets at Bytemark, showing the kind of object you request, one per line.
 
