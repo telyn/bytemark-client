@@ -4,8 +4,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
