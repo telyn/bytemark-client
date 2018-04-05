@@ -10,9 +10,11 @@ func init() {
 		Name:      "show",
 		Usage:     "displays information about your account and of your assets at Bytemark",
 		UsageText: "show accounts, discs, groups, etc - see `bytemark help show <kind of thing> `",
-		Description: `scripting-friendly lists of your assets at Bytemark
+		Description: `displays information about the given server, group, or account.
 
-This command will list the kind of object you request, one per line. Perfect for piping into a bash while loop!`,
+Plurals are scripting-friendly lists of your assets at Bytemark, showing the kind of object you request, one per line.
+
+Perfect for piping into a bash while loop!`,
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: show.Commands,
 	})
