@@ -117,7 +117,7 @@ func updateCores(c *app.Context) error {
 		return nil
 	}
 	if c.VirtualMachine.Cores < cores {
-		if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
+		if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
 			return util.UserRequestedExit{}
 		}
 	}
