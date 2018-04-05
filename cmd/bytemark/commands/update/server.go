@@ -150,13 +150,14 @@ func updateCdrom(c *app.Context) error {
 }
 
 func updateServer(c *app.Context) error {
-	for _, err := range []error{
-		updateMemory(c),
-		updateHwProfile(c),
-		updateCores(c),
-		updateCdrom(c),
-		updateName(c), // needs to be last
+	for _, f := range [](func(*app.Context) error){
+		updateMemory,
+		updateHwProfile,
+		updateCores,
+		updateCdrom,
+		updateName, // needs to be last
 	} {
+		err := f(c)
 		if err != nil {
 			return err
 		}
