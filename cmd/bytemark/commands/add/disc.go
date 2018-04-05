@@ -5,7 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	commandsUtil "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/image"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"

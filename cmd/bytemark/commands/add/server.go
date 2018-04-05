@@ -10,7 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	commandsUtil "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/image"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -97,7 +97,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 		),
 		Action: app.Action(args.Optional("name", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createServer),
 	}
-	createServerCmd.Flags = append(createServerCmd.Flags, commandsUtil.ImageInstallFlags...)
+	createServerCmd.Flags = append(createServerCmd.Flags, image.ImageInstallFlags...)
 	Commands = append(Commands, createServerCmd)
 }
 
@@ -158,7 +158,7 @@ func createServerPrepSpec(c *app.Context) (spec brain.VirtualMachineSpec, err er
 		return
 	}
 
-	imageInstall, _, err := commandsUtil.PrepareImageInstall(c)
+	imageInstall, _, err := image.PrepareImageInstall(c)
 	if err != nil {
 		return
 	}
