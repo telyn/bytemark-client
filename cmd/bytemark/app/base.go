@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -35,7 +36,7 @@ func BaseAppSetup(flags []cli.Flag, commands []cli.Command) (app *cli.App, err e
 // it abstracts away setting the Metadata on the app. Mostly so that we get some type-checking.
 // without it - it's just assigning to an interface{} which will always succeed,
 // and which would near-inevitably result in hard-to-debug null pointer errors down the line.
-func SetClientAndConfig(app *cli.App, client lib.Client, config util.ConfigManager) {
+func SetClientAndConfig(app *cli.App, client lib.Client, config config.Manager) {
 	if app.Metadata == nil {
 		app.Metadata = make(map[string]interface{})
 	}

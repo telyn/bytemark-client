@@ -5,16 +5,16 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 )
 
-func baseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, app *cli.App) {
-	config = new(mocks.Config)
+func baseTestSetup(t *testing.T, admin bool, commands []cli.Command) (conf *mocks.Config, client *mocks.Client, app *cli.App) {
+	conf = new(mocks.Config)
 	client = new(mocks.Client)
-	config.When("GetBool", "admin").Return(admin, nil)
-	config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", "human", "CODE"})
+	conf.When("GetBool", "admin").Return(admin, nil)
+	conf.When("GetV", "output-format").Return(config.Var{"output-format", "human", "CODE"})
 
 	app, err := BaseAppSetup(GlobalFlags(), commands)
 	if err != nil {
@@ -22,12 +22,12 @@ func baseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 	}
 	app.Metadata = map[string]interface{}{
 		"client": client,
-		"config": config,
+		"config": conf,
 	}
 
 	app.Writer = ioutil.Discard
 	for _, c := range commands {
-		//config.When("Get", "token").Return("no-not-a-token")
+		//conf.When("Get", "token").Return("no-not-a-token")
 
 		// the issue is that Command.FullName() is dependent on Command.commandNamePath.
 		// Command.commandNamePath is filled in when the parent's Command.startApp is called
@@ -60,15 +60,15 @@ func (tw *TestWriter) Write(p []byte) (n int, err error) {
 
 // baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
 // user is test-user
-func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, c *mocks.Client, app *cli.App) {
-	config, c, app = baseTestSetup(t, admin, commands)
+func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (conf *mocks.Config, c *mocks.Client, app *cli.App) {
+	conf, c, app = baseTestSetup(t, admin, commands)
 
-	config.When("Get", "account").Return("test-account")
-	config.When("GetIgnoreErr", "token").Return("test-token")
-	config.When("GetIgnoreErr", "user").Return("test-user")
-	config.When("GetIgnoreErr", "yubikey").Return("")
-	config.When("GetIgnoreErr", "2fa-otp").Return("")
+	conf.When("Get", "account").Return("test-account")
+	conf.When("GetIgnoreErr", "token").Return("test-token")
+	conf.When("GetIgnoreErr", "user").Return("test-user")
+	conf.When("GetIgnoreErr", "yubikey").Return("")
+	conf.When("GetIgnoreErr", "2fa-otp").Return("")
 
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	return config, c, app
+	return conf, c, app
 }

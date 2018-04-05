@@ -45,23 +45,9 @@
   revision = "e882a96ec18dd43fa283187b66af74497c9101c0"
 
 [[projects]]
-  name = "github.com/nsf/termbox-go"
-  packages = ["."]
-  revision = "362329b0aa6447eadd52edd8d660ec1dff470295"
-
-[[projects]]
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
   revision = "daf2955e742cf123959884fdff4685aa79b63135"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/telyn/form"
-  packages = [
-    ".",
-    "box"
-  ]
-  revision = "a8f1f52fb0dfdbaad1e49f4c14c9d6befdc93b49"
 
 [[projects]]
   name = "github.com/urfave/cli"
@@ -82,6 +68,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f5d464216d2c855d4edcde9cebd86856d2903f0f73cc172a9d24fbb62af76154"
+  inputs-digest = "8e7b4e0b579902d96b078870931e878a0a7de44f40817e27ac505ac2e816cd29"
   solver-name = "gps-cdcl"
   solver-version = 1

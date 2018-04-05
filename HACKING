@@ -23,12 +23,12 @@ client:
 1. Before cmd/bytemark.main is run, all the init functions are run, which
    compile slices of cli.Commands in the commands/* packages and cmd/bytemark.
 2. cmd/bytemark.main() is run, which runs some other functions in
-   cmd/bytemark to set up a cmd/bytemark/util.Config and flag.FlagSet
+   cmd/bytemark to set up a cmd/bytemark/config.Manager and flag.FlagSet
 3. cmd/bytemark.main combines the commands slices together, with 
    cmd/bytemark/commands/admin if the --admin flag is set, then creates a
    urfave/cli.App using cmd/bytemark/app.BaseAppSetup
-4. cmd/bytemark.main creates a new lib.Client, then attaches that and the Config
-   to the urfave/cli.App.
+4. cmd/bytemark.main creates a new lib.Client, then attaches that and the
+   config.Manager to the urfave/cli.App.
 5. cmd/bytemark.main runs the cli.App, which calls the relevant command's Action
    or returns help, whatever is needed.
 6. Most command actions are made using cmd/bytemark/app.Action, chaining together
@@ -96,8 +96,9 @@ what they're for
 │       │   ├── admin - contains all the admin commands in admin.Commands
 │       │   ├── add - contains commands for adding or creating extra resources to
 │       │   │         and within your bytemark account.
-│       │   ├── admin - contains all the admin commands in admin.Commands
 │       │   └── util - common code shared between commands
+│       ├── config - manages configuration from the environment, global flags
+│       │            and config dir. 
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
 │           │      including: Config - which manages configuration from the
@@ -126,12 +127,12 @@ what they're for
 │   │                     All the types in lib/billing, lib/brain and lib/spp 
 │   │                     should implement PrettyPrinter
 │   ├── requests - empty package
-│   │   └── billing - functions that make requests against the billing endpoint
+│   │   ├── billing - functions that make requests against the billing endpoint
 │   │   └── brain - functions that make requests against the brain endpoint
 │   ├── spp - types & requests for use with the spp server
 │   ├── testutil - helpers for HTTP tests in lib
-│   |   └── assert - assertion helpers for tests. with emphasis on HTTP tests
-|   |                from testutil.
+│   │   └── assert - assertion helpers for tests. with emphasis on HTTP tests
+│   │                from testutil.
 │   └── util - helpers for lib
 ├── mocks - mock types used for testing in various packages
 └── util - empty package
@@ -210,5 +211,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 366767d30e0d053f2f3a3665e5f4ba2084a898967e87f5ef8be61a8fdb4bac22
+# sha256sum: c398af57eea3c352dac1ed42c6d261fcb5f7fe36730b55ce1c9b3109d6e3ee39
 
