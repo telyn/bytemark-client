@@ -92,6 +92,8 @@ what they're for
 │       ├── commands - top-level command skeletons and those which contain no
 │       │   │          subcommands or only one subcommand
 │       │   ├── admin - contains all the admin commands in admin.Commands
+│       │   │   └── add - contains all the admin add commands for adding resources
+│       │   │             that only an admin would have permission to do
 │       │   ├── add - contains commands for adding or creating extra resources to
 │       │   │         and within your bytemark account.
 │       │   ├── show - commands for extracting information from bytemark and
