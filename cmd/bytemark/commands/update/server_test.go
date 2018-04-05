@@ -169,8 +169,8 @@ func TestUpdateServer(t *testing.T) {
 			hwProfile: "foo",
 			memory:    1,
 			cores:     1,
-			cdrom:  "https://microsoft.com/windows.iso",
-			eject:  true,
+			cdrom:     "https://microsoft.com/windows.iso",
+			eject:     true,
 			move: move{
 				expected: true,
 				newName: lib.VirtualMachineName{
