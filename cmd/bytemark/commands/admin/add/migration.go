@@ -14,7 +14,7 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:      "migration",
 		Usage:     "adds a new migration job",
-		UsageText: "--admin create migration [--priority <number>] [--disc <disc>]... [--pool <pool>]... [--tail <tail>]... [--to-pool <pool>]...",
+		UsageText: "--admin add migration [--priority <number>] [--disc <disc>]... [--pool <pool>]... [--tail <tail>]... [--to-pool <pool>]...",
 		Description: `Requests that the brain starts a migration from the various discs, pools and tails specified to the various pools specified.
         
    If no --to-pools are specified, the brain will decide destinations on its own. To migrate multiple discs, pools, or tails, or to distribute migrating discs across multiple storage pools, simply specify those flags multiple times.
@@ -24,22 +24,22 @@ When there are multiple migration jobs at once and migration concurrency limits 
 
 EXAMPLES:
    # migrate one disc whose IP is fe80::1 to tail2-sata1
-   bytemark --admin create migration --disc fe80::1 --to-pool tail2-sata1
+   bytemark --admin add migration --disc fe80::1 --to-pool tail2-sata1
 
    # empty a tail to wherever is appropriate with a high priority
-   bytemark --admin create migration --priority 10 --tail tail1
+   bytemark --admin add migration --priority 10 --tail tail1
 
    # migrate two discs, one called very-unique-label and one whose ID is 45859 to tail2-sata1
-   bytemark --admin create migration --disc very-unique-label --disc 45859 --to-pool tail2-sata1
+   bytemark --admin add migration --disc very-unique-label --disc 45859 --to-pool tail2-sata1
 
    # migrate one pool to another
-   bytemark --admin create migration --pool tail1-sata1 --to-pool tail2-sata1
+   bytemark --admin add migration --pool tail1-sata1 --to-pool tail2-sata1
 
    # migrate two pools to one pool
-   bytemark --admin create migration --pool tail1-sata1 --pool tail1-sata2 --to-pool tail2-sata1
+   bytemark --admin add migration --pool tail1-sata1 --pool tail1-sata2 --to-pool tail2-sata1
 
    # migrate a pool and a specific disc away from their current tail
-   bytemark --admin create migration --pool tail1-sata1 --disc 45859`,
+   bytemark --admin add migration --pool tail1-sata1 --disc 45859`,
 
 		Flags: []cli.Flag{
 			cli.StringSliceFlag{
