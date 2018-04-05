@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
 )
@@ -16,7 +13,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "set",
 		Usage:     "change hardware properties of Bytemark servers",
-		UsageText: "set cores <server>",
+		UsageText: "set cdrom <server>",
 		Description: `change hardware properties of Bytemark servers
 		
 These commands set various hardware properties of Bytemark servers. Note that for cores to take effect you will need to restart the server.`,
@@ -47,36 +44,6 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 						return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
 					}
 					return err
-				}),
-			},
-			{
-				Name:        "cores",
-				Usage:       "set the number of CPU cores on a Bytemark cloud server",
-				UsageText:   "set cores <server name> <cores>",
-				Description: "This command sets the number of CPU cores used by the cloud server. This will usually require a restart of the server to take effect.",
-				Flags: []cli.Flag{
-					forceFlag,
-					cli.GenericFlag{
-						Name:  "server",
-						Usage: "the server to alter",
-						Value: new(app.VirtualMachineNameFlag),
-					},
-					cli.IntFlag{
-						Name:  "cores",
-						Usage: "the number of cores that should be available to the VM",
-					},
-				},
-				Action: app.Action(args.Optional("server", "cores"), with.RequiredFlags("server", "cores"), with.VirtualMachine("server"), func(c *app.Context) error {
-					// cores should be a flag
-					vmName := c.VirtualMachineName("server")
-					cores := c.Int("cores")
-
-					if c.VirtualMachine.Cores < cores {
-						if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
-							return util.UserRequestedExit{}
-						}
-					}
-					return c.Client().SetVirtualMachineCores(vmName, cores)
 				}),
 			},
 		},

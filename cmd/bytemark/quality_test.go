@@ -20,8 +20,8 @@ var destructiveCommands = [...]string{
 	"delete disc",   // can destroy data
 	"reimage",       // can destroy data
 	"resize disc",   // can increase cost
-	"set cores",     // can increase cost
-
+	// FullName() on commands from admin/ and commands/ fails
+	//"update server", // can increase cost
 }
 
 type s struct {

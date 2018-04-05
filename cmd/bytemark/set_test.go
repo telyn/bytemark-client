@@ -28,26 +28,3 @@ func TestSetCDROM(t *testing.T) {
 		t.Fatal(vErr)
 	}
 }
-
-func TestSetCores(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "test-group",
-		Account:        "test-account"}
-
-	config.When("GetVirtualMachine").Return(defVM)
-
-	vm := getFixtureVM()
-	c.When("GetVirtualMachine", vmname).Return(&vm)
-	c.When("SetVirtualMachineCores", vmname, 4).Return(nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark set cores --force test-server.test-group.test-account 4", " "))
-	is.Nil(err)
-
-	if ok, vErr := c.Verify(); !ok {
-		t.Fatal(vErr)
-	}
-}
