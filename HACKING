@@ -94,12 +94,14 @@ what they're for
 │       │   ├── admin - contains all the admin commands in admin.Commands
 │       │   ├── add - contains commands for adding or creating extra resources to
 │       │   │         and within your bytemark account.
+│       │   └── show - commands for extracting information from bytemark and
+│       │              displaying it in human-readable or JSON formats
 │       │   └── util - common code shared between commands
 │       ├── config - manages configuration from the environment, global flags
 │       │            and config dir. 
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
-│           │      including: CallBrowser - a function for opening a 
+│           │      including: CallBrowser - a function for opening a browser
 │           │                               to a given page on any OS
 │           │                 Prompter - utility interface for prompting
 │           │                            for input including passwords
@@ -209,5 +211,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 32ffef7c67300f4eb16555d830861c3c75a86c4b6cfb191d253ea8e5633d83d4
+# sha256sum: b59d945b10e35a07ea41d65ef0168fb6ca85f1cb8cfa7b637001e663d5d27619
 
