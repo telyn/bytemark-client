@@ -8,6 +8,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	commandsUtil "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/util"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
@@ -52,7 +53,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 				Usage: "One or more disc specifications. Defaults to a single 25GiB sata-grade disc",
 				Value: new(util.DiscSpecFlag),
 			},
-			commandsUtil.ForceFlag,
+			flags.ForceFlag,
 			cli.StringFlag{
 				Name:  "hwprofile",
 				Usage: "The hardware profile to use. Defaults to the current modern profile. See `bytemark profiles` for a list of hardware profiles available.",
