@@ -49,16 +49,24 @@ func TestUpdateDiscr(t *testing.T) {
 			disc:      testDisc,
 			newSize:   100,
 		},
+		{
+			name:      "RelativeSize",
+			args:      "--force --server test --disc vda --new-size +10",
+			vmName:    testVMName,
+			discLabel: "vda",
+			disc:      testDisc,
+			newSize:   20,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 			config.When("Force").Return(true)
 			config.When("GetVirtualMachine").Return(defVM)
-			client.When("GetDisc", test.vmName, test.discLabel).Return(&test.disc).Times(1)
+			client.When("GetDisc", test.vmName, test.discLabel).Return(test.disc).Times(1)
 
 			if !test.shouldErr {
-				client.When("ResizeDisc", test.vmName, test.newSize*1024).Return(nil).Times(1)
+				client.When("ResizeDisc", test.vmName, test.discLabel, test.newSize*1024).Return(nil).Times(1)
 			}
 
 			args := strings.Split("bytemark update disc "+test.args, " ")
