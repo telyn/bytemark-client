@@ -1,7 +1,7 @@
 package with
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 )
 
@@ -22,7 +22,7 @@ func (a Authenticator) makeCredentials() (credents map[string]string, err error)
 }
 
 // EnsureAuth authenticates with the Bytemark authentication server, prompting for credentials if necessary.
-func EnsureAuth(client lib.Client, config util.ConfigManager) error {
+func EnsureAuth(client lib.Client, config config.Manager) error {
 	authenticator := NewAuthenticator(client, config)
 	return authenticator.Authenticate()
 }

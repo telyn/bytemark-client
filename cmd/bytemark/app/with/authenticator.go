@@ -8,6 +8,7 @@ import (
 
 	auth3 "gitlab.bytemark.co.uk/auth/client"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -26,13 +27,13 @@ func (r retryErr) Error() string {
 // TODO(telyn): ensure prompts / output comes out on app.ErrWriter.
 type Authenticator struct {
 	client       lib.Client
-	config       util.ConfigManager
+	config       config.Manager
 	prompter     util.Prompter
 	passPrompter passPrompter
 }
 
 // NewAuthenticator creates a new authenticator which will prompt on stderr (expecting input on stdin) and using speakeasy for password prompts.
-func NewAuthenticator(client lib.Client, config util.ConfigManager) Authenticator {
+func NewAuthenticator(client lib.Client, config config.Manager) Authenticator {
 	return Authenticator{
 		client:       client,
 		config:       config,
