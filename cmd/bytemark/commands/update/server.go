@@ -9,6 +9,7 @@ import (
 
 	cutil "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/util"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/urfave/cli"
 )
 
@@ -60,6 +61,14 @@ EXAMPLES
 			cli.IntFlag{
 				Name:  "cores",
 				Usage: "the number of cores that should be available to the VM",
+			},
+			cli.StringFlag{
+				Name:  "cd-url",
+				Usage: "An HTTP(S) URL for an ISO image file to attach as a cdrom.",
+			},
+			cli.BoolFlag{
+				Name:  "remove-cd",
+				Usage: "Removes any current cdrom, as if the cd were ejected.",
 			},
 			cli.GenericFlag{
 				Name:  "server",
@@ -125,11 +134,27 @@ func updateName(c *app.Context) error {
 	return c.Client().MoveVirtualMachine(vmName, newName)
 }
 
+func updateCdrom(c *app.Context) error {
+	vmName := c.VirtualMachineName("server")
+	cdURL := c.String("cd-url")
+	removeCD := c.Bool("remove-cd")
+
+	if cdURL == "" && !removeCD {
+		return nil
+	}
+	err := c.Client().SetVirtualMachineCDROM(vmName, cdURL)
+	if _, ok := err.(lib.InternalServerError); ok {
+		return c.Help("Couldn't set the server's cdrom - check that you have provided a valid public HTTP url")
+	}
+	return err
+}
+
 func updateServer(c *app.Context) error {
 	for _, err := range []error{
 		updateMemory(c),
 		updateHwProfile(c),
 		updateCores(c),
+		updateCdrom(c),
 		updateName(c), // needs to be last
 	} {
 		if err != nil {
