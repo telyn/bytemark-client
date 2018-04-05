@@ -33,10 +33,6 @@
   branch = "master"
   name = "github.com/cheekybits/is"
 
-[[constraint]]
-  branch = "master"
-  name = "github.com/telyn/form"
-
 [prune]
   go-tests = true
   unused-packages = true
