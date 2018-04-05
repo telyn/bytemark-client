@@ -14,7 +14,7 @@ func TestCreateBackup(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 
-	config.When("GetVirtualMachine").Return(defVM)
+	config.When("GetVirtualMachine").Return(testutil.DefVM)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",

@@ -131,7 +131,7 @@ func TestCreateServer(t *testing.T) {
 				"test-server",
 			},
 		}, {
-			ConfigVirtualMachine: defVM,
+			ConfigVirtualMachine: testutil.DefVM,
 			Spec: brain.VirtualMachineSpec{
 				VirtualMachine: brain.VirtualMachine{
 					Name:   "test-server",
@@ -164,7 +164,7 @@ func TestCreateServer(t *testing.T) {
 				"test-server",
 			},
 		}, {
-			ConfigVirtualMachine: defVM,
+			ConfigVirtualMachine: testutil.DefVM,
 			GroupName: lib.GroupName{
 				Group:   "default",
 				Account: "default-account",

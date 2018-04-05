@@ -14,7 +14,7 @@ func TestCreateGroupCommand(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 
-	config.When("GetGroup").Return(defGroup)
+	config.When("GetGroup").Return(testutil.DefGroup)
 
 	group := lib.GroupName{
 		Group:   "test-group",
