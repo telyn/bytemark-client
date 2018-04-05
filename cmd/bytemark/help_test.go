@@ -8,7 +8,6 @@ import (
 	"unicode"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -21,8 +20,7 @@ func TestCommandsComplete(t *testing.T) {
 	traverseAllCommands(Commands(true), func(c cli.Command) {
 		emptyThings := make([]string, 0, 4)
 		if c.Name == "" {
-			log.Log("There is a command with an empty Name.")
-			t.Fail()
+			t.Errorf("There is a command with an empty Name.")
 		}
 		// if a command is only usable via its sub commands, and its usage is built from the
 		// subcommands usage, its not necessary to check it.
@@ -45,8 +43,7 @@ func TestCommandsComplete(t *testing.T) {
 			emptyThings = append(emptyThings, "Action")
 		}
 		if len(emptyThings) > 0 {
-			t.Fail()
-			log.Logf("Command %s has empty %s.\r\n", c.FullName(), strings.Join(emptyThings, ", "))
+			t.Errorf("Command %s has empty %s.\r\n", c.FullName(), strings.Join(emptyThings, ", "))
 		}
 	})
 
