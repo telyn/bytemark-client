@@ -101,7 +101,7 @@ what they're for
 │       │            and config dir. 
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
-│     │      including: CallBrowser - a function for opening a browser
+│       │      including: CallBrowser - a function for opening a browser
 │	    │                               to a given page on any OS
 │	    │                 Prompter - utility interface for prompting
 │	    │                            for input including passwords
