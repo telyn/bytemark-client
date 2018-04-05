@@ -94,8 +94,8 @@ what they're for
 │       │   ├── admin - contains all the admin commands in admin.Commands
 │       │   ├── add - contains commands for adding or creating extra resources to
 │       │   │         and within your bytemark account.
-│       │   └── show - commands for extracting information from bytemark and
-│       │              displaying it in human-readable or JSON formats
+│       │   ├── show - commands for extracting information from bytemark and
+│       │   │          displaying it in human-readable or JSON formats
 │       │   └── util - common code shared between commands
 │       ├── config - manages configuration from the environment, global flags
 │       │            and config dir. 
