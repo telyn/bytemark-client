@@ -14,7 +14,7 @@ func TestCreateDiskCommand(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 
-	config.When("GetVirtualMachine").Return(defVM)
+	config.When("GetVirtualMachine").Return(testutil.DefVM)
 
 	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
 	c.When("GetVirtualMachine", name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
