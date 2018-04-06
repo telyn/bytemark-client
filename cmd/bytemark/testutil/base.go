@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -44,18 +44,18 @@ func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string
 }
 
 // BaseTestSetup constructs mock config and client and produces a cli.App with the given commands.
-func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
+func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (conf *mocks.Config, client *mocks.Client, cliapp *cli.App) {
 	cli.OsExiter = func(_ int) {}
-	config = new(mocks.Config)
+	conf = new(mocks.Config)
 	client = new(mocks.Client)
-	config.When("GetBool", "admin").Return(admin, nil)
-	config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", "human", "CODE"})
+	conf.When("GetBool", "admin").Return(admin, nil)
+	conf.When("GetV", "output-format").Return(config.Var{"output-format", "human", "CODE"})
 
 	cliapp, err := app.BaseAppSetup(app.GlobalFlags(), commands)
 	if err != nil {
 		t.Fatal(err)
 	}
-	app.SetClientAndConfig(cliapp, client, config)
+	app.SetClientAndConfig(cliapp, client, conf)
 
 	buf := bytes.Buffer{}
 	cliapp.Metadata["buf"] = &buf
@@ -123,12 +123,25 @@ func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config
 	return
 }
 
-func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
+// TraverseAllCommands goes through all the commands it is supplied.
+func TraverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	if cmds == nil {
 		return
 	}
 	for _, c := range cmds {
 		fn(c)
-		traverseAllCommands(c.Subcommands, fn)
+		TraverseAllCommands(c.Subcommands, fn)
+	}
+}
+
+// TraverseAllCommandsWithContext adds a more details such as the parent command to commands so we can find the offender easier.
+func TraverseAllCommandsWithContext(cmds []cli.Command, name string, fn func(fullCommandString string, command cli.Command)) {
+	if cmds == nil {
+		return
+	}
+	for _, c := range cmds {
+		subName := name + " " + c.FullName()
+		fn(subName, c)
+		TraverseAllCommandsWithContext(c.Subcommands, subName, fn)
 	}
 }

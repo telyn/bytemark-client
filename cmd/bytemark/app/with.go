@@ -66,6 +66,10 @@ func cleanup(c *Context) {
 	if ok {
 		*server = VirtualMachineNameFlag{}
 	}
+	server, ok = c.Context.Generic("new-name").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
 	server, ok = c.Context.Generic("from").(*VirtualMachineNameFlag)
 	if ok {
 		*server = VirtualMachineNameFlag{}
