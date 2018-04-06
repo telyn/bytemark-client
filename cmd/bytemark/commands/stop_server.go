@@ -11,13 +11,13 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "stop",
 		Usage:       "stop a server, as though pulling the power cable out",
-		UsageText:   "stop <server>",
+		UsageText:   "stop server <server>",
 		Description: "This command will instantly power down a server. Note that this may cause data loss, particularly on servers with unjournaled file systems (e.g. ext2)",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "server",
 			Usage:       "stop a server, as though pulling the power cable out",
-			UsageText:   "stop <server>",
+			UsageText:   "stop server <server>",
 			Description: "This command will instantly power down a server. Note that this may cause data loss, particularly on servers with unjournaled file systems (e.g. ext2)",
 
 			Flags: []cli.Flag{

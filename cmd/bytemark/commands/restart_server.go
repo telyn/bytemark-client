@@ -15,13 +15,13 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "restart",
 		Usage:       "power off a server and start it again",
-		UsageText:   "restart [--rescue | --appliance <appliance>] <server>",
+		UsageText:   "restart server [--rescue | --appliance <appliance>] <server>",
 		Description: "This command will power down a server and then start it back up again.",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:      "server",
 			Usage:     "power off a server and start it again",
-			UsageText: "restart [--rescue | --appliance <appliance>] <server>",
+			UsageText: "restart server [--rescue | --appliance <appliance>] <server>",
 			Flags: []cli.Flag{
 				cli.GenericFlag{
 					Name:  "server",
@@ -62,7 +62,7 @@ func init() {
 				c.Log("Done!\n\nStarting %s back up.", vmName)
 				if appliance != "" {
 					err = brainRequests.StartVirtualMachineWithAppliance(c.Client(), vmName, appliance)
-					c.Log("Server has now started. Use bytemark console %v` or visit https://%v to connect.", c.String("server"), c.Config().PanelURL())
+					c.Log("Server has now started. Use `bytemark console %v` or visit %v to connect.", c.String("server"), c.Config().PanelURL())
 				} else {
 					err = c.Client().StartVirtualMachine(vmName)
 				}

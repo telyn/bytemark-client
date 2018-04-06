@@ -14,13 +14,13 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "shutdown",
 		Usage:       "cleanly shut down a server",
-		UsageText:   "shutdown <server>",
+		UsageText:   "shutdown server <server>",
 		Description: "This command sends the ACPI shutdown signal to the server, causing a clean shut down. This is like pressing the power button on a computer you have physical access to.",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "server",
 			Usage:       "cleanly shut down a server",
-			UsageText:   "shutdown <server>",
+			UsageText:   "shutdown server <server>",
 			Description: "This command sends the ACPI shutdown signal to the server, causing a clean shut down. This is like pressing the power button on a computer you have physical access to.",
 			Flags: []cli.Flag{
 				cli.GenericFlag{

@@ -11,13 +11,13 @@ func init() {
 	Commands = append(Commands, cli.Command{
 		Name:        "start",
 		Usage:       "start a stopped server",
-		UsageText:   "start <server>",
+		UsageText:   "start server <server>",
 		Description: "This command will start a server that is not currently running.",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "server",
 			Usage:       "start a stopped server",
-			UsageText:   "start <server>",
+			UsageText:   "start server <server>",
 			Description: "This command will start a server that is not currently running.",
 			Flags: []cli.Flag{
 				cli.GenericFlag{
