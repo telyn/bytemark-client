@@ -222,25 +222,25 @@ func (variables configVars) updateConfig(c *app.Context) error {
 	for _, variable := range presentVariables {
 		set, unset := variable.getFlags(c)
 		if unset {
-			err := c.Config().Unset(variable.name)
+			err := c.Config().Unset(variable.confName())
 			if err != nil {
 				return err
 			}
 			log.Logf("%s has been unset. \r\n", variable.name)
 		} else {
-			oldVar, err := c.Config().GetV(variable.name)
+			oldVar, err := c.Config().GetV(variable.confName())
 			if err != nil {
 				return err
 			}
-			err = c.Config().SetPersistent(variable.name, set, "CMD set")
+			err = c.Config().SetPersistent(variable.confName(), set, "CMD set")
 			if err != nil {
 				return err
 			}
 
 			if oldVar.Source == "config" {
-				log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable.name, oldVar.Value, c.Config().GetIgnoreErr(variable.name))
+				log.Logf("%s has been changed.\r\nOld value: %s\r\nNew value: %s\r\n", variable.confName(), oldVar.Value, c.Config().GetIgnoreErr(variable.confName()))
 			} else {
-				log.Logf("%s has been set. \r\nNew value: %s\r\n", variable.name, c.Config().GetIgnoreErr(variable.name))
+				log.Logf("%s has been set. \r\nNew value: %s\r\n", variable.confName(), c.Config().GetIgnoreErr(variable.confName()))
 			}
 		}
 	}
