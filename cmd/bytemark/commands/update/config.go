@@ -16,6 +16,7 @@ import (
 
 type configVariable struct {
 	name        string
+	configName  string
 	description string
 	validate    func(*app.Context, string) error
 	needAuth    bool
@@ -50,9 +51,10 @@ var configVariables = configVars{
 		validate:    validateEndpointForConfigFunc("auth-endpoint"),
 	},
 	{
-		name:        "debug-level",
+		name:        "default-debug-level",
+		configName:  "debug_level",
 		description: "default debug level",
-		validate:    validateIntForConfigFunc("debug-level"),
+		validate:    validateIntForConfigFunc("default-debug-level"),
 	},
 	{
 		name:        "token",
@@ -74,6 +76,13 @@ var configVariables = configVars{
 		validate:    validateGroupForConfig,
 		needAuth:    true,
 	},
+}
+
+func (variable configVariable) confName() string {
+	if variable.configName != "" {
+		return variable.configName
+	}
+	return variable.name
 }
 
 func (variable configVariable) getFlags(c *app.Context) (string, bool) {
@@ -161,8 +170,9 @@ func validateIntForConfigFunc(variable string) func(*app.Context, string) error 
 
 func init() {
 	Commands = append(Commands, cli.Command{
-		Name:  "config",
-		Usage: "manage the bytemark client's configuration",
+		Name:      "config",
+		Usage:     "manage the bytemark client's configuration",
+		UsageText: "update config [flags]",
 		Description: `Manipulate the bytemark-client configuration
 
     Available variables:
@@ -178,7 +188,7 @@ func init() {
         billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.
         spp-endpoint - the SPP endpoint to use. https://spp-submissions.bytemark.co.uk is the default.`,
 		Flags:  append(configVariables.configFlags(), flags.Force),
-		Action: configVariables.updateConfig,
+		Action: app.Action(configVariables.updateConfig),
 	})
 }
 
@@ -202,7 +212,7 @@ func (variables configVars) updateConfig(c *app.Context) error {
 				}
 				withAuth = true
 			}
-			err := variable.validate(c, variable.name)
+			err := variable.validate(c, set)
 			if err != nil {
 				return err
 			}
@@ -216,7 +226,7 @@ func (variables configVars) updateConfig(c *app.Context) error {
 			if err != nil {
 				return err
 			}
-			log.Logf("Is has been unset. \r\n", variable.name)
+			log.Logf("%s has been unset. \r\n", variable.name)
 		} else {
 			oldVar, err := c.Config().GetV(variable.name)
 			if err != nil {
