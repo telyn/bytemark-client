@@ -10,8 +10,8 @@ import (
 func init() {
 	commands = append(commands, cli.Command{
 		Name:        "zones",
-		Usage:       "list available zones for cloud servers",
-		UsageText:   "zones",
+		Usage:       "show available zones for cloud servers",
+		UsageText:   "show zones",
 		Description: "This outputs the zones available for cloud servers to be stored and started in. Note that it is not currently possible to migrate a server between zones.",
 		Flags:       app.OutputFlags("zones", "array"),
 		Action: app.Action(with.Definitions, func(c *app.Context) error {
