@@ -93,8 +93,9 @@ what they're for
 │       ├── commands - top-level command skeletons and those which contain no
 │       │   │          subcommands or only one subcommand
 │       │   ├── admin - contains all the admin commands in admin.Commands
-│       │   │   └── add - contains all the admin add commands for adding resources
-│       │   │             that only an admin would have permission to do
+│       │   │   ├── add - contains all the admin add commands for adding resources
+│       │   │   │          that only an admin would have permission to do
+│       │   │   └── show - contains admin show commands
 │       │   ├── add - contains commands for adding or creating extra resources to
 │       │   │         and within your bytemark account.
 │       │   ├── image - common imaging code shared between commands when either
@@ -216,4 +217,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 784106ea0a960d51952630a349c6426952a9e32de7f2b48ef9aca92979c200dd
+# sha256sum: 2884805d04ca83f9fb23d451056af11854be998535f666d58fba2bbde353aee4
