@@ -1,4 +1,4 @@
-package main
+package show
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
