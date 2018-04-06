@@ -16,10 +16,10 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "set",
 		Usage:     "change hardware properties of Bytemark servers",
-		UsageText: "set cores|memory|hwprofile <server>",
+		UsageText: "set cores <server>",
 		Description: `change hardware properties of Bytemark servers
 		
-These commands set various hardware properties of Bytemark servers. Note that for memory increases, cores and hwprofile to take effect you will need to restart the server.`,
+These commands set various hardware properties of Bytemark servers. Note that for cores to take effect you will need to restart the server.`,
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
@@ -78,78 +78,7 @@ This command allows you to add a cdrom to your Bytemark server. The CD must be p
 					}
 					return c.Client().SetVirtualMachineCores(vmName, cores)
 				}),
-			}, {
-				Name:        "hwprofile",
-				Usage:       "set the hardware profile used by the cloud server",
-				UsageText:   "set hwprofile <server> <profile>",
-				Description: "This sets the hardware profile used. Hardware profiles can be simply thought of as what virtual motherboard you're using - generally you want a pretty recent one for maximum speed, but if you're running a very old or experimental OS (e.g. DOS or OS/2 or something) you may require the compatibility one. See `bytemark hwprofiles` for which ones are currently available.",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "lock",
-						Usage: "Locks the hardware profile (prevents it from being automatically upgraded when we release a newer version)",
-					},
-					cli.BoolFlag{
-						Name:  "unlock",
-						Usage: "Unlocks the hardware profile (allows it to be automatically upgraded when we release a newer version)",
-					},
-					cli.GenericFlag{
-						Name:  "server",
-						Usage: "the server whose hardware profile you wish to alter",
-						Value: new(app.VirtualMachineNameFlag),
-					},
-					cli.StringFlag{
-						Name:  "profile",
-						Usage: "the hardware profile to use",
-					},
-				},
-				Action: app.Action(args.Optional("server", "profile"), with.RequiredFlags("server", "profile"), with.Auth, func(c *app.Context) error {
-					if c.Bool("lock") && c.Bool("unlock") {
-						return c.Help("Ambiguous command, both lock and unlock specified")
-					}
-
-					profile := c.String("profile")
-					if profile == "" {
-						return c.Help("No hardware profile name was specified")
-					}
-					vmName := c.VirtualMachineName("server")
-					if c.Bool("lock") {
-						return c.Client().SetVirtualMachineHardwareProfile(vmName, profile, true)
-					} else if c.Bool("unlock") {
-						return c.Client().SetVirtualMachineHardwareProfile(vmName, profile, false)
-					} else {
-						return c.Client().SetVirtualMachineHardwareProfile(vmName, profile)
-					}
-				}),
-			}, {
-				Name:        "memory",
-				Usage:       "sets the amount of memory the server has",
-				UsageText:   "set memory <server> <memory size>",
-				Description: "Memory is specified in GiB by default, but can be suffixed with an M to indicate that it is provided in MiB",
-				Flags: []cli.Flag{
-					forceFlag,
-					cli.GenericFlag{
-						Name:  "server",
-						Usage: "the server to alter",
-						Value: new(app.VirtualMachineNameFlag),
-					},
-					cli.GenericFlag{
-						Name:  "memory",
-						Usage: "the amount of memory the machine should have",
-						Value: new(util.SizeSpecFlag),
-					},
-				},
-				Action: app.Action(args.Optional("server", "memory"), with.RequiredFlags("server", "memory"), with.VirtualMachine("server"), func(c *app.Context) error {
-					memory := c.Size("memory")
-
-					if c.VirtualMachine.Memory < memory {
-						if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You're increasing the memory by %dGiB - this may cost more, are you sure?", (memory-c.VirtualMachine.Memory)/1024)) {
-							return util.UserRequestedExit{}
-						}
-					}
-
-					vmName := c.VirtualMachineName("server")
-					return c.Client().SetVirtualMachineMemory(vmName, memory)
-				}),
-			}},
+			},
+		},
 	})
 }

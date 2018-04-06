@@ -91,6 +91,7 @@ what they're for
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
 │       ├── commands - empty package
 │       │   ├── admin - contains all the admin commands in admin.Commands
+│       │   ├── update - contains all the update commands
 │       │   └── show - commands for extracting information from bytemark and
 │       │              displaying it in human-readable or JSON formats
 │       ├── config - manages configuration from the environment, global flags
@@ -207,5 +208,5 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: a783fd38893a47e36f234513f7a5df81c69de04ab0a3b8772f905bb8fa11acfe
+# sha256sum: 135ef839301ca914e1dda3ef0316fe042a1ef0de294697243eba8e3253ec92ea
 

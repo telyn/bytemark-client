@@ -60,7 +60,7 @@ func TestUpdateBillingDefinition(t *testing.T) {
 
 }
 
-func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
+func TestUpdateServerMigrationWithSpeedAndDowntime(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
@@ -71,7 +71,7 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	downtime := 15
 	c.When("UpdateVMMigration", vmName, &speed, &downtime).Return(nil).Times(1)
 
-	err := app.Run([]string{"bytemark", "update", "vm", "migration", "vm123.group.account", "8500000000000", "15"})
+	err := app.Run([]string{"bytemark", "update", "server-migration", "vm123.group.account", "8500000000000", "15"})
 
 	is.Nil(err)
 
@@ -80,13 +80,13 @@ func TestUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	}
 }
 
-func TestUpdateVMMigrationError(t *testing.T) {
+func TestUpdateServerMigrationError(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
 
-	err := app.Run([]string{"bytemark", "update", "vm", "migration", "vm124.group.account"})
+	err := app.Run([]string{"bytemark", "update",  "server-migration", "vm124.group.account"})
 
 	is.NotNil(err)
 
