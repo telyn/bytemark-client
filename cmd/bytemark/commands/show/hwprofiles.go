@@ -10,8 +10,8 @@ import (
 func init() {
 	Commands = append(Commands, cli.Command{
 		Name:      "hwprofiles",
-		Usage:     "list hardware profiles available for cloud servers",
-		UsageText: "hwprofiles [--json]",
+		Usage:     "show hardware profiles available for cloud servers",
+		UsageText: "show hwprofiles [--json]",
 		Description: `Hardware profiles are used by cloud servers and choosing between them can be thought of as 'which virtual motherboard should I use?'.
 Generally bytemark provide two - virtio and compatibility. The virtio one has better performance but may not work with obscure operating systems, or without drivers (particularly important if you are installing windows from CD rather than our images`,
 		Flags: app.OutputFlags("hardware profiles", "array"),
