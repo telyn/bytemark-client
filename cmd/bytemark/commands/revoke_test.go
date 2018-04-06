@@ -1,10 +1,10 @@
-package main
+package commands_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -12,33 +12,42 @@ import (
 )
 
 func TestRevokePrivilege(t *testing.T) {
+
+	defVM := lib.VirtualMachineName{Group: "default", Account: "default-account"}
+	defGroup := lib.GroupName{Group: "default", Account: "default-account"}
+
 	tests := []struct {
+		Name      string
 		Setup     func(config *mocks.Config, c *mocks.Client)
 		ShouldErr bool
 		Input     string
 	}{
 		{
+			Name: "MissingArguments",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// reset to get rid of the default AuthWithToken expectation
 				c.Reset()
 			},
 			ShouldErr: true,
-			Input:     "bytemark revoke",
+			Input:     "bytemark revoke privilege",
 		}, {
+			Name: "BadPrivilege",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// reset to get rid of the default AuthWithToken expectation
 				c.Reset()
 			},
 			ShouldErr: true,
-			Input:     "bytemark revoke smedly",
+			Input:     "bytemark revoke privilege smedly",
 		}, {
+			Name: "MissingAuth",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// reset to get rid of the default AuthWithToken expectation
 				c.Reset()
 			},
 			ShouldErr: true,
-			Input:     "bytemark revoke cluster_admin on bucholic to no-one",
+			Input:     "bytemark revoke privilege cluster_admin on bucholic to no-one",
 		}, {
+			Name: "RevokeVMAdmin",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 
@@ -72,8 +81,9 @@ func TestRevokePrivilege(t *testing.T) {
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
-			Input:     "bytemark revoke vm_admin on test-vm.test-group.test-account from test-user",
+			Input:     "bytemark revoke privilege vm_admin on test-vm.test-group.test-account from test-user",
 		}, {
+			Name: "RevokeGroupAdmin",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 
@@ -106,8 +116,9 @@ func TestRevokePrivilege(t *testing.T) {
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
-			Input:     "bytemark revoke group_admin on test-group.test-account from test-user",
+			Input:     "bytemark revoke privilege group_admin on test-group.test-account from test-user",
 		}, {
+			Name: "RevokeAccountAdmin",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 
@@ -138,8 +149,9 @@ func TestRevokePrivilege(t *testing.T) {
 			},
 			ShouldErr: false,
 			// secret feature: '.' as alias for default account
-			Input: "bytemark revoke account_admin on . to test-user",
+			Input: "bytemark revoke privilege account_admin on . to test-user",
 		}, {
+			Name: "RevokeClusterAdmin",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// specific to vm_admin/vm_console
 
@@ -165,22 +177,23 @@ func TestRevokePrivilege(t *testing.T) {
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
-			Input:     "bytemark revoke --yubikey-required cluster_admin to test-user",
+			Input:     "bytemark revoke privilege --yubikey-required cluster_admin to test-user",
 		},
 	}
 	for i, test := range tests {
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-		test.Setup(config, c)
+		t.Run(test.Name, func(t *testing.T) {
+			config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
+			test.Setup(config, c)
 
-		fmt.Println(test.Input)
-		err := app.Run(strings.Split(test.Input, " "))
-		if test.ShouldErr && err == nil {
-			t.Errorf("TestRevokePrivilege %d should err and didn't", i)
-		} else if !test.ShouldErr && err != nil {
-			t.Errorf("TestRevokePrivilege %d shouldn't err, but: %s", i, err)
-		}
-		if ok, err := c.Verify(); !ok {
-			t.Fatal(err)
-		}
+			err := app.Run(strings.Split(test.Input, " "))
+			if test.ShouldErr && err == nil {
+				t.Errorf("TestRevokePrivilege %d should err and didn't", i)
+			} else if !test.ShouldErr && err != nil {
+				t.Errorf("TestRevokePrivilege %d shouldn't err, but: %s", i, err)
+			}
+			if ok, err := c.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
 	}
 }
