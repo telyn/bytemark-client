@@ -9,9 +9,9 @@ import (
 
 func init() {
 	Commands = append(Commands, cli.Command{
-		Name:      "stopped eligible vms",
+		Name:      "stopped waiting servers",
 		Usage:     "shows a list of stopped VMs that should be running",
-		UsageText: "--admin show stopped_eligible_vms [--json]",
+		UsageText: "--admin show waiting servers [--json]",
 		Flags:     app.OutputFlags("servers", "array"),
 		Action: app.Action(with.Auth, func(c *app.Context) error {
 			vms, err := c.Client().GetStoppedEligibleVMs()
