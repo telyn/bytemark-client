@@ -9,7 +9,7 @@ import (
 
 func init() {
 	Commands = append(Commands, cli.Command{
-		Name:      "stopped waiting servers",
+		Name:      "waiting servers",
 		Usage:     "shows a list of stopped servers that should be running",
 		UsageText: "--admin show waiting servers [--json]",
 		Flags:     app.OutputFlags("servers", "array"),
