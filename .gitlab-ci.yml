@@ -141,7 +141,8 @@ doc-check:
     - |
       if ! ./gen/test-HACKING.sh; then
         echo "HACKING has not been updated to match the new folder structure!"
-        echo "Run tree -d 'vendor' | sha256sum and paste the shasum over the one in HACKING"
+        echo "Run the following and paste the shasum over the one in HACKING"
+        echo "   find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum"
         exit 1
       fi
 

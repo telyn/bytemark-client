@@ -1,33 +1,18 @@
-package main
+package commands_test
 
 import (
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
-	"github.com/cheekybits/is"
 )
 
-func TestResetCommand(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
-
-	config.When("GetVirtualMachine").Return(defVM)
-
-	c.When("ResetVirtualMachine", vmn).Times(1)
-
-	err := app.Run(strings.Split("bytemark reset test-server.test-group.test-account", " "))
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-func TestRestartCommand(t *testing.T) {
+func TestRestartServerCommand(t *testing.T) {
 	tests := []struct {
 		name          string
 		input         string
@@ -61,7 +46,7 @@ func TestRestartCommand(t *testing.T) {
 			},
 		}, {
 			name:  "RestartWithApplianceFlagWithoutAppliance",
-			input: "test-server --appliance",
+			input: "--appliance test-server",
 			vmname: lib.VirtualMachineName{
 				VirtualMachine: "test-server",
 				Group:          "default",
@@ -70,7 +55,7 @@ func TestRestartCommand(t *testing.T) {
 			shouldErr: true,
 		}, {
 			name:  "RestartWithApplianceFlag",
-			input: "test-server --appliance rescue",
+			input: "--appliance rescue test-server",
 			vmname: lib.VirtualMachineName{
 				VirtualMachine: "test-server",
 				Group:          "default",
@@ -79,7 +64,7 @@ func TestRestartCommand(t *testing.T) {
 			applianceBoot: true,
 		}, {
 			name:  "RestartWithRescueFlag",
-			input: "test-server --rescue",
+			input: "--rescue test-server",
 			vmname: lib.VirtualMachineName{
 				VirtualMachine: "test-server",
 				Group:          "default",
@@ -88,7 +73,7 @@ func TestRestartCommand(t *testing.T) {
 			applianceBoot: true,
 		}, {
 			name:  "RestartWithApplianceAndRescueFlag",
-			input: "test-server --appliance a --rescue",
+			input: "--appliance a --rescue test-server",
 			vmname: lib.VirtualMachineName{
 				VirtualMachine: "test-server",
 				Group:          "default",
@@ -99,8 +84,8 @@ func TestRestartCommand(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			config, client, app := testutil.BaseTestAuthSetup(t, false, commands)
-			config.When("GetVirtualMachine").Return(defVM)
+			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
+			config.When("GetVirtualMachine").Return(lib.VirtualMachineName{Group: "default", Account: "default-account"})
 			config.When("PanelURL").Return("something.com")
 
 			client.When("ShutdownVirtualMachine", test.vmname, true).Times(1)
@@ -120,7 +105,7 @@ func TestRestartCommand(t *testing.T) {
 				client.When("StartVirtualMachine", test.vmname).Times(1)
 			}
 
-			args := fmt.Sprintf("bytemark restart %s", test.input)
+			args := fmt.Sprintf("bytemark restart server %s", test.input)
 			err := app.Run(strings.Split(args, " "))
 			if !test.shouldErr && err != nil {
 				t.Errorf("shouldn't err, but did: %T{%s}", err, err.Error())
@@ -133,53 +118,5 @@ func TestRestartCommand(t *testing.T) {
 				}
 			}
 		})
-	}
-}
-func TestShutdownCommand(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
-
-	config.When("GetVirtualMachine").Return(defVM)
-
-	c.When("ShutdownVirtualMachine", vmn, true).Times(1)
-	c.When("GetVirtualMachine", vmn).Return(brain.VirtualMachine{PowerOn: false})
-
-	err := app.Run(strings.Split("bytemark shutdown test-server.test-group.test-account", " "))
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-func TestStartCommand(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
-
-	config.When("GetVirtualMachine").Return(defVM)
-
-	c.When("StartVirtualMachine", vmn).Times(1)
-
-	err := app.Run(strings.Split("bytemark start test-server.test-group.test-account", " "))
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-func TestStopCommand(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
-	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
-
-	config.When("GetVirtualMachine").Return(defVM)
-
-	c.When("StopVirtualMachine", vmn).Times(1)
-
-	err := app.Run(strings.Split("bytemark stop test-server.test-group.test-account", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
 	}
 }
