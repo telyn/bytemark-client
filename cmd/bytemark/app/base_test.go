@@ -72,13 +72,3 @@ func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (conf *
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	return conf, c, app
 }
-
-func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
-	if cmds == nil {
-		return
-	}
-	for _, c := range cmds {
-		fn(c)
-		traverseAllCommands(c.Subcommands, fn)
-	}
-}

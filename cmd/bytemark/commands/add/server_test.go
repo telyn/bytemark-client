@@ -1,57 +1,17 @@
-package main
+package add_test
 
 import (
 	"runtime/debug"
-	"strings"
 	"testing"
 	"time"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/cheekybits/is"
 	"github.com/urfave/cli"
 )
-
-func TestCreateDiskCommand(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
-	config.When("GetVirtualMachine").Return(defVM)
-
-	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
-	c.When("GetVirtualMachine", name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
-
-	disc := brain.Disc{Size: 35 * 1024, StorageGrade: "archive"}
-
-	c.When("CreateDisc", name, disc).Return(nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark create disc --force --disc archive:35 test-server", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
-func TestCreateGroupCommand(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
-	config.When("GetGroup").Return(defGroup)
-
-	group := lib.GroupName{
-		Group:   "test-group",
-		Account: "default-account",
-	}
-	c.When("CreateGroup", group).Return(nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark create group test-group", " "))
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
 
 func TestCreateServerHasCorrectFlags(t *testing.T) {
 	// I'm not sure why this test exists
@@ -64,8 +24,8 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 	seenImage := false
 	seenRootPassword := false
 
-	traverseAllCommands(Commands(true), func(cmd cli.Command) {
-		if cmd.FullName() == "create server" {
+	testutil.TraverseAllCommands(commands.Commands, func(cmd cli.Command) {
+		if cmd.FullName() == "add server" {
 			seenCmd = true
 			for _, f := range cmd.Flags {
 				switch f.GetName() {
@@ -152,7 +112,7 @@ func TestCreateServer(t *testing.T) {
 			ConfigVirtualMachine: lib.VirtualMachineName{Group: "default"},
 			GroupName:            lib.GroupName{Group: "default"},
 			Args: []string{
-				"bytemark", "create", "server",
+				"bytemark", "add", "server",
 				"--authorized-keys", "test-pubkey",
 				"--firstboot-script", "test-script",
 				"--cdrom", "https://example.com/example.iso",
@@ -171,7 +131,7 @@ func TestCreateServer(t *testing.T) {
 				"test-server",
 			},
 		}, {
-			ConfigVirtualMachine: defVM,
+			ConfigVirtualMachine: testutil.DefVM,
 			Spec: brain.VirtualMachineSpec{
 				VirtualMachine: brain.VirtualMachine{
 					Name:   "test-server",
@@ -196,7 +156,7 @@ func TestCreateServer(t *testing.T) {
 				Account: "default-account",
 			},
 			Args: []string{
-				"bytemark", "create", "server",
+				"bytemark", "add", "server",
 				"--cores", "1",
 				"--force",
 				"--memory", "1",
@@ -204,7 +164,7 @@ func TestCreateServer(t *testing.T) {
 				"test-server",
 			},
 		}, {
-			ConfigVirtualMachine: defVM,
+			ConfigVirtualMachine: testutil.DefVM,
 			GroupName: lib.GroupName{
 				Group:   "default",
 				Account: "default-account",
@@ -222,7 +182,7 @@ func TestCreateServer(t *testing.T) {
 				}},
 			},
 			Args: []string{
-				"bytemark", "create", "server",
+				"bytemark", "add", "server",
 				"--force",
 				"--no-image",
 				"--backup", "never",
@@ -241,7 +201,7 @@ func TestCreateServer(t *testing.T) {
 
 	for i, test = range tests {
 		t.Logf("TestCreateVirtualMachine %d", i)
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 		config.When("GetVirtualMachine").Return(test.ConfigVirtualMachine)
 
 		vmname := lib.VirtualMachineName{
@@ -267,28 +227,5 @@ func TestCreateServer(t *testing.T) {
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
 		}
-	}
-}
-
-func TestCreateBackup(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
-	config.When("GetVirtualMachine").Return(defVM)
-
-	vmname := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
-	}
-
-	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)
-
-	err := app.Run([]string{
-		"bytemark", "create", "backup", "test-server", "test-disc",
-	})
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
 	}
 }
