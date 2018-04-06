@@ -87,10 +87,12 @@ what they're for
 │       │   ├── args - functions for chaining together using app.Action to parse
 │       │   │          arguments into flags
 │       │   ├── flags - common flags
+│       │   ├── wait - functions which wait for a condition to be true before
+│       │   │          returning
 │       │   └── with - functions for chaining together using app.Action to attach
 │       │                       things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
-│       ├── commands - top-level command skeletons and those which contain no
+│       ├── commands - top-level command skeletons and those which contain no
 │       │   │          subcommands or only one subcommand
 │       │   ├── admin - contains all the admin commands in admin.Commands
 │       │   │   ├── add - contains all the admin add commands for adding resources
@@ -191,6 +193,8 @@ allow requests to be written in any package. See the 'update
 billing-definition' command in update.go and the UpdateDefinition and 
 GetDefinition functions in lib/requests/billing, and the tests for those, for
 examples on how to structure code in this new way.
+
+3.0 was primarily about fixing our slightly wacky command naming.
 
 The focus of 4.0 is going to be carving up cmd/bytemark and lib into multiple
 smaller packages, and splitting the files within up into smaller ones - one per
