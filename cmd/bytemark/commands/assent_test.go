@@ -6,11 +6,9 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"strings"
 	"testing"
-	// billingRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/billing"
-	// // "github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
-	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
 func TestAssent(t *testing.T) {

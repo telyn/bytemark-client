@@ -2,11 +2,9 @@ package admin
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -16,27 +14,6 @@ func init() {
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{
 			{
-				Name:      "ip range",
-				Usage:     "create a new IP range in a VLAN",
-				UsageText: "--admin create ip range <ip-range> <vlan-num>",
-				Flags: []cli.Flag{
-					cli.StringFlag{
-						Name:  "ip-range",
-						Usage: "the IP range to add",
-					},
-					cli.IntFlag{
-						Name:  "vlan-num",
-						Usage: "The VLAN number to add the IP range to",
-					},
-				},
-				Action: app.Action(args.Optional("ip-range", "vlan-num"), with.RequiredFlags("ip-range", "vlan-num"), with.Auth, func(c *app.Context) error {
-					if err := c.Client().CreateIPRange(c.String("ip-range"), c.Int("vlan-num")); err != nil {
-						return err
-					}
-					log.Logf("IP range created\r\n")
-					return nil
-				}),
-			}, {
 				Name:      "migration",
 				Usage:     "creates a new migration job",
 				UsageText: "--admin create migration [--priority <number>] [--disc <disc>]... [--pool <pool>]... [--tail <tail>]... [--to-pool <pool>]...",
@@ -112,56 +89,6 @@ EXAMPLES:
 						return ctx.OutputInDesiredForm(job)
 					}
 					return err
-				}),
-			}, {
-				Name:        "user",
-				Usage:       "creates a new cluster admin or cluster superuser",
-				UsageText:   "--admin create user <username> <privilege>",
-				Description: `creates a new cluster admin or superuser. The privilege field must be either cluster_admin or cluster_su.`,
-				Flags: []cli.Flag{
-					cli.StringFlag{
-						Name:  "username",
-						Usage: "The username of the new user",
-					},
-					cli.StringFlag{
-						Name:  "privilege",
-						Usage: "The privilege to grant to the new user",
-					},
-				},
-				Action: app.Action(args.Optional("username", "privilege"), with.RequiredFlags("username", "privilege"), with.Auth, func(c *app.Context) error {
-					// Privilege is just a string and not a app.PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
-					if err := c.Client().CreateUser(c.String("username"), c.String("privilege")); err != nil {
-						return err
-					}
-					log.Logf("User %s has been created with %s privileges\r\n", c.String("username"), c.String("privilege"))
-					return nil
-				}),
-			}, {
-				Name:      "vlan group",
-				Aliases:   []string{"vlan-group"},
-				Usage:     "creates groups for private VLANs",
-				UsageText: "--admin create vlan group <group> [vlan-num]",
-				Description: `Create a group in the specified account, with an optional VLAN specified.
-
-Used when setting up a private VLAN for a customer.`,
-				Flags: []cli.Flag{
-					cli.GenericFlag{
-						Name:  "group",
-						Usage: "the name of the group to create",
-						Value: new(app.GroupNameFlag),
-					},
-					cli.IntFlag{
-						Name:  "vlan-num",
-						Usage: "The VLAN number to add the group to",
-					},
-				},
-				Action: app.Action(args.Optional("group", "vlan-num"), with.RequiredFlags("group"), with.Auth, func(c *app.Context) error {
-					gp := c.GroupName("group")
-					if err := c.Client().AdminCreateGroup(gp, c.Int("vlan-num")); err != nil {
-						return err
-					}
-					log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)
-					return nil
 				}),
 			},
 		},
