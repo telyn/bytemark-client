@@ -142,7 +142,7 @@ func TestSubcommandStyleConformance(t *testing.T) {
 			lines := strings.Split(c.Description, "\n")
 			desc := []rune(lines[0])
 			if unicode.IsUpper(desc[0]) {
-			    t.Errorf("Subcommands: %+v", c.Subcommands)
+				t.Errorf("Subcommands: %+v", c.Subcommands)
 				t.Errorf("Command %s's Description begins with an uppercase letter, but it has subcommands, so should be lowercase.\r\n", c.FullName())
 			}
 			if strings.Contains(lines[0], ".") {

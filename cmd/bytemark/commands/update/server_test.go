@@ -25,6 +25,7 @@ func TestUpdateServer(t *testing.T) {
 		Hostname: "test.default",
 		GroupID:  1,
 		Memory:   2048,
+		Cores:    2,
 	}
 	type move struct {
 		expected bool
@@ -38,6 +39,9 @@ func TestUpdateServer(t *testing.T) {
 		memory        int
 		hwProfile     string
 		hwProfileLock bool
+		cores         int
+		cdrom         string
+		eject         bool
 		move          move
 		shouldErr     bool
 	}{
@@ -121,12 +125,52 @@ func TestUpdateServer(t *testing.T) {
 			shouldErr: true,
 		},
 		{
+			name:   "ChangeCoresDoesNotNeedForceToDecrease",
+			args:   "--cores 1 --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			cores:  1,
+		},
+		{
+			name:      "ChangeCoresDoesNeedsForceToIncrease",
+			args:      "--cores 4 --server test",
+			vmName:    testVMName,
+			vm:        testVM,
+			cores:     4,
+			shouldErr: true,
+		},
+		{
+			name:   "EjectCdrom",
+			args:   "--remove-cd --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			eject:  true,
+		},
+		{
+			name:   "UpdateCdrom",
+			args:   "--cd-url https://microsoft.com/windows.iso --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			cdrom:  "https://microsoft.com/windows.iso",
+		},
+		{
+			name:   "EjectAndUpdateCdrom",
+			args:   "--remove-cd --cd-url https://microsoft.com/windows.iso --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			cdrom:  "https://microsoft.com/windows.iso",
+			eject:  true,
+		},
+		{
 			name:      "CombinedChanges",
-			args:      "--new-name new --memory 1 --hw-profile foo --server test",
+			args:      "--new-name new --memory 1 --hw-profile foo --cores 1 --remove-cd --cd-url https://microsoft.com/windows.iso --server test",
 			vmName:    testVMName,
 			vm:        testVM,
 			hwProfile: "foo",
 			memory:    1,
+			cores:     1,
+			cdrom:     "https://microsoft.com/windows.iso",
+			eject:     true,
 			move: move{
 				expected: true,
 				newName: lib.VirtualMachineName{
@@ -154,6 +198,14 @@ func TestUpdateServer(t *testing.T) {
 
 			if test.memory > 0 && !test.shouldErr {
 				client.When("SetVirtualMachineMemory", test.vmName, test.memory*1024).Return(nil).Times(1)
+			}
+
+			if test.cores > 0 && !test.shouldErr {
+				client.When("SetVirtualMachineCores", test.vmName, test.cores).Return(nil).Times(1)
+			}
+
+			if test.eject || test.cdrom != "" {
+				client.When("SetVirtualMachineCDROM", test.vmName, test.cdrom).Return(nil).Times(1)
 			}
 
 			args := strings.Split("bytemark update server "+test.args, " ")
