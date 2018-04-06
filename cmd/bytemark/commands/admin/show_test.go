@@ -195,22 +195,6 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 	}
 }
 
-func TestAdminShowMigratingVMsCommand(t *testing.T) {
-	// TODO(telyn): make table-driven
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
-
-	vms := []brain.VirtualMachine{getFixtureVM()}
-	c.When("GetMigratingVMs").Return(&vms, nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark --admin show migrating vms", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
 func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
@@ -305,38 +289,6 @@ func TestAdminShowMigration(t *testing.T) {
 				}
 			}
 		})
-	}
-}
-
-func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
-	// TODO(telyn): make table-driven
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
-
-	vms := []brain.VirtualMachine{getFixtureVM()}
-	c.When("GetStoppedEligibleVMs").Return(&vms, nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark --admin show stopped eligible vms", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
-func TestAdminShowRecentVMsCommand(t *testing.T) {
-	// TODO(telyn): make table-driven
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
-
-	vms := []brain.VirtualMachine{getFixtureVM()}
-	c.When("GetRecentVMs").Return(&vms, nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark --admin show recent vms", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
 	}
 }
 
