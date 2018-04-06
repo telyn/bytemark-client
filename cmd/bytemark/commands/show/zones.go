@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	commands = append(commands, cli.Command{
+	Commands = append(Commands, cli.Command{
 		Name:        "zones",
 		Usage:       "show available zones for cloud servers",
 		UsageText:   "show zones",
