@@ -9,12 +9,12 @@ import (
 
 func init() {
 	Commands = append(Commands, cli.Command{
-		Name:      "stopped waiting servers",
-		Usage:     "shows a list of stopped servers that should be running",
-		UsageText: "--admin show waiting servers [--json]",
-		Flags:     app.OutputFlags("servers", "array"),
+		Name:      "migrating servers",
+		Usage:     "shows a list of migrating servers",
+		UsageText: "--admin show migrating servers [--json]",
+		Flags:     app.OutputFlags("migrating servers", "array"),
 		Action: app.Action(with.Auth, func(c *app.Context) error {
-			vms, err := c.Client().GetStoppedEligibleVMs()
+			vms, err := c.Client().GetMigratingVMs()
 			if err != nil {
 				return err
 			}

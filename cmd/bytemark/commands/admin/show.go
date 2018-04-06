@@ -219,19 +219,6 @@ var showCommands = []cli.Command{
 		}),
 	},
 	{
-		Name:      "migrating vms",
-		Usage:     "shows a list of migrating servers",
-		UsageText: "--admin show migrating_vms [--json]",
-		Flags:     app.OutputFlags("migrating servers", "array"),
-		Action: app.Action(with.Auth, func(c *app.Context) error {
-			vms, err := c.Client().GetMigratingVMs()
-			if err != nil {
-				return err
-			}
-			return c.OutputInDesiredForm(vms, output.Table)
-		}),
-	},
-	{
 		Name:      "migration",
 		Usage:     "shows a migration job",
 		UsageText: "--admin show migration [--json] <id>",
@@ -266,19 +253,6 @@ var showCommands = []cli.Command{
 			}
 
 			return c.OutputInDesiredForm(mjs)
-		}),
-	},
-	{
-		Name:      "stopped eligible vms",
-		Usage:     "shows a list of stopped VMs that should be running",
-		UsageText: "--admin show stopped_eligible_vms [--json]",
-		Flags:     app.OutputFlags("servers", "array"),
-		Action: app.Action(with.Auth, func(c *app.Context) error {
-			vms, err := c.Client().GetStoppedEligibleVMs()
-			if err != nil {
-				return err
-			}
-			return c.OutputInDesiredForm(vms, output.Table)
 		}),
 	},
 }
