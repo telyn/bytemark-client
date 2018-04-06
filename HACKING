@@ -86,14 +86,22 @@ what they're for
 │       │   │      useful methods for dealing with flags & output 
 │       │   ├── args - functions for chaining together using app.Action to parse
 │       │   │          arguments into flags
+│       │   ├── flags - common flags
 │       │   └── with - functions for chaining together using app.Action to attach
 │       │                       things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
-│       ├── commands - empty package
+│       ├── commands - top-level command skeletons and those which contain no
+│       │   │          subcommands or only one subcommand
 │       │   ├── admin - contains all the admin commands in admin.Commands
-│       │   ├── update - contains all the update commands
-│       │   └── show - commands for extracting information from bytemark and
-│       │              displaying it in human-readable or JSON formats
+│       │   │   └── add - contains all the admin add commands for adding resources
+│       │   │             that only an admin would have permission to do
+│       │   ├── add - contains commands for adding or creating extra resources to
+│       │   │         and within your bytemark account.
+│       │   ├── image - common imaging code shared between commands when either
+│       │   │           reimaging or creating a server
+│       │   ├── show - commands for extracting information from bytemark and
+│       │   │          displaying it in human-readable or JSON formats
+│       │   └── update - contains all the update commands
 │       ├── config - manages configuration from the environment, global flags
 │       │            and config dir. 
 │       ├── testutil - helpers for cmd/bytemark tests
@@ -208,5 +216,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 135ef839301ca914e1dda3ef0316fe042a1ef0de294697243eba8e3253ec92ea
-
+# sha256sum: 784106ea0a960d51952630a349c6426952a9e32de7f2b48ef9aca92979c200dd

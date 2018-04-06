@@ -9,12 +9,13 @@ package main
 import (
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/urfave/cli"
 )
 
 var destructiveCommands = [...]string{
-	"create server", // can increase cost
-	"create discs",  // can increase cost
+	// "add server",    // can increase cost
+	// "add discs",     // can increase cost
 	"delete server", // can destroy data
 	"delete group",  // can destroy data
 	"delete disc",   // can destroy data
@@ -39,7 +40,7 @@ func TestDestructiveCommandsHaveForceFlags(t *testing.T) {
 	for _, cmd := range destructiveCommands {
 		cmds[cmd] = &s{}
 	}
-	traverseAllCommands(Commands(true), func(c cli.Command) {
+	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		for _, cmd := range destructiveCommands {
 			if c.FullName() == cmd {
 				cmds[cmd].Seen = true
