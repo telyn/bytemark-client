@@ -10,7 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-func TestUpdateDiscr(t *testing.T) {
+func TestUpdateDisc(t *testing.T) {
 	defVM := lib.VirtualMachineName{
 		Group:   "default",
 		Account: "default-account",
