@@ -31,19 +31,17 @@ func init() {
 			Flags: []cli.Flag{
 				serverFlag,
 			},
-			Action: resetServer,
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
+				vmName := c.VirtualMachineName("server")
+				c.LogErr("Attempting to reset %v...\r\n", vmName)
+				err = c.Client().ResetVirtualMachine(vmName)
+				if err != nil {
+					return err
+				}
+
+				c.LogErr("%v reset successfully.\r\n", vmName)
+				return
+			}),
 		}},
 	})
 }
-
-var resetServer = app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
-	vmName := c.VirtualMachineName("server")
-	c.LogErr("Attempting to reset %v...\r\n", vmName)
-	err = c.Client().ResetVirtualMachine(vmName)
-	if err != nil {
-		return err
-	}
-
-	c.LogErr("%v reset successfully.\r\n", vmName)
-	return
-})
