@@ -23,6 +23,8 @@ var configVars = [...]string{
 	"yubikey",
 }
 
+// VarsDescription is text suitable for inclusion in commands that manipulate
+// config variables.
 const VarsDescription = `
         account - the default account, used when you do not explicitly state an account - defaults to the same as your user name
         token - the token used for authentication
