@@ -2,7 +2,7 @@ package show
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/urfave/cli"
 )
 
@@ -27,17 +27,15 @@ func init() {
         endpoint - the brain endpoint to connect to. https://uk0.bigv.io is the default.
         billing-endpoint - the billing API endpoint to connect to. https://bmbilling.bytemark.co.uk is the default.
         spp-endpoint - the SPP endpoint to use. https://spp-submissions.bytemark.co.uk is the default.`,
+		Flags: app.OutputFlags("vars", "array"),
 		Action: app.Action(viewConfig),
 	})
 }
 
-func viewConfig(c *app.Context) (err error) {
+func viewConfig(c *app.Context) error {
 	vars, err := c.Config().GetAll()
 	if err != nil {
-		return
+		return err
 	}
-	for _, v := range vars {
-		log.Logf("%s\t: '%s' (%s)\r\n", v.Name, v.Value, v.Source)
-	}
-	return
+	return c.OutputInDesiredForm(vars, output.List)
 }
