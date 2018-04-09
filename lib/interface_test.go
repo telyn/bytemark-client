@@ -16,7 +16,6 @@ import (
 func TestQualityInterfaceHasntGrown(t *testing.T) {
 	allowed := sort.StringSlice{
 		"AddIP",
-		"AddUserAuthorizedKey",
 		"AdminCreateGroup",
 		"AllowInsecureRequests",
 		"ApproveVM",
@@ -39,7 +38,6 @@ func TestQualityInterfaceHasntGrown(t *testing.T) {
 		"DeleteBackupSchedule",
 		"DeleteDisc",
 		"DeleteGroup",
-		"DeleteUserAuthorizedKey",
 		"DeleteVLAN",
 		"DeleteVirtualMachine",
 		"EmptyHead",
