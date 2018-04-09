@@ -129,6 +129,9 @@ func createServer(c *app.Context) (err error) {
 		return util.UserRequestedExit{}
 	}
 
+	// Clear hostname - it was there for the pre-flight check
+	spec.VirtualMachine.Hostname = ""
+
 	_, err = c.Client().CreateVirtualMachine(groupName, spec)
 	if err != nil {
 		return err
@@ -171,9 +174,15 @@ func createServerPrepSpec(c *app.Context) (spec brain.VirtualMachineSpec, err er
 	// if stopped isn't set and a CDROM or image are present, start the server
 	autoreboot := !stopped && (!noImage || cdrom != "")
 
+	name := c.VirtualMachineName("name")
+
+	// fake hostname so that FullName() works
+	hostname := name.String()
+
 	spec = brain.VirtualMachineSpec{
 		VirtualMachine: brain.VirtualMachine{
-			Name:                  c.VirtualMachineName("name").VirtualMachine,
+			Name:                  name.VirtualMachine,
+			Hostname:              hostname,
 			Autoreboot:            autoreboot,
 			Cores:                 cores,
 			Memory:                memory,
