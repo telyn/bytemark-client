@@ -33,6 +33,7 @@ func IsConfigVar(name string) bool {
 	return false
 }
 
+// Vars is a list of configuration variables
 type Vars []Var
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as VirtualMachine.DefaultFields.
