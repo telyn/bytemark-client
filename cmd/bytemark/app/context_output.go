@@ -38,6 +38,9 @@ func (c *Context) LogErr(format string, values ...interface{}) {
 	fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
 }
 
+// OutputFormat attempts to figure out the output format needed, given the contents of the output-format config var,
+// the json flag, and the table and table-fields flag. If there is an error reading the config, it is returned and
+// human output is assumed.
 func (c *Context) OutputFormat(defaultFormat ...output.Format) (output.Format, error) {
 	format, err := c.Config().GetV("output-format")
 	if err != nil {

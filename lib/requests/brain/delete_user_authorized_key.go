@@ -30,7 +30,7 @@ func DeleteUserAuthorizedKey(client lib.Client, username string, key string) err
 	}
 	// if there's a difference of more than one then the key was ambiguous
 	if len(newKeys) < len(user.AuthorizedKeys)-1 && potentiallyAmbiguous {
-		err := lib.AmbiguousKeyError{}
+		err = lib.AmbiguousKeyError{}
 		return err
 	}
 
