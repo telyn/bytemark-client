@@ -38,7 +38,7 @@ func (c *Context) LogErr(format string, values ...interface{}) {
 	fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
 }
 
-func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.Format, error) {
+func (c *Context) OutputFormat(defaultFormat ...output.Format) (output.Format, error) {
 	format, err := c.Config().GetV("output-format")
 	if err != nil {
 		return output.Human, err
@@ -59,7 +59,7 @@ func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.
 
 func (c *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...output.Format) (cfg output.Config, err error) {
 	cfg = output.Config{}
-	cfg.Format, err = c.determineOutputFormat(defaultFormat...)
+	cfg.Format, err = c.OutputFormat(defaultFormat...)
 
 	cfg.Fields = strings.Split(c.String("table-fields"), ",")
 	trimAllSpace(cfg.Fields)

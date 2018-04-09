@@ -9,9 +9,10 @@ import (
 
 // User represents a Bytemark user.
 type User struct {
-	Username       string
-	Email          string
-	AuthorizedKeys Keys
+	ID             int    `json:"id,omitempty"`
+	Username       string `json:"username,omitempty"`
+	Email          string `json:"email,omitempty"`
+	AuthorizedKeys Keys   `json:"authorized_keys,omitempty"`
 }
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.

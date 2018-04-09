@@ -60,7 +60,8 @@ func (k *Keys) UnmarshalText(text []byte) error {
 	return nil
 }
 
-func (k Keys) strings() (strs []string) {
+func (k Keys) Strings() (strs []string) {
+	strs = make([]string, 0)
 	for _, key := range k {
 		strs = append(strs, key.Key)
 	}
@@ -68,5 +69,5 @@ func (k Keys) strings() (strs []string) {
 }
 
 func (k Keys) MarshalText() ([]byte, error) {
-	return []byte(strings.Join(k.strings(), "\n")), nil
+	return []byte(strings.Join(k.Strings(), "\n")), nil
 }
