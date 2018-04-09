@@ -25,6 +25,8 @@ func init() {
 		Usage:     `add a new server with bytemark`,
 		UsageText: "add server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
 		Description: `Adds a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and weekly backups of the first disc.
+
+The server name can be used to specify which group and account the server should be created in, for example myserver.group1.myaccount.
     
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
