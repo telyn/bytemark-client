@@ -14,6 +14,7 @@ func init() {
 		Usage:       "shows all the SSH public keys associated with a user",
 		UsageText:   "show keys [user]",
 		Description: "Shows all the SSH public keys associated with a user, defaulting to your log-in user.",
+		Flags:       app.OutputFlags("keys", "array"),
 		Action: app.Action(args.Optional("user"), with.User("user"), func(c *app.Context) error {
 			// TODO(telyn): could this be rewritten using OutputInDesiredForm / is it desirable to?
 			for _, k := range c.User.AuthorizedKeys {
