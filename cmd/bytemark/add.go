@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -65,7 +66,7 @@ func init() {
 					return ctx.Help("The key needs to be a public key, not a private key")
 				}
 
-				err = ctx.Client().AddUserAuthorizedKey(user, key)
+				err = brainRequests.AddUserAuthorizedKey(ctx.Client(), user, key)
 				if err == nil {
 					log.Log("Key added successfully")
 				}

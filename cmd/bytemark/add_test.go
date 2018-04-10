@@ -10,6 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
 func TestAddKeyCommand(t *testing.T) {
@@ -25,11 +26,20 @@ func TestAddKeyCommand(t *testing.T) {
 
 	t.Run("Key in command line", func(t *testing.T) {
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-		c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+		c.When("GetUser", "test-user").Return(brain.User{Username: "test-user"}).Times(1)
+		c.MockRequest = &mocks.Request{
+			T:          t,
+			StatusCode: 200,
+		}
+
 		err = app.Run(strings.Split("bytemark add key --user test-user ssh-rsa aaaaawhartevervAsde fake key", " "))
 		if err != nil {
 			t.Error(err)
 		}
+		c.MockRequest.AssertRequestObjectEqual(brain.User{
+			Username:       "test-user",
+			AuthorizedKeys: brain.Keys{brain.Key{Key: "ssh-rsa aaaaawhartevervAsde fake key"}},
+		})
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
 		}
@@ -37,12 +47,20 @@ func TestAddKeyCommand(t *testing.T) {
 	})
 	t.Run("Key in file", func(t *testing.T) {
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		c.When("GetUser", "test-user").Return(brain.User{Username: "test-user"}).Times(1)
+		c.MockRequest = &mocks.Request{
+			T:          t,
+			StatusCode: 200,
+		}
 
-		c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
 		err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "testkey.pub"})
 		if err != nil {
 			t.Error(err)
 		}
+		c.MockRequest.AssertRequestObjectEqual(brain.User{
+			Username:       "test-user",
+			AuthorizedKeys: brain.Keys{brain.Key{Key: "ssh-rsa aaaaawhartevervAsde fake key"}},
+		})
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
 		}
@@ -51,11 +69,19 @@ func TestAddKeyCommand(t *testing.T) {
 
 	t.Run("Key in file using flag", func(t *testing.T) {
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-		c.When("AddUserAuthorizedKey", "test-user", "ssh-rsa aaaaawhartevervAsde fake key").Times(1)
+		c.When("GetUser", "test-user").Return(brain.User{Username: "test-user"}).Times(1)
+		c.MockRequest = &mocks.Request{
+			T:          t,
+			StatusCode: 200,
+		}
 		err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey.pub"})
 		if err != nil {
 			t.Error(err)
 		}
+		c.MockRequest.AssertRequestObjectEqual(brain.User{
+			Username:       "test-user",
+			AuthorizedKeys: brain.Keys{brain.Key{Key: "ssh-rsa aaaaawhartevervAsde fake key"}},
+		})
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
 		}

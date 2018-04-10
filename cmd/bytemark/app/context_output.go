@@ -38,7 +38,10 @@ func (c *Context) LogErr(format string, values ...interface{}) {
 	fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
 }
 
-func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.Format, error) {
+// OutputFormat attempts to figure out the output format needed, given the contents of the output-format config var,
+// the json flag, and the table and table-fields flag. If there is an error reading the config, it is returned and
+// human output is assumed.
+func (c *Context) OutputFormat(defaultFormat ...output.Format) (output.Format, error) {
 	format, err := c.Config().GetV("output-format")
 	if err != nil {
 		return output.Human, err
@@ -59,7 +62,7 @@ func (c *Context) determineOutputFormat(defaultFormat ...output.Format) (output.
 
 func (c *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...output.Format) (cfg output.Config, err error) {
 	cfg = output.Config{}
-	cfg.Format, err = c.determineOutputFormat(defaultFormat...)
+	cfg.Format, err = c.OutputFormat(defaultFormat...)
 
 	cfg.Fields = strings.Split(c.String("table-fields"), ",")
 	trimAllSpace(cfg.Fields)

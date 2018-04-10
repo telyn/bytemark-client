@@ -150,8 +150,6 @@ type Client interface {
 	//
 
 	GetUser(name string) (brain.User, error)
-	AddUserAuthorizedKey(username, key string) error
-	DeleteUserAuthorizedKey(username, key string) error
 
 	//
 	// VIRTUAL MACHINES

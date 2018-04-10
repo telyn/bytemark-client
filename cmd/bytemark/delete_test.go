@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
 
@@ -75,48 +76,53 @@ func TestDeleteDisc(t *testing.T) {
 }
 
 func TestDeleteKey(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
-
 	usr := brain.User{
 		Username: "test-user",
 		Email:    "test-user@example.com",
-		AuthorizedKeys: []string{
-			"ssh-rsa AAAAFakeKey test-key-one",
-			"ssh-rsa AAAAFakeKeyTwo test-key-two",
-			"ssh-rsa AAAAFakeKeyThree test-key-two",
+		AuthorizedKeys: brain.Keys{
+			brain.Key{Key: "ssh-rsa AAAAFakeKey test-key-one"},
+			brain.Key{Key: "ssh-rsa AAAAFakeKeyTwo test-key-two"},
+			brain.Key{Key: "ssh-rsa AAAAFakeKeyThree test-key-two"},
 		},
 	}
+	t.Run("full key", func(t *testing.T) {
+		is := is.New(t)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	config.When("Force").Return(true)
-	c.When("GetUser", usr.Username).Return(usr)
+		config.When("Force").Return(true)
+		c.When("GetUser", usr.Username).Return(usr)
+		c.MockRequest = &mocks.Request{
+			T:          t,
+			StatusCode: 200,
+		}
 
-	c.When("DeleteUserAuthorizedKey", "test-user", "ssh-rsa AAAAFakeKey test-key-one").Return(nil).Times(1)
+		err := app.Run(strings.Split("bytemark delete key ssh-rsa AAAAFakeKey test-key-one", " "))
 
-	err := app.Run(strings.Split("bytemark delete key ssh-rsa AAAAFakeKey test-key-one", " "))
+		is.Nil(err)
+		if ok, vErr := c.Verify(); !ok {
+			t.Fatal(vErr)
+		}
+	})
 
-	is.Nil(err)
-	if ok, vErr := c.Verify(); !ok {
-		t.Fatal(vErr)
-	}
+	t.Run("delete by ambiguous comment is err", func(t *testing.T) {
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	config, c, app = testutil.BaseTestAuthSetup(t, false, commands)
+		config.When("Force").Return(true)
+		config.When("GetIgnoreErr", "user").Return("test-user")
 
-	config.When("Force").Return(true)
-	config.When("GetIgnoreErr", "user").Return("test-user")
+		c.When("AuthWithToken", "test-token").Return(nil)
+		c.When("GetUser", usr.Username).Return(usr)
 
-	c.When("AuthWithToken", "test-token").Return(nil)
-	c.When("GetUser", usr.Username).Return(usr)
-	kerr := new(lib.AmbiguousKeyError)
-	c.When("DeleteUserAuthorizedKey", "test-user", "test-key-two").Return(kerr).Times(1)
+		err := app.Run(strings.Split("bytemark delete key test-key-two", " "))
 
-	err = app.Run(strings.Split("bytemark delete key test-key-two", " "))
-
-	is.Equal(kerr, err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-	c.Reset()
+		if err == nil {
+			t.Error("expecting an error but didn't get one")
+		}
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+		c.Reset()
+	})
 }
 
 func TestDeleteBackup(t *testing.T) {

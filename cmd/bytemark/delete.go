@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -95,7 +96,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					return c.Help("You must specify a key to delete.\r\n")
 				}
 
-				err = c.Client().DeleteUserAuthorizedKey(user, key)
+				err = brainRequests.DeleteUserAuthorizedKey(c.Client(), user, key)
 				if err == nil {
 					log.Log("Key deleted successfully")
 				}
