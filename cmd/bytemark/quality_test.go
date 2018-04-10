@@ -16,10 +16,10 @@ import (
 var destructiveCommands = [...]string{
 	// "add server",    // can increase cost
 	// "add discs",     // can increase cost
-	"delete server", // can destroy data
-	"delete group",  // can destroy data
-	"delete disc",   // can destroy data
-	"reimage",       // can destroy data
+	"delete server",  // can destroy data
+	"delete group",   // can destroy data
+	"delete disc",    // can destroy data
+	"reimage server", // can destroy data
 	// FullName() on commands from admin/ and commands/ fails
 	//"update server", // can increase cost
 	//"update disc", // can increase cost
