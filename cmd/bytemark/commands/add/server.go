@@ -25,6 +25,8 @@ func init() {
 		Usage:     `add a new server with bytemark`,
 		UsageText: "add server [flags] <name> [<cores> [<memory [<disc specs>]...]]",
 		Description: `Adds a Cloud Server with the given specification, defaulting to a basic server with Symbiosis installed and weekly backups of the first disc.
+
+The server name can be used to specify which group and account the server should be created in, for example myserver.group1.myaccount.
     
 A disc spec looks like the following: label:grade:size
 The label and grade fields are optional. If grade is empty, defaults to sata.
@@ -127,6 +129,9 @@ func createServer(c *app.Context) (err error) {
 		return util.UserRequestedExit{}
 	}
 
+	// Clear hostname - it was there for the pre-flight check
+	spec.VirtualMachine.Hostname = ""
+
 	_, err = c.Client().CreateVirtualMachine(groupName, spec)
 	if err != nil {
 		return err
@@ -169,9 +174,15 @@ func createServerPrepSpec(c *app.Context) (spec brain.VirtualMachineSpec, err er
 	// if stopped isn't set and a CDROM or image are present, start the server
 	autoreboot := !stopped && (!noImage || cdrom != "")
 
+	name := c.VirtualMachineName("name")
+
+	// fake hostname so that FullName() works
+	hostname := name.String()
+
 	spec = brain.VirtualMachineSpec{
 		VirtualMachine: brain.VirtualMachine{
-			Name:                  c.VirtualMachineName("name").VirtualMachine,
+			Name:                  name.VirtualMachine,
+			Hostname:              hostname,
 			Autoreboot:            autoreboot,
 			Cores:                 cores,
 			Memory:                memory,
