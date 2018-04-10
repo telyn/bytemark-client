@@ -61,9 +61,9 @@ func (c *Config) GetGroup() lib.GroupName {
 	return ret.Get(0).(lib.GroupName)
 }
 
-func (c *Config) GetAll() ([]config.Var, error) {
+func (c *Config) GetAll() (config.Vars, error) {
 	ret := c.Called()
-	return ret.Get(0).([]config.Var), ret.Error(1)
+	return ret.Get(0).(config.Vars), ret.Error(1)
 }
 
 func (c *Config) PanelURL() string {

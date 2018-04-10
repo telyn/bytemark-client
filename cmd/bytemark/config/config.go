@@ -229,8 +229,8 @@ func (config *config) GetGroup() (group lib.GroupName) {
 }
 
 // GetAll returns all of the available Vars in the Config.
-func (config *config) GetAll() (vars []Var, err error) {
-	vars = make([]Var, len(configVars))
+func (config *config) GetAll() (vars Vars, err error) {
+	vars = make(Vars, len(configVars))
 	for i, v := range configVars {
 		vars[i], err = config.GetV(v)
 		if err != nil {

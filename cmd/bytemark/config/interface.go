@@ -15,7 +15,7 @@ type Manager interface {
 	GetSessionValidity() (int, error)
 	GetVirtualMachine() lib.VirtualMachineName
 	GetGroup() lib.GroupName
-	GetAll() ([]Var, error)
+	GetAll() (Vars, error)
 	Set(string, string, string)
 	SetPersistent(varname string, value string, source string) error
 	Unset(string) error

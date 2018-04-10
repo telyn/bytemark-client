@@ -1,6 +1,12 @@
 package config
 
-import "strings"
+import (
+	"io"
+	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+)
 
 // Var is a struct which contains a name-value-source triplet
 // Source is up to two words separated by a space. The first word is the source type: FLAG, ENV, DIR, CODE.
@@ -27,4 +33,15 @@ func (v *Var) SourceType() string {
 func (v *Var) SourceBaseName() string {
 	bits := strings.Split(v.Source, "/")
 	return bits[len(bits)-1]
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (v Var) DefaultFields(f output.Format) string {
+	return "Name, Value, Source"
+}
+
+// PrettyPrint outputs a nice human-readable overview of the server to the given writer.
+func (v Var) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const template = `{{ define "var_sgl" }} ▸ {{.Name}} {{.Value}} ({{.Source}}){{ end }}{{ define "var_medium" }}{{ template "var_sgl" . }}{{ end }}{{ define "var_full" }}{{ template "var_sgl" . }}{{ end }}`
+	return prettyprint.Run(wr, template, "var"+string(detail), v)
 }
