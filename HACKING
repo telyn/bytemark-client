@@ -94,9 +94,10 @@ what they're for
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
 │       ├── commands - top-level command skeletons and those which contain no
 │       │   │          subcommands or only one subcommand
-│       │   ├── admin - contains all the admin commands in admin.Commands
-│       │   │   └── add - contains all the admin add commands for adding resources
-│       │   │             that only an admin would have permission to do
+│       │   ├── admin - contains all the admin commands in admin.Commands
+│       │   │   ├── add - contains all the admin add commands for adding resources
+│       │   │   │          that only an admin would have permission to do
+│       │   │   └── show - contains admin show commands
 │       │   ├── add - contains commands for adding or creating extra resources to
 │       │   │         and within your bytemark account.
 │       │   ├── image - common imaging code shared between commands when either
@@ -220,4 +221,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: ef446f7be454a2a4a19d0d758388ea79df936beeeedb3c96580cbf8c90cbced0
+# sha256sum: 477101be4e9facbbcc793b05776f9daab3f9f53723ef6794c32e5e410ddb7fdc

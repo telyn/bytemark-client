@@ -1,4 +1,4 @@
-package main
+package show
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
@@ -9,13 +9,13 @@ import (
 
 func init() {
 
-	commands = append(commands, cli.Command{
+	Commands = append(Commands, cli.Command{
 		Name:      "overview",
 		Usage:     `overview of your Bytemark hosting`,
-		UsageText: "show account [--json]",
+		UsageText: "show overview [--json]",
 		Description: `This command displays an overview of the hosting you have with Bytemark.
 
-		If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
+    If the --json flag is specified, prints a complete overview of the account in JSON format, including all groups and their servers.`,
 		Flags: app.OutputFlags("account details", "object"),
 		Action: app.Action(with.Auth, func(c *app.Context) error {
 
