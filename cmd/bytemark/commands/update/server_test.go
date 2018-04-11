@@ -32,21 +32,22 @@ func TestUpdateServer(t *testing.T) {
 		newName  lib.VirtualMachineName
 	}
 	tests := []struct {
-		name          string
-		args          string
-		vmName        lib.VirtualMachineName
-		vm            brain.VirtualMachine
-		memory        int
-		hwProfile     string
-		hwProfileLock bool
-		cores         int
-		cdrom         string
-		eject         bool
-		move          move
-		shouldErr     bool
+		name      string
+		args      string
+		vmName    lib.VirtualMachineName
+		vm        brain.VirtualMachine
+		memory    int
+		hwProfile string
+		lock      bool
+		unlock    bool
+		cores     int
+		cdrom     string
+		eject     bool
+		move      move
+		shouldErr bool
 	}{
 		{
-			name:   "RenameVM",
+			name:   "renaming server",
 			args:   "--new-name new --server test",
 			vmName: testVMName,
 			vm:     testVM,
@@ -60,7 +61,7 @@ func TestUpdateServer(t *testing.T) {
 			},
 		},
 		{
-			name:   "MoveVMGroup",
+			name:   "moving server across groups",
 			args:   "--new-name test.foo --server test",
 			vmName: testVMName,
 			vm:     testVM,
@@ -74,7 +75,7 @@ func TestUpdateServer(t *testing.T) {
 			},
 		},
 		{
-			name:   "MoveVMAccount",
+			name:   "moving server across accounts",
 			args:   "--new-name test.default.other-account --server test",
 			vmName: testVMName,
 			vm:     testVM,
@@ -88,73 +89,71 @@ func TestUpdateServer(t *testing.T) {
 			},
 		},
 		{
-			name:      "HWProfileLockErrorsWithoutHWProfile",
-			args:      "--hw-profile-lock --server test",
-			vmName:    testVMName,
-			vm:        testVM,
-			shouldErr: true,
-		},
-		{
-			name:      "ChangeHWProfile",
-			args:      "--hw-profile foo --server test",
+			name:      "--hwprofile",
+			args:      "--hwprofile foo --server test",
 			vmName:    testVMName,
 			vm:        testVM,
 			hwProfile: "foo",
 		},
 		{
-			name:          "ChangeHWProfileWithLock",
-			args:          "--hw-profile-lock --hw-profile foo --server test",
-			vmName:        testVMName,
-			vm:            testVM,
-			hwProfile:     "foo",
-			hwProfileLock: true,
+			name:      "--lock-hwprofile with --hwprofile",
+			args:      "--lock-hwprofile --hwprofile foo --server test",
+			vmName:    testVMName,
+			vm:        testVM,
+			hwProfile: "foo",
+			lock:      true,
 		},
 		{
-			name:   "ChangeMemoryDoesNotNeedForceToDecrease",
+			name:   "--unlock-hwprofile",
+			args:   "--unlock-hwprofile --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			unlock: true,
+		},
+		{
+			name:   "decreasing memory doesn't need --force",
 			args:   "--memory 1 --server test",
 			vmName: testVMName,
 			vm:     testVM,
 			memory: 1,
 		},
 		{
-			name:      "ChangeMemoryNeedsForceToIncrease",
+			name:      "increasing memory needs --force",
 			args:      "--memory 10 --server test",
 			vmName:    testVMName,
 			vm:        testVM,
-			memory:    10,
 			shouldErr: true,
 		},
 		{
-			name:   "ChangeCoresDoesNotNeedForceToDecrease",
+			name:   "decreasing cores doesn't need --force",
 			args:   "--cores 1 --server test",
 			vmName: testVMName,
 			vm:     testVM,
 			cores:  1,
 		},
 		{
-			name:      "ChangeCoresDoesNeedsForceToIncrease",
+			name:      "increasing cores needs --force",
 			args:      "--cores 4 --server test",
 			vmName:    testVMName,
 			vm:        testVM,
-			cores:     4,
 			shouldErr: true,
 		},
 		{
-			name:   "EjectCdrom",
+			name:   "ejecting cd",
 			args:   "--remove-cd --server test",
 			vmName: testVMName,
 			vm:     testVM,
 			eject:  true,
 		},
 		{
-			name:   "UpdateCdrom",
+			name:   "inserting cd",
 			args:   "--cd-url https://microsoft.com/windows.iso --server test",
 			vmName: testVMName,
 			vm:     testVM,
 			cdrom:  "https://microsoft.com/windows.iso",
 		},
 		{
-			name:   "EjectAndUpdateCdrom",
+			name:   "ejecting and updating cd",
 			args:   "--remove-cd --cd-url https://microsoft.com/windows.iso --server test",
 			vmName: testVMName,
 			vm:     testVM,
@@ -162,8 +161,8 @@ func TestUpdateServer(t *testing.T) {
 			eject:  true,
 		},
 		{
-			name:      "CombinedChanges",
-			args:      "--new-name new --memory 1 --hw-profile foo --cores 1 --remove-cd --cd-url https://microsoft.com/windows.iso --server test",
+			name:      "multiple combined changes",
+			args:      "--new-name new --memory 1 --hwprofile foo --cores 1 --remove-cd --cd-url https://microsoft.com/windows.iso --server test",
 			vmName:    testVMName,
 			vm:        testVM,
 			hwProfile: "foo",
@@ -183,24 +182,35 @@ func TestUpdateServer(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			defer func() {
+				if err := recover(); err != nil {
+					t.Errorf("%v", err)
+				}
+			}()
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 			config.When("GetVirtualMachine").Return(defVM)
 			client.When("GetVirtualMachine", test.vmName).Return(test.vm).Times(1)
-			config.When("Force").Return(true)
 
 			if test.hwProfile != "" {
-				client.When("SetVirtualMachineHardwareProfile", test.vmName, test.hwProfile, []bool{test.hwProfileLock}).Return(nil).Times(1)
+				client.When("SetVirtualMachineHardwareProfile", test.vmName, test.hwProfile, nil).Return(nil).Times(1)
+			}
+			if test.lock {
+				client.When("SetVirtualMachineHardwareProfileLock", test.vmName, true).Return(nil).Times(1)
+			}
+
+			if test.unlock {
+				client.When("SetVirtualMachineHardwareProfileLock", test.vmName, false).Return(nil).Times(1)
 			}
 
 			if test.move.expected {
 				client.When("MoveVirtualMachine", test.vmName, test.move.newName).Return(nil).Times(1)
 			}
 
-			if test.memory > 0 && !test.shouldErr {
+			if test.memory > 0 {
 				client.When("SetVirtualMachineMemory", test.vmName, test.memory*1024).Return(nil).Times(1)
 			}
 
-			if test.cores > 0 && !test.shouldErr {
+			if test.cores > 0 {
 				client.When("SetVirtualMachineCores", test.vmName, test.cores).Return(nil).Times(1)
 			}
 
@@ -211,12 +221,12 @@ func TestUpdateServer(t *testing.T) {
 			args := strings.Split("bytemark update server "+test.args, " ")
 			err := app.Run(args)
 			if test.shouldErr && err == nil {
-				t.Fatal("should error")
+				t.Error("should error")
 			} else if !test.shouldErr && err != nil {
-				t.Fatalf("unexpected error: %v", err)
+				t.Errorf("unexpected error: %v", err)
 			}
 			if ok, err := client.Verify(); !ok {
-				t.Fatal(err)
+				t.Error(err)
 			}
 		})
 	}
