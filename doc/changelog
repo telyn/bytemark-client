@@ -1,4 +1,4 @@
-bytemark-client (3.0~beta1) UNRELEASED; urgency=low
+bytemark-client (3.0) UNRELEASED; urgency=low
 
   ### New Features:
   * `assent` command has been added to mark an account as having assented to
