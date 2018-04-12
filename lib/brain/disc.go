@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // Disc is a representation of a VM's disc.
@@ -28,6 +29,15 @@ type Disc struct {
 
 	NewStorageGrade string `json:"new_storage_grade,omitempty"`
 	NewStoragePool  string `json:"new_storage_pool,omitempty"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (d Disc) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Label, StorageGrade, Size, BackupCount"
+	}
+	return "ID, Label, StorageGrade, Size, BackupCount, BackupSchedules"
 }
 
 // PrettyPrint outputs the disc nicely-formatted to the writer.
@@ -77,4 +87,28 @@ func (d Disc) Validate() (*Disc, error) {
 		d.StorageGrade = "sata"
 	}
 	return &d, nil
+}
+
+// Discs represents multiple Disc objects in an output.Outputtable form.
+type Discs []Disc
+
+// DefaultFields provides the default fields for Discs, which is the same as those of Disc.
+func (ds Discs) DefaultFields(f output.Format) string {
+	return (Disc{}).DefaultFields(f)
+}
+
+// PrettyPrint writes a human-readable summary of the discs to wr at the given detail level.
+func (ds Discs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	discsTpl := `
+{{ define "discs_sgl" }}{{ len . }} discs{{ end }}
+
+{{ define "discs_medium" -}}
+{{- range . -}}
+{{ prettysprint . "_sgl" }}
+{{ end -}}
+{{- end }}
+
+{{ define "discs_full" -}}{{ template "discs_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, discsTpl, "discs"+string(detail), ds)
 }

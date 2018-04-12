@@ -1,8 +1,9 @@
-package lib
+package lib_test
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 func getFixtureNic() brain.NetworkInterface {
@@ -12,8 +13,8 @@ func getFixtureNic() brain.NetworkInterface {
 		Mac:              "00:00:00:00:00",
 		ID:               1,
 		VlanNum:          1,
-		IPs:              []*net.IP{&ip},
-		ExtraIPs:         map[string]*net.IP{},
+		IPs:              []net.IP{ip},
+		ExtraIPs:         map[string]net.IP{},
 		VirtualMachineID: 1,
 	}
 }

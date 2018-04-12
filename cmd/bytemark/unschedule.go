@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -10,7 +14,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "unschedule",
 		Usage:     "unschedule automated backups",
-		UsageText: "bytemark unschedule backups <server> <disc> <schedule id>",
+		UsageText: "unschedule backups <server> <disc> <schedule id>",
 		Description: `unschedules automated backups so that they are no longer taken
 	
 The <schedule id> is a number that can be found out using 'bytemark show disc <server> <disc>'
@@ -20,7 +24,7 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 			{
 				Name:      "backups",
 				Usage:     "unschedule automated backups",
-				UsageText: "bytemark unschedule backups <server> <disc> <schedule id>",
+				UsageText: "unschedule backups <server> <disc> <schedule id>",
 				Description: `unschedules automated backups so that they are no longer taken
 	
 The <schedule id> is a number that can be found out using 'bytemark show disc <server> <disc>'
@@ -29,7 +33,7 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to unschedule backups on",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.StringFlag{
 						Name:  "disc",
@@ -40,12 +44,12 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 						Usage: "the ID of the schedule to remove. See the output of `show disc` to find out schedule IDs.",
 					},
 				},
-				Action: With(OptionalArgs("server", "disc", "schedule-id"), RequiredFlags("server", "disc", "schedule-id"), AuthProvider, func(c *Context) (err error) {
+				Action: app.Action(args.Optional("server", "disc", "schedule-id"), with.RequiredFlags("server", "disc", "schedule-id"), with.Auth, func(c *app.Context) (err error) {
 					if c.Int("schedule-id") < 1 {
 						return fmt.Errorf("schedule-id not specified or invalid")
 					}
 					vmName := c.VirtualMachineName("server")
-					err = global.Client.DeleteBackupSchedule(vmName, c.String("disc"), c.Int("schedule-id"))
+					err = c.Client().DeleteBackupSchedule(vmName, c.String("disc"), c.Int("schedule-id"))
 					if err == nil {
 						log.Log("Backups unscheduled.")
 					}

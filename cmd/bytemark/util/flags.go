@@ -2,16 +2,17 @@ package util
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"net"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util/sizespec"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // IPFlag is a flag.Value used to provide an array of net.IPs
 type IPFlag []net.IP
 
-// Set sets the IPFlag given the space-seperated string of IPs
+// Set sets the IPFlag given the space-separated string of IPs
 func (ips *IPFlag) Set(value string) error {
 	for _, val := range strings.Split(value, " ") {
 		ip := net.ParseIP(val)

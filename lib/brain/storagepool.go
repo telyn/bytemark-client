@@ -3,27 +3,40 @@ package brain
 import (
 	"io"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // StoragePool represents a Bytemark Cloud Servers disk storage pool, as returned by the admin API.
 type StoragePool struct {
-	Name            string   `json:"name"`
-	Label           string   `json:"label"`
-	Zone            string   `json:"zone"`
-	Size            int      `json:"size"`
-	FreeSpace       int      `json:"free_space"`
-	AllocatedSpace  int      `json:"alloc"`
-	Discs           []string `json:"discs"`
-	OvercommitRatio int      `json:"overcommit_ratio"`
-	UsageStrategy   string   `json:"usage_strategy"`
-	StorageGrade    string   `json:"grade"`
-	Note            string   `json:"note"`
+	Name                 string `json:"name,omitempty"`
+	Label                string `json:"label,omitempty"`
+	ZoneName             string `json:"zone,omitempty"`
+	Size                 int    `json:"size,omitempty"`
+	FreeSpace            int    `json:"free_space,omitempty"`
+	Ceiling              int    `json:"ceiling,omitempty"`
+	AllocatedSpace       int    `json:"alloc,omitempty"`
+	Discs                int    `json:"discs,omitempty"`
+	Backups              int    `json:"backups,omitempty"`
+	OvercommitRatio      int    `json:"overcommit_ratio,omitempty"`
+	MigrationConcurrency int    `json:"migration_concurrency,omitempty"`
+	UsageStrategy        string `json:"usage_strategy,omitempty"`
+	StorageGrade         string `json:"grade,omitempty"`
+	Note                 string `json:"note,omitempty"`
+	IOPSLimit            int    `json:"iops_limit,omitempty"`
 
 	// These were defined, but aren't returned by the API
 	// ID        int
-	// Tail      *Tail
-	// IOPSLimit int
+	// Tail      Tail
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (sp StoragePool) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, MigrationConcurrency, Note"
+	}
+	return "ZoneName, Label, Ceiling, Size, FreeSpace, AllocatedSpace, Discs, OvercommitRatio, UsageStrategy, MigrationConcurrency, Note"
 }
 
 // PercentFull gives us the (numeric) percentage of how full the disc is
@@ -58,4 +71,28 @@ func (sp StoragePool) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) 
 {{ end }}
 `
 	return prettyprint.Run(wr, t, "storage_pool"+string(detail), sp)
+}
+
+// StoragePools represents more than one storage pool in output.Outputtable form.
+type StoragePools []StoragePool
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as StoragePool.DefaultFields
+func (sps StoragePools) DefaultFields(f output.Format) string {
+	return (StoragePool{}).DefaultFields(f)
+}
+
+// PrettyPrint writes a human-readable summary of the storage pools to writer at the given detail level.
+func (sps StoragePools) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	storagepoolsTpl := `
+{{ define "storagepools_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "storagepools_medium" -}}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
+{{ end -}}
+{{- end }}
+
+{{ define "storagepools_full" }}{{ template "storagepools_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, storagepoolsTpl, "storagepools"+string(detail), sps)
 }

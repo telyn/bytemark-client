@@ -1,21 +1,28 @@
+// do not add the quality build tag to this file - it requires access to the
+// unexported commands variable, so has to be in package main rather than
+// main_test. For some reason this seems to mess up build tags.
+// This test doesn't add any prerequisites for running 'go test' anyway, unlike
+// the other ones, and doesn't take long to run. So it's fine to keep it in the
+// main test job.
 package main
 
 import (
-	"github.com/urfave/cli"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
+	"github.com/urfave/cli"
 )
 
 var destructiveCommands = [...]string{
-	"create server", // can increase cost
-	"create discs",  // can increase cost
-	"delete server", // can destroy data
-	"delete group",  // can destroy data
-	"delete disc",   // can destroy data
-	"reimage",       // can destroy data
-	"resize disc",   // can increase cost
-	"set memory",    // can increase cost
-	"set cores",     // can increase cost
-
+	// "add server",    // can increase cost
+	// "add discs",     // can increase cost
+	"delete server",  // can destroy data
+	"delete group",   // can destroy data
+	"delete disc",    // can destroy data
+	"reimage server", // can destroy data
+	// FullName() on commands from admin/ and commands/ fails
+	//"update server", // can increase cost
+	//"update disc", // can increase cost
 }
 
 type s struct {
@@ -33,7 +40,7 @@ func TestDestructiveCommandsHaveForceFlags(t *testing.T) {
 	for _, cmd := range destructiveCommands {
 		cmds[cmd] = &s{}
 	}
-	traverseAllCommands(commands, func(c cli.Command) {
+	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		for _, cmd := range destructiveCommands {
 			if c.FullName() == cmd {
 				cmds[cmd].Seen = true

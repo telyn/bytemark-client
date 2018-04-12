@@ -2,9 +2,6 @@ package util
 
 import (
 	"fmt"
-	auth3 "github.com/BytemarkHosting/auth-client"
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"net"
 	"net/url"
 	"os"
@@ -12,6 +9,10 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+
+	auth3 "gitlab.bytemark.co.uk/auth/client"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // UserRequestedExit is returned when the user said 'No' to a 'yes/no' prompt.
@@ -176,7 +177,7 @@ func ProcessError(err error, message ...string) ExitCode {
 	if err != nil {
 		switch e := err.(type) {
 		case *auth3.Error:
-			// TODO(telyn): I feel like this entire chunk should be in github.com/BytemarkHosting/auth-client
+			// TODO(telyn): I feel like this entire chunk should be in gitlab.bytemark.co.uk/auth/client
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)
@@ -228,7 +229,7 @@ func ProcessError(err error, message ...string) ExitCode {
 		case lib.NilAuthError:
 			errorMessage = "Authorization wasn't set up in the client - please file a bug report containing the name of the command you tried to run."
 			exitCode = ExitCodeClientBug
-		case lib.NotAuthorizedError:
+		case lib.ForbiddenError:
 			errorMessage = err.Error()
 			exitCode = ExitCodeActionNotPermitted
 		case lib.BadRequestError:

@@ -4,7 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-func (c *bytemarkClient) AddIP(name *VirtualMachineName, spec *brain.IPCreateRequest) (brain.IPs, error) {
+func (c *bytemarkClient) AddIP(name VirtualMachineName, spec brain.IPCreateRequest) (brain.IPs, error) {
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return nil, err

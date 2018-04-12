@@ -2,9 +2,10 @@ package lib
 
 import (
 	"flag"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"os"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 func TestMain(m *testing.M) {

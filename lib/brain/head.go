@@ -4,7 +4,8 @@ import (
 	"io"
 	"net"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // Head represents a Bytemark Cloud Servers head server.
@@ -33,6 +34,16 @@ type Head struct {
 
 	VirtualMachineCount int      `json:"virtual_machines_count,omitempty"`
 	VirtualMachines     []string `json:"virtual_machines,omitempty"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (h Head) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Label, ZoneName, Architecture, CountVirtualMachines, FreeMemory, TotalMemory, UsageStrategy"
+	}
+	return "ID, Label, IsOnline, UsageStrategy, UUID, CCAddress, CountVirtualMachines, FreeMemory, UsedCores, TotalMemory, LastNote, Architecture, Models, ZoneName"
+
 }
 
 // CountVirtualMachines returns the number of virtual machines running on this head
@@ -65,4 +76,28 @@ func (h Head) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 {{ end }}
 `
 	return prettyprint.Run(wr, t, "head"+string(detail), h)
+}
+
+// Heads represents multiple Head objects in output.Outputtable form
+type Heads []Head
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as Head.DefaultFields
+func (hs Heads) DefaultFields(f output.Format) string {
+	return (Head{}).DefaultFields(f)
+}
+
+// PrettyPrint writes a human-readable summary of the heads to writer at the given detail level.
+func (hs Heads) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	headsTpl := `
+{{ define "heads_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "heads_medium" -}}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
+{{ end -}}
+{{- end }}
+
+{{ define "heads_full" }}{{ template "heads_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, headsTpl, "heads"+string(detail), hs)
 }

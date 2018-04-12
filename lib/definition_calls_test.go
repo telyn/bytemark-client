@@ -1,17 +1,18 @@
-package lib
+package lib_test
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cheekybits/is"
-	"net/http"
-	"os"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
+	"github.com/cheekybits/is"
 )
 
 func TestProcessDefinitions(t *testing.T) {
 	is := is.New(t)
-	var defsJS JSONDefinitions
+	var defsJS lib.JSONDefinitions
 	err := json.Unmarshal([]byte(fixtureDefinitionsJSON), &defsJS)
 
 	is.Nil(err)
@@ -26,7 +27,6 @@ func TestProcessDefinitions(t *testing.T) {
 	is.Equal(2, len(defs.HardwareProfiles))
 	is.Equal(12, len(defs.Distributions))
 
-	is.NotNil(defs)
 	for k, l := range fixtureDefinitions.Distributions {
 		is.Equal(l, defs.Distributions[k])
 	}
@@ -45,48 +45,40 @@ func TestProcessDefinitions(t *testing.T) {
 func TestReadDefinitions(t *testing.T) {
 	is := is.New(t)
 
-	client, servers, err := mkTestClientAndServers(t, Handlers{
-		brain: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/definitions" {
-				_, err := w.Write([]byte(fixtureDefinitionsJSON))
-				if err != nil {
-					t.Fatal(err)
-				}
-			} else {
-				http.NotFound(w, r)
-			}
-		}),
+	rts := testutil.RequestTestSpec{
+		Method:   "GET",
+		Endpoint: lib.BrainEndpoint,
+		URL:      "/definitions",
+		Response: json.RawMessage(fixtureDefinitionsJSON),
+	}
+
+	rts.Run(t, testutil.Name(0), false, func(client lib.Client) {
+		defs, err := client.ReadDefinitions()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		is.Equal(3, len(defs.StorageGrades))
+		is.Equal(2, len(defs.HardwareProfiles))
+		is.Equal(12, len(defs.Distributions))
+
+		for k, l := range fixtureDefinitions.Distributions {
+			is.Equal(l, defs.Distributions[k])
+		}
+		for k, l := range fixtureDefinitions.StorageGrades {
+			is.Equal(l, defs.StorageGrades[k])
+		}
+		for k, l := range fixtureDefinitions.HardwareProfiles {
+			is.Equal(l, defs.HardwareProfiles[k])
+		}
+		for k, l := range fixtureDefinitions.ZoneNames {
+			is.Equal(l, defs.ZoneNames[k])
+		}
 	})
-	defer servers.Close()
 
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		t.FailNow()
-	}
-
-	defs, err := client.ReadDefinitions()
-	is.Nil(err)
-
-	is.Equal(3, len(defs.StorageGrades))
-	is.Equal(2, len(defs.HardwareProfiles))
-	is.Equal(12, len(defs.Distributions))
-
-	is.NotNil(defs)
-	for k, l := range fixtureDefinitions.Distributions {
-		is.Equal(l, defs.Distributions[k])
-	}
-	for k, l := range fixtureDefinitions.StorageGrades {
-		is.Equal(l, defs.StorageGrades[k])
-	}
-	for k, l := range fixtureDefinitions.HardwareProfiles {
-		is.Equal(l, defs.HardwareProfiles[k])
-	}
-	for k, l := range fixtureDefinitions.ZoneNames {
-		is.Equal(l, defs.ZoneNames[k])
-	}
 }
 
-var fixtureDefinitions = &Definitions{
+var fixtureDefinitions = lib.Definitions{
 	DistributionDescriptions: map[string]string{
 		"centos5":     "CentOS 5 (64 bit)",
 		"centos6":     "CentOS 6 (64 bit)",

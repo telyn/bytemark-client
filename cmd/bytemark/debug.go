@@ -4,19 +4,21 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"github.com/urfave/cli"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/urfave/cli"
 )
 
 func init() {
 	commands = append(commands, cli.Command{
 		Name:      "debug",
 		Usage:     "test out the Bytemark API",
-		UsageText: "bytemark debug [--junk-token] [--auth] [--use-billing] GET|POST|PUT|DELETE <path>",
+		UsageText: "debug [--junk-token] [--auth] [--use-billing] GET|POST|PUT|DELETE <path>",
 		Description: `GET sends an HTTP GET request with an optional valid authorization header to the given path on the API endpoint and pretty-prints the received json.
 The rest do similar, but PUT and POST both wait for input from stdin after authenticating. To finish entering, put an EOF (usually ctrl-d)`,
 		Flags: []cli.Flag{
@@ -33,7 +35,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 				Usage: "Send the request to the billing endpoint instead of the brain.",
 			},
 		},
-		Action: With(func(c *Context) error {
+		Action: app.Action(func(c *app.Context) error {
 			shouldAuth := c.Bool("auth")
 
 			endpoint := lib.BrainEndpoint
@@ -42,7 +44,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 			}
 
 			if c.Bool("junk-token") {
-				global.Config.Set("token", "", "FLAG junk-token")
+				c.Config().Set("token", "", "FLAG junk-token")
 			}
 
 			method, err := c.NextArg()
@@ -61,7 +63,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					url = "/" + url
 				}
 				if c.Bool("auth") {
-					err := EnsureAuth()
+					err := with.Auth(c)
 					if err != nil {
 						return err
 					}
@@ -72,9 +74,9 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					reader = bufio.NewReader(os.Stdin)
 					// read until an eof
 				}
-				req, err := global.Client.BuildRequest(method, endpoint, url)
+				req, err := c.Client().BuildRequest(method, endpoint, url)
 				if !shouldAuth {
-					req, err = global.Client.BuildRequestNoAuth(method, endpoint, url)
+					req, err = c.Client().BuildRequestNoAuth(method, endpoint, url)
 				}
 				if err != nil {
 					return err
@@ -85,14 +87,14 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					return err
 				}
 				reqURL := req.GetURL()
-				log.Logf("%s %s: %d\r\n", method, reqURL.String(), statusCode)
+				c.LogErr("%s %s: %d\r\n", method, reqURL.String(), statusCode)
 
 				buf := new(bytes.Buffer)
 				err = json.Indent(buf, body, "", "    ")
 				if err != nil {
 					return err
 				}
-				log.Log(buf.String())
+				c.Log("%s", buf.String())
 				return nil
 			}
 			return c.Help("Unexpected debug command '" + method + "'")

@@ -1,7 +1,7 @@
 Bytemark command-line client
 ============================
 
-[![Build Status](https://travis-ci.org/BytemarkHosting/bytemark-client.svg)](https://travis-ci.org/BytemarkHosting/bytemark-client) [![Coverage Status](https://coveralls.io/repos/github/BytemarkHosting/bytemark-client/badge.svg?branch=develop)](https://coveralls.io/github/BytemarkHosting/bytemark-client?branch=develop)
+[![Build Status](https://travis-ci.org/BytemarkHosting/bytemark-client.svg)](https://travis-ci.org/BytemarkHosting/bytemark-client) [![Coverage Status](https://coveralls.io/repos/github/BytemarkHosting/bytemark-client/badge.svg?branch=develop)](https://coveralls.io/github/BytemarkHosting/bytemark-client?branch=develop) [![Go Report Card](https://goreportcard.com/badge/github.com/BytemarkHosting/bytemark-client)](https://goreportcard.com/report/github.com/BytemarkHosting/bytemark-client)
 
 Installation
 ------------
@@ -42,27 +42,52 @@ It's suggested that you avoid using struct embedding or interface composition wi
 Breaking API change
 ===================
 
-The following breaking API change to the 'lib' package occurred in version 2.0.
+The following breaking API change to the `lib` package occurred in version 3.0
 
-* the packages lib/spp, lib/brain and lib/billing are being created.
-* lib.CreditCard is moving to lib/spp.CreditCard
-* lib.Person is moving to lib/billing.Person
-* lib.billingAccount is moving to lib/billing.Account
-* lib.brainAccount is moving to lib/brain.Account
-* the following types are moving from lib to the same name under lib/brain:
-  * Disc
-  * Group
-  * ImageInstall.go
-  * IP
-  * IPCreateRequest
-  * IPs
-  * IPSpec
-  * NIC
-  * StoragePool
-  * User
-  * VirtualMachine
-  * VirtualMachineSpec
-* lib.VirtualMachineName is being renamed to lib.ServerName
-* lib.ParseVirtualMachineName is being renamed to lib.ParseServerName
+* These functions have been removed from `lib`
+  * `FormatAccount` (replaced by brain.Account.PrettyPrint)
+  * `FormatVirtualMachine` (replaced by brain.VirtualMachine.PrettyPrint)
+  * `FormatVirtualMachineSpec` (replaced by brain.VirtualMachineSpec.PrettyPrint)
+  * `FormatImageInstall` (replaced by brain.ImageInstall.PrettyPrint)
 
-If you require the old API for longer you can use gopkg.in/BytemarkHosting/bytemark-client.v1/lib to refer to the package prior to this change.
+* These functions have been removed from `lib`
+  * `NewWithAuth` has been removed - use `lib.NewWithURLs`. It is no longer possible to pass an auth3.Client directly, but this shouldn't be an issue.
+
+* These functions have been altered:
+  * `lib.NewSimple` has been renamed to `lib.New` - the old implementation of `lib.New` has been removed.
+
+* These `lib.Client` methods have been deleted
+  * `ParseVirtualMachineName` (replaced by `lib.ParseVirtualMachineName`)
+  * `ParseGroupName` (replaced by `lib.ParseGroupName`)
+  * `ParseAccountName`(replaced by `lib.ParseAccountName`)
+  * `AddUserAuthorizedKey` (replaced by `lib/requests/brain.AddUserAuthorizedKey`)
+  * `DeleteUserAuthorizedKey` (replaced by `lib/requests/brain.DeleteUserAuthorizedKey`)
+
+* `lib.NotAuthorizedError` has been renamed to `lib.ForbiddenError`
+
+Most `lib.Client` methods now take `lib`/`brain`/`billing` structs as values, rather than as pointers. See the `lib/interface.go` for the full list of methods available and their new type signatures.
+
+Almost all `lib.Client` struct fields are now values or slices of values instead of pointers or slices of pointers - below is a list. Two notable exceptions are `brain.VirtualMachineSpec.ImageInstall` and `brain.VirtualMachineSpec.IPs` - which may need to be null, and so remain as pointers.
+
+`lib.Request` is now an interface rather than a struct - and `lib.Client.BuildRequest` and `lib.Client.BuildRequestNoAuth` now return `lib.Request` instead of `*lib.Request`
+
+* The type of `brain.Account.Groups` has changed from `[]*Group` to `[]Group`
+* The type of `brain.Backups` has changed from `[]*Group` to `[]Group`
+* The type of `brain.BackupSchedules` has changed from `[]*BackupSchedule` to `[]BackupSchedule`
+* The type of `brain.Group.VirtualMachines` has changed from `[]*VirtualMachine` to `[]VirtualMachine`
+* The type of `brain.Head.CCAddress` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.IP.IP` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.IPRange.Available` has changed from `[]*math/big.Int` to `[]math/big.Int`
+* The type of `brain.IPCreateRequest.IPs` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.IPs` has changed from `[]*net.IP` to `[]net.IP`
+* The type of `brain.NetworkInterface.ExtraIPs` has changed from `map[string]*net.IP` to `map[string]net.IP`
+* The type of `brain.Privileges` has changed from `[]*Privilege` to `[]Privilege`
+* The type of `brain.Tail.CCAddress` has changed from `*net.IP` to `net.IP`
+* The type of `brain.VirtualMachine.Discs` has changed from `[]*Disc` to `[]Disc`
+* The type of `brain.VirtualMachine.ManagementAddress` has changed from `*net.IP` to `net.IP`
+* The type of `brain.VirtualMachine.NetworkInterfaces` has changed from `[]*NetworkInterface` to `[]NetworkInterface`
+* The type of `brain.VirtualMachineSpec.VirtualMachine` has changed from `*VirtualMachine` to `VirtualMachine`
+* The type of `brain.VLAN.IPRanges` has changed from `[]*IPRange` to `[]IPRange`
+
+
+If you require the old API for longer you can use `gopkg.in/BytemarkHosting/bytemark-client.v2/lib` to refer to the package prior to this change.

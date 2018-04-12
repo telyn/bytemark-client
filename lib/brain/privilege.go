@@ -2,9 +2,11 @@ package brain
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // PrivilegeLevel is a type to represent different privilege levels.
@@ -99,6 +101,15 @@ func (p Privilege) String() string {
 	return fmt.Sprintf("%s for %s%s", p.Level, p.Username, requiresYubikey)
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (p Privilege) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Username, Level, YubikeyRequired, Target"
+	}
+	return "ID, Username, Level, Target, YubikeyRequired"
+}
+
 // PrettyPrint nicely formats the Privilege and sends it to the given writer.
 // At the moment, the detail parameter is ignored.
 func (p Privilege) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (err error) {
@@ -107,7 +118,7 @@ func (p Privilege) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (er
 }
 
 // Privileges is used to allow API consumers to use IndexOf on the array of privileges.
-type Privileges []*Privilege
+type Privileges []Privilege
 
 // IndexOf finds the privilege given in the list of privileges, ignoring the Privilege ID and returns the index. If it couldn't find it, returns -1.
 func (ps Privileges) IndexOf(priv Privilege) int {
@@ -123,4 +134,25 @@ func (ps Privileges) IndexOf(priv Privilege) int {
 		}
 	}
 	return -1
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as Privilege.DefaultFields.
+func (ps Privileges) DefaultFields(f output.Format) string {
+	return (Privilege{}).DefaultFields(f)
+}
+
+// PrettyPrint writes a human-readable summary of the privileges to writer at the given detail level.
+func (ps Privileges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	privilegesTpl := `
+{{ define "privileges_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "privileges_medium" -}}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
+{{ end -}}
+{{- end }}
+
+{{ define "privileges_full" }}{{ template "privileges_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, privilegesTpl, "privileges"+string(detail), ps)
 }

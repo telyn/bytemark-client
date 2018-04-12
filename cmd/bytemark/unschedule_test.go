@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
-	"testing"
+	"github.com/urfave/cli"
 )
 
 func TestUnscheduleBackups(t *testing.T) {
@@ -19,26 +22,26 @@ func TestUnscheduleBackups(t *testing.T) {
 		ShouldErr  bool
 		ShouldCall bool
 		CreateErr  error
-		BaseTestFn func(*testing.T, bool) (*mocks.Config, *mocks.Client)
+		BaseTestFn func(*testing.T, bool, []cli.Command) (*mocks.Config, *mocks.Client, *cli.App)
 	}{
 		{
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name"},
 			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
 			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
-			BaseTestFn: baseTestSetup,
+			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			ShouldCall: true,
@@ -46,13 +49,13 @@ func TestUnscheduleBackups(t *testing.T) {
 			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
 			DiscLabel:  "disc-label",
 			ID:         324,
-			BaseTestFn: baseTestAuthSetup,
+			BaseTestFn: testutil.BaseTestAuthSetup,
 		},
 	}
 
 	for i, test := range tests {
-		config, client := test.BaseTestFn(t, false)
-		config.When("GetVirtualMachine").Return(&defVM)
+		config, client, app := test.BaseTestFn(t, false, commands)
+		config.When("GetVirtualMachine").Return(defVM)
 		fmt.Println(i) // fmt.Println still works even when the test panics - unlike t.Log
 
 		if test.ShouldCall {
@@ -60,7 +63,7 @@ func TestUnscheduleBackups(t *testing.T) {
 		} else {
 			client.When("DeleteBackupSchedule", test.Name, test.DiscLabel, test.ID).Return(test.CreateErr).Times(0)
 		}
-		err := global.App.Run(append([]string{"bytemark", "unschedule", "backups"}, test.Args...))
+		err := app.Run(append([]string{"bytemark", "unschedule", "backups"}, test.Args...))
 		checkErr(t, "TestUnscheduleBackups", i, test.ShouldErr, err)
 		verifyAndReset(t, "TestUnscheduleBackups", i, client)
 	}

@@ -2,9 +2,11 @@ package brain
 
 import (
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // ImageInstall represents what image was most recently installed on a VM along with its root password.
@@ -16,16 +18,21 @@ type ImageInstall struct {
 	PublicKeys      string `json:"ssh_public_key"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (ii ImageInstall) DefaultFields(f output.Format) string {
+	return "Distribution, RootPassword"
+}
+
 // PrettyPrint outputs the image install with the given level of detail.
 // TODO(telyn): rewrite to use templates & prettyprint.Run
-func (pp ImageInstall) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+func (ii ImageInstall) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	var output []string
-	if pp.Distribution != "" {
-		output = append(output, "Image: "+pp.Distribution)
+	if ii.Distribution != "" {
+		output = append(output, "Image: "+ii.Distribution)
 	}
-	if pp.PublicKeys != "" {
+	if ii.PublicKeys != "" {
 		var keynames []string
-		for _, k := range strings.Split(pp.PublicKeys, "\n") {
+		for _, k := range strings.Split(ii.PublicKeys, "\n") {
 			kbits := strings.SplitN(k, " ", 3)
 			if len(kbits) == 3 {
 				keynames = append(keynames, strings.TrimSpace(kbits[2]))
@@ -34,10 +41,10 @@ func (pp ImageInstall) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel)
 		}
 		output = append(output, fmt.Sprintf("%d public keys: %s", len(keynames), strings.Join(keynames, ", ")))
 	}
-	if pp.RootPassword != "" {
-		output = append(output, "Root/Administrator password: "+pp.RootPassword)
+	if ii.RootPassword != "" {
+		output = append(output, "Root/Administrator password: "+ii.RootPassword)
 	}
-	if pp.FirstbootScript != "" {
+	if ii.FirstbootScript != "" {
 		output = append(output, "With a firstboot script")
 	}
 	_, err := wr.Write([]byte(strings.Join(output, "\r\n") + "\r\n"))

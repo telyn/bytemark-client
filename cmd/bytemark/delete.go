@@ -2,45 +2,24 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
 func init() {
-	adminCommands = append(adminCommands, cli.Command{
-		Name:   "delete",
-		Action: cli.ShowSubcommandHelp,
-		Subcommands: []cli.Command{
-			{
-				Name:      "vlan",
-				Usage:     "delete a given VLAN",
-				UsageText: "bytemark --admin delete vlan <id>",
-				Flags: []cli.Flag{
-					cli.IntFlag{
-						Name:  "id",
-						Usage: "the ID of the VLAN to delete",
-					},
-				},
-				Action: With(OptionalArgs("id"), RequiredFlags("id"), AuthProvider, func(c *Context) error {
-					if err := global.Client.DeleteVLAN(c.Int("id")); err != nil {
-						return err
-					}
-
-					log.Output("VLAN deleted")
-
-					return nil
-				}),
-			},
-		},
-	})
 
 	commands = append(commands, cli.Command{
 		Name:      "delete",
 		Usage:     "delete a given server, disc, group, account or key",
-		UsageText: "bytemark delete account|disc|group|key|server",
+		UsageText: "delete account|disc|group|key|server",
 		Description: `delete a given server, disc, group, account or key
 
    Only empty groups and accounts can be deleted.
@@ -50,7 +29,7 @@ func init() {
 		Subcommands: []cli.Command{{
 			Name:        "disc",
 			Usage:       "delete the given disc",
-			UsageText:   "bytemark delete disc <virtual machine name> <disc label>",
+			UsageText:   "delete disc <virtual machine name> <disc label>",
 			Description: "Deletes the given disc. To find out a disc's label you can use the `bytemark show server` command or `bytemark list discs` command.",
 			Flags: []cli.Flag{
 				forceFlag,
@@ -61,21 +40,21 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server whose disc you wish to delete",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
 			Aliases: []string{"disk"},
-			Action: With(OptionalArgs("server", "disc"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
-				if !c.Bool("force") && !util.PromptYesNo("Are you sure you wish to delete this disc? It is impossible to recover.") {
+			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
+				if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), "Are you sure you wish to delete this disc? It is impossible to recover.") {
 					return util.UserRequestedExit{}
 				}
 				vmName := c.VirtualMachineName("server")
-				return global.Client.DeleteDisc(&vmName, c.String("disc"))
+				return c.Client().DeleteDisc(vmName, c.String("disc"))
 			}),
 		}, {
 			Name:      "group",
 			Usage:     "deletes the given group",
-			UsageText: "bytemark delete group [--force] [--recursive] <group name>",
+			UsageText: "delete group [--force] [--recursive] <group name>",
 			Description: `Deletes the given group.
 If --recursive is specified, all servers in the group will be purged. Otherwise, if there are servers in the group, will return an error.`,
 			Flags: []cli.Flag{
@@ -86,15 +65,15 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "the name of the group to delete",
-					Value: new(GroupNameFlag),
+					Value: new(app.GroupNameFlag),
 				},
 				forceFlag,
 			},
-			Action: With(OptionalArgs("group"), RequiredFlags("group"), GroupProvider("group"), deleteGroup),
+			Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Group("group"), deleteGroup),
 		}, {
 			Name:        "key",
 			Usage:       "deletes the specified key",
-			UsageText:   "bytemark delete key [--user <user>] <key>",
+			UsageText:   "delete key [--user <user>] <key>",
 			Description: "Keys may be specified as just the comment part or as the whole key. If there are multiple keys with the comment given, an error will be returned",
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -106,10 +85,10 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					Usage: "The public key to delete. Can be the comment part or the whole public key",
 				},
 			},
-			Action: With(JoinArgs("public-key"), RequiredFlags("public-key"), AuthProvider, func(c *Context) (err error) {
+			Action: app.Action(args.Join("public-key"), with.RequiredFlags("public-key"), with.Auth, func(c *app.Context) (err error) {
 				user := c.String("user")
 				if user == "" {
-					user = global.Config.GetIgnoreErr("user")
+					user = c.Config().GetIgnoreErr("user")
 				}
 
 				key := c.String("public-key")
@@ -117,16 +96,16 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 					return c.Help("You must specify a key to delete.\r\n")
 				}
 
-				err = global.Client.DeleteUserAuthorizedKey(user, key)
+				err = brainRequests.DeleteUserAuthorizedKey(c.Client(), user, key)
 				if err == nil {
-					log.Log("Key deleted successfullly")
+					log.Log("Key deleted successfully")
 				}
 				return
 			}),
 		}, {
 			Name:        "server",
 			Usage:       "delete the given server",
-			UsageText:   `bytemark delete server [--purge] <server name>`,
+			UsageText:   `delete server [--purge] <server name>`,
 			Description: "Deletes the given server. Deleted servers still exist and can be restored. To ensure a server is fully deleted, use the --purge flag.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -137,14 +116,14 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to delete",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 			},
-			Action: With(OptionalArgs("server"), RequiredFlags("server"), VirtualMachineProvider("server"), deleteServer),
+			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), deleteServer),
 		}, {
 			Name:        "backup",
 			Usage:       "delete the given backup",
-			UsageText:   `bytemark delete backup <server name> <disc label> <backup label>`,
+			UsageText:   `delete backup <server name> <disc label> <backup label>`,
 			Description: "Deletes the given backup. Backups cannot be recovered after deletion.",
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -154,19 +133,19 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to delete a backup from",
-					Value: new(VirtualMachineNameFlag),
+					Value: new(app.VirtualMachineNameFlag),
 				},
 				cli.StringFlag{
 					Name:  "backup",
 					Usage: "the name or ID of the backup to delete",
 				},
 			},
-			Action: With(OptionalArgs("server", "disc", "backup"), RequiredFlags("server", "disc", "backup"), AuthProvider, deleteBackup),
+			Action: app.Action(args.Optional("server", "disc", "backup"), with.RequiredFlags("server", "disc", "backup"), with.Auth, deleteBackup),
 		}},
 	})
 }
 
-func deleteServer(c *Context) (err error) {
+func deleteServer(c *app.Context) (err error) {
 	purge := c.Bool("purge")
 	vm := c.VirtualMachine
 
@@ -181,13 +160,13 @@ func deleteServer(c *Context) (err error) {
 
 	}
 
-	if !c.Bool("force") && !util.PromptYesNo(fstr) {
+	if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), fstr) {
 		err = util.UserRequestedExit{}
 		return
 	}
 
 	vmName := c.VirtualMachineName("server")
-	err = global.Client.DeleteVirtualMachine(&vmName, purge)
+	err = c.Client().DeleteVirtualMachine(vmName, purge)
 	if err != nil {
 		return
 	}
@@ -208,7 +187,7 @@ func countRunning(group *brain.Group) (running int) {
 	return running
 }
 
-func deleteGroup(c *Context) (err error) {
+func deleteGroup(c *app.Context) (err error) {
 	recursive := c.Bool("recursive")
 	groupName := c.GroupName("group")
 	if len(c.Group.VirtualMachines) > 0 && recursive {
@@ -223,10 +202,10 @@ func deleteGroup(c *Context) (err error) {
 			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.Group.Name, running, andStopped)
 		}
 
-		if !c.Bool("force") && !util.PromptYesNo(prompt+" - are you sure you wish to delete this group?") {
+		if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), prompt+" - are you sure you wish to delete this group?") {
 			return util.UserRequestedExit{}
 		}
-		err = recursiveDeleteGroup(&groupName, c.Group)
+		err = recursiveDeleteGroup(c, &groupName, c.Group)
 		if err != nil {
 			return
 		}
@@ -234,19 +213,19 @@ func deleteGroup(c *Context) (err error) {
 		err = &util.WontDeleteNonEmptyGroupError{Group: &groupName}
 		return
 	}
-	err = global.Client.DeleteGroup(&groupName)
+	err = c.Client().DeleteGroup(groupName)
 	if err == nil {
 		log.Logf("Group %s deleted successfully.\r\n", groupName.String())
 	}
 	return
 }
 
-func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
+func recursiveDeleteGroup(c *app.Context, name *lib.GroupName, group *brain.Group) error {
 	log.Log("", "")
 	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 	for _, vm := range group.VirtualMachines {
 		vmn.VirtualMachine = vm.Name
-		err := global.Client.DeleteVirtualMachine(&vmn, true)
+		err := c.Client().DeleteVirtualMachine(vmn, true)
 		if err != nil {
 			return err
 		}
@@ -265,8 +244,8 @@ func recursiveDeleteGroup(name *lib.GroupName, group *brain.Group) error {
 	log.Log("       bytemark delete server [--force] [---purge] <server>")
 	log.Log("       bytemark undelete server <server>")
 }*/
-func deleteBackup(c *Context) (err error) {
-	err = global.Client.DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
+func deleteBackup(c *app.Context) (err error) {
+	err = c.Client().DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 	if err != nil {
 		return
 	}

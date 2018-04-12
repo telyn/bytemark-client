@@ -1,4 +1,3 @@
-
 variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
@@ -32,9 +31,9 @@ stages:
   stage: test
   before_script:
     # these two are needed for coverage stats
-    - go get github.com/BytemarkHosting/auth-client
     - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - mkdir -p $GOPATH/pkg $GOPATH/bin
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
 
@@ -73,6 +72,7 @@ test:
     - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - export GOPATH
     - |
       for pkg in $(go list ./... | grep -v vendor/); do
         shortpkg="${pkg##github.com/BytemarkHosting/}"
@@ -86,6 +86,15 @@ test:
     paths:
     - coverage.html
     expire_in: '1 week'
+
+quality-test:
+  <<: *test
+  script: 
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - export GOPATH
+    - go install ./...
+    - go generate -tags quality $(go list ./... | grep -v vendor)
+    - go test -run 'TestQuality.*' -tags quality ./...
 
 # release-check makes sure that if we're on a release tag then the changelog and lib/version.go have been updated.
 release-check:
@@ -122,6 +131,21 @@ release-check:
   only:
   - /^v\d+(\.\d+)+$/
 
+doc-check:
+  stage: test
+  image: alpine
+  before_script:
+    - apk update
+    - apk add coreutils bash vim
+  script:
+    - |
+      if ! ./gen/test-HACKING.sh; then
+        echo "HACKING has not been updated to match the new folder structure!"
+        echo "Run the following and paste the shasum over the one in HACKING"
+        echo "   find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum"
+        exit 1
+      fi
+
 release-branch-check:
   stage: test
   image: alpine
@@ -151,6 +175,18 @@ build-manpage:
     - doc/bytemark.pdf
     expire_in: '1 month'
 
+build-changelogs:
+  stage: build
+  image: perl:5
+  script:
+    - gen/convert-changelog rpm < doc/changelog > doc/changelog.rpm
+    - gen/convert-changelog md < doc/changelog > doc/changelog.md
+
+  artifacts:
+    paths:
+      - doc/changelog.*
+    expire_in: '1 month'
+
 .build-job: &build
   stage: build
   image: golang:$GOVERSION
@@ -160,7 +196,6 @@ build-manpage:
     - |
       [ -z "$VERSION" ] && sed -i 's/".*"/"'"$CHANGELOG_VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
     - cat lib/version.go
-    - go get github.com/BytemarkHosting/auth-client
     - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
@@ -223,11 +258,12 @@ package-generic-amd64:
   - |
     for i in bytemark-amd64-*; do
       cp $i bytemark
+      cp doc/changelog.md doc/changelog.txt
       if echo "$i" | grep -- '-windows$'; then
           mv bytemark bytemark.exe
-          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog doc/LICENSE.txt
+          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog.txt doc/LICENSE.txt
       else
-          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog doc/LICENSE.txt
+          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
       fi
     done
   dependencies:
@@ -237,6 +273,7 @@ package-generic-amd64:
   - build-amd64-openbsd
   - build-amd64-windows
   - build-manpage
+  - build-changelogs
   artifacts:
     paths:
     - "*.zip"
@@ -270,6 +307,7 @@ package-rpm-amd64:
   image: nrechn/fedora-mock
   script:
   - mkdir -p ~/rpmbuild/SOURCES
+  - cat doc/changelog.rpm >> .gitlab-ci/bytemark-client.spec
   - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
   - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
   - rpmbuild --define "version ${VERSION:-$CHANGELOG_VERSION}" --define "release ${SNAPSHOT_VERSION}" -bb .gitlab-ci/bytemark-client.spec
@@ -281,6 +319,7 @@ package-rpm-amd64:
   dependencies:
   - build-amd64-linux
   - build-manpage
+  - build-changelogs
 
 # makes a chocolatey package
 package-windows-amd64:
@@ -288,7 +327,11 @@ package-windows-amd64:
     image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
     script:
     - mkdir -p choco/tools
-    - sed -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+      # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
+    - CHANGELOG_VERSION=${CHANGELOG_VERSION%%~*}
+    - sed -i 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g' doc/changelog.md
+    - xmlstarlet tr --xinclude .gitlab-ci/noop.xsl .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - sed -i -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" choco/bytemark-client.nuspec
     - mv bytemark-amd64-windows choco/tools/bytemark.exe
     - unix2dos -n LICENSE choco/tools/LICENSE.txt
     - cd choco/tools
@@ -308,6 +351,7 @@ package-windows-amd64:
       expire_in: "1 month"
     dependencies:
     - build-amd64-windows
+    - build-changelogs
 
 #### RELEASE STAGE
 ## the release stage pushes the tars, zips, debs & rpms out to repo.bytemark
@@ -370,7 +414,7 @@ release-to-repo:
   - scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
   - scp bytemark-client-$VERSION*.rpm $REPO/rpm
   # make rpm & debian repos
-  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && /srv/bin/rpm-addsign-unattended.sh bytemark-client-$VERSION*.rpm && createrepo ."
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && /srv/bin/rpm-addsign-unattended.sh bytemark-client-$VERSION*.rpm && createrepo . && gpg --detach-sign --armor repodata/repomd.xml"
   - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && rm -f Release.gpg InRelease && make"
   # remove old -latest symlinks
   - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do rm -f $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"

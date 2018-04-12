@@ -1,10 +1,11 @@
 package util
 
 import (
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 func TestFileFlag(t *testing.T) {

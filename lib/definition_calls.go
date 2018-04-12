@@ -3,9 +3,10 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"regexp"
 	"sort"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // Definitions represent all the possible things that can be returned as part of BigV's /definitions endpoint.
@@ -21,7 +22,7 @@ type Definitions struct {
 }
 
 // DistributionDefinitions processes DistributionDescriptions into a slice of DistributionDefinitions
-func (d Definitions) DistributionDefinitions() (dists []brain.DistributionDefinition) {
+func (d Definitions) DistributionDefinitions() (dists brain.DistributionDefinitions) {
 	// TODO: mix in data from the imager.
 	dists = make([]brain.DistributionDefinition, 0, len(d.DistributionDescriptions))
 	for name, desc := range d.DistributionDescriptions {
@@ -31,7 +32,7 @@ func (d Definitions) DistributionDefinitions() (dists []brain.DistributionDefini
 }
 
 // HardwareProfileDefinitions processes HardwareProfiles into a slice of HardwareProfileDefinitions and mixes in some static data since the API doesn't return any more useful information yet.
-func (d Definitions) HardwareProfileDefinitions() (profs []brain.HardwareProfileDefinition) {
+func (d Definitions) HardwareProfileDefinitions() (profs brain.HardwareProfileDefinitions) {
 	profs = make([]brain.HardwareProfileDefinition, 0, len(d.HardwareProfiles))
 
 	descriptions := map[string]string{
@@ -52,7 +53,7 @@ func (d Definitions) HardwareProfileDefinitions() (profs []brain.HardwareProfile
 }
 
 // StorageGradeDefinitions processes StorageGradeDescriptions into a slice of StorageGradeDefinitions
-func (d Definitions) StorageGradeDefinitions() (grades []brain.StorageGradeDefinition) {
+func (d Definitions) StorageGradeDefinitions() (grades brain.StorageGradeDefinitions) {
 	grades = make([]brain.StorageGradeDefinition, 0, len(d.StorageGradeDescriptions))
 	for name, desc := range d.StorageGradeDescriptions {
 		grades = append(grades, brain.StorageGradeDefinition{Name: name, Description: desc})
@@ -61,7 +62,7 @@ func (d Definitions) StorageGradeDefinitions() (grades []brain.StorageGradeDefin
 }
 
 // ZoneDefinitions processes ZoneNames into a slice of ZoneDefinitions, adding some static data of our own since there's nothing coming from the API about that right now
-func (d Definitions) ZoneDefinitions() (zones []brain.ZoneDefinition) {
+func (d Definitions) ZoneDefinitions() (zones brain.ZoneDefinitions) {
 	zones = make([]brain.ZoneDefinition, 0, len(d.ZoneNames))
 	zoneDescriptionsMap := map[string]string{
 		"york":       "Cloud Servers in York",
@@ -114,8 +115,7 @@ func (d *JSONDefinition) Process(into *Definitions) error {
 }
 
 // Process processes our intermediate JSONDefinitions into a Definitions object.
-func (defs JSONDefinitions) Process() *Definitions {
-	var out Definitions
+func (defs JSONDefinitions) Process() (out Definitions) {
 
 	for _, def := range defs {
 		if err := def.Process(&out); err != nil {
@@ -127,11 +127,11 @@ func (defs JSONDefinitions) Process() *Definitions {
 	sort.StringSlice(out.ZoneNames).Sort()
 	sort.StringSlice(out.HardwareProfiles).Sort()
 
-	return &out
+	return
 }
 
 // ReadDefinitions queries the brain for its definitions
-func (c *bytemarkClient) ReadDefinitions() (definitions *Definitions, err error) {
+func (c *bytemarkClient) ReadDefinitions() (definitions Definitions, err error) {
 	var defs JSONDefinitions
 	r, err := c.BuildRequestNoAuth("GET", BrainEndpoint, "/definitions")
 	if err != nil {

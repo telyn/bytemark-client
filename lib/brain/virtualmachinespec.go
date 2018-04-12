@@ -6,15 +6,22 @@ import (
 	"math"
 	"strings"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // VirtualMachineSpec represents the specification for a VM that is passed to the create_vm endpoint
 type VirtualMachineSpec struct {
-	VirtualMachine *VirtualMachine `json:"virtual_machine"`
-	Discs          []Disc          `json:"discs,omitempty"`
-	Reimage        *ImageInstall   `json:"reimage,omitempty"`
-	IPs            *IPSpec         `json:"ips,omitempty"`
+	VirtualMachine VirtualMachine `json:"virtual_machine"`
+	Discs          []Disc         `json:"discs,omitempty"`
+	Reimage        *ImageInstall  `json:"reimage,omitempty"` // may want to be null, so is a pointer
+	IPs            *IPSpec        `json:"ips,omitempty"`     // may want to be null, so is a pointer
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (spec VirtualMachineSpec) DefaultFields(f output.Format) string {
+	// TODO: work on this?
+	return "String"
 }
 
 func (spec VirtualMachineSpec) String() string {
@@ -28,7 +35,7 @@ func (spec VirtualMachineSpec) String() string {
 // TODO(telyn): rewrite using templates
 func (spec VirtualMachineSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	output := make([]string, 0, 10)
-	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
+	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.FullName()))
 	s := ""
 	if spec.VirtualMachine.Cores > 1 {
 		s = "s"

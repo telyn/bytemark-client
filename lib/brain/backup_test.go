@@ -1,9 +1,10 @@
 package brain_test
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // TODO(telyn): all the prettyprint tests could be replaced with

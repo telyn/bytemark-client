@@ -3,9 +3,10 @@ package brain
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cheekybits/is"
 	"net"
 	"testing"
+
+	"github.com/cheekybits/is"
 )
 
 var (
@@ -97,7 +98,7 @@ func TestDiscUnmarshal(t *testing.T) {
 	is.Equal(99999, disc.VirtualMachineID)
 }
 
-func containsIP(ips []*net.IP, ip string) bool {
+func containsIP(ips []net.IP, ip string) bool {
 	for _, i := range ips {
 		if i.String() == ip {
 			return true

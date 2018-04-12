@@ -3,11 +3,12 @@ package brain
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
-	"github.com/cheekybits/is"
 	"net"
 	"reflect"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+	"github.com/cheekybits/is"
 )
 
 func getFixtureNic() NetworkInterface {
@@ -17,8 +18,8 @@ func getFixtureNic() NetworkInterface {
 		Mac:              "00:00:00:00:00",
 		ID:               1,
 		VlanNum:          1,
-		IPs:              []*net.IP{&ip},
-		ExtraIPs:         map[string]*net.IP{},
+		IPs:              []net.IP{ip},
+		ExtraIPs:         map[string]net.IP{},
 		VirtualMachineID: 1,
 	}
 }
@@ -40,45 +41,45 @@ func getFixtureVM() (vm VirtualMachine) {
 		HardwareProfile:       "fake-hardwareprofile",
 		HardwareProfileLocked: false,
 		ZoneName:              "default",
-		Discs: []*Disc{
-			&disc,
+		Discs: []Disc{
+			disc,
 		},
 		ID:                1,
-		ManagementAddress: &ip,
+		ManagementAddress: ip,
 		Deleted:           false,
 		Hostname:          "valid-vm.default.account.fake-endpoint.example.com",
 		Head:              "fakehead",
-		NetworkInterfaces: []*NetworkInterface{
-			&nic,
+		NetworkInterfaces: []NetworkInterface{
+			nic,
 		},
 	}
 }
 func getFixtureVMWithManyIPs() (vm VirtualMachine, v4 []string, v6 []string) {
 	vm = getFixtureVM()
-	vm.NetworkInterfaces = make([]*NetworkInterface, 1)
-	vm.NetworkInterfaces[0] = &NetworkInterface{
+	vm.NetworkInterfaces = make([]NetworkInterface, 1)
+	vm.NetworkInterfaces[0] = NetworkInterface{
 		Label: "test-nic",
 		Mac:   "FF:FE:FF:FF:FF",
-		IPs: []*net.IP{
-			&net.IP{192, 168, 1, 16},
-			&net.IP{192, 168, 1, 22},
-			&net.IP{0xfe, 0x80, 0x00, 0x00,
+		IPs: []net.IP{
+			net.IP{192, 168, 1, 16},
+			net.IP{192, 168, 1, 22},
+			net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x10},
-			&net.IP{0xfe, 0x80, 0x00, 0x00,
+			net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x01, 0x00},
 		},
-		ExtraIPs: map[string]*net.IP{
-			"192.168.2.1":  &net.IP{192, 168, 1, 16},
-			"192.168.5.34": &net.IP{192, 168, 1, 22},
-			"fe80::1:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+		ExtraIPs: map[string]net.IP{
+			"192.168.2.1":  net.IP{192, 168, 1, 16},
+			"192.168.5.34": net.IP{192, 168, 1, 22},
+			"fe80::1:1": net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x01, 0x00},
-			"fe80::2:1": &net.IP{0xfe, 0x80, 0x00, 0x00,
+			"fe80::2:1": net.IP{0xfe, 0x80, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x10},
@@ -144,7 +145,7 @@ func TestNames(t *testing.T) {
 func TestDiscLabelOffset(t *testing.T) {
 	is := is.New(t)
 	vm := getFixtureVM()
-	vm.Discs = []*Disc{
+	vm.Discs = []Disc{
 		{
 			Label: "lalalalalala",
 		},
@@ -154,7 +155,7 @@ func TestDiscLabelOffset(t *testing.T) {
 	}
 	is.Equal(6, vm.GetDiscLabelOffset())
 
-	vm.Discs = []*Disc{
+	vm.Discs = []Disc{
 		{
 			Label: "lalalalalala",
 		},
@@ -163,7 +164,7 @@ func TestDiscLabelOffset(t *testing.T) {
 		},
 	}
 	is.Equal(2, vm.GetDiscLabelOffset())
-	vm.Discs = []*Disc{
+	vm.Discs = []Disc{
 		{
 			Label: "disk-2",
 		},

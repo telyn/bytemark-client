@@ -1,36 +1,38 @@
 package main
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/cheekybits/is"
 )
 
 func TestReimage(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	image := &brain.ImageInstall{
+	image := brain.ImageInstall{
 		Distribution:    "symbiosis",
 		FirstbootScript: "",
 		RootPassword:    "gNFgYYIgayyDOjkV",
 		PublicKeys:      "",
 	}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 	config.When("Force").Return(true)
 
-	c.When("ReimageVirtualMachine", &vmname, image).Return(nil).Times(1)
+	c.When("ReimageVirtualMachine", vmname, image).Return(nil).Times(1)
 
-	err := global.App.Run([]string{"bytemark", "reimage", "--force", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
+	err := app.Run([]string{"bytemark", "reimage", "server", "--force", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
 
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
@@ -40,14 +42,14 @@ func TestReimage(t *testing.T) {
 
 func TestReimageFileFlags(t *testing.T) {
 	is := is.New(t)
-	config, c := baseTestAuthSetup(t, false)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",
 		Group:          "test-group",
 		Account:        "test-account"}
 
-	image := &brain.ImageInstall{
+	image := brain.ImageInstall{
 		FirstbootScript: "i am the firstboot script! FEAR ME",
 		PublicKeys:      "i am the authorized keys",
 		Distribution:    "image",
@@ -63,12 +65,12 @@ func TestReimageFileFlags(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config.When("GetVirtualMachine").Return(&defVM)
+	config.When("GetVirtualMachine").Return(defVM)
 	config.When("Force").Return(true)
 
-	c.When("ReimageVirtualMachine", &vmname, image).Return(nil).Times(1)
+	c.When("ReimageVirtualMachine", vmname, image).Return(nil).Times(1)
 
-	err = global.App.Run([]string{"bytemark", "reimage", "--force", "--image", "image", "--root-password", "test-pass", "--firstboot-script-file", "firstboot", "--authorized-keys-file", "authorized-keys", "test-server.test-group.test-account"})
+	err = app.Run([]string{"bytemark", "reimage", "server", "--force", "--image", "image", "--root-password", "test-pass", "--firstboot-script-file", "firstboot", "--authorized-keys-file", "authorized-keys", "test-server.test-group.test-account"})
 
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {

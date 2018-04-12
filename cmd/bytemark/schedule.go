@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -9,7 +12,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "schedule",
 		Usage:     "schedule backups to occur at a regular frequency",
-		UsageText: "bytemark schedule backups [--start <date>] <server> <disc> <interval>",
+		UsageText: "schedule backups [--start <date>] <server> <disc> <interval>",
 		Description: `schedule backups to occur at a regular interval (defined in seconds)
 		
 EXAMPLES
@@ -24,7 +27,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 			{
 				Name:      "backups",
 				Usage:     "schedule backups to occur at a regular frequency",
-				UsageText: "bytemark schedule backups [--start <date>] <server> <disc> [<interval>]",
+				UsageText: "schedule backups [--start <date>] <server> <disc> [<interval>]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "start",
@@ -37,7 +40,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server the disc belongs to",
-						Value: new(VirtualMachineNameFlag),
+						Value: new(app.VirtualMachineNameFlag),
 					},
 					cli.IntFlag{
 						Name:  "interval",
@@ -54,14 +57,14 @@ bytemark schedule backups --start 00:00 fileserver very-important-data 86400
 
 To have hourly backups starting at 14:37 (Central European Summer Time) on the 5th of April, 2017:
 bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-important-data 3600`,
-				Action: With(OptionalArgs("server", "disc", "interval"), RequiredFlags("server", "disc"), AuthProvider, func(c *Context) (err error) {
+				Action: app.Action(args.Optional("server", "disc", "interval"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
 					start := c.String("start")
 					if start == "" {
 						start = "00:00"
 					}
 
 					vmName := c.VirtualMachineName("server")
-					sched, err := global.Client.CreateBackupSchedule(vmName, c.String("disc"), start, c.Int("interval"))
+					sched, err := c.Client().CreateBackupSchedule(vmName, c.String("disc"), start, c.Int("interval"))
 					if err == nil {
 						log.Logf("Schedule set. Backups will be taken every %d seconds.", sched.Interval)
 					}

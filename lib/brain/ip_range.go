@@ -6,7 +6,8 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // IPRange is a representation of an IP range
@@ -15,7 +16,13 @@ type IPRange struct {
 	Spec      string   `json:"spec"`
 	VLANNum   int      `json:"vlan_num"`
 	Zones     []string `json:"zones"`
-	Available *big.Int `json:"available"`
+	Available *big.Int `json:"available"` // wants to be a pointer because MarshalText is defined on the pointer type and we need it for the tests (but not for non-tests)
+
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (ipr IPRange) DefaultFields(f output.Format) string {
+	return "ID, Spec, VLANNum, Zones, Available"
 }
 
 // String serialises an IP range to easily be output
@@ -54,4 +61,28 @@ func (ipr IPRange) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) err
 {{ end }}
 `
 	return prettyprint.Run(wr, t, "ip_range"+string(detail), ipr)
+}
+
+// IPRanges represents more than one ip range in output.Outputtable form.
+type IPRanges []IPRange
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type, which is the same as IPRange.DefaultFields
+func (iprs IPRanges) DefaultFields(f output.Format) string {
+	return (IPRange{}).DefaultFields(f)
+}
+
+// PrettyPrint writes a human-readable summary of the ranges to writer at the given detail level.
+func (iprs IPRanges) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	iprangesTpl := `
+{{ define "ipranges_sgl" }}{{ len . }} servers{{ end }}
+
+{{ define "ipranges_medium" -}}
+{{- range . -}}
+{{- prettysprint . "_sgl" }}
+{{ end -}}
+{{- end }}
+
+{{ define "ipranges_full" }}{{ template "ipranges_medium" . }}{{ end }}
+`
+	return prettyprint.Run(wr, iprangesTpl, "ipranges"+string(detail), iprs)
 }

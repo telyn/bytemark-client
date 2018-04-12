@@ -2,12 +2,14 @@ package brain
 
 import (
 	"bytes"
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
 	"io"
 	"net"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // VirtualMachine represents a VirtualMachine, as passed around from the virtual_machines endpoint
@@ -26,15 +28,24 @@ type VirtualMachine struct {
 	ZoneName string `json:"zone_name,omitempty"`
 
 	// the following cannot be set
-	Discs             []*Disc             `json:"discs,omitempty"`
-	ID                int                 `json:"id,omitempty"`
-	ManagementAddress *net.IP             `json:"management_address,omitempty"`
-	Deleted           bool                `json:"deleted,omitempty"`
-	Hostname          string              `json:"hostname,omitempty"`
-	Head              string              `json:"head,omitempty"`
-	NetworkInterfaces []*NetworkInterface `json:"network_interfaces,omitempty"`
+	Discs             Discs              `json:"discs,omitempty"`
+	ID                int                `json:"id,omitempty"`
+	ManagementAddress net.IP             `json:"management_address,omitempty"`
+	Deleted           bool               `json:"deleted,omitempty"`
+	Hostname          string             `json:"hostname,omitempty"`
+	Head              string             `json:"head,omitempty"`
+	NetworkInterfaces []NetworkInterface `json:"network_interfaces,omitempty"`
 
 	// TODO(telyn): new fields (last_imaged_with and there is another but I forgot)
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (vm VirtualMachine) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Hostname, ManagementAddress, Memory, Cores, Autoreboot, PowerOn, Deleted"
+	}
+	return "ID, Hostname, ManagementAddress, Memory, Cores, Discs, CdromURL, Autoreboot, PowerOn, Deleted"
 }
 
 // PrettyPrint outputs a nice human-readable overview of the server to the given writer.
@@ -100,7 +111,11 @@ func (vm VirtualMachine) ShortName() string {
 // FullName returns the first three parts of the hostname (i.e. name.group.account)
 func (vm VirtualMachine) FullName() string {
 	bits := strings.SplitN(vm.Hostname, ".", 4)
-	return strings.Join(bits[0:3], ".")
+	end := len(bits)
+	if end > 3 {
+	    end = 3
+	}
+	return strings.Join(bits[0:end], ".")
 }
 
 // AllIPv4Addresses flattens all the IPs for a VM into a single IPs (a []*net.IP with some convenience methods)
@@ -114,7 +129,7 @@ func (vm VirtualMachine) AllIPv4Addresses() (ips IPs) {
 		for ip := range nic.ExtraIPs {
 			netip := net.ParseIP(ip)
 			if netip != nil && netip.To4() != nil {
-				ips = append(ips, &netip)
+				ips = append(ips, netip)
 			}
 		}
 	}
@@ -132,7 +147,7 @@ func (vm VirtualMachine) AllIPv6Addresses() (ips IPs) {
 		for ip := range nic.ExtraIPs {
 			netip := net.ParseIP(ip)
 			if netip != nil && netip.To4() == nil {
-				ips = append(ips, &netip)
+				ips = append(ips, netip)
 			}
 		}
 	}
@@ -165,7 +180,7 @@ func (vm VirtualMachine) GetDiscLabelOffset() (offset int) {
 func (vm VirtualMachine) PrimaryIP() net.IP {
 	for _, nic := range vm.NetworkInterfaces {
 		if len(nic.IPs) > 0 {
-			return *nic.IPs[0]
+			return nic.IPs[0]
 		}
 	}
 	return nil

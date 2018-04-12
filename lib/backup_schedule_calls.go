@@ -1,11 +1,12 @@
 package lib
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"strconv"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// CreateBackupSchedule creates a new backup schedule starting at the given date, with backups occuring every interval seconds
+// CreateBackupSchedule creates a new backup schedule starting at the given date, with backups occurring every interval seconds
 func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, interval int) (sched brain.BackupSchedule, err error) {
 	err = c.EnsureVirtualMachineName(&server)
 	if err != nil {

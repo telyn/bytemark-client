@@ -2,11 +2,13 @@ package brain
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"text/template"
 
-	"github.com/BytemarkHosting/bytemark-client/lib/prettyprint"
+	"fmt"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // BackupSchedule represents a schedule to take backups on. It is represented as a start date in YYYY-MM-DD hh:mm:ss format (and assuming UK timezones of some kind.)
@@ -16,6 +18,15 @@ type BackupSchedule struct {
 	Interval  int    `json:"interval_seconds"`
 	// Capacity is how many backups will be kept
 	Capacity int `json:"capacity"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (sched BackupSchedule) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, StartDate, Interval"
+	}
+	return "ID, StartDate, Interval"
 }
 
 // PrettyPrint outputs a nicely-formatted human-readable version of the schedule to the given writer.
@@ -61,7 +72,7 @@ func (sched BackupSchedule) String() string {
 }
 
 // BackupSchedules represents multiple backup schedules
-type BackupSchedules []*BackupSchedule
+type BackupSchedules []BackupSchedule
 
 // MapTemplateFragment takes a template fragment (as if it was starting within a {{ }}) and executes it against every schedule in scheds, returning all the results as a slice of strings, or an error if one occurred.
 // it is called by the 'map' template function, as used in BackupSchedules.PrettyPrint

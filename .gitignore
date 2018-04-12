@@ -9,9 +9,11 @@ bytemark.exe
 /doc/*.ps
 /docs/
 /lib/version.go
+/lib/output/generated_types_test.go
 *.nupkg
 *.json
 *.coverprofile
 ports/chocolatey/package
 ports/chocolatey/VERSION
 ports/chocolatey/choco.exe
+*.DS_Store
