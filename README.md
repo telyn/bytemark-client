@@ -57,15 +57,19 @@ The following breaking API change to the `lib` package occurred in version 3.0
   * `lib.NewSimple` has been renamed to `lib.New` - the old implementation of `lib.New` has been removed.
 
 * These `lib.Client` methods have been deleted
-  * `ParseVirtualMachineName` (replaced by lib.ParseVirtualMachineName)
-  * `ParseGroupName` (replaced by lib.ParseGroupName)
-  * `ParseAccountName`(replaced by lib.ParseAccountName)
+  * `ParseVirtualMachineName` (replaced by `lib.ParseVirtualMachineName`)
+  * `ParseGroupName` (replaced by `lib.ParseGroupName`)
+  * `ParseAccountName`(replaced by `lib.ParseAccountName`)
+  * `AddUserAuthorizedKey` (replaced by `lib/requests/brain.AddUserAuthorizedKey`)
+  * `DeleteUserAuthorizedKey` (replaced by `lib/requests/brain.DeleteUserAuthorizedKey`)
 
 * `lib.NotAuthorizedError` has been renamed to `lib.ForbiddenError`
 
 Most `lib.Client` methods now take `lib`/`brain`/`billing` structs as values, rather than as pointers. See the `lib/interface.go` for the full list of methods available and their new type signatures.
 
 Almost all `lib.Client` struct fields are now values or slices of values instead of pointers or slices of pointers - below is a list. Two notable exceptions are `brain.VirtualMachineSpec.ImageInstall` and `brain.VirtualMachineSpec.IPs` - which may need to be null, and so remain as pointers.
+
+`lib.Request` is now an interface rather than a struct - and `lib.Client.BuildRequest` and `lib.Client.BuildRequestNoAuth` now return `lib.Request` instead of `*lib.Request`
 
 * The type of `brain.Account.Groups` has changed from `[]*Group` to `[]Group`
 * The type of `brain.Backups` has changed from `[]*Group` to `[]Group`

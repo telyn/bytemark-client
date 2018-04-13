@@ -6,8 +6,8 @@
     <id>bytemark</id>
     <title>Bytemark Client</title>
     <version>VERSION</version>
-    <authors>Telyn Z.F., Phil Manavopoulos, Matthew Bloch</authors>
-    <owners>Telyn Z.F., Phil Manavopoulos</owners>
+    <authors>Telyn Z.F., Phil Manavopoulos, James Carter, Bryan Wagg, Matthew Bloch</authors>
+    <owners>Telyn Z.F., James Carter</owners>
     <summary>Command-line client for Bytemark's self-service hosting.</summary>
     <description>Bytemark Client is a command-line client for interacting
     with Bytemark's self-service hosting.
