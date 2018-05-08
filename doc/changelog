@@ -1,3 +1,8 @@
+
+  ### Admin changes:
+  * `approve server`, `reject server`, `reify disc`, `reap servers` commands
+    have all been removed
+
 bytemark-client (3.0) UNRELEASED; urgency=low
 
   ### New Features:
