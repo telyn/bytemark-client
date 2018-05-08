@@ -149,17 +149,17 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 	}
 
 	currentUser := a.client.GetSessionUser()
-	requestedUser := a.config.GetIgnoreErr("impersonate")
+	impersonatee := a.config.GetIgnoreErr("impersonate")
 
 	// if we want to impersonate someone and we're not currently them
-	if requestedUser != "" && currentUser != requestedUser {
+	if impersonatee != "" && currentUser != impersonatee {
 		// if we already tried impersonating we should just give up
 		if shortCircuit {
 			err := a.config.Unset("token")
 			if err != nil {
 				return fmt.Errorf("Couldn't unset token: %v", err)
 			}
-			return fmt.Errorf("Impersonation as %s requested, but unable to impersonate as them - got %s instead", requestedUser, currentUser)
+			return fmt.Errorf("Impersonation as %s requested, but unable to impersonate as them - got %s instead", impersonatee, currentUser)
 		}
 		// if our token is already an impersonated one then we need to unset it
 		// and start over
@@ -168,16 +168,16 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 			if err != nil {
 				return fmt.Errorf("Couldn't unset token: %v", err)
 			}
-			return retryErr(fmt.Sprintf("Impersonation as %s requested but already impersonating %s", requestedUser, currentUser))
+			return retryErr(fmt.Sprintf("Impersonation as %s requested but already impersonating %s", impersonatee, currentUser))
 		}
 		// if not, run impersonation and see
-		err := a.client.Impersonate(requestedUser)
+		err := a.client.Impersonate(impersonatee)
 		if err != nil {
 			return err
 		}
 		// check that we got the right user this time
 		return a.checkSession(true)
-	} else if requestedUser == "" {
+	} else if impersonatee == "" {
 		// we didn't want to impersonate
 		if factorExists(factors, "impersonated") {
 			// but we got an impersonated token anyway, so unset token and retry
@@ -186,16 +186,6 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 				return fmt.Errorf("Couldn't unset token: %v", err)
 			}
 			return retryErr("Impersonation was not requested but impersonation still happened")
-		}
-		// and we didn't impersonate but we aren't logged in as who we want to be
-		if currentUser != a.config.GetIgnoreErr("user") {
-			// we didn't want to impersonate anyone and we're not ourselves
-			// so unset the token and cry about it
-			err := a.config.Unset("token")
-			if err != nil {
-				return fmt.Errorf("Couldn't unset token: %v", err)
-			}
-			return fmt.Errorf("Expected to log in as %s but logged in as %s", a.config.GetIgnoreErr("user"), currentUser)
 		}
 	}
 
