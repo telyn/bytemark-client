@@ -1,4 +1,4 @@
-package with
+package auth
 
 import (
 	"errors"
@@ -144,7 +144,7 @@ func (a Authenticator) checkSession(shortCircuit bool) error {
 
 			a.config.Set("token", "", "FLAG yubikey")
 
-			return EnsureAuth(a.client, a.config)
+			return a.Authenticate()
 		}
 	}
 
@@ -226,4 +226,20 @@ func (a Authenticator) Authenticate() error {
 		err = a.Authenticate()
 	}
 	return err
+}
+
+func (a Authenticator) makeCredentials() (credents map[string]string, err error) {
+	err = a.promptForCredentials()
+	if err != nil {
+		return
+	}
+	credents = map[string]string{
+		"username": a.config.GetIgnoreErr("user"),
+		"password": a.config.GetIgnoreErr("pass"),
+		"validity": a.config.GetIgnoreErr("session-validity"),
+	}
+	if useKey, _ := a.config.GetBool("yubikey"); useKey {
+		credents["yubikey"] = a.config.GetIgnoreErr("yubikey-otp")
+	}
+	return
 }
