@@ -27,7 +27,7 @@ func getFixtureNic() brain.NetworkInterface {
 
 func TestAddIP(t *testing.T) {
 	local1 := net.IPv4(127, 0, 0, 1)
-	local1 := net.IPv4(127, 0, 0, 2)
+	local2 := net.IPv4(127, 0, 0, 2)
 	tests := []struct {
 		name       string
 		serverName lib.VirtualMachineName
