@@ -1,4 +1,4 @@
-package with
+package auth
 
 import (
 	"fmt"
@@ -282,7 +282,7 @@ func TestAuthenticate(t *testing.T) {
 			},
 			expectingError: false,
 		}, {
-			name: "G err when not who we want to be",
+			name: "G ok when user in config is not same as user in session",
 			input: authInput{
 				user:  "input-user",
 				token: "valid-token",
@@ -300,7 +300,7 @@ func TestAuthenticate(t *testing.T) {
 					impersonateErr:         unexpect{},
 				},
 			},
-			expectingError: true,
+			expectingError: false,
 		}, {
 			name: "N credentials auth tries 3 times",
 			input: authInput{
