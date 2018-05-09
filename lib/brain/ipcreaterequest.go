@@ -2,7 +2,6 @@ package brain
 
 import (
 	"io"
-	"net"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
@@ -15,7 +14,7 @@ type IPCreateRequest struct {
 	Reason     string `json:"reason"`
 	Contiguous bool   `json:"contiguous"`
 	// don't actually specify the IPs - this is for filling in from the response!
-	IPs []net.IP `json:"ips"`
+	IPs IPs `json:"ips,omitempty"`
 }
 
 // DefaultFields returns the default fields for feeding into github.com/BytemarkHosting/row.From

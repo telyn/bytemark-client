@@ -89,7 +89,8 @@ func init() {
 				},
 				cli.IntFlag{
 					Name:  "ips",
-					Usage: "How many IPs to add (1 to 4) - defaults to one.",
+					Usage: "How many IPs to add (1 to 4)",
+					Value: 1,
 				},
 				cli.StringFlag{
 					Name:  "reason",
