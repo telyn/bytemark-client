@@ -27,6 +27,7 @@ func getFixtureNic() brain.NetworkInterface {
 
 func TestAddIP(t *testing.T) {
 	local1 := net.IPv4(127, 0, 0, 1)
+	local1 := net.IPv4(127, 0, 0, 2)
 	tests := []struct {
 		name       string
 		serverName lib.VirtualMachineName
@@ -46,8 +47,8 @@ func TestAddIP(t *testing.T) {
 			name:       "add two ips",
 			serverName: lib.VirtualMachineName{Account: "borm", Group: "galp", VirtualMachine: "sklep"},
 			nicID:      564,
-			spec:       brain.IPCreateRequest{Addresses: 1, Family: "ipv4", Reason: "jeff", Contiguous: false},
-			created:    brain.IPCreateRequest{IPs: brain.IPs{local1}},
+			spec:       brain.IPCreateRequest{Addresses: 2, Family: "ipv4", Reason: "jeff", Contiguous: false},
+			created:    brain.IPCreateRequest{IPs: brain.IPs{local1, local2}},
 		},
 	}
 
