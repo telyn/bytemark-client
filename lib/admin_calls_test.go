@@ -510,12 +510,6 @@ func TestPostMigrateVirtualMachineInvalidVirtualMachineName(t *testing.T) {
 	})
 }
 
-func TestPostReapVMs(t *testing.T) {
-	simplePostTest(t, "/admin/reap_vms", "", func(client lib.Client) error {
-		return client.ReapVMs()
-	})
-}
-
 func TestDeleteVLAN(t *testing.T) {
 	simpleDeleteTest(t, "/admin/vlans/123", func(client lib.Client) error {
 		return client.DeleteVLAN(123)
@@ -561,33 +555,6 @@ func TestPostEmptyStoragePool(t *testing.T) {
 func TestPostEmptyHead(t *testing.T) {
 	simplePostTest(t, "/admin/heads/head1/empty", ``, func(client lib.Client) error {
 		return client.EmptyHead("head1")
-	})
-}
-
-func TestPostReifyDisc(t *testing.T) {
-	simplePostTest(t, "/admin/discs/1231/reify", ``, func(client lib.Client) error {
-		return client.ReifyDisc(1231)
-	})
-}
-
-func TestPostApproveVM(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/134/approve", &brain.VirtualMachine{ID: 134}, `{}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.ApproveVM(vmName, false)
-	})
-}
-
-func TestPostApproveVMAndPowerOn(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/145/approve", &brain.VirtualMachine{ID: 145}, `{"power_on":true}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.ApproveVM(vmName, true)
-	})
-}
-
-func TestPostRejectVM(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/139/reject", &brain.VirtualMachine{ID: 139}, `{"reason":"do not like the name"}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.RejectVM(vmName, "do not like the name")
 	})
 }
 
