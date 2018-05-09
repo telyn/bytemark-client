@@ -439,7 +439,7 @@ func (c *Client) ReapVMs() error {
 	return r.Error(0)
 }
 func (c *Client) DeleteVLAN(id int) error {
-	r := c.Called()
+	r := c.Called(id)
 	return r.Error(0)
 }
 func (c *Client) AdminCreateGroup(name lib.GroupName, vlanNum int) error {

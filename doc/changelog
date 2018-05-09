@@ -1,5 +1,11 @@
 bytemark-client (3.1) UNRELEASED; urgency=low
 
+  ### Admin changes:
+  * `approve server`, `reject server`, `reify disc`, `reap servers` commands
+    have all been removed
+  * ApproveVMs, RejectVMs, ReifyDisc, ReapVMs methods have all been removed
+    from Client interface and bytemarkClient struct.
+
   ### Fixes:
   * Authentication with a token as a user other than $USER (or the value in
     your config-dir) no longer fails with a messages about being an unexpected
