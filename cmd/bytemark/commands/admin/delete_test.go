@@ -13,9 +13,9 @@ func TestDeleteVLAN(t *testing.T) {
 	is := is.New(t)
 	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-	c.When("ReapVMs").Return(nil).Times(1)
+	c.When("DeleteVLAN", 25).Return(nil).Times(1)
 
-	err := app.Run([]string{"bytemark", "reap", "servers"})
+	err := app.Run([]string{"bytemark", "delete", "vlan", "25"})
 
 	is.Nil(err)
 
@@ -28,9 +28,9 @@ func TestDeleteVLANError(t *testing.T) {
 	is := is.New(t)
 	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-	c.When("ReapVMs").Return(fmt.Errorf("Could not delete VLAN")).Times(1)
+	c.When("DeleteVLAN", 204).Return(fmt.Errorf("Could not delete VLAN")).Times(1)
 
-	err := app.Run([]string{"bytemark", "reap", "servers"})
+	err := app.Run([]string{"bytemark", "delete", "vlan", "204"})
 
 	is.NotNil(err)
 

@@ -1,6 +1,7 @@
 package update
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
@@ -13,6 +14,10 @@ import (
 	"github.com/urfave/cli"
 )
 
+// err.. this whole file is a bit of a fudge at the moment.
+// a simpler UpdateVirtualMachine(VirtualMachineName, brain.VirtualMachine)
+// would do the job of all the functions completely adequately
+
 func init() {
 	Commands = append(Commands, cli.Command{
 		Name:      "server",
@@ -22,7 +27,7 @@ func init() {
 
 Note that for changes to cores, memory or hardware profile to take effect you will need to restart the server.
 
---hw-profile the hardware profile used. Hardware profiles can be simply thought of as what virtual motherboard you're using - generally you want a pretty recent one for maximum speed, but if you're running a very old or experimental OS (e.g. DOS or OS/2 or something) you may require the compatibility one. See "bytemark hwprofiles" for which ones are currently available.
+--hwprofile the hardware profile used. Hardware profiles can be simply thought of as what virtual motherboard you're using - generally you want a pretty recent one for maximum speed, but if you're running a very old or experimental OS (e.g. DOS or OS/2 or something) you may require the compatibility one. See "bytemark hwprofiles" for which ones are currently available.
 
 Memory is specified in GiB by default, but can be suffixed with an M to indicate that it is provided in MiB.
 
@@ -46,12 +51,16 @@ EXAMPLES
 				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units.",
 			},
 			cli.StringFlag{
-				Name:  "hw-profile",
+				Name:  "hwprofile",
 				Usage: "The hardware profile to use. See `bytemark profiles` for a list of hardware profiles available.",
 			},
 			cli.BoolFlag{
-				Name:  "hw-profile-lock",
+				Name:  "lock-hwprofile",
 				Usage: "Locks the hardware profile (prevents it from being automatically upgraded when we release a newer version)",
+			},
+			cli.BoolFlag{
+				Name:  "unlock-hwprofile",
+				Usage: "Locks the hardware profile (allows it to be automatically upgraded when we release a newer version)",
 			},
 			cli.GenericFlag{
 				Name:  "new-name",
@@ -97,16 +106,27 @@ func updateMemory(c *app.Context) error {
 
 func updateHwProfile(c *app.Context) error {
 	vmName := c.VirtualMachineName("server")
-	hwProfile := c.String("hw-profile")
-	hwProfileLock := c.Bool("hw-profile-lock")
-
+	hwProfile := c.String("hwprofile")
 	if hwProfile == "" {
-		if hwProfileLock {
-			return c.Help("Must specify a hardware profile to lock")
-		}
 		return nil
 	}
-	return c.Client().SetVirtualMachineHardwareProfile(vmName, hwProfile, hwProfileLock)
+
+	return c.Client().SetVirtualMachineHardwareProfile(vmName, hwProfile)
+}
+
+func updateLock(c *app.Context) error {
+	server := c.VirtualMachineName("server")
+
+	lockProfile := c.Bool("lock-hwprofile")
+	unlockProfile := c.Bool("unlock-hwprofile")
+	if lockProfile && unlockProfile {
+		return errors.New("--lock-hwprofile and --unlock-hwprofile were both specified - only one may be specified at a time")
+	} else if lockProfile {
+		return c.Client().SetVirtualMachineHardwareProfileLock(server, true)
+	} else if unlockProfile {
+		return c.Client().SetVirtualMachineHardwareProfileLock(server, false)
+	}
+	return nil
 }
 
 func updateCores(c *app.Context) error {
@@ -153,6 +173,7 @@ func updateServer(c *app.Context) error {
 	for _, f := range [](func(*app.Context) error){
 		updateMemory,
 		updateHwProfile,
+		updateLock,
 		updateCores,
 		updateCdrom,
 		updateName, // needs to be last
