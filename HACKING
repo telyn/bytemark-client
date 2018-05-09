@@ -74,8 +74,7 @@ so.
 Code overview
 ==============
 
-Here's a tree of the folders in this repo bytemark-client with descriptions of
-what they're for
+Here's a tree of the folders in this repo with descriptions of what each is for
 
 .
 ├── cmd - empty package
@@ -86,6 +85,8 @@ what they're for
 │       │   │      useful methods for dealing with flags & output 
 │       │   ├── args - functions for chaining together using app.Action to parse
 │       │   │          arguments into flags
+│       │   ├── auth - Authentication routine for the client, called via
+│       │   │          with.EnsureAuth
 │       │   ├── flags - common flags
 │       │   ├── wait - functions which wait for a condition to be true before
 │       │   │          returning
@@ -221,4 +222,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 477101be4e9facbbcc793b05776f9daab3f9f53723ef6794c32e5e410ddb7fdc
+# sha256sum: e3961b39d1266a224a231b96839ee6a8f85f58511cbf2591c0aae99eff310bdb

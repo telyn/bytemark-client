@@ -1,4 +1,4 @@
-package with
+package auth
 
 import (
 	"os"
