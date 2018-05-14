@@ -1,3 +1,11 @@
+bytemark-client (3.2) UNRELEASED; urgency=low
+
+  ### Changes:
+  * `show servers` now takes a group instead of an account by default.
+    `--account <account>` can be specified to list all servers on an account.
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 14 May 2018 11:31:25 +0100
+
 bytemark-client (3.1) UNRELEASED; urgency=low
 
   ### Admin changes:
