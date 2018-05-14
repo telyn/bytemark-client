@@ -252,7 +252,7 @@ func init() {
 			},
 			{
 				Name:        "migration",
-				Usage:       "update a migration",
+				Usage:       "update a migration job",
 				UsageText:   "--admin update migration --id <id> --priority <priority> --cancel-disc <disc> --cancel-pool <pool> --cancel-tail <tail> | --cancel-all",
 				Description: `This command allows you to update an ongoing migration job by altering its priority, cancelling migrating discs, pools, tails, or canceling everything for the current job`,
 				Flags: []cli.Flag{
