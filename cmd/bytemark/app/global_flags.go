@@ -9,6 +9,7 @@ import (
 // This is where they are defined.
 func GlobalFlags() (flags []cli.Flag) {
 	return []cli.Flag{
+		cli.BashCompletionFlag,
 		cli.StringFlag{
 			Name:  "account",
 			Usage: "account name to use when no other accounts are specified",

@@ -18,6 +18,7 @@ func BaseAppSetup(flags []cli.Flag, commands []cli.Command) (app *cli.App, err e
 	app.Version = lib.Version
 	app.Flags = flags
 	app.Commands = commands
+	app.EnableBashCompletion = true
 	app.Writer = io.MultiWriter(
 		log.LogFile,
 		os.Stdout,

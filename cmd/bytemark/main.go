@@ -201,5 +201,9 @@ func prepConfig() (flags []cli.Flag, args []string, conf config.Manager) {
 		copy(versionArgs, args)
 		args = versionArgs
 	}
+	genBashComp := flagset.Lookup("generate-bash-completion").Value.String()
+	if genBashComp != "" {
+		args = append(args, "--generate-bash-completion")
+	}
 	return
 }
