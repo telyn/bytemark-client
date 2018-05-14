@@ -16,12 +16,19 @@ func SetupTable(wr io.Writer, cfg Config) (table *tablewriter.Table) {
 	table.SetHeader(cfg.Fields)
 	switch cfg.Format {
 	case List:
-		// autowrap - lists want to be contained on a single line
+		// autowrap makes sure multiline text is a single line (I think)
 		table.SetAutoWrapText(true)
-		// no row line - we wanna be able to grep stuff
+
+		// don't autoformat headers so people can --table-fields it
+		table.SetAutoFormatHeaders(false)
+
+		// no lines - gotta be greppabable
 		table.SetRowLine(false)
-		// CAPITAL headers because... well `docker ps` has them
-		table.SetAutoFormatHeaders(true)
+		table.SetHeaderLine(false)
+		table.SetBorder(false)
+		table.SetColumnSeparator(" ")
+		table.SetRowSeparator(" ")
+		table.SetCenterSeparator(" ")
 	default:
 		// don't autowrap because fields that are slices output one element per line
 		// and autowrap
