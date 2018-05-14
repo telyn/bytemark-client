@@ -30,6 +30,8 @@ func (v *Var) SourceType() string {
 	return bits[0]
 }
 
+// SourceTypeAtLeast ensures that this Var's SourceType is at least as 'good' as the one specified.
+// The ranking is currently INTERACTION > FLAG > ENV > DIR > FLAG
 func (v *Var) SourceTypeAtLeast(min string) bool {
 	scores := map[string]int{
 		"CODE":        0,
