@@ -18,14 +18,36 @@ type Var struct {
 }
 
 // SourceType returns one of the following:
+// INTERACTION for a configVar set by some interaction with the user
 // FLAG for a configVar whose value was set by passing a flag on the command line
 // ENV for a configVar whose value was set from an environment variable
 // DIR for a configVar whose value was set from a file in the config dir
+// CODE for the default hardcoded into bytemark-client
 //
 func (v *Var) SourceType() string {
 	bits := strings.Fields(v.Source)
 
 	return bits[0]
+}
+
+func (v *Var) SourceTypeAtLeast(min string) bool {
+	scores := map[string]int{
+		"CODE":        0,
+		"DIR":         1,
+		"ENV":         2,
+		"FLAG":        3,
+		"INTERACTION": 9999,
+	}
+	minScore, ok := scores[min]
+	if !ok {
+		minScore = 0
+	}
+	myScore, ok := scores[v.SourceType()]
+	if !ok {
+		myScore = 0
+	}
+
+	return myScore >= minScore
 }
 
 // SourceBaseName returns the basename of the configVar's source.

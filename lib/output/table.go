@@ -16,11 +16,13 @@ func SetupTable(wr io.Writer, cfg Config) (table *tablewriter.Table) {
 	table.SetHeader(cfg.Fields)
 	switch cfg.Format {
 	case List:
-		// autowrap makes sure multiline text is a single line (I think)
-		table.SetAutoWrapText(true)
+		// autowrap just makes multiline things worse
+		table.SetAutoWrapText(false)
 
 		// don't autoformat headers so people can --table-fields it
 		table.SetAutoFormatHeaders(false)
+
+		table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
 		// no lines - gotta be greppabable
 		table.SetRowLine(false)
