@@ -42,6 +42,10 @@ If --group and --account are specified, the group will be displayed and the acco
 				return c.OutputInDesiredForm(brain.VirtualMachines(group.VirtualMachines), output.List)
 			}
 			if c.IsSet("account") {
+				err := with.Account("account")(c)
+				if err != nil {
+					return err
+				}
 				for _, g := range c.Account.Groups {
 					servers = append(servers, g.VirtualMachines...)
 				}
