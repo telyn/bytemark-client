@@ -1,5 +1,8 @@
 bytemark-client (3.2) UNRELEASED; urgency=low
 
+  ### Changes:
+  * `profiles` and `scripting` have been updated to match the 3.0+ updates.
+
   ### Fixes:
   * `--output-format` is no longer clobbered by `--table-fields`
   * `--output-format=list` now produces a list with no lines between columns,
