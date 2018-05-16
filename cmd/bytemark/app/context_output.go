@@ -52,8 +52,14 @@ func (c *Context) OutputFormat(defaultFormat ...output.Format) (output.Format, e
 
 	if c.Bool("json") {
 		format.Value = "json"
-	} else if c.Bool("table") || c.Context.IsSet("table-fields") {
+	} else if c.Bool("table") {
 		format.Value = "table"
+	} else if c.IsSet("table-fields") {
+		val, err := c.Config().GetV("output-format")
+		if err != nil || !val.SourceTypeAtLeast("FLAG") {
+			format.Value = "table"
+		}
+
 	}
 
 	return output.FormatByName(format.Value), nil
