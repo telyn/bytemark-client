@@ -123,10 +123,12 @@ func (variables configVars) configFlags() (flags []cli.Flag) {
 func validateAccountForConfig(c *app.Context, name string) (err error) {
 	_, err = c.Client().GetAccount(name)
 	if err != nil {
-		if _, ok := err.(lib.NotFoundError); ok {
+		switch err.(type) {
+		case lib.NotFoundError:
 			return fmt.Errorf("No such account %s - check your typing and specify --yubikey if necessary", name)
+		case lib.BillingAccountNotFound:
+			return nil
 		}
-		return err
 	}
 	return
 }
