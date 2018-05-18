@@ -1,3 +1,19 @@
+bytemark-client (3.2) UNRELEASED; urgency=low
+
+  ### Changes:
+  * `show servers` now takes a group instead of an account by default.
+    `--account <account>` can be specified to list all servers on an account.
+  * `profiles` and `scripting` have been updated to match the 3.0+ updates.
+
+  ### Fixes:
+  * `update config --account <account>` no longer fails if a billing account
+    cannot be found for the named account (but a Bytemark Cloud account can)
+  * `--output-format` is no longer clobbered by `--table-fields`
+  * `--output-format=list` now produces a list with no lines between columns,
+    nor between the header and the body of the list
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 14 May 2018 11:31:25 +0100
+
 bytemark-client (3.1) UNRELEASED; urgency=low
 
   ### Admin changes:
