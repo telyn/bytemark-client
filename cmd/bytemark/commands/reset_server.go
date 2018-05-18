@@ -16,7 +16,7 @@ func init() {
 
 	Commands = append(Commands, cli.Command{
 		Name:        "reset",
-		Usage:       "restart a server as though the reset button had been pushed FISMO",
+		Usage:       "restart a server as though the reset button had been pushed",
 		UsageText:   "reset server <server>",
 		Description: "For cloud servers, this does not cause the qemu process to be restarted. This means that the server will remain on the same head and will not notice hardware changes.",
 		Action:      cli.ShowSubcommandHelp,
