@@ -16,7 +16,7 @@ or to different instances of the Bytemark API. You can set up and use different 
 For example, to set up your default configuration to log in by default as 'alice', and one configuration where you log in as 'bob'
 with a yubikey, run the following commands (windows users, note that in cmd.exe you'll need to use --config-dir="%HOME%\.bob"):
 
-    bytemark config set user alice
+    bytemark update config --user alice
     bytemark --config-dir="$HOME/.bob" update config --user bob --yubikey
 	
 Almost every one of the global flags can be set into the config in this way - see 'bytemark update config --help' for the full list of accepted flags.
