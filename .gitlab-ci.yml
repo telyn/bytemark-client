@@ -324,7 +324,7 @@ package-rpm-amd64:
 # makes a chocolatey package
 package-windows-amd64:
     <<: *package
-    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
+    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:chocorepo
     script:
     - mkdir -p choco/tools
       # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
@@ -342,7 +342,7 @@ package-windows-amd64:
     - echo -en "sha256 utility to hash the file.\r\n\r\n" >> VERIFICATION.txt
     - sha256sum bytemark.exe >> VERIFICATION.txt
     - cd .. # back to choco/
-    - mono /usr/bin/choco.exe pack bytemark-client.nuspec
+    - choco pack bytemark-client.nuspec
     - cd .. # back to bytemark-client
     - mv choco/*.nupkg .
     artifacts:
