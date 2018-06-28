@@ -324,7 +324,7 @@ package-rpm-amd64:
 # makes a chocolatey package
 package-windows-amd64:
     <<: *package
-    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:chocorepo
+    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:master
     script:
     - mkdir -p choco/tools
       # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
