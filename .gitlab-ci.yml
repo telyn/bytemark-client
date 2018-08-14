@@ -263,7 +263,7 @@ package-generic-amd64:
           mv bytemark bytemark.exe
           zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog.txt doc/LICENSE.txt
       else
-          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
+          tar czf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
       fi
     done
   dependencies:
