@@ -4,6 +4,8 @@ bytemark-client (3.2) UNRELEASED; urgency=low
   * `show servers` now takes a group instead of an account by default.
     `--account <account>` can be specified to list all servers on an account.
   * `profiles` and `scripting` have been updated to match the 3.0+ updates.
+  * The .tar.gz files available on repo.bytemark.co.uk are now gzipped and not
+    merely pretending to be.
 
   ### Fixes:
   * `update config --account <account>` no longer fails if a billing account
