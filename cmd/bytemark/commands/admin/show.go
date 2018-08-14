@@ -255,4 +255,49 @@ var showCommands = []cli.Command{
 			return c.OutputInDesiredForm(mjs)
 		}),
 	},
+	{
+		Name:		"dependant servers",
+		Usage:		"shows servers dependant on a head, tail or storage pool at a given time",
+		UsageText:	"bytemark --admin show dependant servers [--head <head>] [--tail <tail>] [--storage-pool <storage pool>] [--at <time>]",
+		Flags: append(app.OutputFlags("dependant servers", "object"),
+			cli.StringFlag{
+				Name:  "head",
+				Usage: "the ID of the head to display",
+			},
+			cli.StringFlag{
+				Name:  "tail",
+				Usage: "the ID of the tail to display",
+			},
+			cli.StringFlag{
+				Name:  "storage-pool",
+				Usage: "The ID or label of the storage pool to display",
+			},
+			cli.StringFlag{
+				Name: "at",
+				Usage: "the date and time in history to check the dependant servers, defaults to now if unset",
+			},
+		),
+		Action: app.Action(with.Auth, func(c *app.Context) error {
+			head := c.String("head")
+			tail := c.String("tail")
+			storage := c.String("storage-pool")
+			time := c.String("at")
+
+			fmt.Println("at:", time)
+
+			if head != "" {
+				fmt.Println("head:", head)
+				servers, err := brainRequests.GetServersOnHead(c.Client(), head, time)
+				fmt.Println("return:", servers, err)
+			} else if tail != ""{
+				fmt.Println("tail:", tail)
+			} else if storage != ""{
+				fmt.Println("storage-pool:", storage)
+			} else {
+				fmt.Println("NEED MORE INFO")
+			}
+
+			return nil
+		}),
+	},
 }
