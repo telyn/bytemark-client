@@ -277,22 +277,38 @@ var showCommands = []cli.Command{
 				Usage: "the date and time in history to check the dependant servers, defaults to now if unset",
 			},
 		),
-		Action: app.Action(with.Auth, func(c *app.Context) error {
+		Action: app.Action(with.Auth, func(c *app.Context) (err error) {
 			head := c.String("head")
 			tail := c.String("tail")
 			storage := c.String("storage-pool")
-			time := c.String("at")
+			at := c.String("at")
 
-			fmt.Println("at:", time)
+			fmt.Println("at:", at)
 
 			if head != "" {
-				fmt.Println("head:", head)
-				servers, err := brainRequests.GetServersOnHead(c.Client(), head, time)
-				fmt.Println("return:", servers, err)
+				servers, err := brainRequests.GetServersOnHead(c.Client(), head)
+
+				if err != nil {
+					return err
+				}
+
+				return c.OutputInDesiredForm(servers)
 			} else if tail != ""{
-				fmt.Println("tail:", tail)
+				servers, err := brainRequests.GetServersOnTail(c.Client(), tail)
+
+				if err != nil {
+					return err
+				}
+
+				return c.OutputInDesiredForm(servers)
 			} else if storage != ""{
-				fmt.Println("storage-pool:", storage)
+				servers, err := brainRequests.GetServersOnStoragePool(c.Client(), storage)
+
+				if err != nil {
+					return err
+				}
+
+				return c.OutputInDesiredForm(servers)
 			} else {
 				fmt.Println("NEED MORE INFO")
 			}
