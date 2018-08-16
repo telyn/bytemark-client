@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin/show"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
 )
 
@@ -282,38 +283,24 @@ var showCommands = []cli.Command{
 			tail := c.String("tail")
 			storage := c.String("storage-pool")
 			at := c.String("at")
-
-			fmt.Println("at:", at)
+			var servers brain.VirtualMachines
 
 			if head != "" {
-				servers, err := brainRequests.GetServersOnHead(c.Client(), head)
-
-				if err != nil {
-					return err
-				}
-
-				return c.OutputInDesiredForm(servers)
-			} else if tail != ""{
-				servers, err := brainRequests.GetServersOnTail(c.Client(), tail)
-
-				if err != nil {
-					return err
-				}
-
-				return c.OutputInDesiredForm(servers)
-			} else if storage != ""{
-				servers, err := brainRequests.GetServersOnStoragePool(c.Client(), storage)
-
-				if err != nil {
-					return err
-				}
-
-				return c.OutputInDesiredForm(servers)
+				servers, err = brainRequests.GetServersOnHead(c.Client(), head, at)
+			} else if tail != "" {
+				servers, err = brainRequests.GetServersOnTail(c.Client(), tail, at)
+			} else if storage != "" {
+				servers, err = brainRequests.GetServersOnStoragePool(c.Client(), storage, at)
 			} else {
 				fmt.Println("NEED MORE INFO")
+				return
 			}
 
-			return nil
+			if err != nil {
+				return
+			}
+
+			return c.OutputInDesiredForm(servers, output.Table)
 		}),
 	},
 }
