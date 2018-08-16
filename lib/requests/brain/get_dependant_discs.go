@@ -10,12 +10,6 @@ func GetDiscsOnTail(client lib.Client, id string, at string) (servers brain.Disc
 	var r lib.Request
 
 	if at != "" {
-		at, err = ParseDateTime(at)
-
-		if err != nil {
-			return
-		}
-
 		r, err = client.BuildRequest("GET", lib.BrainEndpoint, "/admin/tails/%s/discs?at=%s", id, at)
 	} else {
 		r, err = client.BuildRequest("GET", lib.BrainEndpoint, "/admin/tails/%s/discs", id)
@@ -35,12 +29,6 @@ func GetDiscsOnStoragePool(client lib.Client, id string, at string) (servers bra
 	var r lib.Request
 
 	if at != "" {
-		at, err = ParseDateTime(at)
-
-		if err != nil {
-			return
-		}
-
 		r, err = client.BuildRequest("GET", lib.BrainEndpoint, "/admin/storage_pools/%s/discs?at=%s", id, at)
 	} else {
 		r, err = client.BuildRequest("GET", lib.BrainEndpoint, "/admin/storage_pools/%s/discs", id)

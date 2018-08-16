@@ -10,6 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/urfave/cli"
 )
 
@@ -273,8 +274,9 @@ var showCommands = []cli.Command{
 				Name:  "storage-pool",
 				Usage: "The ID or label of the storage pool to display",
 			},
-			cli.StringFlag{
+			cli.GenericFlag{
 				Name: "at",
+				Value: new(util.DateTimeFlag),
 				Usage: "the date and time in history to check the dependant servers, defaults to now if unset",
 			},
 		),
@@ -315,8 +317,9 @@ var showCommands = []cli.Command{
 				Name:  "storage-pool",
 				Usage: "The ID or label of the storage pool to display",
 			},
-			cli.StringFlag{
+			cli.GenericFlag{
 				Name: "at",
+				Value: new(util.DateTimeFlag),
 				Usage: "the date and time in history to check the dependant discs, defaults to now if unset",
 			},
 		),
