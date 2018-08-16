@@ -303,4 +303,44 @@ var showCommands = []cli.Command{
 			return c.OutputInDesiredForm(servers, output.Table)
 		}),
 	},
+	{
+		Name:		"dependant discs",
+		Usage:		"shows discs on a head, tail or storage pool at a given time",
+		UsageText:	"bytemark --admin show dependant discs [--storage-pool <storage pool>] [--tail <tail>] [--at <time>]",
+		Flags: append(app.OutputFlags("dependant servers", "object"),
+			cli.StringFlag{
+				Name:  "tail",
+				Usage: "the ID of the tail to display",
+			},
+			cli.StringFlag{
+				Name:  "storage-pool",
+				Usage: "The ID or label of the storage pool to display",
+			},
+			cli.StringFlag{
+				Name: "at",
+				Usage: "the date and time in history to check the dependant discs, defaults to now if unset",
+			},
+		),
+		Action: app.Action(with.Auth, func(c *app.Context) (err error) {
+			tail := c.String("tail")
+			storage := c.String("storage-pool")
+			at := c.String("at")
+			var discs brain.Discs
+
+			if tail != "" {
+				discs, err = brainRequests.GetDiscsOnTail(c.Client(), tail, at)
+			} else if storage != "" {
+				discs, err = brainRequests.GetDiscsOnStoragePool(c.Client(), storage, at)
+			}else {
+				fmt.Println("NEED MORE INFO")
+				return
+			}
+
+			if err != nil {
+				return
+			}
+
+			return c.OutputInDesiredForm(discs, output.Table)
+		}),
+	},
 }
