@@ -5,7 +5,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-// Function to get array of discs on specified tail
+// GetDiscsOnTail returns an array of discs on specified tail
 func GetDiscsOnTail(client lib.Client, id string, at string) (servers brain.Discs, err error) {
 	var r lib.Request
 
@@ -24,7 +24,7 @@ func GetDiscsOnTail(client lib.Client, id string, at string) (servers brain.Disc
 	return
 }
 
-// Function to get array of discs on specified storage pool
+// GetDiscsOnStoragePool returns an array of discs on specified storage pool
 func GetDiscsOnStoragePool(client lib.Client, id string, at string) (servers brain.Discs, err error) {
 	var r lib.Request
 
