@@ -292,8 +292,7 @@ var showCommands = []cli.Command{
 			} else if storage != "" {
 				servers, err = brainRequests.GetServersOnStoragePool(c.Client(), storage, at)
 			} else {
-				fmt.Println("NEED MORE INFO")
-				return
+				return fmt.Errorf("One of the following flags should be set: [--head <head>] [--tail <tail>] [--storage-pool <storage pool>]")
 			}
 
 			if err != nil {
@@ -332,8 +331,7 @@ var showCommands = []cli.Command{
 			} else if storage != "" {
 				discs, err = brainRequests.GetDiscsOnStoragePool(c.Client(), storage, at)
 			}else {
-				fmt.Println("NEED MORE INFO")
-				return
+				return fmt.Errorf("One of the following flags should be set: [--tail <tail>] [--storage-pool <storage pool>]")
 			}
 
 			if err != nil {
