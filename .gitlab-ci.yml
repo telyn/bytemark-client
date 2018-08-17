@@ -36,6 +36,8 @@ stages:
     - mkdir -p $GOPATH/pkg $GOPATH/bin
       # stick our code in the correct place.
     - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+  variables:
+    GIT_STRATEGY: clone
 
 # we do a lot of linting to keep our code clean
 #
