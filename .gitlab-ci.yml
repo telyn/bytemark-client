@@ -1,7 +1,7 @@
 variables:
   GO15VENDOREXPERIMENT: "1"
   GOPATH: /go
-  GOVERSION: "1.8"
+  GOVERSION: "1.10"
 
 stages:
   - test
