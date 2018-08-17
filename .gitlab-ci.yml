@@ -73,6 +73,7 @@ test:
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - export GOPATH
+    - find $GOPATH/src/github.com/BytemarkHosting/bytemark-client/vendor/github.com -type d
     - |
       for pkg in $(go list ./... | grep -v vendor/); do
         shortpkg="${pkg##github.com/BytemarkHosting/}"
