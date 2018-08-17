@@ -73,6 +73,7 @@ test:
     - OLDPWD="$PWD"
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - export GOPATH
+    - find vendor/github.com/olebedev/when -type f
     - find $GOPATH/src/github.com/BytemarkHosting/bytemark-client/vendor/github.com/olebedev/when -type f
     - |
       for pkg in $(go list ./... | grep -v vendor/); do
