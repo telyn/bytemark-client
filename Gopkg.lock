@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/AlekSi/pointer"
+  packages = ["."]
+  revision = "08a25bac605b3fcb6cc27f3917b2c2c87451963d"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/BytemarkHosting/row"
   packages = ["."]
@@ -45,9 +51,21 @@
   revision = "e882a96ec18dd43fa283187b66af74497c9101c0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/olebedev/when"
+  packages = [".","rules","rules/common","rules/en","rules/ru"]
+  revision = "53693fbb59a88d8eb5a214820c5ec1ea76d2460c"
+
+[[projects]]
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
   revision = "daf2955e742cf123959884fdff4685aa79b63135"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   name = "github.com/urfave/cli"
@@ -58,6 +76,7 @@
   name = "gitlab.bytemark.co.uk/auth/client"
   packages = ["."]
   revision = "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf"
+  source = "git@gitlab.bytemark.co.uk:auth/client.git"
 
 [[projects]]
   branch = "master"
@@ -68,6 +87,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8e7b4e0b579902d96b078870931e878a0a7de44f40817e27ac505ac2e816cd29"
+  inputs-digest = "7fdc5161b0c17d5065bbfee866c761ad0ab947da9abb2c5ab0a7375fd7973fa6"
   solver-name = "gps-cdcl"
   solver-version = 1
