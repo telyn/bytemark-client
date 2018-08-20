@@ -260,7 +260,7 @@ var showCommands = []cli.Command{
 	{
 		Name:		"dependant servers",
 		Usage:		"shows servers dependant on a head, tail or storage pool at a given time",
-		UsageText:	"bytemark --admin show dependant servers [--head <head>] [--tail <tail>] [--storage-pool <storage pool>] [--at <time>]",
+		UsageText:	"--admin show dependant servers [--head <head>] [--tail <tail>] [--storage-pool <storage pool>] [--at <time>]",
 		Flags: append(app.OutputFlags("dependant servers", "object"),
 			cli.StringFlag{
 				Name:  "head",
@@ -307,7 +307,7 @@ var showCommands = []cli.Command{
 	{
 		Name:		"dependant discs",
 		Usage:		"shows discs on a head, tail or storage pool at a given time",
-		UsageText:	"bytemark --admin show dependant discs [--storage-pool <storage pool>] [--tail <tail>] [--at <time>]",
+		UsageText:	"--admin show dependant discs [--storage-pool <storage pool>] [--tail <tail>] [--at <time>]",
 		Flags: append(app.OutputFlags("dependant servers", "object"),
 			cli.StringFlag{
 				Name:  "tail",
