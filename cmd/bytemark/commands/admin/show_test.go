@@ -313,21 +313,43 @@ func TestAdminShowDependantServers(t *testing.T) {
 		name	string
 		url		string
 		args 	[]string
+		values 	[]string
 	}{
 		{
 			name: "head",
 			url: "/admin/heads/%s/virtual_machines",
 			args: []string{"--head", "123"},
+			values: []string{"123"},
 		},
 		{
 			name: "tail",
 			url: "/admin/tails/%s/virtual_machines",
 			args: []string{"--tail", "123"},
+			values: []string{"123"},
 		},
 		{
 			name: "storage pool",
 			url: "/admin/storage_pools/%s/virtual_machines",
 			args: []string{"--storage-pool", "123"},
+			values: []string{"123"},
+		},
+		{
+			name: "head",
+			url: "/admin/heads/%s/virtual_machines?at=%s",
+			args: []string{"--head", "123", "--at", "2018-08-21T15:00:00+0000"},
+			values: []string{"123", "2018-08-21T15:00:00+0000"},
+		},
+		{
+			name: "tail",
+			url: "/admin/tails/%s/virtual_machines?at=%s",
+			args: []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
+			values: []string{"123", "2018-08-21T15:00:00+0000"},
+		},
+		{
+			name: "storage pool",
+			url: "/admin/storage_pools/%s/virtual_machines?at=%s",
+			args: []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
+			values: []string{"123", "2018-08-21T15:00:00+0000"},
 		},
 	}
 
@@ -347,7 +369,7 @@ func TestAdminShowDependantServers(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, []string{"123"}).Return(&servers).Times(1)
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, test.values).Return(&servers).Times(1)
 
 			err := app.Run(append(baseArgs, test.args...))
 			is.Nil(err)
@@ -363,16 +385,31 @@ func TestAdminShowDependantDiscs(t *testing.T) {
 		name	string
 		url		string
 		args 	[]string
+		values 	[]string
 	}{
 		{
 			name: "tail",
 			url: "/admin/tails/%s/discs",
 			args: []string{"--tail", "123"},
+			values: []string{"123"},
 		},
 		{
 			name: "storage pool",
 			url: "/admin/storage_pools/%s/discs",
 			args: []string{"--storage-pool", "123"},
+			values: []string{"123"},
+		},
+		{
+			name: "tail",
+			url: "/admin/tails/%s/discs?at=%s",
+			args: []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
+			values: []string{"123", "2018-08-21T15:00:00+0000"},
+		},
+		{
+			name: "storage pool",
+			url: "/admin/storage_pools/%s/discs?at=%s",
+			args: []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
+			values: []string{"123", "2018-08-21T15:00:00+0000"},
 		},
 	}
 
@@ -392,7 +429,7 @@ func TestAdminShowDependantDiscs(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, []string{"123"}).Return(&discs).Times(1)
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, test.values).Return(&discs).Times(1)
 
 			err := app.Run(append(baseArgs, test.args...))
 			is.Nil(err)
