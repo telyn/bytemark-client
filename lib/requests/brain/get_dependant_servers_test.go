@@ -78,14 +78,6 @@ func TestGetServersOnTail(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, testName, servers, testServers)
-
-		rts.URL = "/admin/tails/123/virtual_machines?at=2018-08-01T15:00:00+0000"
-
-		servers, err = brainMethods.GetServersOnTail(client, "123", "1/8/18 3pm")
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, testName, servers, testServers)
 	})
 }
 
@@ -117,14 +109,6 @@ func TestGetServersOnStoragePool(t *testing.T) {
 
 	rts.Run(t, testName, true, func(client lib.Client) {
 		servers, err := brainMethods.GetServersOnStoragePool(client, "123", "")
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, testName, servers, testServers)
-
-		rts.URL = "/admin/storage_pools/123/virtual_machines?at=2018-08-01T15:00:00+0000"
-
-		servers, err = brainMethods.GetServersOnStoragePool(client, "123", "1/8/18 3pm")
 		if err != nil {
 			t.Fatal(err)
 		}
