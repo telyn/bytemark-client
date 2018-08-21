@@ -36,6 +36,16 @@ func TestGetDiscsOnTail(t *testing.T) {
 		}
 		assert.Equal(t, testName, discs, testDiscs)
 	})
+
+	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+0000")
+
+	rts.Run(t, testName, true, func(client lib.Client) {
+		discs, err := brainMethods.GetDiscsOnTail(client, "123", "2018-08-21T15:00:00+0000")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, testName, discs, testDiscs)
+	})
 }
 
 func TestGetDiscsOnStoragePool(t *testing.T) {
@@ -58,6 +68,16 @@ func TestGetDiscsOnStoragePool(t *testing.T) {
 
 	rts.Run(t, testName, true, func(client lib.Client) {
 		discs, err := brainMethods.GetDiscsOnStoragePool(client, "123", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, testName, discs, testDiscs)
+	})
+
+	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+0000")
+
+	rts.Run(t, testName, true, func(client lib.Client) {
+		discs, err := brainMethods.GetDiscsOnStoragePool(client, "123", "2018-08-21T15:00:00+0000")
 		if err != nil {
 			t.Fatal(err)
 		}
