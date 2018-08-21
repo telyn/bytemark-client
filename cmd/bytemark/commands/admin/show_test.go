@@ -307,3 +307,53 @@ func TestAdminShowDiscByIDCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestAdminShowDependantServers(t *testing.T) {
+	tests := []struct {
+		name	string
+		url		string
+		args 	[]string
+	}{
+		{
+			name: "head",
+			url: "/admin/heads/%s/virtual_machines",
+			args: []string{"--head", "123"},
+		},
+		{
+			name: "tail",
+			url: "/admin/tails/%s/virtual_machines",
+			args: []string{"--tail", "123"},
+		},
+		{
+			name: "storage pool",
+			url: "/admin/storage_pools/%s/virtual_machines",
+			args: []string{"--storage-pool", "123"},
+		},
+	}
+
+	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "servers"}
+	servers := mocks.Request{
+		T:              t,
+		StatusCode:     200,
+		ResponseObject: []brain.VirtualMachine{
+			{ID: 1, Name: "Test1"},
+			{ID: 2, Name: "Test2"},
+		},
+	}
+
+	is := is.New(t)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, []string{"123"}).Return(&servers).Times(1)
+
+			err := app.Run(append(baseArgs, test.args...))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
+	}
+}
