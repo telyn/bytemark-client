@@ -28,12 +28,12 @@ func TestGetServersOnHead(t *testing.T) {
 		URL:           "/admin/heads/123/virtual_machines",
 		Endpoint:      lib.BrainEndpoint,
 		Response: json.RawMessage(`[{
-		"Cores": 4,
-		"Memory": 4,
-		"Name": "test_server",
-		"ID": 123,
-		"Hostname": "test_hostname",
-		"Head": "test_head"
+		"cores": 4,
+		"memory": 4,
+		"name": "test_server",
+		"id": 123,
+		"hostname": "test_hostname",
+		"head": "test_head"
 	    }]`),
 	}
 
@@ -45,3 +45,90 @@ func TestGetServersOnHead(t *testing.T) {
 		assert.Equal(t, testName, servers, testServers)
 	})
 }
+
+func TestGetServersOnTail(t *testing.T) {
+	testName := testutil.Name(0)
+
+	testServers := brain.VirtualMachines{{
+		Cores:		4,
+		Memory:		4,
+		Name:		"test_server",
+		ID:			123,
+		Hostname:	"test_hostname",
+		Head:		"test_head",
+	}}
+
+	rts := testutil.RequestTestSpec{
+		Method:        "GET",
+		URL:           "/admin/tails/123/virtual_machines",
+		Endpoint:      lib.BrainEndpoint,
+		Response: json.RawMessage(`[{
+		"cores": 4,
+		"memory": 4,
+		"name": "test_server",
+		"id": 123,
+		"hostname": "test_hostname",
+		"head": "test_head"
+	    }]`),
+	}
+
+	rts.Run(t, testName, true, func(client lib.Client) {
+		servers, err := brainMethods.GetServersOnTail(client, "123", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, testName, servers, testServers)
+
+		rts.URL = "/admin/tails/123/virtual_machines?at=2018-08-01T15:00:00+0000"
+
+		servers, err = brainMethods.GetServersOnTail(client, "123", "1/8/18 3pm")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, testName, servers, testServers)
+	})
+}
+
+func TestGetServersOnStoragePool(t *testing.T) {
+	testName := testutil.Name(0)
+
+	testServers := brain.VirtualMachines{{
+		Cores:		4,
+		Memory:		4,
+		Name:		"test_server",
+		ID:			123,
+		Hostname:	"test_hostname",
+		Head:		"test_head",
+	}}
+
+	rts := testutil.RequestTestSpec{
+		Method:        "GET",
+		URL:           "/admin/storage_pools/123/virtual_machines",
+		Endpoint:      lib.BrainEndpoint,
+		Response: json.RawMessage(`[{
+		"cores": 4,
+		"memory": 4,
+		"name": "test_server",
+		"id": 123,
+		"hostname": "test_hostname",
+		"head": "test_head"
+	    }]`),
+	}
+
+	rts.Run(t, testName, true, func(client lib.Client) {
+		servers, err := brainMethods.GetServersOnStoragePool(client, "123", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, testName, servers, testServers)
+
+		rts.URL = "/admin/storage_pools/123/virtual_machines?at=2018-08-01T15:00:00+0000"
+
+		servers, err = brainMethods.GetServersOnStoragePool(client, "123", "1/8/18 3pm")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, testName, servers, testServers)
+	})
+}
+
