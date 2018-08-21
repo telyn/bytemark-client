@@ -357,3 +357,48 @@ func TestAdminShowDependantServers(t *testing.T) {
 		})
 	}
 }
+
+func TestAdminShowDependantDiscs(t *testing.T) {
+	tests := []struct {
+		name	string
+		url		string
+		args 	[]string
+	}{
+		{
+			name: "tail",
+			url: "/admin/tails/%s/discs",
+			args: []string{"--tail", "123"},
+		},
+		{
+			name: "storage pool",
+			url: "/admin/storage_pools/%s/discs",
+			args: []string{"--storage-pool", "123"},
+		},
+	}
+
+	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "discs"}
+	discs := mocks.Request{
+		T:              t,
+		StatusCode:     200,
+		ResponseObject: []brain.Disc{
+			{ID: 1},
+			{ID: 2},
+		},
+	}
+
+	is := is.New(t)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, []string{"123"}).Return(&discs).Times(1)
+
+			err := app.Run(append(baseArgs, test.args...))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
+	}
+}
