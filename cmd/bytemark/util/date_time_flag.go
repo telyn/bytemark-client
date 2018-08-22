@@ -2,7 +2,6 @@ package util
 
 import (
 	"time"
-	"fmt"
 
 	"github.com/olebedev/when"
 	"github.com/olebedev/when/rules/common"
@@ -38,5 +37,5 @@ func (dtf *DateTimeFlag) Set(value string) (err error) {
 }
 
 func (dtf *DateTimeFlag) String() string {
-	return fmt.Sprintf("%s", *dtf)
+	return string(*dtf)
 }
