@@ -9,6 +9,8 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin/show"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/urfave/cli"
 )
 
@@ -253,6 +255,93 @@ var showCommands = []cli.Command{
 			}
 
 			return c.OutputInDesiredForm(mjs)
+		}),
+	},
+	{
+		Name:		"dependant servers",
+		Usage:		"shows servers dependant on a head, tail or storage pool at a given time",
+		UsageText:	"--admin show dependant servers [--head <head>] [--tail <tail>] [--storage-pool <storage pool>] [--at <time>]",
+		Flags: append(app.OutputFlags("dependant servers", "object"),
+			cli.StringFlag{
+				Name:  "head",
+				Usage: "the ID of the head to display",
+			},
+			cli.StringFlag{
+				Name:  "tail",
+				Usage: "the ID of the tail to display",
+			},
+			cli.StringFlag{
+				Name:  "storage-pool",
+				Usage: "The ID or label of the storage pool to display",
+			},
+			cli.GenericFlag{
+				Name: "at",
+				Value: new(util.DateTimeFlag),
+				Usage: "the date and time in history to check the dependant servers, defaults to now if unset",
+			},
+		),
+		Action: app.Action(with.Auth, func(c *app.Context) (err error) {
+			head := c.String("head")
+			tail := c.String("tail")
+			storage := c.String("storage-pool")
+			at := c.String("at")
+			var servers brain.VirtualMachines
+
+			if head != "" {
+				servers, err = brainRequests.GetServersOnHead(c.Client(), head, at)
+			} else if tail != "" {
+				servers, err = brainRequests.GetServersOnTail(c.Client(), tail, at)
+			} else if storage != "" {
+				servers, err = brainRequests.GetServersOnStoragePool(c.Client(), storage, at)
+			} else {
+				return fmt.Errorf("One of the following flags should be set: [--head <head>] [--tail <tail>] [--storage-pool <storage pool>]")
+			}
+
+			if err != nil {
+				return
+			}
+
+			return c.OutputInDesiredForm(servers, output.Table)
+		}),
+	},
+	{
+		Name:		"dependant discs",
+		Usage:		"shows discs on a head, tail or storage pool at a given time",
+		UsageText:	"--admin show dependant discs [--storage-pool <storage pool>] [--tail <tail>] [--at <time>]",
+		Flags: append(app.OutputFlags("dependant servers", "object"),
+			cli.StringFlag{
+				Name:  "tail",
+				Usage: "the ID of the tail to display",
+			},
+			cli.StringFlag{
+				Name:  "storage-pool",
+				Usage: "The ID or label of the storage pool to display",
+			},
+			cli.GenericFlag{
+				Name: "at",
+				Value: new(util.DateTimeFlag),
+				Usage: "the date and time in history to check the dependant discs, defaults to now if unset",
+			},
+		),
+		Action: app.Action(with.Auth, func(c *app.Context) (err error) {
+			tail := c.String("tail")
+			storage := c.String("storage-pool")
+			at := c.String("at")
+			var discs brain.Discs
+
+			if tail != "" {
+				discs, err = brainRequests.GetDiscsOnTail(c.Client(), tail, at)
+			} else if storage != "" {
+				discs, err = brainRequests.GetDiscsOnStoragePool(c.Client(), storage, at)
+			}else {
+				return fmt.Errorf("One of the following flags should be set: [--tail <tail>] [--storage-pool <storage pool>]")
+			}
+
+			if err != nil {
+				return
+			}
+
+			return c.OutputInDesiredForm(discs, output.Table)
 		}),
 	},
 }
