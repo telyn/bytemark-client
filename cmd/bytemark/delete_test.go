@@ -54,25 +54,42 @@ func TestDeleteServer(t *testing.T) {
 }
 
 func TestDeleteDisc(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+	t.Run("server and label", func(t *testing.T) {
+		is := is.New(t)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	config.When("Force").Return(true)
-	config.When("GetVirtualMachine").Return(defVM)
+		config.When("Force").Return(true)
+		config.When("GetVirtualMachine").Return(defVM)
 
-	name := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "test-group",
-		Account:        "test-account",
-	}
-	c.When("DeleteDisc", name, "666").Return(nil).Times(1)
+		name := lib.VirtualMachineName{
+			VirtualMachine: "test-server",
+			Group:          "test-group",
+			Account:        "test-account",
+		}
+		c.When("DeleteDisc", name, "666").Return(nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark delete disc --force test-server.test-group.test-account 666", " "))
+		err := app.Run(strings.Split("bytemark delete disc --force test-server.test-group.test-account 666", " "))
 
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
+		is.Nil(err)
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	})
+	t.Run("disc ID", func(t *testing.T) {
+		is := is.New(t)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+
+		config.When("Force").Return(true)
+
+		c.When("DeleteDiscByID", "666").Return(nil).Times(1)
+
+		err := app.Run(strings.Split("bytemark delete disc --force --id 666", " "))
+
+		is.Nil(err)
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	})
 }
 
 func TestDeleteKey(t *testing.T) {

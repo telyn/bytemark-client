@@ -197,6 +197,11 @@ func (c *Client) DeleteDisc(name lib.VirtualMachineName, disc string) error {
 	return r.Error(0)
 }
 
+func (c *Client) DeleteDiscByID(discID string) error {
+	r := c.Called(discID)
+	return r.Error(0)
+}
+
 func (c *Client) DeleteGroup(name lib.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
