@@ -213,7 +213,7 @@ var showCommands = []cli.Command{
 					return err
 				}
 			}
-			fmt.Fprintln(ctx.App().Writer, "Storage sizes are in MB, speeds in MB/s, and times in seconds.")
+			ctx.Log("Storage sizes are in MB, speeds in MB/s, and times in seconds.")
 			return ctx.OutputInDesiredForm(discs, output.Table)
 
 		}),
