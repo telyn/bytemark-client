@@ -48,7 +48,7 @@ func init() {
 				},
 			},
 			Aliases: []string{"disk"},
-			Action: app.Action(args.Optional("server", "label"), with.Auth, func(c *app.Context) (err error) {
+			Action: app.Action(args.Optional("server", "label", "id"), with.Auth, func(c *app.Context) (err error) {
 				if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), "Are you sure you wish to delete this disc? It is impossible to recover.") {
 					return util.UserRequestedExit{}
 				}
