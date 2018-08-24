@@ -57,7 +57,7 @@ func init() {
 				discID := c.String("id")
 
 				if discID != "" {
-					return c.Client().DeleteDiscByID(discID)
+					return brainRequests.DeleteDiscByID(c.Client(), discID)
 				} else if vmName.String() != "" && discLabel != "" {
 					return c.Client().DeleteDisc(vmName, discLabel)
 				} else {

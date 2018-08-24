@@ -57,19 +57,6 @@ func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string)
 	return
 }
 
-// DeleteDiscByID takes a disc ID and removes the specified disc from the given virtual machine
-func (c *bytemarkClient) DeleteDiscByID(discID string) (err error) {
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/discs/%s?purge=true", discID)
-
-	if err != nil {
-		return
-	}
-
-	_, _, err = r.Run(nil, nil)
-
-	return
-}
-
 // ResizeDisc resizes the specified disc to the given size in megabytes
 func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
 	err = c.EnsureVirtualMachineName(&vm)
