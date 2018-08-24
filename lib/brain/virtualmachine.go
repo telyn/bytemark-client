@@ -113,7 +113,7 @@ func (vm VirtualMachine) FullName() string {
 	bits := strings.SplitN(vm.Hostname, ".", 4)
 	end := len(bits)
 	if end > 3 {
-	    end = 3
+		end = 3
 	}
 	return strings.Join(bits[0:end], ".")
 }

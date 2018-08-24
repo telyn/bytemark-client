@@ -15,18 +15,18 @@ func TestGetServersOnHead(t *testing.T) {
 	testName := testutil.Name(0)
 
 	testServers := brain.VirtualMachines{{
-		Cores:					4,
-		Memory:					4,
-		Name:					"test_server",
-		ID:                		123,
-		Hostname:				"test_hostname",
-		Head:					"test_head",
+		Cores:    4,
+		Memory:   4,
+		Name:     "test_server",
+		ID:       123,
+		Hostname: "test_hostname",
+		Head:     "test_head",
 	}}
 
 	rts := testutil.RequestTestSpec{
-		Method:        "GET",
-		URL:           "/admin/heads/123/virtual_machines",
-		Endpoint:      lib.BrainEndpoint,
+		Method:   "GET",
+		URL:      "/admin/heads/123/virtual_machines",
+		Endpoint: lib.BrainEndpoint,
 		Response: json.RawMessage(`[{
 		"cores": 4,
 		"memory": 4,
@@ -60,18 +60,18 @@ func TestGetServersOnTail(t *testing.T) {
 	testName := testutil.Name(0)
 
 	testServers := brain.VirtualMachines{{
-		Cores:		4,
-		Memory:		4,
-		Name:		"test_server",
-		ID:			123,
-		Hostname:	"test_hostname",
-		Head:		"test_head",
+		Cores:    4,
+		Memory:   4,
+		Name:     "test_server",
+		ID:       123,
+		Hostname: "test_hostname",
+		Head:     "test_head",
 	}}
 
 	rts := testutil.RequestTestSpec{
-		Method:        "GET",
-		URL:           "/admin/tails/123/virtual_machines",
-		Endpoint:      lib.BrainEndpoint,
+		Method:   "GET",
+		URL:      "/admin/tails/123/virtual_machines",
+		Endpoint: lib.BrainEndpoint,
 		Response: json.RawMessage(`[{
 		"cores": 4,
 		"memory": 4,
@@ -105,18 +105,18 @@ func TestGetServersOnStoragePool(t *testing.T) {
 	testName := testutil.Name(0)
 
 	testServers := brain.VirtualMachines{{
-		Cores:		4,
-		Memory:		4,
-		Name:		"test_server",
-		ID:			123,
-		Hostname:	"test_hostname",
-		Head:		"test_head",
+		Cores:    4,
+		Memory:   4,
+		Name:     "test_server",
+		ID:       123,
+		Hostname: "test_hostname",
+		Head:     "test_head",
 	}}
 
 	rts := testutil.RequestTestSpec{
-		Method:        "GET",
-		URL:           "/admin/storage_pools/123/virtual_machines",
-		Endpoint:      lib.BrainEndpoint,
+		Method:   "GET",
+		URL:      "/admin/storage_pools/123/virtual_machines",
+		Endpoint: lib.BrainEndpoint,
 		Response: json.RawMessage(`[{
 		"cores": 4,
 		"memory": 4,
@@ -145,4 +145,3 @@ func TestGetServersOnStoragePool(t *testing.T) {
 		assert.Equal(t, testName, servers, testServers)
 	})
 }
-

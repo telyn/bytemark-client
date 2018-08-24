@@ -86,7 +86,7 @@ func TestUpdateServerMigrationError(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(defVM)
 
-	err := app.Run([]string{"bytemark", "update",  "server-migration", "vm124.group.account"})
+	err := app.Run([]string{"bytemark", "update", "server-migration", "vm124.group.account"})
 
 	is.NotNil(err)
 
