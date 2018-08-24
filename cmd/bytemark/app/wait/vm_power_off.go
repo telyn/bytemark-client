@@ -19,7 +19,8 @@ func VMPowerOff(c *app.Context, name lib.VirtualMachineName) (err error) {
 		if !c.IsTest() {
 			time.Sleep(5 * time.Second)
 		}
-		fmt.Fprint(c.App().Writer, ".")
+		// this Fprint is actually needed as there's no way to get ctx.Log to not output a newline after
+		_, _ = fmt.Fprint(c.App().Writer, ".")
 
 		vm, err = c.Client().GetVirtualMachine(name)
 		if err != nil {
