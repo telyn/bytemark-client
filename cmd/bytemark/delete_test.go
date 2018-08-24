@@ -81,10 +81,13 @@ func TestDeleteDisc(t *testing.T) {
 
 		config.When("Force").Return(true)
 
-		c.When("DeleteDiscByID", "666").Return(nil).Times(1)
+		c.When("BuildRequest", "DELETE", lib.BrainEndpoint, "/discs/%s?purge=true", []string{"666"}).Return(&mocks.Request{
+			T:              t,
+			StatusCode:     200,
+			ResponseObject: nil,
+		}).Times(1)
 
 		err := app.Run(strings.Split("bytemark delete disc --force --id 666", " "))
-
 		is.Nil(err)
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
