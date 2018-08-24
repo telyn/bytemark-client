@@ -15,14 +15,14 @@ func TestGetDiscsOnTail(t *testing.T) {
 	testName := testutil.Name(0)
 
 	testDiscs := brain.Discs{{
-		ID:			4,
-		Label:		"test_disc",
+		ID:    4,
+		Label: "test_disc",
 	}}
 
 	rts := testutil.RequestTestSpec{
-		Method:        "GET",
-		URL:           "/admin/tails/123/discs",
-		Endpoint:      lib.BrainEndpoint,
+		Method:   "GET",
+		URL:      "/admin/tails/123/discs",
+		Endpoint: lib.BrainEndpoint,
 		Response: json.RawMessage(`[{
 		"id": 4,
 		"label": "test_disc"
@@ -52,14 +52,14 @@ func TestGetDiscsOnStoragePool(t *testing.T) {
 	testName := testutil.Name(0)
 
 	testDiscs := brain.Discs{{
-		ID:			4,
-		Label:		"test_disc",
+		ID:    4,
+		Label: "test_disc",
 	}}
 
 	rts := testutil.RequestTestSpec{
-		Method:        "GET",
-		URL:           "/admin/storage_pools/123/discs",
-		Endpoint:      lib.BrainEndpoint,
+		Method:   "GET",
+		URL:      "/admin/storage_pools/123/discs",
+		Endpoint: lib.BrainEndpoint,
 		Response: json.RawMessage(`[{
 		"id": 4,
 		"label": "test_disc"
@@ -84,4 +84,3 @@ func TestGetDiscsOnStoragePool(t *testing.T) {
 		assert.Equal(t, testName, discs, testDiscs)
 	})
 }
-

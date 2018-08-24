@@ -11,7 +11,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"github.com/mattn/go-isatty"
+	isatty "github.com/mattn/go-isatty"
 	"github.com/urfave/cli"
 )
 
@@ -50,6 +50,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 					}
 
 					log.Logf("%s will be reimaged with the following. Note that this will wipe all data on the main disc:\r\n\r\n", vmName)
+					// don't use ctx.App().ErrWriter / ctx.LogErr here to avoid outputting a password to debug.log
 					err = imageInstall.PrettyPrint(os.Stderr, prettyprint.Full)
 					if err != nil {
 						return
@@ -62,7 +63,8 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 
 					err = c.Client().ReimageVirtualMachine(vmName, imageInstall)
 					if err != nil && !isatty.IsTerminal(os.Stdout.Fd()) {
-						fmt.Fprintf(os.Stdout, imageInstall.RootPassword)
+						// by default everything gets output to stdout + debug.log - don't want to output the password to debug log
+						_, _ = fmt.Fprintf(os.Stdout, imageInstall.RootPassword)
 					}
 					return
 				}),

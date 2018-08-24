@@ -2,13 +2,14 @@ package commands_test
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
-	"strings"
-	"testing"
 )
 
 func TestAssent(t *testing.T) {

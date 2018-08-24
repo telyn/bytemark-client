@@ -71,5 +71,9 @@ func GlobalFlags() (flags []cli.Flag) {
 			Name:  "yubikey-otp",
 			Usage: "one-time password from your yubikey to use to login",
 		},
+		cli.BoolFlag{
+			Name:  "insecure",
+			Usage: "allow insecure connections to be made",
+		},
 	}
 }

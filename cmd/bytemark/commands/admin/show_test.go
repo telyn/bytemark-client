@@ -310,53 +310,53 @@ func TestAdminShowDiscByIDCommand(t *testing.T) {
 
 func TestAdminShowDependantServers(t *testing.T) {
 	tests := []struct {
-		name	string
-		url		string
-		args 	[]string
-		values 	[]string
+		name   string
+		url    string
+		args   []string
+		values []string
 	}{
 		{
-			name: "head",
-			url: "/admin/heads/%s/virtual_machines",
-			args: []string{"--head", "123"},
+			name:   "head",
+			url:    "/admin/heads/%s/virtual_machines",
+			args:   []string{"--head", "123"},
 			values: []string{"123"},
 		},
 		{
-			name: "tail",
-			url: "/admin/tails/%s/virtual_machines",
-			args: []string{"--tail", "123"},
+			name:   "tail",
+			url:    "/admin/tails/%s/virtual_machines",
+			args:   []string{"--tail", "123"},
 			values: []string{"123"},
 		},
 		{
-			name: "storage pool",
-			url: "/admin/storage_pools/%s/virtual_machines",
-			args: []string{"--storage-pool", "123"},
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/virtual_machines",
+			args:   []string{"--storage-pool", "123"},
 			values: []string{"123"},
 		},
 		{
-			name: "head",
-			url: "/admin/heads/%s/virtual_machines?at=%s",
-			args: []string{"--head", "123", "--at", "2018-08-21T15:00:00+0000"},
+			name:   "head",
+			url:    "/admin/heads/%s/virtual_machines?at=%s",
+			args:   []string{"--head", "123", "--at", "2018-08-21T15:00:00+0000"},
 			values: []string{"123", "2018-08-21T15:00:00+0000"},
 		},
 		{
-			name: "tail",
-			url: "/admin/tails/%s/virtual_machines?at=%s",
-			args: []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
+			name:   "tail",
+			url:    "/admin/tails/%s/virtual_machines?at=%s",
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
 			values: []string{"123", "2018-08-21T15:00:00+0000"},
 		},
 		{
-			name: "storage pool",
-			url: "/admin/storage_pools/%s/virtual_machines?at=%s",
-			args: []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/virtual_machines?at=%s",
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
 			values: []string{"123", "2018-08-21T15:00:00+0000"},
 		},
 	}
 
 	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "servers"}
 	servers := mocks.Request{
-		T:              t,
-		StatusCode:     200,
+		T:          t,
+		StatusCode: 200,
 		ResponseObject: []brain.VirtualMachine{
 			{ID: 1, Name: "Test1"},
 			{ID: 2, Name: "Test2"},
@@ -382,41 +382,41 @@ func TestAdminShowDependantServers(t *testing.T) {
 
 func TestAdminShowDependantDiscs(t *testing.T) {
 	tests := []struct {
-		name	string
-		url		string
-		args 	[]string
-		values 	[]string
+		name   string
+		url    string
+		args   []string
+		values []string
 	}{
 		{
-			name: "tail",
-			url: "/admin/tails/%s/discs",
-			args: []string{"--tail", "123"},
+			name:   "tail",
+			url:    "/admin/tails/%s/discs",
+			args:   []string{"--tail", "123"},
 			values: []string{"123"},
 		},
 		{
-			name: "storage pool",
-			url: "/admin/storage_pools/%s/discs",
-			args: []string{"--storage-pool", "123"},
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/discs",
+			args:   []string{"--storage-pool", "123"},
 			values: []string{"123"},
 		},
 		{
-			name: "tail",
-			url: "/admin/tails/%s/discs?at=%s",
-			args: []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
+			name:   "tail",
+			url:    "/admin/tails/%s/discs?at=%s",
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
 			values: []string{"123", "2018-08-21T15:00:00+0000"},
 		},
 		{
-			name: "storage pool",
-			url: "/admin/storage_pools/%s/discs?at=%s",
-			args: []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/discs?at=%s",
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
 			values: []string{"123", "2018-08-21T15:00:00+0000"},
 		},
 	}
 
 	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "discs"}
 	discs := mocks.Request{
-		T:              t,
-		StatusCode:     200,
+		T:          t,
+		StatusCode: 200,
 		ResponseObject: []brain.Disc{
 			{ID: 1},
 			{ID: 2},

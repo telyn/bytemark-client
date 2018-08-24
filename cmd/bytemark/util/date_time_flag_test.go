@@ -16,7 +16,7 @@ func TestDateTimeFlag(t *testing.T) {
 
 	is.Nil(err)
 	is.OK(flag.String())
-	
+
 	// check format
 	formatted, err := time.Parse("2006-01-02T15:04:05-0700", flag.String())
 	is.Nil(err)

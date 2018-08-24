@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/wait"
@@ -31,7 +29,7 @@ func init() {
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 				vmName := c.VirtualMachineName("server")
-				fmt.Fprintf(c.App().Writer, "Shutting down %v...", vmName)
+				c.Log("Shutting down %v...", vmName)
 				err = c.Client().ShutdownVirtualMachine(vmName, true)
 				if err != nil {
 					return

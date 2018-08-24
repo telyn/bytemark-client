@@ -12,7 +12,10 @@ func TestRequest(t *testing.T) {
 		T:              t,
 		ResponseObject: map[string]string{"hello": "hi"},
 	}
-	r.MarshalAndRun(nil, &testMap)
+	_, _, err := r.MarshalAndRun(nil, &testMap)
+	if err != nil {
+		t.Error(err)
+	}
 	if testMap["hello"] != "hi" {
 		t.Errorf("Assignment failed")
 	}
