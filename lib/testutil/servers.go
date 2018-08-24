@@ -92,7 +92,7 @@ func NilHandler(t *testing.T) http.Handler {
 // just for convenience when writing tests that require auth.
 func NewAuthServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w,
+		_, _ = fmt.Fprintln(w,
 			`{
     "token": "working-auth-token",
     "username": "account",

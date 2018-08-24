@@ -33,8 +33,8 @@ type Fn func(wr io.Writer, config Config, obj Outputtable) error
 // FormatFns is a map which contains all the supported output format functions -- except 'human' because that's implemented in the OutputInDesiredForm method, by necessity.
 var FormatFns = map[Format]Fn{
 	Debug: func(wr io.Writer, cfg Config, obj Outputtable) error {
-		fmt.Fprintf(wr, "%#v", obj)
-		return nil
+		_, err := fmt.Fprintf(wr, "%#v", obj)
+		return err
 	},
 	JSON: func(wr io.Writer, _ Config, obj Outputtable) error {
 		encoder := json.NewEncoder(wr)
@@ -49,11 +49,11 @@ var FormatFns = map[Format]Fn{
 }
 
 // outputTable is an OutputFn, used by List and Table output types
-func outputTable(wr io.Writer, cfg Config, obj Outputtable) error {
+func outputTable(wr io.Writer, cfg Config, obj Outputtable) (err error) {
 	if cfg.Fields[0] == "help" {
 		fieldsList := row.FieldsFrom(obj)
-		fmt.Fprintf(wr, "Fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
-		return nil
+		_, err = fmt.Fprintf(wr, "Fields available for this command: \r\n  %s\r\n\r\n", strings.Join(fieldsList, "\r\n  "))
+		return
 	}
 	return RenderTable(wr, cfg, obj)
 }

@@ -49,7 +49,7 @@ func init() {
 					appliance = "rescue"
 				}
 
-				fmt.Fprintf(c.App().Writer, "Shutting down %v...", vmName)
+				c.Log("Shutting down %v...", vmName)
 				err = c.Client().ShutdownVirtualMachine(vmName, true)
 				if err != nil {
 					return
