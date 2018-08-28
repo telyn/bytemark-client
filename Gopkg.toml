@@ -43,3 +43,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/olebedev/when"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/bcampbell/fuzzytime"
