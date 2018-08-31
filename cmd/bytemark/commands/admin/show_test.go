@@ -336,20 +336,20 @@ func TestAdminShowDependantServers(t *testing.T) {
 		{
 			name:   "head",
 			url:    "/admin/heads/%s/virtual_machines?at=%s",
-			args:   []string{"--head", "123", "--at", "2018-08-21T15:00:00+0000"},
-			values: []string{"123", "2018-08-21T15:00:00+0000"},
+			args:   []string{"--head", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
 		},
 		{
 			name:   "tail",
 			url:    "/admin/tails/%s/virtual_machines?at=%s",
-			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
-			values: []string{"123", "2018-08-21T15:00:00+0000"},
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
 		},
 		{
 			name:   "storage pool",
 			url:    "/admin/storage_pools/%s/virtual_machines?at=%s",
-			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
-			values: []string{"123", "2018-08-21T15:00:00+0000"},
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
 		},
 	}
 
@@ -402,14 +402,14 @@ func TestAdminShowDependantDiscs(t *testing.T) {
 		{
 			name:   "tail",
 			url:    "/admin/tails/%s/discs?at=%s",
-			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+0000"},
-			values: []string{"123", "2018-08-21T15:00:00+0000"},
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
 		},
 		{
 			name:   "storage pool",
 			url:    "/admin/storage_pools/%s/discs?at=%s",
-			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+0000"},
-			values: []string{"123", "2018-08-21T15:00:00+0000"},
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
 		},
 	}
 

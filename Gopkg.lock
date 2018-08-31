@@ -2,20 +2,20 @@
 
 
 [[projects]]
-  digest = "1:ee907e9ead8d8b090f1e2c07967ff1ec7ed20687c2ffd270d1c6c1b71dff5496"
-  name = "github.com/AlekSi/pointer"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "08a25bac605b3fcb6cc27f3917b2c2c87451963d"
-  version = "v1.0.0"
-
-[[projects]]
   branch = "master"
   digest = "1:26958ec13f54dca00ee3d8a171124c6660eb0cafe48cd4ae2b651dd86558fe45"
   name = "github.com/BytemarkHosting/row"
   packages = ["."]
   pruneopts = "UT"
   revision = "64689958a4cb09a01483ae1ca39511ca14c3222e"
+
+[[projects]]
+  branch = "master"
+  digest = "1:bbbc4c011a04f0653e12121ad37ac3a669c23ebbad74ae2095bf22df18ddeba5"
+  name = "github.com/bcampbell/fuzzytime"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6a03581b01a2b1647d35ccf849090b5036108e0c"
 
 [[projects]]
   digest = "1:03b540ccf698c49706b9b54eae235ecec9f07f9f0d5d2811a9a0d10d2f768e0a"
@@ -69,33 +69,11 @@
   revision = "e882a96ec18dd43fa283187b66af74497c9101c0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:cb3e0863ed6c4ff67f4443e03a5b6b77e88927e57885335380d188553ceb577b"
-  name = "github.com/olebedev/when"
-  packages = [
-    ".",
-    "rules",
-    "rules/common",
-    "rules/en",
-    "rules/ru",
-  ]
-  pruneopts = "UT"
-  revision = "53693fbb59a88d8eb5a214820c5ec1ea76d2460c"
-
-[[projects]]
   digest = "1:2320b17ab014d050d75c868f3daf96416cbe93898cdd43e66bb66056faf6131d"
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
   pruneopts = "UT"
   revision = "daf2955e742cf123959884fdff4685aa79b63135"
-
-[[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
-  name = "github.com/pkg/errors"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
 
 [[projects]]
   digest = "1:8080e1aba103c6ed33937dfdfbaebb3438721ee58a4bf8bb9d2a1ffa0f5d25f6"
@@ -125,13 +103,11 @@
   analyzer-version = 1
   input-imports = [
     "github.com/BytemarkHosting/row",
+    "github.com/bcampbell/fuzzytime",
     "github.com/bgentry/speakeasy",
     "github.com/cheekybits/is",
     "github.com/maraino/go-mock",
     "github.com/mattn/go-isatty",
-    "github.com/olebedev/when",
-    "github.com/olebedev/when/rules/common",
-    "github.com/olebedev/when/rules/en",
     "github.com/olekukonko/tablewriter",
     "github.com/urfave/cli",
     "gitlab.bytemark.co.uk/auth/client",

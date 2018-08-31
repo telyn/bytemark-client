@@ -277,7 +277,7 @@ var showCommands = []cli.Command{
 			cli.GenericFlag{
 				Name:  "at",
 				Value: new(util.DateTimeFlag),
-				Usage: "the date and time in history to check the dependant servers, defaults to now if unset",
+				Usage: "the date and time in history to check the dependant servers, defaults to now if unset. The flag will take most formats, e.g. '20/01/18', '15:30', '31/02/2018 18:20:33'",
 			},
 		),
 		Action: app.Action(with.Auth, func(c *app.Context) (err error) {
@@ -320,7 +320,7 @@ var showCommands = []cli.Command{
 			cli.GenericFlag{
 				Name:  "at",
 				Value: new(util.DateTimeFlag),
-				Usage: "the date and time in history to check the dependant discs, defaults to now if unset",
+				Usage: "the date and time in history to check the dependant discs, defaults to now if unset. The flag will take most formats, e.g. '20/01/18', '15:30', '31/02/2018 18:20:33'",
 			},
 		),
 		Action: app.Action(with.Auth, func(c *app.Context) (err error) {

@@ -45,10 +45,10 @@ func TestGetServersOnHead(t *testing.T) {
 		assert.Equal(t, testName, servers, testServers)
 	})
 
-	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+0000")
+	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+0100")
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		servers, err := brainMethods.GetServersOnHead(client, "123", "2018-08-21T15:00:00+0000")
+		servers, err := brainMethods.GetServersOnHead(client, "123", "2018-08-21T15:00:00+0100")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -90,10 +90,10 @@ func TestGetServersOnTail(t *testing.T) {
 		assert.Equal(t, testName, servers, testServers)
 	})
 
-	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+0000")
+	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+0100")
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		servers, err := brainMethods.GetServersOnTail(client, "123", "2018-08-21T15:00:00+0000")
+		servers, err := brainMethods.GetServersOnTail(client, "123", "2018-08-21T15:00:00+0100")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -135,10 +135,10 @@ func TestGetServersOnStoragePool(t *testing.T) {
 		assert.Equal(t, testName, servers, testServers)
 	})
 
-	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+0000")
+	rts.AssertRequest = assert.QueryValue("at", "2018-08-21T15:00:00+01:00")
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		servers, err := brainMethods.GetServersOnStoragePool(client, "123", "2018-08-21T15:00:00+0000")
+		servers, err := brainMethods.GetServersOnStoragePool(client, "123", "2018-08-21T15:00:00+01:00")
 		if err != nil {
 			t.Fatal(err)
 		}
