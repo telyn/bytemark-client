@@ -5,6 +5,8 @@ bytemark-client (3.3) UNRELEASED; urgency=low
     storage pool at a given time
   * `show dependant discs` command for viewing discs on a head, tail or
     storage pool at a given time
+  * The .tar.gz files available on repo.bytemark.co.uk are now gzipped and not
+    merely pretending to be.
 
  -- Hannah Pirie <hannah.pirie@bytemark.co.uk>  Tue, 21 Aug 2018 16:39:43 +0100
 
@@ -14,8 +16,6 @@ bytemark-client (3.2) UNRELEASED; urgency=low
   * `show servers` now takes a group instead of an account by default.
     `--account <account>` can be specified to list all servers on an account.
   * `profiles` and `scripting` have been updated to match the 3.0+ updates.
-  * The .tar.gz files available on repo.bytemark.co.uk are now gzipped and not
-    merely pretending to be.
 
   ### Fixes:
   * `update config --account <account>` no longer fails if a billing account
