@@ -24,6 +24,9 @@
 #   go-tests = true
 #   unused-packages = true
 
+[[constraint]]
+  name = "gitlab.bytemark.co.uk/auth/client"
+  source = "git@gitlab.bytemark.co.uk:auth/client.git"
 
 [[constraint]]
   branch = "master"
@@ -36,3 +39,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/bcampbell/fuzzytime"

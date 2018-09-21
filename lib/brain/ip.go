@@ -23,7 +23,7 @@ func (ip IP) DefaultFields(f output.Format) string {
 }
 
 // PrettyPrint outputs a vaguely human-readable version of the IP and reverse DNS to wr. Detail is ignored.
-func (ip IP) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	fmt.Fprintf(wr, "%s: %s", ip.IP, ip.RDns)
-	return nil
+func (ip IP) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (err error) {
+	_, err = fmt.Fprintf(wr, "%s: %s", ip.IP, ip.RDns)
+	return
 }
