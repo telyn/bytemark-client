@@ -1,4 +1,5 @@
 .*.sw*
+.codeclimate.yml
 Bytemark.app
 /bytemark
 /cmd/bytemark/bytemark
