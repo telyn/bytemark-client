@@ -244,12 +244,15 @@ func ProcessError(err error, message ...string) ExitCode {
 		case lib.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = ExitCodeNotFound
-		case WontDeleteGroupWithVMsError:
+		case RecursiveDeleteGroupError:
 			errorMessage = err.Error()
-			exitCode = ExitCodeWontDeletePopulated
+			exitCode = ExitCodeAPIInternalError
 		case UserRequestedExit:
 			errorMessage = ""
 			exitCode = ExitCodeUserExit
+		case WontDeleteGroupWithVMsError:
+			errorMessage = err.Error()
+			exitCode = ExitCodeWontDeletePopulated
 		case *syscall.Errno:
 			errorMessage = fmt.Sprintf("A command we tried to execute failed. The operating system gave us the error code %d", e)
 			exitCode = ExitCodeUnknownError

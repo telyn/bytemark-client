@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 )
@@ -34,4 +35,21 @@ type WontDeleteGroupWithVMsError struct {
 
 func (e WontDeleteGroupWithVMsError) Error() string {
 	return fmt.Sprintf("Group %s contains servers, will not be deleted without --recursive\r\n", e.Group)
+}
+
+// RecursiveDeleteGroupError is returned by delete group when called with --recursive, when deleting VMs.
+type RecursiveDeleteGroupError struct {
+	Group lib.GroupName
+	// Map of VirtualMachine names to the error that occurred when trying to delete them.
+	// N.B. that this will not contain nil errors for VMs that were successfully deleted.
+	Errors map[string]error
+}
+
+func (e RecursiveDeleteGroupError) Error() string {
+	strs := make([]string, 0, len(e.Errors))
+	for vm, err := range e.Errors {
+		strs = append(strs, fmt.Sprintf("%s: %s", vm, err))
+	}
+
+	return fmt.Sprintf("Errors occurred while deleting VMs in group %s: \n\t%s", e.Group, strings.Join(strs, "\n\t"))
 }

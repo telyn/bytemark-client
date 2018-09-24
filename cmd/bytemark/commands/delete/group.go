@@ -10,7 +10,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -43,12 +42,11 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				}
 
 				err = promptForRecursiveDeleteGroup(ctx)
-				ctx.Debug("promptForRecursiveDeleteGroup sezz %s", err)
 				if err != nil {
 					return
 				}
 
-				err = deleteVmsInGroup(ctx, &groupName, ctx.Group)
+				err = deleteVmsInGroup(ctx, groupName, ctx.Group)
 				if err != nil {
 					return
 				}
@@ -57,7 +55,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			}
 			err = ctx.Client().DeleteGroup(groupName)
 			if err == nil {
-				log.Logf("Group %s deleted successfully.\r\n", groupName.String())
+				ctx.Log("\nGroup %s deleted successfully.", groupName.String())
 			}
 			return
 		}),
@@ -83,18 +81,25 @@ func promptForRecursiveDeleteGroup(ctx *app.Context) error {
 	return nil
 }
 
-func deleteVmsInGroup(ctx *app.Context, name *lib.GroupName, group *brain.Group) error {
-	ctx.Log("Purging all VMs in %s...", name)
+func deleteVmsInGroup(ctx *app.Context, name lib.GroupName, group *brain.Group) error {
+	ctx.Log("\nPurging all VMs in %s...", name)
+
+	recurseErr := util.RecursiveDeleteGroupError{Group: name, Errors: map[string]error{}}
 
 	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 	for _, vm := range group.VirtualMachines {
 		vmn.VirtualMachine = vm.Name
-		ctx.Log("%s...", vm.Name)
+		ctx.Logf("%s...", vm.Name)
+
 		err := ctx.Client().DeleteVirtualMachine(vmn, true)
 		if err != nil {
-			return err
+			ctx.Log("failed")
+			recurseErr.Errors[vm.Name] = err
 		}
 		ctx.Log("deleted")
+	}
+	if len(recurseErr.Errors) > 0 {
+		return recurseErr
 	}
 	return nil
 }
