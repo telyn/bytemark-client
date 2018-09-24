@@ -186,6 +186,7 @@ func (vm VirtualMachine) PrimaryIP() net.IP {
 	return nil
 }
 
+// Path returns a path to access more resources for this VM
 func (vm VirtualMachine) Path() (string, error) {
-	return VirtualMachineID(v.ID).Path()
+	return VirtualMachineID(vm.ID).Path()
 }
