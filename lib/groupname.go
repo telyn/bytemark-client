@@ -1,5 +1,7 @@
 package lib
 
+import "fmt"
+
 // GroupName is the double-form of the name of a Group, which should be enough to find the group.
 type GroupName struct {
 	Group   string
@@ -17,4 +19,15 @@ func (g GroupName) String() string {
 		return g.Group
 	}
 	return g.Group + "." + g.Account
+}
+
+// Path returns the URL path for this group, if possible.
+// If the group is not full specified (i.e. does not have an account and group)
+// it instead returns an error.
+func (g GroupName) Path() (string, error) {
+	if g.Group == "" || g.Account == "" {
+		return "", fmt.Errorf("Group %q was not fully specified so cannot make a URL", g)
+	}
+	path := fmt.Sprintf("/accounts/%s/groups/%s", g.Account, g.Group)
+	return path, nil
 }

@@ -82,3 +82,7 @@ func (gs Groups) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 `
 	return prettyprint.Run(wr, groupsTpl, "groups"+string(detail), gs)
 }
+
+func (g Group) Path() (string, error) {
+	return GroupID(g.ID).Path()
+}

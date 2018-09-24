@@ -185,3 +185,7 @@ func (vm VirtualMachine) PrimaryIP() net.IP {
 	}
 	return nil
 }
+
+func (vm VirtualMachine) Path() (string, error) {
+	return VirtualMachineID(v.ID).Path()
+}

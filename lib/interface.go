@@ -54,8 +54,43 @@ type Client interface {
 	//
 
 	AllowInsecureRequests()
-	BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (Request, error)
-	BuildRequest(method string, endpoint Endpoint, path string, parts ...string) (Request, error)
+
+	// For the time being BuildCustomRequest and BuildCustomRequestNoAuth are
+	// aliases to BuildRequest and BuildRequestNoAuth. In 4.0 BuildRequest and
+	// BuildRequestNoAuth BuildRequestWithPather will be renamed to
+	// BuildRequest (and sometime before that a NoAuth version will be added).
+	// To stay up-to-date, either use BuildRequestWithPather now and be ready
+	// to switch in 4.0, or use BuildCustomRequest.
+
+	// BuildRequestWithPather is a new way of building a Request object using
+	// a Pather. This allows use of IP address to address VMs, or IDs to address
+	// any kind of object without having to write conditional code to call
+	// BuildRequest.
+	// BuildRequestWithPather will be renamed to BuildRequest in v4.0
+	BuildRequestWithPather(method string, endpoint Endpoint,
+		pather Pather, suffixParts ...string) (Request, error)
+	// BuildCustomRequestNoAuth is the "old" way of building a Request object
+	// using a URL path. The path and parts are fed to fmt.Sprintf as they are
+	// provided, so make sure parts is the same length as the number of %s in
+	// your path :-)
+	// This will create an unauthenticated request - i.e. the request will not
+	// contain an Authorization header.
+	BuildCustomRequestNoAuth(method string, endpoint Endpoint,
+		path string, parts ...string) (Request, error)
+	// BuildCustomRequest is the "old" way of building a Request object using a
+	/// URL path. The path and parts are fed to fmt.Sprintf as they are
+	// provided, so make sure parts is the same length as the number of %s in
+	// your path :-)
+	BuildCustomRequest(method string, endpoint Endpoint,
+		path string, parts ...string) (Request, error)
+	// BuildRequestNoAuth is an alias for BuildCustomRequestNoAuth, but in v4.0
+	// it will become an alias to BuildRequestNoAuthWithPather.
+	BuildRequestNoAuth(method string, endpoint Endpoint,
+		path string, parts ...string) (Request, error)
+	// BuildRequest is an alias for BuildCustomRequest, but in v4.0 it will be
+	// become an alias to BuildRequestWithPather.
+	BuildRequest(method string, endpoint Endpoint,
+		path string, parts ...string) (Request, error)
 
 	///////////////////////
 	////// SPP STUFF //////

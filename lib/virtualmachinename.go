@@ -5,6 +5,7 @@ import (
 )
 
 // VirtualMachineName is the triplet-form of the name of a VirtualMachine, which should be enough to find the VM.
+// VirtualMachineName implements the Pather interface
 type VirtualMachineName struct {
 	VirtualMachine string
 	Group          string
@@ -27,4 +28,16 @@ func (vm VirtualMachineName) GroupName() GroupName {
 		Group:   vm.Group,
 		Account: vm.Account,
 	}
+}
+
+// Path returns the URL path for this VM, if possible.
+// If the VM is not full specified (i.e. does not have an account, group and
+// name), it instead returns an error.
+func (vm VirtualMachineName) Path() (string, error) {
+	if vm.VirtualMachine == "" || vm.Group == "" || vm.Account == "" {
+		return "", fmt.Errorf("Server %q was not fully specified so cannot make a URL", vm)
+	}
+	path := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s",
+		vm.Account, vm.Group, vm.VirtualMachine)
+	return path, nil
 }
