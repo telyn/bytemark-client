@@ -200,40 +200,55 @@ func countRunning(group *brain.Group) (running int) {
 	return running
 }
 
-func deleteGroup(c *app.Context) (err error) {
-	recursive := c.Bool("recursive")
-	groupName := c.GroupName("group")
-	if len(c.Group.VirtualMachines) > 0 && recursive {
-		prompt := fmt.Sprintf("The group '%s' has %d servers in it which will be irrevocably deleted", c.Group.Name, len(c.Group.VirtualMachines))
-		running := countRunning(c.Group)
-		if running != 0 {
-			stopped := len(c.Group.VirtualMachines) - running
-			andStopped := ""
-			if stopped > 0 {
-				andStopped = fmt.Sprintf("and %d stopped ", stopped)
-			}
-			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.Group.Name, running, andStopped)
+func deleteGroup(ctx *app.Context) (err error) {
+	recursive := ctx.Bool("recursive")
+	groupName := ctx.GroupName("group")
+	if len(ctx.Group.VirtualMachines) > 0 {
+		if !recursive {
+			err = util.WontDeleteGroupWithVMsError{Group: groupName}
+			return
 		}
 
-		if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), prompt+" - are you sure you wish to delete this group?") {
-			return util.UserRequestedExit{}
-		}
-		err = recursiveDeleteGroup(c, &groupName, c.Group)
+		err = promptForRecursiveDeleteGroup(ctx)
+		ctx.Debug("promptForRecursiveDeleteGroup sezz %s", err)
 		if err != nil {
 			return
 		}
-	} else if !recursive {
-		err = &util.WontDeleteNonEmptyGroupError{Group: &groupName}
-		return
+
+		err = deleteVmsInGroup(ctx, &groupName, ctx.Group)
+		if err != nil {
+			return
+		}
+	} else if !ctx.Bool("force") && !util.PromptYesNo(ctx.Prompter(), fmt.Sprintf("Are you sure you wish to delete the %s group?", groupName)) {
+		return util.UserRequestedExit{}
 	}
-	err = c.Client().DeleteGroup(groupName)
+	err = ctx.Client().DeleteGroup(groupName)
 	if err == nil {
 		log.Logf("Group %s deleted successfully.\r\n", groupName.String())
 	}
 	return
 }
 
-func recursiveDeleteGroup(c *app.Context, name *lib.GroupName, group *brain.Group) error {
+func promptForRecursiveDeleteGroup(ctx *app.Context) error {
+	prompt := fmt.Sprintf("The group '%s' has %d servers in it which will be irrevocably deleted", ctx.Group.Name, len(ctx.Group.VirtualMachines))
+	running := countRunning(ctx.Group)
+
+	if running != 0 {
+		stopped := len(ctx.Group.VirtualMachines) - running
+		andStopped := ""
+		if stopped > 0 {
+			andStopped = fmt.Sprintf("and %d stopped ", stopped)
+		}
+		prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", ctx.Group.Name, running, andStopped)
+	}
+
+	if !ctx.Bool("force") && !util.PromptYesNo(ctx.Prompter(), prompt+" - are you sure you wish to delete this group?") {
+		return util.UserRequestedExit{}
+	}
+	return nil
+}
+
+func deleteVmsInGroup(c *app.Context, name *lib.GroupName, group *brain.Group) error {
 	log.Log("", "")
 	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
 	for _, vm := range group.VirtualMachines {

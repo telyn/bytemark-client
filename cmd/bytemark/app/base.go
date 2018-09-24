@@ -45,3 +45,10 @@ func SetClientAndConfig(app *cli.App, client lib.Client, config config.Manager) 
 	app.Metadata["config"] = config
 	app.Metadata["prompter"] = util.NewPrompter()
 }
+
+func SetPrompter(app *cli.App, prompter util.Prompter) {
+	if app.Metadata == nil {
+		app.Metadata = make(map[string]interface{})
+	}
+	app.Metadata["prompter"] = prompter
+}

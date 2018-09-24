@@ -27,11 +27,11 @@ func (e UsageDisplayedError) Error() string {
 	return e.TheProblem + "\r\n\r\nFor more information, see `bytemark help " + e.Command + "`"
 }
 
-// WontDeleteNonEmptyGroupError is returned when 'delete group' was called on a group with stuff in, without --recursive being specified
-type WontDeleteNonEmptyGroupError struct {
-	Group *lib.GroupName
+// WontDeleteGroupWithVMsError is returned when 'delete group' was called on a group with stuff in, without --recursive being specified
+type WontDeleteGroupWithVMsError struct {
+	Group lib.GroupName
 }
 
-func (e WontDeleteNonEmptyGroupError) Error() string {
+func (e WontDeleteGroupWithVMsError) Error() string {
 	return fmt.Sprintf("Group %s contains servers, will not be deleted without --recursive\r\n", e.Group)
 }
