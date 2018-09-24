@@ -244,7 +244,7 @@ func ProcessError(err error, message ...string) ExitCode {
 		case lib.NotFoundError:
 			errorMessage = err.Error()
 			exitCode = ExitCodeNotFound
-		case util.WontDeleteGroupWithVMsError:
+		case WontDeleteGroupWithVMsError:
 			errorMessage = err.Error()
 			exitCode = ExitCodeWontDeletePopulated
 		case UserRequestedExit:

@@ -19,7 +19,22 @@ func trimAllSpace(strs []string) {
 // In tests, this is a TestWriter. Otherwise it's nil for now - but might be
 // changed to the debug.log File in the future.
 func (c *Context) Debug(format string, values ...interface{}) {
-	dw, ok := c.App().Metadata["debugWriter"]
+	c.Debugf(format+"\n", values...)
+}
+
+// Log runs fmt.Fprintf on the args, outputting to the App's Writer
+func (ctx *Context) Log(format string, values ...interface{}) {
+	ctx.Logf(format+"\n", values...)
+}
+
+// LogErr runs fmt.Fprintf on the args, outputting to the App's Writer
+func (ctx *Context) LogErr(format string, values ...interface{}) {
+	ctx.LogErrf(format+"\n", values...)
+}
+
+// Debugf is the same as Debug, but does not append a \n to the format specified
+func (ctx *Context) Debugf(format string, values ...interface{}) {
+	dw, ok := ctx.App().Metadata["debugWriter"]
 	if !ok {
 		return
 	}
@@ -28,14 +43,14 @@ func (c *Context) Debug(format string, values ...interface{}) {
 	}
 }
 
-// Log runs fmt.Fprintf on the args, outputting to the App's Writer
-func (c *Context) Log(format string, values ...interface{}) {
-	_, _ = fmt.Fprintf(c.App().Writer, format+"\n", values...)
+// Logf is the same as Log, but does not append a \n to the format specified
+func (ctx *Context) Logf(format string, values ...interface{}) {
+	_, _ = fmt.Fprintf(ctx.App().Writer, format, values...)
 }
 
-// LogErr runs fmt.Fprintf on the args, outputting to the App's Writer
-func (c *Context) LogErr(format string, values ...interface{}) {
-	_, _ = fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
+// LogErrf is the same as LogErr, but does not append a \n to the format specified
+func (ctx *Context) LogErrf(format string, values ...interface{}) {
+	_, _ = fmt.Fprintf(ctx.App().ErrWriter, format, values...)
 }
 
 // OutputFormat attempts to figure out the output format needed, given the contents of the output-format config var,
