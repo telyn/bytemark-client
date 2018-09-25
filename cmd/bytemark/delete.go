@@ -7,8 +7,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -64,25 +62,6 @@ func init() {
 					return fmt.Errorf("Please include both --server and --label flags or provide --id")
 				}
 			}),
-		}, {
-			Name:      "group",
-			Usage:     "deletes the given group",
-			UsageText: "delete group [--force] [--recursive] <group name>",
-			Description: `Deletes the given group.
-If --recursive is specified, all servers in the group will be purged. Otherwise, if there are servers in the group, will return an error.`,
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "recursive",
-					Usage: "If set, all servers in the group will be irrevocably deleted.",
-				},
-				cli.GenericFlag{
-					Name:  "group",
-					Usage: "the name of the group to delete",
-					Value: new(app.GroupNameFlag),
-				},
-				forceFlag,
-			},
-			Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Group("group"), deleteGroup),
 		}, {
 			Name:        "key",
 			Usage:       "deletes the specified key",
@@ -191,72 +170,6 @@ func deleteServer(c *app.Context) (err error) {
 	return
 }
 
-func countRunning(group *brain.Group) (running int) {
-	for _, vm := range group.VirtualMachines {
-		if vm.PowerOn {
-			running++
-		}
-	}
-	return running
-}
-
-func deleteGroup(c *app.Context) (err error) {
-	recursive := c.Bool("recursive")
-	groupName := c.GroupName("group")
-	if len(c.Group.VirtualMachines) > 0 && recursive {
-		prompt := fmt.Sprintf("The group '%s' has %d servers in it which will be irrevocably deleted", c.Group.Name, len(c.Group.VirtualMachines))
-		running := countRunning(c.Group)
-		if running != 0 {
-			stopped := len(c.Group.VirtualMachines) - running
-			andStopped := ""
-			if stopped > 0 {
-				andStopped = fmt.Sprintf("and %d stopped ", stopped)
-			}
-			prompt = fmt.Sprintf("The group '%s' has %d currently-running %sservers in it which will be forcibly stopped and irrevocably deleted", c.Group.Name, running, andStopped)
-		}
-
-		if !c.Bool("force") && !util.PromptYesNo(c.Prompter(), prompt+" - are you sure you wish to delete this group?") {
-			return util.UserRequestedExit{}
-		}
-		err = recursiveDeleteGroup(c, &groupName, c.Group)
-		if err != nil {
-			return
-		}
-	} else if !recursive {
-		err = &util.WontDeleteNonEmptyGroupError{Group: &groupName}
-		return
-	}
-	err = c.Client().DeleteGroup(groupName)
-	if err == nil {
-		log.Logf("Group %s deleted successfully.\r\n", groupName.String())
-	}
-	return
-}
-
-func recursiveDeleteGroup(c *app.Context, name *lib.GroupName, group *brain.Group) error {
-	log.Log("", "")
-	vmn := lib.VirtualMachineName{Group: name.Group, Account: name.Account}
-	for _, vm := range group.VirtualMachines {
-		vmn.VirtualMachine = vm.Name
-		err := c.Client().DeleteVirtualMachine(vmn, true)
-		if err != nil {
-			return err
-		}
-		log.Logf("%s\r\n", vm.Name)
-
-	}
-	log.Log()
-	return nil
-}
-
-/*log.Log("usage: bytemark delete account <account>")
-	log.Log("       bytemark delete disc <server> <label>")
-	log.Log("       bytemark delete group [--recursive] <group>")
-	//log.Log("       bytemark delete user <user>")
-	log.Log("       bytemark delete key [--user=<user>] <public key identifier>")
-	log.Log("       bytemark delete server [--force] [---purge] <server>")
-	log.Log("       bytemark undelete server <server>")
-}*/
 func deleteBackup(c *app.Context) (err error) {
 	err = c.Client().DeleteBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
 	if err != nil {

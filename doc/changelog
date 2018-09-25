@@ -8,6 +8,9 @@ bytemark-client (3.3) UNRELEASED; urgency=low
   * The .tar.gz files available on repo.bytemark.co.uk are now gzipped and not
     merely pretending to be.
 
+  ## Fixes:
+  * The `--recursive` flag is no longer required to delete non-empty groups.
+
  -- Hannah Pirie <hannah.pirie@bytemark.co.uk>  Tue, 21 Aug 2018 16:39:43 +0100
 
 bytemark-client (3.2) UNRELEASED; urgency=low

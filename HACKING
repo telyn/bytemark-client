@@ -2,14 +2,14 @@ How to hack on bytemark-client
 ==============================
 
 bytemark-client is a big go project with a lot of code (>  20,000 SLOC at last
-count) and a lot of packages. It's divided up into two main big chunks - 
+count) and a lot of packages. It's divided up into two main big chunks -
 the command-line client in cmd/bytemark, and the API client library in lib.
 
 The API client library is based around go's built-in http package with very
 little exciting about it. We have an interface called PrettyPrinter which all
 of our wire types implement, and is used by the command-line client for output.
 
-The command-line client is based around github.com/urfave/cli - it's very 
+The command-line client is based around github.com/urfave/cli - it's very
 useful to understand urfave/cli before you start working on bytemark-client.
 In particular, focus on understanding the App and Command types within it.
 
@@ -24,7 +24,7 @@ client:
    compile slices of cli.Commands in the commands/* packages and cmd/bytemark.
 2. cmd/bytemark.main() is run, which runs some other functions in
    cmd/bytemark to set up a cmd/bytemark/config.Manager and flag.FlagSet
-3. cmd/bytemark.main combines the commands slices together, with 
+3. cmd/bytemark.main combines the commands slices together, with
    cmd/bytemark/commands/admin if the --admin flag is set, then creates a
    urfave/cli.App using cmd/bytemark/app.BaseAppSetup
 4. cmd/bytemark.main creates a new lib.Client, then attaches that and the
@@ -34,7 +34,7 @@ client:
 6. Most command actions are made using cmd/bytemark/app.Action, chaining together
    functions from cmd/bytemark/app/args and cmd/bytemark/app/with - which are
    used to collect and parse data from the command line and to get data from the
-   API. 
+   API.
 7. The final function in the command's Action chain then performs whatever task
    the purpose of the command is.
 8. Any errors in the cmd/bytemark/app.Action chain bubble back up through the
@@ -56,11 +56,11 @@ Action: app.Action(args.Optional("account"), with.Account("account"), func(c *ap
 	return c.OutputInDesiredForm(c.Account)
 }),
 
-app.Action returns a `func(c *cli.Context) error`, and takes 
+app.Action returns a `func(c *cli.Context) error`, and takes
 `(func(c *app.Context) error)...` as arguments. The function returned by
 app.Action wraps the cli.Context in an app.Context, then executes each function
 in order, stopping at the first error. args.Optional("account") reads the next
-command line argument if there is one and sets the flag named "account" with 
+command line argument if there is one and sets the flag named "account" with
 it. with.Account("account") takes the "account" flag and attaches it to the
 app.Context which is being passed to each of the providers - this sets c.Account
 which is then used by the final function in this chain, which runs
@@ -68,7 +68,7 @@ c.OutputInDesiredForm.
 
 app.Context.OutputInDesiredForm is a complicated function which looks at the
 --output-type global flag to determine how to output the account, and then does
-so. 
+so.
 
 ==============
 Code overview
@@ -79,10 +79,12 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 .
 ├── cmd - empty package
 │   └── bytemark - the main package - glue code to stick the commands together
-│       │          and run an app
+│       │          and run an app. At time of writing, still also contains some
+│       │          implementations of commands which ought to be refactored into
+│       │          the commands subfolder.
 │       ├── app - setup functions for our cliApp
 │       │   │      github.com/urfave/cli, plus our Context which is full of
-│       │   │      useful methods for dealing with flags & output 
+│       │   │      useful methods for dealing with flags & output
 │       │   ├── args - functions for chaining together using app.Action to parse
 │       │   │          arguments into flags
 │       │   ├── auth - Authentication routine for the client, called via
@@ -90,24 +92,24 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   ├── flags - common flags
 │       │   ├── wait - functions which wait for a condition to be true before
 │       │   │          returning
-│       │   └── with - functions for chaining together using app.Action to attach
-│       │                       things to the Context by parsing flag values.
+│       │   └── with - functions for chaining together using app.Action to
+│       │              attach things to the Context by parsing flag values.
 │       ├── cliutil - workarounds for deficiencies in urfave/cli
-│       ├── commands - top-level command skeletons and those which contain no
-│       │   │          subcommands or only one subcommand
+│       ├── commands - contains implementations for all commands, either
+│       │   │          directly for commands with no subcommands, or indirectly
+│       │   │          through its subpackages for commands with subcommands
+│       │   ├── add - implementations of all the "add X" commands
 │       │   ├── admin - contains all the admin commands in admin.Commands
-│       │   │   ├── add - contains all the admin add commands for adding resources
-│       │   │   │          that only an admin would have permission to do
+│       │   │   ├── add - contains all the admin add commands for adding
+│       │   │   │         resources that only an admin would have permission to
 │       │   │   └── show - contains admin show commands
-│       │   ├── add - contains commands for adding or creating extra resources to
-│       │   │         and within your bytemark account.
+│       │   ├── delete - implementations of all the "delete X" commands
 │       │   ├── image - common imaging code shared between commands when either
 │       │   │           reimaging or creating a server
-│       │   ├── show - commands for extracting information from bytemark and
-│       │   │          displaying it in human-readable or JSON formats
-│       │   └── update - contains all the update commands
+│       │   ├── show - implementations of all the "show X" commands
+│       │   └── update - implementations of all the "update X" commands
 │       ├── config - manages configuration from the environment, global flags
-│       │            and config dir. 
+│       │            and config dir.
 │       ├── testutil - helpers for cmd/bytemark tests
 │       └── util - various utilities which should be their own packages.
 │           │      including: CallBrowser - a function for opening a browser
@@ -117,7 +119,7 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │           │                 Some additional parsing functions and flag types
 │           │                 that don't require access to an app.Context
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
-├── doc - folder of documentation stuff. 
+├── doc - folder of documentation stuff.
 │         Also includes the manpage source (bytemark.asciidoc)
 ├── gen - scripts to aid the building/distributing process.
 │         changelog.
@@ -131,9 +133,9 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │   │   │        other types in lib.
 │   │   │        DefaultFieldsHaver interface defined and tested-for here
 │   │   │        (required for table & list output types)
-│   │   └── prettyprint - PrettyPrinter interface and a helper function for 
+│   │   └── prettyprint - PrettyPrinter interface and a helper function for
 │   │                     writing PrettyPrinters
-│   │                     All the types in lib/billing, lib/brain and lib/spp 
+│   │                     All the types in lib/billing, lib/brain and lib/spp
 │   │                     should implement PrettyPrinter
 │   ├── requests - empty package
 │   │   ├── billing - functions that make requests against the billing endpoint
@@ -167,7 +169,7 @@ Here's a probably-not-comprehensive description of the quality tests that are
 performed:
 
 lib/interface_test.go ensures that the lib.Client interface doesn't have any
-new methods added to it. 
+new methods added to it.
 
 lib/output/types_test.go generates a test from lib/output/types_test.go.inc and
 runs it. This test ensures that all types in lib/brain, lib/billing and lib/spp
@@ -191,7 +193,7 @@ Between 2.x and 3.0 we split out a lot of the utility-functions from
 cmd/bytemark to allow it to be split up. We also declared a moratorium on
 adding more methods to the lib.Client interface and cleaned up the tests to
 allow requests to be written in any package. See the 'update
-billing-definition' command in update.go and the UpdateDefinition and 
+billing-definition' command in update.go and the UpdateDefinition and
 GetDefinition functions in lib/requests/billing, and the tests for those, for
 examples on how to structure code in this new way.
 
@@ -222,4 +224,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: e3961b39d1266a224a231b96839ee6a8f85f58511cbf2591c0aae99eff310bdb
+# sha256sum: befe22d7cff8c14af43f2dd901572aef94f6b6d2349d276147f8bbfe039af0c4

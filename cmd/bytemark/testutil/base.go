@@ -71,7 +71,7 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (conf *mock
 }
 
 // fixCommandFullName ensures that Command.FullName works for all commands in the slice.
-// see the comment inside for the
+// see the comment inside for the reasoning behind it
 func fixCommandFullName(cliapp *cli.App, commands []cli.Command) {
 	// discard output during this setup
 	oldWriter := cliapp.Writer

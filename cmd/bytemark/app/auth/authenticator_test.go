@@ -140,7 +140,7 @@ func stubClientAuth(t *testing.T, state *int, c *mocks.Client, input authInput, 
 	})
 }
 
-func stubPromptResponses(t *testing.T, counter *int, prompter *testPrompter, resp []string) {
+func stubPromptResponses(t *testing.T, counter *int, prompter *mocks.Prompter, resp []string) {
 	nextResponse := func() string {
 		if *counter == len(resp) {
 			t.Fatal("ran out of prompt responses")
@@ -1213,7 +1213,7 @@ func TestAuthenticate(t *testing.T) {
 
 			fmt.Println("attempting authentication")
 
-			prompter := testPrompter{}
+			prompter := mocks.Prompter{}
 			promptCounter := 0
 			stubPromptResponses(t, &promptCounter, &prompter, test.input.promptResponses)
 
