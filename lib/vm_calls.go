@@ -48,7 +48,11 @@ func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.Virtua
 // DeleteVirtualMachine deletes the named virtual machine.
 // returns nil on success or an error otherwise.
 func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge bool) (err error) {
-	err = c.EnsureVirtualMachineName(&name)
+	name, err = c.CheckVMPather(name)
+	if err != nil {
+		return err
+	}
+	path, err := name.VirtualMachinePath()
 	if err != nil {
 		return err
 	}
@@ -56,7 +60,7 @@ func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge boo
 	if purge {
 		purgePart = "?purge=true"
 	}
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s"+purgePart, name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, path+purgePart)
 	if err != nil {
 		return err
 	}

@@ -66,6 +66,14 @@ type Client interface {
 	// same length as the number of %s in your path :-)
 	BuildRequest(method string, endpoint Endpoint,
 		path string, parts ...string) (Request, error)
+	// BuildAccountRequest creates an authenticated request for the given (brain) Account
+	BuildAccountRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
+	// BuildDiscRequest creates an authenticate request for the given disc
+	BuildDiscRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
+	// BuildGroupRequest creates an authenticate request for the given group
+	BuildGroupRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
+	// BuildVirtualMachineRequest creates an authenticate request for the given virtual machine
+	BuildVirtualMachineRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
 
 	///////////////////////
 	////// SPP STUFF //////

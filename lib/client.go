@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	auth3 "gitlab.bytemark.co.uk/auth/client"
 )
@@ -120,20 +121,24 @@ func (c *bytemarkClient) AllowInsecureRequests() {
 	c.allowInsecure = true
 }
 
-func (c *bytemarkClient) EnsureVirtualMachineName(vm *VirtualMachineName) error {
-	if vm.Account == "" {
-		if err := c.EnsureAccountName(&vm.Account); err != nil {
-			return err
+func (c *bytemarkClient) CheckVMPather(vmPather brain.VirtualMachinePather) (brain.VirtualMachinePather, error) {
+	if vm, ok := vmPather.(VirtualMachineName); ok {
+		if vm.Account == "" {
+			acc, err := c.CheckAccountPather(brain.AccountName(vm.Account))
+			vm.Account = acc
+			if err != nil {
+				return vm, err
+			}
 		}
-	}
-	if vm.Group == "" {
-		vm.Group = DefaultGroup
-	}
+		if vm.Group == "" {
+			vm.Group = DefaultGroup
+		}
 
-	if vm.VirtualMachine == "" {
-		return BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+		if vm.VirtualMachine == "" {
+			return vm, BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
+		}
+		return vm, nil
 	}
-	return nil
 }
 
 func (c *bytemarkClient) EnsureGroupName(group *GroupName) error {
@@ -148,33 +153,35 @@ func (c *bytemarkClient) EnsureGroupName(group *GroupName) error {
 	return nil
 }
 
-func (c *bytemarkClient) EnsureAccountName(account *string) error {
-	if *account == "" && c.authSession != nil {
-		log.Debug(log.LvlArgs, "validateAccountName called with empty name and a valid auth session - will try to figure out the default by talking to APIs.")
-		if c.urls.Billing == "" {
-			log.Debug(log.LvlArgs, "validateAccountName - there's no Billing endpoint, so we're most likely on a cluster devoid of bmbilling. Requesting account list from bigv...")
-			brainAccs, err := c.getBrainAccounts()
-			if err != nil {
-				return err
-			}
-			log.Debugf(log.LvlArgs, "validateAccountName found %d accounts\r\n", len(brainAccs))
-			if len(brainAccs) > 0 {
-				log.Debugf(log.LvlArgs, "validateAccountName using the first account returned from bigv (%s) as the default\r\n", brainAccs[0].Name)
-				*account = brainAccs[0].Name
-			}
-		} else {
-			log.Debug(log.LvlArgs, "validateAccountName finding the default billing account")
-			billAcc, err := c.getDefaultBillingAccount()
-			if err == nil && billAcc.IsValid() {
-				log.Debugf(log.LvlArgs, "validateAccountName found the default billing account - %s\r\n", billAcc.Name)
-				*account = billAcc.Name
-			} else if err != nil {
-				return err
+func (c *bytemarkClient) CheckAccountPather(accountPather brain.AccountPather) (brain.AccountPather, error) {
+	if account, ok = accountPather.(string); ok {
+		if account == "" && c.authSession != nil {
+			log.Debug(log.LvlArgs, "CheckAccountPather called with empty name and a valid auth session - will try to figure out the default by talking to APIs.")
+			if c.urls.Billing == "" {
+				log.Debug(log.LvlArgs, "CheckAccountPather - there's no Billing endpoint, so we're most likely on a cluster devoid of bmbilling. Requesting account list from bigv...")
+				brainAccs, err := c.getBrainAccounts()
+				if err != nil {
+					return err
+				}
+				log.Debugf(log.LvlArgs, "CheckAccountPather found %d accounts\r\n", len(brainAccs))
+				if len(brainAccs) > 0 {
+					log.Debugf(log.LvlArgs, "CheckAccountPather using the first account returned from bigv (%s) as the default\r\n", brainAccs[0].Name)
+					account = brainAccs[0].Name
+				}
+			} else {
+				log.Debug(log.LvlArgs, "CheckAccountPather finding the default billing account")
+				billAcc, err := c.getDefaultBillingAccount()
+				if err == nil && billAcc.IsValid() {
+					log.Debugf(log.LvlArgs, "CheckAccountPather found the default billing account - %s\r\n", billAcc.Name)
+					account = billAcc.Name
+				} else if err != nil {
+					return nil, err
+				}
 			}
 		}
+		if account == "" {
+			return nil, NoDefaultAccountError{}
+		}
+		return brain.AccountName(account), nil
 	}
-	if *account == "" {
-		return NoDefaultAccountError{}
-	}
-	return nil
 }

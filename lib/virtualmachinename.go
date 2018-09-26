@@ -33,7 +33,7 @@ func (vm VirtualMachineName) GroupName() GroupName {
 // Path returns the URL path for this VM, if possible.
 // If the VM is not full specified (i.e. does not have an account, group and
 // name), it instead returns an error.
-func (vm VirtualMachineName) Path() (string, error) {
+func (vm VirtualMachineName) VirtualMachinePath() (string, error) {
 	if vm.VirtualMachine == "" || vm.Group == "" || vm.Account == "" {
 		return "", fmt.Errorf("Server %q was not fully specified so cannot make a URL", vm)
 	}

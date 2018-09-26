@@ -5,39 +5,13 @@ import (
 	"fmt"
 	"go/importer"
 	gotypes "go/types"
-	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
 
 func main() {
-	outputFile := flag.String("o", "-", "File to output to. Blank or - for stdin")
-	templateFile := flag.String("t", "", "File to use as template for sprintf. if blank, just list the types")
 	fmtStr := flag.String("f", "%s", "Format string to use on each type before sending to the template")
-
-	flag.Parse()
-	var err error
-
-	tmpl := "%s"
-	if *templateFile != "" {
-		var bytes []byte
-		bytes, err = ioutil.ReadFile(*templateFile)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		tmpl = string(bytes)
-	}
-
-	var wr io.WriteCloser = os.Stdout
-	if *outputFile != "" && *outputFile != "-" {
-		wr, err = os.Create(*outputFile)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}
+	tmpl, wr := setupGenerator()
 	importer := importer.Default()
 
 	// aaaallllrighty that's all the flag stuff outta the way
@@ -47,7 +21,7 @@ func main() {
 
 	for _, p := range flag.Args() {
 		var pkg *gotypes.Package
-		pkg, err = importer.Import(p)
+		pkg, err := importer.Import(p)
 		if err != nil {
 			fmt.Println(err)
 			hasFailed = true
@@ -68,7 +42,7 @@ func main() {
 
 	}
 
-	_, err = fmt.Fprintf(wr, tmpl, strings.Join(types, "\n"))
+	_, err := fmt.Fprintf(wr, tmpl, strings.Join(types, "\n"))
 	if err != nil {
 		fmt.Println(err)
 		hasFailed = true
@@ -81,5 +55,4 @@ func main() {
 	if hasFailed {
 		os.Exit(1)
 	}
-
 }
