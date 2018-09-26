@@ -43,6 +43,10 @@ func (b Backup) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 	return prettyprint.Run(wr, backupTpl, "backup"+string(detail), b)
 }
 
+func (b Backup) DiscPath() (string, error) {
+	return DiscID(b.ParentDiscID).DiscPath()
+}
+
 // Backups represents a collection of backups
 type Backups []Backup
 

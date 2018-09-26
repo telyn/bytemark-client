@@ -113,6 +113,6 @@ func (ds Discs) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error 
 	return prettyprint.Run(wr, discsTpl, "discs"+string(detail), ds)
 }
 
-func (d Disc) Path() (string, error) {
-	return DiscID(d.ID).Path()
+func (d Disc) DiscPath() (string, error) {
+	return DiscID(d.ID).DiscPath()
 }

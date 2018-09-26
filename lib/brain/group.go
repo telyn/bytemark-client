@@ -54,6 +54,14 @@ func (g Group) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	return prettyprint.Run(wr, groupTpl, "group"+string(detail), g)
 }
 
+func (g Group) AccountPath() (string, error) {
+	return AccountID(g.AccountID).AccountPath()
+}
+
+func (g Group) GroupPath() (string, error) {
+	return GroupID(g.ID).GroupPath()
+}
+
 // String formats the Group as a string - a single line in a human-readable form.
 func (g Group) String() string {
 	return fmt.Sprintf("group %d %q - has %d servers", g.ID, g.Name, len(g.VirtualMachines))
@@ -81,8 +89,4 @@ func (gs Groups) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 {{ define "groups_full" }}{{ template "groups_medium" . }}{{ end }}
 `
 	return prettyprint.Run(wr, groupsTpl, "groups"+string(detail), gs)
-}
-
-func (g Group) Path() (string, error) {
-	return GroupID(g.ID).Path()
 }

@@ -186,7 +186,13 @@ func (vm VirtualMachine) PrimaryIP() net.IP {
 	return nil
 }
 
-// Path returns a path to access more resources for this VM
-func (vm VirtualMachine) Path() (string, error) {
-	return VirtualMachineID(vm.ID).Path()
+// VirtualMachinePath returns a URL path for brain endpoints for this VM
+func (vm VirtualMachine) VirtualMachinePath() (string, error) {
+	return VirtualMachineID(vm.ID).VirtualMachinePath()
+}
+
+// GroupPath returns a URL path for brain endpoints for the group this VM
+// belongs to
+func (vm VirtualMachine) GroupPath() (string, error) {
+	return GroupID(vm.GroupID).GroupPath()
 }

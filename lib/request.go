@@ -75,26 +75,6 @@ func (r *internalRequest) GetURL() url.URL {
 	return *r.url
 }
 
-// BuildRequestWithPather creates a new Request that will be authenticated for
-// the given Pather object.
-// suffixParts are a collection of url parts that will be separated with
-// forward slashes and appended to the URL
-func (c *bytemarkClient) BuildRequestWithPather(method string, endpoint Endpoint, pather Pather, suffixParts ...string) (r Request, err error) {
-	path, err := pather.Path()
-	if err != nil {
-		return
-	}
-	return c.BuildCustomRequest(method, endpoint, path+strings.Join(suffixParts, "/"))
-}
-
-func (c *bytemarkClient) BuildCustomRequest(method string, endpoint Endpoint, path string, parts ...string) (r Request, err error) {
-	return c.BuildRequest(method, endpoint, path, parts...)
-}
-
-func (c *bytemarkClient) BuildCustomRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r Request, err error) {
-	return c.BuildRequestNoAuth(method, endpoint, path, parts...)
-}
-
 // BuildRequestNoAuth creates a new Request with the intention of not authenticating.
 func (c *bytemarkClient) BuildRequestNoAuth(method string, endpoint Endpoint, path string, parts ...string) (r Request, err error) {
 	url, err := c.BuildURL(endpoint, path, parts...)

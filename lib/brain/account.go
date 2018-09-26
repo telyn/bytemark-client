@@ -47,6 +47,6 @@ func (a Account) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error
 	return prettyprint.Run(wr, accountTpl, "account"+string(detail), a)
 }
 
-func (a Account) Path() (string, error) {
-	return AccountID(a.ID).Path()
+func (a Account) AccountPath() (string, error) {
+	return AccountID(a.ID).AccountPath()
 }
