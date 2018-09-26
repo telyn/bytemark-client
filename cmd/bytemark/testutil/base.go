@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
+	"regexp"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
@@ -13,7 +14,9 @@ import (
 	"github.com/urfave/cli"
 )
 
-// GetBuf returns the buffer in app's metadata, or an error if there isn't one.
+// GetBuf returns the captured output buffer for the given app.
+// Use this in your tests to find out if your command's output is correct.
+// TODO: add an example
 func GetBuf(app *cli.App) (buf *bytes.Buffer, err error) {
 	if bufInterface, ok := app.Metadata["buf"]; ok {
 		if buf, ok = bufInterface.(*bytes.Buffer); ok {
@@ -26,11 +29,9 @@ func GetBuf(app *cli.App) (buf *bytes.Buffer, err error) {
 	return
 }
 
-// AssertOutput fails the test unless the app under test has output the
-// expected string. identifier is a string used to identify the test - usually
-// the function name of the test, plus some integer for the index of the test
-// in the test-table. See show_test.go's TestShowAccountCommand for example usage
-func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string) {
+// AssertOutput fails the test unless the app under test has output exactly the
+// expected string.
+func AssertOutput(t *testing.T, app *cli.App, expected string) {
 	buf, err := GetBuf(app)
 
 	if err == nil {
@@ -40,6 +41,20 @@ func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string
 		}
 	} else {
 		t.Error("Couldn't recover the buffer - use BaseTestSetup to create your cli.Apps!")
+	}
+}
+
+// AssertOutputMatch fails the test unless the app under test has produced
+// output which matches the supplied regex.
+func AssertOutputMatch(t *testing.T, app *cli.App, expected regexp.Regexp) {
+	buf, err := GetBuf(app)
+
+	if err != nil {
+		t.Errorf("Couldn't recover the buffer - use BaseTestSetup to create your cli.Apps")
+		return
+	}
+	if !expected.Match(buf.Bytes()) {
+		return
 	}
 }
 
