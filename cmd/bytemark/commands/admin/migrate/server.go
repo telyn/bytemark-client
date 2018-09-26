@@ -4,7 +4,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -27,16 +26,20 @@ func init() {
 			},
 		},
 		Action: app.Action(args.Optional("server", "new-head"), with.RequiredFlags("server"), with.Auth, func(ctx *app.Context) (err error) {
-			vm := ctx.VirtualMachineName("server")
+			vmName := ctx.VirtualMachineName("server")
 			head := ctx.String("new-head")
 
-			if err := ctx.Client().MigrateVirtualMachine(vm, head); err != nil {
-				return err
+			vm, err := ctx.Client().GetVirtualMachine(vmName)
+			if err != nil {
+				return
 			}
 
-			log.Outputf("Migration for server %s initiated\n", vm.String())
+			if err = ctx.Client().MigrateVirtualMachine(vmName, head); err != nil {
+				return
+			}
 
-			return nil
+			ctx.Log("Migration for server %s initiated", vm.Hostname)
+			return
 		}),
 	})
 }
