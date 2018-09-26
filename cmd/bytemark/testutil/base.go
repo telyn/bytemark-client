@@ -46,7 +46,7 @@ func AssertOutput(t *testing.T, app *cli.App, expected string) {
 
 // AssertOutputMatch fails the test unless the app under test has produced
 // output which matches the supplied regex.
-func AssertOutputMatch(t *testing.T, app *cli.App, expected regexp.Regexp) {
+func AssertOutputMatch(t *testing.T, app *cli.App, expected *regexp.Regexp) {
 	buf, err := GetBuf(app)
 
 	if err != nil {
