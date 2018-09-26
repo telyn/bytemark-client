@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 
@@ -29,6 +30,8 @@ type CommandT struct {
 	// Commands are the command set to use in the app. TODO: should I default to
 	// main.Commands(Admin)?
 	Commands []cli.Command
+	// OutputMustMatch are the regexes the output must match
+	OutputMustMatch []*regexp.Regexp
 }
 
 // Run runs the test. Before setup, it calls t.Run to make a subtest and sets up
@@ -56,6 +59,10 @@ func (test CommandT) Run(t *testing.T, setup func(*testing.T, *mocks.Config, *mo
 		}
 		if ok, err := client.Verify(); !ok {
 			t.Error(err)
+		}
+
+		for _, regex := range test.OutputMustMatch {
+			AssertOutputMatches(t, app, regex)
 		}
 	})
 }
