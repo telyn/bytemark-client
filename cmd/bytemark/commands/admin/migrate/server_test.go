@@ -75,7 +75,7 @@ func TestMigrateServer(t *testing.T) {
 				// of the vm returned from GetVirtualMachineName below - in
 				// other words, the 'real' name of the VM that the user wanted
 				// to migrate.
-				regexp.MustCompile("real\\.cool\\.vm"),
+				regexp.MustCompile(`real\.cool\.vm`),
 			}
 		}
 		ct.Run(t, func(t *testing.T, config *mocks.Config, client *mocks.Client, app *cli.App) {
