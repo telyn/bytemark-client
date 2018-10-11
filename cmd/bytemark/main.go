@@ -85,6 +85,7 @@ func main() {
 		os.Exit(int(util.ProcessError(err)))
 	}
 	client.SetDebugLevel(config.GetDebugLevel())
+	setInsecure(client, config)
 
 	bmapp.SetClientAndConfig(app, client, config)
 
@@ -93,6 +94,12 @@ func main() {
 	err = app.Run(args)
 
 	os.Exit(int(util.ProcessError(err)))
+}
+
+func setInsecure(client lib.Client, config config.Manager) {
+	if b, err := config.GetBool("insecure"); err == nil && b {
+		client.AllowInsecureRequests()
+	}
 }
 
 func outputDebugInfo(config config.Manager) {
@@ -170,6 +177,7 @@ func prepConfig() (flags []cli.Flag, args []string, conf config.Manager) {
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
+
 	configDir := flagset.Lookup("config-dir").Value.String()
 	conf, err = config.New(configDir)
 	if err != nil {

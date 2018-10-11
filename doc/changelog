@@ -1,3 +1,36 @@
+bytemark-client (3.3) UNRELEASED; urgency=low
+
+  ### New Admin Features:
+  * `show dependant servers` command for viewing servers on a head, tail or
+    storage pool at a given time
+  * `show dependant discs` command for viewing discs on a head, tail or
+    storage pool at a given time
+
+  ## Fixes:
+  * The `--recursive` flag is no longer required to delete non-empty groups.
+  * `migrate server` now outputs the VM's hostname correctly when the
+    migration has been started.
+  * The .tar.gz files available on repo.bytemark.co.uk are now gzipped and not
+    merely pretending to be.
+
+ -- Hannah Pirie <hannah.pirie@bytemark.co.uk>  Tue, 21 Aug 2018 16:39:43 +0100
+
+bytemark-client (3.2) UNRELEASED; urgency=low
+
+  ### Changes:
+  * `show servers` now takes a group instead of an account by default.
+    `--account <account>` can be specified to list all servers on an account.
+  * `profiles` and `scripting` have been updated to match the 3.0+ updates.
+
+  ### Fixes:
+  * `update config --account <account>` no longer fails if a billing account
+    cannot be found for the named account (but a Bytemark Cloud account can)
+  * `--output-format` is no longer clobbered by `--table-fields`
+  * `--output-format=list` now produces a list with no lines between columns,
+    nor between the header and the body of the list
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 14 May 2018 11:31:25 +0100
+
 bytemark-client (3.1) UNRELEASED; urgency=low
 
   ### Admin changes:

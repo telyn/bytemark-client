@@ -19,6 +19,7 @@ func BaseAppSetup(flags []cli.Flag, commands []cli.Command) (app *cli.App, err e
 	app.Flags = flags
 	app.Commands = commands
 	app.EnableBashCompletion = true
+	app.Usage = "Command-line interface to Bytemark Cloud services"
 	app.Writer = io.MultiWriter(
 		log.LogFile,
 		os.Stdout,
@@ -44,4 +45,18 @@ func SetClientAndConfig(app *cli.App, client lib.Client, config config.Manager) 
 	app.Metadata["client"] = client
 	app.Metadata["config"] = config
 	app.Metadata["prompter"] = util.NewPrompter()
+}
+
+// SetPrompter sets the prompter for the given app. It does not normally need
+// to be set (as this is done for you when calling SetClientAndConfig in
+// cmd/bytemark.main() )
+// This is used by command tests such as TestDeleteGroup in
+// cmd/bytemark/commands/delete/group_test.go to allow for mocking user input.
+// See that test, or cmd/bytemark/app/auth/authenticator_test.go for example
+// usage of a mock Prompter.
+func SetPrompter(app *cli.App, prompter util.Prompter) {
+	if app.Metadata == nil {
+		app.Metadata = make(map[string]interface{})
+	}
+	app.Metadata["prompter"] = prompter
 }

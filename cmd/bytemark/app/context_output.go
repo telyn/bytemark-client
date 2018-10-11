@@ -18,31 +18,46 @@ func trimAllSpace(strs []string) {
 // Debug runs fmt.Fprintf on the args, outputting to the App's debugWriter.
 // In tests, this is a TestWriter. Otherwise it's nil for now - but might be
 // changed to the debug.log File in the future.
-func (c *Context) Debug(format string, values ...interface{}) {
-	dw, ok := c.App().Metadata["debugWriter"]
+func (ctx *Context) Debug(format string, values ...interface{}) {
+	ctx.Debugf(format+"\n", values...)
+}
+
+// Log runs fmt.Fprintf on the args, outputting to the App's Writer
+func (ctx *Context) Log(format string, values ...interface{}) {
+	ctx.Logf(format+"\n", values...)
+}
+
+// LogErr runs fmt.Fprintf on the args, outputting to the App's Writer
+func (ctx *Context) LogErr(format string, values ...interface{}) {
+	ctx.LogErrf(format+"\n", values...)
+}
+
+// Debugf is the same as Debug, but does not append a \n to the format specified
+func (ctx *Context) Debugf(format string, values ...interface{}) {
+	dw, ok := ctx.App().Metadata["debugWriter"]
 	if !ok {
 		return
 	}
 	if wr, ok := dw.(io.Writer); ok {
-		fmt.Fprintf(wr, format, values...)
+		_, _ = fmt.Fprintf(wr, format+"\n", values...)
 	}
 }
 
-// Log runs fmt.Fprintf on the args, outputting to the App's Writer
-func (c *Context) Log(format string, values ...interface{}) {
-	fmt.Fprintf(c.App().Writer, format+"\n", values...)
+// Logf is the same as Log, but does not append a \n to the format specified
+func (ctx *Context) Logf(format string, values ...interface{}) {
+	_, _ = fmt.Fprintf(ctx.App().Writer, format, values...)
 }
 
-// LogErr runs fmt.Fprintf on the args, outputting to the App's Writer
-func (c *Context) LogErr(format string, values ...interface{}) {
-	fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
+// LogErrf is the same as LogErr, but does not append a \n to the format specified
+func (ctx *Context) LogErrf(format string, values ...interface{}) {
+	_, _ = fmt.Fprintf(ctx.App().ErrWriter, format, values...)
 }
 
 // OutputFormat attempts to figure out the output format needed, given the contents of the output-format config var,
 // the json flag, and the table and table-fields flag. If there is an error reading the config, it is returned and
 // human output is assumed.
-func (c *Context) OutputFormat(defaultFormat ...output.Format) (output.Format, error) {
-	format, err := c.Config().GetV("output-format")
+func (ctx *Context) OutputFormat(defaultFormat ...output.Format) (output.Format, error) {
+	format, err := ctx.Config().GetV("output-format")
 	if err != nil {
 		return output.Human, err
 	}
@@ -50,21 +65,27 @@ func (c *Context) OutputFormat(defaultFormat ...output.Format) (output.Format, e
 		format.Value = string(defaultFormat[0])
 	}
 
-	if c.Bool("json") {
+	if ctx.Bool("json") {
 		format.Value = "json"
-	} else if c.Bool("table") || c.Context.IsSet("table-fields") {
+	} else if ctx.Bool("table") {
 		format.Value = "table"
+	} else if ctx.IsSet("table-fields") {
+		val, err := ctx.Config().GetV("output-format")
+		if err != nil || !val.SourceTypeAtLeast("FLAG") {
+			format.Value = "table"
+		}
+
 	}
 
 	return output.FormatByName(format.Value), nil
 
 }
 
-func (c *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...output.Format) (cfg output.Config, err error) {
+func (ctx *Context) createOutputConfig(obj output.DefaultFieldsHaver, defaultFormat ...output.Format) (cfg output.Config, err error) {
 	cfg = output.Config{}
-	cfg.Format, err = c.OutputFormat(defaultFormat...)
+	cfg.Format, err = ctx.OutputFormat(defaultFormat...)
 
-	cfg.Fields = strings.Split(c.String("table-fields"), ",")
+	cfg.Fields = strings.Split(ctx.String("table-fields"), ",")
 	trimAllSpace(cfg.Fields)
 
 	if len(cfg.Fields) > 0 && cfg.Fields[0] != "" {
@@ -100,13 +121,13 @@ func OutputFlags(thing string, jsonType string) []cli.Flag {
 // or as a table / table row if --table is set
 // otherwise calls humanOutputFn (which should output it in a very human form - PrettyPrint or such
 // defaultFormat is an optional string stating what the default format should be
-func (c *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...output.Format) error {
+func (ctx *Context) OutputInDesiredForm(obj output.Outputtable, defaultFormat ...output.Format) error {
 	if obj == nil {
 		return fmt.Errorf("Object passed to OutputInDesiredForm was nil")
 	}
-	cfg, err := c.createOutputConfig(obj, defaultFormat...)
+	cfg, err := ctx.createOutputConfig(obj, defaultFormat...)
 	if err != nil {
 		return err
 	}
-	return output.Write(c.App().Writer, cfg, obj)
+	return output.Write(ctx.App().Writer, cfg, obj)
 }

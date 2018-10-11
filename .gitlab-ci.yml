@@ -55,7 +55,16 @@ lint-in-anger:
     go get github.com/alecthomas/gometalinter
     gometalinter -i
     cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+    gometalinter --vendored-linters --vendor --disable-all --skip=mocks \
+      --enable errcheck \
+      --enable goconst \
+      --enable goimports \
+      --enable golint \
+      --enable gosimple \
+      --enable ineffassign \
+      --enable varcheck \
+      --enable vetshadow \
+      --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
   allow_failure: false
 
 # the vet linter in gometalinter doesn't seem as reliable, so we keep it as a separate job
@@ -263,7 +272,7 @@ package-generic-amd64:
           mv bytemark bytemark.exe
           zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog.txt doc/LICENSE.txt
       else
-          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
+          tar czf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
       fi
     done
   dependencies:
@@ -324,7 +333,7 @@ package-rpm-amd64:
 # makes a chocolatey package
 package-windows-amd64:
     <<: *package
-    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
+    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:master
     script:
     - mkdir -p choco/tools
       # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
@@ -342,7 +351,7 @@ package-windows-amd64:
     - echo -en "sha256 utility to hash the file.\r\n\r\n" >> VERIFICATION.txt
     - sha256sum bytemark.exe >> VERIFICATION.txt
     - cd .. # back to choco/
-    - mono /usr/bin/choco.exe pack bytemark-client.nuspec
+    - choco pack bytemark-client.nuspec
     - cd .. # back to bytemark-client
     - mv choco/*.nupkg .
     artifacts:
@@ -430,12 +439,12 @@ release-to-repo:
 # pushes the chocolate package to chocolatey.
 release-to-chocolatey:
   <<: *release
-  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
+  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:master
   before_script:
   - VERSION=${CI_BUILD_REF_NAME##v}
-  - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
+  - choco apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
-  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
+  - choco push bytemark.$VERSION.nupkg -acceptLicense -y
   dependencies:
   - package-windows-amd64
 
