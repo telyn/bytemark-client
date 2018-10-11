@@ -146,7 +146,7 @@ func TestShowAccount(t *testing.T) {
 				t.Errorf("TestShowAccountCommand %d client failed to verify: %s", i, vErr.Error())
 			}
 			if expected, ok := expectedOutput[format]; ok {
-				testutil.AssertOutput(t, fmt.Sprintf("TestShowAccountCommand %d (%s)", i, format), app, expected)
+				testutil.AssertOutput(t, app, expected)
 			} else {
 				buf, err := testutil.GetBuf(app)
 				if err != nil {

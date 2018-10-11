@@ -5,6 +5,11 @@ bytemark-client (3.3) UNRELEASED; urgency=low
     storage pool at a given time
   * `show dependant discs` command for viewing discs on a head, tail or
     storage pool at a given time
+
+  ## Fixes:
+  * The `--recursive` flag is no longer required to delete non-empty groups.
+  * `migrate server` now outputs the VM's hostname correctly when the
+    migration has been started.
   * The .tar.gz files available on repo.bytemark.co.uk are now gzipped and not
     merely pretending to be.
 

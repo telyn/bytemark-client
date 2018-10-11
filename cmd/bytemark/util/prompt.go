@@ -16,7 +16,7 @@ func PromptfValidate(p Prompter, valid func(string) (bool, string), prompt strin
 	ok := false
 
 	for !ok {
-		input = Promptf(p, prompt, values)
+		input = Promptf(p, prompt, values...)
 		ok, input = valid(input)
 	}
 	return input
