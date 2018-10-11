@@ -368,7 +368,7 @@ func TestGetStoragePools(t *testing.T) {
 	testStoragePools := brain.StoragePools{
 		{
 			Label:           "swimming-pool",
-			Zone:            "frozone",
+			ZoneName:        "frozone",
 			Size:            244500,
 			FreeSpace:       43355,
 			AllocatedSpace:  20000,
@@ -379,7 +379,7 @@ func TestGetStoragePools(t *testing.T) {
 			Note:            "probably best to avoid using this one",
 		}, {
 			Label:           "useful-pool",
-			Zone:            "serious-zone",
+			ZoneName:        "serious-zone",
 			Size:            244500000,
 			FreeSpace:       43355000,
 			AllocatedSpace:  20000000,
@@ -398,7 +398,7 @@ func TestGetStoragePools(t *testing.T) {
 func TestGetStoragePool(t *testing.T) {
 	testStoragePool := brain.StoragePool{
 		Label:           "useful-pool",
-		Zone:            "serious-zone",
+		ZoneName:        "serious-zone",
 		Size:            244500000,
 		FreeSpace:       43355000,
 		AllocatedSpace:  20000000,
@@ -510,12 +510,6 @@ func TestPostMigrateVirtualMachineInvalidVirtualMachineName(t *testing.T) {
 	})
 }
 
-func TestPostReapVMs(t *testing.T) {
-	simplePostTest(t, "/admin/reap_vms", "", func(client lib.Client) error {
-		return client.ReapVMs()
-	})
-}
-
 func TestDeleteVLAN(t *testing.T) {
 	simpleDeleteTest(t, "/admin/vlans/123", func(client lib.Client) error {
 		return client.DeleteVLAN(123)
@@ -561,33 +555,6 @@ func TestPostEmptyStoragePool(t *testing.T) {
 func TestPostEmptyHead(t *testing.T) {
 	simplePostTest(t, "/admin/heads/head1/empty", ``, func(client lib.Client) error {
 		return client.EmptyHead("head1")
-	})
-}
-
-func TestPostReifyDisc(t *testing.T) {
-	simplePostTest(t, "/admin/discs/1231/reify", ``, func(client lib.Client) error {
-		return client.ReifyDisc(1231)
-	})
-}
-
-func TestPostApproveVM(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/134/approve", &brain.VirtualMachine{ID: 134}, `{}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.ApproveVM(vmName, false)
-	})
-}
-
-func TestPostApproveVMAndPowerOn(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/145/approve", &brain.VirtualMachine{ID: 145}, `{"power_on":true}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.ApproveVM(vmName, true)
-	})
-}
-
-func TestPostRejectVM(t *testing.T) {
-	testPostVirtualMachine(t, "/admin/vms/139/reject", &brain.VirtualMachine{ID: 139}, `{"reason":"do not like the name"}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
-		return client.RejectVM(vmName, "do not like the name")
 	})
 }
 
@@ -685,22 +652,22 @@ func TestPostUpdateTail(t *testing.T) {
 
 func TestPostUpdateStoragePool(t *testing.T) {
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":"empty"}`, func(client lib.Client) error {
-		v := "empty"
-		return client.UpdateStoragePool("t3-sata1", lib.UpdateStoragePool{UsageStrategy: &v})
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{UsageStrategy: "empty"})
 	})
 
-	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":null}`, func(client lib.Client) error {
-		v := ""
-		return client.UpdateStoragePool("t3-sata1", lib.UpdateStoragePool{UsageStrategy: &v})
+	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"usage_strategy":"default"}`, func(client lib.Client) error {
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{UsageStrategy: "default"})
+	})
+
+	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"migration_concurrency":5}`, func(client lib.Client) error {
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{MigrationConcurrency: 5})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"overcommit_ratio":115}`, func(client lib.Client) error {
-		v := 115
-		return client.UpdateStoragePool("t3-sata1", lib.UpdateStoragePool{OvercommitRatio: &v})
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{OvercommitRatio: 115})
 	})
 
 	simplePutTest(t, "/admin/storage_pools/t3-sata1", `{"label":"t3-sata2"}`, func(client lib.Client) error {
-		v := "t3-sata2"
-		return client.UpdateStoragePool("t3-sata1", lib.UpdateStoragePool{Label: &v})
+		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{Label: "t3-sata2"})
 	})
 }

@@ -8,7 +8,6 @@ import (
 )
 
 var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
-var defGroup = lib.GroupName{Group: "default", Account: "default-account"}
 
 func getFixtureVM() brain.VirtualMachine {
 	return brain.VirtualMachine{

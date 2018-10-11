@@ -35,7 +35,7 @@ func (spec VirtualMachineSpec) String() string {
 // TODO(telyn): rewrite using templates
 func (spec VirtualMachineSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	output := make([]string, 0, 10)
-	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.Name))
+	output = append(output, fmt.Sprintf("Name: '%s'", spec.VirtualMachine.FullName()))
 	s := ""
 	if spec.VirtualMachine.Cores > 1 {
 		s = "s"

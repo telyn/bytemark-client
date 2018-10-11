@@ -18,16 +18,6 @@ func init() {
 	cli.OsExiter = func(c int) {}
 }
 
-func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
-	if cmds == nil {
-		return
-	}
-	for _, c := range cmds {
-		fn(c)
-		traverseAllCommands(c.Subcommands, fn)
-	}
-}
-
 func getFixtureVM() brain.VirtualMachine {
 	return brain.VirtualMachine{
 		Name:     "test-server",

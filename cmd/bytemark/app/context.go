@@ -1,10 +1,10 @@
 package app
 
 import (
-	"fmt"
 	"io"
 	"net"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -61,14 +61,22 @@ func (c *Context) ErrWriter() io.Writer {
 	return c.App().ErrWriter
 }
 
+// Prompter returns the prompter which is used by this Context for prompting the user for input
+func (c *Context) Prompter() util.Prompter {
+	if prompter, ok := c.App().Metadata["prompter"].(util.Prompter); ok {
+		return prompter
+	}
+	return nil
+}
+
 // Command returns the cli.Command this context is for
 func (c *Context) Command() cli.Command {
 	return c.Context.Command()
 }
 
 // Config returns the config attached to the App this Context is for
-func (c *Context) Config() util.ConfigManager {
-	if config, ok := c.App().Metadata["config"].(util.ConfigManager); ok {
+func (c *Context) Config() config.Manager {
+	if config, ok := c.App().Metadata["config"].(config.Manager); ok {
 		return config
 	}
 	return nil
@@ -80,6 +88,16 @@ func (c *Context) Client() lib.Client {
 		return client
 	}
 	return nil
+}
+
+// IsTest returns whether this app is being run as part of a test
+// It uses the "buf" on the App's Metadata - which is added by
+// app_test.BaseTestSetup and used to capture output for later assertions
+func (c *Context) IsTest() bool {
+	if _, ok := c.App().Metadata["buf"]; ok {
+		return true
+	}
+	return false
 }
 
 // NextArg returns the next unused argument, and marks it as used.
@@ -95,6 +113,11 @@ func (c *Context) NextArg() (string, error) {
 // Help creates a UsageDisplayedError that will output the issue and a message to consult the documentation
 func (c *Context) Help(whatsyourproblem string) (err error) {
 	return util.UsageDisplayedError{TheProblem: whatsyourproblem, Command: c.Command().FullName()}
+}
+
+// IsSet returns true if the specified flag has been set.
+func (c *Context) IsSet(flagName string) bool {
+	return c.Context.IsSet(flagName)
 }
 
 // flags below
@@ -136,11 +159,9 @@ func (c *Context) FileContents(flagname string) string {
 func (c *Context) GroupName(flagname string) (gp lib.GroupName) {
 	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
 	if !ok {
-		fmt.Println("WRONGO")
 		return lib.GroupName{}
 	}
 	if gpNameFlag.GroupName == nil {
-		fmt.Println("NILO")
 		return lib.GroupName{}
 	}
 	return *gpNameFlag.GroupName
@@ -183,6 +204,14 @@ func (c *Context) String(flagname string) string {
 	return c.Context.GlobalString(flagname)
 }
 
+// StringSlice returns the values of the named flag as a []string
+func (c *Context) StringSlice(flagname string) []string {
+	if c.Context.IsSet(flagname) || c.Context.String(flagname) != "" {
+		return c.Context.StringSlice(flagname)
+	}
+	return c.Context.GlobalStringSlice(flagname)
+}
+
 // Size returns the value of the named SizeSpecFlag as an int in megabytes
 func (c *Context) Size(flagname string) int {
 	size, ok := c.Context.Generic(flagname).(*util.SizeSpecFlag)
@@ -205,11 +234,9 @@ func (c *Context) ResizeFlag(flagname string) ResizeFlag {
 func (c *Context) VirtualMachineName(flagname string) (vm lib.VirtualMachineName) {
 	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
 	if !ok {
-		fmt.Println("WRONGO")
 		return c.Config().GetVirtualMachine()
 	}
 	if vmNameFlag.VirtualMachineName == nil {
-		fmt.Println("NILO")
 		return lib.VirtualMachineName{}
 	}
 

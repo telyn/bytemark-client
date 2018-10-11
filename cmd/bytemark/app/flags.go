@@ -16,13 +16,15 @@ type Preprocesser interface {
 
 // AccountNameFlag is used for all --account flags, excluding the global one.
 type AccountNameFlag struct {
-	AccountName string
-	Value       string
+	AccountName        string
+	Value              string
+	SetFromCommandLine bool
 }
 
 // Set runs lib.ParseAccountName to make sure we get just the 'pure' account name; no cluster / endpoint details
 func (name *AccountNameFlag) Set(value string) error {
 	name.Value = value
+	name.SetFromCommandLine = true
 	return nil
 }
 

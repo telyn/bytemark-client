@@ -37,6 +37,7 @@ func (c *bytemarkClient) getBillingAccount(name string) (account billing.Account
 			return
 		}
 	}
+	account = billing.Account{}
 	err = BillingAccountNotFound(name)
 	return
 }
@@ -121,7 +122,7 @@ func (c *bytemarkClient) GetAccount(name string) (account Account, err error) {
 	if err == nil {
 		account.fillBilling(billingAccount)
 	} else {
-		// don't return on a CantFindAccountErr
+		// don't return on a BillingAccountNotFound
 		if _, ok := billErr.(BillingAccountNotFound); !ok {
 			return Account{}, billErr
 		}

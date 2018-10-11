@@ -29,12 +29,11 @@ func (c *Context) Preprocess() error {
 	if c.preprocessHasRun {
 		return nil
 	}
-	c.Debug("Preprocessing\n")
+	c.Debug("Preprocessing")
 	for _, flag := range c.Command().Flags {
 		if gf, ok := flag.(cli.GenericFlag); ok {
 			if pp, ok := gf.Value.(Preprocesser); ok {
-				c.Debug("Doing some shit to %s\n", flag.GetName())
-				c.Debug("b4: %#v ", gf.Value)
+				c.Debug("--%s b4: %#v", gf.Name, gf.Value)
 				err := pp.Preprocess(c)
 				if err != nil {
 					return err
@@ -67,6 +66,10 @@ func cleanup(c *Context) {
 	if ok {
 		*server = VirtualMachineNameFlag{}
 	}
+	server, ok = c.Context.Generic("new-name").(*VirtualMachineNameFlag)
+	if ok {
+		*server = VirtualMachineNameFlag{}
+	}
 	server, ok = c.Context.Generic("from").(*VirtualMachineNameFlag)
 	if ok {
 		*server = VirtualMachineNameFlag{}
@@ -89,7 +92,7 @@ func cleanup(c *Context) {
 // foldProviders runs all the providers with the given context, stopping if there's an error
 func foldProviders(c *Context, providers ...ProviderFunc) (err error) {
 	for i, provider := range providers {
-		c.Debug("Provider #%d (%v)n\n", i, provider)
+		c.Debug("Running provider #%d (%v)\n", i, provider)
 		err = provider(c)
 		if err != nil {
 			return

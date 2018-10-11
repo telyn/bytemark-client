@@ -12,7 +12,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "schedule",
 		Usage:     "schedule backups to occur at a regular frequency",
-		UsageText: "bytemark schedule backups [--start <date>] <server> <disc> <interval>",
+		UsageText: "schedule backups [--start <date>] <server> <disc> <interval>",
 		Description: `schedule backups to occur at a regular interval (defined in seconds)
 		
 EXAMPLES
@@ -27,7 +27,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 			{
 				Name:      "backups",
 				Usage:     "schedule backups to occur at a regular frequency",
-				UsageText: "bytemark schedule backups [--start <date>] <server> <disc> [<interval>]",
+				UsageText: "schedule backups [--start <date>] <server> <disc> [<interval>]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "start",

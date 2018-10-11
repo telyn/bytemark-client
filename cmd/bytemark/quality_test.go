@@ -9,20 +9,19 @@ package main
 import (
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/urfave/cli"
 )
 
 var destructiveCommands = [...]string{
-	"create server", // can increase cost
-	"create discs",  // can increase cost
-	"delete server", // can destroy data
-	"delete group",  // can destroy data
-	"delete disc",   // can destroy data
-	"reimage",       // can destroy data
-	"resize disc",   // can increase cost
-	"set memory",    // can increase cost
-	"set cores",     // can increase cost
-
+	// "add server",    // can increase cost
+	// "add discs",     // can increase cost
+	"delete server",  // can destroy data
+	"delete group",   // can destroy data
+	"delete disc",    // can destroy data
+	"reimage server", // can destroy data
+	"update server",  // can increase cost
+	"update disc",    // can increase cost
 }
 
 type s struct {
@@ -40,7 +39,9 @@ func TestDestructiveCommandsHaveForceFlags(t *testing.T) {
 	for _, cmd := range destructiveCommands {
 		cmds[cmd] = &s{}
 	}
-	traverseAllCommands(commands, func(c cli.Command) {
+	// BaseTestSetup (hopefully) gives us an app where FullName works for every command
+	_, _, app := testutil.BaseTestSetup(t, true, Commands(true))
+	testutil.TraverseAllCommands(app.Commands, func(c cli.Command) {
 		for _, cmd := range destructiveCommands {
 			if c.FullName() == cmd {
 				cmds[cmd].Seen = true

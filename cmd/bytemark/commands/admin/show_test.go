@@ -1,12 +1,15 @@
 package admin_test
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
 
@@ -192,22 +195,6 @@ func TestAdminShowStoragePoolCommand(t *testing.T) {
 	}
 }
 
-func TestAdminShowMigratingVMsCommand(t *testing.T) {
-	// TODO(telyn): make table-driven
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
-
-	vms := []brain.VirtualMachine{getFixtureVM()}
-	c.When("GetMigratingVMs").Return(&vms, nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark --admin show migrating vms", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
-}
-
 func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	// TODO(telyn): make table-driven
 	is := is.New(t)
@@ -224,35 +211,84 @@ func TestAdminShowMigratingDiscsCommand(t *testing.T) {
 	}
 }
 
-func TestAdminShowStoppedEligibleVMsCommand(t *testing.T) {
-	// TODO(telyn): make table-driven
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
-
-	vms := []brain.VirtualMachine{getFixtureVM()}
-	c.When("GetStoppedEligibleVMs").Return(&vms, nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark --admin show stopped eligible vms", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+func TestAdminShowMigrations(t *testing.T) {
+	tests := []struct {
+		name string
+		mjs  brain.MigrationJobs
+	}{
+		{
+			name: "NoJobs",
+			mjs:  brain.MigrationJobs{},
+		},
+		{
+			name: "OneJob",
+			mjs: brain.MigrationJobs{
+				{ID: 123},
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			is := is.New(t)
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, "/admin/migration_jobs?unfinished=1%s", []string{""}).Return(&mocks.Request{
+				T:              t,
+				StatusCode:     200,
+				ResponseObject: test.mjs,
+			}).Times(1)
+			err := app.Run(strings.Split("bytemark --admin show migrations", " "))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
 	}
 }
 
-func TestAdminShowRecentVMsCommand(t *testing.T) {
-	// TODO(telyn): make table-driven
-	is := is.New(t)
-	_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
-
-	vms := []brain.VirtualMachine{getFixtureVM()}
-	c.When("GetRecentVMs").Return(&vms, nil).Times(1)
-
-	err := app.Run(strings.Split("bytemark --admin show recent vms", " "))
-	is.Nil(err)
-
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
+func TestAdminShowMigration(t *testing.T) {
+	tests := []struct {
+		name      string
+		id        int
+		shouldErr bool
+	}{
+		{
+			name:      "MissingID",
+			shouldErr: true,
+		},
+		{
+			name: "Successful",
+			id:   123,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+			args := []string{"bytemark", "--admin", "show", "migration"}
+			if test.id > 0 {
+				client.When("BuildRequest", "GET", lib.BrainEndpoint, "/admin/migration_jobs/%s", []string{strconv.Itoa(test.id)}).Return(&mocks.Request{
+					T:              t,
+					StatusCode:     200,
+					ResponseObject: brain.MigrationJob{ID: test.id},
+				}).Times(1)
+				client.When("BuildRequest", "GET", lib.BrainEndpoint, "/admin/migration_jobs/%s/migrations", []string{strconv.Itoa(test.id)}).Return(&mocks.Request{
+					T:              t,
+					StatusCode:     200,
+					ResponseObject: brain.Migrations{},
+				}).Times(1)
+				args = append(args, "--id", strconv.Itoa(test.id))
+			}
+			err := app.Run(args)
+			if !test.shouldErr && err != nil {
+				t.Errorf("shouldn't err, but did: %T{%s}", err, err.Error())
+			} else if test.shouldErr && err == nil {
+				t.Errorf("should err, but didn't")
+			}
+			if !test.shouldErr {
+				if ok, err := client.Verify(); !ok {
+					t.Fatal(err)
+				}
+			}
+		})
 	}
 }
 
@@ -269,5 +305,137 @@ func TestAdminShowDiscByIDCommand(t *testing.T) {
 
 	if ok, err := c.Verify(); !ok {
 		t.Fatal(err)
+	}
+}
+
+func TestAdminShowDependantServers(t *testing.T) {
+	tests := []struct {
+		name   string
+		url    string
+		args   []string
+		values []string
+	}{
+		{
+			name:   "head",
+			url:    "/admin/heads/%s/virtual_machines",
+			args:   []string{"--head", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/virtual_machines",
+			args:   []string{"--tail", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/virtual_machines",
+			args:   []string{"--storage-pool", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "head",
+			url:    "/admin/heads/%s/virtual_machines?at=%s",
+			args:   []string{"--head", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/virtual_machines?at=%s",
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/virtual_machines?at=%s",
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+	}
+
+	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "servers"}
+	servers := mocks.Request{
+		T:          t,
+		StatusCode: 200,
+		ResponseObject: []brain.VirtualMachine{
+			{ID: 1, Name: "Test1"},
+			{ID: 2, Name: "Test2"},
+		},
+	}
+
+	is := is.New(t)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, test.values).Return(&servers).Times(1)
+
+			err := app.Run(append(baseArgs, test.args...))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestAdminShowDependantDiscs(t *testing.T) {
+	tests := []struct {
+		name   string
+		url    string
+		args   []string
+		values []string
+	}{
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/discs",
+			args:   []string{"--tail", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/discs",
+			args:   []string{"--storage-pool", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/discs?at=%s",
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/discs?at=%s",
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+	}
+
+	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "discs"}
+	discs := mocks.Request{
+		T:          t,
+		StatusCode: 200,
+		ResponseObject: []brain.Disc{
+			{ID: 1},
+			{ID: 2},
+		},
+	}
+
+	is := is.New(t)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, test.values).Return(&discs).Times(1)
+
+			err := app.Run(append(baseArgs, test.args...))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
 	}
 }

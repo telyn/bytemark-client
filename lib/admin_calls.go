@@ -23,13 +23,6 @@ type UpdateTail struct {
 	Label           *string
 }
 
-// UpdateStoragePool is a struct with all the possible settings that can be updated on a storage pool
-type UpdateStoragePool struct {
-	UsageStrategy   *string
-	OvercommitRatio *int
-	Label           *string
-}
-
 func (c *bytemarkClient) GetVLANs() (vlans brain.VLANs, err error) {
 	r, err := c.BuildRequest("GET", BrainEndpoint, "/admin/vlans")
 	if err != nil {
@@ -236,16 +229,6 @@ func (c *bytemarkClient) MigrateVirtualMachine(vmName VirtualMachineName, newHea
 	return
 }
 
-func (c *bytemarkClient) ReapVMs() (err error) {
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/reap_vms")
-	if err != nil {
-		return
-	}
-
-	_, _, err = r.Run(nil, nil)
-	return
-}
-
 func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
 	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/admin/vlans/%s", strconv.Itoa(id))
 	if err != nil {
@@ -332,55 +315,6 @@ func (c *bytemarkClient) EmptyHead(idOrLabel string) (err error) {
 	}
 
 	_, _, err = r.Run(nil, nil)
-	return
-}
-
-func (c *bytemarkClient) ReifyDisc(id int) (err error) {
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/discs/%s/reify", strconv.Itoa(id))
-	if err != nil {
-		return
-	}
-
-	_, _, err = r.Run(nil, nil)
-	return
-}
-
-func (c *bytemarkClient) ApproveVM(name VirtualMachineName, powerOn bool) (err error) {
-	vm, err := c.GetVirtualMachine(name)
-	if err != nil {
-		return err
-	}
-
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/approve", strconv.Itoa(vm.ID))
-	if err != nil {
-		return
-	}
-
-	obj := map[string]bool{}
-	if powerOn {
-		obj["power_on"] = powerOn
-	}
-
-	_, _, err = r.MarshalAndRun(obj, nil)
-	return
-}
-
-func (c *bytemarkClient) RejectVM(name VirtualMachineName, reason string) (err error) {
-	vm, err := c.GetVirtualMachine(name)
-	if err != nil {
-		return err
-	}
-
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/vms/%s/reject", strconv.Itoa(vm.ID))
-	if err != nil {
-		return
-	}
-
-	obj := map[string]string{
-		"reason": reason,
-	}
-
-	_, _, err = r.MarshalAndRun(obj, nil)
 	return
 }
 
@@ -490,29 +424,12 @@ func (c *bytemarkClient) UpdateTail(idOrLabel string, options UpdateTail) (err e
 	return
 }
 
-func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options UpdateStoragePool) (err error) {
+func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options brain.StoragePool) (err error) {
 	r, err := c.BuildRequest("PUT", BrainEndpoint, "/admin/storage_pools/%s", idOrLabel)
 	if err != nil {
 		return
 	}
 
-	obj := map[string]interface{}{}
-
-	if options.OvercommitRatio != nil {
-		obj["overcommit_ratio"] = *options.OvercommitRatio
-	}
-	if options.Label != nil {
-		obj["label"] = *options.Label
-	}
-	if options.UsageStrategy != nil {
-		// It is set, but we need to translate an empty string to nil
-		if *options.UsageStrategy == "" {
-			obj["usage_strategy"] = nil
-		} else {
-			obj["usage_strategy"] = *options.UsageStrategy
-		}
-	}
-
-	_, _, err = r.MarshalAndRun(obj, nil)
+	_, _, err = r.MarshalAndRun(options, nil)
 	return
 }

@@ -12,14 +12,14 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:        "restore",
 		Usage:       "restores a previously deleted cloud server",
-		UsageText:   "bytemark restore server <name>",
+		UsageText:   "restore server <name>",
 		Description: `restores a previously deleted cloud server`,
 
 		Action: cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:      "server",
 			Usage:     "restores a previously deleted cloud server",
-			UsageText: "bytemark restore server <name>",
+			UsageText: "restore server <name>",
 			Description: `This command restores a previously deleted cloud server to its non-deleted state.
 Note that it cannot be used to restore a server that has been permanently deleted (purged).`,
 			Flags: []cli.Flag{
@@ -47,7 +47,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 		}, {
 			Name:        "backup",
 			Usage:       "restore the given backup",
-			UsageText:   `bytemark restore backup <server name> <disc label> <backup label>`,
+			UsageText:   `restore backup <server name> <disc label> <backup label>`,
 			Description: "Restores the given backup. Before doing this, a new backup is made of the disc's current state.",
 			Flags: []cli.Flag{
 				cli.StringFlag{

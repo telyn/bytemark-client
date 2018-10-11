@@ -11,7 +11,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
@@ -19,7 +18,7 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:      "debug",
 		Usage:     "test out the Bytemark API",
-		UsageText: "bytemark debug [--junk-token] [--auth] [--use-billing] GET|POST|PUT|DELETE <path>",
+		UsageText: "debug [--junk-token] [--auth] [--use-billing] GET|POST|PUT|DELETE <path>",
 		Description: `GET sends an HTTP GET request with an optional valid authorization header to the given path on the API endpoint and pretty-prints the received json.
 The rest do similar, but PUT and POST both wait for input from stdin after authenticating. To finish entering, put an EOF (usually ctrl-d)`,
 		Flags: []cli.Flag{
@@ -88,14 +87,14 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					return err
 				}
 				reqURL := req.GetURL()
-				log.Logf("%s %s: %d\r\n", method, reqURL.String(), statusCode)
+				c.LogErr("%s %s: %d\r\n", method, reqURL.String(), statusCode)
 
 				buf := new(bytes.Buffer)
 				err = json.Indent(buf, body, "", "    ")
 				if err != nil {
 					return err
 				}
-				log.Log(buf.String())
+				c.Log("%s", buf.String())
 				return nil
 			}
 			return c.Help("Unexpected debug command '" + method + "'")

@@ -1,4 +1,5 @@
 .*.sw*
+.codeclimate.yml
 Bytemark.app
 /bytemark
 /cmd/bytemark/bytemark
@@ -16,3 +17,4 @@ bytemark.exe
 ports/chocolatey/package
 ports/chocolatey/VERSION
 ports/chocolatey/choco.exe
+*.DS_Store

@@ -31,7 +31,6 @@ stages:
   stage: test
   before_script:
     # these two are needed for coverage stats
-    - go get github.com/BytemarkHosting/auth-client
     - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - mkdir -p $GOPATH/pkg $GOPATH/bin
@@ -56,7 +55,16 @@ lint-in-anger:
     go get github.com/alecthomas/gometalinter
     gometalinter -i
     cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --enable goimports --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+    gometalinter --vendored-linters --vendor --disable-all --skip=mocks \
+      --enable errcheck \
+      --enable goconst \
+      --enable goimports \
+      --enable golint \
+      --enable gosimple \
+      --enable ineffassign \
+      --enable varcheck \
+      --enable vetshadow \
+      --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
   allow_failure: false
 
 # the vet linter in gometalinter doesn't seem as reliable, so we keep it as a separate job
@@ -142,7 +150,8 @@ doc-check:
     - |
       if ! ./gen/test-HACKING.sh; then
         echo "HACKING has not been updated to match the new folder structure!"
-        echo "Run tree -d 'vendor' | sha256sum and paste the shasum over the one in HACKING"
+        echo "Run the following and paste the shasum over the one in HACKING"
+        echo "   find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum"
         exit 1
       fi
 
@@ -196,7 +205,6 @@ build-changelogs:
     - |
       [ -z "$VERSION" ] && sed -i 's/".*"/"'"$CHANGELOG_VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
     - cat lib/version.go
-    - go get github.com/BytemarkHosting/auth-client
     - go get github.com/BytemarkHosting/row
     - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
       # stick our code in the correct place.
@@ -264,7 +272,7 @@ package-generic-amd64:
           mv bytemark bytemark.exe
           zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog.txt doc/LICENSE.txt
       else
-          tar cf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
+          tar czf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
       fi
     done
   dependencies:
@@ -325,7 +333,7 @@ package-rpm-amd64:
 # makes a chocolatey package
 package-windows-amd64:
     <<: *package
-    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
+    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:master
     script:
     - mkdir -p choco/tools
       # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
@@ -343,7 +351,7 @@ package-windows-amd64:
     - echo -en "sha256 utility to hash the file.\r\n\r\n" >> VERIFICATION.txt
     - sha256sum bytemark.exe >> VERIFICATION.txt
     - cd .. # back to choco/
-    - mono /usr/bin/choco.exe pack bytemark-client.nuspec
+    - choco pack bytemark-client.nuspec
     - cd .. # back to bytemark-client
     - mv choco/*.nupkg .
     artifacts:
@@ -415,7 +423,7 @@ release-to-repo:
   - scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
   - scp bytemark-client-$VERSION*.rpm $REPO/rpm
   # make rpm & debian repos
-  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && /srv/bin/rpm-addsign-unattended.sh bytemark-client-$VERSION*.rpm && createrepo ."
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && /srv/bin/rpm-addsign-unattended.sh bytemark-client-$VERSION*.rpm && createrepo . && gpg --yes --detach-sign --armor repodata/repomd.xml"
   - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && rm -f Release.gpg InRelease && make"
   # remove old -latest symlinks
   - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do rm -f $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
@@ -431,12 +439,12 @@ release-to-repo:
 # pushes the chocolate package to chocolatey.
 release-to-chocolatey:
   <<: *release
-  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey
+  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:master
   before_script:
   - VERSION=${CI_BUILD_REF_NAME##v}
-  - mono /usr/bin/choco.exe apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
+  - choco apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
   script:
-  - mono /usr/bin/choco.exe push bytemark.$VERSION.nupkg -acceptLicense -y
+  - choco push bytemark.$VERSION.nupkg -acceptLicense -y
   dependencies:
   - package-windows-amd64
 

@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -17,13 +18,13 @@ func init() {
 	commands = append(commands, cli.Command{
 		Name:        "add",
 		Usage:       "add SSH keys to a user / IPs to a server",
-		UsageText:   "bytemark add key|ip",
+		UsageText:   "add key|ip",
 		Description: "add SSH keys to a user or IPs to a server",
 		Action:      cli.ShowSubcommandHelp,
 		Subcommands: []cli.Command{{
 			Name:        "key",
 			Usage:       "add public SSH keys to a Bytemark user",
-			UsageText:   "bytemark add key [--user <user>] [--public-key-file <filename>] <key>",
+			UsageText:   "add key [--user <user>] [--public-key-file <filename>] <key>",
 			Description: `Add the given public key to the given user (or the default user). This will allow them to use that key to access management IPs they have access to using that key. To remove a key, use the remove key command. --public-key-file will be ignored if a public key is specified in the arguments`,
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -65,7 +66,7 @@ func init() {
 					return ctx.Help("The key needs to be a public key, not a private key")
 				}
 
-				err = ctx.Client().AddUserAuthorizedKey(user, key)
+				err = brainRequests.AddUserAuthorizedKey(ctx.Client(), user, key)
 				if err == nil {
 					log.Log("Key added successfully")
 				}
@@ -75,7 +76,7 @@ func init() {
 			Name:        "ips",
 			Aliases:     []string{"ip"},
 			Usage:       "add extra IP addresses to a server",
-			UsageText:   "bytemark add ips [--ipv4 | --ipv6] [--ips <number>] <server name>",
+			UsageText:   "add ips [--ipv4 | --ipv6] [--ips <number>] <server name>",
 			Description: `Add an extra IP to the given server. The IP will be chosen by the brain and output to standard out.`,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -88,7 +89,8 @@ func init() {
 				},
 				cli.IntFlag{
 					Name:  "ips",
-					Usage: "How many IPs to add (1 to 4) - defaults to one.",
+					Usage: "How many IPs to add (1 to 4)",
+					Value: 1,
 				},
 				cli.StringFlag{
 					Name:  "reason",
@@ -115,9 +117,9 @@ func init() {
 				reason := c.String("reason")
 				if reason == "" {
 					if addrs == 1 {
-						reason = util.Prompt("Enter the purpose for this extra IP: ")
+						reason = c.Prompter().Prompt("Enter the purpose for this extra IP: ")
 					} else {
-						reason = util.Prompt("Enter the purpose for these extra IPs: ")
+						reason = c.Prompter().Prompt("Enter the purpose for these extra IPs: ")
 					}
 				}
 				ipcr := brain.IPCreateRequest{

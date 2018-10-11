@@ -2,19 +2,20 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
 
 	bmapp "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
+	commandsPkg "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	"github.com/bgentry/speakeasy"
 	"github.com/urfave/cli"
 )
 
@@ -26,6 +27,20 @@ var forceFlag = cli.BoolFlag{
 
 //commands is assembled during init()
 var commands = make([]cli.Command, 0)
+
+// Commands returns the full list of commands that are available to a user
+// (including admin commands if requested), sorts them into alphabetical order,
+// and then generates the help section for each command
+func Commands(wantAdminCmds bool) []cli.Command {
+	myCommands := cliutil.AssembleCommands(commands, commandsPkg.Commands)
+	if wantAdminCmds {
+		myCommands = cliutil.MergeCommands(myCommands, admin.Commands)
+	}
+	generateHelp(myCommands)
+	sorted := cli.CommandsByName(myCommands)
+	sort.Sort(sorted)
+	return sorted
+}
 
 func main() {
 	// watch for interrupts (Ctrl-C) and exit "gracefully" if they are encountered.
@@ -42,7 +57,8 @@ func main() {
 
 	}()
 
-	overrideHelp()
+	name := os.Args[0]
+	overrideHelp(name)
 	flags, args, config := prepConfig()
 
 	// add admin commands if --admin is set
@@ -51,11 +67,7 @@ func main() {
 		os.Exit(int(util.ProcessError(err)))
 	}
 
-	myCommands := commands
-	if wantAdminCmds {
-		myCommands = cliutil.MergeCommands(commands, admin.Commands)
-	}
-	generateHelp(myCommands)
+	myCommands := Commands(wantAdminCmds)
 
 	app, err := bmapp.BaseAppSetup(flags, myCommands)
 	if err != nil {
@@ -73,6 +85,7 @@ func main() {
 		os.Exit(int(util.ProcessError(err)))
 	}
 	client.SetDebugLevel(config.GetDebugLevel())
+	setInsecure(client, config)
 
 	bmapp.SetClientAndConfig(app, client, config)
 
@@ -83,7 +96,13 @@ func main() {
 	os.Exit(int(util.ProcessError(err)))
 }
 
-func outputDebugInfo(config util.ConfigManager) {
+func setInsecure(client lib.Client, config config.Manager) {
+	if b, err := config.GetBool("insecure"); err == nil && b {
+		client.AllowInsecureRequests()
+	}
+}
+
+func outputDebugInfo(config config.Manager) {
 	log.Debugf(log.LvlOutline, "bytemark-client %s\r\n\r\n", lib.Version)
 	// assemble a string of config vars (excluding token)
 	vars, err := config.GetAll()
@@ -106,12 +125,12 @@ func outputDebugInfo(config util.ConfigManager) {
 }
 
 // overrideHelp writes our own help templates into urfave/cli
-func overrideHelp() {
+func overrideHelp(name string) {
 	cli.SubcommandHelpTemplate = `NAME:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} command{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}
+   ` + name + ` {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} command{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}
 
 COMMANDS:{{range .VisibleCategories}}{{if .Name}}
    {{.Name}}:{{end}}{{range .VisibleCommands}}
@@ -126,13 +145,12 @@ OPTIONS:
    {{.HelpName}} - {{.Usage}}
 
 USAGE:
-   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}{{if .Category}}
+   ` + name + ` {{.UsageText}}{{if .Description}}
+
+   {{.Description}}{{end}}{{if .Category}}
 
 CATEGORY:
-   {{.Category}}{{end}}{{if .Description}}
-
-DESCRIPTION:
-   {{.Description}}{{end}}{{if .VisibleFlags}}
+   {{.Category}}{{end}}{{if .VisibleFlags}}
 
 OPTIONS:
    {{range .VisibleFlags}}{{.}}
@@ -140,7 +158,7 @@ OPTIONS:
 `
 }
 
-func prepConfig() (flags []cli.Flag, args []string, config util.ConfigManager) {
+func prepConfig() (flags []cli.Flag, args []string, conf config.Manager) {
 	// set up our global flags because we need some config before we can set up our App
 	flagset := flag.NewFlagSet("flags", flag.ContinueOnError)
 	help := flagset.Bool("help", false, "")
@@ -159,12 +177,13 @@ func prepConfig() (flags []cli.Flag, args []string, config util.ConfigManager) {
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
+
 	configDir := flagset.Lookup("config-dir").Value.String()
-	config, err = util.NewConfig(configDir)
+	conf, err = config.New(configDir)
 	if err != nil {
 		os.Exit(int(util.ProcessError(err)))
 	}
-	flargs := config.ImportFlags(flagset)
+	flargs := conf.ImportFlags(flagset)
 
 	//juggle the arguments in order to get the executable on the beginning
 	args = make([]string, len(flargs)+1)
@@ -191,43 +210,4 @@ func prepConfig() (flags []cli.Flag, args []string, config util.ConfigManager) {
 		args = versionArgs
 	}
 	return
-}
-
-// PromptForCredentials ensures that user, pass and yubikey-otp are defined, by prompting the user for them.
-// needs a for loop to ensure that they don't stay empty.
-// returns nil on success or an error on failure
-func PromptForCredentials(config util.ConfigManager) error {
-	userVar, _ := config.GetV("user")
-	for userVar.Value == "" || userVar.Source != "INTERACTION" {
-		if userVar.Value != "" {
-			user := util.Prompt(fmt.Sprintf("User [%s]: ", userVar.Value))
-			if strings.TrimSpace(user) == "" {
-				config.Set("user", userVar.Value, "INTERACTION")
-			} else {
-				config.Set("user", strings.TrimSpace(user), "INTERACTION")
-			}
-		} else {
-			user := util.Prompt("User: ")
-			config.Set("user", strings.TrimSpace(user), "INTERACTION")
-		}
-		userVar, _ = config.GetV("user")
-	}
-
-	for config.GetIgnoreErr("pass") == "" {
-		pass, err := speakeasy.FAsk(os.Stderr, "Pass: ")
-
-		if err != nil {
-			return err
-		}
-		config.Set("pass", strings.TrimSpace(pass), "INTERACTION")
-	}
-
-	if config.GetIgnoreErr("yubikey") != "" {
-		for config.GetIgnoreErr("yubikey-otp") == "" {
-			yubikey := util.Prompt("Press yubikey: ")
-			config.Set("yubikey-otp", strings.TrimSpace(yubikey), "INTERACTION")
-		}
-	}
-	log.Log("")
-	return nil
 }

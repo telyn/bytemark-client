@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -47,10 +47,10 @@ var showAccountTestOutput = map[string]string{
 }
 
 func TestShowAccount(t *testing.T) {
-	baseShowAccountSetup := func(c *mocks.Client, config *mocks.Config, configAccount, outputFormat string) {
-		config.Mock.Functions = resetOneMockedFunction(config.Mock.Functions, "GetV", "output-format")
-		config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", outputFormat, "FLAG output-format"})
-		config.When("GetIgnoreErr", "account").Return(configAccount)
+	baseShowAccountSetup := func(c *mocks.Client, conf *mocks.Config, configAccount, outputFormat string) {
+		conf.Mock.Functions = resetOneMockedFunction(conf.Mock.Functions, "GetV", "output-format")
+		conf.When("GetV", "output-format").Return(config.Var{"output-format", outputFormat, "FLAG output-format"})
+		conf.When("GetIgnoreErr", "account").Return(configAccount)
 	}
 
 	tests := []showAccountTest{
@@ -146,7 +146,7 @@ func TestShowAccount(t *testing.T) {
 				t.Errorf("TestShowAccountCommand %d client failed to verify: %s", i, vErr.Error())
 			}
 			if expected, ok := expectedOutput[format]; ok {
-				testutil.AssertOutput(t, fmt.Sprintf("TestShowAccountCommand %d (%s)", i, format), app, expected)
+				testutil.AssertOutput(t, app, expected)
 			} else {
 				buf, err := testutil.GetBuf(app)
 				if err != nil {
@@ -229,6 +229,81 @@ func TestShowPrivileges(t *testing.T) {
 		}
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
+		}
+	}
+}
+
+func TestShowDisc(t *testing.T) {
+	tests := []struct {
+		disc          brain.Disc
+		err           error
+		shouldErr     bool
+		args          string
+		vm            lib.VirtualMachineName
+		discLabelOrID string
+	}{
+		{ // 0 - fully specified flags
+			disc: brain.Disc{
+				ID:           42,
+				Label:        "faff",
+				StorageGrade: "sata",
+			},
+			args:          "bytemark show disc --server fliff --disc faff",
+			vm:            lib.VirtualMachineName{VirtualMachine: "fliff", Group: "default", Account: "default-account"},
+			discLabelOrID: "faff",
+		}, { // 1 - flags from args
+			disc: brain.Disc{
+				ID:           42,
+				Label:        "faff",
+				StorageGrade: "sata",
+			},
+			args:          "bytemark show disc fliff faff",
+			vm:            lib.VirtualMachineName{VirtualMachine: "fliff", Group: "default", Account: "default-account"},
+			discLabelOrID: "faff",
+		}, { // 2 - no disc
+			args:      "bytemark show disc fliff",
+			shouldErr: true,
+		}, { // 3 --server but no --disc
+			args:      "bytemark show disc --server fliff",
+			shouldErr: true,
+		}, { // 4 - numeric --disc with no server
+			disc: brain.Disc{
+				ID:           42,
+				Label:        "faff",
+				StorageGrade: "sata",
+			},
+			vm:            lib.VirtualMachineName{},
+			args:          "bytemark show disc --disc 42",
+			discLabelOrID: "42",
+		},
+	}
+	var i = 0
+	var test = tests[0]
+
+	defer func() {
+		if msg := recover(); msg != nil {
+			t.Errorf("TestShowDisc %d panic: %v", i, msg)
+		}
+	}()
+
+	for i, test = range tests {
+		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		if test.shouldErr && test.err == nil {
+			config, c, app = testutil.BaseTestSetup(t, false, commands)
+		}
+		config.When("GetVirtualMachine").Return(defVM)
+		c.When("GetDisc", test.vm, test.discLabelOrID).Return(test.disc, test.err)
+
+		err := app.Run(strings.Split(test.args, " "))
+		if test.shouldErr != (err != nil) {
+			nt := ""
+			if test.shouldErr {
+				nt = "n't"
+			}
+			t.Errorf("%s should%s error, got %s", testutil.Name(i), nt, err)
+		}
+		if ok, vErr := c.Verify(); !ok {
+			t.Errorf("%s client failed to verify: %s", testutil.Name(i), vErr.Error())
 		}
 	}
 }

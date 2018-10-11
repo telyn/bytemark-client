@@ -4,15 +4,19 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
+	"regexp"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
+	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
 
-// GetBuf returns the buffer in app's metadata, or an error if there isn't one.
+// GetBuf returns the captured output buffer for the given app.
+// Use this in your tests to find out if your command's output is correct.
+// TODO: add an example
 func GetBuf(app *cli.App) (buf *bytes.Buffer, err error) {
 	if bufInterface, ok := app.Metadata["buf"]; ok {
 		if buf, ok = bufInterface.(*bytes.Buffer); ok {
@@ -25,11 +29,9 @@ func GetBuf(app *cli.App) (buf *bytes.Buffer, err error) {
 	return
 }
 
-// AssertOutput fails the test unless the app under test has output the
-// expected string. identifier is a string used to identify the test - usually
-// the function name of the test, plus some integer for the index of the test
-// in the test-table. See show_test.go's TestShowAccountCommand for example usage
-func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string) {
+// AssertOutput fails the test unless the app under test has output exactly the
+// expected string.
+func AssertOutput(t *testing.T, app *cli.App, expected string) {
 	buf, err := GetBuf(app)
 
 	if err == nil {
@@ -42,20 +44,56 @@ func AssertOutput(t *testing.T, identifier string, app *cli.App, expected string
 	}
 }
 
+// AssertOutputMatches fails the test unless the app under test has produced
+// output which matches the supplied regex.
+func AssertOutputMatches(t *testing.T, app *cli.App, expected *regexp.Regexp) {
+	buf, err := GetBuf(app)
+
+	if err != nil {
+		t.Errorf("Couldn't recover the buffer - use BaseTestSetup to create your cli.Apps")
+		return
+	}
+	if !expected.Match(buf.Bytes()) {
+		t.Errorf("Command's output (%q) does not match %q", buf, expected)
+		return
+	}
+}
+
 // BaseTestSetup constructs mock config and client and produces a cli.App with the given commands.
-func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mocks.Config, client *mocks.Client, cliapp *cli.App) {
+func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (conf *mocks.Config, client *mocks.Client, cliapp *cli.App) {
 	cli.OsExiter = func(_ int) {}
-	config = new(mocks.Config)
+	conf = new(mocks.Config)
 	client = new(mocks.Client)
-	config.When("GetBool", "admin").Return(admin, nil)
-	config.When("GetV", "output-format").Return(util.ConfigVar{"output-format", "human", "CODE"})
+	conf.When("GetBool", "admin").Return(admin, nil)
+	conf.When("GetV", "output-format").Return(config.Var{"output-format", "human", "CODE"})
 
 	cliapp, err := app.BaseAppSetup(app.GlobalFlags(), commands)
 	if err != nil {
 		t.Fatal(err)
 	}
-	app.SetClientAndConfig(cliapp, client, config)
+	app.SetClientAndConfig(cliapp, client, conf)
+
+	buf := bytes.Buffer{}
+	cliapp.Metadata["buf"] = &buf
+	cliapp.Metadata["debugWriter"] = &TestWriter{t}
+
+	fixCommandFullName(cliapp, commands)
+
+	cliapp.Writer = &buf
+	cliapp.ErrWriter = &buf
+	log.Writer = &buf
+	log.ErrWriter = &buf
+
+	return
+}
+
+// fixCommandFullName ensures that Command.FullName works for all commands in the slice.
+// see the comment inside for the reasoning behind it
+func fixCommandFullName(cliapp *cli.App, commands []cli.Command) {
+	// discard output during this setup
+	oldWriter := cliapp.Writer
 	cliapp.Writer = ioutil.Discard
+
 	for _, c := range commands {
 		//config.When("Get", "token").Return("no-not-a-token")
 
@@ -69,14 +107,7 @@ func BaseTestSetup(t *testing.T, admin bool, commands []cli.Command) (config *mo
 			_ = cliapp.Run([]string{"bytemark.test", c.Name, "help"})
 		}
 	}
-
-	buf := bytes.Buffer{}
-	cliapp.Metadata["buf"] = &buf
-	cliapp.Metadata["debugWriter"] = &TestWriter{t}
-
-	cliapp.Writer = &buf
-
-	return
+	cliapp.Writer = oldWriter
 }
 
 // TestWriter is a writer which writes to the test log.
@@ -101,17 +132,33 @@ func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (config
 	config.When("GetIgnoreErr", "user").Return("test-user")
 	config.When("GetIgnoreErr", "yubikey").Return("")
 	config.When("GetIgnoreErr", "2fa-otp").Return("")
+	config.When("GetIgnoreErr", "impersonate").Return("")
 
+	c.When("GetSessionFactors").Return([]string{"username", "password"})
+	c.When("GetSessionUser").Return("test-user")
 	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
 	return
 }
 
-func traverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
+// TraverseAllCommands goes through all the commands it is supplied.
+func TraverseAllCommands(cmds []cli.Command, fn func(cli.Command)) {
 	if cmds == nil {
 		return
 	}
 	for _, c := range cmds {
 		fn(c)
-		traverseAllCommands(c.Subcommands, fn)
+		TraverseAllCommands(c.Subcommands, fn)
+	}
+}
+
+// TraverseAllCommandsWithContext adds a more details such as the parent command to commands so we can find the offender easier.
+func TraverseAllCommandsWithContext(cmds []cli.Command, name string, fn func(fullCommandString string, command cli.Command)) {
+	if cmds == nil {
+		return
+	}
+	for _, c := range cmds {
+		subName := name + " " + c.FullName()
+		fn(subName, c)
+		TraverseAllCommandsWithContext(c.Subcommands, subName, fn)
 	}
 }

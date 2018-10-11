@@ -96,7 +96,12 @@ func (c *bytemarkClient) SetDiscIopsLimit(vm VirtualMachineName, discLabelOrID s
 }
 
 // GetDisc returns the specified disc from the given virtual machine.
+// if discLabelOrID is a number then vm is ignored.
 func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc brain.Disc, err error) {
+	if id, atoiErr := strconv.Atoi(discLabelOrID); atoiErr == nil {
+		return c.GetDiscByID(id)
+
+	}
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return

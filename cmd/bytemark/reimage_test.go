@@ -32,7 +32,7 @@ func TestReimage(t *testing.T) {
 
 	c.When("ReimageVirtualMachine", vmname, image).Return(nil).Times(1)
 
-	err := app.Run([]string{"bytemark", "reimage", "--force", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
+	err := app.Run([]string{"bytemark", "reimage", "server", "--force", "--image", image.Distribution, "--root-password", image.RootPassword, "test-server.test-group.test-account"})
 
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {
@@ -70,7 +70,7 @@ func TestReimageFileFlags(t *testing.T) {
 
 	c.When("ReimageVirtualMachine", vmname, image).Return(nil).Times(1)
 
-	err = app.Run([]string{"bytemark", "reimage", "--force", "--image", "image", "--root-password", "test-pass", "--firstboot-script-file", "firstboot", "--authorized-keys-file", "authorized-keys", "test-server.test-group.test-account"})
+	err = app.Run([]string{"bytemark", "reimage", "server", "--force", "--image", "image", "--root-password", "test-pass", "--firstboot-script-file", "firstboot", "--authorized-keys-file", "authorized-keys", "test-server.test-group.test-account"})
 
 	is.Nil(err)
 	if ok, err := c.Verify(); !ok {

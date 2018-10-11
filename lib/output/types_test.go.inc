@@ -36,8 +36,29 @@ func isIgnoredType(t string) bool {
         // PrivilegeLevel is never gonna come out of the lib, except as part of a Privilege
 	case "brain.PrivilegeLevel":
 		return true
+	// brain.MigrationJobDestinations only ever exists as part of a MigrationJob
+	case "brain.MigrationJobDestinations":
+		return true
+	// brain.MigrationJobDiscStatus only ever exists as part of a MigrationJobStatus
+	case "brain.MigrationJobDiscStatus":
+		return true
+	// brain.MigrationJobLocations only ever exists as part of a MigrationJobSpec or MigrationJobModification
+	case "brain.MigrationJobLocations":
+		return true
+	// brain.MigrationJobOptions only ever exists as part of a MigrationJobSpec or MigrationJobModification
+	case "brain.MigrationJobOptions":
+		return true
+	// brain.MigrationJobSpec is only sent, never received
+	case "brain.MigrationJobSpec":
+		return true
 	// billing.Accounts should ALWAYS be dressed as lib.Accounts
 	case "billing.Account":
+		return true
+	// billing.Assent will only be sent, never received.
+	case "billing.Assent":
+		return true
+	// brain.MigrationJobModification will only be sent, never received.
+	case "brain.MigrationJobModification":
 		return true
 	// billing.SPPTokenRequests will only be sent, never received.
 	case "billing.SPPTokenRequest":

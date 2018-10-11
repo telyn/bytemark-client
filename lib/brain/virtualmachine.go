@@ -111,7 +111,11 @@ func (vm VirtualMachine) ShortName() string {
 // FullName returns the first three parts of the hostname (i.e. name.group.account)
 func (vm VirtualMachine) FullName() string {
 	bits := strings.SplitN(vm.Hostname, ".", 4)
-	return strings.Join(bits[0:3], ".")
+	end := len(bits)
+	if end > 3 {
+		end = 3
+	}
+	return strings.Join(bits[0:end], ".")
 }
 
 // AllIPv4Addresses flattens all the IPs for a VM into a single IPs (a []*net.IP with some convenience methods)

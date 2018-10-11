@@ -3,7 +3,7 @@ package mocks
 import (
 	"flag"
 
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	mock "github.com/maraino/go-mock"
 )
@@ -46,9 +46,9 @@ func (c *Config) GetSessionValidity() (int, error) {
 	return ret.Int(0), ret.Error(1)
 }
 
-func (c *Config) GetV(name string) (util.ConfigVar, error) {
+func (c *Config) GetV(name string) (config.Var, error) {
 	ret := c.Called(name)
-	return ret.Get(0).(util.ConfigVar), ret.Error(1)
+	return ret.Get(0).(config.Var), ret.Error(1)
 }
 
 func (c *Config) GetVirtualMachine() lib.VirtualMachineName {
@@ -61,9 +61,9 @@ func (c *Config) GetGroup() lib.GroupName {
 	return ret.Get(0).(lib.GroupName)
 }
 
-func (c *Config) GetAll() ([]util.ConfigVar, error) {
+func (c *Config) GetAll() (config.Vars, error) {
 	ret := c.Called()
-	return ret.Get(0).([]util.ConfigVar), ret.Error(1)
+	return ret.Get(0).(config.Vars), ret.Error(1)
 }
 
 func (c *Config) PanelURL() string {

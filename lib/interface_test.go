@@ -10,15 +10,14 @@ import (
 )
 
 // TestQualityInterfaceHasntGrown will fail if the Client interface has gained any new
-// functions since the 5th Oct 2017. See billing/updatedefinitions.go for an
-// example of how functions should be written from now.
+// functions since the 16th Mar 2018 (Impersonate was added)
+// See billing/updatedefinitions.go for an example of how ordinary request functions
+// should be written from now.
 func TestQualityInterfaceHasntGrown(t *testing.T) {
 	allowed := sort.StringSlice{
 		"AddIP",
-		"AddUserAuthorizedKey",
 		"AdminCreateGroup",
 		"AllowInsecureRequests",
-		"ApproveVM",
 		"AuthWithCredentials",
 		"AuthWithToken",
 		"BuildRequest",
@@ -38,7 +37,6 @@ func TestQualityInterfaceHasntGrown(t *testing.T) {
 		"DeleteBackupSchedule",
 		"DeleteDisc",
 		"DeleteGroup",
-		"DeleteUserAuthorizedKey",
 		"DeleteVLAN",
 		"DeleteVirtualMachine",
 		"EmptyHead",
@@ -79,16 +77,14 @@ func TestQualityInterfaceHasntGrown(t *testing.T) {
 		"GetVLANs",
 		"GetVirtualMachine",
 		"GrantPrivilege",
+		"Impersonate",
 		"MigrateDisc",
 		"MigrateVirtualMachine",
 		"MoveVirtualMachine",
 		"ReadDefinitions",
-		"ReapVMs",
 		"RegisterNewAccount",
 		"RegradeDisc",
-		"ReifyDisc",
 		"ReimageVirtualMachine",
-		"RejectVM",
 		"ResetVirtualMachine",
 		"ResizeDisc",
 		"RestartVirtualMachine",

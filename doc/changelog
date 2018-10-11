@@ -1,8 +1,134 @@
-bytemark-client (3.0~beta1) UNRELEASED; urgency=low
+bytemark-client (3.3) UNRELEASED; urgency=low
 
-  * Remove unnecessary / potentially dangerous pointers from the lib package
+  ### New Admin Features:
+  * `show dependant servers` command for viewing servers on a head, tail or
+    storage pool at a given time
+  * `show dependant discs` command for viewing discs on a head, tail or
+    storage pool at a given time
 
- -- telyn <telyn@bytemark.co.uk>  Wed, 20 Sep 2017 15:40:30 +0100
+  ## Fixes:
+  * The `--recursive` flag is no longer required to delete non-empty groups.
+  * `migrate server` now outputs the VM's hostname correctly when the
+    migration has been started.
+  * The .tar.gz files available on repo.bytemark.co.uk are now gzipped and not
+    merely pretending to be.
+
+ -- Hannah Pirie <hannah.pirie@bytemark.co.uk>  Tue, 21 Aug 2018 16:39:43 +0100
+
+bytemark-client (3.2) UNRELEASED; urgency=low
+
+  ### Changes:
+  * `show servers` now takes a group instead of an account by default.
+    `--account <account>` can be specified to list all servers on an account.
+  * `profiles` and `scripting` have been updated to match the 3.0+ updates.
+
+  ### Fixes:
+  * `update config --account <account>` no longer fails if a billing account
+    cannot be found for the named account (but a Bytemark Cloud account can)
+  * `--output-format` is no longer clobbered by `--table-fields`
+  * `--output-format=list` now produces a list with no lines between columns,
+    nor between the header and the body of the list
+
+ -- telyn <telyn@bytemark.co.uk>  Mon, 14 May 2018 11:31:25 +0100
+
+bytemark-client (3.1) UNRELEASED; urgency=low
+
+  ### Admin changes:
+  * `approve server`, `reject server`, `reify disc`, `reap servers` commands
+    have all been removed
+  * ApproveVMs, RejectVMs, ReifyDisc, ReapVMs methods have all been removed
+    from Client interface and bytemarkClient struct.
+
+  ### Fixes:
+  * Authentication with a token as a user other than $USER (or the value in
+    your config-dir) no longer fails with a messages about being an unexpected
+    user.
+  * add ip command no longer makes requests to incorrect URL, causing failure
+
+ -- telyn <telyn@bytemark.co.uk>  Tue, 08 May 2018 10:22:23 +0100
+
+bytemark-client (3.0) UNRELEASED; urgency=low
+
+  ### New Features:
+  * `assent` command has been added to mark an account as having assented to
+    new terms of business.
+  * `restart server` (previously `restart`) and `start server` (previously
+    `start`) can now start a server up in the rescue netboot appliance with
+    the `--netboot` flag, or into any appliance with the `--appliance <name>`
+    flag.
+
+  ### New Admin Features:
+  * impersonation support using `--impersonate` global flag. (see `bytemark
+    help`)
+  * `create migration` command for creating a MigrationJob. See
+    the help for this command - it's really very good.
+  * `show migrations` command for inspecting MigrationJobs
+  * `show migration` command for inspecting a single MigrationJob
+  * `update migration` command for altering MigrationJob-style migrations
+  * `set iops limit` command for limiting a disc or server's IOPS
+  * `update billing-definition` command
+  * `show disc by id` command
+
+  ### Changes:
+  * Numerous commands have been renamed / altered:
+    - `config` renamed to `show config`
+    - `config set` & `config unset` have been merged into `update config` (see
+      `help update config`)
+    - `create backup` renamed to `backup discs`
+    - `create discs` renamed to `add discs`
+    - `create group` renamed to `add group`
+    - `create server` renamed to `add server`
+    - `grant` and `revoke` renamed to `grant privilege` and `revoke privilege`
+    - `list accounts` renamed to `show accounts`
+    - `list backups` renamed to `show backups`
+    - `list discs` renamed to `show discs`
+    - `list groups` renamed to `show groups`
+    - `list keys` renamed to `show keys`
+    - `list servers` renamed to `show servers`
+    - `overview` renamed to `show overview`
+    - `resize disc` renamed to `update disc` (see `help update disc`)
+    - `set cdrom`, `set cores`, `set hwprofile`, `set memory`, `lock
+       hwprofile`, `unlock hwprofile` and `move` have all been merged
+       into `update server` (see `help update server`)
+    - `show disc` can now take a disc ID with no server specified.
+    - `signup` has been removed
+    - `hwprofiles` renamed to `show hwprofiles`
+    - `images` renamed to `show images`
+    - `storage` renamed to `show storage`
+    - `zones` renamed to `show zones`
+  * Numerous admin commands have been renamed / altered:
+    - `cancel migration disc` and `cancel migration server` merged into
+      `cancel migration` (see `help cancel migration`)
+    - `create user` renamed to `add user`
+    - `create ip range` renamed to `add ip range`
+    - `create vlan-group` renamed to `add vlan group`
+    - `show stopped eligible vms` renamed to `show waiting servers`
+    - `show recent vms` renamed to `show recent servers`
+    - `show migrating vms` renamed to `show migrating servers`
+  * `add server` (previously `create server`) now outputs the group and
+    account in the pre-flight check
+  * `debug` now outputs the response from the server to stdout
+  * `restart server` (previously `restart`) now cleanly shuts down the server
+    before restarting it.
+  * `show config` (previously `config`) now supports --json and --table.
+  * more commands support `--json`, `--table`, `--output-format` and
+    `--table-fields` (basically everything in `show` supports theme)
+  * RPM repository at https://repo.bytemark.co.uk/bytemark-client/rpm is now
+    GPG-signed.
+  * RPM repo file at
+    https://repo.bytemark.co.uk/bytemark-client/rpm/bytemark-client.repo now
+    has gpgkey parameter to allow automatic download of the GPG public key
+    from secure.bytemark.co.uk.
+  * Various bits of help text have been improved
+
+  Fixes:
+  * supplying --json or --table to show keys (prev. list keys) no longer causes
+    a crash
+  * `show account` and `show overview` (previously `overview`) no longer
+    fail when the account has no billing details.
+  * parsing `--account` flag no longer crashes in some circumstances
+
+ -- telyn <telyn@bytemark.co.uk>  Tue, 10 Apr 2018 17:11:50 +0100
 
 bytemark-client (2.5.1) UNRELEASED; urgency=low
 
