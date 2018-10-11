@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	auth3 "gitlab.bytemark.co.uk/auth/client"
+	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
 // AuthWithCredentials attempts to authenticate with the given credentials. Returns nil on success or an error otherwise.
