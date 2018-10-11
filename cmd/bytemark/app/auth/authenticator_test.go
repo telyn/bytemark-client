@@ -9,12 +9,12 @@ import (
 	"runtime/debug"
 	"testing"
 
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
-	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
 type unexpect struct{}
