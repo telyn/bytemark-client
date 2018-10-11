@@ -3,71 +3,112 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:10b03bbb2b5206663ab870d2c963bc3a90dd5e6f52508d2f4bdc53021db4b7ca"
+  name = "github.com/BytemarkHosting/auth-client"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d9180fd34c3b987a970bb7827ba151ac05f36cdc"
+
+[[projects]]
+  branch = "master"
+  digest = "1:26958ec13f54dca00ee3d8a171124c6660eb0cafe48cd4ae2b651dd86558fe45"
   name = "github.com/BytemarkHosting/row"
   packages = ["."]
+  pruneopts = "UT"
   revision = "64689958a4cb09a01483ae1ca39511ca14c3222e"
 
 [[projects]]
+  digest = "1:1343a2963481a305ca4d051e84bc2abd16b601ee22ed324f8d605de1adb291b0"
   name = "github.com/bgentry/speakeasy"
   packages = ["."]
-  revision = "36e9cfdd690967f4f690c6edcc9ffacd006014a0"
+  pruneopts = "UT"
+  revision = "4aabc24848ce5fd31929f7d1e4ea74d3709c14cd"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:2e6cf73ad7194a08a973caa3644d255350184ed38b9423517949653a893a29ee"
   name = "github.com/cheekybits/is"
   packages = ["."]
+  pruneopts = "UT"
   revision = "68e9c0620927fb5427fda3708222d0edee89eae9"
 
 [[projects]]
+  digest = "1:ca955a9cd5b50b0f43d2cc3aeb35c951473eeca41b34eb67507f1dbcc0542394"
   name = "github.com/kr/pretty"
   packages = ["."]
-  revision = "e6ac2fc51e89a3249e82157fa0bb7a18ef9dd5bb"
+  pruneopts = "UT"
+  revision = "73f6ac0b30a98e433b289500d779f50c1a6f0712"
+  version = "v0.1.0"
 
 [[projects]]
+  digest = "1:15b5cc79aad436d47019f814fde81a10221c740dc8ddf769221a65097fb6c2e9"
   name = "github.com/kr/text"
   packages = ["."]
-  revision = "bb797dc4fb8320488f47bf11de07a733d7233e1f"
+  pruneopts = "UT"
+  revision = "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:62ea13ba29ceb0ca589dc264aac2aa4c5f9ece34519140a97bb843e8bf67d32b"
   name = "github.com/maraino/go-mock"
   packages = ["."]
+  pruneopts = "UT"
   revision = "4c74c434cd3a9e9a70ed1eeb56646a1d3fac372f"
 
 [[projects]]
+  digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
-  revision = "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8"
+  pruneopts = "UT"
+  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
+  version = "v0.0.4"
 
 [[projects]]
+  digest = "1:cdb899c199f907ac9fb50495ec71212c95cb5b0e0a8ee0800da0238036091033"
   name = "github.com/mattn/go-runewidth"
   packages = ["."]
-  revision = "e882a96ec18dd43fa283187b66af74497c9101c0"
-
-[[projects]]
-  name = "github.com/olekukonko/tablewriter"
-  packages = ["."]
-  revision = "daf2955e742cf123959884fdff4685aa79b63135"
-
-[[projects]]
-  name = "github.com/urfave/cli"
-  packages = ["."]
-  revision = "f017f86fccc5a039a98f23311f34fdf78b014f78"
-
-[[projects]]
-  name = "gitlab.bytemark.co.uk/auth/client"
-  packages = ["."]
-  revision = "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf"
+  pruneopts = "UT"
+  revision = "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb"
+  version = "v0.0.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:f611266e3ac01ab4adb6f1d67f6c1be82998d02f452faff450596658712d860b"
+  name = "github.com/olekukonko/tablewriter"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "be2c049b30ccd4d3fd795d6bf7dce74e42eeedaa"
+
+[[projects]]
+  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
+  name = "github.com/urfave/cli"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:0a40b0bdd57a93e741d8557465be3a2edeec408e9b6399586ad65bbe8e355796"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "7ceb54c8418b8f9cdf0177b511d5cbb06e9fae39"
+  pruneopts = "UT"
+  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8e7b4e0b579902d96b078870931e878a0a7de44f40817e27ac505ac2e816cd29"
+  input-imports = [
+    "github.com/BytemarkHosting/auth-client",
+    "github.com/BytemarkHosting/row",
+    "github.com/bgentry/speakeasy",
+    "github.com/cheekybits/is",
+    "github.com/maraino/go-mock",
+    "github.com/mattn/go-isatty",
+    "github.com/olekukonko/tablewriter",
+    "github.com/urfave/cli",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

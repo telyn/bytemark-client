@@ -1,0 +1,490 @@
+variables:
+  GO15VENDOREXPERIMENT: "1"
+  GOPATH: /go
+  GOVERSION: "1.8"
+
+stages:
+  - test
+  - build
+  - package
+  - release
+
+# understanding version_script is kind of central to understanding a lot of jobs, so I am putting it here, at the top.
+# if this is a release branch, VERSION is set to the version specified in the branch name
+# if not, VERSION is blank
+# in either case, CHANGELOG_VERSION is the version in the most recent entry in doc/changelog
+# and SNAPSHOT_VERSION is "<pipeline ID>.git<7 chars of commit id>"
+.version_script: &version_script
+  - VERSIONPREFIX=${VERSIONPREFIX:-v}
+  - VERSION=${CI_BUILD_REF_NAME##$VERSIONPREFIX}
+  # If the CI_BUILD_REF_NAME is not prefixed with v
+  # then VERSION will be equal to CI_BUILD_REF_NAME.
+  - '! [ "$VERSION" = "$CI_BUILD_REF_NAME" ] || VERSION=""'
+  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
+
+#### TEST STAGE
+## The test stage runs the test, checks the code for lint issues, and makes sure that release tags are up-to-snuff
+
+.test-job: &test
+  image: golang:$GOVERSION
+  stage: test
+  before_script:
+    # these two are needed for coverage stats
+    - go get github.com/BytemarkHosting/row
+    - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - mkdir -p $GOPATH/pkg $GOPATH/bin
+      # stick our code in the correct place.
+    - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+
+# we do a lot of linting to keep our code clean
+#
+# the lint-with-fail-allowed job lets us know how bad we are at the stuff I don't particularly care about
+lint-with-fail-allowed:
+  <<: *test
+  allow_failure: true # delete me once we've got the lintiness down to 0
+  script: |
+    go get github.com/alecthomas/gometalinter
+    gometalinter -i
+    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --disable gotype --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+
+lint-in-anger:
+  <<: *test
+  script: |
+    go get github.com/alecthomas/gometalinter
+    gometalinter -i
+    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+<<<<<<< HEAD
+    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gas --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --enable goimports --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+=======
+    gometalinter --vendored-linters --vendor --disable-all --skip=mocks --enable errcheck --enable gosimple --enable ineffassign --enable varcheck --enable goconst --enable vetshadow --enable golint --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
+>>>>>>> develop
+  allow_failure: false
+
+# the vet linter in gometalinter doesn't seem as reliable, so we keep it as a separate job
+vet:
+  <<: *test
+  script:
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - go vet $(go list ./... | grep -v vendor/)
+
+# and we should actually run the tests, too...
+test:
+  <<: *test
+  script:
+    - go get github.com/modocache/gover golang.org/x/tools/cmd/cover
+    - OLDPWD="$PWD"
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - export GOPATH
+    - |
+      for pkg in $(go list ./... | grep -v vendor/); do
+        shortpkg="${pkg##github.com/BytemarkHosting/}"
+        pkg_with_underscores="${shortpkg//\//_}"
+        go test -coverprofile="${pkg_with_underscores}.coverprofile" $pkg
+      done
+    - gover
+    - go tool cover -func gover.coverprofile | tail -n 1
+    - go tool cover -html gover.coverprofile -o "$OLDPWD/coverage.html"
+  artifacts:
+    paths:
+    - coverage.html
+    expire_in: '1 week'
+
+quality-test:
+  <<: *test
+  script: 
+    - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - export GOPATH
+    - go install ./...
+    - go generate -tags quality $(go list ./... | grep -v vendor)
+    - go test -run 'TestQuality.*' -tags quality ./...
+
+# release-check makes sure that if we're on a release tag then the changelog and lib/version.go have been updated.
+release-check:
+  stage: test
+  image: alpine
+  before_script: *version_script
+  script: &release_check_script
+  - |
+    if ! [ "$VERSION" = "$CHANGELOG_VERSION" ] ; then
+      echo "Mismatch between branch name and changelog version"
+      exit 1
+    fi
+    if ! grep 'Version = "'$VERSION'"' lib/version.go > /dev/null; then
+      echo "Mismatch between branch name and lib/version.go version"
+      exit 1
+    fi
+  after_script:
+  - apk update && apk add git gnupg
+  - |
+    echo "$GPG_TAG_SIGNING_PUBLIC_KEY" > key.asc
+    gpg --import key.asc
+    if ! git tag -v $CI_BUILD_REF_NAME; then
+      echo "$CI_BUILD_REF_NAME is not a signed tag, or it is, but it's not signed by someone we trust (see GPG_TAG_SIGNING_PUBLIC_KEY secret variable)"
+      exit 1
+    fi
+  - |
+    git fetch origin master
+    git rev-parse HEAD
+    git rev-parse FETCH_HEAD
+    if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+      echo "version tag is not the same as current master, will not release"
+      exit 1
+    fi
+  only:
+  - /^v\d+(\.\d+)+$/
+
+doc-check:
+  stage: test
+  image: alpine
+  before_script:
+    - apk update
+    - apk add coreutils bash vim
+  script:
+    - |
+      if ! ./gen/test-HACKING.sh; then
+        echo "HACKING has not been updated to match the new folder structure!"
+        echo "Run the following and paste the shasum over the one in HACKING"
+        echo "   find . -type d \! -path './.*' \! -path './vendor/*' | sort | sha256sum"
+        exit 1
+      fi
+
+release-branch-check:
+  stage: test
+  image: alpine
+  before_script: *version_script
+  script: *release_check_script
+  only:
+  - /^release-\d+(\.\d+)+$/
+  variables:
+    VERSIONPREFIX: "release-"
+
+
+#### BUILD STAGE
+## The build stage builds a binary for each OS and architecture combination we support
+## and also assembles a manpage and pdf version of the manpage.
+
+build-manpage:
+  stage: build
+  image: gitlab.bytemark.co.uk:8443/docker-images/layers:jessie-asciidoc
+  script:
+  - cd doc
+  - a2x --doctype manpage --format manpage bytemark.asciidoc
+  - a2x --doctype manpage --format pdf bytemark.asciidoc
+  - sed -i -e "1 s/^'/./" bytemark.1
+  artifacts:
+    paths:
+    - doc/bytemark.1
+    - doc/bytemark.pdf
+    expire_in: '1 month'
+
+build-changelogs:
+  stage: build
+  image: perl:5
+  script:
+    - gen/convert-changelog rpm < doc/changelog > doc/changelog.rpm
+    - gen/convert-changelog md < doc/changelog > doc/changelog.md
+
+  artifacts:
+    paths:
+      - doc/changelog.*
+    expire_in: '1 month'
+
+.build-job: &build
+  stage: build
+  image: golang:$GOVERSION
+  before_script: *version_script
+  script:
+    # if VERSION is not set (i.e. this is not a release branch), set version.go to include the snapshot version.
+    - |
+      [ -z "$VERSION" ] && sed -i 's/".*"/"'"$CHANGELOG_VERSION~$SNAPSHOT_VERSION"'"/' lib/version.go
+    - cat lib/version.go
+    - go get github.com/BytemarkHosting/row
+    - mkdir -p $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+      # stick our code in the correct place.
+    - cp -r . $GOPATH/src/github.com/BytemarkHosting/bytemark-client
+    - go build -o bytemark-$GOARCH-$GOOS github.com/BytemarkHosting/bytemark-client/cmd/bytemark
+  artifacts:
+    paths:
+    - bytemark-$GOARCH-$GOOS
+    expire_in: '1 month'
+
+
+build-amd64-linux:
+  <<: *build
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+
+build-amd64-freebsd:
+  <<: *build
+  variables:
+    GOOS: freebsd
+    GOARCH: amd64
+
+build-amd64-openbsd:
+  <<: *build
+  variables:
+    GOOS: openbsd
+    GOARCH: amd64
+
+build-amd64-darwin:
+  <<: *build
+  variables:
+    GOOS: darwin
+    GOARCH: amd64
+
+build-amd64-windows:
+  <<: *build
+  variables:
+    GOOS: windows
+    GOARCH: amd64
+
+#### PACKAGE STAGE
+## the package job assembles tarballs for each OS & arch we support (zips for windows)
+## and assembles debian, RPM and chocolatey packages
+
+.package-job: &package
+  stage: package
+  before_script: *version_script
+  dependencies:
+  - build-amd64-linux
+  - build-manpage
+
+# package-generic-amd64 makes the tars and zips for manual install
+
+package-generic-amd64:
+  <<: *package
+  image: alpine:latest
+  script:
+  - apk update && apk add zip tar
+  - |
+    for i in bytemark-amd64-*; do
+      cp $i bytemark
+      cp doc/changelog.md doc/changelog.txt
+      if echo "$i" | grep -- '-windows$'; then
+          mv bytemark bytemark.exe
+          zip $i.zip bytemark.exe doc/bytemark.pdf doc/changelog.txt doc/LICENSE.txt
+      else
+          tar czf $i.tar.gz bytemark doc/bytemark.1 doc/changelog.txt doc/LICENSE.txt
+      fi
+    done
+  dependencies:
+  - build-amd64-linux
+  - build-amd64-darwin
+  - build-amd64-freebsd
+  - build-amd64-openbsd
+  - build-amd64-windows
+  - build-manpage
+  - build-changelogs
+  artifacts:
+    paths:
+    - "*.zip"
+    - "*.tar.gz"
+    expire_in: '1 month'
+
+# assembles debian packages
+package-debian-amd64:
+  <<: *package
+  image: gitlab.bytemark.co.uk:8443/docker-images/debhelper:jessie
+  script:
+  - ln -s .gitlab-ci/debian
+  - mv bytemark-amd64-linux bytemark
+  - '[ "v$VERSION" = "$CI_BUILD_REF_NAME" ] || CHANGELOG=doc/changelog dch --nomultimaint --maintmaint -v "$CHANGELOG_VERSION+$SNAPSHOT_VERSION" --force-bad-version "Snapshot build"'
+  - fakeroot debian/rules binary
+  - lintian -i ../bytemark-client*.deb
+  - mv ../bytemark-client*.deb .
+  artifacts:
+    paths:
+    - "*.deb"
+    expire_in: "1 month"
+  dependencies:
+  - build-amd64-linux
+  - build-manpage
+
+
+# assembles rpm packages
+# if desired, we can use mock to set up a cleanroom build using the cap-sys-admin runner.
+package-rpm-amd64:
+  <<: *package
+  image: nrechn/fedora-mock
+  script:
+  - mkdir -p ~/rpmbuild/SOURCES
+  - cat doc/changelog.rpm >> .gitlab-ci/bytemark-client.spec
+  - mv bytemark-amd64-linux ~/rpmbuild/SOURCES/bytemark
+  - mv doc/bytemark.1 ~/rpmbuild/SOURCES/bytemark.1
+  - rpmbuild --define "version ${VERSION:-$CHANGELOG_VERSION}" --define "release ${SNAPSHOT_VERSION}" -bb .gitlab-ci/bytemark-client.spec
+  - mv ~/rpmbuild/RPMS/*/bytemark*.rpm .
+  artifacts:
+    paths:
+    - "*.rpm"
+    expire_in: "1 month"
+  dependencies:
+  - build-amd64-linux
+  - build-manpage
+  - build-changelogs
+
+# makes a chocolatey package
+package-windows-amd64:
+    <<: *package
+    image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:master
+    script:
+    - mkdir -p choco/tools
+      # take off the ~ section for chocolatey packages. Unfortunately this means development versions won't get overridden by the final ones, but they should never be being uploaded to chocolatey anyway
+    - CHANGELOG_VERSION=${CHANGELOG_VERSION%%~*}
+    - sed -i 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g' doc/changelog.md
+    - xmlstarlet tr --xinclude .gitlab-ci/noop.xsl .gitlab-ci/bytemark-client.nuspec > choco/bytemark-client.nuspec
+    - sed -i -e "s/VERSION/${VERSION:-$CHANGELOG_VERSION.$CI_PIPELINE_ID}/g" choco/bytemark-client.nuspec
+    - mv bytemark-amd64-windows choco/tools/bytemark.exe
+    - unix2dos -n LICENSE choco/tools/LICENSE.txt
+    - cd choco/tools
+    - echo -en "The following is a sha256 hash of the contents of bytemark.exe. It should be\r\n" > VERIFICATION.txt
+    - echo -en "possible to run sha256sum -c VERIFICATION.txt to check the hash.\r\n" >> VERIFICATION.txt
+    - echo -en "Though it will complain about these top lines not being valid checksums.\r\n" >> VERIFICATION.txt
+    - echo -en "sha256sum can be installed on windows using cygwin, or you could use any other\r\n" >> VERIFICATION.txt
+    - echo -en "sha256 utility to hash the file.\r\n\r\n" >> VERIFICATION.txt
+    - sha256sum bytemark.exe >> VERIFICATION.txt
+    - cd .. # back to choco/
+    - choco pack bytemark-client.nuspec
+    - cd .. # back to bytemark-client
+    - mv choco/*.nupkg .
+    artifacts:
+      paths:
+      - "*.nupkg"
+      expire_in: "1 month"
+    dependencies:
+    - build-amd64-windows
+    - build-changelogs
+
+#### RELEASE STAGE
+## the release stage pushes the tars, zips, debs & rpms out to repo.bytemark
+## it also updates our homebrew repo at github.com/BytemarkHosting/homebrew-tools
+## and pushes the chocolatey package up to chocolatey
+
+# the publish job pushes the tars, zips, debs & rpms to repo.bytemark.co.uk/open-source/bytemark-client/<branch name>
+publish:
+  stage: release
+  tags:
+  - shell
+  before_script: *version_script
+  script:
+  - mkdir -p pkg/{linux,mac,freebsd,openbsd,windows,debian,rpm}
+  - VERSION=${VERSION:-$CHANGELOG_VERSION+$SNAPSHOT_VERSION}
+  - cp bytemark-amd64-linux.tar.gz pkg/linux/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-freebsd.tar.gz pkg/freebsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-openbsd.tar.gz pkg/openbsd/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-darwin.tar.gz pkg/mac/bytemark-$VERSION.tar.gz
+  - cp bytemark-amd64-windows.zip pkg/windows/bytemark-$VERSION.zip
+  # The debian, rpm, and chocolatey versions have their numbers set already.
+  - cp bytemark.*.nupkg pkg/windows
+  - cp bytemark-client_*_amd64.deb pkg/debian
+  - cp bytemark-client-*.rpm pkg/rpm
+  - publish
+  dependencies:
+  - package-generic-amd64
+  - package-rpm-amd64
+  - package-debian-amd64
+  - package-windows-amd64
+
+
+# this is a base which sets up SSH and git, so that the release-to-repo and release-to-brew jobs don't have to
+.release-job: &release
+  stage: release
+  image: gitlab.bytemark.co.uk:8443/docker-images/debian-git
+  before_script:
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$CD_SSH_KEY")
+  - mkdir ~/.ssh
+  - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+  - REPO=$REPO_SSH_HOST:$REPO_PATH
+  - VERSION=${CI_BUILD_REF_NAME##v}
+  - git config --global user.name Bytemark Automation
+  - git config --global user.email nobody@bytemark.co.uk
+  only:
+  - /^v\d+(\.\d+)+$/
+
+# releases a new version of bytemark client to repo.bytemark.co.uk/bytemark-client
+# this includes tarballs, zipballs, debian and rpm repos.
+release-to-repo:
+  <<: *release
+  script:
+  # upload
+  - scp bytemark-amd64-linux.tar.gz $REPO/linux/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-freebsd.tar.gz $REPO/freebsd/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-darwin.tar.gz $REPO/mac/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-openbsd.tar.gz $REPO/openbsd/bytemark-$VERSION.tar.gz
+  - scp bytemark-amd64-windows.zip $REPO/windows/bytemark-$VERSION.zip
+  - scp bytemark-client_${VERSION}_amd64.deb $REPO/debian
+  - scp bytemark-client-$VERSION*.rpm $REPO/rpm
+  # make rpm & debian repos
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/rpm && /srv/bin/rpm-addsign-unattended.sh bytemark-client-$VERSION*.rpm && createrepo . && gpg --yes --detach-sign --armor repodata/repomd.xml"
+  - ssh $REPO_SSH_HOST -- "cd $REPO_PATH/debian && rm -f Release.gpg InRelease && make"
+  # remove old -latest symlinks
+  - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do rm -f $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
+    # add new -latest symlinks
+  - ssh $REPO_SSH_HOST -- "for OS in linux mac openbsd freebsd; do ln -s bytemark-$VERSION.tar.gz $REPO_PATH/\$OS/bytemark-latest.tar.gz; done"
+  - ssh $REPO_SSH_HOST -- "rm -f $REPO_PATH/windows/bytemark-latest.zip"
+  - ssh $REPO_SSH_HOST -- "ln -s bytemark-$VERSION.zip $REPO_PATH/windows/bytemark-latest.zip"
+  dependencies:
+  - package-generic-amd64
+  - package-rpm-amd64
+  - package-debian-amd64
+
+# pushes the chocolate package to chocolatey.
+release-to-chocolatey:
+  <<: *release
+  image: gitlab.bytemark.co.uk:8443/docker-images/chocolatey:master
+  before_script:
+  - VERSION=${CI_BUILD_REF_NAME##v}
+  - choco apiKey -k "$CHOCO_API_KEY" -source https://chocolatey.org
+  script:
+  - choco push bytemark.$VERSION.nupkg -acceptLicense -y
+  dependencies:
+  - package-windows-amd64
+
+# release-to-brew and release-to-brew-beta both update our
+# github.com/BytemarkHosting/homebrew-tools repository with
+# the new sha256sum for the mac tarball.
+# They're separate jobs despite sharing a lot of their scripts
+# to absolutely ensure that development builds don't end up
+# being released to stable
+release-to-brew:
+  <<: *release
+  script:
+  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
+  # update the homebrew repo
+  - git clone git@github.com:BytemarkHosting/homebrew-tools.git
+  - cd homebrew-tools
+  - URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/bytemark-client/mac/bytemark-$VERSION.tar.gz'"'!)
+  - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
+  - echo sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
+  - sed -e "$URLRULE" -e "$HASHRULE" -i bytemark-client.rb
+  - git commit -m "Update bytemark-client to version VERSION" -- bytemark-client.rb
+  - git log HEAD^..HEAD
+  - git diff HEAD^..HEAD
+  - git push origin master
+  dependencies:
+  - package-generic-amd64
+
+release-to-brew-beta:
+  <<: *release
+  script:
+  - SHA256=$(sha256sum bytemark-amd64-darwin.tar.gz | cut -d' ' -f 1)
+  - CHANGELOG_VERSION=$(sed "s/.*(\([^)]\+\)).*/\1/ ; q"  doc/changelog)
+  - SNAPSHOT_VERSION=${CI_PIPELINE_ID}.git${CI_BUILD_REF:0:7}
+  # update the homebrew repo
+  - git clone git@github.com:BytemarkHosting/homebrew-tools.git
+  - cd homebrew-tools
+  - URLRULE=$(echo s!url '"'.*'"'!url '"'https://repo.bytemark.co.uk/open-source/bytemark-client/$CI_BUILD_REF_NAME/$CI_PIPELINE_ID/mac/bytemark-$CHANGELOG_VERSION~$SNAPSHOT_VERSION.tar.gz'"'!)
+  - HASHRULE=$(echo s!sha256 '"'.*'"'!sha256 '"'$SHA256'"'!)
+  - echo sed -e "$URLRULE" -e "$HASHRULE" -i "bytemark-client-beta.rb"
+  - sed -e "$URLRULE" -e "$HASHRULE" -i "bytemark-client-beta.rb"
+  - git commit -m "Update bytemark-client-beta to version VERSION" -- "bytemark-client-beta.rb"
+  - git log HEAD^..HEAD
+  - git diff HEAD^..HEAD
+  - git push origin master
+  only:
+  - develop
+  dependencies:
+  - package-generic-amd64
