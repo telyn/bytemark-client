@@ -4,7 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
-	auth3 "gitlab.bytemark.co.uk/auth/client"
+	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
 // Client provides the interface which all API clients should implement.

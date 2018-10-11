@@ -14,7 +14,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
-	auth3 "gitlab.bytemark.co.uk/auth/client"
+	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
 type unexpect struct{}

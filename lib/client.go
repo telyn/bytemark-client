@@ -2,7 +2,7 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	auth3 "gitlab.bytemark.co.uk/auth/client"
+	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
 // EndpointURLs are the URLs stored by the client for the various API endpoints the client touches.
