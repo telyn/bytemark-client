@@ -109,10 +109,9 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/BytemarkHosting/row",
-    "github.com/bcampbell/fuzzytime",
     "github.com/BytemarkHosting/auth-client",
     "github.com/BytemarkHosting/row",
+    "github.com/bcampbell/fuzzytime",
     "github.com/bgentry/speakeasy",
     "github.com/cheekybits/is",
     "github.com/maraino/go-mock",
