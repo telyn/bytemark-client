@@ -43,23 +43,6 @@ func nametomib(name string) (mib []_C_int, err error) {
 	return nil, EINVAL
 }
 
-func SysctlUvmexp(name string) (*Uvmexp, error) {
-	mib, err := sysctlmib(name)
-	if err != nil {
-		return nil, err
-	}
-
-	n := uintptr(SizeofUvmexp)
-	var u Uvmexp
-	if err := sysctl(mib, (*byte)(unsafe.Pointer(&u)), &n, nil, 0); err != nil {
-		return nil, err
-	}
-	if n != SizeofUvmexp {
-		return nil, EIO
-	}
-	return &u, nil
-}
-
 //sysnb pipe(p *[2]_C_int) (err error)
 func Pipe(p []int) (err error) {
 	if len(p) != 2 {
@@ -130,11 +113,11 @@ func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
 }
 
-func ioctlSetWinsize(fd int, req uint, value *Winsize) error {
+func IoctlSetWinsize(fd int, req uint, value *Winsize) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
 }
 
-func ioctlSetTermios(fd int, req uint, value *Termios) error {
+func IoctlSetTermios(fd int, req uint, value *Termios) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
 }
 
@@ -218,7 +201,6 @@ func Uname(uname *Utsname) error {
 //sys	Dup(fd int) (nfd int, err error)
 //sys	Dup2(from int, to int) (err error)
 //sys	Exit(code int)
-//sys	Faccessat(dirfd int, path string, mode uint32, flags int) (err error)
 //sys	Fchdir(fd int) (err error)
 //sys	Fchflags(fd int, flags int) (err error)
 //sys	Fchmod(fd int, mode uint32) (err error)
@@ -240,7 +222,6 @@ func Uname(uname *Utsname) error {
 //sysnb	Getppid() (ppid int)
 //sys	Getpriority(which int, who int) (prio int, err error)
 //sysnb	Getrlimit(which int, lim *Rlimit) (err error)
-//sysnb	Getrtable() (rtable int, err error)
 //sysnb	Getrusage(who int, rusage *Rusage) (err error)
 //sysnb	Getsid(pid int) (sid int, err error)
 //sysnb	Gettimeofday(tv *Timeval) (err error)
@@ -278,7 +259,6 @@ func Uname(uname *Utsname) error {
 //sysnb	Setresgid(rgid int, egid int, sgid int) (err error)
 //sysnb	Setresuid(ruid int, euid int, suid int) (err error)
 //sysnb	Setrlimit(which int, lim *Rlimit) (err error)
-//sysnb	Setrtable(rtable int) (err error)
 //sysnb	Setsid() (pid int, err error)
 //sysnb	Settimeofday(tp *Timeval) (err error)
 //sysnb	Setuid(uid int) (err error)
@@ -327,6 +307,7 @@ func Uname(uname *Utsname) error {
 // getlogin
 // getresgid
 // getresuid
+// getrtable
 // getthrid
 // ktrace
 // lfs_bmapv
@@ -362,6 +343,7 @@ func Uname(uname *Utsname) error {
 // semop
 // setgroups
 // setitimer
+// setrtable
 // setsockopt
 // shmat
 // shmctl

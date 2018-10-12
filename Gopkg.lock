@@ -2,12 +2,11 @@
 
 
 [[projects]]
-  branch = "master"
   digest = "1:10b03bbb2b5206663ab870d2c963bc3a90dd5e6f52508d2f4bdc53021db4b7ca"
   name = "github.com/BytemarkHosting/auth-client"
   packages = ["."]
   pruneopts = "UT"
-  revision = "d9180fd34c3b987a970bb7827ba151ac05f36cdc"
+  revision = "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf"
 
 [[projects]]
   branch = "master"
@@ -18,12 +17,11 @@
   revision = "64689958a4cb09a01483ae1ca39511ca14c3222e"
 
 [[projects]]
-  digest = "1:1343a2963481a305ca4d051e84bc2abd16b601ee22ed324f8d605de1adb291b0"
+  digest = "1:03b540ccf698c49706b9b54eae235ecec9f07f9f0d5d2811a9a0d10d2f768e0a"
   name = "github.com/bgentry/speakeasy"
   packages = ["."]
   pruneopts = "UT"
-  revision = "4aabc24848ce5fd31929f7d1e4ea74d3709c14cd"
-  version = "v0.1.0"
+  revision = "36e9cfdd690967f4f690c6edcc9ffacd006014a0"
 
 [[projects]]
   branch = "master"
@@ -34,20 +32,18 @@
   revision = "68e9c0620927fb5427fda3708222d0edee89eae9"
 
 [[projects]]
-  digest = "1:ca955a9cd5b50b0f43d2cc3aeb35c951473eeca41b34eb67507f1dbcc0542394"
+  digest = "1:045300d96eca8646d57c4a039de9b47694ef328612f69ef0ade22a97a670a8d8"
   name = "github.com/kr/pretty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "73f6ac0b30a98e433b289500d779f50c1a6f0712"
-  version = "v0.1.0"
+  revision = "e6ac2fc51e89a3249e82157fa0bb7a18ef9dd5bb"
 
 [[projects]]
-  digest = "1:15b5cc79aad436d47019f814fde81a10221c740dc8ddf769221a65097fb6c2e9"
+  digest = "1:d249ec295344198f1d3cb3534dc03204a83f7321b99fa604284e4eec1792ddf5"
   name = "github.com/kr/text"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f"
-  version = "v0.1.0"
+  revision = "bb797dc4fb8320488f47bf11de07a733d7233e1f"
 
 [[projects]]
   branch = "master"
@@ -58,44 +54,40 @@
   revision = "4c74c434cd3a9e9a70ed1eeb56646a1d3fac372f"
 
 [[projects]]
-  digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
+  digest = "1:3dce9780102fd9dfd8b864b18b84b1f94868f992d455af69a4604fae5d3b24f1"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
-  version = "v0.0.4"
+  revision = "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8"
 
 [[projects]]
-  digest = "1:cdb899c199f907ac9fb50495ec71212c95cb5b0e0a8ee0800da0238036091033"
+  digest = "1:be63acfa937b5ab65c2a1351a68671b1e4ab64c18a013008aa264021f93bf840"
   name = "github.com/mattn/go-runewidth"
   packages = ["."]
   pruneopts = "UT"
-  revision = "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb"
-  version = "v0.0.3"
+  revision = "e882a96ec18dd43fa283187b66af74497c9101c0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:f611266e3ac01ab4adb6f1d67f6c1be82998d02f452faff450596658712d860b"
+  digest = "1:2320b17ab014d050d75c868f3daf96416cbe93898cdd43e66bb66056faf6131d"
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
   pruneopts = "UT"
-  revision = "be2c049b30ccd4d3fd795d6bf7dce74e42eeedaa"
+  revision = "daf2955e742cf123959884fdff4685aa79b63135"
 
 [[projects]]
-  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
+  digest = "1:8080e1aba103c6ed33937dfdfbaebb3438721ee58a4bf8bb9d2a1ffa0f5d25f6"
   name = "github.com/urfave/cli"
   packages = ["."]
   pruneopts = "UT"
-  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
-  version = "v1.20.0"
+  revision = "f017f86fccc5a039a98f23311f34fdf78b014f78"
 
 [[projects]]
   branch = "master"
-  digest = "1:0a40b0bdd57a93e741d8557465be3a2edeec408e9b6399586ad65bbe8e355796"
+  digest = "1:5ba3abb5c4008242b72fcfa096743cdf1ea4ab3d7a6de15e4a493df6d98796a9"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
+  revision = "7ceb54c8418b8f9cdf0177b511d5cbb06e9fae39"
 
 [solve-meta]
   analyzer-name = "dep"
