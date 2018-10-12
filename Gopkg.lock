@@ -2,6 +2,13 @@
 
 
 [[projects]]
+  digest = "1:10b03bbb2b5206663ab870d2c963bc3a90dd5e6f52508d2f4bdc53021db4b7ca"
+  name = "github.com/BytemarkHosting/auth-client"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf"
+
+[[projects]]
   branch = "master"
   digest = "1:26958ec13f54dca00ee3d8a171124c6660eb0cafe48cd4ae2b651dd86558fe45"
   name = "github.com/BytemarkHosting/row"
@@ -83,14 +90,6 @@
   revision = "f017f86fccc5a039a98f23311f34fdf78b014f78"
 
 [[projects]]
-  digest = "1:10b03bbb2b5206663ab870d2c963bc3a90dd5e6f52508d2f4bdc53021db4b7ca"
-  name = "gitlab.bytemark.co.uk/auth/client"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf"
-  source = "git@gitlab.bytemark.co.uk:auth/client.git"
-
-[[projects]]
   branch = "master"
   digest = "1:5ba3abb5c4008242b72fcfa096743cdf1ea4ab3d7a6de15e4a493df6d98796a9"
   name = "golang.org/x/sys"
@@ -102,6 +101,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/BytemarkHosting/auth-client",
     "github.com/BytemarkHosting/row",
     "github.com/bcampbell/fuzzytime",
     "github.com/bgentry/speakeasy",
@@ -110,7 +110,6 @@
     "github.com/mattn/go-isatty",
     "github.com/olekukonko/tablewriter",
     "github.com/urfave/cli",
-    "gitlab.bytemark.co.uk/auth/client",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

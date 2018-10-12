@@ -10,9 +10,9 @@ import (
 	"strings"
 	"syscall"
 
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
-	auth3 "gitlab.bytemark.co.uk/auth/client"
 )
 
 // UserRequestedExit is returned when the user said 'No' to a 'yes/no' prompt.
@@ -177,7 +177,7 @@ func ProcessError(err error, message ...string) ExitCode {
 	if err != nil {
 		switch e := err.(type) {
 		case *auth3.Error:
-			// TODO(telyn): I feel like this entire chunk should be in gitlab.bytemark.co.uk/auth/client
+			// TODO(telyn): I feel like this entire chunk should be in github.com/BytemarkHosting/auth-client
 			switch e.Err.(type) {
 			case *url.Error:
 				urlErr, _ := e.Err.(*url.Error)

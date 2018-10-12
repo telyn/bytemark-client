@@ -9,7 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	mock "github.com/maraino/go-mock"
-	auth3 "gitlab.bytemark.co.uk/auth/client"
+	auth3 "github.com/BytemarkHosting/auth-client"
 )
 
 type Client struct {
