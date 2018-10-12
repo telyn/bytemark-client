@@ -24,18 +24,18 @@ func (c *Context) Debug(format string, values ...interface{}) {
 		return
 	}
 	if wr, ok := dw.(io.Writer); ok {
-		fmt.Fprintf(wr, format, values...)
+		_, _ = fmt.Fprintf(wr, format+"\n", values...)
 	}
 }
 
 // Log runs fmt.Fprintf on the args, outputting to the App's Writer
 func (c *Context) Log(format string, values ...interface{}) {
-	fmt.Fprintf(c.App().Writer, format+"\n", values...)
+	_, _ = fmt.Fprintf(c.App().Writer, format+"\n", values...)
 }
 
 // LogErr runs fmt.Fprintf on the args, outputting to the App's Writer
 func (c *Context) LogErr(format string, values ...interface{}) {
-	fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
+	_, _ = fmt.Fprintf(c.App().ErrWriter, format+"\n", values...)
 }
 
 // OutputFormat attempts to figure out the output format needed, given the contents of the output-format config var,
