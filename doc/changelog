@@ -1,5 +1,13 @@
 bytemark-client (3.3) UNRELEASED; urgency=low
 
+  ### New Features:
+  * Discs can be moved between servers using the `update disc` command and the
+    new `--new-server` flag
+
+ -- Hannah Pirie <hannah.pirie@bytemark.co.uk>  Tue, 06 Nov 2018 10:24:36 +0000
+
+bytemark-client (3.3) UNRELEASED; urgency=low
+
   ### New Admin Features:
   * `show dependant servers` command for viewing servers on a head, tail or
     storage pool at a given time
