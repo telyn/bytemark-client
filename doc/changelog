@@ -1,4 +1,4 @@
-bytemark-client (3.3) UNRELEASED; urgency=low
+bytemark-client (3.4) UNRELEASED; urgency=low
 
   ### New Features:
   * Discs can be moved between servers using the `update disc` command and the
