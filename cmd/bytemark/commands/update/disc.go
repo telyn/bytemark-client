@@ -23,7 +23,7 @@ func init() {
 
 Resizes the given disc to the given size. Sizes may be specified with a + in front, in which case they are interpreted as relative. For example, '+2GB' is parsed as 'increase the disc size by 2GiB', where '2GB' is parsed as 'set the size of the disc to 2GiB'
 
-Moving the disc to another server may require you to update your operating system configuration. Both servers must be shutdown and root discs cannot be moved. Please find documentation for moving discs at https://docs.bytemark.co.uk/`,
+Moving the disc to another server may require you to update your operating system configuration. Both servers must be shutdown and root discs cannot be moved. Please find documentation for moving discs at https://docs.bytemark.co.uk/article/moving-a-disc`,
 		Flags: []cli.Flag{
 			flags.Force,
 			cli.StringFlag{
@@ -77,7 +77,7 @@ func updateDisc(c *app.Context) (err error) {
 	if c.IsSet("new-server") {
 		newVM := c.VirtualMachineName("new-server")
 
-		log.Logf("This may require an update to the operating system configuration, please find documentation for moving discs at https://docs.bytemark.co.uk/\r\n")
+		log.Logf("This may require an update to the operating system configuration, please find documentation for moving discs at https://docs.bytemark.co.uk/article/moving-a-disc\r\n")
 
 		if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to move the disc?")) {
 			return util.UserRequestedExit{}
