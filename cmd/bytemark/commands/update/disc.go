@@ -51,45 +51,61 @@ Moving the disc to another server may require you to update your operating syste
 }
 
 func updateDisc(c *app.Context) (err error) {
-	vmName := c.VirtualMachineName("server")
-
 	if c.IsSet("new-size") {
-		size := c.ResizeFlag("new-size")
-		newSize := size.Size
-
-		if size.Mode == app.ResizeModeIncrease {
-			newSize += c.Disc.Size
-		}
-		log.Logf("Resizing %s from %dGiB to %dGiB...", c.Disc.Label, c.Disc.Size/1024, newSize/1024)
-
-		if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to perform this resize?")) {
-			return util.UserRequestedExit{}
-		}
-
-		err = c.Client().ResizeDisc(vmName, c.String("disc"), newSize)
+		err = resizeDisc(c)
 		if err != nil {
-			log.Logf("Failed!\r\n")
-			return
+			return err
 		}
-		log.Logf("Completed.\r\n")
 	}
 
 	if c.IsSet("new-server") {
-		newVM := c.VirtualMachineName("new-server")
-
-		log.Logf("This may require an update to the operating system configuration, please find documentation for moving discs at https://docs.bytemark.co.uk/article/moving-a-disc\r\n")
-
-		if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to move the disc?")) {
-			return util.UserRequestedExit{}
-		}
-		log.Logf("Moving %s from %s to %s...", c.Disc.Label, vmName, newVM)
-		err = brainRequests.MoveDisc(c.Client(), vmName, c.String("disc"), newVM)
+		err = moveDisc(c)
 		if err != nil {
-			log.Logf("Failed!\r\n")
-			return
+			return err
 		}
-		log.Logf("Completed.\r\n")
 	}
 
+	return
+}
+
+func resizeDisc(c *app.Context) (err error) {
+	vmName := c.VirtualMachineName("server")
+	size := c.ResizeFlag("new-size")
+	newSize := size.Size
+	if size.Mode == app.ResizeModeIncrease {
+		newSize += c.Disc.Size
+	}
+
+	log.Logf("Resizing %s from %dGiB to %dGiB...", c.Disc.Label, c.Disc.Size/1024, newSize/1024)
+
+	if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to perform this resize?")) {
+		return util.UserRequestedExit{}
+	}
+
+	err = c.Client().ResizeDisc(vmName, c.String("disc"), newSize)
+	if err != nil {
+		log.Logf("Failed!\r\n")
+		return
+	}
+	log.Logf("Completed.\r\n")
+	return
+}
+
+func moveDisc(c *app.Context) (err error) {
+	vmName := c.VirtualMachineName("server")
+	newVM := c.VirtualMachineName("new-server")
+
+	log.Logf("This may require an update to the operating system configuration, please find documentation for moving discs at https://docs.bytemark.co.uk/article/moving-a-disc\r\n")
+
+	if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to move the disc?")) {
+		return util.UserRequestedExit{}
+	}
+	log.Logf("Moving %s from %s to %s...", c.Disc.Label, vmName, newVM)
+	err = brainRequests.MoveDisc(c.Client(), vmName, c.String("disc"), newVM)
+	if err != nil {
+		log.Logf("Failed!\r\n")
+		return
+	}
+	log.Logf("Completed.\r\n")
 	return
 }
