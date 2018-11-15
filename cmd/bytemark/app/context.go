@@ -24,6 +24,7 @@ type Context struct {
 	Privilege      brain.Privilege
 	User           *brain.User
 	VirtualMachine *brain.VirtualMachine
+	VmDefault	   *brain.VMDefault
 
 	currentArgIndex  int
 	preprocessHasRun bool
