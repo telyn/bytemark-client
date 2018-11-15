@@ -251,4 +251,5 @@ type Client interface {
 	UpdateHead(idOrLabel string, options UpdateHead) error
 	UpdateTail(idOrLabel string, options UpdateTail) error
 	UpdateStoragePool(idOrLabel string, options brain.StoragePool) error
+	CreateVMDefault(name string, public bool, serverSettings brain.VmDefaultSpec) error
 }

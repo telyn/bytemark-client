@@ -10,6 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	mock "github.com/maraino/go-mock"
 	auth3 "github.com/BytemarkHosting/auth-client"
+
 )
 
 type Client struct {
@@ -535,4 +536,9 @@ func (c *Client) EnsureVirtualMachineName(name *lib.VirtualMachineName) error {
 		name.VirtualMachine = "blank-vm-name"
 	}
 	return nil
+}
+
+func (c *Client) CreateVMDefault(name string, public bool, serverSettings brain.VmDefaultSpec) error{
+	r := c.Called(name, public, serverSettings)
+	return r.Error(1)
 }

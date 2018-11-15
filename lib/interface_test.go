@@ -33,6 +33,7 @@ func TestQualityInterfaceHasntGrown(t *testing.T) {
 		"CreateIPRange",
 		"CreateUser",
 		"CreateVirtualMachine",
+		"CreateVMDefault",
 		"DeleteBackup",
 		"DeleteBackupSchedule",
 		"DeleteDisc",
