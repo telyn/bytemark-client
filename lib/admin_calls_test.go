@@ -671,3 +671,41 @@ func TestPostUpdateStoragePool(t *testing.T) {
 		return client.UpdateStoragePool("t3-sata1", brain.StoragePool{Label: "t3-sata2"})
 	})
 }
+
+
+func TestPostCreateVMDefault(t *testing.T) {
+	// TODO(tom): shorten and fix, too messy & remove non required
+	simplePostTest(t, "/vm_defaults", `{"name":"vmd-name","public":true,"server_settings":{` +
+													`"vm_default":{"cores":1,"name":"vm"},` +
+													`"disc":[{"storage_grade":"sata","size":1024,` +
+													`"backup_schedules":[{"start_at":"","interval_seconds":604800,"capacity":1}]}],` +
+													`"reimage":{"distribution":"image","firstboot_script":"script","root_password":"","ssh_public_key":""}}}`,
+	func(client lib.Client) error {
+		return client.CreateVMDefault("vmd-name",true, brain.VmDefaultSpec{
+			VmDefault: brain.VMDefault{
+				CdromURL:         "",
+				Cores:            1,
+				Memory:           0,
+				Name:             "vm",
+				HardwareProfile:  "",
+				ZoneName:         "",
+			},
+			Discs: brain.Discs{
+				brain.Disc{
+					StorageGrade: "sata",
+					Size:         1024,
+					BackupSchedules: brain.BackupSchedules{{
+						Interval: 604800,
+						Capacity: 1,
+					}},
+				},
+			},
+			Reimage: &brain.ImageInstall{
+				Distribution: 	  "image",
+				FirstbootScript:  "script",
+				RootPassword: 	  "",
+				PublicKeys:       "",
+				},
+		})
+	})
+}
