@@ -433,19 +433,3 @@ func (c *bytemarkClient) UpdateStoragePool(idOrLabel string, options brain.Stora
 	_, _, err = r.MarshalAndRun(options, nil)
 	return
 }
-
-func (c *bytemarkClient) CreateVMDefault(name string, public bool, serverSettings brain.VmDefaultSpec) (err error) {
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/vm_defaults")
-	if err != nil {
-		return
-	}
-
-	obj := map[string]interface{}{
-		"name": name,
-		"public": public,
-		"server_settings": serverSettings,
-	}
-
-	_, _, err = r.MarshalAndRun(obj, nil)
-	return
-}
