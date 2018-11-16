@@ -10,6 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/image"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/urfave/cli"
 )
 
@@ -71,7 +72,7 @@ func init() {
 }
 
 
-// createVmDefault creates a server object to be created by the brain and sends it.
+// createVMDefault creates a server object to be created by the brain and sends it.
 func createVMDefault(c *app.Context) (err error) {
 	name := c.String("name")
 	public := c.Bool("public")
@@ -87,7 +88,7 @@ func createVMDefault(c *app.Context) (err error) {
 
 	// add pretty print
 
-	err = c.Client().CreateVMDefault(name, public, serverSettings)
+	err = brainRequests.CreateVMDefault(c.Client(),name, public, serverSettings)
 	if err != nil {
 		return err
 	}
@@ -97,7 +98,7 @@ func createVMDefault(c *app.Context) (err error) {
 }
 
 // createServerPrepSpec sets up the server spec by reading in all the flags.
-func createVMDPrepSpec(c *app.Context) (spec brain.VmDefaultSpec, err error) {
+func createVMDPrepSpec(c *app.Context) (spec brain.VMDefaultSpec, err error) {
 	backupFrequency := c.String("backup")
 
 	discs, cores, memory, err := createVMDReadArgs(c)
@@ -117,8 +118,8 @@ func createVMDPrepSpec(c *app.Context) (spec brain.VmDefaultSpec, err error) {
 
 	name := c.VirtualMachineName("vm-name")
 
-	spec = brain.VmDefaultSpec{
-		VmDefault: brain.VMDefault{
+	spec = brain.VMDefaultSpec{
+		VMDefault: brain.VMDefault{
 			Name:                  name.VirtualMachine,
 			Cores:                 cores,
 			Memory:                memory,

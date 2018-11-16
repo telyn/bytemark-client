@@ -1,7 +1,10 @@
 package brain
 
 import (
+	"io"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
 // TODO(tom): add test
@@ -29,4 +32,9 @@ func (vmd VMDefault ) DefaultFields(f output.Format) string {
 		return "Memory, Cores, Name "
 	}
 	return "Memory, Cores, Discs, CdromURL, HardwareProfile"
+}
+
+// PrettyPrint outputs a nice human-readable overview of the server to the given writer.
+func (vmd VMDefault) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	return nil
 }

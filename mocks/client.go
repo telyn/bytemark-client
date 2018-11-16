@@ -538,7 +538,7 @@ func (c *Client) EnsureVirtualMachineName(name *lib.VirtualMachineName) error {
 	return nil
 }
 
-func (c *Client) CreateVMDefault(name string, public bool, serverSettings brain.VmDefaultSpec) error{
+func (c *Client) CreateVMDefault(name string, public bool, serverSettings brain.VMDefaultSpec) error{
 	r := c.Called(name, public, serverSettings)
 	return r.Error(1)
 }
