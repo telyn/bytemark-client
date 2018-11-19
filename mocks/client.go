@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
-	mock "github.com/maraino/go-mock"
-	auth3 "github.com/BytemarkHosting/auth-client"
-
+	"github.com/maraino/go-mock"
 )
 
 type Client struct {
@@ -538,7 +537,7 @@ func (c *Client) EnsureVirtualMachineName(name *lib.VirtualMachineName) error {
 	return nil
 }
 
-func (c *Client) CreateVMDefault(name string, public bool, serverSettings brain.VMDefaultSpec) error{
+func (c *Client) CreateVMDefault(name string, public bool, serverSettings brain.VMDefaultSpec) error {
 	r := c.Called(name, public, serverSettings)
 	return r.Error(1)
 }
