@@ -1,10 +1,13 @@
 package brain
 
 import (
+	"io"
+
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
-// TODO (tom): Add pretty print & test file for this function
+// TODO(tom): Add pretty print & test file for this function
 // VMDefaultSpec represents a VM Default specification.
 type VMDefaultSpec struct {
 	VMDefault VMDefault     `json:"vm_default,omitempty"`
@@ -19,4 +22,34 @@ func (spec VMDefaultSpec) DefaultFields(f output.Format) string {
 		return "VirtualMachine, Discs, Reimage"
 	}
 	return "VirtualMachine, Discs, Reimage"
+}
+
+// TODO(tom): add test file for this
+// TODO(tom): add backup schedules to prettyprint
+
+// PrettyPrint outputs a nice human-readable overview of the VM Default Specification to the given writer.
+func (spec VMDefaultSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	const template = `{{ define "vmdspec_sgl" }} ▸ {{.VMDefault.Name }} in {{capitalize .VMDefault.ZoneName}}{{ end }}
+{{ define "vmdspec_vmd" }} {{ pluralize "core" "cores" .VMDefault.Cores }}, {{ mibgib .VMDefault.Memory }}, {{pluralize "disc" "discs"  }}{{ else }}no discs{{ end }}{{ end }}
+{{ define "vmdspec_reimage" }} {{ .Reimage.Distribution }}{{ end }}
+
+{{ define "vmdspec_discs"  }}
+{{- if .Discs }}    discs:
+{{- range .VMDefault.Discs }}
+      • {{ prettysprint . "_sgl" }}
+{{- end }}
+{{ end -}}
+{{ end }}
+
+{{ define "vmdspec_medium" }}{{ template "vmdspec_sgl" . }}
+{{ template "vmdspec_vmd" . }}{{ end }}
+
+{{ define "vmdspec_full" -}}
+{{ template "vmdspec_medium" . }}
+
+{{ template "vmdspec_vmd" . }}
+{{ template "vmdspec_discs" . -}}
+{{ template "vmdspec_reimage" . }}
+{{ end }}`
+	return prettyprint.Run(wr, template, "vmdspec"+string(detail), spec)
 }
