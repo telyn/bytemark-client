@@ -16,13 +16,13 @@ import (
 
 func init() {
 	Commands = append(Commands, cli.Command{
-		Name:    "vm default",
-		Aliases: []string{"vm-default"},
-		Usage:   "adds a new VM Default",
+		Name:      "vm default",
+		Aliases:   []string{"vm-default"},
+		Usage:     "adds a new VM Default",
 		UsageText: "--admin add vm default <name> <public> [<cores>[<memory>[<disc-specs>]...]]",
 		Description: `adds a new VM Default to the current account, which can be specified as either public or private.
   					  the server settings can be specified for the vm default with flags`,
-		// TODO (tom): add to description
+		// TODO(tom): add to description
 
 		Flags: append(app.OutputFlags("vmdefault", "object"),
 			cli.StringFlag{
@@ -32,6 +32,10 @@ func init() {
 			cli.BoolFlag{
 				Name:  "public",
 				Usage: "If the VM Default should be made public or not",
+			},
+			cli.StringFlag{
+				Name:  "cdrom",
+				Usage: "URL pointing to an ISO which will be attached to the cloud server as a CD",
 			},
 			cli.IntFlag{
 				Name:  "cores",
@@ -58,6 +62,10 @@ func init() {
 				Usage: "Image to install on the server. See `bytemark images` for the list of available images.",
 			},
 			cli.StringFlag{
+				Name:  "hwprofile",
+				Usage: "The hardware profile to use. Defaults to the current modern profile. See `bytemark profiles` for a list of hardware profiles available.",
+			},
+			cli.StringFlag{
 				Name:  "backup",
 				Usage: "Add a backup schedule for the first disk at the given frequency (daily, weekly, monthly, or never)",
 				Value: "weekly",
@@ -66,11 +74,14 @@ func init() {
 				Name:  "zone",
 				Usage: "Which zone the server will be created in. See `bytemark zones` for the choices.",
 			},
+			cli.StringFlag{
+				Name:  "firstboot-script",
+				Usage: "The firstboot script the VM Default should use.",
+			},
 		),
 		Action: app.Action(args.Optional("name", "public", "cores", "memory", "disc"), with.RequiredFlags("name", "public"), with.Auth, createVMDefault),
 	})
 }
-
 
 // createVMDefault creates a server object to be created by the brain and sends it.
 func createVMDefault(c *app.Context) (err error) {
@@ -88,7 +99,7 @@ func createVMDefault(c *app.Context) (err error) {
 
 	// add pretty print
 
-	err = brainRequests.CreateVMDefault(c.Client(),name, public, serverSettings)
+	err = brainRequests.CreateVMDefault(c.Client(), name, public, serverSettings)
 	if err != nil {
 		return err
 	}
@@ -120,12 +131,12 @@ func createVMDPrepSpec(c *app.Context) (spec brain.VMDefaultSpec, err error) {
 
 	spec = brain.VMDefaultSpec{
 		VMDefault: brain.VMDefault{
-			Name:                  name.VirtualMachine,
-			Cores:                 cores,
-			Memory:                memory,
-			ZoneName:              c.String("zone"),
-			CdromURL:              c.String("cdrom"),
-			HardwareProfile:       c.String("hwprofile"),
+			Name:            name.VirtualMachine,
+			Cores:           cores,
+			Memory:          memory,
+			ZoneName:        c.String("zone"),
+			CdromURL:        c.String("cdrom"),
+			HardwareProfile: c.String("hwprofile"),
 		},
 		Discs:   discs,
 		Reimage: &imageInstall,
