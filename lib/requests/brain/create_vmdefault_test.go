@@ -1,68 +1,97 @@
 package brain_test
 
 import (
-	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
+	"fmt"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
+	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
+	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
-func simplePostTest(t *testing.T, url string, testBody string, runTest func(lib.Client) error) {
-	testName := testutil.Name(0)
-	rts := testutil.RequestTestSpec{
-		Method:        "POST",
-		Endpoint:      lib.BrainEndpoint,
-		URL:           url,
-		AssertRequest: assert.BodyString(testBody),
-	}
-	rts.Run(t, testName, true, func(client lib.Client) {
-
-		err := runTest(client)
-		if err != nil {
-			t.Errorf("%s errored: %s", testName, err.Error())
-		}
-	})
-}
-
-func TestPostCreateVMDefault(t *testing.T) {
-	// TODO(tom): shorten and fix, too messy & remove non required
-
-	simplePostTest(t, "/vm_defaults",
-		`{"name":"vmd-name","public":true,"server_settings":{` +
-		`"vm_default":{"cores":1,"name":"vm"},` +
-		`"disc":[{"storage_grade":"sata","size":1024,` +
-		`"backup_schedules":[{"start_at":"","interval_seconds":604800,"capacity":1}]}],` +
-		`"reimage":{"distribution":"image","firstboot_script":"script","root_password":"","ssh_public_key":""}}}`,
-
-		func(client lib.Client) error {
-			return brainRequests.CreateVMDefault(client,"vmd-name",true, brain.VMDefaultSpec{
+func TestCreateVMDefault(t *testing.T) {
+	tests := []struct {
+		name           string
+		public         bool
+		serverSettings brain.VMDefaultSpec
+		expected       map[string]interface{}
+		shouldErr      bool
+	}{
+		{
+			name:   "vmd-test",
+			public: true,
+			serverSettings: brain.VMDefaultSpec{
 				VMDefault: brain.VMDefault{
-					CdromURL:         "",
-					Cores:            1,
-					Memory:           0,
-					Name:             "vm",
-					HardwareProfile:  "",
-					ZoneName:         "",
+					CdromURL:        "test-url",
+					Cores:           1,
+					Memory:          1024,
+					Name:            "test-vm",
+					HardwareProfile: "test-hwp",
+					ZoneName:        "test-zone",
 				},
 				Discs: brain.Discs{
 					brain.Disc{
-						StorageGrade: "sata",
-						Size:         1024,
+						StorageGrade: "test-grade",
+						Size:         1,
 						BackupSchedules: brain.BackupSchedules{{
-							Interval: 604800,
-							Capacity: 1,
+							StartDate: "",
+							Interval:  7 * 86400,
+							Capacity:  1,
 						}},
 					},
 				},
 				Reimage: &brain.ImageInstall{
-					Distribution: 	  "image",
-					FirstbootScript:  "script",
-					RootPassword: 	  "",
-					PublicKeys:       "",
+					Distribution:    "test-image",
+					FirstbootScript: "test-script",
+					PublicKeys:      "",
+					RootPassword:    "",
 				},
-			})
+			},
+			expected: map[string]interface{}{
+				"name":   "vmd-test",
+				"public": true,
+				"server_settings": map[string]interface{}{
+					"vm_default": map[string]interface{}{
+						"cdrom_url":        "test-url",
+						"cores":            1,
+						"memory":           1024,
+						"name":             "test-vm",
+						"hardware_profile": "test-hwp",
+						"zone_name":        "test-zone"},
+					"disc": []interface{}{map[string]interface{}{
+						"storage_grade": "test-grade",
+						"size":          1,
+						"backup_schedules": map[string]interface{}{
+							"start_at":         "",
+							"interval_seconds": 604800,
+							"capacity":         1}}},
+					"reimage": map[string]interface{}{
+						"distribution":     "test-image",
+						"firstboot_script": "test-script",
+						"root_password":    "",
+						"ssh_public_key":   ""},
+				},
+			},
+		},
+	}
+	for i, test := range tests {
+		testName := testutil.Name(i)
+		rts := testutil.RequestTestSpec{
+			Method:   "POST",
+			Endpoint: lib.BrainEndpoint,
+			URL:      fmt.Sprintf("/vm_defaults"),
+			// TODO(tom): Implement this properly. Objects contain same keys, but not ordered bc map
+			//AssertRequest: assert.BodyUnmarshalEqual(test.expected),
+		}
+		rts.Run(t, testName, true, func(client lib.Client) {
+			err := brainMethods.CreateVMDefault(client, test.name, test.public, test.serverSettings)
+			if test.shouldErr {
+				assert.NotEqual(t, testName, nil, err)
+			} else {
+				assert.Equal(t, testName, nil, err)
+			}
 		})
+	}
 }

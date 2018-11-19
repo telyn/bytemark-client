@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
-	types "github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-func CreateVMDefault(client lib.Client, name string, public bool, serverSettings types.VMDefaultSpec) (err error) {
+func CreateVMDefault(client lib.Client, name string, public bool, serverSettings brain.VMDefaultSpec) error {
 	if name == "" {
 		return fmt.Errorf("VMDefault must have a non-blank name")
 	}
@@ -17,15 +17,15 @@ func CreateVMDefault(client lib.Client, name string, public bool, serverSettings
 
 	r, err := client.BuildRequest("POST", lib.BrainEndpoint, "/vm_defaults")
 	if err != nil {
-		return
+		return err
 	}
 
 	obj := map[string]interface{}{
-		"name": name,
-		"public": public,
+		"name":            name,
+		"public":          public,
 		"server_settings": serverSettings,
 	}
 
 	_, _, err = r.MarshalAndRun(obj, nil)
-	return
+	return err
 }
