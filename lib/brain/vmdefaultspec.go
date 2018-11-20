@@ -7,7 +7,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
-// TODO(tom): Add pretty print & test file for this function
 // VMDefaultSpec represents a VM Default specification.
 type VMDefaultSpec struct {
 	VMDefault VMDefault     `json:"vm_default,omitempty"`
@@ -23,9 +22,6 @@ func (spec VMDefaultSpec) DefaultFields(f output.Format) string {
 	}
 	return "VirtualMachine, Discs, Reimage"
 }
-
-// TODO(tom): add test file for this
-// TODO(tom): add backup schedules to prettyprint
 
 // PrettyPrint outputs a nice human-readable overview of the VM Default Specification to the given writer.
 func (spec VMDefaultSpec) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {

@@ -7,6 +7,8 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+// CreateVMDefault creates a new VM Default with the specified parameters,
+// returning the newly created job on success or an error otherwise.
 func CreateVMDefault(client lib.Client, name string, public bool, serverSettings brain.VMDefaultSpec) error {
 	if name == "" {
 		return fmt.Errorf("VMDefault must have a non-blank name")

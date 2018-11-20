@@ -83,7 +83,7 @@ func TestCreateVMDefault(t *testing.T) {
 			Endpoint: lib.BrainEndpoint,
 			URL:      fmt.Sprintf("/vm_defaults"),
 			// TODO(tom): Implement this properly. Objects contain same keys, but not ordered bc map
-			//AssertRequest: assert.BodyUnmarshalEqual(test.expected),
+			AssertRequest: assert.BodyUnmarshalEqual(test.expected),
 		}
 		rts.Run(t, testName, true, func(client lib.Client) {
 			err := brainMethods.CreateVMDefault(client, test.name, test.public, test.serverSettings)
