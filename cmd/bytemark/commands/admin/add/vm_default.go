@@ -112,7 +112,6 @@ func createVMDefault(c *app.Context) (err error) {
 	}
 
 	return c.OutputInDesiredForm(CreatedVMDefault{Spec: spec})
-
 }
 
 // createServerPrepSpec sets up the server spec by reading in all the flags.
@@ -225,12 +224,12 @@ func defaultBackupSchedule() brain.BackupSchedule {
 // and the spec that went into creating it.
 type CreatedVMDefault struct {
 	Spec      brain.VMDefaultSpec `json:"server_settings"`
-	VMDefault brain.VMDefault     `json:"vm_default"`
+	VMDefault brain.VMDefault     `json:"virtual_machine"`
 }
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (c CreatedVMDefault) DefaultFields(f output.Format) string {
-	return "Spec, VirtualMachine"
+	return "Spec, VMDefault"
 }
 
 // PrettyPrint outputs this created vm default in a vaguely nice format to the given writer. detail is ignored.

@@ -9,7 +9,7 @@ import (
 
 // VMDefaultSpec represents a VM Default specification.
 type VMDefaultSpec struct {
-	VMDefault VMDefault     `json:"vm_default,omitempty"`
+	VMDefault VMDefault     `json:"virtual_machine,omitempty"`
 	Discs     []Disc        `json:"disc,omitempty"`
 	Reimage   *ImageInstall `json:"reimage,omitempty"` // may want to be null, so is a pointer
 }
