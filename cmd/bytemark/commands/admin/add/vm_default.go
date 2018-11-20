@@ -2,7 +2,11 @@ package add
 
 import (
 	"fmt"
+	"io"
 	"time"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
@@ -21,9 +25,15 @@ func init() {
 		Usage:     "adds a new VM Default",
 		UsageText: "--admin add vm default <name> <public> [<cores>[<memory>[<disc-specs>]...]]",
 		Description: `adds a new VM Default to the current account, which can be specified as either public or private.
-  					  the server settings can be specified for the vm default with flags`,
-		// TODO(tom): add to description
+  					  the server settings can be specified for the vm default with aditional flags
 
+The VM Default name will be a name for the whole VM Default spcification. This is what the VMDefault will be referred as.
+
+A disc spec looks like the following: grade:size. The grade field is optional and will default to sata.
+Multiple --disc flags can be used to add multiple discs to the VM Default
+
+If --backup is set then a backup of the first disk will be taken at the
+frequency specified - never, daily, weekly or monthly.`,
 		Flags: append(app.OutputFlags("vmdefault", "object"),
 			cli.StringFlag{
 				Name:  "name",
@@ -47,15 +57,9 @@ func init() {
 				Value: new(util.SizeSpecFlag),
 				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units. Defaults to 1GiB.",
 			},
-			cli.GenericFlag{
-				Name:  "disc",
-				Usage: "One or more disc specifications. Defaults to a single 25GiB sata-grade disc",
-				Value: new(util.DiscSpecFlag),
-			},
-			cli.GenericFlag{
+			cli.StringFlag{
 				Name:  "vm-name",
 				Usage: "The name of the VM",
-				Value: new(app.VirtualMachineNameFlag),
 			},
 			cli.StringFlag{
 				Name:  "image",
@@ -73,6 +77,11 @@ func init() {
 			cli.StringFlag{
 				Name:  "zone",
 				Usage: "Which zone the server will be created in. See `bytemark zones` for the choices.",
+			},
+			cli.GenericFlag{
+				Name:  "disc",
+				Usage: "One or more disc specifications. Defaults to a single 25GiB sata-grade disc",
+				Value: new(util.DiscSpecFlag),
 			},
 			cli.StringFlag{
 				Name:  "firstboot-script",
@@ -92,20 +101,18 @@ func createVMDefault(c *app.Context) (err error) {
 		name = "vm default"
 	}
 
-	serverSettings, err := createVMDPrepSpec(c)
+	spec, err := createVMDPrepSpec(c)
 	if err != nil {
 		return
 	}
 
-	// add pretty print
-
-	err = brainRequests.CreateVMDefault(c.Client(), name, public, serverSettings)
+	err = brainRequests.CreateVMDefault(c.Client(), name, public, spec)
 	if err != nil {
 		return err
 	}
 
-	// add pretty print for created vm default
-	return
+	return c.OutputInDesiredForm(CreatedVMDefault{Spec: spec})
+
 }
 
 // createServerPrepSpec sets up the server spec by reading in all the flags.
@@ -127,11 +134,9 @@ func createVMDPrepSpec(c *app.Context) (spec brain.VMDefaultSpec, err error) {
 		return
 	}
 
-	name := c.VirtualMachineName("vm-name")
-
 	spec = brain.VMDefaultSpec{
 		VMDefault: brain.VMDefault{
-			Name:            name.VirtualMachine,
+			Name:            c.String("vm-name"),
 			Cores:           cores,
 			Memory:          memory,
 			ZoneName:        c.String("zone"),
@@ -214,4 +219,25 @@ func defaultBackupSchedule() brain.BackupSchedule {
 		Interval:  7 * 86400,
 		Capacity:  1,
 	}
+}
+
+// CreatedVMDefault is a struct containing the vmd object returned by the VM Default after creation,
+// and the spec that went into creating it.
+type CreatedVMDefault struct {
+	Spec      brain.VMDefaultSpec `json:"server_settings"`
+	VMDefault brain.VMDefault     `json:"vm_default"`
+}
+
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
+func (c CreatedVMDefault) DefaultFields(f output.Format) string {
+	return "Spec, VirtualMachine"
+}
+
+// PrettyPrint outputs this created vm default in a vaguely nice format to the given writer. detail is ignored.
+func (c CreatedVMDefault) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) (err error) {
+	err = c.VMDefault.PrettyPrint(wr, prettyprint.Full)
+	if err != nil {
+		return
+	}
+	return
 }
