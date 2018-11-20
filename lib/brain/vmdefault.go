@@ -7,8 +7,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
-// TODO(tom): add test
-
 // VMDefault represents a VM Default, as passed around from the vm_defaults endpoint
 type VMDefault struct {
 	CdromURL        string `json:"cdrom_url,omitempty"`

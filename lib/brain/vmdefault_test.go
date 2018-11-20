@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
-
 	"github.com/cheekybits/is"
 )
 
@@ -34,24 +33,6 @@ func TestStringFields(t *testing.T) {
 	is.Equal("vmd-name", vmd.Name)
 	is.Equal("virtio_test", vmd.HardwareProfile)
 	is.Equal("york", vmd.ZoneName)
-}
-
-// TODO(tom): remove disc test? already tested in VirtualMachine
-func TestVMDDiscs(t *testing.T) {
-	is := is.New(t)
-	discs := getFixtureDiscSet()
-	for _, d := range discs {
-		d2, err := d.Validate()
-		is.Nil(err)
-
-		is.Equal(d.Size, d2.Size)
-		switch d.ID {
-		case 1, 3:
-			is.Equal("sata", d2.StorageGrade)
-		case 2:
-			is.Equal("archive", d2.StorageGrade)
-		}
-	}
 }
 
 func TestVMDJSON(t *testing.T) {
