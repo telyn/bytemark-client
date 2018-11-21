@@ -142,7 +142,7 @@ func TestGrantPrivilege(t *testing.T) {
 					Username:  "user",
 					AccountID: 32310,
 					Level:     brain.AccountAdminPrivilege,
-					ApiKeyID:  4,
+					APIKeyID:  4,
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
