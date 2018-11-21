@@ -4,6 +4,10 @@ import (
 	"runtime/debug"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/mocks"
+
+	"github.com/BytemarkHosting/bytemark-client/lib"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -28,7 +32,7 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 					CdromURL:        "https://example.com/example.iso",
 					Cores:           1,
 					Memory:          1024,
-					Name:            "test-server",
+					Name:            "test-vm",
 					HardwareProfile: "test-profile",
 					ZoneName:        "test-zone",
 					Discs:           nil,
@@ -77,7 +81,15 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 		t.Logf("TestCreateVMDefault %d", i)
 		_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
+		c.When("BuildRequest", "POST", lib.Endpoint(1), "/vm_defaults", []string(nil)).Return(&mocks.Request{
+			T:              t,
+			StatusCode:     200,
+			ResponseObject: nil,
+		})
+
 		c.When("CreateVMDefault", test.Name, test.Public, test.Spec).Return(nil).Times(1)
+
+		c.When("ReadDefinitions").Return(lib.Definitions{Distributions: []string{"test-image"}}, nil)
 
 		err := app.Run(test.Args)
 		if err != nil {

@@ -3,17 +3,16 @@ package add
 import (
 	"fmt"
 	"io"
-	"time"
-
-	"github.com/BytemarkHosting/bytemark-client/lib/output"
-	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/image"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/urfave/cli"
 )
@@ -33,7 +32,7 @@ A disc spec looks like the following: grade:size. The grade field is optional an
 Multiple --disc flags can be used to add multiple discs to the VM Default
 
 If --backup is set then a backup of the first disk will be taken at the
-frequency specified - never, daily, weekly or monthly.`,
+frequency specified - never, daily, weekly or monthly. If not specified the backup will default to weekly.`,
 		Flags: append(app.OutputFlags("vmdefault", "object"),
 			cli.StringFlag{
 				Name:  "name",
@@ -61,6 +60,7 @@ frequency specified - never, daily, weekly or monthly.`,
 				Name:  "vm-name",
 				Usage: "The name of the VM",
 			},
+			flags.Force,
 			cli.StringFlag{
 				Name:  "image",
 				Usage: "Image to install on the server. See `bytemark images` for the list of available images.",
@@ -207,14 +207,9 @@ func backupScheduleIntervalFromWords(words string) (freq int, err error) {
 }
 
 // defaultBackupSchedule returns a schedule that will backup every week (well - every 604800 seconds)
-// starting from midnight tonight.
 func defaultBackupSchedule() brain.BackupSchedule {
-	tomorrow := time.Now().Add(24 * time.Hour)
-	y, m, d := tomorrow.Date()
-	midnightTonight := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
-	defaultStartDate := midnightTonight.Format("2006-01-02 15:04:05 MST")
 	return brain.BackupSchedule{
-		StartDate: defaultStartDate,
+		StartDate: "",
 		Interval:  7 * 86400,
 		Capacity:  1,
 	}
