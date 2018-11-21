@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"errors"
+
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
@@ -30,6 +32,10 @@ func init() {
 			UsageText:   "grant privilege <privilege> [on] <object> [to] <user>\r\nbytemark grant cluster_admin [to] <user>",
 			Description: "Grant a privilege to a user for a particular bytemark object\r\n\r\n" + privilegeText,
 			Flags: []cli.Flag{
+				cli.IntFlag{
+					Name:  "api-key-id",
+					Usage: "ID of an API key that should be allowed to use this privilege. Leave blank when not using api keys",
+				},
 				cli.BoolFlag{
 					Name:  "yubikey-required",
 					Usage: "Set if the privilege should require a yubikey.",
@@ -42,6 +48,10 @@ func init() {
 			},
 			Action: app.Action(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {
 				c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
+				if c.Bool("yubikey-required") && c.IsSet("api-key-id") {
+					return errors.New("Only one of --api-key-id and --yubikey-required may be set at a time")
+				}
+				c.Privilege.ApiKeyID = c.Int("api-key-id")
 
 				err = c.Client().GrantPrivilege(c.Privilege)
 				if err == nil {

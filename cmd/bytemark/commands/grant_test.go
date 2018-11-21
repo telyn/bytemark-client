@@ -133,6 +133,20 @@ func TestGrantPrivilege(t *testing.T) {
 			},
 			ShouldErr: false,
 			Input:     "bytemark grant privilege account_admin on test-account to test-user",
+		}, {
+			Name: "ApiKey",
+			Setup: func(config *mocks.Config, c *mocks.Client) {
+				config.When("GetIgnoreErr", "account").Return("default-account")
+				c.When("GetAccount", "account").Return(lib.Account{BrainID: 32310})
+				c.When("GrantPrivilege", brain.Privilege{
+					Username:  "user",
+					AccountID: 32310,
+					Level:     brain.AccountAdminPrivilege,
+					ApiKeyID:  4,
+				}).Return(nil).Times(1)
+			},
+			ShouldErr: false,
+			Input:     "bytemark grant privilege --api-key-id 4 account_admin on account to user",
 		},
 	}
 	for i, test := range tests {
