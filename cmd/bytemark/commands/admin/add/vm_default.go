@@ -1,14 +1,12 @@
 package add
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/image"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -18,6 +16,9 @@ import (
 )
 
 func init() {
+	vmdefaultFlags := append(app.OutputFlags("vmdefault", "object"),
+		flags.ImageInstallFlags...)
+	vmdefaultFlags = append(vmdefaultFlags, flags.ServerSpecFlags...)
 	Commands = append(Commands, cli.Command{
 		Name:      "vm default",
 		Aliases:   []string{"vm-default"},
@@ -33,7 +34,7 @@ Multiple --disc flags can be used to add multiple discs to the VM Default
 
 If --backup is set then a backup of the first disk will be taken at the
 frequency specified - never, daily, weekly or monthly. If not specified the backup will default to weekly.`,
-		Flags: append(app.OutputFlags("vmdefault", "object"),
+		Flags: append(vmdefaultFlags,
 			cli.StringFlag{
 				Name:  "name",
 				Usage: "The name of the VM Default to add",
@@ -101,7 +102,7 @@ func createVMDefault(c *app.Context) (err error) {
 		name = "vm default"
 	}
 
-	spec, err := createVMDPrepSpec(c)
+	spec, err := flags.PrepareServerSpec(c)
 	if err != nil {
 		return
 	}
@@ -112,107 +113,6 @@ func createVMDefault(c *app.Context) (err error) {
 	}
 
 	return c.OutputInDesiredForm(CreatedVMDefault{Spec: spec})
-}
-
-// createServerPrepSpec sets up the server spec by reading in all the flags.
-func createVMDPrepSpec(c *app.Context) (spec brain.VMDefaultSpec, err error) {
-	backupFrequency := c.String("backup")
-
-	discs, cores, memory, err := createVMDReadArgs(c)
-	if err != nil {
-		return
-	}
-
-	discs, err = createVMDPrepDiscs(backupFrequency, discs)
-	if err != nil {
-		return
-	}
-
-	imageInstall, _, err := image.PrepareImageInstall(c)
-	if err != nil {
-		return
-	}
-
-	spec = brain.VMDefaultSpec{
-		VMDefault: brain.VMDefault{
-			Name:            c.String("vm-name"),
-			Cores:           cores,
-			Memory:          memory,
-			ZoneName:        c.String("zone"),
-			CdromURL:        c.String("cdrom"),
-			HardwareProfile: c.String("hwprofile"),
-		},
-		Discs:   discs,
-		Reimage: &imageInstall,
-	}
-	return
-}
-
-// createServerPrepDiscs checks to see if discs are valid and sets up a backup schedule (if any).
-func createVMDPrepDiscs(backupFrequency string, discs []brain.Disc) ([]brain.Disc, error) {
-	if len(discs) == 0 {
-		discs = append(discs, brain.Disc{Size: 25600})
-	}
-
-	for i := range discs {
-		d, discErr := discs[i].Validate()
-		if discErr != nil {
-			return discs, discErr
-		}
-		discs[i] = *d
-	}
-
-	interval, err := backupScheduleIntervalFromWords(backupFrequency)
-	if err != nil {
-		return discs, err
-	}
-
-	if interval > 0 {
-		if len(discs) > 0 {
-			bs := defaultBackupSchedule()
-			bs.Interval = interval
-			discs[0].BackupSchedules = brain.BackupSchedules{bs}
-		}
-	}
-	return discs, nil
-}
-
-// createServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags
-func createVMDReadArgs(c *app.Context) (discs []brain.Disc, cores, memory int, err error) {
-	discs = c.Discs("disc")
-	cores = c.Int("cores")
-	memory = c.Size("memory")
-	if memory == 0 {
-		memory = 1024
-	}
-	return
-}
-
-// backupScheduleIntervalFromWords deteremines the backup interval
-func backupScheduleIntervalFromWords(words string) (freq int, err error) {
-	switch words {
-	case "daily":
-		freq = 86400
-	case "weekly":
-		freq = 7 * 86400
-	case "never":
-		// the brain will reject a -1 - so even if the frequency accidentally
-		// makes it to the brain the schedule won't be made
-		freq = -1
-	default:
-		err = fmt.Errorf("invalid backup frequency '%s'", words)
-	}
-	return
-
-}
-
-// defaultBackupSchedule returns a schedule that will backup every week (well - every 604800 seconds)
-func defaultBackupSchedule() brain.BackupSchedule {
-	return brain.BackupSchedule{
-		StartDate: "",
-		Interval:  7 * 86400,
-		Capacity:  1,
-	}
 }
 
 // CreatedVMDefault is a struct containing the vmd object returned by the VM Default after creation,
