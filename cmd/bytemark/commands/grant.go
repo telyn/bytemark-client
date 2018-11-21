@@ -51,7 +51,7 @@ func init() {
 				if c.Bool("yubikey-required") && c.IsSet("api-key-id") {
 					return errors.New("Only one of --api-key-id and --yubikey-required may be set at a time")
 				}
-				c.Privilege.ApiKeyID = c.Int("api-key-id")
+				c.Privilege.APIKeyID = c.Int("api-key-id")
 
 				err = c.Client().GrantPrivilege(c.Privilege)
 				if err == nil {
