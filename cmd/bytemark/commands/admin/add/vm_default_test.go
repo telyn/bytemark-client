@@ -17,7 +17,7 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 	type createTest struct {
 		Name      string
 		Public    bool
-		Spec      brain.VMDefaultSpec
+		Spec      brain.VirtualMachineSpec
 		Args      []string
 		Output    string
 		ShouldErr bool
@@ -27,12 +27,11 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 		{
 			Name:   "vmdefault",
 			Public: true,
-			Spec: brain.VMDefaultSpec{
-				VMDefault: brain.VMDefault{
+			Spec: brain.VirtualMachineSpec{
+				VirtualMachine: brain.VirtualMachine{
 					CdromURL:        "https://example.com/example.iso",
 					Cores:           1,
 					Memory:          1024,
-					Name:            "test-vm",
 					HardwareProfile: "test-profile",
 					ZoneName:        "test-zone",
 					Discs:           nil,
@@ -58,7 +57,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				"--cdrom", "https://example.com/example.iso",
 				"--cores", "1",
 				"--memory", "1",
-				"--vm-name", "vm",
 				"--hwprofile", "test-profile",
 				"--backup", "never",
 				"--zone", "test-zone",
@@ -81,13 +79,7 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 		t.Logf("TestCreateVMDefault %d", i)
 		_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-		c.When("BuildRequest", "POST", lib.Endpoint(1), "/vm_defaults", []string(nil)).Return(&mocks.Request{
-			T:              t,
-			StatusCode:     200,
-			ResponseObject: nil,
-		})
-
-		c.When("CreateVMDefault", test.Name, test.Public, test.Spec).Return(nil).Times(1)
+		//c.When("CreateVMDefault", test.Name, test.Public, test.Spec).Return(nil).Times(1)
 
 		c.When("ReadDefinitions").Return(lib.Definitions{Distributions: []string{"test-image"}}, nil)
 
@@ -95,6 +87,11 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
+		c.When("BuildRequest", "POST", lib.Endpoint(1), "/vm_defaults", []string(nil)).Return(&mocks.Request{
+			T:              t,
+			StatusCode:     200,
+			ResponseObject: err,
+		})
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
 		}
