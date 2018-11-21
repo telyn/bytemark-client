@@ -10,20 +10,34 @@ import (
 	"github.com/cheekybits/is"
 )
 
-func getFixtureVMD() (vm VMDefault) {
-	disc := getFixtureDisc()
-
-	return VMDefault{
-		CdromURL:        "",
-		Cores:           1,
-		Memory:          1,
-		Name:            "vmd-name",
-		HardwareProfile: "virtio_test",
-		ZoneName:        "york",
-		Discs: []Disc{
-			disc,
+func getFixtureVMD() (vm VirtualMachineDefault) {
+	return VirtualMachineDefault{
+		Name:   "vmd-name",
+		Public: true,
+		ServerSettings: VirtualMachineSpec{
+			VirtualMachine: VirtualMachine{
+				CdromURL:        "test-url",
+				Cores:           1,
+				Memory:          1,
+				HardwareProfile: "test-profile",
+				ZoneName:        "test-zone",
+				Discs:           nil,
+			},
+			Discs: Discs{
+				Disc{
+					StorageGrade: "sata",
+					Size:         1,
+					BackupSchedules: BackupSchedules{{
+						Interval: 604800,
+						Capacity: 1,
+					}},
+				},
+			},
+			Reimage: &ImageInstall{
+				Distribution:    "test-image",
+				FirstbootScript: "test-script",
+			},
 		},
-		ID: 0,
 	}
 }
 
@@ -31,20 +45,19 @@ func TestStringFields(t *testing.T) {
 	is := is.New(t)
 	vmd := getFixtureVMD()
 	is.Equal("vmd-name", vmd.Name)
-	is.Equal("virtio_test", vmd.HardwareProfile)
-	is.Equal("york", vmd.ZoneName)
+	is.Equal("test-profile", vmd.ServerSettings.VirtualMachine.HardwareProfile)
+	is.Equal("test-zone", vmd.ServerSettings.VirtualMachine.ZoneName)
 }
 
 func TestVMDJSON(t *testing.T) {
 	tests := []struct {
-		vmd      VMDefault
+		vmd      VirtualMachine
 		expected map[string]interface{}
 	}{
 		{
-			vmd: VMDefault{CdromURL: "test_url", Name: "vmd_name"},
+			vmd: VirtualMachine{CdromURL: "test_url"},
 			expected: map[string]interface{}{
 				"cdrom_url": "test_url",
-				"name":      "vmd_name",
 			},
 		},
 	}
@@ -71,41 +84,14 @@ func TestFormatVMD(t *testing.T) {
 	vmd := getFixtureVMD()
 
 	tests := []struct {
-		in     VMDefault
+		in     VirtualMachineDefault
 		detail prettyprint.DetailLevel
 		expt   string
 	}{
 		{
 			in:     vmd,
 			detail: prettyprint.SingleLine,
-			expt:   " ▸ vmd-name in York",
-		},
-		{
-			in:     vmd,
-			detail: prettyprint.Medium,
-			expt: ` ▸ vmd-name in York
-   - 1 core, 1MiB, 25GiB on 1 disc`,
-		},
-		{
-			in:     vmd,
-			detail: prettyprint.Full,
-			expt: ` ▸ vmd-name in York
-   - 1 core, 1MiB, 25GiB on 1 disc
-
-    discs:
-      •  - 25GiB, sata grade
-
-`,
-		},
-		{
-			in:     VMDefault{},
-			detail: "_discs",
-			expt:   "",
-		},
-		{
-			in:     VMDefault{},
-			detail: "_spec",
-			expt:   "   - 0 cores, 0MiB, no discs",
+			expt:   " ▸ vmd-name with public => true",
 		},
 	}
 
