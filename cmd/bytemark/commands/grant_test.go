@@ -39,6 +39,14 @@ func TestGrantPrivilege(t *testing.T) {
 			ShouldErr: true,
 			Input:     "bytemark grant privilege smedly",
 		}, {
+			Name: "BadPrivilegeYubikeyPlusApiKey",
+			Setup: func(config *mocks.Config, c *mocks.Client) {
+				// reset to get rid of the default AuthWithToken expectation
+				c.Reset()
+			},
+			ShouldErr: true,
+			Input:     "bytemark grant privilege --api-key jeff --yubikey-required cluster_admin",
+		}, {
 			Name: "MissingAuth",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				// reset to get rid of the default AuthWithToken expectation
@@ -61,9 +69,10 @@ func TestGrantPrivilege(t *testing.T) {
 					ID: 303,
 				}).Times(1)
 				c.When("GrantPrivilege", brain.Privilege{
-					Username: "test-user",
-					Level:    brain.GroupAdminPrivilege,
-					GroupID:  303,
+					Username:         "test-user",
+					PasswordRequired: true,
+					Level:            brain.GroupAdminPrivilege,
+					GroupID:          303,
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
@@ -84,9 +93,10 @@ func TestGrantPrivilege(t *testing.T) {
 					ID: 303,
 				}).Times(1)
 				c.When("GrantPrivilege", brain.Privilege{
-					Username: "test-user",
-					Level:    brain.GroupAdminPrivilege,
-					GroupID:  303,
+					Username:         "test-user",
+					PasswordRequired: true,
+					Level:            brain.GroupAdminPrivilege,
+					GroupID:          303,
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
@@ -108,6 +118,7 @@ func TestGrantPrivilege(t *testing.T) {
 
 				c.When("GrantPrivilege", brain.Privilege{
 					Username:         "test-user",
+					PasswordRequired: true,
 					Level:            brain.VMAdminPrivilege,
 					VirtualMachineID: 333,
 				}).Return(nil).Times(1)
@@ -126,23 +137,45 @@ func TestGrantPrivilege(t *testing.T) {
 				})
 
 				c.When("GrantPrivilege", brain.Privilege{
-					Username:  "test-user",
-					Level:     brain.AccountAdminPrivilege,
-					AccountID: 32310,
+					Username:         "test-user",
+					PasswordRequired: true,
+					Level:            brain.AccountAdminPrivilege,
+					AccountID:        32310,
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
 			Input:     "bytemark grant privilege account_admin on test-account to test-user",
+		}, {
+			Name: "AccountVMAdmin with Yubikey",
+			Setup: func(config *mocks.Config, c *mocks.Client) {
+				// specific to vm_admin/vm_console
+				config.When("GetIgnoreErr", "account").Return("default-account")
+
+				c.When("GetAccount", "test-account").Return(lib.Account{
+					BrainID: 32310,
+				})
+
+				c.When("GrantPrivilege", brain.Privilege{
+					Username:         "test-user",
+					PasswordRequired: true,
+					YubikeyRequired:  true,
+					Level:            brain.AccountAdminPrivilege,
+					AccountID:        32310,
+				}).Return(nil).Times(1)
+			},
+			ShouldErr: false,
+			Input:     "bytemark grant privilege --yubikey-required account_admin on test-account to test-user",
 		}, {
 			Name: "ApiKey",
 			Setup: func(config *mocks.Config, c *mocks.Client) {
 				config.When("GetIgnoreErr", "account").Return("default-account")
 				c.When("GetAccount", "account").Return(lib.Account{BrainID: 32310})
 				c.When("GrantPrivilege", brain.Privilege{
-					Username:  "user",
-					AccountID: 32310,
-					Level:     brain.AccountAdminPrivilege,
-					APIKeyID:  4,
+					Username:         "user",
+					AccountID:        32310,
+					PasswordRequired: false,
+					Level:            brain.AccountAdminPrivilege,
+					APIKeyID:         4,
 				}).Return(nil).Times(1)
 			},
 			ShouldErr: false,
