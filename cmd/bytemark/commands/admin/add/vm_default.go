@@ -11,18 +11,18 @@ import (
 )
 
 func init() {
-	vmdefaultFlags := append(app.OutputFlags("vmdefault", "object"),
+	vmdefaultFlags := append(app.OutputFlags("vm default", "object"),
 		flags.ImageInstallFlags...)
 	vmdefaultFlags = append(vmdefaultFlags, flags.ServerSpecFlags...)
 	Commands = append(Commands, cli.Command{
 		Name:      "vm default",
 		Aliases:   []string{"vm-default"},
 		Usage:     "adds a new VM Default",
-		UsageText: "--admin add vm default <name> <public> [<cores>[<memory>[<disc-specs>]...]]",
+		UsageText: "--admin add vm default <name>",
 		Description: `adds a new VM Default to the current account, which can be specified as either public or private.
   					  the server settings can be specified for the vm default with aditional flags
 
-The VM Default name will be a name for the whole VM Default spcification. This is what the VMDefault will be referred as.
+--name is an identifier for the default, not a default name for servers created based upon it.
 
 A disc spec looks like the following: grade:size. The grade field is optional and will default to sata.
 Multiple --disc flags can be used to add multiple discs to the VM Default
@@ -39,7 +39,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				Usage: "If the VM Default should be made public or not",
 			},
 		),
-		Action: app.Action(args.Optional("name", "public", "cores", "memory", "disc"), with.RequiredFlags("name", "public"), with.Auth, createVMDefault),
+		Action: app.Action(args.Optional("name", "public", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createVMDefault),
 	})
 }
 

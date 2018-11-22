@@ -16,44 +16,58 @@ import (
 func TestCreateVMDefaultCommand(t *testing.T) {
 	type createTest struct {
 		Name      string
-		Public    bool
-		Spec      brain.VirtualMachineSpec
+		VMDefault brain.VirtualMachineDefault
 		Args      []string
 		Output    string
 		ShouldErr bool
+		// ResponseErr is the error returned by request.Run
+		ResponseErr error
 	}
 
 	tests := []createTest{
 		{
-			Name:   "vmdefault",
-			Public: true,
-			Spec: brain.VirtualMachineSpec{
-				VirtualMachine: brain.VirtualMachine{
-					CdromURL:        "https://example.com/example.iso",
-					Cores:           1,
-					Memory:          1024,
-					HardwareProfile: "test-profile",
-					ZoneName:        "test-zone",
-					Discs:           nil,
-					ID:              0,
-				},
-				Discs: []brain.Disc{
-					brain.Disc{
-						Size:         25 * 1024,
-						StorageGrade: "archive",
-						BackupSchedules: brain.BackupSchedules{{
-							Interval: 0,
-							Capacity: 0,
-						}},
+			Args: []string{
+				"bytemark", "add", "vm", "default", "jeffrey",
+			},
+			ShouldErr: true,
+		}, {
+			Args: []string{
+				"bytemark", "add", "vm", "default", "--image", "not-real-image", "jeffrey",
+			},
+			ShouldErr: true,
+		}, {
+			Name: "totally proper vm default",
+			VMDefault: brain.VirtualMachineDefault{
+				Name:   "test-vm-default",
+				Public: true,
+				ServerSettings: brain.VirtualMachineSpec{
+					VirtualMachine: brain.VirtualMachine{
+						Autoreboot:      true,
+						CdromURL:        "https://example.com/example.iso",
+						Cores:           1,
+						HardwareProfile: "test-profile",
+						Memory:          1024,
+						PowerOn:         true,
+						ZoneName:        "test-zone",
 					},
-				},
-				Reimage: &brain.ImageInstall{
-					Distribution:    "test-image",
-					FirstbootScript: "test-script",
+					Discs: []brain.Disc{
+						brain.Disc{
+							Size:         25 * 1024,
+							StorageGrade: "archive",
+							BackupSchedules: brain.BackupSchedules{{
+								Interval: 0,
+								Capacity: 0,
+							}},
+						},
+					},
+					Reimage: &brain.ImageInstall{
+						Distribution:    "test-image",
+						FirstbootScript: "test-script",
+					},
 				},
 			},
 			Args: []string{
-				"bytemark", "add", "vm default", "vmdefault", "true",
+				"bytemark", "add", "vm", "default",
 				"--cdrom", "https://example.com/example.iso",
 				"--cores", "1",
 				"--memory", "1",
@@ -63,6 +77,7 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				"--disc", "archive:50",
 				"--image", "test-image",
 				"--firstboot-script", "test-script",
+				"test-vm-default", "true",
 			},
 		},
 	}
@@ -79,19 +94,26 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 		t.Logf("TestCreateVMDefault %d", i)
 		_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-		//c.When("CreateVMDefault", test.Name, test.Public, test.Spec).Return(nil).Times(1)
-
 		c.When("ReadDefinitions").Return(lib.Definitions{Distributions: []string{"test-image"}}, nil)
 
-		err := app.Run(test.Args)
-		if err != nil {
-			t.Error(err)
+		request := mocks.Request{
+			T:          t,
+			StatusCode: 200,
+			Err:        test.ResponseErr,
 		}
-		c.When("BuildRequest", "POST", lib.Endpoint(1), "/vm_defaults", []string(nil)).Return(&mocks.Request{
-			T:              t,
-			StatusCode:     200,
-			ResponseObject: err,
-		})
+		c.When("BuildRequest", "POST", lib.Endpoint(1), "/vm_defaults", []string(nil)).Return(&request)
+		t.Logf("%#v", test)
+
+		err := app.Run(test.Args)
+		if !test.ShouldErr && err != nil {
+			t.Errorf("Unexpected error: %s", err)
+		} else if test.ShouldErr && err == nil {
+			t.Error("Expected error but didn't get one")
+		}
+
+		if !test.ShouldErr {
+			request.AssertRequestObjectEqual(test.VMDefault)
+		}
 		if ok, err := c.Verify(); !ok {
 			t.Fatal(err)
 		}
