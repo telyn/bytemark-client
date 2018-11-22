@@ -7,7 +7,13 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
+// VirtualMachineDefault is a default (or perhaps better, template) for virtual
+// machines. They're essentially a VirtualMachineSpec which the panel picks
+// details from and populates the virtual machine creation screen with.
+// Public defaults can be made by setting Public: true.
 type VirtualMachineDefault struct {
+	ID             int                `json:"id,omitempty"`
+	AccountID      int                `json:"account_id,omitempty"`
 	Name           string             `json:"name"`
 	Public         bool               `json:"public"`
 	ServerSettings VirtualMachineSpec `json:"server_settings"`
@@ -15,12 +21,13 @@ type VirtualMachineDefault struct {
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (vmd VirtualMachineDefault) DefaultFields(f output.Format) string {
-	return "Name, Public, ServerSettings"
+	return "ID, AccountID, Name, Public, ServerSettings"
 }
 
 // PrettyPrint outputs a nice human-readable overview of the VM Default to the given writer.
 func (vmd VirtualMachineDefault) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	const template = `{{ define "vmdspec_sgl" }} ▸ {{.Name }} with public => {{.Public }}{{ end }}`
+	const template = `{{ define "vmdspec_sgl" }} ▸ {{.Name }} with public => {{.Public }}
+{{ prettysprint .ServerSettings }}{{ end }}`
 	return prettyprint.Run(wr, template, "vmdspec"+string(detail), vmd)
 }
 
