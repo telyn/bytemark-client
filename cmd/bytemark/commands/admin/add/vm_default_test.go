@@ -15,31 +15,89 @@ import (
 
 func TestCreateVMDefaultCommand(t *testing.T) {
 	type createTest struct {
-		Name      string
+		Name string
+		// account that will be requested to find out account id
+		// (use VMDefault.AccountID to specify account id)
+		Account string
+		// VMDefault to expect
 		VMDefault brain.VirtualMachineDefault
-		Args      []string
-		Output    string
+		// Args to provide to app.Run
+		Args []string
+		// Output to expect... one day we'll write output tests
+		Output string
+		// ShouldErr should be set to true if you expect app.Run to error
 		ShouldErr bool
-		// ResponseErr is the error returned by request.Run
+		// ResponseErr is the error to return from request.Run (to simulate 403/404/network error/etc)
 		ResponseErr error
 	}
 
 	tests := []createTest{
 		{
+			Name:    "no params",
+			Account: "bytemark",
 			Args: []string{
 				"bytemark", "add", "vm", "default", "jeffrey",
 			},
 			ShouldErr: true,
 		}, {
+			Name:    "nonexistent image",
+			Account: "bytemark",
 			Args: []string{
 				"bytemark", "add", "vm", "default", "--image", "not-real-image", "jeffrey",
 			},
 			ShouldErr: true,
 		}, {
-			Name: "totally proper vm default",
+			Name:    "public on bytemark account",
+			Account: "bytemark",
 			VMDefault: brain.VirtualMachineDefault{
-				Name:   "test-vm-default",
-				Public: true,
+				AccountID: 142,
+				Name:      "test-vm-default",
+				Public:    true,
+				ServerSettings: brain.VirtualMachineSpec{
+					VirtualMachine: brain.VirtualMachine{
+						Autoreboot:      true,
+						CdromURL:        "https://example.com/example.iso",
+						Cores:           1,
+						HardwareProfile: "test-profile",
+						Memory:          1024,
+						ZoneName:        "test-zone",
+					},
+					Discs: []brain.Disc{
+						brain.Disc{
+							Size:            50 * 1024,
+							StorageGrade:    "archive",
+							BackupSchedules: nil,
+						},
+					},
+					Reimage: &brain.ImageInstall{
+						Distribution:    "test-image",
+						FirstbootScript: "test-script",
+						RootPassword:    "test-password",
+					},
+				},
+			},
+			Args: []string{
+				"bytemark", "add", "vm", "default",
+				"--cdrom", "https://example.com/example.iso",
+				"--cores", "1",
+				"--memory", "1",
+				"--hwprofile", "test-profile",
+				"--backup", "never",
+				"--zone", "test-zone",
+				"--disc", "archive:50",
+				"--image", "test-image",
+				"--firstboot-script", "test-script",
+				"--root-password", "test-password",
+				"--public",
+				"test-vm-default", "true",
+			},
+		}, {
+			Name:    "private on bytemark account",
+			Account: "bytemark",
+			VMDefault: brain.VirtualMachineDefault{
+				AccountID: 142,
+				Name:      "test-vm-default",
+				Public:    false,
 				ServerSettings: brain.VirtualMachineSpec{
 					VirtualMachine: brain.VirtualMachine{
 						Autoreboot:      true,
@@ -77,6 +135,52 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				"--root-password", "test-password",
 				"test-vm-default", "true",
 			},
+		}, {
+			Name:    "public on tomatoes account",
+			Account: "tomatoes",
+			VMDefault: brain.VirtualMachineDefault{
+				AccountID: 26580,
+				Name:      "test-vm-default",
+				Public:    true,
+				ServerSettings: brain.VirtualMachineSpec{
+					VirtualMachine: brain.VirtualMachine{
+						Autoreboot:      true,
+						CdromURL:        "https://example.com/example.iso",
+						Cores:           1,
+						HardwareProfile: "test-profile",
+						Memory:          1024,
+						ZoneName:        "test-zone",
+					},
+					Discs: []brain.Disc{
+						brain.Disc{
+							Size:            50 * 1024,
+							StorageGrade:    "archive",
+							BackupSchedules: nil,
+						},
+					},
+					Reimage: &brain.ImageInstall{
+						Distribution:    "test-image",
+						FirstbootScript: "test-script",
+						RootPassword:    "test-password",
+					},
+				},
+			},
+			Args: []string{
+				"bytemark", "add", "vm", "default",
+				"--cdrom", "https://example.com/example.iso",
+				"--cores", "1",
+				"--memory", "1",
+				"--hwprofile", "test-profile",
+				"--backup", "never",
+				"--zone", "test-zone",
+				"--disc", "archive:50",
+				"--image", "test-image",
+				"--firstboot-script", "test-script",
+				"--root-password", "test-password",
+				"--account", "tomatoes",
+				"--public",
+				"test-vm-default",
+			},
 		},
 	}
 
@@ -89,31 +193,37 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 	}()
 
 	for i, test = range tests {
-		t.Logf("TestCreateVMDefault %d", i)
-		_, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+		t.Run(test.Name, func(t *testing.T) {
+			config, c, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
 
-		c.When("ReadDefinitions").Return(lib.Definitions{Distributions: []string{"test-image"}}, nil)
+			config.When("GetIgnoreErr", "account").Return("jeff")
 
-		request := mocks.Request{
-			T:          t,
-			StatusCode: 200,
-			Err:        test.ResponseErr,
-		}
-		c.When("BuildRequest", "POST", lib.Endpoint(1), "/vm_defaults", []string(nil)).Return(&request)
-		t.Logf("%#v", test)
+			if test.Account != "" {
+				c.When("GetAccount", test.Account).Return(lib.Account{BrainID: test.VMDefault.AccountID})
+			}
 
-		err := app.Run(test.Args)
-		if !test.ShouldErr && err != nil {
-			t.Errorf("Unexpected error: %s", err)
-		} else if test.ShouldErr && err == nil {
-			t.Error("Expected error but didn't get one")
-		}
+			c.When("ReadDefinitions").Return(lib.Definitions{Distributions: []string{"test-image"}}, nil)
 
-		if !test.ShouldErr {
-			request.AssertRequestObjectEqual(test.VMDefault)
-		}
-		if ok, err := c.Verify(); !ok {
-			t.Fatal(err)
-		}
+			request := mocks.Request{
+				T:          t,
+				StatusCode: 200,
+				Err:        test.ResponseErr,
+			}
+			c.When("BuildRequest", "POST", lib.Endpoint(1), "/vm_defaults", []string(nil)).Return(&request)
+
+			err := app.Run(test.Args)
+			if !test.ShouldErr && err != nil {
+				t.Errorf("Unexpected error: %s", err)
+			} else if test.ShouldErr && err == nil {
+				t.Error("Expected error but didn't get one")
+			}
+
+			if !test.ShouldErr {
+				request.AssertRequestObjectEqual(test.VMDefault)
+			}
+			if ok, err := c.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
 	}
 }

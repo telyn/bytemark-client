@@ -38,33 +38,38 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				Name:  "public",
 				Usage: "If the VM Default should be made public or not",
 			},
+			cli.GenericFlag{
+				Name:  "account",
+				Usage: "the account to add the default to (will use 'bytemark' if unset)",
+				Value: new(app.AccountNameFlag),
+			},
 		),
-		Action: app.Action(args.Optional("name", "public", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createVMDefault),
+		Action: app.Action(args.Optional("name"), with.RequiredFlags("name"), with.Auth, func(c *app.Context) (err error) {
+			accountName := c.String("account")
+			if !c.IsSet("account") {
+				accountName = "bytemark"
+			}
+			account, err := c.Client().GetAccount(accountName)
+			if err != nil {
+				return
+			}
+			spec, err := flags.PrepareServerSpec(c)
+			if err != nil {
+				return
+			}
+
+			vmd := brain.VirtualMachineDefault{
+				AccountID:      account.BrainID,
+				Name:           c.String("name"),
+				Public:         c.Bool("public"),
+				ServerSettings: spec,
+			}
+
+			err = brainRequests.CreateVMDefault(c.Client(), vmd)
+			if err != nil {
+				return
+			}
+			return
+		}),
 	})
-}
-
-// createVMDefault creates a server object to be created by the brain and sends it.
-func createVMDefault(c *app.Context) (err error) {
-	name := c.String("name")
-	public := c.Bool("public")
-
-	if name == "" {
-		name = "vm-default"
-	}
-	spec, err := flags.PrepareServerSpec(c)
-	if err != nil {
-		return
-	}
-
-	vmd := brain.VirtualMachineDefault{
-		Name:           name,
-		Public:         public,
-		ServerSettings: spec,
-	}
-
-	err = brainRequests.CreateVMDefault(c.Client(), vmd)
-	if err != nil {
-		return err
-	}
-	return
 }
