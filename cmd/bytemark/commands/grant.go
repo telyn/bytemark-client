@@ -34,7 +34,7 @@ func init() {
 			Flags: []cli.Flag{
 				cli.IntFlag{
 					Name:  "api-key-id",
-					Usage: "ID of an API key that should be allowed to use this privilege. Leave blank when not using api keys",
+					Usage: "ID of an API key that should be required in order to use this privilege. Leave blank when not using api keys",
 				},
 				cli.BoolFlag{
 					Name:  "yubikey-required",
@@ -49,9 +49,12 @@ func init() {
 			Action: app.Action(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {
 				c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 				if c.Bool("yubikey-required") && c.IsSet("api-key-id") {
-					return errors.New("Only one of --api-key-id and --yubikey-required may be set at a time")
+					return errors.New("Only one of --api-key-id and --yubikey-required may be set at a time - privileges with api-key-id set are for exclusive use with API keys")
 				}
 				c.Privilege.APIKeyID = c.Int("api-key-id")
+				if !c.IsSet("api-key-id") {
+					c.Privilege.PasswordRequired = true
+				}
 
 				err = c.Client().GrantPrivilege(c.Privilege)
 				if err == nil {
