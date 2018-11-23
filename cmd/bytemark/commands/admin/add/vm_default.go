@@ -16,13 +16,12 @@ func init() {
 	vmdefaultFlags = append(vmdefaultFlags, flags.ServerSpecFlags...)
 	Commands = append(Commands, cli.Command{
 		Name:      "vm default",
-		Aliases:   []string{"vm-default"},
-		Usage:     "adds a new VM Default",
-		UsageText: "--admin add vm default <name>",
+		Usage:     "adds a new VM default",
+		UsageText: "--admin add vm default <default name>",
 		Description: `adds a new VM Default to the current account, which can be specified as either public or private.
-  					  the server settings can be specified for the vm default with aditional flags
+The server settings can be specified for the vm default with aditional flags
 
---name is an identifier for the default, not a default name for servers created based upon it.
+--default-name (and the <default name> positional argument) is an identifier for the default, not a default name for servers created based upon it.
 
 A disc spec looks like the following: grade:size. The grade field is optional and will default to sata.
 Multiple --disc flags can be used to add multiple discs to the VM Default
@@ -31,12 +30,12 @@ If --backup is set then a backup of the first disk will be taken at the
 frequency specified - never, daily, weekly or monthly. If not specified the backup will default to weekly.`,
 		Flags: append(vmdefaultFlags,
 			cli.StringFlag{
-				Name:  "name",
-				Usage: "The name of the VM Default to add",
+				Name:  "default-name",
+				Usage: "The name of the VM default to add",
 			},
 			cli.BoolFlag{
 				Name:  "public",
-				Usage: "If the VM Default should be made public or not",
+				Usage: "If the VM default should be made public or not",
 			},
 			cli.GenericFlag{
 				Name:  "account",
@@ -44,7 +43,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				Value: new(app.AccountNameFlag),
 			},
 		),
-		Action: app.Action(args.Optional("name"), with.RequiredFlags("name"), with.Auth, func(c *app.Context) (err error) {
+		Action: app.Action(args.Optional("default-name"), with.RequiredFlags("default-name"), with.Auth, func(c *app.Context) (err error) {
 			accountName := c.String("account")
 			if !c.IsSet("account") {
 				accountName = "bytemark"
@@ -60,7 +59,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 
 			vmd := brain.VirtualMachineDefault{
 				AccountID:      account.BrainID,
-				Name:           c.String("name"),
+				Name:           c.String("default-name"),
 				Public:         c.Bool("public"),
 				ServerSettings: spec,
 			}
