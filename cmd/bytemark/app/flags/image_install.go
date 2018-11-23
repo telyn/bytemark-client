@@ -13,15 +13,6 @@ import (
 // that get stitched the commands that use it.
 var ImageInstallFlags = []cli.Flag{
 	cli.StringFlag{
-		Name:  "authorized-keys",
-		Usage: "Public keys that will be authorised to log in as root, separated by newlines.",
-	},
-	cli.GenericFlag{
-		Name:  "authorized-keys-file",
-		Usage: "Local file to read the --authorized-keys from",
-		Value: new(util.FileFlag),
-	},
-	cli.StringFlag{
 		Name:  "firstboot-script",
 		Usage: "Script which runs on the server's first boot after imaging.",
 	},
@@ -34,20 +25,55 @@ var ImageInstallFlags = []cli.Flag{
 		Name:  "image",
 		Usage: "Image to install on the server. See `bytemark images` for the list of available images.",
 	},
+}
+
+// ImageInstallAuthFlags is common to a couple of commands and contains additional
+// additional flags for when you're passing true to PrepareImageInstall.
+var ImageInstallAuthFlags = []cli.Flag{
+	cli.StringFlag{
+		Name:  "authorized-keys",
+		Usage: "Public keys that will be authorised to log in as root, separated by newlines.",
+	},
+	cli.GenericFlag{
+		Name:  "authorized-keys-file",
+		Usage: "Local file to read the --authorized-keys from",
+		Value: new(util.FileFlag),
+	},
 	cli.StringFlag{
 		Name:  "root-password",
 		Usage: "Password for the root/Administrator user. If unset, will be randomly generated.",
 	},
 }
 
+func readAuthentication(c *app.Context) (pubkeys, rootPassword string) {
+	pubkeys = c.String("authorized-keys")
+	pubkeysFile := c.FileContents("authorized-keys-file")
+	rootPassword = c.String("root-password")
+	if pubkeysFile != "" {
+		if pubkeys != "" {
+			pubkeys += "\r\n" + pubkeysFile
+		} else {
+			pubkeys = pubkeysFile
+		}
+	}
+	if rootPassword == "" {
+		rootPassword = util.GeneratePassword()
+	}
+	return
+}
+
 // PrepareImageInstall is a funcion that prepares an image to be imaged on a server.
-func PrepareImageInstall(c *app.Context) (imageInstall brain.ImageInstall, defaulted bool, err error) {
+// set authentication to true when you wanna read in authorized-keys/-file and root-password too.
+func PrepareImageInstall(c *app.Context, authentication bool) (imageInstall brain.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
 	firstbootScriptFile := c.FileContents("firstboot-script-file")
-	pubkeys := c.String("authorized-keys")
-	pubkeysFile := c.FileContents("authorized-keys-file")
-	rootPassword := c.String("root-password")
+	pubkeys := ""
+	rootPassword := ""
+
+	if authentication {
+		pubkeys, rootPassword = readAuthentication(c)
+	}
 
 	if image == "" {
 		image = "symbiosis"
@@ -65,20 +91,8 @@ func PrepareImageInstall(c *app.Context) (imageInstall brain.ImageInstall, defau
 		}
 	}
 
-	if pubkeysFile != "" {
-		if pubkeys != "" {
-			pubkeys += "\r\n" + pubkeysFile
-		} else {
-			pubkeys = pubkeysFile
-		}
-	}
-
 	if firstbootScript == "" {
 		firstbootScript = firstbootScriptFile
-	}
-
-	if rootPassword == "" {
-		rootPassword = util.GeneratePassword()
 	}
 
 	return brain.ImageInstall{

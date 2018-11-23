@@ -47,6 +47,27 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 			},
 			ShouldErr: true,
 		}, {
+			Name:    "minimal public on bytemark account",
+			Account: "bytemark",
+			VMDefault: brain.VirtualMachineDefault{
+				AccountID: 142,
+				Name:      "test-vm-default",
+				Public:    true,
+				ServerSettings: brain.VirtualMachineSpec{
+					VirtualMachine: brain.VirtualMachine{},
+					Reimage: &brain.ImageInstall{
+						FirstbootScript: "test-script",
+					},
+				},
+			},
+			Args: []string{
+				"bytemark", "add", "vm", "default",
+				"--firstboot-script", "test-script",
+				"--force", // we're pretending symbiosis doesn't exist, so --force is needed
+				"--public",
+				"test-vm-default",
+			},
+		}, {
 			Name:    "public on bytemark account",
 			Account: "bytemark",
 			VMDefault: brain.VirtualMachineDefault{
@@ -55,7 +76,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				Public:    true,
 				ServerSettings: brain.VirtualMachineSpec{
 					VirtualMachine: brain.VirtualMachine{
-						Autoreboot:      true,
 						CdromURL:        "https://example.com/example.iso",
 						Cores:           1,
 						HardwareProfile: "test-profile",
@@ -72,7 +92,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 					Reimage: &brain.ImageInstall{
 						Distribution:    "test-image",
 						FirstbootScript: "test-script",
-						RootPassword:    "test-password",
 					},
 				},
 			},
@@ -87,9 +106,8 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				"--disc", "archive:50",
 				"--image", "test-image",
 				"--firstboot-script", "test-script",
-				"--root-password", "test-password",
 				"--public",
-				"test-vm-default", "true",
+				"test-vm-default",
 			},
 		}, {
 			Name:    "private on bytemark account",
@@ -100,7 +118,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				Public:    false,
 				ServerSettings: brain.VirtualMachineSpec{
 					VirtualMachine: brain.VirtualMachine{
-						Autoreboot:      true,
 						CdromURL:        "https://example.com/example.iso",
 						Cores:           1,
 						HardwareProfile: "test-profile",
@@ -117,7 +134,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 					Reimage: &brain.ImageInstall{
 						Distribution:    "test-image",
 						FirstbootScript: "test-script",
-						RootPassword:    "test-password",
 					},
 				},
 			},
@@ -132,7 +148,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				"--disc", "archive:50",
 				"--image", "test-image",
 				"--firstboot-script", "test-script",
-				"--root-password", "test-password",
 				"test-vm-default", "true",
 			},
 		}, {
@@ -144,7 +159,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				Public:    true,
 				ServerSettings: brain.VirtualMachineSpec{
 					VirtualMachine: brain.VirtualMachine{
-						Autoreboot:      true,
 						CdromURL:        "https://example.com/example.iso",
 						Cores:           1,
 						HardwareProfile: "test-profile",
@@ -161,7 +175,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 					Reimage: &brain.ImageInstall{
 						Distribution:    "test-image",
 						FirstbootScript: "test-script",
-						RootPassword:    "test-password",
 					},
 				},
 			},
@@ -176,7 +189,6 @@ func TestCreateVMDefaultCommand(t *testing.T) {
 				"--disc", "archive:50",
 				"--image", "test-image",
 				"--firstboot-script", "test-script",
-				"--root-password", "test-password",
 				"--account", "tomatoes",
 				"--public",
 				"test-vm-default",

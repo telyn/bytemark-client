@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -17,20 +18,6 @@ import (
 )
 
 func init() {
-	createServerFlags := append(app.OutputFlags("server", "object"), flags.ServerSpecFlags...)
-	createServerFlags = append(createServerFlags, flags.ImageInstallFlags...)
-	createServerFlags = append(createServerFlags,
-		cli.GenericFlag{
-			Name:  "name",
-			Usage: "The new server's name",
-			Value: new(app.VirtualMachineNameFlag),
-		},
-		cli.GenericFlag{
-			Name:  "ip",
-			Value: new(util.IPFlag),
-			Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
-		},
-	)
 
 	createServerCmd := cli.Command{
 		Name:      "server",
@@ -52,7 +39,20 @@ This may cost money if your first disk is larger than the default.
 See the price list for more details at http://www.bytemark.co.uk/prices
 
 If --hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
-		Flags:  createServerFlags,
+		Flags: cliutil.ConcatFlags(app.OutputFlags("server", "object"),
+			flags.ServerSpecFlags, flags.ImageInstallFlags, flags.ImageInstallAuthFlags,
+			[]cli.Flag{
+				cli.GenericFlag{
+					Name:  "name",
+					Usage: "The new server's name",
+					Value: new(app.VirtualMachineNameFlag),
+				},
+				cli.GenericFlag{
+					Name:  "ip",
+					Value: new(util.IPFlag),
+					Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
+				},
+			}),
 		Action: app.Action(args.Optional("name", "cores", "memory", "disc"), with.RequiredFlags("name"), with.Auth, createServer),
 	}
 	Commands = append(Commands, createServerCmd)
@@ -61,7 +61,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 // createServer creates a server objec to be created by the brain and sends it.
 func createServer(c *app.Context) (err error) {
 	name := c.VirtualMachineName("name")
-	spec, err := flags.PrepareServerSpec(c)
+	spec, err := flags.PrepareServerSpec(c, true)
 	if err != nil {
 		return
 	}

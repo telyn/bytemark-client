@@ -61,7 +61,8 @@ var ServerSpecFlags = []cli.Flag{
 }
 
 // PrepareServerSpec sets up the server spec by reading in all the flags.
-func PrepareServerSpec(c *app.Context) (spec brain.VirtualMachineSpec, err error) {
+// set authentication to true when you wanna read in authorized-keys/-file and root-password too.
+func PrepareServerSpec(c *app.Context, authentication bool) (spec brain.VirtualMachineSpec, err error) {
 	noImage := c.Bool("no-image")
 	backupFrequency := c.String("backup")
 
@@ -75,7 +76,7 @@ func PrepareServerSpec(c *app.Context) (spec brain.VirtualMachineSpec, err error
 		return
 	}
 
-	imageInstall, _, err := PrepareImageInstall(c)
+	imageInstall, _, err := PrepareImageInstall(c, authentication)
 	if err != nil {
 		return
 	}
