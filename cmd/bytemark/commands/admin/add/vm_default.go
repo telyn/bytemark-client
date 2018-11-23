@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/urfave/cli"
 )
@@ -80,10 +81,13 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				ServerSettings: spec,
 			}
 
-			err = brainRequests.CreateVMDefault(c.Client(), vmd)
+			vmd, err = brainRequests.CreateVMDefault(c.Client(), vmd)
 			if err != nil {
 				return
 			}
+			c.Log("Successfully created virtual machine default:")
+			vmd.PrettyPrint(c.Writer(), prettyprint.Full)
+
 			return
 		}),
 	})

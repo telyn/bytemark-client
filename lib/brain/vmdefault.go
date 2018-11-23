@@ -26,9 +26,9 @@ func (vmd VirtualMachineDefault) DefaultFields(f output.Format) string {
 
 // PrettyPrint outputs a nice human-readable overview of the VM Default to the given writer.
 func (vmd VirtualMachineDefault) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
-	const template = `{{ define "vmdspec_sgl" }} ▸ {{ .Name }} with public => {{ .Public }}{{ end}}
-{{ define "vmdspec_medium" }}{{ template "vmdspec_sgl" }}{{ end }}
-{{ define "vmdspec_full" }}{{ template "vmdspec_medium" }}
+	const template = `{{ define "vmdspec_sgl" }} ▸ {{ .Name }} (ID: #{{ .ID }}) ({{ if .Public }}public{{ else }}private){{ end }}){{ end }}
+{{ define "vmdspec_medium" }}{{ template "vmdspec_sgl" . }}{{ end }}
+{{ define "vmdspec_full" }}{{ template "vmdspec_medium" . }}
 {{ prettysprint .ServerSettings "_full" }}{{ end }}`
 	return prettyprint.Run(wr, template, "vmdspec"+string(detail), vmd)
 }
