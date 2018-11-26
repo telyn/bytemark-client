@@ -79,7 +79,6 @@ func TestVMDJSON(t *testing.T) {
 }
 
 func TestFormatVMD(t *testing.T) {
-	is := is.New(t)
 	b := new(bytes.Buffer)
 	vmd := getFixtureVMD()
 
@@ -91,7 +90,7 @@ func TestFormatVMD(t *testing.T) {
 		{
 			in:     vmd,
 			detail: prettyprint.SingleLine,
-			expt:   " ▸ vmd-name with public => true",
+			expt:   " ▸ vmd-name (ID: #0) (public)",
 		},
 	}
 
@@ -101,6 +100,8 @@ func TestFormatVMD(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		is.Equal(test.expt, b.String())
+		if test.expt != b.String() {
+			t.Errorf("prettyprint output was different to expected\nexpected: %q\n  actual: %q", test.expt, b.String())
+		}
 	}
 }
