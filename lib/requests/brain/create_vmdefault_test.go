@@ -1,6 +1,7 @@
 package brain_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -86,10 +87,17 @@ func TestCreateVMDefault(t *testing.T) {
 			AssertRequest: assert.BodyUnmarshal(&spec, func(_ *testing.T, _ string) {
 				assert.Equal(t, testName, test.Expect, spec)
 			}),
-			Response: test.Expect.ServerSettings,
+			Response: brain.VirtualMachineDefault{
+				Name: "jeff",
+			},
 		}
 		rts.Run(t, testName, true, func(client lib.Client) {
-			err := brainRequests.CreateVMDefault(client, test.Input)
+			vmd, err := brainRequests.CreateVMDefault(client, test.Input)
+			if !reflect.DeepEqual(brain.VirtualMachineDefault{
+				Name: "jeff",
+			}, vmd) {
+				t.Errorf("response wasn't jeff :-( got: %#v", vmd)
+			}
 			if err != nil && !test.ExpectErr {
 				t.Fatal(err)
 			}
