@@ -86,9 +86,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				return
 			}
 			c.Log("Successfully created virtual machine default:")
-			vmd.PrettyPrint(c.Writer(), prettyprint.Full)
-
-			return
+			return vmd.PrettyPrint(c.Writer(), prettyprint.Full)
 		}),
 	})
 }
