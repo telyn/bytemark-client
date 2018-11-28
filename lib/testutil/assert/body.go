@@ -46,6 +46,7 @@ func (fb *fakeBody) Close() error {
 }
 
 // BodyUnmarshalEqual makes a RequestAssertFunc that reads the request body, unmarshals it, and checks the unmarshalled object is equal to expected.
+// Remember that json treats all numbers as float64s! add a .0 to your numbers
 func BodyUnmarshalEqual(expected map[string]interface{}) RequestAssertFunc {
 	body := make(map[string]interface{})
 	return BodyUnmarshal(&body, func(t *testing.T, testName string) {
