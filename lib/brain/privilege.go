@@ -56,8 +56,12 @@ type Privilege struct {
 	AccountID int `json:"account_id,omitempty"`
 	// GroupID is the ID of the group the privilege is granted on
 	GroupID int `json:"group_id,omitempty"`
+	// APIKeyID is the ID of the api key required in order to use this Privilege. If not set, privilege relates to normal logins using auth.
+	APIKeyID int `json:"api_key_id,omitempty"`
 	// Level is the PrivilegeLevel they have
 	Level PrivilegeLevel `json:"level,omitempty"`
+	// PasswordRequired is true for all privileges requiring a password (all except api key privileges)
+	PasswordRequired bool `json:"password_required"`
 	// YubikeyRequired is true if the user should have to authenticate with a yubikey in order to use this privilege. Only set it to true if you're sure the user has a yubikey set up on their account, and that they know where it is!
 	YubikeyRequired bool `json:"yubikey_required"`
 	// YubikeyOTPMaxAge should set how long (in seconds) a yubikey one-time-password would be accepted for, but it might not be used?
@@ -105,9 +109,9 @@ func (p Privilege) String() string {
 func (p Privilege) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
-		return "ID, Username, Level, YubikeyRequired, Target"
+		return "ID, Username, Level, APIKeyID, PasswordRequired, YubikeyRequired, Target"
 	}
-	return "ID, Username, Level, Target, YubikeyRequired"
+	return "ID, Username, Level, Target, APIKeyID, PasswordRequired, YubikeyRequired"
 }
 
 // PrettyPrint nicely formats the Privilege and sends it to the given writer.
