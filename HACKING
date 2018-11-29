@@ -89,7 +89,8 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   │          arguments into flags
 │       │   ├── auth - Authentication routine for the client, called via
 │       │   │          with.EnsureAuth
-│       │   ├── flags - common flags
+│       │   ├── flags - common flags & code to support reading complex objects
+│       │   │           from them. e.g. VirtualMachineSpec & ImageInstall
 │       │   ├── wait - functions which wait for a condition to be true before
 │       │   │          returning
 │       │   └── with - functions for chaining together using app.Action to
@@ -106,8 +107,6 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   │   │             things around on bigv
 │       │   │   └── show - contains admin show commands
 │       │   ├── delete - implementations of all the "delete X" commands
-│       │   ├── image - common imaging code shared between commands when either
-│       │   │           reimaging or creating a server
 │       │   ├── show - implementations of all the "show X" commands
 │       │   └── update - implementations of all the "update X" commands
 │       ├── config - manages configuration from the environment, global flags
@@ -226,4 +225,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 719a294ab7e55832e4fc1e45948b7de230f771461dc478033210d493946d2e5a
+# sha256sum: 13111e01c90d466eae6d7c1c4f53d031e6274a988e0f2861b0be27d958988647

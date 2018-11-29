@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 type Request struct {
@@ -51,6 +53,10 @@ func (r *Request) AssertRequestObjectEqual(expected interface{}) {
 	if !reflect.DeepEqual(expected, r.requestObject) {
 		// FIXME: the Fatalf panics - using Printf for now to get
 		// usable debug output
+		if vmd, ok := r.requestObject.(brain.VirtualMachineDefault); ok {
+			r.T.Logf("ImageInstall: %#v", vmd.ServerSettings.Reimage)
+		}
+
 		fmt.Printf("Request body did not equal expected:\nexpected: %#v \n  actual: %#v\n", expected, r.requestObject)
 		r.T.Fatalf("Request body did not equal expected:\nexpected: %#v \n  actual: %#v", expected, r.requestObject)
 	}

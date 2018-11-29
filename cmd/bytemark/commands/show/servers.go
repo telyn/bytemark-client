@@ -26,6 +26,7 @@ If --group and --account are specified, the group will be displayed and the acco
 				Usage: "the group to list the servers of",
 				Value: new(app.GroupNameFlag),
 			},
+			// TODO: change to AccountNameFlag
 			cli.StringFlag{
 				Name:  "account",
 				Usage: "the account to show all the servers of",

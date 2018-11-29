@@ -6,8 +6,9 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/image"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -33,14 +34,17 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 Specify --force to prevent prompting.
 
 The root password will be output on stdout if the imaging succeeded, otherwise nothing will (and the exit code will be nonzero)`,
-				Flags: append(image.ImageInstallFlags, forceFlag, cli.GenericFlag{
-					Name:  "server",
-					Usage: "the server to reimage",
-					Value: new(app.VirtualMachineNameFlag),
-				}),
+				Flags: cliutil.ConcatFlags(flags.ImageInstallFlags, flags.ImageInstallAuthFlags,
+					[]cli.Flag{
+						forceFlag, cli.GenericFlag{
+							Name:  "server",
+							Usage: "the server to reimage",
+							Value: new(app.VirtualMachineNameFlag),
+						},
+					}),
 				Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
 					vmName := c.VirtualMachineName("server")
-					imageInstall, defaulted, err := image.PrepareImageInstall(c)
+					imageInstall, defaulted, err := flags.PrepareImageInstall(c, true)
 					if err != nil {
 						return
 					}

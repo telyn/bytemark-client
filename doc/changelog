@@ -5,6 +5,11 @@ bytemark-client (3.4) UNRELEASED; urgency=low
     new `--new-server` flag
   * Grant command can now grant privileges to users using api keys
 
+  ### Admin changes:
+  * `add vm default` has been added, allowing staff to create
+    publicly-accessible server configurations for use in tutorials, 1-click
+    installs, etc.
+
  -- Hannah Pirie <hannah.pirie@bytemark.co.uk>  Tue, 06 Nov 2018 10:24:36 +0000
 
 bytemark-client (3.3) UNRELEASED; urgency=low
