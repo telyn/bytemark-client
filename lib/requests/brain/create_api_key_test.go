@@ -2,6 +2,7 @@ package brain_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"testing"
 
@@ -73,6 +74,18 @@ func TestCreateAPIKey(t *testing.T) {
 				UserID:    4123,
 				ExpiresAt: "2018-05-05T05:05:05Z",
 			},
+		}, {
+			name: "error!!",
+			spec: brain.APIKey{
+				UserID:    4123,
+				ExpiresAt: "2018-05-05T05:05:05Z",
+			},
+			requestExpected: map[string]interface{}{
+				"user_id":    4123.0,
+				"expires_at": "2018-05-05T05:05:05Z",
+			},
+			shouldErr:   true,
+			responseErr: errors.New("the turboencabulator couldn't effectively prevent side fumbling"),
 		},
 	}
 	for _, test := range tests {
@@ -83,6 +96,11 @@ func TestCreateAPIKey(t *testing.T) {
 						"/api_keys": func(wr http.ResponseWriter, r *http.Request) {
 							assert.Equal(t, "method", "POST", r.Method)
 							assert.BodyUnmarshalEqual(test.requestExpected)(t, "request", r)
+
+							if test.responseErr != nil {
+								wr.WriteHeader(500)
+								wr.Write([]byte(test.responseErr.Error()))
+							}
 							bytes, err := json.Marshal(test.response)
 							if err != nil {
 								t.Fatal(err)
