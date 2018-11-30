@@ -1,11 +1,13 @@
-package brain
+package brain_test
 
 import (
 	"encoding/json"
 	"net/http"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
@@ -17,10 +19,10 @@ func TestCreateAPIKey(t *testing.T) {
 		spec brain.APIKey
 		// if the user ID needs to be retrieved from the api (when user == "" and spec.UserID == 0)
 		// then specify the user id to return here
-		userID      int
-		expect      map[string]interface{}
-		response    brain.APIKey
-		responseErr error
+		userID          int
+		requestExpected map[string]interface{}
+		response        brain.APIKey
+		responseErr     error
 
 		shouldErr bool
 	}{
@@ -30,6 +32,47 @@ func TestCreateAPIKey(t *testing.T) {
 				ExpiresAt: "2018-03-03T03:03:03Z",
 			},
 			shouldErr: true,
+		}, {
+			name: "both user and UserID set",
+			user: "jeff",
+			spec: brain.APIKey{
+				UserID:    4123.0,
+				ExpiresAt: "2018-03-03T03:03:03Z",
+			},
+			shouldErr: true,
+		}, {
+			name: "user set",
+			user: "jeff",
+			spec: brain.APIKey{
+				ExpiresAt: "2019-04-04T04:04:04Z",
+			},
+			userID: 1111,
+			requestExpected: map[string]interface{}{
+				"user_id":    1111.0,
+				"expires_at": "2019-04-04T04:04:04Z",
+			},
+			response: brain.APIKey{
+				ID:        9,
+				APIKey:    "fake-api-key",
+				UserID:    1111,
+				ExpiresAt: "2019-04-04T04:04:04Z",
+			},
+		}, {
+			name: "UserID set",
+			spec: brain.APIKey{
+				UserID:    4123,
+				ExpiresAt: "2018-05-05T05:05:05Z",
+			},
+			requestExpected: map[string]interface{}{
+				"user_id":    4123.0,
+				"expires_at": "2018-05-05T05:05:05Z",
+			},
+			response: brain.APIKey{
+				ID:        12435,
+				APIKey:    "this-key-be-fake",
+				UserID:    4123,
+				ExpiresAt: "2018-05-05T05:05:05Z",
+			},
 		},
 	}
 	for _, test := range tests {
@@ -38,8 +81,8 @@ func TestCreateAPIKey(t *testing.T) {
 				MuxHandlers: &testutil.MuxHandlers{
 					Brain: testutil.Mux{
 						"/api_keys": func(wr http.ResponseWriter, r *http.Request) {
-							assert.Equal(t, test.name, "POST", r.Method)
-							assert.BodyUnmarshalEqual(test.expect)(t, test.name, r)
+							assert.Equal(t, "method", "POST", r.Method)
+							assert.BodyUnmarshalEqual(test.requestExpected)(t, "request", r)
 							bytes, err := json.Marshal(test.response)
 							if err != nil {
 								t.Fatal(err)
@@ -51,7 +94,7 @@ func TestCreateAPIKey(t *testing.T) {
 			}
 			if test.userID != 0 {
 				rts.MuxHandlers.Brain["/users/"+test.user] = func(wr http.ResponseWriter, r *http.Request) {
-					assert.Equal(t, test.name, "GET", r.Method)
+					assert.Equal(t, "", "GET", r.Method)
 					bytes, err := json.Marshal(brain.User{ID: test.userID})
 					if err != nil {
 						t.Fatal(err)
@@ -60,6 +103,18 @@ func TestCreateAPIKey(t *testing.T) {
 				}
 			}
 
+			rts.Run(t, "", true, func(client lib.Client) {
+				apikey, err := brainRequests.CreateAPIKey(client, test.user, test.spec)
+				if err != nil && !test.shouldErr {
+					t.Errorf("Unexpected error: %v", err)
+				} else if err == nil && test.shouldErr {
+					t.Error("Error expected but not returned")
+				}
+
+				if !test.shouldErr {
+					assert.Equal(t, "response", test.response, apikey)
+				}
+			})
 		})
 	}
 }
