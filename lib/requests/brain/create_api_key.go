@@ -30,6 +30,6 @@ func CreateAPIKey(client lib.Client, username string, spec brain.APIKey) (apiKey
 	if err != nil {
 		return
 	}
-	_, _, err = r.MarshalAndRun(spec, apiKey)
+	_, _, err = r.MarshalAndRun(spec, &apiKey)
 	return
 }
