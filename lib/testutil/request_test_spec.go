@@ -21,7 +21,8 @@ type RequestTestFunc func(lib.Client)
 type RequestTestSpec struct {
 	// MuxHandlers will be used if defined - this allows for the test to support
 	// multiple endpoints, URLs, methods, etc. while still keeping as DRY as
-	// possible. Otherwise, set the Method, Endpoint, URL, ExpectedRequest, and Response fields.
+	// possible. Otherwise, set the Method, Endpoint, URL, AssertRequest,
+	// Response and StatusCode.
 	MuxHandlers *MuxHandlers
 
 	// Method is used to assert that the request was given the correct type
@@ -35,6 +36,8 @@ type RequestTestSpec struct {
 	// to use a raw string (i.e. if you don't want to use JSON) cast it to
 	// encoding/json.RawMessage - this will be reproduced verbatim
 	Response interface{}
+	// StatusCode is the status code that will be returned
+	StatusCode int
 	// AssertRequest is an optional func which will get called to check the
 	// request object further - for example to check the URL has particular
 	// query string keys
