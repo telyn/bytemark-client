@@ -36,7 +36,9 @@ type RequestTestSpec struct {
 	// to use a raw string (i.e. if you don't want to use JSON) cast it to
 	// encoding/json.RawMessage - this will be reproduced verbatim
 	Response interface{}
-	// StatusCode is the status code that will be returned
+	// StatusCode is the status code that will be returned. If unset, will
+	// default to whatever http.ResponseWriter.Write defaults to.
+	// Only used if MuxHandlers is nil
 	StatusCode int
 	// AssertRequest is an optional func which will get called to check the
 	// request object further - for example to check the URL has particular
@@ -61,6 +63,9 @@ func (rts *RequestTestSpec) handlerFunc(t *testing.T, testName string, auth bool
 		}
 		if rts.AssertRequest != nil {
 			rts.AssertRequest(t, testName, r)
+		}
+		if rts.StatusCode != 0 {
+			wr.WriteHeader(rts.StatusCode)
 		}
 		WriteJSON(t, wr, rts.Response)
 	}

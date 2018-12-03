@@ -17,6 +17,6 @@ func RevokeAPIKey(client lib.Client, id int) (err error) {
 	apiKey := brain.APIKey{
 		ExpiresAt: "00:00:00",
 	}
-	r.MarshalAndRun(spec, &apiKey)
+	_, _, err = r.MarshalAndRun(apiKey, nil)
 	return
 }
