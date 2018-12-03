@@ -63,15 +63,18 @@ func TestCreateAPIKey(t *testing.T) {
 			spec: brain.APIKey{
 				UserID:    4123,
 				ExpiresAt: "2018-05-05T05:05:05Z",
+				Label:     "jeffs-cool-key-for-arctic-exploration",
 			},
 			requestExpected: map[string]interface{}{
 				"user_id":    4123.0,
 				"expires_at": "2018-05-05T05:05:05Z",
+				"label":      "jeffs-cool-key-for-arctic-exploration",
 			},
 			response: brain.APIKey{
 				ID:        12435,
 				APIKey:    "this-key-be-fake",
 				UserID:    4123,
+				Label:     "jeffs-cool-key-for-arctic-exploration",
 				ExpiresAt: "2018-05-05T05:05:05Z",
 			},
 		}, {
