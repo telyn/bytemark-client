@@ -12,6 +12,16 @@ type TemplateFragmentMapper interface {
 	MapTemplateFragment(templateFrag string) (strs []string, err error)
 }
 
+func prefixEachLine(prefix string, input string) string {
+	lines := strings.Split(input, "\n")
+	for i := range lines {
+		if lines[i] != "" {
+			lines[i] = string(prefix) + lines[i]
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
 var templateFuncMap = map[string]interface{}{
 	// capitalize the first letter of str
 	"capitalize": func(str string) string {
@@ -39,6 +49,17 @@ var templateFuncMap = map[string]interface{}{
 		}
 		return fmt.Sprintf("%s%d%ciB", lt, size, gt)
 	},
+	// indent indents every line of the input string by n spaces.
+	// for example indent 1 " hi\nhello" would produce "  hi\n hello"
+	"indent": func(amount int, input string) string {
+		spaces := make([]rune, amount)
+		for i := range spaces {
+			spaces[i] = ' '
+		}
+		return prefixEachLine(string(spaces), input)
+
+	},
+	"prefixEachLine": prefixEachLine,
 	// mibgib takes a size in megabytes and formats it with a unit in either MiB or GiB, if size >= 1024.
 	"mibgib": func(size int) string {
 		mg := 'M'
@@ -74,7 +95,9 @@ var templateFuncMap = map[string]interface{}{
 	},
 	// join joins multiple strings together with a separator
 	"join": strings.Join,
+	// joinWithSpecialLast joins multiple strings together with a separator, except the last two, which are seperated by a different seperator. e.g. joinWithSpecialLast ", " " and " []string{"hi","hello","welcome","good evening"} would produce "hi, hello, welcome and good evening"
 	"joinWithSpecialLast": func(sep string, fin string, strs []string) string {
+		// special cases for when there are 0, 1 or 2 strings
 		switch len(strs) {
 		case 0:
 			return ""
@@ -83,7 +106,9 @@ var templateFuncMap = map[string]interface{}{
 		case 2:
 			return strs[0] + fin + strs[1]
 		}
+		// join with one seperator
 		most := strings.Join(strs[0:len(strs)-1], sep)
+		// and add the last with the 'fin' seperator.
 		return most + fin + strs[len(strs)-1]
 	},
 }

@@ -1,5 +1,13 @@
 package brain
 
+import (
+	"io"
+	"time"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
+)
+
 // APIKey represents an api_key in the brain.
 type APIKey struct {
 	// ID must not be set during creation.
@@ -19,4 +27,43 @@ type APIKey struct {
 	// Privileges cannot be set at creation or update time, but are returned by
 	// the brain when view=overview.
 	Privileges Privileges `json:"privileges,omitempty"`
+}
+
+func (key APIKey) DefaultFields(f output.Format) string {
+	switch f {
+	case output.List:
+		return "ID, Label, Expired, ExpiresAt, Privileges"
+	}
+	return "ID, UserID, Label, Expired, ExpiresAt, Privileges"
+}
+
+func (key APIKey) Expired() bool {
+	if key.ExpiresAt == "" {
+		return false
+	}
+	// TODO(telyn): not keen on this ad-hoc iso8601 parsing
+	expiresAt, err := time.Parse("2006-01-02T15:04:05-0700", key.ExpiresAt)
+	if err != nil {
+		return false
+	}
+	return expiresAt.Before(time.Now())
+}
+
+func (key APIKey) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
+	accountTpl := `
+{{ define "apikey_sgl" }}{{ .Label }}{{ if .Expired }} (expired){{ end }}{{ end }}
+{{ define "apikey_medium" }}{{ template "apikey_sgl" . }}{{ end }}
+{{ define "apikey_full" }}{{ template "apikey_sgl" . }}
+  Expire{{ if .Expired }}d{{ else }}s{{ end }}: {{ if eq .ExpiresAt "" }}never{{ else }}{{ .ExpiresAt }}{{ end -}}
+{{ if .APIKey}}
+  Key: apikey.{{ .APIKey }}{{ end -}}
+{{ if len .Privileges | le 1 }}
+
+  Privileges:
+{{ prettysprint .Privileges "_medium" | prefixEachLine "* " | indent 4 -}}
+{{ else }}
+{{ end -}}
+{{ end }}
+`
+	return prettyprint.Run(wr, accountTpl, "apikey"+string(detail), key)
 }
