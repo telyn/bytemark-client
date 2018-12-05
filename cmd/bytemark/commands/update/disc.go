@@ -5,7 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
@@ -25,7 +25,7 @@ Resizes the given disc to the given size. Sizes may be specified with a + in fro
 
 Moving the disc to another server may require you to update your operating system configuration. Both servers must be shutdown and root discs cannot be moved. Please find documentation for moving discs at https://docs.bytemark.co.uk/article/moving-a-disc`,
 		Flags: []cli.Flag{
-			flags.Force,
+			flagsets.Force,
 			cli.StringFlag{
 				Name:  "disc",
 				Usage: "the disc to resize",
@@ -78,7 +78,7 @@ func resizeDisc(c *app.Context) (err error) {
 
 	log.Logf("Resizing %s from %dGiB to %dGiB...", c.Disc.Label, c.Disc.Size/1024, newSize/1024)
 
-	if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to perform this resize?")) {
+	if !flagsets.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to perform this resize?")) {
 		return util.UserRequestedExit{}
 	}
 
@@ -97,7 +97,7 @@ func moveDisc(c *app.Context) (err error) {
 
 	log.Logf("This may require an update to the operating system configuration, please find documentation for moving discs at https://docs.bytemark.co.uk/article/moving-a-disc\r\n")
 
-	if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to move the disc?")) {
+	if !flagsets.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("Are you certain you wish to move the disc?")) {
 		return util.UserRequestedExit{}
 	}
 	log.Logf("Moving %s from %s to %s...", c.Disc.Label, vmName, newVM)

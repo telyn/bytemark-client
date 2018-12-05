@@ -5,7 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -30,7 +30,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 				Usage: "the name of the group to delete",
 				Value: new(app.GroupNameFlag),
 			},
-			flags.Force,
+			flagsets.Force,
 		},
 		Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Group("group"), func(ctx *app.Context) (err error) {
 			recursive := ctx.Bool("recursive")

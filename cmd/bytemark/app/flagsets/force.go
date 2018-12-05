@@ -1,4 +1,4 @@
-package flags
+package flagsets
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
