@@ -1,6 +1,11 @@
 package add
 
-import "github.com/urfave/cli"
+import (
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
+	"github.com/urfave/cli"
+)
 
 func init() {
 	Commands = append(Commands, cli.Command{
@@ -15,6 +20,10 @@ func init() {
 				Name:  "group",
 				Usage: "Group to grant the API key administrative privilege over",
 			},
+			cli.StringFlag{
+				Name:  "label",
+				Usage: "user-friendly label for the API key",
+			},
 			cli.StringSliceFlag{
 				Name:  "server",
 				Usage: "Server to grant the API key administrative privilege over",
@@ -25,7 +34,7 @@ func init() {
 			},
 		},
 		Usage:     "add an API key to your Bytemark Cloud Servers user",
-		UsageText: "add api key [--server <cloud server>]... [--group <group name>]... [--user <",
+		UsageText: "add api key [--server <cloud server>]... [--group <group name>]... [--user <user>] <label>",
 		Description: `--expires-at may be set to any date format the Brain
 accepts, but we generally recommend ISO8601 format.
 
@@ -42,5 +51,28 @@ Servers API - to manage servers and groups.
 
 Multiple --group and --server flags (and combinations thereof) can be supplied,
 and the API key will be have privileges over each that is supplied.`,
+		Action: app.Action(args.Optional("label"), with.Auth, func(ctx *app.Context) error {
+			servers, serverIDsMap, err := findServers(ctx)
+			if err != nil {
+				return err
+			}
+			groups, groupIDsMap := findGroups(ctx)
+			if err != nil {
+				return err
+			}
+
+			apiKey, err := brainRequests.CreateAPIKey(ctx.Client(),keySpec)
+			if err != nil {
+				return err
+			}
+			privs := makeServerPrivs(servers, apiKey)
+			privs = append(privs, makeGroupPrivs(groups, apiKey))
+			privErrs := []error{}
+			for _, priv := range privs {
+				err = ctx.Client().GrantPrivilege(privs)
+				if err != nil {
+					privErrs
+			}
+		}),
 	})
 }
