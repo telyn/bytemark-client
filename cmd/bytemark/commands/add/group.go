@@ -19,7 +19,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the name of the group to add",
-				Value: new(app.GroupNameFlag),
+				Value: new(flags.GroupName),
 			},
 		},
 		Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Auth, createGroup),

@@ -24,7 +24,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to add the disc to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineName),
 			},
 		},
 		Usage:     "add virtual discs attached to one of your cloud servers",

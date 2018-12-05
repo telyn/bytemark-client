@@ -28,7 +28,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server whose disk you wish to backup",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 			},
 			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) error {

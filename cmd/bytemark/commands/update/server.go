@@ -65,7 +65,7 @@ EXAMPLES
 			cli.GenericFlag{
 				Name:  "new-name",
 				Usage: "A new name for the server",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineName),
 			},
 			cli.IntFlag{
 				Name:  "cores",
@@ -82,7 +82,7 @@ EXAMPLES
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "The server to update",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineName),
 			},
 		),
 		Action: app.Action(args.Optional("new-name", "hwprofile", "memory"), with.RequiredFlags("server"), with.VirtualMachine("server"), with.Auth, updateServer),

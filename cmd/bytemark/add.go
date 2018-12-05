@@ -99,7 +99,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "The server to add IPs to",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {

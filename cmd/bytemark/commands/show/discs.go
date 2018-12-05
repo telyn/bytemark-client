@@ -22,7 +22,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server whose discs you wish to list",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineName),
 			},
 		),
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {

@@ -24,7 +24,7 @@ If --group and --account are specified, the group will be displayed and the acco
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the group to list the servers of",
-				Value: new(app.GroupNameFlag),
+				Value: new(flags.GroupName),
 			},
 			// TODO: change to AccountNameFlag
 			cli.StringFlag{

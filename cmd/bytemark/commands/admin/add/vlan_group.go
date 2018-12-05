@@ -21,7 +21,7 @@ Used when setting up a private VLAN for a customer.`,
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the name of the group to add",
-				Value: new(app.GroupNameFlag),
+				Value: new(flags.GroupName),
 			},
 			cli.IntFlag{
 				Name:  "vlan-num",

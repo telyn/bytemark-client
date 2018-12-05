@@ -28,7 +28,7 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the name of the group to delete",
-				Value: new(app.GroupNameFlag),
+				Value: new(flags.GroupName),
 			},
 			flagsets.Force,
 		},

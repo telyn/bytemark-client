@@ -24,7 +24,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to stop",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {

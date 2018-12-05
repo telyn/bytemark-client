@@ -48,7 +48,7 @@ Defaults to connecting to the serial console for the given server.`,
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "The server whose console will be connected to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineName),
 			},
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(ctx *app.Context) (err error) {

@@ -45,7 +45,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 				cli.GenericFlag{
 					Name:  "name",
 					Usage: "The new server's name",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 				cli.GenericFlag{
 					Name:  "ip",

@@ -32,7 +32,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
-					Value: new(app.AccountNameFlag),
+					Value: new(flags.AccountName),
 				}),
 			Action: app.Action(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
 				c.Debug("show account command output")
@@ -48,7 +48,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 				cli.StringFlag{
 					Name:  "disc",
@@ -68,7 +68,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The name of the group to show",
-					Value: new(app.GroupNameFlag),
+					Value: new(flags.GroupName),
 				},
 			),
 			Action: app.Action(args.Optional("group"), with.Group("group"), func(c *app.Context) error {
@@ -83,7 +83,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 			),
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {
@@ -132,12 +132,12 @@ Privileges will be output in no particular order.`,
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The group to show the privileges of",
-					Value: new(app.GroupNameFlag),
+					Value: new(flags.GroupName),
 				},
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "The server to show the privileges of",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 			),
 			Action: app.Action(with.Auth, func(c *app.Context) (err error) {

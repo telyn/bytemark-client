@@ -39,7 +39,7 @@ The root password will be output on stdout if the imaging succeeded, otherwise n
 						forceFlag, cli.GenericFlag{
 							Name:  "server",
 							Usage: "the server to reimage",
-							Value: new(app.VirtualMachineNameFlag),
+							Value: new(flags.VirtualMachineName),
 						},
 					}),
 				Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {

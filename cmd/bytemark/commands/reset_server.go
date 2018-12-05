@@ -11,7 +11,7 @@ func init() {
 	serverFlag := cli.GenericFlag{
 		Name:  "server",
 		Usage: "the server to reset",
-		Value: new(app.VirtualMachineNameFlag),
+		Value: new(flags.VirtualMachineName),
 	}
 
 	Commands = append(Commands, cli.Command{

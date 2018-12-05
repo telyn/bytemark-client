@@ -38,7 +38,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server whose disc you wish to delete, must provide a label too",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 				cli.StringFlag{
 					Name:  "id",
@@ -108,7 +108,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to delete",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), deleteServer),
@@ -125,7 +125,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to delete a backup from",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 				cli.StringFlag{
 					Name:  "backup",

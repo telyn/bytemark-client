@@ -18,7 +18,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "account",
 				Usage: "the account to list the groups of",
-				Value: new(app.AccountNameFlag),
+				Value: new(flags.AccountName),
 			},
 		),
 		Action: app.Action(args.Optional("account"), with.RequiredFlags("account"), with.Account("account"), func(c *app.Context) error {

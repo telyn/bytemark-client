@@ -43,7 +43,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "privilege",
 					Usage: "A privilege written out like '<level> [on] <object> [to] <user>",
-					Value: new(app.PrivilegeFlag),
+					Value: new(flags.Privilege),
 				},
 			},
 			Action: app.Action(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {

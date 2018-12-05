@@ -26,7 +26,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server that the disc is attached to",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) (err error) {
@@ -57,7 +57,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server that the disc is attached to",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 				cli.StringFlag{
 					Name:  "backup",

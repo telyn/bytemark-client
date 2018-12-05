@@ -27,7 +27,7 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server the disc belongs to",
-						Value: new(app.VirtualMachineNameFlag),
+						Value: new(flags.VirtualMachineName),
 					},
 					cli.IntFlag{
 						Name:  "iops-limit",

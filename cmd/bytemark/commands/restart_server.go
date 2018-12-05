@@ -26,7 +26,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to restart",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineName),
 				},
 				cli.BoolFlag{
 					Name:  "rescue",

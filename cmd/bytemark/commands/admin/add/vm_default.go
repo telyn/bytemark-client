@@ -28,7 +28,7 @@ Multiple --disc flags can be used to add multiple discs to the VM Default
 
 If --backup is set then a backup of the first disk will be taken at the
 frequency specified - never, daily, weekly or monthly. If not specified the backup will default to weekly.`,
-		Flags: cliutil.ConcatFlags(app.OutputFlags("vm default", "object"),
+		Flags: cliutil.ConcatFlags(flags.Outputs("vm default", "object"),
 			flagsets.ImageInstallFlags, flagsets.ServerSpecFlags,
 			[]cli.Flag{
 				cli.StringFlag{
@@ -42,7 +42,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to add the default to (will use 'bytemark' if unset)",
-					Value: new(app.AccountNameFlag),
+					Value: new(flags.AccountName),
 				},
 			}),
 		Action: app.Action(args.Optional("default-name"), with.RequiredFlags("default-name"), with.Auth, func(c *app.Context) (err error) {

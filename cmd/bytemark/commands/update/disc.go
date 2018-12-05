@@ -33,17 +33,17 @@ Moving the disc to another server may require you to update your operating syste
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server that the disc is attached to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineName),
 			},
 			cli.GenericFlag{
 				Name:  "new-size",
 				Usage: "the new size for the disc. Prefix with + to indicate 'increase by'",
-				Value: new(app.ResizeFlag),
+				Value: new(flags.Resize),
 			},
 			cli.GenericFlag{
 				Name:  "new-server",
 				Usage: "the server that the disc should be moved to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineName),
 			},
 		},
 		Action: app.Action(args.Optional("server", "disc", "new-size", "new-server"), with.RequiredFlags("server", "disc"), with.Disc("server", "disc"), updateDisc),

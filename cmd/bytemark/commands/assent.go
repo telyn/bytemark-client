@@ -29,7 +29,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "account",
 				Usage: "the account which is assenting",
-				Value: new(app.AccountNameFlag),
+				Value: new(flags.AccountName),
 			},
 			cli.IntFlag{
 				Name:  "accountid",
@@ -46,7 +46,7 @@ func init() {
 		},
 		Action: app.Action(with.RequiredFlags("agreement", "person"), func(ctx *app.Context) error {
 			accountString := ctx.String("account")
-			accountNameFlag := ctx.Context.Generic("account").(*app.AccountNameFlag)
+			accountNameFlag := ctx.Context.Generic("account").(*flags.AccountName)
 			accountID := ctx.Int("accountid")
 			var account billing.Account
 

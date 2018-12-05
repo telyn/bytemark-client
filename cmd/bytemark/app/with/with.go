@@ -32,15 +32,15 @@ func flagValueIsOK(c *app.Context, flag cli.Flag) bool {
 	switch realFlag := flag.(type) {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
-		case *app.VirtualMachineNameFlag:
+		case *flags.VirtualMachineName:
 			return value.VirtualMachineName != nil
-		case *app.GroupNameFlag:
+		case *flags.GroupName:
 			return value.GroupName != nil
-		case *app.AccountNameFlag:
+		case *flags.AccountName:
 			return value.AccountName != ""
 		case *util.SizeSpecFlag:
 			return *value != 0
-		case *app.PrivilegeFlag:
+		case *flags.Privilege:
 			return value.Username != "" && value.Level != ""
 		}
 	case cli.StringFlag:

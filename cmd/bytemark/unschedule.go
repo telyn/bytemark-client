@@ -33,7 +33,7 @@ The <schedule id> is a number that can be found out using 'bytemark show disc <s
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to unschedule backups on",
-						Value: new(app.VirtualMachineNameFlag),
+						Value: new(flags.VirtualMachineName),
 					},
 					cli.StringFlag{
 						Name:  "disc",

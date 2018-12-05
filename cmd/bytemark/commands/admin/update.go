@@ -211,7 +211,7 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to migrate",
-						Value: new(app.VirtualMachineNameFlag),
+						Value: new(flags.VirtualMachineName),
 					},
 					cli.Int64Flag{
 						Name:  "migrate-speed",

@@ -40,7 +40,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server the disc belongs to",
-						Value: new(app.VirtualMachineNameFlag),
+						Value: new(flags.VirtualMachineName),
 					},
 					cli.IntFlag{
 						Name:  "interval",
