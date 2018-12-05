@@ -212,7 +212,7 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to migrate",
-						Value: new(flags.VirtualMachineName),
+						Value: new(flags.VirtualMachineNameFlag),
 					},
 					cli.Int64Flag{
 						Name:  "migrate-speed",
@@ -224,7 +224,7 @@ func init() {
 					},
 				},
 				Action: app.Action(args.Optional("server", "migrate-speed", "migrate-downtime"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
-					vm := c.VirtualMachineName("server")
+					vm := flags.VirtualMachineName(c, "server")
 
 					var speed *int64
 					var downtime *int

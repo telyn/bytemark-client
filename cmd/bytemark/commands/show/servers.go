@@ -25,7 +25,7 @@ If --group and --account are specified, the group will be displayed and the acco
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the group to list the servers of",
-				Value: new(flags.GroupName),
+				Value: new(flags.GroupNameFlag),
 			},
 			// TODO: change to AccountNameFlag
 			cli.StringFlag{
@@ -36,7 +36,7 @@ If --group and --account are specified, the group will be displayed and the acco
 		Action: app.Action(args.Optional("group"), with.Auth, func(c *app.Context) error {
 			servers := brain.VirtualMachines{}
 			if c.IsSet("group") {
-				groupName := c.GroupName("group")
+				groupName := flags.GroupName(c, "group")
 				group, err := c.Client().GetGroup(groupName)
 				if err != nil {
 					return err

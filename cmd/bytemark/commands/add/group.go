@@ -20,7 +20,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the name of the group to add",
-				Value: new(flags.GroupName),
+				Value: new(flags.GroupNameFlag),
 			},
 		},
 		Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Auth, createGroup),
@@ -28,7 +28,7 @@ func init() {
 }
 
 func createGroup(c *app.Context) (err error) {
-	gp := c.GroupName("group")
+	gp := flags.GroupName(c, "group")
 	err = c.Client().CreateGroup(gp)
 	if err == nil {
 		log.Logf("Group %s was created under account %s\r\n", gp.Group, gp.Account)

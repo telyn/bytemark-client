@@ -2,7 +2,6 @@ package app
 
 import (
 	"io"
-	"net"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
@@ -120,51 +119,12 @@ func (c *Context) IsSet(flagName string) bool {
 	return c.Context.IsSet(flagName)
 }
 
-// flags below
+// Flags provided by urfave/cli below.
+// For all the flags in the flags package, see flags/accessors.go
 
 // Bool returns the value of the named flag as a bool
 func (c *Context) Bool(flagname string) bool {
 	return c.Context.Bool(flagname)
-}
-
-// Discs returns the discs passed along as the named flag.
-// I can't imagine why I'd ever name a disc flag anything other than --disc, but the flexibility is there just in case.
-func (c *Context) Discs(flagname string) []brain.Disc {
-	disc, ok := c.Context.Generic(flagname).(*util.DiscSpecFlag)
-	if ok {
-		return []brain.Disc(*disc)
-	}
-	return []brain.Disc{}
-}
-
-// FileName returns the name of the file given by the named flag
-func (c *Context) FileName(flagname string) string {
-	file, ok := c.Context.Generic(flagname).(*util.FileFlag)
-	if ok {
-		return file.FileName
-	}
-	return ""
-}
-
-// FileContents returns the contents of the file given by the named flag.
-func (c *Context) FileContents(flagname string) string {
-	file, ok := c.Context.Generic(flagname).(*util.FileFlag)
-	if ok {
-		return file.Value
-	}
-	return ""
-}
-
-// GroupName returns the named flag as a lib.GroupName
-func (c *Context) GroupName(flagname string) (gp lib.GroupName) {
-	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
-	if !ok {
-		return lib.GroupName{}
-	}
-	if gpNameFlag.GroupName == nil {
-		return lib.GroupName{}
-	}
-	return *gpNameFlag.GroupName
 }
 
 // Int returns the value of the named flag as an int
@@ -175,24 +135,6 @@ func (c *Context) Int(flagname string) int {
 // Int64 returns the value of the named flag as an int64
 func (c *Context) Int64(flagname string) int64 {
 	return c.Context.Int64(flagname)
-}
-
-// IPs returns the ips passed along as the named flag.
-func (c *Context) IPs(flagname string) []net.IP {
-	ips, ok := c.Context.Generic(flagname).(*util.IPFlag)
-	if ok {
-		return []net.IP(*ips)
-	}
-	return []net.IP{}
-}
-
-// PrivilegeFlag returns the named flag as a PrivilegeFlag
-func (c *Context) PrivilegeFlag(flagname string) PrivilegeFlag {
-	priv, ok := c.Context.Generic(flagname).(*PrivilegeFlag)
-	if ok {
-		return *priv
-	}
-	return PrivilegeFlag{}
 }
 
 // String returns the value of the named flag as a string
@@ -210,35 +152,4 @@ func (c *Context) StringSlice(flagname string) []string {
 		return c.Context.StringSlice(flagname)
 	}
 	return c.Context.GlobalStringSlice(flagname)
-}
-
-// Size returns the value of the named SizeSpecFlag as an int in megabytes
-func (c *Context) Size(flagname string) int {
-	size, ok := c.Context.Generic(flagname).(*util.SizeSpecFlag)
-	if ok {
-		return int(*size)
-	}
-	return 0
-}
-
-// ResizeFlag returns the named ResizeFlag
-func (c *Context) ResizeFlag(flagname string) ResizeFlag {
-	size, ok := c.Context.Generic(flagname).(*ResizeFlag)
-	if ok {
-		return *size
-	}
-	return ResizeFlag{}
-}
-
-// VirtualMachineName returns the named flag as a lib.VirtualMachineName
-func (c *Context) VirtualMachineName(flagname string) (vm lib.VirtualMachineName) {
-	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
-	if !ok {
-		return c.Config().GetVirtualMachine()
-	}
-	if vmNameFlag.VirtualMachineName == nil {
-		return lib.VirtualMachineName{}
-	}
-
-	return *vmNameFlag.VirtualMachineName
 }

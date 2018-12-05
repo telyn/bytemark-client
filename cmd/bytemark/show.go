@@ -33,7 +33,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "The account to view",
-					Value: new(flags.AccountName),
+					Value: new(flags.AccountNameFlag),
 				}),
 			Action: app.Action(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
 				c.Debug("show account command output")
@@ -49,7 +49,7 @@ If the --json flag is specified, prints a complete overview of the account in JS
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
-					Value: new(flags.VirtualMachineName),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 				cli.StringFlag{
 					Name:  "disc",
@@ -69,7 +69,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The name of the group to show",
-					Value: new(flags.GroupName),
+					Value: new(flags.GroupNameFlag),
 				},
 			),
 			Action: app.Action(args.Optional("group"), with.Group("group"), func(c *app.Context) error {
@@ -84,7 +84,7 @@ If the --json flag is specified, prints a complete overview of the group in JSON
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to display",
-					Value: new(flags.VirtualMachineName),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 			),
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) error {
@@ -133,18 +133,18 @@ Privileges will be output in no particular order.`,
 				cli.GenericFlag{
 					Name:  "group",
 					Usage: "The group to show the privileges of",
-					Value: new(flags.GroupName),
+					Value: new(flags.GroupNameFlag),
 				},
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "The server to show the privileges of",
-					Value: new(flags.VirtualMachineName),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 			),
 			Action: app.Action(with.Auth, func(c *app.Context) (err error) {
 				account := c.String("account")
-				group := c.GroupName("group")
-				server := c.VirtualMachineName("server")
+				group := flags.GroupName(c, "group")
+				server := flags.VirtualMachineName(c, "server")
 
 				privs := make(brain.Privileges, 0)
 				if account != "" {

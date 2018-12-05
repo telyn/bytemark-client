@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
 )
@@ -25,7 +25,7 @@ var ServerSpecFlags = []cli.Flag{
 	cli.GenericFlag{
 		Name:  "disc",
 		Usage: "One or more disc specifications. Defaults to a single 25GiB sata-grade disc",
-		Value: new(util.DiscSpecFlag),
+		Value: new(flags.DiscSpecFlag),
 	},
 	Force,
 	cli.StringFlag{
@@ -38,7 +38,7 @@ var ServerSpecFlags = []cli.Flag{
 	},
 	cli.GenericFlag{
 		Name:  "memory",
-		Value: new(util.SizeSpecFlag),
+		Value: new(flags.SizeSpecFlag),
 		Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units. Defaults to 1GiB.",
 	},
 	cli.BoolFlag{
@@ -137,9 +137,9 @@ func prepareDiscs(backupFrequency string, discs []brain.Disc) ([]brain.Disc, err
 
 // prepareServerReadArgs sets up the initial defaults, reads in the --disc, --cores and --memory flags
 func prepareServerReadArgs(c *app.Context) (discs []brain.Disc, cores, memory int, err error) {
-	discs = c.Discs("disc")
+	discs = flags.Discs(c, "disc")
 	cores = c.Int("cores")
-	memory = c.Size("memory")
+	memory = flags.Size(c, "memory")
 	if memory == 0 {
 		memory = 1024
 	}

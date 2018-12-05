@@ -22,7 +22,7 @@ Used when setting up a private VLAN for a customer.`,
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the name of the group to add",
-				Value: new(flags.GroupName),
+				Value: new(flags.GroupNameFlag),
 			},
 			cli.IntFlag{
 				Name:  "vlan-num",
@@ -30,7 +30,7 @@ Used when setting up a private VLAN for a customer.`,
 			},
 		},
 		Action: app.Action(args.Optional("group", "vlan-num"), with.RequiredFlags("group"), with.Auth, func(c *app.Context) error {
-			gp := c.GroupName("group")
+			gp := flags.GroupName(c, "group")
 			if err := c.Client().AdminCreateGroup(gp, c.Int("vlan-num")); err != nil {
 				return err
 			}

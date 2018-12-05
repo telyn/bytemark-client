@@ -1,4 +1,4 @@
-package util
+package flags
 
 import (
 	"github.com/bcampbell/fuzzytime"

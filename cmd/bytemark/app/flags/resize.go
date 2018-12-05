@@ -17,14 +17,14 @@ const (
 	ResizeModeIncrease
 )
 
-// Resize is effectively an extension of SizeSpecFlag which has a ResizeMode. The Size stored in the flag is the size to set to or increase by depending on the Mode
-type Resize struct {
+// ResizeFlag is effectively an extension of SizeSpecFlag which has a ResizeMode. The Size stored in the flag is the size to set to or increase by depending on the Mode
+type ResizeFlag struct {
 	Mode ResizeMode
 	Size int
 }
 
 // Set parses the string into a Resize. If it starts with +, Mode is set to ResizeModeIncrease. Otherwise, it's set to ResizeModeSet. The rest of the string is parsed as a sizespec using sizespec.Parse
-func (rf *Resize) Set(value string) (err error) {
+func (rf *ResizeFlag) Set(value string) (err error) {
 	rf.Mode = ResizeModeSet
 	if strings.HasPrefix(value, "+") {
 		rf.Mode = ResizeModeIncrease
@@ -40,7 +40,7 @@ func (rf *Resize) Set(value string) (err error) {
 }
 
 // String returns the size, in GiB or TiB (if the size is > 1TIB) with the unit used as a suffix. If Mode is ResizeModeIncrease, the string is prefixed with '+'
-func (rf Resize) String() string {
+func (rf ResizeFlag) String() string {
 	plus := ""
 	if rf.Mode == ResizeModeIncrease {
 		plus += "+"

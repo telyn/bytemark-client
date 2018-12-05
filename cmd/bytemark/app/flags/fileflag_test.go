@@ -1,10 +1,11 @@
-package util
+package flags_test
 
 import (
 	"io/ioutil"
 	"os"
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/cheekybits/is"
 )
 
@@ -15,7 +16,7 @@ func TestFileFlag(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	flag := FileFlag{}
+	flag := flags.FileFlag{}
 
 	err = flag.Set("test-fileflag")
 	if err != nil {

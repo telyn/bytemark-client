@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
@@ -25,7 +26,7 @@ func (args *privArgs) shift() (arg string, err error) {
 }
 
 // Privilege is an un-realised brain.Privilege - where the target name has been parsed but hasn't been turned into IDs yet
-type Privilege struct {
+type PrivilegeFlag struct {
 	AccountName        string
 	GroupName          *lib.GroupName
 	VirtualMachineName *lib.VirtualMachineName
@@ -35,12 +36,12 @@ type Privilege struct {
 }
 
 // TargetType returns the prefix of the Privilege's Level. Use the brain.PrivilegeTargetType* constants for comparison
-func (pf Privilege) TargetType() string {
+func (pf PrivilegeFlag) TargetType() string {
 	return strings.SplitN(string(pf.Level), "_", 2)[0]
 }
 
 // fillPrivilegeTarget adds the object to the privilege, trying to use it as a VM, Group or Account name depending on what PrivilegeLevel the Privilege is for. The target is expected to be the NextArg at this point in the Context
-func (pf *Privilege) fillPrivilegeTarget(c *Context, args *privArgs) (err error) {
+func (pf *PrivilegeFlag) fillPrivilegeTarget(c *app.Context, args *privArgs) (err error) {
 	if pf.TargetType() != brain.PrivilegeTargetTypeCluster {
 		var target string
 		target, err = args.shift()
@@ -70,14 +71,14 @@ func (pf *Privilege) fillPrivilegeTarget(c *Context, args *privArgs) (err error)
 }
 
 // Set sets the privilege given some string (should be in the form "<level> [[on] <target>] [to|from|for] <user>"
-func (pf *Privilege) Set(value string) (err error) {
+func (pf *PrivilegeFlag) Set(value string) (err error) {
 	pf.Value = value
 	return nil
 }
 
 // Preprocess parses the Privilege and looks up the target's ID so it can
 // be made into a brain.Privilege
-func (pf *Privilege) Preprocess(c *Context) (err error) {
+func (pf *PrivilegeFlag) Preprocess(c *app.Context) (err error) {
 	args := privArgs(strings.Split(pf.Value, " "))
 
 	level, err := args.shift()
@@ -107,7 +108,7 @@ func (pf *Privilege) Preprocess(c *Context) (err error) {
 	return
 }
 
-func (pf Privilege) String() string {
+func (pf PrivilegeFlag) String() string {
 	switch pf.TargetType() {
 	case brain.PrivilegeTargetTypeVM:
 		return fmt.Sprintf("%s on %s for %s", pf.Level, pf.VirtualMachineName, pf.Username)

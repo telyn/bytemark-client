@@ -19,7 +19,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to migrate",
-				Value: new(flags.VirtualMachineName),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 			cli.StringFlag{
 				Name:  "new-head",
@@ -27,7 +27,7 @@ func init() {
 			},
 		},
 		Action: app.Action(args.Optional("server", "new-head"), with.RequiredFlags("server"), with.Auth, func(ctx *app.Context) (err error) {
-			vmName := ctx.VirtualMachineName("server")
+			vmName := flags.VirtualMachineName(ctx, "server")
 			head := ctx.String("new-head")
 
 			vm, err := ctx.Client().GetVirtualMachine(vmName)

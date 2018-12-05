@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
@@ -19,7 +20,7 @@ var ImageInstallFlags = []cli.Flag{
 	cli.GenericFlag{
 		Name:  "firstboot-script-file",
 		Usage: "Local file to read the firstboot script from.",
-		Value: new(util.FileFlag),
+		Value: new(flags.FileFlag),
 	},
 	cli.StringFlag{
 		Name:  "image",
@@ -37,7 +38,7 @@ var ImageInstallAuthFlags = []cli.Flag{
 	cli.GenericFlag{
 		Name:  "authorized-keys-file",
 		Usage: "Local file to read the --authorized-keys from",
-		Value: new(util.FileFlag),
+		Value: new(flags.FileFlag),
 	},
 	cli.StringFlag{
 		Name:  "root-password",
@@ -47,7 +48,7 @@ var ImageInstallAuthFlags = []cli.Flag{
 
 func readAuthentication(c *app.Context) (pubkeys, rootPassword string) {
 	pubkeys = c.String("authorized-keys")
-	pubkeysFile := c.FileContents("authorized-keys-file")
+	pubkeysFile := flags.FileContents(c, "authorized-keys-file")
 	rootPassword = c.String("root-password")
 	if pubkeysFile != "" {
 		if pubkeys != "" {
@@ -67,7 +68,7 @@ func readAuthentication(c *app.Context) (pubkeys, rootPassword string) {
 func PrepareImageInstall(c *app.Context, authentication bool) (imageInstall brain.ImageInstall, defaulted bool, err error) {
 	image := c.String("image")
 	firstbootScript := c.String("firstboot-script")
-	firstbootScriptFile := c.FileContents("firstboot-script-file")
+	firstbootScriptFile := flags.FileContents(c, "firstboot-script-file")
 	pubkeys := ""
 	rootPassword := ""
 

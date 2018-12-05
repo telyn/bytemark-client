@@ -29,13 +29,13 @@ If --recursive is specified, all servers in the group will be purged. Otherwise,
 			cli.GenericFlag{
 				Name:  "group",
 				Usage: "the name of the group to delete",
-				Value: new(flags.GroupName),
+				Value: new(flags.GroupNameFlag),
 			},
 			flagsets.Force,
 		},
 		Action: app.Action(args.Optional("group"), with.RequiredFlags("group"), with.Group("group"), func(ctx *app.Context) (err error) {
 			recursive := ctx.Bool("recursive")
-			groupName := ctx.GroupName("group")
+			groupName := flags.GroupName(ctx, "group")
 			if len(ctx.Group.VirtualMachines) > 0 {
 				if !recursive {
 					err = util.WontDeleteGroupWithVMsError{Group: groupName}

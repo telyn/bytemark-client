@@ -28,7 +28,7 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server the disc belongs to",
-						Value: new(flags.VirtualMachineName),
+						Value: new(flags.VirtualMachineNameFlag),
 					},
 					cli.IntFlag{
 						Name:  "iops-limit",
@@ -40,7 +40,7 @@ func init() {
 					if iopsLimit < 1 {
 						return fmt.Errorf("IOPS limit must be at least 1")
 					}
-					vmName := c.VirtualMachineName("server")
+					vmName := flags.VirtualMachineName(c, "server")
 
 					return c.Client().SetDiscIopsLimit(vmName, c.String("disc"), iopsLimit)
 				}),

@@ -46,11 +46,11 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 				cli.GenericFlag{
 					Name:  "name",
 					Usage: "The new server's name",
-					Value: new(flags.VirtualMachineName),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 				cli.GenericFlag{
 					Name:  "ip",
-					Value: new(util.IPFlag),
+					Value: new(flags.IPFlag),
 					Usage: "Specify an IPv4 or IPv6 address to use. This will only be useful if you are creating the machine in a private VLAN.",
 				},
 			}),
@@ -61,7 +61,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 
 // createServer creates a server objec to be created by the brain and sends it.
 func createServer(c *app.Context) (err error) {
-	name := c.VirtualMachineName("name")
+	name := flags.VirtualMachineName(c, "name")
 	spec, err := flagsets.PrepareServerSpec(c, true)
 	if err != nil {
 		return
@@ -110,7 +110,7 @@ func createServer(c *app.Context) (err error) {
 
 // createServerReadIPs reads the IP flags and creates an IPSpec
 func createServerReadIPs(c *app.Context) (ipspec *brain.IPSpec, err error) {
-	ips := c.IPs("ip")
+	ips := flags.IPs(c, "ip")
 
 	if len(ips) > 2 {
 		err = c.Help("A maximum of one IPv4 and one IPv6 address may be specified")

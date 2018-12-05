@@ -7,7 +7,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -15,7 +14,7 @@ import (
 )
 
 func init() {
-	publicKeyFile := util.FileFlag{}
+	publicKeyFile := flags.FileFlag{}
 	commands = append(commands, cli.Command{
 		Name:        "add",
 		Usage:       "add SSH keys to a user / IPs to a server",
@@ -39,7 +38,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "public-key-file",
 					Usage: "The public key file to add to the account",
-					Value: &publicKeyFile,
+					Value: &flags.FileFlag{},
 				},
 			},
 			Action: app.Action(args.Join("public-key"), with.Auth, func(ctx *app.Context) (err error) {
@@ -57,7 +56,7 @@ func init() {
 				} else {
 					// if public-key is not blank, try to use it as a filename
 					// FileFlag does some nice ~-substitution which is why we use it rather than the infinitely more normal-looking ioutil.ReadFile
-					publicKeyFile = util.FileFlag{FileName: key}
+					publicKeyFile = flags.FileFlag{FileName: key}
 					if err := publicKeyFile.Set(key); err == nil {
 						key = publicKeyFile.Value
 					}
@@ -100,7 +99,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "The server to add IPs to",
-					Value: new(flags.VirtualMachineName),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
@@ -129,7 +128,7 @@ func init() {
 					Reason:     reason,
 					Contiguous: c.Bool("contiguous"),
 				}
-				vmName := c.VirtualMachineName("server")
+				vmName := flags.VirtualMachineName(c, "server")
 				ips, err := c.Client().AddIP(vmName, ipcr)
 				if err != nil {
 					return err

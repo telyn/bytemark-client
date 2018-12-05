@@ -5,7 +5,6 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/urfave/cli"
 )
 
@@ -33,15 +32,15 @@ func flagValueIsOK(c *app.Context, flag cli.Flag) bool {
 	switch realFlag := flag.(type) {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
-		case *flags.VirtualMachineName:
+		case *flags.VirtualMachineNameFlag:
 			return value.VirtualMachineName != nil
-		case *flags.GroupName:
+		case *flags.GroupNameFlag:
 			return value.GroupName != nil
-		case *flags.AccountName:
+		case *flags.AccountNameFlag:
 			return value.AccountName != ""
-		case *util.SizeSpecFlag:
+		case *flags.SizeSpecFlag:
 			return *value != 0
-		case *flags.Privilege:
+		case *flags.PrivilegeFlag:
 			return value.Username != "" && value.Level != ""
 		}
 	case cli.StringFlag:
@@ -92,7 +91,7 @@ func Disc(vmFlagName, discFlagName string) func(*app.Context) error {
 			return
 		}
 
-		vmName := c.VirtualMachineName(vmFlagName)
+		vmName := flags.VirtualMachineName(c, vmFlagName)
 		discLabel := c.String(discFlagName)
 		disc, err := c.Client().GetDisc(vmName, discLabel)
 		if err != nil {
@@ -127,7 +126,7 @@ func Group(flagName string) func(*app.Context) error {
 			return
 		}
 
-		groupName := c.GroupName(flagName)
+		groupName := flags.GroupName(c, flagName)
 		if groupName.Account == "" {
 			groupName.Account = c.Config().GetIgnoreErr("account")
 		}
