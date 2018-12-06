@@ -1220,8 +1220,8 @@ func TestAuthenticate(t *testing.T) {
 			err := Authenticator{
 				client:       client,
 				config:       config,
-				prompter:     prompter,
-				passPrompter: prompter,
+				prompter:     &prompter,
+				passPrompter: &prompter,
 			}.Authenticate()
 			if test.expectingError && err == nil {
 				t.Error("Expecting Authenticate to error, but it didn't")
