@@ -6,7 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
@@ -40,7 +40,7 @@ See the price list for more details at http://www.bytemark.co.uk/prices
 
 If --hwprofile-locked is set then the cloud server's virtual hardware won't be changed over time.`,
 		Flags: cliutil.ConcatFlags(app.OutputFlags("server", "object"),
-			flags.ServerSpecFlags, flags.ImageInstallFlags, flags.ImageInstallAuthFlags,
+			flagsets.ServerSpecFlags, flagsets.ImageInstallFlags, flagsets.ImageInstallAuthFlags,
 			[]cli.Flag{
 				cli.GenericFlag{
 					Name:  "name",
@@ -61,7 +61,7 @@ If --hwprofile-locked is set then the cloud server's virtual hardware won't be c
 // createServer creates a server objec to be created by the brain and sends it.
 func createServer(c *app.Context) (err error) {
 	name := c.VirtualMachineName("name")
-	spec, err := flags.PrepareServerSpec(c, true)
+	spec, err := flagsets.PrepareServerSpec(c, true)
 	if err != nil {
 		return
 	}

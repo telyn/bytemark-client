@@ -6,7 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
@@ -44,7 +44,7 @@ EXAMPLES
 	bytemark update server --new-name rennes.bretagne.france charata.chaco.argentina
 		This will move the server called charata in the chaco group in the argentina account, placing it in the bretagne group in the france account and rename it to rennes.`,
 		Flags: append(app.OutputFlags("server", "object"),
-			flags.Force,
+			flagsets.Force,
 			cli.GenericFlag{
 				Name:  "memory",
 				Value: new(util.SizeSpecFlag),
@@ -97,7 +97,7 @@ func updateMemory(c *app.Context) error {
 		return nil
 	}
 	if c.VirtualMachine.Memory < memory {
-		if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You're increasing the memory by %dGiB - this may cost more, are you sure?", (memory-c.VirtualMachine.Memory)/1024)) {
+		if !flagsets.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You're increasing the memory by %dGiB - this may cost more, are you sure?", (memory-c.VirtualMachine.Memory)/1024)) {
 			return util.UserRequestedExit{}
 		}
 	}
@@ -137,7 +137,7 @@ func updateCores(c *app.Context) error {
 		return nil
 	}
 	if c.VirtualMachine.Cores < cores {
-		if !flags.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
+		if !flagsets.Forced(c) && !util.PromptYesNo(c.Prompter(), fmt.Sprintf("You are increasing the number of cores from %d to %d. This may cause your VM to cost more, are you sure?", c.VirtualMachine.Cores, cores)) {
 			return util.UserRequestedExit{}
 		}
 	}

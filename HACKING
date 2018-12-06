@@ -89,8 +89,8 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   │          arguments into flags
 │       │   ├── auth - Authentication routine for the client, called via
 │       │   │          with.EnsureAuth
-│       │   ├── flags - common flags & code to support reading complex objects
-│       │   │           from them. e.g. VirtualMachineSpec & ImageInstall
+│       │   ├── flagsets - common flags & code to support reading complex objects
+│       │   │              from them. e.g. VirtualMachineSpec & ImageInstall
 │       │   ├── wait - functions which wait for a condition to be true before
 │       │   │          returning
 │       │   └── with - functions for chaining together using app.Action to
@@ -225,4 +225,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 13111e01c90d466eae6d7c1c4f53d031e6274a988e0f2861b0be27d958988647
+# sha256sum: 4c172559ebbe8e0e565de3dd72236d56bb85bbed9271249804b22dcef3a006d1
