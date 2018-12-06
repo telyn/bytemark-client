@@ -19,7 +19,7 @@ type Head struct {
 
 	Architecture  string   `json:"arch,omitempty"`
 	CCAddress     *net.IP  `json:"cnc_address,omitempty"`
-	LastNote      string   `json:"last_note, omitempty"`
+	LastNote      string   `json:"last_note,omitempty"`
 	TotalMemory   int      `json:"total_memory,omitempty"`
 	UsageStrategy string   `json:"usage_strategy,omitempty"`
 	Models        []string `json:"models,omitempty"`
