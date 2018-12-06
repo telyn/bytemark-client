@@ -147,7 +147,7 @@ Privileges will be output in no particular order.`,
 				server := flags.VirtualMachineName(c, "server")
 
 				privs := make(brain.Privileges, 0)
-				newPrivs := make(brain.Privileges, 0)
+				var newPrivs []brain.Privileges
 				if account != "" {
 					newPrivs, err = findPrivilegesForAccount(c, account, c.Bool("recursive"))
 					if err != nil {
