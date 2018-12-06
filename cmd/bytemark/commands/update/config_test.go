@@ -22,7 +22,7 @@ func TestUpdateConfig(t *testing.T) {
 			name: "SetUser",
 			args: "--user fred",
 			expectation: func(config *mocks.Config, _ *mocks.Client) {
-				before := cf.Var{"user", "joan", ""}
+				before := cf.Var{Name: "user", Value: "joan", Source: ""}
 				config.When("GetV", "user").Return(before).Times(1)
 				config.When("SetPersistent", "user", "fred", "CMD set")
 			},
@@ -38,7 +38,7 @@ func TestUpdateConfig(t *testing.T) {
 			name: "SetAccount",
 			args: "--account smythe",
 			expectation: func(config *mocks.Config, client *mocks.Client) {
-				before := cf.Var{"account", "not-smythe", ""}
+				before := cf.Var{Name: "account", Value: "not-smythe", Source: ""}
 				smythe := lib.Account{}
 				config.When("GetV", "account").Return(before).Times(1)
 				config.When("GetIgnoreErr", "account").Return(before.Value).Times(1)
@@ -50,7 +50,7 @@ func TestUpdateConfig(t *testing.T) {
 			name: "SetAccountNoBilling",
 			args: "--account smythe",
 			expectation: func(config *mocks.Config, client *mocks.Client) {
-				before := cf.Var{"account", "not-smythe", ""}
+				before := cf.Var{Name: "account", Value: "not-smythe", Source: ""}
 				smythe := lib.Account{}
 				config.When("GetV", "account").Return(before).Times(1)
 				config.When("GetIgnoreErr", "account").Return(before.Value).Times(1)

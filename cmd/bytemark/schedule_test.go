@@ -40,7 +40,7 @@ func TestScheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
+			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   86400,
@@ -51,7 +51,7 @@ func TestScheduleBackups(t *testing.T) {
 		{
 			ShouldCall: true,
 			Args:       []string{"vm-name.group.account", "disc-label", "3600"},
-			Name:       lib.VirtualMachineName{"vm-name", "group", "account"},
+			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "group", Account: "account"},
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   3600,
@@ -59,7 +59,7 @@ func TestScheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"--start", "thursday", "vm-name", "disc-label", "3235"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
+			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
 			DiscLabel:  "disc-label",
 			Start:      "thursday",
 			Interval:   3235,
