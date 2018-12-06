@@ -25,7 +25,7 @@ func (args *privArgs) shift() (arg string, err error) {
 	return
 }
 
-// Privilege is an un-realised brain.Privilege - where the target name has been parsed but hasn't been turned into IDs yet
+// PrivilegeFlag is an un-realised brain.Privilege - where the target name has been parsed but hasn't been turned into IDs yet
 type PrivilegeFlag struct {
 	AccountName        string
 	GroupName          *lib.GroupName
