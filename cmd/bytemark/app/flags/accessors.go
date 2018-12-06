@@ -8,6 +8,8 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
+// AccountName returns the named AccountNameFlag. Why does it return the
+// flag and not simply the account name? I don't know
 func AccountName(c *app.Context, flagname string) AccountNameFlag {
 	accountName, ok := c.Context.Generic(flagname).(*AccountNameFlag)
 	if ok {
