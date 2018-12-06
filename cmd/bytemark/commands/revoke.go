@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
@@ -30,11 +31,11 @@ func init() {
 				cli.GenericFlag{
 					Name:  "privilege",
 					Usage: "the privilege to revoke",
-					Value: new(app.PrivilegeFlag),
+					Value: new(flags.PrivilegeFlag),
 				},
 			},
 			Action: app.Action(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {
-				pf := c.PrivilegeFlag("privilege")
+				pf := flags.Privilege(c, "privilege")
 				c.Privilege.YubikeyRequired = c.Bool("yubikey-required")
 
 				var privs brain.Privileges
@@ -67,7 +68,7 @@ func init() {
 
 				err = c.Client().RevokePrivilege(privs[i])
 				if err == nil {
-					log.Outputf("Revoked %s\r\n", c.PrivilegeFlag("privilege").String())
+					log.Outputf("Revoked %s\r\n", pf.String())
 
 				}
 				return

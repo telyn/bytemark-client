@@ -4,6 +4,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -29,7 +30,7 @@ Multiple --disc flags can be used to add multiple discs to the VM Default
 If --backup is set then a backup of the first disk will be taken at the
 frequency specified - never, daily, weekly or monthly. If not specified the backup will default to weekly.`,
 		Flags: cliutil.ConcatFlags(app.OutputFlags("vm default", "object"),
-			flags.ImageInstallFlags, flags.ServerSpecFlags,
+			flagsets.ImageInstallFlags, flagsets.ServerSpecFlags,
 			[]cli.Flag{
 				cli.StringFlag{
 					Name:  "default-name",
@@ -42,7 +43,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to add the default to (will use 'bytemark' if unset)",
-					Value: new(app.AccountNameFlag),
+					Value: new(flags.AccountNameFlag),
 				},
 			}),
 		Action: app.Action(args.Optional("default-name"), with.RequiredFlags("default-name"), with.Auth, func(c *app.Context) (err error) {
@@ -54,7 +55,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 			if err != nil {
 				return
 			}
-			spec, err := flags.PrepareServerSpec(c, false)
+			spec, err := flagsets.PrepareServerSpec(c, false)
 			if err != nil {
 				return
 			}

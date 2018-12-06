@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -43,7 +44,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "privilege",
 					Usage: "A privilege written out like '<level> [on] <object> [to] <user>",
-					Value: new(app.PrivilegeFlag),
+					Value: new(flags.PrivilegeFlag),
 				},
 			},
 			Action: app.Action(args.Join("privilege"), with.RequiredFlags("privilege"), with.Privilege("privilege"), func(c *app.Context) (err error) {
@@ -58,7 +59,7 @@ func init() {
 
 				err = c.Client().GrantPrivilege(c.Privilege)
 				if err == nil {
-					log.Outputf("Granted %s\r\n", c.PrivilegeFlag("privilege").String())
+					log.Outputf("Granted %s\r\n", flags.Privilege(c, "privilege").String())
 				}
 				return
 			}),

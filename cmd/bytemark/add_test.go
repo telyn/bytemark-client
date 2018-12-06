@@ -25,6 +25,11 @@ func TestAddKeyCommand(t *testing.T) {
 	}
 
 	t.Run("Key in command line", func(t *testing.T) {
+		defer func() {
+			if err := recover(); err != nil {
+				t.Error(err)
+			}
+		}()
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		c.When("GetUser", "test-user").Return(brain.User{Username: "test-user"}).Times(1)
 		c.MockRequest = &mocks.Request{
@@ -46,6 +51,11 @@ func TestAddKeyCommand(t *testing.T) {
 
 	})
 	t.Run("Key in file", func(t *testing.T) {
+		defer func() {
+			if err := recover(); err != nil {
+				t.Error(err)
+			}
+		}()
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		c.When("GetUser", "test-user").Return(brain.User{Username: "test-user"}).Times(1)
 		c.MockRequest = &mocks.Request{
@@ -68,6 +78,11 @@ func TestAddKeyCommand(t *testing.T) {
 	})
 
 	t.Run("Key in file using flag", func(t *testing.T) {
+		defer func() {
+			if err := recover(); err != nil {
+				t.Error(err)
+			}
+		}()
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		c.When("GetUser", "test-user").Return(brain.User{Username: "test-user"}).Times(1)
 		c.MockRequest = &mocks.Request{
@@ -89,6 +104,11 @@ func TestAddKeyCommand(t *testing.T) {
 	})
 
 	t.Run("dont allow private key", func(t *testing.T) {
+		defer func() {
+			if err := recover(); err != nil {
+				t.Error(err)
+			}
+		}()
 		_, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 		err = app.Run([]string{"bytemark", "add", "key", "--user", "test-user", "--public-key-file", "testkey"})
 		if err == nil {

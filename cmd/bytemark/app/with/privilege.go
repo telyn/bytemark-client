@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
@@ -28,7 +29,7 @@ func normalisePrivilegeLevel(l brain.PrivilegeLevel) (level brain.PrivilegeLevel
 // Privilege gets the named PrivilegeFlag from the context, then resolves its target to an ID if needed to create a brain.Privilege, then attaches that to the context
 func Privilege(flagName string) func(*app.Context) error {
 	return func(c *app.Context) (err error) {
-		pf := c.PrivilegeFlag(flagName)
+		pf := flags.Privilege(c, flagName)
 		level, ok := normalisePrivilegeLevel(pf.Level)
 		if !ok && !c.Bool("force") {
 			return fmt.Errorf("Unexpected privilege level '%s' - expecting account_admin, group_admin, vm_admin or vm_console", pf.Level)
@@ -97,7 +98,7 @@ func VirtualMachine(flagName string) func(*app.Context) error {
 		if err != nil {
 			return
 		}
-		vmName := c.VirtualMachineName(flagName)
+		vmName := flags.VirtualMachineName(c, flagName)
 		vm, err := c.Client().GetVirtualMachine(vmName)
 		if err != nil {
 			return

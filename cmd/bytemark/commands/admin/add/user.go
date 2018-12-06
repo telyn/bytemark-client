@@ -25,7 +25,7 @@ func init() {
 			},
 		},
 		Action: app.Action(args.Optional("username", "privilege"), with.RequiredFlags("username", "privilege"), with.Auth, func(c *app.Context) error {
-			// Privilege is just a string and not a app.PrivilegeFlag, since it can only be "cluster_admin" or "cluster_su"
+			// Privilege is just a string and not a flags.Privilege, since it can only be "cluster_admin" or "cluster_su"
 			if err := c.Client().CreateUser(c.String("username"), c.String("privilege")); err != nil {
 				return err
 			}

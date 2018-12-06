@@ -3,6 +3,7 @@ package show
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
@@ -23,11 +24,11 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server you wish to list the backups of",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 		),
 		Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) (err error) {
-			vmName := c.VirtualMachineName("server")
+			vmName := flags.VirtualMachineName(c, "server")
 			label := c.String("disc")
 			var backups brain.Backups
 

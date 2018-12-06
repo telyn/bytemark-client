@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/wait"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
@@ -26,7 +27,7 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server to restart",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 				cli.BoolFlag{
 					Name:  "rescue",
@@ -38,7 +39,7 @@ func init() {
 				},
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) (err error) {
-				vmName := c.VirtualMachineName("server")
+				vmName := flags.VirtualMachineName(c, "server")
 				appliance := c.String("appliance")
 
 				if appliance != "" && c.Bool("rescue") {
