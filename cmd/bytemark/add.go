@@ -58,7 +58,7 @@ func init() {
 					// if public-key is not blank, try to use it as a filename
 					// FileFlag does some nice ~-substitution which is why we use it rather than the infinitely more normal-looking ioutil.ReadFile
 					publicKeyFile := flags.FileFlag{FileName: key}
-					if err := publicKeyFile.Set(key); err == nil {
+					if err = publicKeyFile.Set(key); err == nil {
 						key = publicKeyFile.Value
 					}
 				}

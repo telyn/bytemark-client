@@ -63,7 +63,7 @@ The rest do similar, but PUT and POST both wait for input from stdin after authe
 					url = "/" + url
 				}
 				if c.Bool("auth") {
-					err := with.Auth(c)
+					err = with.Auth(c)
 					if err != nil {
 						return err
 					}

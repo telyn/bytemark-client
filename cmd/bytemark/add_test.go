@@ -45,7 +45,7 @@ func TestAddKeyCommand(t *testing.T) {
 			Username:       "test-user",
 			AuthorizedKeys: brain.Keys{brain.Key{Key: "ssh-rsa aaaaawhartevervAsde fake key"}},
 		})
-		if ok, err := c.Verify(); !ok {
+		if ok, err = c.Verify(); !ok {
 			t.Fatal(err)
 		}
 
@@ -71,7 +71,7 @@ func TestAddKeyCommand(t *testing.T) {
 			Username:       "test-user",
 			AuthorizedKeys: brain.Keys{brain.Key{Key: "ssh-rsa aaaaawhartevervAsde fake key"}},
 		})
-		if ok, err := c.Verify(); !ok {
+		if ok, err = c.Verify(); !ok {
 			t.Fatal(err)
 		}
 
@@ -97,8 +97,8 @@ func TestAddKeyCommand(t *testing.T) {
 			Username:       "test-user",
 			AuthorizedKeys: brain.Keys{brain.Key{Key: "ssh-rsa aaaaawhartevervAsde fake key"}},
 		})
-		if ok, err := c.Verify(); !ok {
-			t.Fatal(err)
+		if ok, vErr := c.Verify(); !ok {
+			t.Fatal(vErr)
 		}
 
 	})
