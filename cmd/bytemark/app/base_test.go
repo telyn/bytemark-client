@@ -14,7 +14,7 @@ func baseTestSetup(t *testing.T, admin bool, commands []cli.Command) (conf *mock
 	conf = new(mocks.Config)
 	client = new(mocks.Client)
 	conf.When("GetBool", "admin").Return(admin, nil)
-	conf.When("GetV", "output-format").Return(config.Var{"output-format", "human", "CODE"})
+	conf.When("GetV", "output-format").Return(config.Var{Name: "output-format", Value: "human", Source: "CODE"})
 
 	app, err := BaseAppSetup(GlobalFlags(), commands)
 	if err != nil {
