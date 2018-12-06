@@ -14,7 +14,6 @@ import (
 )
 
 func init() {
-	publicKeyFile := flags.FileFlag{}
 	commands = append(commands, cli.Command{
 		Name:        "add",
 		Usage:       "add SSH keys to a user / IPs to a server",
@@ -46,17 +45,19 @@ func init() {
 				if user == "" {
 					user = ctx.Config().GetIgnoreErr("user")
 				}
+				publicKeyFileContents := flags.FileContents(ctx, "public-key-file")
 
 				key := strings.TrimSpace(ctx.String("public-key"))
 				if key == "" {
-					if publicKeyFile.Value == "" {
+
+					if publicKeyFileContents == "" {
 						return ctx.Help("Please specify a key")
 					}
-					key = publicKeyFile.Value
+					key = publicKeyFileContents
 				} else {
 					// if public-key is not blank, try to use it as a filename
 					// FileFlag does some nice ~-substitution which is why we use it rather than the infinitely more normal-looking ioutil.ReadFile
-					publicKeyFile = flags.FileFlag{FileName: key}
+					publicKeyFile := flags.FileFlag{FileName: key}
 					if err := publicKeyFile.Set(key); err == nil {
 						key = publicKeyFile.Value
 					}
