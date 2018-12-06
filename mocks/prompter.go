@@ -9,12 +9,12 @@ type Prompter struct {
 	mock.Mock
 }
 
-func (tp Prompter) Prompt(prompt string) (response string) {
+func (tp *Prompter) Prompt(prompt string) (response string) {
 	r := tp.Called(prompt)
 	return r.String(0)
 }
 
-func (tp Prompter) Ask(prompt string) (password string, err error) {
+func (tp *Prompter) Ask(prompt string) (password string, err error) {
 	r := tp.Called(prompt)
 	return r.String(0), r.Error(1)
 }
