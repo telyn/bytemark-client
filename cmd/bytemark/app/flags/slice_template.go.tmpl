@@ -1,0 +1,25 @@
+// {{ .TypeName }}SliceFlag is used for {{ .TypeName }}Flags that may be specified more than
+// once. It's a slice of {{ .TypeName }}Flag in order to avoid rewriting parsing
+// logic.
+type {{ .TypeName }}SliceFlag interface {
+	flag.Value
+	app.Preprocesser
+	{{ .TypeName }}s() []lib.{{ .TypeName }}
+}
+
+type {{ .TypeName | lcfirst }}SliceFlag struct {
+	GenericSliceFlag
+}
+
+// New{{ .TypeName }}SliceFlag creates a new
+func New{{ .TypeName }}SliceFlag() {{ .TypeName }}SliceFlag {
+	return {{ .TypeName | lcfirst }}SliceFlag{
+		template: {{ .TypeName }}Flag{},
+	}
+}
+
+// {{ .TypeName }}s returns the {{ .TypeName }}Slice for which this flag is named
+func (gnsf {{ .TypeName }}SliceFlag) {{ .TypeName }}s() ({{ .TypeName | lcfirst }}s []lib.{{ .TypeName }}) {
+	gnsf.copyValues({{ .TypeName | lcfirst }}s)
+	return
+}
