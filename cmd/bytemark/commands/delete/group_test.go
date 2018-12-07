@@ -104,7 +104,7 @@ func TestDeleteGroup(t *testing.T) {
 			}
 
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
-			appPkg.SetPrompter(app, testPrompter)
+			appPkg.SetPrompter(app, &testPrompter)
 
 			group := brain.Group{
 				Name: "test-group",

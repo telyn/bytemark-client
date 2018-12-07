@@ -42,7 +42,7 @@ func TestShowServers(t *testing.T) {
 		config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 		config.When("GetGroup").Return(testutil.DefGroup)
 
-		c.When("GetGroup", lib.GroupName{"ghosts", "spooky-steve"}).Return(brain.Group{
+		c.When("GetGroup", lib.GroupName{Group: "ghosts", Account: "spooky-steve"}).Return(brain.Group{
 			Name: "default",
 			VirtualMachines: []brain.VirtualMachine{
 				{ID: 1, Name: "old-man-crumbles"},

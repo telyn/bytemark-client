@@ -147,8 +147,9 @@ Privileges will be output in no particular order.`,
 				server := flags.VirtualMachineName(c, "server")
 
 				privs := make(brain.Privileges, 0)
+				var newPrivs brain.Privileges
 				if account != "" {
-					newPrivs, err := findPrivilegesForAccount(c, account, c.Bool("recursive"))
+					newPrivs, err = findPrivilegesForAccount(c, account, c.Bool("recursive"))
 					if err != nil {
 						return err
 					}
@@ -156,7 +157,7 @@ Privileges will be output in no particular order.`,
 				}
 
 				if group.Group != "" {
-					newPrivs, err := findPrivilegesForGroup(c, group, c.Bool("recursive"))
+					newPrivs, err = findPrivilegesForGroup(c, group, c.Bool("recursive"))
 					if err != nil {
 						return err
 					}
@@ -164,7 +165,7 @@ Privileges will be output in no particular order.`,
 				}
 
 				if server.VirtualMachine != "" {
-					newPrivs, err := c.Client().GetPrivilegesForVirtualMachine(server)
+					newPrivs, err = c.Client().GetPrivilegesForVirtualMachine(server)
 					if err != nil {
 						return err
 					}
