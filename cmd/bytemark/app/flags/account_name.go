@@ -20,7 +20,8 @@ func (name *AccountNameFlag) Set(value string) error {
 }
 
 // Preprocess sets the value of this flag to the global account flag if it's unset,
-// and then runs lib.ParseAccountName
+// and then runs lib.ParseAccountName. This is an implementation of `app.Preprocessor`,
+// which is detected and called automatically by actions created with `app.Action`
 func (name *AccountNameFlag) Preprocess(c *app.Context) (err error) {
 	if name.Value == "" {
 		name.Value = c.Context.GlobalString("account")

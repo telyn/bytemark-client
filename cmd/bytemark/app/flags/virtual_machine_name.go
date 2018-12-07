@@ -19,6 +19,8 @@ func (name *VirtualMachineNameFlag) Set(value string) error {
 
 // Preprocess defaults the value of this flag to the default server from the
 // config attached to the context and then runs lib.ParseVirtualMachineName
+// This is an implementation of `app.Preprocessor`, which is detected and
+// called automatically by actions created with `app.Action`
 func (name *VirtualMachineNameFlag) Preprocess(c *app.Context) (err error) {
 	if name.Value == "" {
 		return

@@ -78,6 +78,8 @@ func (pf *PrivilegeFlag) Set(value string) (err error) {
 
 // Preprocess parses the Privilege and looks up the target's ID so it can
 // be made into a brain.Privilege
+// This is an implementation of `app.Preprocessor`, which is detected and
+// called automatically by actions created with `app.Action`
 func (pf *PrivilegeFlag) Preprocess(c *app.Context) (err error) {
 	args := privArgs(strings.Split(pf.Value, " "))
 
