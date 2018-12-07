@@ -3,9 +3,9 @@ package add
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -18,13 +18,13 @@ func init() {
 			cli.GenericFlag{
 				Name:  "disc",
 				Usage: "A disc to add. You can specify as many discs as you like by adding more --disc flags.",
-				Value: new(util.DiscSpecFlag),
+				Value: new(flags.DiscSpecFlag),
 			},
 			flagsets.Force,
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to add the disc to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 		},
 		Usage:     "add virtual discs attached to one of your cloud servers",
@@ -39,7 +39,7 @@ Multiple --disc flags can be used to add multiple discs`,
 
 // createDiscs adds the disc(s) to the speicified server
 func createDiscs(c *app.Context) (err error) {
-	discs := c.Discs("disc")
+	discs := flags.Discs(c, "disc")
 
 	for i := range discs {
 		d, err := discs[i].Validate()
@@ -48,7 +48,7 @@ func createDiscs(c *app.Context) (err error) {
 		}
 		discs[i] = *d
 	}
-	vmName := c.VirtualMachineName("server")
+	vmName := flags.VirtualMachineName(c, "server")
 
 	log.Logf("Adding %d discs to %s:\r\n", len(discs), vmName)
 	for _, d := range discs {

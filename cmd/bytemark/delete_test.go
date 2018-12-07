@@ -23,7 +23,7 @@ func TestDeleteServer(t *testing.T) {
 	vm := getFixtureVM()
 
 	t.Run("force delete", func(t *testing.T) {
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 		config.When("GetVirtualMachine").Return(defVM)
@@ -38,7 +38,7 @@ func TestDeleteServer(t *testing.T) {
 		}
 	})
 	t.Run("force purge", func(t *testing.T) {
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 		config.When("Force").Return(true)
 		config.When("GetVirtualMachine").Return(defVM)
 
@@ -56,7 +56,7 @@ func TestDeleteServer(t *testing.T) {
 func TestDeleteDisc(t *testing.T) {
 	t.Run("server and label", func(t *testing.T) {
 		is := is.New(t)
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 		config.When("GetVirtualMachine").Return(defVM)
@@ -77,7 +77,7 @@ func TestDeleteDisc(t *testing.T) {
 	})
 	t.Run("disc ID", func(t *testing.T) {
 		is := is.New(t)
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 
@@ -107,7 +107,7 @@ func TestDeleteKey(t *testing.T) {
 	}
 	t.Run("full key", func(t *testing.T) {
 		is := is.New(t)
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 		c.When("GetUser", usr.Username).Return(usr)
@@ -125,7 +125,7 @@ func TestDeleteKey(t *testing.T) {
 	})
 
 	t.Run("delete by ambiguous comment is err", func(t *testing.T) {
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 		config.When("GetIgnoreErr", "user").Return("test-user")
@@ -147,7 +147,7 @@ func TestDeleteKey(t *testing.T) {
 
 func TestDeleteBackup(t *testing.T) {
 	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",

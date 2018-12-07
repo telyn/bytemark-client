@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
@@ -211,7 +212,7 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server to migrate",
-						Value: new(app.VirtualMachineNameFlag),
+						Value: new(flags.VirtualMachineNameFlag),
 					},
 					cli.Int64Flag{
 						Name:  "migrate-speed",
@@ -223,7 +224,7 @@ func init() {
 					},
 				},
 				Action: app.Action(args.Optional("server", "migrate-speed", "migrate-downtime"), with.RequiredFlags("server"), with.Auth, func(c *app.Context) error {
-					vm := c.VirtualMachineName("server")
+					vm := flags.VirtualMachineName(c, "server")
 
 					var speed *int64
 					var downtime *int

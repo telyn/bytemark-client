@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -26,11 +27,11 @@ Note that it cannot be used to restore a server that has been permanently delete
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server that the disc is attached to",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 			},
 			Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.VirtualMachine("server"), func(c *app.Context) (err error) {
-				vmName := c.VirtualMachineName("server")
+				vmName := flags.VirtualMachineName(c, "server")
 				if !c.VirtualMachine.Deleted {
 					log.Errorf("%s was already restored\r\n", c.VirtualMachine.Hostname)
 					return
@@ -57,7 +58,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server that the disc is attached to",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 				cli.StringFlag{
 					Name:  "backup",
@@ -66,7 +67,7 @@ Note that it cannot be used to restore a server that has been permanently delete
 			},
 			Action: app.Action(args.Optional("server", "disc", "backup"), with.RequiredFlags("server", "disc", "backup"), with.Auth, func(c *app.Context) (err error) {
 				// TODO(telyn): eventually RestoreBackup will return backups as the first argument. We should process that and output info :)
-				_, err = c.Client().RestoreBackup(c.VirtualMachineName("server"), c.String("disc"), c.String("backup"))
+				_, err = c.Client().RestoreBackup(flags.VirtualMachineName(c, "server"), c.String("disc"), c.String("backup"))
 				if err != nil {
 					return
 				}

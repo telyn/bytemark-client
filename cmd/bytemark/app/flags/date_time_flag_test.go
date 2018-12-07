@@ -1,9 +1,10 @@
-package util
+package flags_test
 
 import (
 	"testing"
 	"time"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/cheekybits/is"
 )
 
@@ -41,7 +42,7 @@ func TestDateTimeFlag(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run("datetime flag", func(t *testing.T) {
-			var flag DateTimeFlag
+			var flag flags.DateTimeFlag
 
 			err := flag.Set(test.input)
 

@@ -3,6 +3,7 @@ package add
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/cliutil"
@@ -42,7 +43,7 @@ frequency specified - never, daily, weekly or monthly. If not specified the back
 				cli.GenericFlag{
 					Name:  "account",
 					Usage: "the account to add the default to (will use 'bytemark' if unset)",
-					Value: new(app.AccountNameFlag),
+					Value: new(flags.AccountNameFlag),
 				},
 			}),
 		Action: app.Action(args.Optional("default-name"), with.RequiredFlags("default-name"), with.Auth, func(c *app.Context) (err error) {

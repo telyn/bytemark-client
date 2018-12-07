@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 
@@ -47,7 +48,7 @@ EXAMPLES
 			flagsets.Force,
 			cli.GenericFlag{
 				Name:  "memory",
-				Value: new(util.SizeSpecFlag),
+				Value: new(flags.SizeSpecFlag),
 				Usage: "How much memory the server will have available, specified in GiB or with GiB/MiB units.",
 			},
 			cli.StringFlag{
@@ -65,7 +66,7 @@ EXAMPLES
 			cli.GenericFlag{
 				Name:  "new-name",
 				Usage: "A new name for the server",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 			cli.IntFlag{
 				Name:  "cores",
@@ -82,7 +83,7 @@ EXAMPLES
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "The server to update",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 		),
 		Action: app.Action(args.Optional("new-name", "hwprofile", "memory"), with.RequiredFlags("server"), with.VirtualMachine("server"), with.Auth, updateServer),
@@ -90,8 +91,8 @@ EXAMPLES
 }
 
 func updateMemory(c *app.Context) error {
-	vmName := c.VirtualMachineName("server")
-	memory := c.Size("memory")
+	vmName := flags.VirtualMachineName(c, "server")
+	memory := flags.Size(c, "memory")
 
 	if memory == 0 {
 		return nil
@@ -105,7 +106,7 @@ func updateMemory(c *app.Context) error {
 }
 
 func updateHwProfile(c *app.Context) error {
-	vmName := c.VirtualMachineName("server")
+	vmName := flags.VirtualMachineName(c, "server")
 	hwProfile := c.String("hwprofile")
 	if hwProfile == "" {
 		return nil
@@ -115,7 +116,7 @@ func updateHwProfile(c *app.Context) error {
 }
 
 func updateLock(c *app.Context) error {
-	server := c.VirtualMachineName("server")
+	server := flags.VirtualMachineName(c, "server")
 
 	lockProfile := c.Bool("lock-hwprofile")
 	unlockProfile := c.Bool("unlock-hwprofile")
@@ -130,7 +131,7 @@ func updateLock(c *app.Context) error {
 }
 
 func updateCores(c *app.Context) error {
-	vmName := c.VirtualMachineName("server")
+	vmName := flags.VirtualMachineName(c, "server")
 	cores := c.Int("cores")
 
 	if cores == 0 {
@@ -145,8 +146,8 @@ func updateCores(c *app.Context) error {
 }
 
 func updateName(c *app.Context) error {
-	vmName := c.VirtualMachineName("server")
-	newName := c.VirtualMachineName("new-name")
+	vmName := flags.VirtualMachineName(c, "server")
+	newName := flags.VirtualMachineName(c, "new-name")
 
 	if newName.VirtualMachine == "" {
 		return nil
@@ -155,7 +156,7 @@ func updateName(c *app.Context) error {
 }
 
 func updateCdrom(c *app.Context) error {
-	vmName := c.VirtualMachineName("server")
+	vmName := flags.VirtualMachineName(c, "server")
 	cdURL := c.String("cd-url")
 	removeCD := c.Bool("remove-cd")
 

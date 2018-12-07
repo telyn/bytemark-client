@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/urfave/cli"
 )
@@ -27,7 +28,7 @@ func init() {
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server the disc belongs to",
-						Value: new(app.VirtualMachineNameFlag),
+						Value: new(flags.VirtualMachineNameFlag),
 					},
 					cli.IntFlag{
 						Name:  "iops-limit",
@@ -39,7 +40,7 @@ func init() {
 					if iopsLimit < 1 {
 						return fmt.Errorf("IOPS limit must be at least 1")
 					}
-					vmName := c.VirtualMachineName("server")
+					vmName := flags.VirtualMachineName(c, "server")
 
 					return c.Client().SetDiscIopsLimit(vmName, c.String("disc"), iopsLimit)
 				}),

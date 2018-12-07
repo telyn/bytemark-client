@@ -1,15 +1,16 @@
-package util
+package flags_test
 
 import (
 	"testing"
 
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/cheekybits/is"
 )
 
 func TestIPFlag(t *testing.T) {
 	is := is.New(t)
 
-	flag := IPFlag{}
+	flag := flags.IPFlag{}
 	// IPFlag.Set never returns an error
 	_ = flag.Set("192.168.1.1")
 	_ = flag.Set("2000::1")

@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
@@ -33,17 +34,17 @@ Moving the disc to another server may require you to update your operating syste
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server that the disc is attached to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 			cli.GenericFlag{
 				Name:  "new-size",
 				Usage: "the new size for the disc. Prefix with + to indicate 'increase by'",
-				Value: new(app.ResizeFlag),
+				Value: new(flags.ResizeFlag),
 			},
 			cli.GenericFlag{
 				Name:  "new-server",
 				Usage: "the server that the disc should be moved to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 		},
 		Action: app.Action(args.Optional("server", "disc", "new-size", "new-server"), with.RequiredFlags("server", "disc"), with.Disc("server", "disc"), updateDisc),
@@ -69,10 +70,10 @@ func updateDisc(c *app.Context) (err error) {
 }
 
 func resizeDisc(c *app.Context) (err error) {
-	vmName := c.VirtualMachineName("server")
-	size := c.ResizeFlag("new-size")
+	vmName := flags.VirtualMachineName(c, "server")
+	size := flags.Resize(c, "new-size")
 	newSize := size.Size
-	if size.Mode == app.ResizeModeIncrease {
+	if size.Mode == flags.ResizeModeIncrease {
 		newSize += c.Disc.Size
 	}
 
@@ -92,8 +93,8 @@ func resizeDisc(c *app.Context) (err error) {
 }
 
 func moveDisc(c *app.Context) (err error) {
-	vmName := c.VirtualMachineName("server")
-	newVM := c.VirtualMachineName("new-server")
+	vmName := flags.VirtualMachineName(c, "server")
+	newVM := flags.VirtualMachineName(c, "new-server")
 
 	log.Logf("This may require an update to the operating system configuration, please find documentation for moving discs at https://docs.bytemark.co.uk/article/moving-a-disc\r\n")
 

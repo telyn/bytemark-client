@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -40,7 +41,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 					cli.GenericFlag{
 						Name:  "server",
 						Usage: "the server the disc belongs to",
-						Value: new(app.VirtualMachineNameFlag),
+						Value: new(flags.VirtualMachineNameFlag),
 					},
 					cli.IntFlag{
 						Name:  "interval",
@@ -63,7 +64,7 @@ bytemark schedule backups --start "2017-04-05T14:37:00+02:00" fileserver very-im
 						start = "00:00"
 					}
 
-					vmName := c.VirtualMachineName("server")
+					vmName := flags.VirtualMachineName(c, "server")
 					sched, err := c.Client().CreateBackupSchedule(vmName, c.String("disc"), start, c.Int("interval"))
 					if err == nil {
 						log.Logf("Schedule set. Backups will be taken every %d seconds.", sched.Interval)

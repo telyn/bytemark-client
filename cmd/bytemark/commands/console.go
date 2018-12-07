@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
@@ -17,7 +18,7 @@ import (
 )
 
 func init() {
-	commands = append(commands, cli.Command{
+	Commands = append(Commands, cli.Command{
 		Name:      "console",
 		Usage:     "connect to a server's serial or graphical console - as though physically plugging in",
 		UsageText: "console [--serial | --vnc | --panel] [--no-connect] <server>",
@@ -48,11 +49,11 @@ Defaults to connecting to the serial console for the given server.`,
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "The server whose console will be connected to",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 		},
 		Action: app.Action(args.Optional("server"), with.RequiredFlags("server"), with.Auth, func(ctx *app.Context) (err error) {
-			vmName := ctx.VirtualMachineName("server")
+			vmName := flags.VirtualMachineName(ctx, "server")
 			if ctx.Bool("serial") && ctx.Bool("panel") {
 				return ctx.Help("You must only specify one of --serial and --panel!")
 			}
