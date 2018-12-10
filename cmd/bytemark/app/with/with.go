@@ -33,9 +33,9 @@ func flagValueIsOK(c *app.Context, flag cli.Flag) bool {
 	case cli.GenericFlag:
 		switch value := realFlag.Value.(type) {
 		case *flags.VirtualMachineNameFlag:
-			return value.VirtualMachineName != nil
+			return value.VirtualMachineName.VirtualMachine != ""
 		case *flags.GroupNameFlag:
-			return value.GroupName != nil
+			return value.GroupName.Group != ""
 		case *flags.AccountNameFlag:
 			return value.AccountName != ""
 		case *flags.SizeSpecFlag:

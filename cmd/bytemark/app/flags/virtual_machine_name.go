@@ -32,8 +32,5 @@ func (name *VirtualMachineNameFlag) Preprocess(c *app.Context) (err error) {
 
 // String returns the VirtualMachineName as a string.
 func (name VirtualMachineNameFlag) String() string {
-	if name.VirtualMachineName != nil {
-		return name.VirtualMachineName.String()
-	}
-	return ""
+	return name.VirtualMachineName.String()
 }
