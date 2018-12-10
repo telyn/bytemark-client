@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"unicode"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/output/morestrings"
 )
 
 // TemplateFragmentMapper is an interface that requires MapTemplateFragment to exist. The implementation of MapTemplateFragment should add "{{" and "}}" to the beginning and end of template fragment, and run it for each element in the receiver, collecting the output up into an array of strings.
@@ -96,21 +98,7 @@ var templateFuncMap = map[string]interface{}{
 	// join joins multiple strings together with a separator
 	"join": strings.Join,
 	// joinWithSpecialLast joins multiple strings together with a separator, except the last two, which are seperated by a different seperator. e.g. joinWithSpecialLast ", " " and " []string{"hi","hello","welcome","good evening"} would produce "hi, hello, welcome and good evening"
-	"joinWithSpecialLast": func(sep string, fin string, strs []string) string {
-		// special cases for when there are 0, 1 or 2 strings
-		switch len(strs) {
-		case 0:
-			return ""
-		case 1:
-			return strs[0]
-		case 2:
-			return strs[0] + fin + strs[1]
-		}
-		// join with one seperator
-		most := strings.Join(strs[0:len(strs)-1], sep)
-		// and add the last with the 'fin' seperator.
-		return most + fin + strs[len(strs)-1]
-	},
+	"joinWithSpecialLast": morestrings.JoinWithSpecialLast,
 }
 
 // Funcs is not for general usage, only while in transition to PrettyPrint.
