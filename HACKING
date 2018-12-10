@@ -53,7 +53,7 @@ pretty normal command, in terms of its implementation. It's defined in show.go
 Here's the source for its Action. (app here being cmd/bytemark/app)
 
 Action: app.Action(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
-	return c.OutputInDesiredForm(c.Account)
+        return c.OutputInDesiredForm(c.Account)
 }),
 
 app.Action returns a `func(c *cli.Context) error`, and takes
@@ -90,8 +90,15 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   ├── auth - Authentication routine for the client, called via
 │       │   │          with.EnsureAuth
 │       │   ├── flags - new flag types that are used in the client (e.g.
-│       │   │           VirtualMachineName, SizeSpec, ResizeSpec, AccountName,
-│       │   │           Privilege)
+│       │   │   │       VirtualMachineName, SizeSpec, ResizeSpec, AccountName,
+│       │   │   │       Privilege)
+│       │   │   └── gen - packages to generate flag code
+│       │   │       └── slice_flags - generator for SliceFlags - currently
+│       │   │                         AccountName, GroupName and
+│       │   │                         VirtualMachineName. More can be added by
+│       │   │                         altering app/flags/slice_flags.go and you
+│       │   │                         may need to add more preparation code to
+│       │   │                         gen/slice_flags/template_test.go.tmpl
 │       │   ├── flagsets - common sets of flags & code to support reading complex
 │       │   │              objects from them. e.g. VirtualMachineSpec & ImageInstall
 │       │   ├── wait - functions which wait for a condition to be true before
@@ -125,8 +132,10 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff.
 │         Also includes the manpage source (bytemark.asciidoc)
-├── gen - scripts to aid the building/distributing process.
-│         changelog.
+├── gen - scripts to aid the building/distributing process. In particular, has
+│   │     a changelog.sh script to generate a new changelog entry with all the
+│   │     changes since the last commit to master.
+│   └─ list_types - package to generate code for a list of types using sprintf.
 ├── lib - the main API client object, which makes requests.
 │   │     At the moment, loads of requests are defined as methods on lib.Client,
 │   │     but we want to move away from that and towards requests being
@@ -228,4 +237,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 2a2e8078c018b791fb8f4749ae2a3afec81a6eacec6caf36cfaa094ede7d82c5
+# sha256sum: 993688b7f02276dcbd79d543b41f9994be2776ca163c8c40b6cc346435f834ce
