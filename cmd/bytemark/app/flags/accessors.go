@@ -52,10 +52,10 @@ func GroupName(c *app.Context, flagname string) (gp lib.GroupName) {
 	if !ok {
 		return lib.GroupName{}
 	}
-	if gpNameFlag.GroupName == nil {
+	if gpNameFlag == nil {
 		return lib.GroupName{}
 	}
-	return *gpNameFlag.GroupName
+	return gpNameFlag.GroupName
 }
 
 // IPs returns the ips passed along as the named flag.
@@ -100,9 +100,9 @@ func VirtualMachineName(c *app.Context, flagname string) (vm lib.VirtualMachineN
 	if !ok {
 		return c.Config().GetVirtualMachine()
 	}
-	if vmNameFlag.VirtualMachineName == nil {
+	if vmNameFlag == nil {
 		return lib.VirtualMachineName{}
 	}
 
-	return *vmNameFlag.VirtualMachineName
+	return vmNameFlag.VirtualMachineName
 }
