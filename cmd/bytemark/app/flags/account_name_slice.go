@@ -24,7 +24,6 @@ func (sf *AccountNameSliceFlag) Preprocess(ctx *app.Context) error {
 	return nil
 }
 
-
 // Set appends a AccountNameFlag (created for you) to the slice
 func (sf *AccountNameSliceFlag) Set(value string) error {
 	flag := AccountNameFlag{}
@@ -49,7 +48,7 @@ func (sf AccountNameSliceFlag) String() string {
 // if it was one in the first place.
 func AccountNameSlice(ctx *app.Context, name string) AccountNameSliceFlag {
 	if sf, ok := ctx.Context.Generic(name).(AccountNameSliceFlag); ok {
-		return sf	
+		return sf
 	}
 	return AccountNameSliceFlag{}
 }

@@ -24,7 +24,6 @@ func (sf *VirtualMachineNameSliceFlag) Preprocess(ctx *app.Context) error {
 	return nil
 }
 
-
 // Set appends a VirtualMachineNameFlag (created for you) to the slice
 func (sf *VirtualMachineNameSliceFlag) Set(value string) error {
 	flag := VirtualMachineNameFlag{}
@@ -49,7 +48,7 @@ func (sf VirtualMachineNameSliceFlag) String() string {
 // if it was one in the first place.
 func VirtualMachineNameSlice(ctx *app.Context, name string) VirtualMachineNameSliceFlag {
 	if sf, ok := ctx.Context.Generic(name).(VirtualMachineNameSliceFlag); ok {
-		return sf	
+		return sf
 	}
 	return VirtualMachineNameSliceFlag{}
 }
