@@ -24,7 +24,6 @@ func (sf *GroupNameSliceFlag) Preprocess(ctx *app.Context) error {
 	return nil
 }
 
-
 // Set appends a GroupNameFlag (created for you) to the slice
 func (sf *GroupNameSliceFlag) Set(value string) error {
 	flag := GroupNameFlag{}
@@ -49,7 +48,7 @@ func (sf GroupNameSliceFlag) String() string {
 // if it was one in the first place.
 func GroupNameSlice(ctx *app.Context, name string) GroupNameSliceFlag {
 	if sf, ok := ctx.Context.Generic(name).(GroupNameSliceFlag); ok {
-		return sf	
+		return sf
 	}
 	return GroupNameSliceFlag{}
 }

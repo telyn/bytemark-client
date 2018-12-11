@@ -5,10 +5,19 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/joncalhoun/pipe"
 )
+
+type sliceFlag struct {
+	TypeName     string
+	Preprocess   bool
+	ExampleInput string
+}
 
 // ok for this bad boy you gotta set the arguments as all the types you wanna
 // generate slice flags for.
@@ -38,55 +47,53 @@ func main() {
 		os.Exit(1)
 	}
 
-	data := struct {
-		TypeName     string
-		Preprocess   bool
-		ExampleInput string
-	}{
+	data := sliceFlag{
 		TypeName:     args[0],
 		Preprocess:   *preprocess,
 		ExampleInput: *exampleInput,
 	}
+	err = writeTemplate(*outputFile, *templateFile, data)
+	if err != nil {
+		fmt.Printf("couldn't write %s: %s\n", *outputFile, err)
+		os.Exit(1)
+	}
+	writeTemplate(*testOutputFile, *testTemplateFile, data)
+	if err != nil {
+		fmt.Printf("couldn't write %s: %s\n", *testOutputFile, err)
+		os.Exit(1)
+	}
+}
 
-	var wr io.WriteCloser = os.Stdout
-	if *outputFile != "" && *outputFile != "-" {
-		wr, err = os.Create(*outputFile)
+func writeTemplate(outputFile, templateFile string, data sliceFlag) (err error) {
+	var outputWriter io.WriteCloser = os.Stdout
+	if outputFile != "" && outputFile != "-" {
+		outputWriter, err = os.Create(outputFile)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return
 		}
 	}
+	defer outputWriter.Close()
 
-	tmpl, err := template.ParseFiles(*templateFile)
+	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return
 	}
 
-	err = tmpl.Execute(wr, data)
+	rc, wc, _ := pipe.Commands(
+		exec.Command("gofmt"),
+		exec.Command("goimports"),
+	)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return
 	}
+	defer rc.Close()
 
-	wr = os.Stdout
-	if *testOutputFile != "" && *testOutputFile != "-" {
-		wr, err = os.Create(*testOutputFile)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}
-
-	tmpl, err = template.ParseFiles(*testTemplateFile)
+	err = tmpl.Execute(wc, data)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return
 	}
+	wc.Close()
 
-	err = tmpl.Execute(wr, data)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	io.Copy(outputWriter, rc)
+	return
 }
