@@ -47,8 +47,8 @@ func (sf AccountNameSliceFlag) String() string {
 // AccountNameSlice returns the named flag as a AccountNameSliceFlag,
 // if it was one in the first place.
 func AccountNameSlice(ctx *app.Context, name string) AccountNameSliceFlag {
-	if sf, ok := ctx.Context.Generic(name).(AccountNameSliceFlag); ok {
-		return sf
+	if sf, ok := ctx.Context.Generic(name).(*AccountNameSliceFlag); ok {
+		return *sf
 	}
 	return AccountNameSliceFlag{}
 }

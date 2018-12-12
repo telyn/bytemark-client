@@ -48,8 +48,8 @@ func (sf {{ .TypeName }}SliceFlag) String() string {
 // {{ .TypeName }}Slice returns the named flag as a {{ .TypeName }}SliceFlag,
 // if it was one in the first place.
 func {{ .TypeName }}Slice(ctx *app.Context, name string) {{ .TypeName }}SliceFlag {
-	if sf, ok := ctx.Context.Generic(name).({{ .TypeName }}SliceFlag); ok {
-		return sf	
+	if sf, ok := ctx.Context.Generic(name).(*{{ .TypeName }}SliceFlag); ok {
+		return *sf	
 	}
 	return {{ .TypeName }}SliceFlag{}
 }

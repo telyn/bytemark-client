@@ -22,13 +22,11 @@ func (name *GroupNameFlag) Set(value string) error {
 // This is an implementation of `app.Preprocessor`, which is detected and
 // called automatically by actions created with `app.Action`
 func (name *GroupNameFlag) Preprocess(c *app.Context) (err error) {
-	c.Debug("GroupName.Preprocess before %#v", name.GroupName)
 	if name.Value == "" {
 		return
 	}
 	groupName := lib.ParseGroupName(name.Value, c.Config().GetGroup())
 	name.GroupName = groupName
-	c.Debug("GroupName.Preprocess after %#v", name.GroupName)
 	return
 }
 
