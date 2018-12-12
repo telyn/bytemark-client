@@ -47,8 +47,8 @@ func (sf GroupNameSliceFlag) String() string {
 // GroupNameSlice returns the named flag as a GroupNameSliceFlag,
 // if it was one in the first place.
 func GroupNameSlice(ctx *app.Context, name string) GroupNameSliceFlag {
-	if sf, ok := ctx.Context.Generic(name).(GroupNameSliceFlag); ok {
-		return sf
+	if sf, ok := ctx.Context.Generic(name).(*GroupNameSliceFlag); ok {
+		return *sf
 	}
 	return GroupNameSliceFlag{}
 }

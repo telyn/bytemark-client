@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -9,8 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
-
-	"github.com/joncalhoun/pipe"
 )
 
 type sliceFlag struct {
@@ -65,6 +64,7 @@ func main() {
 }
 
 func writeTemplate(outputFile, templateFile string, data sliceFlag) (err error) {
+	fmt.Println("writeTemplate started")
 	var outputWriter io.WriteCloser = os.Stdout
 	if outputFile != "" && outputFile != "-" {
 		outputWriter, err = os.Create(outputFile)
@@ -79,21 +79,63 @@ func writeTemplate(outputFile, templateFile string, data sliceFlag) (err error) 
 		return
 	}
 
-	rc, wc, _ := pipe.Commands(
-		exec.Command("gofmt"),
-		exec.Command("goimports"),
-	)
+	inputReader, inputWriter := io.Pipe()
+	betweenReader, betweenWriter := io.Pipe()
+	gofmtPath, err := exec.LookPath("gofmt")
 	if err != nil {
 		return
 	}
-	defer rc.Close()
-
-	err = tmpl.Execute(wc, data)
+	importsPath, err := exec.LookPath("goimports")
 	if err != nil {
 		return
 	}
-	wc.Close()
+	gofmt := exec.Cmd{
+		Path:   gofmtPath,
+		Args:   []string{"gofmt"},
+		Stdin:  inputReader,
+		Stdout: betweenWriter,
+		Stderr: os.Stderr,
+	}
+	imports := exec.Cmd{
+		Path:   importsPath,
+		Args:   []string{"goimports"},
+		Stdin:  betweenReader,
+		Stdout: outputWriter,
+		Stderr: os.Stderr,
+	}
+	err = gofmt.Start()
+	if err != nil {
+		return fmt.Errorf("Couldn't start gofmt: %s", err)
+	}
+	err = imports.Start()
+	if err != nil {
+		return fmt.Errorf("Couldn't start goimports: %s", err)
+	}
 
-	io.Copy(outputWriter, rc)
+	fmt.Println("executing template")
+	err = tmpl.Execute(inputWriter, data)
+	if err != nil {
+		fmt.Println("template errored: %s", err)
+	}
+
+	fmt.Println("closing inputWriter")
+	inputWriter.Close()
+
+	fmt.Println("waiting for gofmt to finish")
+	fmtErr := gofmt.Wait()
+	if fmtErr != nil {
+		fmt.Println("gofmt errored: %s", fmtErr)
+	}
+	betweenWriter.Close()
+
+	fmt.Println("waiting for goimports to finish")
+	importsErr := imports.Wait()
+	if importsErr != nil {
+		fmt.Println("goimports errored: %s", importsErr)
+	}
+	if err != nil || fmtErr != nil || importsErr != nil {
+		err = errors.New("template/goimports/gofmt errored")
+	}
+	fmt.Println("returning from writeTemplate")
 	return
 }

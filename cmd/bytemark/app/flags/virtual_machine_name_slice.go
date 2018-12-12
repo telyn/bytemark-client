@@ -47,8 +47,8 @@ func (sf VirtualMachineNameSliceFlag) String() string {
 // VirtualMachineNameSlice returns the named flag as a VirtualMachineNameSliceFlag,
 // if it was one in the first place.
 func VirtualMachineNameSlice(ctx *app.Context, name string) VirtualMachineNameSliceFlag {
-	if sf, ok := ctx.Context.Generic(name).(VirtualMachineNameSliceFlag); ok {
-		return sf
+	if sf, ok := ctx.Context.Generic(name).(*VirtualMachineNameSliceFlag); ok {
+		return *sf
 	}
 	return VirtualMachineNameSliceFlag{}
 }
