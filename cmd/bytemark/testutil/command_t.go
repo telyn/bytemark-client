@@ -28,7 +28,7 @@ type CommandT struct {
 	// Args are the command-line arguments to pass to app.Run (after "bytemark")
 	Args string
 	// Commands are the command set to use in the app. TODO: should I default to
-	// main.Commands(Admin)?
+	// main.Commands(Admin)? A: probably
 	Commands []cli.Command
 	// OutputMustMatch are the regexes the output must match
 	OutputMustMatch []*regexp.Regexp

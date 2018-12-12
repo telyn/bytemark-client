@@ -84,7 +84,7 @@ func (r *Request) fillOut(out interface{}) {
 	}
 	outVal := reflect.ValueOf(out)
 	if resVal.Type().AssignableTo(outVal.Type()) {
-		r.T.Fatalf("ResponseBody %s was not assignable to out %s", resVal.Type(), outVal.Type())
+		r.T.Fatalf("ResponseObject %s was not assignable to out %s", resVal.Type(), outVal.Type())
 	}
 	outVal.Elem().Set(resVal)
 }

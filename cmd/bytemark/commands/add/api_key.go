@@ -151,6 +151,11 @@ account:
 func makeAPIKeySpec(ctx *app.Context) (spec brain.APIKey, err error) {
 	spec.Label = ctx.String("label")
 	spec.UserID = ctx.User.ID
+	spec.ExpiresAt = ctx.String("expires-at")
+
+	if spec.Label == "" {
+		return spec, errors.New("a label must be specified for the key")
+	}
 
 	typesWithErrs := []string{}
 	spec.Privileges, err = addAPIKeySpecifyServerPrivileges(ctx, spec.Privileges)
