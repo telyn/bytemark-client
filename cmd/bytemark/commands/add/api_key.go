@@ -28,7 +28,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "account-admin",
 				Usage: "Account to grant the API key administrative privilege over",
-				Value: &flags.GroupNameSliceFlag{},
+				Value: &flags.AccountNameSliceFlag{},
 			},
 			cli.GenericFlag{
 				Name:  "group",
@@ -108,6 +108,9 @@ account:
 				return err
 			}
 
+			privsToCreate := keySpec.Privileges
+			keySpec.Privileges = nil
+
 			apiKey, err := brainRequests.CreateAPIKey(ctx.Client(), "", keySpec)
 			if err != nil {
 				return err
@@ -115,17 +118,18 @@ account:
 			keySpec.APIKey = apiKey.APIKey
 			keySpec.ID = apiKey.ID
 
-			for i := range keySpec.Privileges {
-				keySpec.Privileges[i].APIKeyID = apiKey.ID
+			for i := range privsToCreate {
+				privsToCreate[i].APIKeyID = apiKey.ID
 			}
 
-			if len(keySpec.Privileges) == 0 {
+			if len(privsToCreate) == 0 {
 				ctx.LogErr("Successfully created an api key:")
 				err = apiKey.PrettyPrint(ctx.Writer(), prettyprint.Full)
 				return err
 			}
 
-			ctx.LogErr("Successfully created api key, now creating %d privileges...", len(keySpec.Privileges))
+			ctx.LogErr("Successfully created api key, now creating %d privileges...", len(privsToCreate))
+			keySpec.Privileges = privsToCreate
 
 			// keep this error separate cause we check it later
 			privsErr := addAPIKeyPrivileges(ctx, keySpec)
@@ -194,11 +198,12 @@ func addAPIKeySpecifyServerPrivileges(ctx *app.Context, privileges brain.Privile
 		}
 
 		privileges = append(privileges, brain.Privilege{
+			Level:            brain.VMAdminPrivilege,
 			Username:         ctx.User.Username,
 			VirtualMachineID: server.ID,
 		})
 	}
-	return privileges, nil
+	return privileges, serverErr
 }
 
 // creates a privilege spec for every --group flag
@@ -219,10 +224,11 @@ func addAPIKeySpecifyGroupPrivileges(ctx *app.Context, privileges brain.Privileg
 
 		privileges = append(privileges, brain.Privilege{
 			Username: ctx.User.Username,
+			Level:    brain.GroupAdminPrivilege,
 			GroupID:  group.ID,
 		})
 	}
-	return privileges, nil
+	return privileges, groupErr
 }
 
 // creates a privilege spec for every --account-admin flag
@@ -243,10 +249,11 @@ func addAPIKeySpecifyAccountPrivileges(ctx *app.Context, privileges brain.Privil
 
 		privileges = append(privileges, brain.Privilege{
 			Username:  ctx.User.Username,
+			Level:     brain.AccountAdminPrivilege,
 			AccountID: account.BrainID,
 		})
 	}
-	return privileges, nil
+	return privileges, accountErr
 }
 
 // addAPIKeyPrivileges goes over the privilege specs and grants them to the api
