@@ -56,7 +56,7 @@ func main() {
 		fmt.Printf("couldn't write %s: %s\n", *outputFile, err)
 		os.Exit(1)
 	}
-	writeTemplate(*testOutputFile, *testTemplateFile, data)
+	err = writeTemplate(*testOutputFile, *testTemplateFile, data)
 	if err != nil {
 		fmt.Printf("couldn't write %s: %s\n", *testOutputFile, err)
 		os.Exit(1)
@@ -72,7 +72,7 @@ func writeTemplate(outputFile, templateFile string, data sliceFlag) (err error) 
 			return
 		}
 	}
-	defer outputWriter.Close()
+	defer func() { _ = outputWriter.Close() }()
 
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
@@ -121,14 +121,14 @@ func writeTemplate(outputFile, templateFile string, data sliceFlag) (err error) 
 	}
 
 	fmt.Println("closing inputWriter")
-	inputWriter.Close()
+	_ = inputWriter.Close()
 
 	fmt.Println("waiting for gofmt to finish")
 	fmtErr := gofmt.Wait()
 	if fmtErr != nil {
 		fmt.Printf("gofmt errored: %s\n", fmtErr)
 	}
-	betweenWriter.Close()
+	_ = betweenWriter.Close()
 
 	fmt.Println("waiting for goimports to finish")
 	importsErr := imports.Wait()
