@@ -1,7 +1,7 @@
 How to hack on bytemark-client
 ==============================
 
-bytemark-client is a big go project with a lot of code (>  20,000 SLOC at last
+bytemark-client is a big go project with a lot of code (>  30,000 SLOC at last
 count) and a lot of packages. It's divided up into two main big chunks -
 the command-line client in cmd/bytemark, and the API client library in lib.
 
@@ -24,7 +24,7 @@ client:
    compile slices of cli.Commands in the commands/* packages and cmd/bytemark.
 2. cmd/bytemark.main() is run, which runs some other functions in
    cmd/bytemark to set up a cmd/bytemark/config.Manager and flag.FlagSet
-3. cmd/bytemark.main combines the commands slices together, with
+3. cmd/bytemark.Commands() combines the commands slices together, with
    cmd/bytemark/commands/admin if the --admin flag is set, then creates a
    urfave/cli.App using cmd/bytemark/app.BaseAppSetup
 4. cmd/bytemark.main creates a new lib.Client, then attaches that and the
@@ -53,7 +53,7 @@ pretty normal command, in terms of its implementation. It's defined in show.go
 Here's the source for its Action. (app here being cmd/bytemark/app)
 
 Action: app.Action(args.Optional("account"), with.Account("account"), func(c *app.Context) error {
-	return c.OutputInDesiredForm(c.Account)
+        return c.OutputInDesiredForm(c.Account)
 }),
 
 app.Action returns a `func(c *cli.Context) error`, and takes
@@ -90,8 +90,18 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   ├── auth - Authentication routine for the client, called via
 │       │   │          with.EnsureAuth
 │       │   ├── flags - new flag types that are used in the client (e.g.
-│       │   │           VirtualMachineName, SizeSpec, ResizeSpec, AccountName,
-│       │   │           Privilege)
+│       │   │   │       VirtualMachineName, SizeSpec, ResizeSpec, AccountName,
+│       │   │   │       Privilege)
+│       │   │   └── gen - packages to generate flag code
+│       │   │       └── slice_flags - generator for SliceFlags - currently
+│       │   │                 AccountName, GroupName and  VirtualMachineName. 
+│       │   │                 More can be added by altering 
+│       │   │                 app/flags/slice_flags.go and you may need to add
+│       │   │                 more preparation code to
+│       │   │                 gen/slice_flags/template_test.go.tmpl
+│       │   │                 Whenever you alter anything in slice_flags, run
+│       │   │                 `go generate ./...` from the bytemark-client dir
+│       │   │                 to make sure the slice flags are kept up-to-date.
 │       │   ├── flagsets - common sets of flags & code to support reading complex
 │       │   │              objects from them. e.g. VirtualMachineSpec & ImageInstall
 │       │   ├── wait - functions which wait for a condition to be true before
@@ -125,8 +135,10 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │           └── sizespec - Parser for size specifications (e.g 35GiB, +3MiB)
 ├── doc - folder of documentation stuff.
 │         Also includes the manpage source (bytemark.asciidoc)
-├── gen - scripts to aid the building/distributing process.
-│         changelog.
+├── gen - scripts to aid the building/distributing process. In particular, has
+│   │     a changelog.sh script to generate a new changelog entry with all the
+│   │     changes since the last commit to master.
+│   └─ list_types - package to generate code for a list of types using sprintf.
 ├── lib - the main API client object, which makes requests.
 │   │     At the moment, loads of requests are defined as methods on lib.Client,
 │   │     but we want to move away from that and towards requests being
@@ -228,4 +240,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 2a2e8078c018b791fb8f4749ae2a3afec81a6eacec6caf36cfaa094ede7d82c5
+# sha256sum: 993688b7f02276dcbd79d543b41f9994be2776ca163c8c40b6cc346435f834ce

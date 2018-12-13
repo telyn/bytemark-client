@@ -52,6 +52,7 @@
   revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
   version = "v0.2.0"
 
+
 [[projects]]
   digest = "1:045300d96eca8646d57c4a039de9b47694ef328612f69ef0ade22a97a670a8d8"
   name = "github.com/kr/pretty"
@@ -120,6 +121,7 @@
     "github.com/bgentry/speakeasy",
     "github.com/cheekybits/is",
     "github.com/google/go-cmp/cmp",
+    "github.com/joncalhoun/pipe",
     "github.com/maraino/go-mock",
     "github.com/mattn/go-isatty",
     "github.com/olekukonko/tablewriter",

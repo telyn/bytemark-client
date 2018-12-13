@@ -7,7 +7,7 @@ import (
 
 // GroupNameFlag is used for all --group flags, including the global one.
 type GroupNameFlag struct {
-	GroupName *lib.GroupName
+	GroupName lib.GroupName
 	Value     string
 }
 
@@ -22,22 +22,15 @@ func (name *GroupNameFlag) Set(value string) error {
 // This is an implementation of `app.Preprocessor`, which is detected and
 // called automatically by actions created with `app.Action`
 func (name *GroupNameFlag) Preprocess(c *app.Context) (err error) {
-	if name.GroupName != nil {
-		c.Debug("GroupName.Preprocess before %#v", *name.GroupName)
-	}
 	if name.Value == "" {
 		return
 	}
 	groupName := lib.ParseGroupName(name.Value, c.Config().GetGroup())
-	name.GroupName = &groupName
-	c.Debug("GroupName.Preprocess after %#v", *name.GroupName)
+	name.GroupName = groupName
 	return
 }
 
 // String returns the GroupName as a string.
 func (name GroupNameFlag) String() string {
-	if name.GroupName != nil {
-		return name.GroupName.String()
-	}
-	return ""
+	return name.GroupName.String()
 }

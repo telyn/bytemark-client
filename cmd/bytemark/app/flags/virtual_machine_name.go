@@ -7,7 +7,7 @@ import (
 
 // VirtualMachineNameFlag is used for all --server flags, or should be at least.
 type VirtualMachineNameFlag struct {
-	VirtualMachineName *lib.VirtualMachineName
+	VirtualMachineName lib.VirtualMachineName
 	Value              string
 }
 
@@ -26,14 +26,11 @@ func (name *VirtualMachineNameFlag) Preprocess(c *app.Context) (err error) {
 		return
 	}
 	vmName, err := lib.ParseVirtualMachineName(name.Value, c.Config().GetVirtualMachine())
-	name.VirtualMachineName = &vmName
+	name.VirtualMachineName = vmName
 	return
 }
 
 // String returns the VirtualMachineName as a string.
 func (name VirtualMachineNameFlag) String() string {
-	if name.VirtualMachineName != nil {
-		return name.VirtualMachineName.String()
-	}
-	return ""
+	return name.VirtualMachineName.String()
 }
