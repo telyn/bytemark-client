@@ -112,10 +112,12 @@ func writeTemplate(outputFile, templateFile string, data sliceFlag) (err error) 
 		return fmt.Errorf("Couldn't start goimports: %s", err)
 	}
 
+	// errors are echoed rather than returned from here on out in order to
+	// ensure resources get cleaned up properly, otherwise we get a deadlock
 	fmt.Println("executing template")
 	err = tmpl.Execute(inputWriter, data)
 	if err != nil {
-		fmt.Println("template errored: %s", err)
+		fmt.Printf("template errored: %s\n", err)
 	}
 
 	fmt.Println("closing inputWriter")
@@ -124,14 +126,14 @@ func writeTemplate(outputFile, templateFile string, data sliceFlag) (err error) 
 	fmt.Println("waiting for gofmt to finish")
 	fmtErr := gofmt.Wait()
 	if fmtErr != nil {
-		fmt.Println("gofmt errored: %s", fmtErr)
+		fmt.Printf("gofmt errored: %s\n", fmtErr)
 	}
 	betweenWriter.Close()
 
 	fmt.Println("waiting for goimports to finish")
 	importsErr := imports.Wait()
 	if importsErr != nil {
-		fmt.Println("goimports errored: %s", importsErr)
+		fmt.Printf("goimports errored: %s\n", importsErr)
 	}
 	if err != nil || fmtErr != nil || importsErr != nil {
 		err = errors.New("template/goimports/gofmt errored")
