@@ -18,7 +18,7 @@
 //
 // If, for whatever reason, it is useful to reuse this code with different
 // templates, the -t and -tt options specify the template for the SliceFlag and
-// the
+// the test for the SliceFlag, respectively.
 package main
 
 import (
