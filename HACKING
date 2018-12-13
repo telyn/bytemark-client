@@ -95,9 +95,13 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   │   └── gen - packages to generate flag code
 │       │   │       └── slice_flags - generator for SliceFlags - currently
 │       │   │                 AccountName, GroupName and  VirtualMachineName. 
-More can be added by altering app/flags/slice_flags.go and you may need to add more preparation code to │       │   │                 gen/slice_flags/template_test.go.tmpl
-│       │   │                 Whenever you alter anything in here, run
-│       │   │                 `go generate ./...` from the bytemark-client
+│       │   │                 More can be added by altering 
+│       │   │                 app/flags/slice_flags.go and you may need to add
+│       │   │                 more preparation code to
+│       │   │                 gen/slice_flags/template_test.go.tmpl
+│       │   │                 Whenever you alter anything in slice_flags, run
+│       │   │                 `go generate ./...` from the bytemark-client dir
+│       │   │                 to make sure the slice flags are kept up-to-date.
 │       │   ├── flagsets - common sets of flags & code to support reading complex
 │       │   │              objects from them. e.g. VirtualMachineSpec & ImageInstall
 │       │   ├── wait - functions which wait for a condition to be true before
