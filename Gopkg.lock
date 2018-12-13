@@ -52,13 +52,6 @@
   revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
   version = "v0.2.0"
 
-[[projects]]
-  branch = "master"
-  digest = "1:b579884fc3d29505203470f59bc80019983ad77b5c12e2556b5d4347908c2102"
-  name = "github.com/joncalhoun/pipe"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "72505674a733661d44d46ffc6070c3211c01954a"
 
 [[projects]]
   digest = "1:045300d96eca8646d57c4a039de9b47694ef328612f69ef0ade22a97a670a8d8"

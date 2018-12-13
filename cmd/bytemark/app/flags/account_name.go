@@ -7,7 +7,9 @@ import (
 
 // AccountNameFlag is used for all --account flags, excluding the global one.
 type AccountNameFlag struct {
-	// AccountName is the
+	// AccountName is the actual name that will be passed on to API calls, and
+	// is made by checking the contents of Value are a valid account. If Value
+	// is unset then the value of the 'account' config variable is used
 	AccountName string
 	// Value is the raw input to the flag, and can be used as the default when
 	// creating the flag.

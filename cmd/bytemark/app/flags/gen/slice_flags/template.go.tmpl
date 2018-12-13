@@ -14,6 +14,7 @@ import (
 // logic.
 type {{ .TypeName }}SliceFlag []{{.TypeName}}Flag
 {{ if .Preprocess }}
+// Preprocess calls Preprocess on all the underlying {{ .TypeName }}Flags
 func (sf *{{ .TypeName}}SliceFlag) Preprocess(ctx *app.Context) error {
 	for i := range *sf {
 		err := (*sf)[i].Preprocess(ctx)

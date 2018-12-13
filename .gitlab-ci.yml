@@ -101,6 +101,7 @@ quality-test:
   script: 
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - export GOPATH
+    - go get golang.org/x/tools/cmd/goimports
     - go install ./...
     - go generate -tags quality $(go list ./... | grep -v vendor)
     - go test -run 'TestQuality.*' -tags quality ./...

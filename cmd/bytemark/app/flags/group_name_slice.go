@@ -14,6 +14,7 @@ import (
 // logic.
 type GroupNameSliceFlag []GroupNameFlag
 
+// Preprocess calls Preprocess on all the underlying GroupNameFlags
 func (sf *GroupNameSliceFlag) Preprocess(ctx *app.Context) error {
 	for i := range *sf {
 		err := (*sf)[i].Preprocess(ctx)
