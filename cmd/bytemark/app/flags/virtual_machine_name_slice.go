@@ -2,6 +2,9 @@ package flags
 
 // This file was automatically generate using
 // cmd/bytemark/app/flags/gen/slice_flags - do not edit it by hand!
+// To make your own SliceFlag, see the documentation in
+// cmd/bytemark/app/flags/gen/slice_flags/slice_flags.go
+// and edit cmd/bytemark/app/flags/slice_flags.go
 
 import (
 	"strings"

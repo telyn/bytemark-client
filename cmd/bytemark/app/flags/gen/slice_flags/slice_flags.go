@@ -1,3 +1,24 @@
+// slice_flags is a tool to instantly implement a flag.Value called
+// <Something>SliceFlag, which contains a
+// slice of <Something>Flags, an accessor called <Something>Slice, and a test to
+// ensure that the SliceFlag parses and Preprocesses correctly if necessary.
+//
+// It's intended for use in cmd/bytemark/app/flags - see slice_flags.go in that
+// package for the go:generate directives.
+//
+// example usage: to add a SliceFlag for some NewFlag which uses Preprocess and
+// for which "blah" is a value value:
+// go run ./gen/slice_flags/slice_flags.go -preprocesser -o new_flag.go
+// --example-input "blah" New
+//
+// For the generated test it is assumed that your original Flag, when Set with
+// some string will return the same string when String() is called. If this is
+// not the case, we need to modify this code and template_test.go.tmpl to
+// accept an example output as well as the example input.
+//
+// If, for whatever reason, it is useful to reuse this code with different
+// templates, the -t and -tt options specify the template for the SliceFlag and
+// the
 package main
 
 import (
@@ -18,6 +39,10 @@ type sliceFlag struct {
 	ExampleInput string
 }
 
+func log(text string) {
+	_, _ = fmt.Fprintln(os.Stderr, text)
+}
+
 // ok for this bad boy you gotta set the arguments as all the types you wanna
 // generate slice flags for.
 func main() {
@@ -25,7 +50,7 @@ func main() {
 	testOutputFile := flag.String("ot", "", "Test file to output to. - for stdin. If unset, defaults to same base same path without extension as outputFile, with _test.go appended")
 	templateFile := flag.String("t", "./gen/slice_flags/template.go.tmpl", "File to use as template")
 	testTemplateFile := flag.String("tt", "./gen/slice_flags/template_test.go.tmpl", "File to use as template")
-	exampleInput := flag.String("example-input", "", "Example input")
+	exampleInput := flag.String("example-input", "", "Example input, used to ensure that the test works")
 	preprocess := flag.Bool("preprocesser", false, "Whether Preprocessor is implemented on the single-version of these flags")
 
 	flag.Parse()
@@ -38,9 +63,10 @@ func main() {
 
 	args := flag.Args()
 	if len(args) != 1 {
-		fmt.Println("usage: go run slice_flags -o <output file> -t <template file> [-p] <type name>")
-		fmt.Println("")
-		fmt.Println("-p: implement Preprocesser by calling Preprocess on each value in the sliceflag slice.")
+		log("usage: go run slice_flags -o <output file> -t <template file> [-preprocesser] [-example-input <example>] <type name>")
+		log("")
+		log("creates a new SomeTypeSliceFlag for a flag type names SomeTypeFlag.")
+		flag.PrintDefaults()
 		fmt.Println("")
 		fmt.Println("To generate multiple slice flags, call this multiple times")
 		os.Exit(1)

@@ -1,7 +1,7 @@
 How to hack on bytemark-client
 ==============================
 
-bytemark-client is a big go project with a lot of code (>  20,000 SLOC at last
+bytemark-client is a big go project with a lot of code (>  30,000 SLOC at last
 count) and a lot of packages. It's divided up into two main big chunks -
 the command-line client in cmd/bytemark, and the API client library in lib.
 
@@ -24,7 +24,7 @@ client:
    compile slices of cli.Commands in the commands/* packages and cmd/bytemark.
 2. cmd/bytemark.main() is run, which runs some other functions in
    cmd/bytemark to set up a cmd/bytemark/config.Manager and flag.FlagSet
-3. cmd/bytemark.main combines the commands slices together, with
+3. cmd/bytemark.Commands() combines the commands slices together, with
    cmd/bytemark/commands/admin if the --admin flag is set, then creates a
    urfave/cli.App using cmd/bytemark/app.BaseAppSetup
 4. cmd/bytemark.main creates a new lib.Client, then attaches that and the
@@ -94,11 +94,10 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │       │   │   │       Privilege)
 │       │   │   └── gen - packages to generate flag code
 │       │   │       └── slice_flags - generator for SliceFlags - currently
-│       │   │                         AccountName, GroupName and
-│       │   │                         VirtualMachineName. More can be added by
-│       │   │                         altering app/flags/slice_flags.go and you
-│       │   │                         may need to add more preparation code to
-│       │   │                         gen/slice_flags/template_test.go.tmpl
+│       │   │                 AccountName, GroupName and  VirtualMachineName. 
+More can be added by altering app/flags/slice_flags.go and you may need to add more preparation code to │       │   │                 gen/slice_flags/template_test.go.tmpl
+│       │   │                 Whenever you alter anything in here, run
+│       │   │                 `go generate ./...` from the bytemark-client
 │       │   ├── flagsets - common sets of flags & code to support reading complex
 │       │   │              objects from them. e.g. VirtualMachineSpec & ImageInstall
 │       │   ├── wait - functions which wait for a condition to be true before
