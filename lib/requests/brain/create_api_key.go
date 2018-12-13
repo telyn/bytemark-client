@@ -24,9 +24,10 @@ func CreateAPIKey(client lib.Client, username string, spec brain.APIKey) (apiKey
 		return
 	}
 	if spec.UserID == 0 {
-		user, err := client.GetUser(username)
+		var user brain.User
+		user, err = client.GetUser(username)
 		if err != nil {
-			return apiKey, err
+			return
 		}
 		spec.UserID = user.ID
 	}
