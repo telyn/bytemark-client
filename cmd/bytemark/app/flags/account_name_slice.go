@@ -14,6 +14,7 @@ import (
 // logic.
 type AccountNameSliceFlag []AccountNameFlag
 
+// Preprocess calls Preprocess on all the underlying AccountNameFlags
 func (sf *AccountNameSliceFlag) Preprocess(ctx *app.Context) error {
 	for i := range *sf {
 		err := (*sf)[i].Preprocess(ctx)

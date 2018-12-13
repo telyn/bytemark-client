@@ -14,6 +14,7 @@ import (
 // logic.
 type VirtualMachineNameSliceFlag []VirtualMachineNameFlag
 
+// Preprocess calls Preprocess on all the underlying VirtualMachineNameFlags
 func (sf *VirtualMachineNameSliceFlag) Preprocess(ctx *app.Context) error {
 	for i := range *sf {
 		err := (*sf)[i].Preprocess(ctx)
