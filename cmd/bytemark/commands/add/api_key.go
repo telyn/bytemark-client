@@ -140,14 +140,12 @@ account:
 			}
 
 			ctx.LogErr(done)
-			apiKey.PrettyPrint(ctx.Writer(), prettyprint.Full)
-
-			if privsErr != nil {
-				return privsErr
+			err = apiKey.PrettyPrint(ctx.Writer(), prettyprint.Full)
+			if err != nil {
+				return err
 			}
 
-			return nil
-
+			return privsErr
 		}),
 	})
 }

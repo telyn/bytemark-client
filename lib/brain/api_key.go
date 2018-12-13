@@ -29,6 +29,7 @@ type APIKey struct {
 	Privileges Privileges `json:"privileges,omitempty"`
 }
 
+// DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
 func (key APIKey) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
@@ -37,6 +38,9 @@ func (key APIKey) DefaultFields(f output.Format) string {
 	return "ID, UserID, Label, Expired, ExpiresAt, Privileges"
 }
 
+// Expired returns true if ExpiresAt is in the past.
+// This assumes ExpiresAt is in ISO8601 format, which it will be if the APIKey
+// was set by a unmarshalling a response from the brain.
 func (key APIKey) Expired() bool {
 	if key.ExpiresAt == "" {
 		return false
@@ -49,6 +53,8 @@ func (key APIKey) Expired() bool {
 	return expiresAt.Before(time.Now())
 }
 
+// PrettyPrint outputs a nice human-readable overview of the api key, including
+// what privileges it has, to the given writer.
 func (key APIKey) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) error {
 	accountTpl := `
 {{ define "apikey_sgl" }}{{ .Label }}{{ if .Expired }} (expired){{ end }}{{ end }}

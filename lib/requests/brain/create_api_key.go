@@ -11,6 +11,10 @@ import (
 // Neither the ID nor APIKey field should be specified in the spec.
 // username may be blank if the spec.UserID is set.
 func CreateAPIKey(client lib.Client, username string, spec brain.APIKey) (apiKey brain.APIKey, err error) {
+	if len(spec.Privileges) > 0 {
+		err = errors.New("CreateAPIKey does not support creating an APIKey with privileges already attached - please use GrantPrivilege after CreateAPIKey, and provide an APIKey with Privileges unset to CreateAPIKey")
+		return
+	}
 	if spec.UserID != 0 && username != "" {
 		err = errors.New("only specify one of username and spec.UserID")
 		return
