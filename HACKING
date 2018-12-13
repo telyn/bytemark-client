@@ -145,6 +145,8 @@ More can be added by altering app/flags/slice_flags.go and you may need to add m
 │   │   │        other types in lib.
 │   │   │        DefaultFieldsHaver interface defined and tested-for here
 │   │   │        (required for table & list output types)
+│   │   ├── morestrings - extra string manipulation functions used by multiple
+│   │   │                 packages
 │   │   └── prettyprint - PrettyPrinter interface and a helper function for
 │   │                     writing PrettyPrinters
 │   │                     All the types in lib/billing, lib/brain and lib/spp
@@ -236,4 +238,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 993688b7f02276dcbd79d543b41f9994be2776ca163c8c40b6cc346435f834ce
+# sha256sum: 14ec7f63021ea2d5f870bb638e911e540294fee5247a4e90f0b4020baf70071a
