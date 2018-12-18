@@ -11,8 +11,9 @@ import (
 // APIKey represents an api_key in the brain.
 type APIKey struct {
 	// ID must not be set during creation.
-	ID     int `json:"id,omitempty"`
-	UserID int `json:"user_id,omitempty"`
+	ID       int    `json:"id,omitempty"`
+	UserID   int    `json:"user_id,omitempty"`
+	Username string `json:"username,omitempty"`
 	// Label is a friendly display name for this API key
 	Label string `json:"label,omitempty"`
 	// API key is the actual key. To use it, it must be prepended with
@@ -35,7 +36,7 @@ func (key APIKey) DefaultFields(f output.Format) string {
 	case output.List:
 		return "ID, Label, Expired, ExpiresAt, Privileges"
 	}
-	return "ID, UserID, Label, Expired, ExpiresAt, Privileges"
+	return "ID, Username, Label, Expired, ExpiresAt, Privileges"
 }
 
 // Expired returns true if ExpiresAt is in the past.
