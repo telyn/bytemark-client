@@ -4,6 +4,11 @@ bytemark-client (3.4) UNRELEASED; urgency=low
   * Discs can be moved between servers using the `update disc` command and the
     new `--new-server` flag
   * Grant command can now grant privileges to users using api keys
+  * API keys can be used for authentication (with access restricted to
+    Bytemark Cloud Server's APIs)
+  * API keys can be managed with the `add api key`, `delete api key`, `show
+    api keys`, and `grant privilege` (with --api-key flag) and `revoke
+    privilege` commands.
 
   ### Admin changes:
   * `add vm default` has been added, allowing staff to create
