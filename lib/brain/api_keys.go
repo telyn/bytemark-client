@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/output/prettyprint"
 )
 
+// APIKeys is a slice of APIKey implementing output.Outputtable
 type APIKeys []APIKey
 
 // DefaultFields returns the list of default fields to feed to github.com/BytemarkHosting/row.From for this type.
