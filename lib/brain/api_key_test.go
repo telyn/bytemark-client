@@ -48,10 +48,11 @@ func TestAPIKeyPrettyPrint(t *testing.T) {
 				ExpiresAt: "3000-01-01T01:01:01-0000",
 				Privileges: brain.Privileges{
 					{
-						Username:  "jeffathan",
-						AccountID: 23,
-						Level:     "account_admin",
-						APIKeyID:  4,
+						Username:    "jeffathan",
+						AccountID:   23,
+						AccountName: "jeffadiah",
+						Level:       "account_admin",
+						APIKeyID:    4,
 					},
 				},
 			},
@@ -59,7 +60,7 @@ func TestAPIKeyPrettyPrint(t *testing.T) {
   Expires: 3000-01-01T01:01:01-0000
 
   Privileges:
-    * account_admin on account #23 for jeffathan
+    * account_admin on account jeffadiah for jeffathan
 `,
 		}, {
 			name:  "full with key",
