@@ -5,12 +5,14 @@ import (
 	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // DeleteAPIKey takes an API key id or label and revokes it.
 func DeleteAPIKey(client lib.Client, id string) (err error) {
-	if _, err := strconv.Atoi(id); err != nil {
-		apikeys, err := GetAPIKeys(client)
+	if _, convErr := strconv.Atoi(id); convErr != nil {
+		var apikeys brain.APIKeys
+		apikeys, err = GetAPIKeys(client)
 		if err != nil {
 			return err
 		}

@@ -54,7 +54,6 @@ func TestShowApiKeys(t *testing.T) {
 		test.Run(t, func(t *testing.T, config *mocks.Config, client *mocks.Client, app *cli.App) {
 			client.When("BuildRequest", "GET", lib.BrainEndpoint, "/api_keys?view=overview", []string(nil)).Return(&mockRequest, nil)
 			client.When("GetUser", "test-user").Return(test.user, nil)
-			return
 		})
 	}
 }
