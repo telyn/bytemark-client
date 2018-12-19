@@ -10,9 +10,10 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
-func TestRevokeAPIKey(t *testing.T) {
+func TestDeleteAPIKey(t *testing.T) {
 	tests := []struct {
 		name       string
+		id         int
 		labelOrID  string
 		statusCode int
 		shouldErr  bool
@@ -23,7 +24,8 @@ func TestRevokeAPIKey(t *testing.T) {
 			statusCode: 200,
 			shouldErr:  false,
 		}, {
-			name:       "success",
+			name:       "successjumanji",
+			id:         229,
 			labelOrID:  "jumanji",
 			statusCode: 200,
 			shouldErr:  false,
@@ -39,7 +41,7 @@ func TestRevokeAPIKey(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			rts := testutil.RequestTestSpec{
 				Method:        "DELETE",
-				URL:           fmt.Sprintf("/api_keys/%s", test.labelOrID),
+				URL:           fmt.Sprintf("/api_keys/%s", test.id),
 				Endpoint:      lib.BrainEndpoint,
 				StatusCode:    test.statusCode,
 				AssertRequest: assert.BodyString(""),
