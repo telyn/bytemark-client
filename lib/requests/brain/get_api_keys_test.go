@@ -13,7 +13,7 @@ import (
 func TestGetAPIKeys(t *testing.T) {
 	tests := []struct {
 		name       string
-		response   []brain.APIKey
+		response   brain.APIKeys
 		statusCode int
 		shouldErr  bool
 	}{
@@ -27,7 +27,7 @@ func TestGetAPIKeys(t *testing.T) {
 		},
 		{
 			name: "some keys",
-			response: []brain.APIKey{
+			response: brain.APIKeys{
 				{
 					ID:        6,
 					UserID:    2152,

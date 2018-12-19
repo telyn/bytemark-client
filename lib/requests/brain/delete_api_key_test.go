@@ -12,26 +12,24 @@ import (
 
 func TestRevokeAPIKey(t *testing.T) {
 	tests := []struct {
-		name            string
-		id              int
-		requestExpected map[string]interface{}
-		statusCode      int
-		shouldErr       bool
+		name       string
+		labelOrID  string
+		statusCode int
+		shouldErr  bool
 	}{
 		{
-			name: "success",
-			id:   9,
-			requestExpected: map[string]interface{}{
-				"expires_at": "00:00:00",
-			},
+			name:       "success",
+			labelOrID:  "9",
 			statusCode: 200,
 			shouldErr:  false,
 		}, {
-			name: "error 500",
-			id:   25,
-			requestExpected: map[string]interface{}{
-				"expires_at": "00:00:00",
-			},
+			name:       "success",
+			labelOrID:  "jumanji",
+			statusCode: 200,
+			shouldErr:  false,
+		}, {
+			name:       "error 500",
+			labelOrID:  "25",
 			statusCode: 500,
 			shouldErr:  true,
 		},
@@ -40,14 +38,14 @@ func TestRevokeAPIKey(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			rts := testutil.RequestTestSpec{
-				Method:        "PUT",
-				URL:           fmt.Sprintf("/api_keys/%d", test.id),
+				Method:        "DELETE",
+				URL:           fmt.Sprintf("/api_keys/%s", test.labelOrID),
 				Endpoint:      lib.BrainEndpoint,
 				StatusCode:    test.statusCode,
-				AssertRequest: assert.BodyUnmarshalEqual(test.requestExpected),
+				AssertRequest: assert.BodyString(""),
 			}
 			rts.Run(t, test.name, true, func(client lib.Client) {
-				err := brainRequests.RevokeAPIKey(client, test.id)
+				err := brainRequests.DeleteAPIKey(client, test.labelOrID)
 				if err != nil && !test.shouldErr {
 					t.Errorf("Unexpected error: %v", err)
 				} else if err == nil && test.shouldErr {
