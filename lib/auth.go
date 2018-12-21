@@ -3,6 +3,7 @@ package lib
 import (
 	"context"
 	"errors"
+	"strings"
 
 	auth3 "github.com/BytemarkHosting/auth-client"
 )
@@ -20,6 +21,18 @@ func (c *bytemarkClient) AuthWithCredentials(credentials auth3.Credentials) erro
 func (c *bytemarkClient) AuthWithToken(token string) error {
 	if token == "" {
 		return errors.New("No token provided")
+	}
+
+	if strings.HasPrefix(token, "apikey.") {
+		c.authSession = &auth3.SessionData{
+			Username: "apikeyuser",
+			Factors: []string{
+				"apikey",
+			},
+			Token: token,
+		}
+		c.urls.Billing = ""
+		return nil
 	}
 
 	session, err := c.auth.ReadSession(context.TODO(), token)

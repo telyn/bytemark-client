@@ -6,16 +6,14 @@ import (
 	"time"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/add"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/cheekybits/is"
 	"github.com/urfave/cli"
 )
 
 func TestCreateServerHasCorrectFlags(t *testing.T) {
-	// I'm not sure why this test exists
-	is := is.New(t)
 	seenCmd := false
 	seenAuthKeys := false
 	seenAuthKeysFile := false
@@ -24,8 +22,8 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 	seenImage := false
 	seenRootPassword := false
 
-	testutil.TraverseAllCommands(commands.Commands, func(cmd cli.Command) {
-		if cmd.FullName() == "add server" {
+	testutil.TraverseAllCommands(add.Commands, func(cmd cli.Command) {
+		if cmd.Name == "server" {
 			seenCmd = true
 			for _, f := range cmd.Flags {
 				switch f.GetName() {
@@ -45,13 +43,27 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 			}
 		}
 	})
-	is.True(seenCmd)
-	is.True(seenAuthKeys)
-	is.True(seenAuthKeysFile)
-	is.True(seenFirstbootScript)
-	is.True(seenFirstbootScriptFile)
-	is.True(seenImage)
-	is.True(seenRootPassword)
+	if !seenCmd {
+		t.Error("Didn't see add server command")
+	}
+	if !seenAuthKeys {
+		t.Error("Didn't see authorized-keys")
+	}
+	if !seenAuthKeysFile {
+		t.Error("Didn't see authorised-keys-file")
+	}
+	if !seenFirstbootScript {
+		t.Error("Didn't see firstboot-script")
+	}
+	if !seenFirstbootScriptFile {
+		t.Error("Didn't see firstboot-script-file")
+	}
+	if !seenImage {
+		t.Error("Didn't see image")
+	}
+	if !seenRootPassword {
+		t.Error("Didn't see root-password")
+	}
 
 }
 
