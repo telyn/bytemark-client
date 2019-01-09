@@ -100,7 +100,7 @@ func TestAddApiKey(t *testing.T) {
 			Name: "all defaults",
 			Args: "test-api-key",
 			OutputMustMatch: []*regexp.Regexp{
-				regexp.MustCompile("Successfully created an api key:\ntest-api-key\n  Expires: never\n  Key: apikey.apikey.ay1pee2eye3key\n"),
+				regexp.MustCompile("Successfully created an api key:\ntest-api-key\n  Expires: never\n  Key: apikey.ay1pee2eye3key\n"),
 			},
 		},
 		user: brain.User{
