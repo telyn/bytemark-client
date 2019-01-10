@@ -87,6 +87,8 @@ func (rts *RequestTestSpec) MakeServers(t *testing.T) Servers {
 	}.MakeServers(t)
 }
 
+// Verify ensures that the request was visited at least once, as long as
+// NoVerify is false and this RequestTestSpec is not the MuxHandlers style.
 func (rts *RequestTestSpec) Verify(t *testing.T) {
 	if rts.NoVerify {
 		return
