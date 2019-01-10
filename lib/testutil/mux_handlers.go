@@ -21,11 +21,11 @@ type MuxHandlers struct {
 // MakeServers creates a Servers whose httptest.Server elements are handled by these Muxes
 func (mh MuxHandlers) MakeServers(t *testing.T) (s Servers) {
 	h := HandlerMap{
-		lib.AuthEndpoint:    mh.Auth.ToHandler(),
-		lib.BrainEndpoint:   mh.Brain.ToHandler(),
-		lib.BillingEndpoint: mh.Billing.ToHandler(),
-		lib.SPPEndpoint:     mh.SPP.ToHandler(),
-		lib.APIEndpoint:     mh.API.ToHandler(),
+		lib.AuthEndpoint:    mh.Auth.Handler(),
+		lib.BrainEndpoint:   mh.Brain.Handler(),
+		lib.BillingEndpoint: mh.Billing.Handler(),
+		lib.SPPEndpoint:     mh.SPP.Handler(),
+		lib.APIEndpoint:     mh.API.Handler(),
 	}
 	if mh.Auth == nil {
 		delete(h, lib.AuthEndpoint)
