@@ -8,12 +8,11 @@ import "net/http"
 // RequestTestSpec.Handler)
 type Mux map[string]http.HandlerFunc
 
-// ToHandler turns the Mux into an http.ServeMux
-func (m Mux) ToHandler() (serveMux *http.ServeMux) {
-
-	serveMux = http.NewServeMux()
+// Handler makes a http.Handler for this Mux
+func (m Mux) Handler() http.Handler {
+	serveMux := http.NewServeMux()
 	for p, f := range m {
 		serveMux.HandleFunc(p, f)
 	}
-	return
+	return serveMux
 }

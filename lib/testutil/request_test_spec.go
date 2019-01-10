@@ -75,6 +75,9 @@ func (rts *RequestTestSpec) Run(t *testing.T, testName string, auth bool, fn Req
 	rts.Verify(t)
 }
 
+// MakeServers creates a Servers object for this RequestTestSpec. If MuxHandlers
+// is set, that is used as the entirety of the basis for the Servers. Otherwise,
+// makes a HandlerMap and calls MakeServers on that.
 func (rts *RequestTestSpec) MakeServers(t *testing.T) Servers {
 	if rts.MuxHandlers != nil {
 		return rts.MuxHandlers.MakeServers(t)
@@ -113,5 +116,5 @@ func (rts *RequestTestSpec) Handler(t *testing.T) http.Handler {
 			}
 			WriteJSON(t, wr, rts.Response)
 		},
-	}.ToHandler()
+	}.Handler()
 }
