@@ -45,50 +45,21 @@ type RequestTestSpec struct {
 	// query string keys
 	AssertRequest func(t *testing.T, testName string, r *http.Request)
 
+	// Auth is used to determine whether authentication should be performed - if
+	// it is set to true it will be. Auth is automatically set by Run and only
+	// used
+	Auth bool
+	// NoVerify is used to disable visit count verification in case the test is
+	// expected not to get as far as calling out to this API call.
+	NoVerify bool
 	// visits is how many times the generated handler has been called
-	// TODO(telyn): maybe refactor this out to MuxHandlers so we get visits-tracking across all endpoints for custom MuxHandlers.
 	visits int
-}
-
-// handlerFunc creates a http.HandlerFunc which validates the Method & ExpectedRequestBody
-// then writes the Response
-func (rts *RequestTestSpec) handlerFunc(t *testing.T, testName string, auth bool) http.HandlerFunc {
-	return func(wr http.ResponseWriter, r *http.Request) {
-		// TODO(telyn): refactor the visits thing out to MuxHandlers
-		rts.visits++
-
-		assert.Method(rts.Method)(t, testName, r)
-		if auth {
-			assert.Auth(lib.TokenType(rts.Endpoint))(t, testName, r)
-		}
-		if rts.AssertRequest != nil {
-			rts.AssertRequest(t, testName, r)
-		}
-		if rts.StatusCode != 0 {
-			wr.WriteHeader(rts.StatusCode)
-		}
-		WriteJSON(t, wr, rts.Response)
-	}
-}
-
-// mkMuxHandlers makes a MuxHandlers which contains one endpoint (specified by this RequestTestSpec)
-// which validates the Method and ExpectedRequest, then writes the Response
-func (rts *RequestTestSpec) mkMuxHandlers(t *testing.T, testName string, auth bool) (mh MuxHandlers, err error) {
-	return NewMuxHandlers(rts.Endpoint, rts.URL, rts.handlerFunc(t, testName, auth))
 }
 
 // Run sets up fake servers, creates a client that talks to them, then passes the client to fn.
 // fn should run some request method using the client & test the results of that function.
 func (rts *RequestTestSpec) Run(t *testing.T, testName string, auth bool, fn RequestTestFunc) {
-	if rts.MuxHandlers == nil {
-		mh, err := rts.mkMuxHandlers(t, testName, auth)
-		if err != nil {
-			t.Fatalf("Couldn't create MuxHandlers - %s", err)
-		}
-		rts.MuxHandlers = &mh
-	}
-
-	client, servers, err := NewClientAndServers(t, rts.MuxHandlers)
+	client, servers, err := NewClientAndServers(t, rts)
 	defer servers.Close()
 	if err != nil {
 		t.Fatalf("%s NewClientAndServers failed - %s", testName, err)
@@ -101,9 +72,46 @@ func (rts *RequestTestSpec) Run(t *testing.T, testName string, auth bool, fn Req
 	}
 
 	fn(client)
+	rts.Verify(t)
+}
+
+func (rts *RequestTestSpec) MakeServers(t *testing.T) Servers {
+	if rts.MuxHandlers != nil {
+		return rts.MuxHandlers.MakeServers(t)
+	}
+	return HandlerMap{
+		rts.Endpoint: rts.Handler(t),
+	}.MakeServers(t)
+}
+
+func (rts *RequestTestSpec) Verify(t *testing.T) {
+	if rts.NoVerify {
+		return
+	}
 	if rts.MuxHandlers == nil {
 		if rts.visits == 0 {
-			t.Errorf("%s never called the HTTP endpoint", testName)
+			t.Error("never called the HTTP endpoint")
 		}
 	}
+}
+
+// Handler returns an http.Handler for the request(s) expected by this
+// RequestTestSpec.
+func (rts *RequestTestSpec) Handler(t *testing.T) http.Handler {
+	return Mux{
+		rts.URL: func(wr http.ResponseWriter, r *http.Request) {
+			assert.Method(rts.Method)(t, "", r)
+			rts.visits++
+			if rts.Auth {
+				assert.Auth(lib.TokenType(rts.Endpoint))(t, "", r)
+			}
+			if rts.AssertRequest != nil {
+				rts.AssertRequest(t, "", r)
+			}
+			if rts.StatusCode != 0 {
+				wr.WriteHeader(rts.StatusCode)
+			}
+			WriteJSON(t, wr, rts.Response)
+		},
+	}.ToHandler()
 }
