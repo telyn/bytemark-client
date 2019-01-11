@@ -95,7 +95,7 @@ func (rts *RequestTestSpec) Verify(t *testing.T) {
 	}
 	if rts.MuxHandlers == nil {
 		if rts.visits == 0 {
-			t.Error("never called the HTTP endpoint")
+			t.Errorf("never called %s %s%s", rts.Method, rts.Endpoint, rts.URL)
 		}
 	}
 }
