@@ -66,7 +66,7 @@ func (s Servers) Client() (c lib.Client, err error) {
 
 // ServersFactory is an interface used for convenience - so that Handlers or MuxHandlers can be passed to NewClientAndServers
 type ServersFactory interface {
-	MakeServers(t *testing.T) (s Servers)
+	MakeServers(t *testing.T) Servers
 }
 
 // NewClientAndServers constructs httptest Servers for a pretend auth and API endpoint, then constructs a Client that uses those servers.
@@ -78,14 +78,6 @@ func NewClientAndServers(t *testing.T, factory ServersFactory) (c lib.Client, s 
 	s = factory.MakeServers(t)
 	c, err = s.Client()
 	return
-}
-
-// NilHandler creates an http.Handler that fails and ends the test when called.
-// It's the default for MuxHandlers and Handlers - so that you only need specify the endpoints you expect to talk to.
-func NilHandler(t *testing.T) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t.Fatalf("Unexpected request to a nil server\r\n%s %s", r.Method, r.URL.String())
-	})
 }
 
 // NewAuthServer creates a fake auth server that responds to any request with a session.
