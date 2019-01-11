@@ -67,7 +67,7 @@ func TestAPIKeyPrettyPrint(t *testing.T) {
 			level: prettyprint.Full,
 			in: brain.APIKey{
 				Label:     "jeff",
-				APIKey:    "abcdefgh",
+				APIKey:    "apikey.abcdefgh",
 				ExpiresAt: "3006-01-01T01:01:01-0000",
 			},
 			out: `jeff
