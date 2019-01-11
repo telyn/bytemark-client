@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 )
 
+// GetVM creates a basic RequestTestSpec which expects a GET request for some VM
 func GetVM(vmName lib.VirtualMachineName, vm brain.VirtualMachine) testutil.RequestTestSpec {
 	return testutil.RequestTestSpec{
 		Endpoint: lib.BrainEndpoint,
