@@ -63,7 +63,7 @@ func (key APIKey) PrettyPrint(wr io.Writer, detail prettyprint.DetailLevel) erro
 {{ define "apikey_full" }}{{ template "apikey_sgl" . }}
   Expire{{ if .Expired }}d{{ else }}s{{ end }}: {{ if eq .ExpiresAt "" }}never{{ else }}{{ .ExpiresAt }}{{ end -}}
 {{ if .APIKey}}
-  Key: apikey.{{ .APIKey }}{{ end -}}
+  Key: {{ .APIKey }}{{ end -}}
 {{ if len .Privileges | le 1 }}
 
   Privileges:

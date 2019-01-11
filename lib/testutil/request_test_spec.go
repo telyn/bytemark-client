@@ -47,7 +47,8 @@ type RequestTestSpec struct {
 
 	// Auth is used to determine whether authentication should be performed - if
 	// it is set to true it will be. Auth is automatically set by Run and only
-	// used
+	// needs to be set if you're using MultiRequestTestSpec but don't want all
+	// the requests to be authenticated.
 	Auth bool
 	// NoVerify is used to disable visit count verification in case the test is
 	// expected not to get as far as calling out to this API call.
