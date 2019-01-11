@@ -12,7 +12,7 @@ func (c *bytemarkClient) BuildAccountRequest(
 	suffix string,
 	suffixSubs ...string,
 ) (Request, error) {
-	account, err := c.CheckAccountPather(account)
+	account, err := c.checkAccountPather(account)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (c *bytemarkClient) BuildDiscRequest(
 	suffix string,
 	suffixSubs ...string,
 ) (Request, error) {
-	disc, err := c.CheckDiscPather(disc)
+	disc, err := c.checkDiscPather(disc)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *bytemarkClient) BuildGroupRequest(
 	suffix string,
 	suffixSubs ...string,
 ) (Request, error) {
-	group, err := c.CheckGroupPather(group)
+	group, err := c.checkGroupPather(group)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (c *bytemarkClient) BuildVirtualMachineRequest(
 	suffix string,
 	suffixSubs ...string,
 ) (Request, error) {
-	virtualMachine, err := c.CheckVirtualMachinePather(virtualMachine)
+	virtualMachine, err := c.checkVirtualMachinePather(virtualMachine)
 	if err != nil {
 		return nil, err
 	}

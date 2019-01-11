@@ -8,7 +8,7 @@ import (
 
 // CreateBackupSchedule creates a new backup schedule starting at the given date, with backups occurring every interval seconds
 func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, interval int) (sched brain.BackupSchedule, err error) {
-	err = c.EnsureVirtualMachineName(&server)
+	err = c.checkVirtualMachinePather(&server)
 	if err != nil {
 		return
 	}
@@ -26,7 +26,7 @@ func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLab
 
 // DeleteBackupSchedule deletes the given backup schedule
 func (c *bytemarkClient) DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) (err error) {
-	err = c.EnsureVirtualMachineName(&server)
+	err = c.checkVirtualMachinePather(&server)
 	if err != nil {
 		return
 	}

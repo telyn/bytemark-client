@@ -2,14 +2,15 @@ package lib
 
 import (
 	"fmt"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
 // VirtualMachineName is the triplet-form of the name of a VirtualMachine, which should be enough to find the VM.
 // VirtualMachineName implements the Pather interface
 type VirtualMachineName struct {
+	brain.GroupPather
 	VirtualMachine string
-	Group          string
-	Account        string
 }
 
 func (vm VirtualMachineName) String() string {

@@ -9,7 +9,7 @@ func (c *bytemarkClient) BuildVirtualMachineRequest(
 	suffix string,
 	suffixSubs ...string,
 ) (Request, error) {
-	virtualMachine, err := c.CheckVirtualMachinePather(virtualMachine)
+	virtualMachine, err := c.checkVirtualMachinePather(virtualMachine)
 	if err != nil {
 		return nil, err
 	}

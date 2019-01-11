@@ -5,8 +5,8 @@ import (
 )
 
 // CreateBackup creates a backup of the given disc, returning the backup if it was successful.
-func (c *bytemarkClient) CreateBackup(vm VirtualMachineName, discLabelOrID string) (backup brain.Backup, err error) {
-	err = c.EnsureVirtualMachineName(&vm)
+func (c *bytemarkClient) CreateBackup(path brain.DiscPather) (backup brain.Backup, err error) {
+	path, err = c.checkDiscPather(path)
 	if err != nil {
 		return
 	}
@@ -21,7 +21,7 @@ func (c *bytemarkClient) CreateBackup(vm VirtualMachineName, discLabelOrID strin
 }
 
 func (c *bytemarkClient) DeleteBackup(vm VirtualMachineName, discLabelOrID string, backupLabelOrID string) (err error) {
-	err = c.EnsureVirtualMachineName(&vm)
+	err = c.checkVirtualMachinePather(&vm)
 	if err != nil {
 		return
 	}
@@ -35,7 +35,7 @@ func (c *bytemarkClient) DeleteBackup(vm VirtualMachineName, discLabelOrID strin
 }
 
 func (c *bytemarkClient) GetBackups(vm VirtualMachineName, discLabelOrID string) (backups brain.Backups, err error) {
-	err = c.EnsureVirtualMachineName(&vm)
+	err = c.checkVirtualMachinePather(&vm)
 	if err != nil {
 		return
 	}
@@ -49,7 +49,7 @@ func (c *bytemarkClient) GetBackups(vm VirtualMachineName, discLabelOrID string)
 }
 
 func (c *bytemarkClient) RestoreBackup(vm VirtualMachineName, discLabelOrID string, backupLabelOrID string) (backup brain.Backup, err error) {
-	err = c.EnsureVirtualMachineName(&vm)
+	err = c.checkVirtualMachinePather(&vm)
 	if err != nil {
 		return
 	}

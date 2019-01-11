@@ -7,7 +7,7 @@ import (
 )
 
 func (c *bytemarkClient) AddIP(name VirtualMachineName, spec brain.IPCreateRequest) (brain.IPs, error) {
-	err := c.EnsureVirtualMachineName(&name)
+	err := c.checkVirtualMachinePather(&name)
 	if err != nil {
 		return nil, err
 	}

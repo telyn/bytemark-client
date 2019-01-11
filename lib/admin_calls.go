@@ -240,9 +240,15 @@ func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
 }
 
 func (c *bytemarkClient) AdminCreateGroup(name GroupName, vlanNum int) (err error) {
-	err = c.EnsureGroupName(&name)
+	namePath, err := c.checkGroupPather(name)
 	if err != nil {
 		return
+	}
+	var ok bool
+	// should be impossible but maybe someday I'll write a bug so pernicious as
+	// to cause this problem
+	if name, ok = namePath.(GroupName); !ok {
+		return fmt.Errorf("checkGroupPather returned a %s - was expecting GroupName. This is a bug")
 	}
 
 	r, err := c.BuildRequest("POST", BrainEndpoint, "/admin/groups")

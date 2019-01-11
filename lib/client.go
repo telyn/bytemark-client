@@ -2,8 +2,6 @@ package lib
 
 import (
 	auth3 "github.com/BytemarkHosting/auth-client"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
-	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 // EndpointURLs are the URLs stored by the client for the various API endpoints the client touches.
@@ -119,69 +117,4 @@ func (c *bytemarkClient) GetSessionUser() string {
 
 func (c *bytemarkClient) AllowInsecureRequests() {
 	c.allowInsecure = true
-}
-
-func (c *bytemarkClient) CheckVMPather(vmPather brain.VirtualMachinePather) (brain.VirtualMachinePather, error) {
-	if vm, ok := vmPather.(VirtualMachineName); ok {
-		if vm.Account == "" {
-			acc, err := c.CheckAccountPather(brain.AccountName(vm.Account))
-			vm.Account = acc
-			if err != nil {
-				return vm, err
-			}
-		}
-		if vm.Group == "" {
-			vm.Group = DefaultGroup
-		}
-
-		if vm.VirtualMachine == "" {
-			return vm, BadNameError{Type: "virtual machine", ProblemField: "name", ProblemValue: vm.VirtualMachine}
-		}
-		return vm, nil
-	}
-}
-
-func (c *bytemarkClient) EnsureGroupName(group *GroupName) error {
-	if group.Account == "" {
-		if err := c.EnsureAccountName(&group.Account); err != nil {
-			return err
-		}
-	}
-	if group.Group == "" {
-		group.Group = DefaultGroup
-	}
-	return nil
-}
-
-func (c *bytemarkClient) CheckAccountPather(accountPather brain.AccountPather) (brain.AccountPather, error) {
-	if account, ok = accountPather.(string); ok {
-		if account == "" && c.authSession != nil {
-			log.Debug(log.LvlArgs, "CheckAccountPather called with empty name and a valid auth session - will try to figure out the default by talking to APIs.")
-			if c.urls.Billing == "" {
-				log.Debug(log.LvlArgs, "CheckAccountPather - there's no Billing endpoint, so we're most likely on a cluster devoid of bmbilling. Requesting account list from bigv...")
-				brainAccs, err := c.getBrainAccounts()
-				if err != nil {
-					return err
-				}
-				log.Debugf(log.LvlArgs, "CheckAccountPather found %d accounts\r\n", len(brainAccs))
-				if len(brainAccs) > 0 {
-					log.Debugf(log.LvlArgs, "CheckAccountPather using the first account returned from bigv (%s) as the default\r\n", brainAccs[0].Name)
-					account = brainAccs[0].Name
-				}
-			} else {
-				log.Debug(log.LvlArgs, "CheckAccountPather finding the default billing account")
-				billAcc, err := c.getDefaultBillingAccount()
-				if err == nil && billAcc.IsValid() {
-					log.Debugf(log.LvlArgs, "CheckAccountPather found the default billing account - %s\r\n", billAcc.Name)
-					account = billAcc.Name
-				} else if err != nil {
-					return nil, err
-				}
-			}
-		}
-		if account == "" {
-			return nil, NoDefaultAccountError{}
-		}
-		return brain.AccountName(account), nil
-	}
 }

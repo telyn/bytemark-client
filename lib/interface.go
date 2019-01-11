@@ -31,14 +31,6 @@ type Client interface {
 	SetDebugLevel(int)
 
 	//
-	// Ensurers
-	//
-
-	EnsureVirtualMachineName(vm *VirtualMachineName) error
-	EnsureGroupName(group *GroupName) error
-	EnsureAccountName(account *string) error
-
-	//
 	// Auth
 	//
 
@@ -60,20 +52,20 @@ type Client interface {
 	// the same length as the number of %s in your path :-)
 	BuildRequestNoAuth(method string, endpoint Endpoint,
 		path string, parts ...string) (Request, error)
-	// BuildRequestNoAuth creates an authenticated Request, formatting the URL
+	// BuildRequest creates an authenticated Request, formatting the URL
 	// using fmt.Sprintf. The path and parts are fed to fmt.Sprintf as they are
 	// provided in order to create the full URL path, so make sure parts is the
 	// same length as the number of %s in your path :-)
 	BuildRequest(method string, endpoint Endpoint,
 		path string, parts ...string) (Request, error)
 	// BuildAccountRequest creates an authenticated request for the given (brain) Account
-	BuildAccountRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
-	// BuildDiscRequest creates an authenticate request for the given disc
-	BuildDiscRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
+	BuildAccountRequest(method string, pather brain.AccountPather, suffixFmt string, suffixParts ...string) (Request, error)
+	// BuildDiscRequest creates an authenticated request for the given disc
+	BuildDiscRequest(method string, pather brain.DiscPather, suffixFmt string, suffixParts ...string) (Request, error)
 	// BuildGroupRequest creates an authenticate request for the given group
-	BuildGroupRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
+	BuildGroupRequest(method string, pather brain.GroupPather, suffixFmt string, suffixParts ...string) (Request, error)
 	// BuildVirtualMachineRequest creates an authenticate request for the given virtual machine
-	BuildVirtualMachineRequest(method string, pather brain.AccountPather, suffix string, parts ...string)
+	BuildVirtualMachineRequest(method string, pather brain.VirtualMachinePather, suffixFmt string, suffixParts ...string) (Request, error)
 
 	///////////////////////
 	////// SPP STUFF //////

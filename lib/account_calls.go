@@ -59,13 +59,13 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []billing.Account, err e
 }
 
 // getBrainAccount gets the brain account with the given name.
-func (c *bytemarkClient) getBrainAccount(name string) (account brain.Account, err error) {
-	err = c.EnsureAccountName(&name)
+func (c *bytemarkClient) getBrainAccount(path brain.AccountPather) (account brain.Account, err error) {
+	path, err = c.checkAccountPather(path)
 	if err != nil {
 		return
 	}
 
-	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s?view=overview&include_deleted=true", name)
+	req, err := c.BuildAccountRequest("GET", path, "?view=overview&include_deleted=true")
 	if err != nil {
 		return
 	}
@@ -127,7 +127,7 @@ func (c *bytemarkClient) GetAccount(name string) (account Account, err error) {
 			return Account{}, billErr
 		}
 	}
-	brainAccount, err := c.getBrainAccount(name)
+	brainAccount, err := c.getBrainAccount(AccountName(name))
 	if err != nil {
 		return Account{}, err
 	}
@@ -188,7 +188,7 @@ func (c *bytemarkClient) GetDefaultAccount() (acc Account, err error) {
 		acc.fillBilling(billAcc)
 		var brainAcc brain.Account
 
-		brainAcc, err = c.getBrainAccount(billAcc.Name)
+		brainAcc, err = c.getBrainAccount(AccountName(billAcc.Name))
 
 		if err != nil {
 			return acc, err
