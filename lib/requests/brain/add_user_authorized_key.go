@@ -14,7 +14,7 @@ func AddUserAuthorizedKey(client lib.Client, username string, key string) error 
 		return err
 	}
 	key = strings.TrimSpace(key)
-	user.AuthorizedKeys = append(user.AuthorizedKeys, brain.Key{key})
+	user.AuthorizedKeys = append(user.AuthorizedKeys, brain.Key{Key: key})
 
 	r, err := client.BuildRequest("PUT", lib.BrainEndpoint, "/users/%s", username)
 	if err != nil {

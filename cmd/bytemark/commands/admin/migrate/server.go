@@ -3,6 +3,7 @@ package migrate
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/urfave/cli"
 )
@@ -18,7 +19,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "server",
 				Usage: "the server to migrate",
-				Value: new(app.VirtualMachineNameFlag),
+				Value: new(flags.VirtualMachineNameFlag),
 			},
 			cli.StringFlag{
 				Name:  "new-head",
@@ -26,7 +27,7 @@ func init() {
 			},
 		},
 		Action: app.Action(args.Optional("server", "new-head"), with.RequiredFlags("server"), with.Auth, func(ctx *app.Context) (err error) {
-			vmName := ctx.VirtualMachineName("server")
+			vmName := flags.VirtualMachineName(ctx, "server")
 			head := ctx.String("new-head")
 
 			vm, err := ctx.Client().GetVirtualMachine(vmName)

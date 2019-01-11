@@ -9,12 +9,12 @@ import (
 	"runtime/debug"
 	"testing"
 
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
-	auth3 "gitlab.bytemark.co.uk/auth/client"
 )
 
 type unexpect struct{}
@@ -1220,8 +1220,8 @@ func TestAuthenticate(t *testing.T) {
 			err := Authenticator{
 				client:       client,
 				config:       config,
-				prompter:     prompter,
-				passPrompter: prompter,
+				prompter:     &prompter,
+				passPrompter: &prompter,
 			}.Authenticate()
 			if test.expectingError && err == nil {
 				t.Error("Expecting Authenticate to error, but it didn't")

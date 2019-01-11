@@ -49,7 +49,7 @@ var showAccountTestOutput = map[string]string{
 func TestShowAccount(t *testing.T) {
 	baseShowAccountSetup := func(c *mocks.Client, conf *mocks.Config, configAccount, outputFormat string) {
 		conf.Mock.Functions = resetOneMockedFunction(conf.Mock.Functions, "GetV", "output-format")
-		conf.When("GetV", "output-format").Return(config.Var{"output-format", outputFormat, "FLAG output-format"})
+		conf.When("GetV", "output-format").Return(config.Var{Name: "output-format", Value: outputFormat, Source: "FLAG output-format"})
 		conf.When("GetIgnoreErr", "account").Return(configAccount)
 	}
 

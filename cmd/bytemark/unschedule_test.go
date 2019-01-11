@@ -31,14 +31,14 @@ func TestUnscheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"vm-name"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
+			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
 			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
+			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
 			ShouldCall: false,
 			ShouldErr:  true,
 			BaseTestFn: testutil.BaseTestSetup,
@@ -46,7 +46,7 @@ func TestUnscheduleBackups(t *testing.T) {
 		{
 			ShouldCall: true,
 			Args:       []string{"vm-name", "disc-label", "324"},
-			Name:       lib.VirtualMachineName{"vm-name", "default", "default-account"},
+			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
 			DiscLabel:  "disc-label",
 			ID:         324,
 			BaseTestFn: testutil.BaseTestAuthSetup,

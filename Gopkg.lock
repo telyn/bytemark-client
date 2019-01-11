@@ -2,6 +2,13 @@
 
 
 [[projects]]
+  digest = "1:10b03bbb2b5206663ab870d2c963bc3a90dd5e6f52508d2f4bdc53021db4b7ca"
+  name = "github.com/BytemarkHosting/auth-client"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf"
+
+[[projects]]
   branch = "master"
   digest = "1:26958ec13f54dca00ee3d8a171124c6660eb0cafe48cd4ae2b651dd86558fe45"
   name = "github.com/BytemarkHosting/row"
@@ -31,6 +38,20 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "68e9c0620927fb5427fda3708222d0edee89eae9"
+
+[[projects]]
+  digest = "1:2e3c336fc7fde5c984d2841455a658a6d626450b1754a854b3b32e7a8f49a07a"
+  name = "github.com/google/go-cmp"
+  packages = [
+    "cmp",
+    "cmp/internal/diff",
+    "cmp/internal/function",
+    "cmp/internal/value",
+  ]
+  pruneopts = "UT"
+  revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
+  version = "v0.2.0"
+
 
 [[projects]]
   digest = "1:045300d96eca8646d57c4a039de9b47694ef328612f69ef0ade22a97a670a8d8"
@@ -83,14 +104,6 @@
   revision = "f017f86fccc5a039a98f23311f34fdf78b014f78"
 
 [[projects]]
-  digest = "1:10b03bbb2b5206663ab870d2c963bc3a90dd5e6f52508d2f4bdc53021db4b7ca"
-  name = "gitlab.bytemark.co.uk/auth/client"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "0c7acf539a3d7d55dc5a9f05f81f0ab0dae3b0cf"
-  source = "git@gitlab.bytemark.co.uk:auth/client.git"
-
-[[projects]]
   branch = "master"
   digest = "1:5ba3abb5c4008242b72fcfa096743cdf1ea4ab3d7a6de15e4a493df6d98796a9"
   name = "golang.org/x/sys"
@@ -102,15 +115,17 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/BytemarkHosting/auth-client",
     "github.com/BytemarkHosting/row",
     "github.com/bcampbell/fuzzytime",
     "github.com/bgentry/speakeasy",
     "github.com/cheekybits/is",
+    "github.com/google/go-cmp/cmp",
+    "github.com/joncalhoun/pipe",
     "github.com/maraino/go-mock",
     "github.com/mattn/go-isatty",
     "github.com/olekukonko/tablewriter",
     "github.com/urfave/cli",
-    "gitlab.bytemark.co.uk/auth/client",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

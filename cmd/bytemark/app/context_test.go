@@ -25,7 +25,7 @@ func TestOutput(t *testing.T) {
 	}{
 		{ // 0
 			// default to human output
-			ConfigFormat: config.Var{"output-format", "human", "CODE"},
+			ConfigFormat: config.Var{Name: "output-format", Value: "human", Source: "CODE"},
 			Object: brain.Disc{
 				Label:        "disk-1",
 				StorageGrade: "sata",
@@ -35,13 +35,13 @@ func TestOutput(t *testing.T) {
 			Expected: "disk-1 - 25GiB, sata grade\n",
 		}, { // 1
 			// default to human output with an error
-			ConfigFormat: config.Var{"output-format", "human", "CODE"},
+			ConfigFormat: config.Var{Name: "output-format", Value: "human", Source: "CODE"},
 			Object:       nil,
 			Expected:     "",
 			ShouldErr:    true,
 		}, { // 2
 			// when there's a default format specific to the command, use that instead of the uber-default
-			ConfigFormat:  config.Var{"output-format", "human", "CODE"},
+			ConfigFormat:  config.Var{Name: "output-format", Value: "human", Source: "CODE"},
 			DefaultFormat: []output.Format{output.Table},
 			Object: brain.Disc{
 				StorageGrade: "sata",
@@ -52,7 +52,7 @@ func TestOutput(t *testing.T) {
 			Expected:    "+-----+\n| ID  |\n+-----+\n| 123 |\n+-----+\n",
 		}, { // 3
 			// except when the JSON flag is set, then output JSON
-			ConfigFormat:  config.Var{"output-format", "human", "CODE"},
+			ConfigFormat:  config.Var{Name: "output-format", Value: "human", Source: "CODE"},
 			DefaultFormat: []output.Format{output.Table},
 			JSONFlag:      true,
 			Object: brain.Group{
@@ -62,7 +62,7 @@ func TestOutput(t *testing.T) {
 			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}\n",
 		}, { // 4
 			// or if output-format is set by a FILE
-			ConfigFormat:  config.Var{"output-format", "json", "FILE"},
+			ConfigFormat:  config.Var{Name: "output-format", Value: "json", Source: "FILE"},
 			DefaultFormat: []output.Format{output.Table},
 			Object: brain.Group{
 				Name: "my-cool-group",
@@ -71,7 +71,7 @@ func TestOutput(t *testing.T) {
 			Expected: "{\n    \"name\": \"my-cool-group\",\n    \"account_id\": 0,\n    \"id\": 11323,\n    \"virtual_machines\": null\n}\n",
 			// but the table and json flags should have precedence in every situation
 		}, { // 5
-			ConfigFormat:  config.Var{"output-format", "json", "FILE"},
+			ConfigFormat:  config.Var{Name: "output-format", Value: "json", Source: "FILE"},
 			DefaultFormat: []output.Format{output.Human},
 			TableFlag:     true,
 			Object: brain.Group{
@@ -81,7 +81,7 @@ func TestOutput(t *testing.T) {
 			Expected: "+---------------+-----------------+\n|     Name      | VirtualMachines |\n+---------------+-----------------+\n| my-cool-group |                 |\n+---------------+-----------------+\n",
 			// also, --table-fields being non-empty should imply --table and be case insensitive
 		}, { // 6
-			ConfigFormat:  config.Var{"output-format", "json", "FILE"},
+			ConfigFormat:  config.Var{Name: "output-format", Value: "json", Source: "FILE"},
 			DefaultFormat: []output.Format{output.Human},
 			TableFlag:     false,
 			TableFields:   "AccountID,ID,Name,VirtualMachines",

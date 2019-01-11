@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flagsets"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -179,7 +179,7 @@ func init() {
 		Description: `Manipulate the bytemark-client configuration
 
     Available variables:` + config.VarsDescription,
-		Flags:  append(configVariables.configFlags(), flags.Force),
+		Flags:  append(configVariables.configFlags(), flagsets.Force),
 		Action: app.Action(configVariables.updateConfig),
 	})
 }
@@ -196,7 +196,7 @@ func (variables configVars) updateConfig(c *app.Context) error {
 		if set != "" && unset {
 			return c.Help("cannot set and unset " + variable.name)
 		}
-		if set != "" && !flags.Forced(c) && variable.validate != nil {
+		if set != "" && !flagsets.Forced(c) && variable.validate != nil {
 			if variable.needAuth && !withAuth {
 				err := with.Auth(c)
 				if err != nil {

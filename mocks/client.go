@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
-	mock "github.com/maraino/go-mock"
-	auth3 "gitlab.bytemark.co.uk/auth/client"
+	"github.com/maraino/go-mock"
 )
 
 type Client struct {

@@ -3,6 +3,7 @@ package commands
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
@@ -28,11 +29,11 @@ func init() {
 				cli.GenericFlag{
 					Name:  "server",
 					Usage: "the server whose disk you wish to backup",
-					Value: new(app.VirtualMachineNameFlag),
+					Value: new(flags.VirtualMachineNameFlag),
 				},
 			},
 			Action: app.Action(args.Optional("server", "disc"), with.RequiredFlags("server", "disc"), with.Auth, func(c *app.Context) error {
-				backup, err := c.Client().CreateBackup(c.VirtualMachineName("server"), c.String("disc"))
+				backup, err := c.Client().CreateBackup(flags.VirtualMachineName(c, "server"), c.String("disc"))
 				if err != nil {
 					return err
 				}

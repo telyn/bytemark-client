@@ -1,6 +1,7 @@
 package lib_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
@@ -122,29 +123,72 @@ func TestGetPrivilegesForServer(t *testing.T) {
 }
 
 func TestGrantPrivilege(t *testing.T) {
-	var priv map[string]interface{}
 	testName := testutil.Name(0)
-	rts := testutil.RequestTestSpec{
-		Method:   "POST",
-		Endpoint: lib.BrainEndpoint,
-		URL:      "/users/satan/privileges",
-		AssertRequest: assert.BodyUnmarshal(&priv, func(_ *testing.T, _ string) {
-			assert.Equal(t, testName, 433224.0, priv["account_id"])
-			assert.Equal(t, testName, "account_admin", priv["level"])
-			assert.Equal(t, testName, false, priv["yubikey_required"])
-			assert.Equal(t, testName, 3, len(priv))
-		}),
+	tests := []struct {
+		name string
+
+		input    brain.Privilege
+		expected map[string]interface{}
+	}{
+		{
+			name: "account admin with password",
+			input: brain.Privilege{
+				Username:         "satan",
+				AccountID:        433224.0,
+				PasswordRequired: true,
+				Level:            brain.AccountAdminPrivilege,
+			},
+			expected: map[string]interface{}{
+				"account_id":        433224.0,
+				"level":             "account_admin",
+				"password_required": true,
+				"yubikey_required":  false,
+			},
+		}, {
+			name: "yubikey",
+			input: brain.Privilege{
+				Username:         "azriel",
+				PasswordRequired: true,
+				YubikeyRequired:  true,
+				Level:            brain.ClusterAdminPrivilege,
+			},
+			expected: map[string]interface{}{
+				"level":             "cluster_admin",
+				"password_required": true,
+				"yubikey_required":  true,
+			},
+		}, {
+			name: "api key",
+			input: brain.Privilege{
+				APIKeyID: 2013,
+				Username: "dr-robotnik",
+				GroupID:  2145,
+				Level:    brain.GroupAdminPrivilege,
+			},
+			expected: map[string]interface{}{
+				"api_key_id":        2013.0,
+				"level":             "group_admin",
+				"group_id":          2145.0,
+				"password_required": false,
+				"yubikey_required":  false,
+			},
+		},
 	}
-	rts.Run(t, testName, true, func(client lib.Client) {
-		err := client.GrantPrivilege(brain.Privilege{
-			Username:  "satan",
-			AccountID: 433224,
-			Level:     brain.AccountAdminPrivilege,
-		})
-		if err != nil {
-			t.Fatal(err)
+
+	for _, test := range tests {
+		rts := testutil.RequestTestSpec{
+			Method:        "POST",
+			Endpoint:      lib.BrainEndpoint,
+			URL:           fmt.Sprintf("/users/%s/privileges", test.input.Username),
+			AssertRequest: assert.BodyUnmarshalEqual(test.expected),
 		}
-	})
+		rts.Run(t, testName, true, func(client lib.Client) {
+			err := client.GrantPrivilege(test.input)
+			if err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
 }
 
 func TestRevokePrivilegeWithID(t *testing.T) {

@@ -5,9 +5,9 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin/show"
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
@@ -276,7 +276,7 @@ var showCommands = []cli.Command{
 			},
 			cli.GenericFlag{
 				Name:  "at",
-				Value: new(util.DateTimeFlag),
+				Value: new(flags.DateTimeFlag),
 				Usage: "the date and time in history to check the dependant servers, defaults to now if unset. The flag will take most formats, e.g. '20/01/18', '15:30', '31/02/2018 18:20:33'",
 			},
 		),
@@ -319,7 +319,7 @@ var showCommands = []cli.Command{
 			},
 			cli.GenericFlag{
 				Name:  "at",
-				Value: new(util.DateTimeFlag),
+				Value: new(flags.DateTimeFlag),
 				Usage: "the date and time in history to check the dependant discs, defaults to now if unset. The flag will take most formats, e.g. '20/01/18', '15:30', '31/02/2018 18:20:33'",
 			},
 		),
