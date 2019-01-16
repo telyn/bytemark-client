@@ -9,6 +9,9 @@ bytemark-client (3.4) UNRELEASED; urgency=low
   * API keys can be managed with the `add api key`, `delete api key`, `show
     api keys`, and `grant privilege` (with --api-key flag) and `revoke
     privilege` commands.
+  * Primary IPs can now be swapped between servers with `update server
+    --swap-ips-with <server>` and all IPs can be swapped between two servers
+    with `update server --swap-extra-ips --swap-ips-with <server>`
 
   ### Admin changes:
   * `add vm default` has been added, allowing staff to create
