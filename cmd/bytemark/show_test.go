@@ -49,7 +49,7 @@ var showAccountTestOutput = map[string]string{
 func TestShowAccount(t *testing.T) {
 	baseShowAccountSetup := func(c *mocks.Client, conf *mocks.Config, configAccount, outputFormat string) {
 		conf.Mock.Functions = resetOneMockedFunction(conf.Mock.Functions, "GetV", "output-format")
-		conf.When("GetV", "output-format").Return(config.Var{"output-format", outputFormat, "FLAG output-format"})
+		conf.When("GetV", "output-format").Return(config.Var{Name: "output-format", Value: outputFormat, Source: "FLAG output-format"})
 		conf.When("GetIgnoreErr", "account").Return(configAccount)
 	}
 
@@ -146,7 +146,7 @@ func TestShowAccount(t *testing.T) {
 				t.Errorf("TestShowAccountCommand %d client failed to verify: %s", i, vErr.Error())
 			}
 			if expected, ok := expectedOutput[format]; ok {
-				testutil.AssertOutput(t, fmt.Sprintf("TestShowAccountCommand %d (%s)", i, format), app, expected)
+				testutil.AssertOutput(t, app, expected)
 			} else {
 				buf, err := testutil.GetBuf(app)
 				if err != nil {

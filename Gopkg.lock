@@ -17,6 +17,14 @@
   revision = "64689958a4cb09a01483ae1ca39511ca14c3222e"
 
 [[projects]]
+  branch = "master"
+  digest = "1:bbbc4c011a04f0653e12121ad37ac3a669c23ebbad74ae2095bf22df18ddeba5"
+  name = "github.com/bcampbell/fuzzytime"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6a03581b01a2b1647d35ccf849090b5036108e0c"
+
+[[projects]]
   digest = "1:03b540ccf698c49706b9b54eae235ecec9f07f9f0d5d2811a9a0d10d2f768e0a"
   name = "github.com/bgentry/speakeasy"
   packages = ["."]
@@ -30,6 +38,20 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "68e9c0620927fb5427fda3708222d0edee89eae9"
+
+[[projects]]
+  digest = "1:2e3c336fc7fde5c984d2841455a658a6d626450b1754a854b3b32e7a8f49a07a"
+  name = "github.com/google/go-cmp"
+  packages = [
+    "cmp",
+    "cmp/internal/diff",
+    "cmp/internal/function",
+    "cmp/internal/value",
+  ]
+  pruneopts = "UT"
+  revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
+  version = "v0.2.0"
+
 
 [[projects]]
   digest = "1:045300d96eca8646d57c4a039de9b47694ef328612f69ef0ade22a97a670a8d8"
@@ -95,8 +117,11 @@
   input-imports = [
     "github.com/BytemarkHosting/auth-client",
     "github.com/BytemarkHosting/row",
+    "github.com/bcampbell/fuzzytime",
     "github.com/bgentry/speakeasy",
     "github.com/cheekybits/is",
+    "github.com/google/go-cmp/cmp",
+    "github.com/joncalhoun/pipe",
     "github.com/maraino/go-mock",
     "github.com/mattn/go-isatty",
     "github.com/olekukonko/tablewriter",

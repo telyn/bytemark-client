@@ -8,18 +8,19 @@ import (
 )
 
 var configVars = [...]string{
-	"endpoint",
-	"billing-endpoint",
-	"auth-endpoint",
-	"spp-endpoint",
-	"admin",
-	"user",
 	"account",
+	"admin",
+	"auth-endpoint",
+	"billing-endpoint",
+	"debug-level",
+	"endpoint",
 	"group",
+	"insecure",
 	"output-format",
 	"session-validity",
+	"spp-endpoint",
 	"token",
-	"debug-level",
+	"user",
 	"yubikey",
 }
 

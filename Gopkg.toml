@@ -24,7 +24,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-
 [[constraint]]
   branch = "master"
   name = "github.com/BytemarkHosting/row"
@@ -36,3 +35,11 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/bcampbell/fuzzytime"
+
+[[constraint]]
+  name = "github.com/google/go-cmp"
+  version = "0.2.0"

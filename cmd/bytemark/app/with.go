@@ -1,15 +1,18 @@
 package app
 
 import (
-	"net"
+	"reflect"
 
-	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
-	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/urfave/cli"
 )
 
 // ProviderFunc is the function type that can be passed to Action()
 type ProviderFunc func(*Context) error
+
+// A Preprocesser is a flag.Flag that has a preprocess step that requires a Context
+type Preprocesser interface {
+	Preprocess(c *Context) error
+}
 
 // Action is a convenience function for making cli.Command.Actions that sets up a Context, runs all the providers, cleans up afterward and returns errors from the actions if there is one
 func Action(providers ...ProviderFunc) func(c *cli.Context) error {
@@ -50,42 +53,16 @@ func (c *Context) Preprocess() error {
 // This is needed because the init() functions are only executed once during the testing cycle.
 // Outside of the tests, global.App.Run is only called once before the program closes.
 func cleanup(c *Context) {
-	ips, ok := c.Context.Generic("ip").(*util.IPFlag)
-	if ok {
-		*ips = make([]net.IP, 0)
-	}
-	disc, ok := c.Context.Generic("disc").(*util.DiscSpecFlag)
-	if ok {
-		*disc = make([]brain.Disc, 0)
-	}
-	size, ok := c.Context.Generic("memory").(*util.SizeSpecFlag)
-	if ok {
-		*size = 0
-	}
-	server, ok := c.Context.Generic("server").(*VirtualMachineNameFlag)
-	if ok {
-		*server = VirtualMachineNameFlag{}
-	}
-	server, ok = c.Context.Generic("new-name").(*VirtualMachineNameFlag)
-	if ok {
-		*server = VirtualMachineNameFlag{}
-	}
-	server, ok = c.Context.Generic("from").(*VirtualMachineNameFlag)
-	if ok {
-		*server = VirtualMachineNameFlag{}
-	}
-	server, ok = c.Context.Generic("to").(*VirtualMachineNameFlag)
-	if ok {
-		*server = VirtualMachineNameFlag{}
-	}
-	group, ok := c.Context.Generic("group").(*GroupNameFlag)
-	if ok {
-		*group = GroupNameFlag{}
-	}
+	allFlags := append(c.Command().Flags, c.App().Flags...)
+	for _, flag := range allFlags {
+		if genericFlag, ok := flag.(cli.GenericFlag); ok {
+			flagValue := reflect.ValueOf(genericFlag.Value)
+			if flagValue.Kind() == reflect.Ptr {
+				flagValue = flagValue.Elem()
+			}
 
-	account, ok := c.Context.Generic("account").(*AccountNameFlag)
-	if ok {
-		*account = AccountNameFlag{}
+			flagValue.Set(reflect.Zero(flagValue.Type()))
+		}
 	}
 }
 

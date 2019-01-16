@@ -23,7 +23,7 @@ func TestDeleteServer(t *testing.T) {
 	vm := getFixtureVM()
 
 	t.Run("force delete", func(t *testing.T) {
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 		config.When("GetVirtualMachine").Return(defVM)
@@ -38,7 +38,7 @@ func TestDeleteServer(t *testing.T) {
 		}
 	})
 	t.Run("force purge", func(t *testing.T) {
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 		config.When("Force").Return(true)
 		config.When("GetVirtualMachine").Return(defVM)
 
@@ -54,25 +54,45 @@ func TestDeleteServer(t *testing.T) {
 }
 
 func TestDeleteDisc(t *testing.T) {
-	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+	t.Run("server and label", func(t *testing.T) {
+		is := is.New(t)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
-	config.When("Force").Return(true)
-	config.When("GetVirtualMachine").Return(defVM)
+		config.When("Force").Return(true)
+		config.When("GetVirtualMachine").Return(defVM)
 
-	name := lib.VirtualMachineName{
-		VirtualMachine: "test-server",
-		Group:          "test-group",
-		Account:        "test-account",
-	}
-	c.When("DeleteDisc", name, "666").Return(nil).Times(1)
+		name := lib.VirtualMachineName{
+			VirtualMachine: "test-server",
+			Group:          "test-group",
+			Account:        "test-account",
+		}
+		c.When("DeleteDisc", name, "666").Return(nil).Times(1)
 
-	err := app.Run(strings.Split("bytemark delete disc --force test-server.test-group.test-account 666", " "))
+		err := app.Run(strings.Split("bytemark delete disc --force test-server.test-group.test-account 666", " "))
 
-	is.Nil(err)
-	if ok, err := c.Verify(); !ok {
-		t.Fatal(err)
-	}
+		is.Nil(err)
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	})
+	t.Run("disc ID", func(t *testing.T) {
+		is := is.New(t)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
+
+		config.When("Force").Return(true)
+
+		c.When("BuildRequest", "DELETE", lib.BrainEndpoint, "/discs/%s?purge=true", []string{"666"}).Return(&mocks.Request{
+			T:              t,
+			StatusCode:     200,
+			ResponseObject: nil,
+		}).Times(1)
+
+		err := app.Run(strings.Split("bytemark delete disc --force --id 666", " "))
+		is.Nil(err)
+		if ok, err := c.Verify(); !ok {
+			t.Fatal(err)
+		}
+	})
 }
 
 func TestDeleteKey(t *testing.T) {
@@ -87,7 +107,7 @@ func TestDeleteKey(t *testing.T) {
 	}
 	t.Run("full key", func(t *testing.T) {
 		is := is.New(t)
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 		c.When("GetUser", usr.Username).Return(usr)
@@ -105,7 +125,7 @@ func TestDeleteKey(t *testing.T) {
 	})
 
 	t.Run("delete by ambiguous comment is err", func(t *testing.T) {
-		config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+		config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 		config.When("Force").Return(true)
 		config.When("GetIgnoreErr", "user").Return("test-user")
@@ -127,7 +147,7 @@ func TestDeleteKey(t *testing.T) {
 
 func TestDeleteBackup(t *testing.T) {
 	is := is.New(t)
-	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
+	config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
 	vmname := lib.VirtualMachineName{
 		VirtualMachine: "test-server",

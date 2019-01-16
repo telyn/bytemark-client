@@ -3,6 +3,7 @@ package show
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/args"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/urfave/cli"
@@ -18,7 +19,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "account",
 				Usage: "the account to list the groups of",
-				Value: new(app.AccountNameFlag),
+				Value: new(flags.AccountNameFlag),
 			},
 		),
 		Action: app.Action(args.Optional("account"), with.RequiredFlags("account"), with.Account("account"), func(c *app.Context) error {

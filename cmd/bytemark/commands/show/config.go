@@ -15,7 +15,7 @@ func init() {
 		Description: `View the bytemark-client configuration.
 
     The following variables are displayed:` + config.VarsDescription,
-		Flags: app.OutputFlags("vars", "array"),
+		Flags:  app.OutputFlags("vars", "array"),
 		Action: app.Action(viewConfig),
 	})
 }

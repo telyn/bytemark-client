@@ -307,3 +307,135 @@ func TestAdminShowDiscByIDCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestAdminShowDependantServers(t *testing.T) {
+	tests := []struct {
+		name   string
+		url    string
+		args   []string
+		values []string
+	}{
+		{
+			name:   "head",
+			url:    "/admin/heads/%s/virtual_machines",
+			args:   []string{"--head", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/virtual_machines",
+			args:   []string{"--tail", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/virtual_machines",
+			args:   []string{"--storage-pool", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "head",
+			url:    "/admin/heads/%s/virtual_machines?at=%s",
+			args:   []string{"--head", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/virtual_machines?at=%s",
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/virtual_machines?at=%s",
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+	}
+
+	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "servers"}
+	servers := mocks.Request{
+		T:          t,
+		StatusCode: 200,
+		ResponseObject: []brain.VirtualMachine{
+			{ID: 1, Name: "Test1"},
+			{ID: 2, Name: "Test2"},
+		},
+	}
+
+	is := is.New(t)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, test.values).Return(&servers).Times(1)
+
+			err := app.Run(append(baseArgs, test.args...))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestAdminShowDependantDiscs(t *testing.T) {
+	tests := []struct {
+		name   string
+		url    string
+		args   []string
+		values []string
+	}{
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/discs",
+			args:   []string{"--tail", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/discs",
+			args:   []string{"--storage-pool", "123"},
+			values: []string{"123"},
+		},
+		{
+			name:   "tail",
+			url:    "/admin/tails/%s/discs?at=%s",
+			args:   []string{"--tail", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+		{
+			name:   "storage pool",
+			url:    "/admin/storage_pools/%s/discs?at=%s",
+			args:   []string{"--storage-pool", "123", "--at", "2018-08-21T15:00:00+01:00"},
+			values: []string{"123", "2018-08-21T15:00:00+01:00"},
+		},
+	}
+
+	baseArgs := []string{"bytemark", "--admin", "show", "dependant", "discs"}
+	discs := mocks.Request{
+		T:          t,
+		StatusCode: 200,
+		ResponseObject: []brain.Disc{
+			{ID: 1},
+			{ID: 2},
+		},
+	}
+
+	is := is.New(t)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, client, app := testutil.BaseTestAuthSetup(t, true, admin.Commands)
+
+			client.When("BuildRequest", "GET", lib.BrainEndpoint, test.url, test.values).Return(&discs).Times(1)
+
+			err := app.Run(append(baseArgs, test.args...))
+			is.Nil(err)
+			if ok, err := client.Verify(); !ok {
+				t.Fatal(err)
+			}
+		})
+	}
+}

@@ -52,12 +52,22 @@ type Privilege struct {
 	Username string `json:"username,omitempty"`
 	// VirtualMachineID is the ID of the virtual machine the privilege is granted on
 	VirtualMachineID int `json:"virtual_machine_id,omitempty"`
+	// VirtualMachineName is the name of the virtual machine the privilege is granted on
+	VirtualMachineName string `json:"virtual_machine_name,omitempty"`
 	// AccountID is the ID of the account the privilege is granted on
 	AccountID int `json:"account_id,omitempty"`
+	// AccountID is the name of the account the privilege is granted on
+	AccountName string `json:"account_name,omitempty"`
 	// GroupID is the ID of the group the privilege is granted on
 	GroupID int `json:"group_id,omitempty"`
+	// GroupID is the name of the group the privilege is granted on
+	GroupName string `json:"group_name,omitempty"`
+	// APIKeyID is the ID of the api key required in order to use this Privilege. If not set, privilege relates to normal logins using auth.
+	APIKeyID int `json:"api_key_id,omitempty"`
 	// Level is the PrivilegeLevel they have
 	Level PrivilegeLevel `json:"level,omitempty"`
+	// PasswordRequired is true for all privileges requiring a password (all except api key privileges)
+	PasswordRequired bool `json:"password_required"`
 	// YubikeyRequired is true if the user should have to authenticate with a yubikey in order to use this privilege. Only set it to true if you're sure the user has a yubikey set up on their account, and that they know where it is!
 	YubikeyRequired bool `json:"yubikey_required"`
 	// YubikeyOTPMaxAge should set how long (in seconds) a yubikey one-time-password would be accepted for, but it might not be used?
@@ -68,11 +78,11 @@ type Privilege struct {
 func (p Privilege) Target() string {
 	switch p.TargetType() {
 	case PrivilegeTargetTypeVM:
-		return fmt.Sprintf("server %d", p.VirtualMachineID)
+		return fmt.Sprintf("server %s", p.VirtualMachineName)
 	case PrivilegeTargetTypeGroup:
-		return fmt.Sprintf("group %d", p.GroupID)
+		return fmt.Sprintf("group %s", p.GroupName)
 	case PrivilegeTargetTypeAccount:
-		return fmt.Sprintf("account %d", p.AccountID)
+		return fmt.Sprintf("account %s", p.AccountName)
 	}
 	return ""
 
@@ -92,11 +102,11 @@ func (p Privilege) String() string {
 	}
 	switch p.TargetType() {
 	case PrivilegeTargetTypeVM:
-		return fmt.Sprintf("%s on VM #%d for %s%s", p.Level, p.VirtualMachineID, p.Username, requiresYubikey)
+		return fmt.Sprintf("%s on VM %s for %s%s", p.Level, p.VirtualMachineName, p.Username, requiresYubikey)
 	case PrivilegeTargetTypeGroup:
-		return fmt.Sprintf("%s on group #%d for %s%s", p.Level, p.GroupID, p.Username, requiresYubikey)
+		return fmt.Sprintf("%s on group %s for %s%s", p.Level, p.GroupName, p.Username, requiresYubikey)
 	case PrivilegeTargetTypeAccount:
-		return fmt.Sprintf("%s on account #%d for %s%s", p.Level, p.AccountID, p.Username, requiresYubikey)
+		return fmt.Sprintf("%s on account %s for %s%s", p.Level, p.AccountName, p.Username, requiresYubikey)
 	}
 	return fmt.Sprintf("%s for %s%s", p.Level, p.Username, requiresYubikey)
 }
@@ -105,9 +115,9 @@ func (p Privilege) String() string {
 func (p Privilege) DefaultFields(f output.Format) string {
 	switch f {
 	case output.List:
-		return "ID, Username, Level, YubikeyRequired, Target"
+		return "ID, Username, Level, APIKeyID, PasswordRequired, YubikeyRequired, Target"
 	}
-	return "ID, Username, Level, Target, YubikeyRequired"
+	return "ID, Username, Level, Target, APIKeyID, PasswordRequired, YubikeyRequired"
 }
 
 // PrettyPrint nicely formats the Privilege and sends it to the given writer.

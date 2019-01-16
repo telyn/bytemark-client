@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
+	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
@@ -29,7 +30,7 @@ func init() {
 			cli.GenericFlag{
 				Name:  "account",
 				Usage: "the account which is assenting",
-				Value: new(app.AccountNameFlag),
+				Value: new(flags.AccountNameFlag),
 			},
 			cli.IntFlag{
 				Name:  "accountid",
@@ -46,7 +47,7 @@ func init() {
 		},
 		Action: app.Action(with.RequiredFlags("agreement", "person"), func(ctx *app.Context) error {
 			accountString := ctx.String("account")
-			accountNameFlag := ctx.Context.Generic("account").(*app.AccountNameFlag)
+			accountNameFlag := flags.AccountName(ctx, "account")
 			accountID := ctx.Int("accountid")
 			var account billing.Account
 
