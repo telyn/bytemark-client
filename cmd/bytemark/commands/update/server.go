@@ -27,32 +27,42 @@ func init() {
 		UsageText: "update server [flags] <server>",
 		Description: `Updates the configuration of an existing Cloud Server.
 
-Note that for changes to cores, memory or hardware profile to take effect you will need to restart the server.
+    Note that for changes to cores, memory or hardware profile to take effect you will need to restart the server.
 
-Hardware profiles can be thought of as what virtual motherboard your server has, and in general it is best to use a pretty recent one for maximum speed. If the server is running an old or experimental OS without support for virtio drivers, or installing an older windows from an ISO without the virtio drivers compiled in, you may require the compatibility profile. See "bytemark show hwprofiles" for which ones are currently available.
+    Hardware profiles can be thought of as what virtual motherboard your server has, and in general it is best to use a
+    pretty recent one for maximum speed. If the server is running an old or experimental OS without support for virtio
+    drivers, or installing an older windows from an ISO without the virtio drivers compiled in, you may require the
+    compatibility profile. See "bytemark show hwprofiles" for which ones are currently available.
 
-Memory is specified in GiB by default, but can be suffixed with an M to indicate that it is provided in MiB.
+    Memory is specified in GiB by default, but can be suffixed with an M to indicate that it is provided in MiB.
 
-Updating a server's name also allows it to be moved between groups and accounts you administer.
+    Updating a server's name also allows it to be moved between groups and accounts you administer.
 
 EXAMPLES
     bytemark update server --memory 768m --hwprofile virtio2018 small-server
-	    Changes small-server's memory to 768MiB, and its hwprofile to virtio2018
-	
-	bytemark update server --server app-dev --swap-ips-with app-production
-	    Swaps the primary IPs (those given to a server upon creation) with another server. Specify --swap-extra-ips to swap both primary and extra IPs with another server. For more granular IP alterations, use the panel for now or petition us to add an 'update ip'. Before swapping the IPs the servers ought to be reconfigured to expect the new IPs and then shut down, otherwise the serial/VNC console will have to be used (see bytemark-console) to configure the networking.
+        Changes small-server's memory to 768MiB, and its hwprofile to virtio2018
 
-	bytemark update server --server app-dev --swap-ips-with app-production --swap-extra-ips
-	    Swaps all the IPs between app-dev and app-production. Before swapping the IPs the servers ought to be reconfigured to expect the new IPs and then shut down, otherwise the serial/VNC console will have to be used (see bytemark-console) to configure the networking.
+    bytemark update server --server app-dev --swap-ips-with app-production
+        Swaps the primary IPs (those given to a server upon creation) with another server. Specify --swap-extra-ips to
+        swap both primary and extra IPs with another server. For more granular IP alterations, use the panel for now or
+        petition us to add an 'update ip'. Before swapping the IPs the servers ought to be reconfigured to expect the
+        new IPs and then shut down, otherwise the serial/VNC console will have to be used (see bytemark-console) to
+        configure the networking.
+
+    bytemark update server --server app-dev --swap-ips-with app-production --swap-extra-ips
+        Swaps all the IPs between app-dev and app-production. Before swapping the IPs the servers ought to be
+        reconfigured to expect the new IPs and then shut down, otherwise the serial/VNC console will have to be used
+        (see bytemark-console) to configure the networking.
 
     bytemark update server --new-name boron oxygen
-	    This will rename the server called oxygen in your default group to boron, still in your default group.
+        This will rename the server called oxygen in your default group to boron, still in your default group.
 
-	bytemark update server --new-name sunglasses.development sunglasses
-		This will move the server called sunglasses into the development group, keeping its name as sunglasses,
+    bytemark update server --new-name sunglasses.development sunglasses
+        This will move the server called sunglasses into the development group, keeping its name as sunglasses,
 
-	bytemark update server --new-name rennes.bretagne.france charata.chaco.argentina
-		This will move the server called charata in the chaco group in the argentina account, placing it in the bretagne group in the france account and rename it to rennes.`,
+    bytemark update server --new-name rennes.bretagne.france charata.chaco.argentina
+        This will move the server called charata in the chaco group in the argentina account, placing it in the bretagne
+        group in the france account and rename it to rennes.`,
 		Flags: append(app.OutputFlags("server", "object"),
 			flagsets.Force,
 			cli.GenericFlag{
@@ -79,7 +89,7 @@ EXAMPLES
 			},
 			cli.GenericFlag{
 				Name:  "swap-ips-with",
-				Usage: "A server to swap IP addresses with. Both v4 and v6 are swapped. See description below and --swap-extra-ips",
+				Usage: "A server to swap IP addresses with. Both v4 and v6 are swapped. See description and --swap-extra-ips",
 				Value: new(flags.VirtualMachineNameFlag),
 			},
 			cli.BoolFlag{
