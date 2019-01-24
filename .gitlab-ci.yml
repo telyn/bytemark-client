@@ -60,7 +60,7 @@ lint-in-anger:
       --enable goconst \
       --enable goimports \
       --enable golint \
-      --enable gosimple \
+      --enable staticcheck \
       --enable ineffassign \
       --enable varcheck \
       --enable vetshadow \
