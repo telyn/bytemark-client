@@ -42,7 +42,7 @@ func (spec VirtualMachineSpec) PrettyPrint(wr io.Writer, detail prettyprint.Deta
 	}
 
 	mems := fmt.Sprintf("%d", spec.VirtualMachine.Memory/1024)
-	if 0 != math.Mod(float64(spec.VirtualMachine.Memory), 1024) {
+	if math.Mod(float64(spec.VirtualMachine.Memory), 1024) != 0 {
 		mem := float64(spec.VirtualMachine.Memory) / 1024.0
 		mems = fmt.Sprintf("%.2f", mem)
 	}

@@ -150,7 +150,7 @@ func TestGetAccounts(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %s", testName, err)
 		}
-		if 2 != len(accs) {
+		if len(accs) != 2 {
 			t.Errorf("%s didn't return 2 accounts. returned %#v", testName, accs)
 		}
 		seenDrEvil := false
