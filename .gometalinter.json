@@ -11,7 +11,7 @@
 	],
 	"Linters": {
 		"staticcheck": {
-			"Command": "staticcheck --checks all,-ST1005"
+			"Command": "staticcheck --checks all,-ST1005,-ST1000"
 		}
 	}
 }
