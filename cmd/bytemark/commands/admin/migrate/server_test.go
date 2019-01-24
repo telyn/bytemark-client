@@ -19,7 +19,6 @@ func TestMigrateServer(t *testing.T) {
 		args       string
 		head       string
 		vm         lib.VirtualMachineName
-		vmid       int
 		migrateErr error
 		shouldErr  bool
 	}{{

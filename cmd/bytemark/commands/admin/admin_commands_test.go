@@ -7,15 +7,9 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 )
 
-var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
+// These functions are all deprecated, stop using them please
 
-func getFixtureVM() brain.VirtualMachine {
-	return brain.VirtualMachine{
-		Name:     "test-server",
-		Hostname: "test-server.test-group",
-		GroupID:  1,
-	}
-}
+var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
 
 func getFixtureVLAN() brain.VLAN {
 	return brain.VLAN{
@@ -61,15 +55,5 @@ func getFixtureDisc() brain.Disc {
 	return brain.Disc{
 		ID:    132,
 		Label: "disc.sata-1.132",
-	}
-}
-
-func getFixtureGroup() brain.Group {
-	vms := make([]brain.VirtualMachine, 1)
-	vms[0] = getFixtureVM()
-
-	return brain.Group{
-		Name:            "test-group",
-		VirtualMachines: vms,
 	}
 }

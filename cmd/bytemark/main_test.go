@@ -36,12 +36,6 @@ func getFixtureGroup() brain.Group {
 	}
 }
 
-func assertEqual(t *testing.T, test string, testNum int, name string, expected interface{}, actual interface{}) {
-	if expected != actual {
-		t.Errorf("%s %d: wrong %s: expected %#v, got %#v", test, testNum, name, expected, actual)
-	}
-}
-
 func checkErr(t *testing.T, name string, testNum int, shouldErr bool, err error) {
 	if err == nil && shouldErr {
 		t.Errorf("%s %d should error but didn't.", name, testNum)

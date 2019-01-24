@@ -23,23 +23,6 @@ func getFixtureDisc() brain.Disc {
 	}
 }
 
-func getFixtureDiscSet() []brain.Disc {
-	return []brain.Disc{
-		getFixtureDisc(),
-		brain.Disc{
-			ID:           2,
-			StorageGrade: "archive",
-			Label:        "arch",
-			Size:         1024000,
-		},
-		brain.Disc{
-			ID:           3,
-			StorageGrade: "",
-			Size:         2048,
-		},
-	}
-}
-
 func TestCreateDisc(t *testing.T) {
 	testName := testutil.Name(0)
 

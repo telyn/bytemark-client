@@ -52,7 +52,7 @@ func TestCommandsComplete(t *testing.T) {
 
 type stringPredicate func(string) bool
 
-func checkFlagUsage(f cli.Flag, predicate stringPredicate) bool {
+func checkFlagUsage(t *testing.T, f cli.Flag, predicate stringPredicate) bool {
 	switch f := f.(type) {
 	case cli.BoolFlag:
 		return predicate(f.Usage)
@@ -69,14 +69,12 @@ func checkFlagUsage(f cli.Flag, predicate stringPredicate) bool {
 	case cli.StringSliceFlag:
 		return predicate(f.Usage)
 	}
+	t.Errorf("checkFlagUsage doesn't support flags of type %T", f)
 	return false
 }
 
 func isEmpty(s string) bool {
 	return s == ""
-}
-func notEmpty(s string) bool {
-	return s != ""
 }
 
 func firstIsUpper(s string) bool {
