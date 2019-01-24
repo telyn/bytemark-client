@@ -93,13 +93,13 @@ func hasFullStop(s string) bool {
 func TestFlagsHaveUsage(t *testing.T) {
 	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		for _, f := range c.Flags {
-			if checkFlagUsage(f, isEmpty) {
+			if checkFlagUsage(t, f, isEmpty) {
 				t.Errorf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.GetName())
 			}
 		}
 	})
 	for _, flag := range app.GlobalFlags() {
-		if checkFlagUsage(flag, isEmpty) {
+		if checkFlagUsage(t, flag, isEmpty) {
 			t.Errorf("Global flag %s doesn't have usage.", flag.GetName())
 		}
 	}
