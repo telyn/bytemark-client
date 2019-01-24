@@ -53,24 +53,12 @@ func TestCommandsComplete(t *testing.T) {
 type stringPredicate func(string) bool
 
 func checkFlagUsage(t *testing.T, f cli.Flag, predicate stringPredicate) bool {
-	switch f := f.(type) {
-	case cli.BoolFlag:
-		return predicate(f.Usage)
-	case cli.BoolTFlag:
-		return predicate(f.Usage)
-	case cli.DurationFlag:
-		return predicate(f.Usage)
-	case cli.Float64Flag:
-		return predicate(f.Usage)
-	case cli.GenericFlag:
-		return predicate(f.Usage)
-	case cli.StringFlag:
-		return predicate(f.Usage)
-	case cli.StringSliceFlag:
-		return predicate(f.Usage)
+	field := reflect.ValueOf(f).FieldByName("Usage")
+	if !field.IsValid() {
+		t.Errorf("checkFlagUsage doesn't support flags of type %T", f)
+		return false
 	}
-	t.Errorf("checkFlagUsage doesn't support flags of type %T", f)
-	return false
+	return predicate(field.String())
 }
 
 func isEmpty(s string) bool {
