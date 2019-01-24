@@ -52,9 +52,9 @@ lint:
       --enable goimports \
       --enable golint \
       --enable ineffassign \
+      --enable staticcheck \
       --enable varcheck \
       --enable vetshadow \
-      --enable staticcheck \
       --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
   allow_failure: false
 
