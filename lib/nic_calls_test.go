@@ -60,8 +60,8 @@ func TestAddIP(t *testing.T) {
 				"reason":     test.spec.Reason,
 				"contiguous": test.spec.Contiguous,
 			}
-			vmUrl := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s", test.serverName.Account, test.serverName.Group, test.serverName.VirtualMachine)
-			ipcreateUrl := vmUrl + fmt.Sprintf("/nics/%d/ip_create", test.nicID)
+			vmURL := fmt.Sprintf("/accounts/%s/groups/%s/virtual_machines/%s", test.serverName.Account, test.serverName.Group, test.serverName.VirtualMachine)
+			ipcreateURL := vmURL + fmt.Sprintf("/nics/%d/ip_create", test.nicID)
 			vm := brain.VirtualMachine{
 				NetworkInterfaces: []brain.NetworkInterface{
 					{
@@ -73,7 +73,7 @@ func TestAddIP(t *testing.T) {
 			rts := testutil.RequestTestSpec{
 				MuxHandlers: &testutil.MuxHandlers{
 					Brain: testutil.Mux{
-						vmUrl: func(wr http.ResponseWriter, r *http.Request) {
+						vmURL: func(wr http.ResponseWriter, r *http.Request) {
 							assert.All(
 								assert.Auth(lib.TokenType(lib.BrainEndpoint)),
 								assert.Method("GET"),
@@ -81,7 +81,7 @@ func TestAddIP(t *testing.T) {
 
 							testutil.WriteJSON(t, wr, vm)
 						},
-						ipcreateUrl: func(wr http.ResponseWriter, r *http.Request) {
+						ipcreateURL: func(wr http.ResponseWriter, r *http.Request) {
 							assert.All(
 								assert.Auth(lib.TokenType(lib.BrainEndpoint)),
 								assert.Method("POST"),

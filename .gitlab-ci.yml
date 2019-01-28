@@ -39,17 +39,8 @@ stages:
 
 # we do a lot of linting to keep our code clean
 #
-# the lint-with-fail-allowed job lets us know how bad we are at the stuff I don't particularly care about
-lint-with-fail-allowed:
-  <<: *test
-  allow_failure: true # delete me once we've got the lintiness down to 0
-  script: |
-    go get github.com/alecthomas/gometalinter
-    gometalinter -i
-    cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
-    gometalinter --vendored-linters --vendor --skip=mocks --disable dupl --disable gotype --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
 
-lint-in-anger:
+lint:
   <<: *test
   script: |
     go get github.com/alecthomas/gometalinter
@@ -60,8 +51,8 @@ lint-in-anger:
       --enable goconst \
       --enable goimports \
       --enable golint \
-      --enable gosimple \
       --enable ineffassign \
+      --enable staticcheck \
       --enable varcheck \
       --enable vetshadow \
       --deadline=120s ./... | sort -t ':' -k 1,1 -k 2,2n
@@ -98,7 +89,7 @@ test:
 
 quality-test:
   <<: *test
-  script: 
+  script:
     - cd $GOPATH/src/github.com/BytemarkHosting/bytemark-client
     - export GOPATH
     - go get golang.org/x/tools/cmd/goimports
@@ -372,8 +363,7 @@ package-windows-amd64:
 # the publish job pushes the tars, zips, debs & rpms to repo.bytemark.co.uk/open-source/bytemark-client/<branch name>
 publish:
   stage: release
-  tags:
-  - shell
+  image: $CI_REGISTRY/docker-images/layers:stretch-publish
   before_script: *version_script
   script:
   - mkdir -p pkg/{linux,mac,freebsd,openbsd,windows,debian,rpm}

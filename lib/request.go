@@ -62,7 +62,6 @@ type internalRequest struct {
 	endpoint      Endpoint
 	url           *url.URL
 	method        string
-	body          []byte
 	allowInsecure bool
 	hasRun        bool
 }

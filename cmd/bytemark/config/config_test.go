@@ -71,19 +71,6 @@ func CleanDir() (dirName string, err error) {
 	return ioutil.TempDir("", "bytemark-client-test")
 }
 
-func JunkDir() (dirName string, err error) {
-	junk := map[string]string{
-		"endpoint":      "https://junk.dir.localhost.local",
-		"user":          "junk-dir-user",
-		"account":       "junk-dir-account",
-		"auth-endpoint": "https://junk.dir.auth.localhost.local",
-		"debug-level":   "junk-dir-debug-level",
-	}
-
-	dirName, _, err = MakeDirFromFixture(junk)
-	return
-}
-
 func FixtureDir() (dir string, fixture map[string]string, err error) {
 	fixture = map[string]string{
 		"endpoint":      "https://fixture.dir.localhost.local",

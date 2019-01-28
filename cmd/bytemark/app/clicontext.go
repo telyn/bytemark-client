@@ -54,11 +54,11 @@ type CliContextWrapper struct {
 }
 
 // App returns the app for this Context
-func (c CliContextWrapper) App() *cli.App {
-	return c.Context.App
+func (ctx CliContextWrapper) App() *cli.App {
+	return ctx.Context.App
 }
 
 // Command returns the Command that was run to create this Context
-func (c CliContextWrapper) Command() cli.Command {
-	return c.Context.Command
+func (ctx CliContextWrapper) Command() cli.Command {
+	return ctx.Context.Command
 }

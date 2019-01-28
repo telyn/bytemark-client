@@ -13,17 +13,17 @@ import (
 func TestGetAccountByBigvName(t *testing.T) {
 	tests := []struct {
 		body      []billing.Account
-		bigv_name string
+		bigvName  string
 		shouldErr bool
 	}{
 		{
 			body:      []billing.Account{},
-			bigv_name: "",
+			bigvName:  "",
 			shouldErr: true,
 		},
 		{
 			body:      []billing.Account{},
-			bigv_name: "notaperson",
+			bigvName:  "notaperson",
 			shouldErr: true,
 		},
 		{
@@ -31,7 +31,7 @@ func TestGetAccountByBigvName(t *testing.T) {
 				ID:   101,
 				Name: "Geoff Jeff",
 			}},
-			bigv_name: "bwagg",
+			bigvName: "bwagg",
 		},
 	}
 
@@ -42,10 +42,10 @@ func TestGetAccountByBigvName(t *testing.T) {
 			Endpoint:      lib.BillingEndpoint,
 			URL:           "/api/v1/accounts",
 			Response:      test.body,
-			AssertRequest: assert.QueryValue("bigv_account_name", test.bigv_name),
+			AssertRequest: assert.QueryValue("bigv_account_name", test.bigvName),
 		}
 		rts.Run(t, testutil.Name(i), true, func(client lib.Client) {
-			account, err := billingMethods.GetAccountByBigVName(client, test.bigv_name)
+			account, err := billingMethods.GetAccountByBigVName(client, test.bigvName)
 			if len(test.body) > 0 {
 				assert.Equal(t, testutil.Name(i), test.body[0], account)
 			}
