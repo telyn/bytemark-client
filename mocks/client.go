@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 	"github.com/maraino/go-mock"
 )
@@ -509,7 +510,7 @@ func (c *Client) GetMigratingDiscs() (brain.Discs, error) {
 	return discs, r.Error(1)
 }
 
-func (c *Client) EnsureAccountName(name *string) error {
+func (c *Client) EnsureAccountName(name *pathers.AccountName) error {
 	*name = "blank-account-name"
 	return nil
 }

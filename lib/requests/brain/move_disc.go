@@ -16,7 +16,7 @@ func MoveDisc(client lib.Client, vm lib.VirtualMachineName, discLabelOrID string
 		return err
 	}
 
-	r, err := client.BuildRequest("PUT", lib.BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := client.BuildRequest("PUT", lib.BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}

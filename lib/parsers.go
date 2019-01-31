@@ -2,6 +2,8 @@ package lib
 
 import (
 	"strings"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // ParseAccountName parses a group name given in account[.extrabits] format.
@@ -38,7 +40,8 @@ func ParseGroupName(name string, defaults ...GroupName) (group GroupName) {
 
 	}
 	if len(bits) >= 2 {
-		group.Account = ParseAccountName(bits[1], group.Account)
+		// gross. sorry.
+		group.Account = pathers.AccountName(ParseAccountName(bits[1], string(group.Account)))
 	}
 	return group
 

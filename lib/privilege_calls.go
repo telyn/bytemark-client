@@ -35,7 +35,7 @@ func (c *bytemarkClient) GetPrivilegesForAccount(account string) (privileges bra
 
 // GetPrivilegesForGroup gets all privileges lower than your privilege on the given group
 func (c *bytemarkClient) GetPrivilegesForGroup(group GroupName) (privileges brain.Privileges, err error) {
-	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/privileges", group.Account, group.Group)
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/privileges", string(group.Account), group.Group)
 	if err != nil {
 		return
 	}
@@ -45,7 +45,7 @@ func (c *bytemarkClient) GetPrivilegesForGroup(group GroupName) (privileges brai
 
 // GetPrivilegesForVirtualMachine gets all privileges lower than your privilege on the given virtual machine
 func (c *bytemarkClient) GetPrivilegesForVirtualMachine(vm VirtualMachineName) (privileges brain.Privileges, err error) {
-	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/privileges", vm.Account, vm.Group, vm.VirtualMachine)
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/privileges", string(vm.Account), vm.Group, vm.VirtualMachine)
 	if err != nil {
 		return
 	}

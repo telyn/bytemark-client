@@ -17,7 +17,7 @@ func (c *bytemarkClient) AddIP(name VirtualMachineName, spec brain.IPCreateReque
 	}
 	nicid := strconv.Itoa(vm.NetworkInterfaces[0].ID)
 
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/nics/%s/ip_create", name.Account, name.Group, name.VirtualMachine, nicid)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/nics/%s/ip_create", string(name.Account), name.Group, name.VirtualMachine, nicid)
 	if err != nil {
 		return nil, err
 	}

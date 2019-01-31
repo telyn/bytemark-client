@@ -7,6 +7,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
@@ -27,13 +28,16 @@ func (e BillingAccountNotFound) Error() string {
 
 // getBillingAccount gets the billing account with the given name.
 // Due to the way the billing API is implemented this is done by grabbing them all and looping *shrug*
+// name is NOT an AccountPather here because AccountPathers are only valid for
+// the brain and may not contain the account name (e.g. if they are a brain
+// account ID)
 func (c *bytemarkClient) getBillingAccount(name string) (account billing.Account, err error) {
 	accounts, err := c.getBillingAccounts()
 	if err != nil {
 		return
 	}
 	for _, account = range accounts {
-		if account.Name == name {
+		if string(account.Name) == name {
 			return
 		}
 	}
@@ -59,13 +63,13 @@ func (c *bytemarkClient) getBillingAccounts() (accounts []billing.Account, err e
 }
 
 // getBrainAccount gets the brain account with the given name.
-func (c *bytemarkClient) getBrainAccount(name string) (account brain.Account, err error) {
+func (c *bytemarkClient) getBrainAccount(name pathers.AccountName) (account brain.Account, err error) {
 	err = c.EnsureAccountName(&name)
 	if err != nil {
 		return
 	}
 
-	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s?view=overview&include_deleted=true", name)
+	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s?view=overview&include_deleted=true", string(name))
 	if err != nil {
 		return
 	}
@@ -127,7 +131,7 @@ func (c *bytemarkClient) GetAccount(name string) (account Account, err error) {
 			return Account{}, billErr
 		}
 	}
-	brainAccount, err := c.getBrainAccount(name)
+	brainAccount, err := c.getBrainAccount(pathers.AccountName(name))
 	if err != nil {
 		return Account{}, err
 	}
@@ -188,7 +192,7 @@ func (c *bytemarkClient) GetDefaultAccount() (acc Account, err error) {
 		acc.fillBilling(billAcc)
 		var brainAcc brain.Account
 
-		brainAcc, err = c.getBrainAccount(billAcc.Name)
+		brainAcc, err = c.getBrainAccount(pathers.AccountName(billAcc.Name))
 
 		if err != nil {
 			return acc, err

@@ -2,13 +2,15 @@ package lib
 
 import (
 	"fmt"
+
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // VirtualMachineName is the triplet-form of the name of a VirtualMachine, which should be enough to find the VM.
 type VirtualMachineName struct {
 	VirtualMachine string
 	Group          string
-	Account        string
+	Account        pathers.AccountName
 }
 
 func (vm VirtualMachineName) String() string {

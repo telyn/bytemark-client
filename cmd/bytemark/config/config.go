@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
@@ -215,7 +216,7 @@ func (config *config) GetV(name string) (Var, error) {
 
 // GetVirtualMachine returns a VirtualMachineName with the config's default group and account set, and a blank VirtualMachine field
 func (config *config) GetVirtualMachine() (vm lib.VirtualMachineName) {
-	vm.Account = config.GetIgnoreErr("account")
+	vm.Account = pathers.AccountName(config.GetIgnoreErr("account"))
 	vm.Group = config.GetIgnoreErr("group")
 	vm.VirtualMachine = ""
 	return vm
@@ -223,7 +224,7 @@ func (config *config) GetVirtualMachine() (vm lib.VirtualMachineName) {
 
 // GetGroup returns a GroupName with the config's default group and account
 func (config *config) GetGroup() (group lib.GroupName) {
-	group.Account = config.GetIgnoreErr("account")
+	group.Account = pathers.AccountName(config.GetIgnoreErr("account"))
 	group.Group = config.GetIgnoreErr("group")
 	return group
 }
