@@ -31,16 +31,40 @@ If you have problems to report, or contributions to make, feel free to [use the 
 Compatibility Guarantee
 =======================
 
-In go, semantic versioning is pretty hard. We guarantee that the following types of changes will not occur between minor versions within the lib package and all packages under its path (e.g. lib/brain)
+The following guarantee applies to versions of bytemark-client before 4.0. The
+major version 4 is reserved for an upcoming series of breaking changes. Versions
+5 and onwards are expected to be compatible as normal. See the "Breaking API
+change" section below.
 
-* Publicly-exported functions and methods will not be removed, renamed, nor will their prototypes change.
-* Publicly-exported struct-type fields will not be removed, renamed, nor will their types change.
-* Publicly-exported variables and constants will not be removed, renamed, nor will their types change.
+In go, semantic versioning is pretty hard. We (attempt to) guarantee that the
+following types of changes will not occur between minor versions within the lib
+package and all packages under its path (e.g. lib/brain)
 
-It's suggested that you avoid using struct embedding or interface composition with multiple types if any of those types are from bytemark-client/lib or any packages inside - bytemark-client's types are wont to have extra fields and methods added.
+* Publicly-exported functions and methods will not be removed, renamed, nor will
+  their prototypes change.
+* Publicly-exported struct-type fields will not be removed, renamed, nor will
+  their types change.
+* Publicly-exported variables and constants will not be removed, renamed, nor
+  will their types change.
+
+It's suggested that you avoid using struct embedding or interface composition
+with multiple types if any of those types are from bytemark-client/lib or any
+packages inside - bytemark-client's types are wont to have extra fields and
+methods added.
 
 Breaking API change
 ===================
+
+The following changes are planned to occur during the 4.x version series and to
+be finalized in version 5.0:
+
+* All request-making functions removed from `lib.Client` and replaced with
+  requests in the relevant package under `lib/requests`.
+* All requests in `lib/requests` rewritten in terms of new `Pather` types.
+* `lib.VirtualMachineName` and `lib.GroupName` rewritten in terms of new
+  `Pather` types.
+* `lib.VirtualMachineName` and `lib.GroupName` will be moved into the
+  `lib/pathers` package.
 
 The following breaking API change to the `lib` package occurred in version 3.0
 
