@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // TODO: we need to clean this file up. 500 SLOC is 400 too many.
@@ -239,7 +240,7 @@ func (c *bytemarkClient) DeleteVLAN(id int) (err error) {
 	return
 }
 
-func (c *bytemarkClient) AdminCreateGroup(name GroupName, vlanNum int) (err error) {
+func (c *bytemarkClient) AdminCreateGroup(name pathers.GroupName, vlanNum int) (err error) {
 	err = c.EnsureGroupName(&name)
 	if err != nil {
 		return

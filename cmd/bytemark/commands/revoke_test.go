@@ -8,13 +8,14 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
 func TestRevokePrivilege(t *testing.T) {
 
 	defVM := lib.VirtualMachineName{Group: "default", Account: "default-account"}
-	defGroup := lib.GroupName{Group: "default", Account: "default-account"}
+	defGroup := pathers.GroupName{Group: "default", Account: "default-account"}
 
 	tests := []struct {
 		Name      string
@@ -88,7 +89,7 @@ func TestRevokePrivilege(t *testing.T) {
 				// specific to vm_admin/vm_console
 
 				config.When("GetGroup").Return(defGroup)
-				group := lib.GroupName{
+				group := pathers.GroupName{
 					Group:   "test-group",
 					Account: "test-account",
 				}

@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 )
@@ -45,7 +46,7 @@ func TestAddApiKey(t *testing.T) {
 		{ID: 1},
 		{ID: 2},
 	}
-	groupNames := []lib.GroupName{
+	groupNames := []pathers.GroupName{
 		{Group: "", Account: "default-account"},
 		{Group: "test-group", Account: "test-account"},
 	}
@@ -72,7 +73,7 @@ func TestAddApiKey(t *testing.T) {
 		// aaand here's all the stuff to assert on and return from Request
 		// the map keys are used for the mock BuildRequest calls' URLs
 		accounts   map[string]accountWithErr
-		groups     map[lib.GroupName]groupWithErr
+		groups     map[pathers.GroupName]groupWithErr
 		servers    map[lib.VirtualMachineName]serverWithErr
 		privileges []privWithErr
 		// apiKey is both the apiKey to return and some of its fields will be
@@ -187,7 +188,7 @@ func TestAddApiKey(t *testing.T) {
 			serverNames[0]: serverWithErr{VirtualMachine: servers[0]},
 			serverNames[1]: serverWithErr{VirtualMachine: servers[1]},
 		},
-		groups: map[lib.GroupName]groupWithErr{
+		groups: map[pathers.GroupName]groupWithErr{
 			groupNames[0]: groupWithErr{Group: groups[0]},
 			groupNames[1]: groupWithErr{Group: groups[1]},
 		},
@@ -259,7 +260,7 @@ func TestAddApiKey(t *testing.T) {
 
 		test.Run(t, func(t *testing.T, config *mocks.Config, client *mocks.Client, app *cli.App) {
 			config.When("GetVirtualMachine").Return(lib.VirtualMachineName{Group: "default", Account: "default-account"})
-			config.When("GetGroup").Return(lib.GroupName{Group: "default", Account: "default-account"})
+			config.When("GetGroup").Return(pathers.GroupName{Group: "default", Account: "default-account"})
 			config.When("GetIgnoreErr", "account").Return("default-account")
 			client.When("GetUser", test.user.Username).Return(test.user, nil)
 

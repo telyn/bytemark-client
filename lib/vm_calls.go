@@ -6,11 +6,12 @@ import (
 	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
 //CreateVirtualMachine creates a virtual machine in the given group.
-func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.VirtualMachineSpec) (vm brain.VirtualMachine, err error) {
+func (c *bytemarkClient) CreateVirtualMachine(group pathers.GroupName, spec brain.VirtualMachineSpec) (vm brain.VirtualMachine, err error) {
 	err = c.EnsureGroupName(&group)
 	if err != nil {
 		return
@@ -106,7 +107,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName VirtualMachineName, newName 
 	change := brain.VirtualMachine{Name: newName.VirtualMachine}
 	if newName.Group != "" || newName.Account != "" {
 		// get group
-		groupName := GroupName{Group: newName.Group, Account: newName.Account}
+		groupName := pathers.GroupName{Group: newName.Group, Account: newName.Account}
 		group, groupErr := c.GetGroup(groupName)
 		if groupErr != nil {
 			return groupErr

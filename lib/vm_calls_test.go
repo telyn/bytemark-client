@@ -7,6 +7,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
@@ -234,7 +235,7 @@ func TestCreateVirtualMachine(t *testing.T) {
 			Response: test.Expect.VirtualMachine,
 		}
 		rts.Run(t, testName, true, func(client lib.Client) {
-			group := lib.GroupName{Group: "test-group", Account: "test-account"}
+			group := pathers.GroupName{Group: "test-group", Account: "test-account"}
 			_, err := client.CreateVirtualMachine(group, test.Input)
 			if err != nil && !test.ExpectErr {
 				t.Fatal(err)

@@ -25,7 +25,7 @@ func ParseAccountName(name string, defaults ...string) (account string) {
 }
 
 // ParseGroupName parses a group name given in group[.account[.extrabits]] format.
-func ParseGroupName(name string, defaults ...GroupName) (group GroupName) {
+func ParseGroupName(name string, defaults ...pathers.GroupName) (group pathers.GroupName) {
 	if len(defaults) == 0 {
 		group.Group = ""
 		group.Account = ""
@@ -62,7 +62,7 @@ func ParseVirtualMachineName(name string, defaults ...VirtualMachineName) (vm Vi
 	bits := strings.SplitN(name, ".", 2)
 	vm.VirtualMachine = bits[0]
 	if len(bits) > 1 {
-		gp := ParseGroupName(bits[1], GroupName{Group: vm.Group, Account: vm.Account})
+		gp := ParseGroupName(bits[1], pathers.GroupName{Group: vm.Group, Account: vm.Account})
 		vm.Group = gp.Group
 		vm.Account = gp.Account
 	}

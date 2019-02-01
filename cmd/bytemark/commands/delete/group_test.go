@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	mock "github.com/maraino/go-mock"
 )
@@ -124,10 +125,10 @@ func TestDeleteGroup(t *testing.T) {
 				}, true).Return(nil)
 			}
 
-			config.When("GetGroup").Return(lib.GroupName{Account: "test-account"})
-			client.When("GetGroup", lib.GroupName{Group: "test-group", Account: "test-account"}).Return(group)
+			config.When("GetGroup").Return(pathers.GroupName{Account: "test-account"})
+			client.When("GetGroup", pathers.GroupName{Group: "test-group", Account: "test-account"}).Return(group)
 			if test.shouldCall {
-				client.When("DeleteGroup", lib.GroupName{Group: "test-group", Account: "test-account"}).Return(nil)
+				client.When("DeleteGroup", pathers.GroupName{Group: "test-group", Account: "test-account"}).Return(nil)
 			}
 
 			err := app.Run(strings.Split("bytemark "+test.command, " "))

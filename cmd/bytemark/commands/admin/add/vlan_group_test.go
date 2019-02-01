@@ -7,7 +7,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 func TestCreateVLANGroup(t *testing.T) {
@@ -44,7 +44,7 @@ func TestCreateVLANGroup(t *testing.T) {
 
 			config.When("GetGroup").Return(testutil.DefGroup).Times(1)
 
-			group := lib.GroupName{
+			group := pathers.GroupName{
 				Group:   "test-group",
 				Account: "test-account",
 			}

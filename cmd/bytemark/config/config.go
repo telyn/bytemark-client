@@ -223,7 +223,7 @@ func (config *config) GetVirtualMachine() (vm lib.VirtualMachineName) {
 }
 
 // GetGroup returns a GroupName with the config's default group and account
-func (config *config) GetGroup() (group lib.GroupName) {
+func (config *config) GetGroup() (group pathers.GroupName) {
 	group.Account = pathers.AccountName(config.GetIgnoreErr("account"))
 	group.Group = config.GetIgnoreErr("group")
 	return group

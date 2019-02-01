@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // SubprocessFailedError is returned when a process run by bytemark-client (e.g. open/xdg-open to open a browser) failed
@@ -30,7 +30,7 @@ func (e UsageDisplayedError) Error() string {
 
 // WontDeleteGroupWithVMsError is returned when 'delete group' was called on a group with stuff in, without --recursive being specified
 type WontDeleteGroupWithVMsError struct {
-	Group lib.GroupName
+	Group pathers.GroupName
 }
 
 func (e WontDeleteGroupWithVMsError) Error() string {
@@ -39,7 +39,7 @@ func (e WontDeleteGroupWithVMsError) Error() string {
 
 // RecursiveDeleteGroupError is returned by delete group when called with --recursive, when deleting VMs.
 type RecursiveDeleteGroupError struct {
-	Group lib.GroupName
+	Group pathers.GroupName
 	// Map of VirtualMachine names to the error that occurred when trying to delete them.
 	// N.B. that this will not contain nil errors for VMs that were successfully deleted.
 	Errors map[string]error

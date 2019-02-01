@@ -6,7 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -16,7 +16,7 @@ func TestCreateGroupCommand(t *testing.T) {
 
 	config.When("GetGroup").Return(testutil.DefGroup)
 
-	group := lib.GroupName{
+	group := pathers.GroupName{
 		Group:   "test-group",
 		Account: "default-account",
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
@@ -32,7 +33,7 @@ func TestCreateGroup(t *testing.T) {
 		Response: getFixtureGroup(),
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
-		err := client.CreateGroup(lib.GroupName{Group: "invalid-group", Account: "account"})
+		err := client.CreateGroup(pathers.GroupName{Group: "invalid-group", Account: "account"})
 		if err != nil {
 			t.Errorf("%s err %s", testName, err)
 		}
@@ -62,7 +63,7 @@ func TestDeleteGroup(t *testing.T) {
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
 
-		err := client.DeleteGroup(lib.GroupName{Group: "default", Account: "account"})
+		err := client.DeleteGroup(pathers.GroupName{Group: "default", Account: "account"})
 		if err != nil {
 			t.Errorf("%s: %s", testName, err)
 		}
@@ -92,19 +93,19 @@ func TestGetGroup(t *testing.T) {
 	rts.Run(t, testName, true, func(client lib.Client) {
 		t.Logf("Trying invalid-group")
 
-		group, err := client.GetGroup(lib.GroupName{Group: "invalid-group", Account: "account"})
+		group, err := client.GetGroup(pathers.GroupName{Group: "invalid-group", Account: "account"})
 		assert.NotEqual(t, testName, nil, err)
 		assert.Equal(t, testName, "", group.Name)
 
 		t.Logf("Trying default.account")
-		group, err = client.GetGroup(lib.GroupName{Group: "default", Account: "account"})
+		group, err = client.GetGroup(pathers.GroupName{Group: "default", Account: "account"})
 		assert.Equal(t, testName, nil, err)
 		assert.Equal(t, testName, "default", group.Name)
 		assert.Equal(t, testName, 1, len(group.VirtualMachines))
 
 		t.Logf("Trying blank group")
 
-		group, err = client.GetGroup(lib.GroupName{Group: "", Account: ""})
+		group, err = client.GetGroup(pathers.GroupName{Group: "", Account: ""})
 		assert.Equal(t, testName, nil, err)
 		assert.Equal(t, testName, "default", group.Name)
 		assert.Equal(t, testName, 1, len(group.VirtualMachines))

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 func TestRecursiveDeleteGroupError(t *testing.T) {
@@ -12,12 +12,12 @@ func TestRecursiveDeleteGroupError(t *testing.T) {
 		//name of the test
 		name string
 
-		group  lib.GroupName
+		group  pathers.GroupName
 		errors map[string]error
 		output string
 	}{{
 		name:  "one error",
-		group: lib.GroupName{Group: "test", Account: "account"},
+		group: pathers.GroupName{Group: "test", Account: "account"},
 		errors: map[string]error{
 			"vm1": fmt.Errorf("Deleting the vm totes failed, my dude"),
 		},

@@ -36,7 +36,7 @@ type Client interface {
 	//
 
 	EnsureVirtualMachineName(vm *VirtualMachineName) error
-	EnsureGroupName(group *GroupName) error
+	EnsureGroupName(group *pathers.GroupName) error
 	EnsureAccountName(account *pathers.AccountName) error
 
 	//
@@ -109,9 +109,9 @@ type Client interface {
 	//
 
 	// CreateGroup sends a request to the API server to create a group with the given name.
-	CreateGroup(name GroupName) error
-	DeleteGroup(name GroupName) error
-	GetGroup(name GroupName) (brain.Group, error)
+	CreateGroup(name pathers.GroupName) error
+	DeleteGroup(name pathers.GroupName) error
+	GetGroup(name pathers.GroupName) (brain.Group, error)
 
 	//
 	// NICS
@@ -125,7 +125,7 @@ type Client interface {
 	// username is allowed to be empty
 	GetPrivileges(username string) (brain.Privileges, error)
 	GetPrivilegesForAccount(account string) (brain.Privileges, error)
-	GetPrivilegesForGroup(group GroupName) (brain.Privileges, error)
+	GetPrivilegesForGroup(group pathers.GroupName) (brain.Privileges, error)
 	GetPrivilegesForVirtualMachine(vm VirtualMachineName) (brain.Privileges, error)
 	GrantPrivilege(p brain.Privilege) error
 	RevokePrivilege(p brain.Privilege) error
@@ -158,7 +158,7 @@ type Client interface {
 
 	// CreateVirtualMachine creates a virtual machine with a given specification in the given group.
 	// returns nil on success or an error otherwise.
-	CreateVirtualMachine(group GroupName, vm brain.VirtualMachineSpec) (brain.VirtualMachine, error)
+	CreateVirtualMachine(group pathers.GroupName, vm brain.VirtualMachineSpec) (brain.VirtualMachine, error)
 
 	// DeleteVirtualMachine deletes the named virtual machine.
 	// returns nil on success or an error otherwise.
@@ -240,7 +240,7 @@ type Client interface {
 	MigrateDisc(disc int, newStoragePool string) error
 	MigrateVirtualMachine(vmName VirtualMachineName, newHead string) error
 	DeleteVLAN(id int) error
-	AdminCreateGroup(name GroupName, vlanNum int) error
+	AdminCreateGroup(name pathers.GroupName, vlanNum int) error
 	CreateIPRange(ipRange string, vlanNum int) error
 	CancelDiscMigration(id int) error
 	CancelVMMigration(id int) error

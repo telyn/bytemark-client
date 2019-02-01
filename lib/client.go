@@ -112,7 +112,7 @@ func (c *bytemarkClient) EnsureVirtualMachineName(vm *VirtualMachineName) error 
 		}
 	}
 	if vm.Group == "" {
-		vm.Group = DefaultGroup
+		vm.Group = pathers.DefaultGroup
 	}
 
 	if vm.VirtualMachine == "" {
@@ -121,14 +121,14 @@ func (c *bytemarkClient) EnsureVirtualMachineName(vm *VirtualMachineName) error 
 	return nil
 }
 
-func (c *bytemarkClient) EnsureGroupName(group *GroupName) error {
+func (c *bytemarkClient) EnsureGroupName(group *pathers.GroupName) error {
 	if group.Account == "" {
 		if err := c.EnsureAccountName(&group.Account); err != nil {
 			return err
 		}
 	}
 	if group.Group == "" {
-		group.Group = DefaultGroup
+		group.Group = pathers.DefaultGroup
 	}
 	return nil
 }

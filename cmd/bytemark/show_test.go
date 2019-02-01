@@ -11,6 +11,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
@@ -170,7 +171,7 @@ func TestShowGroupCommand(t *testing.T) {
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetGroup").Return(defGroup)
-	gpname := lib.GroupName{Group: "test-group", Account: "test-account"}
+	gpname := pathers.GroupName{Group: "test-group", Account: "test-account"}
 
 	group := getFixtureGroup()
 	c.When("GetGroup", gpname).Return(&group, nil).Times(1)

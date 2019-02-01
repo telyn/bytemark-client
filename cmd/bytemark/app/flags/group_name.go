@@ -3,11 +3,12 @@ package flags
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // GroupNameFlag is used for all --group flags, including the global one.
 type GroupNameFlag struct {
-	GroupName lib.GroupName
+	GroupName pathers.GroupName
 	Value     string
 }
 

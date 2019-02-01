@@ -198,7 +198,7 @@ func findPrivilegesForAccount(c *app.Context, account string, recurse bool) (pri
 	}
 
 	for _, group := range acc.Groups {
-		newPrivs, err := findPrivilegesForGroup(c, lib.GroupName{
+		newPrivs, err := findPrivilegesForGroup(c, pathers.GroupName{
 			Group:   group.Name,
 			Account: pathers.AccountName(account),
 		}, recurse) // recurse is always true at this point but maybe I'd like to make two flags? recurse-account and recurse-group?
@@ -210,7 +210,7 @@ func findPrivilegesForAccount(c *app.Context, account string, recurse bool) (pri
 	return
 }
 
-func findPrivilegesForGroup(c *app.Context, name lib.GroupName, recurse bool) (privs brain.Privileges, err error) {
+func findPrivilegesForGroup(c *app.Context, name pathers.GroupName, recurse bool) (privs brain.Privileges, err error) {
 	privs, err = c.Client().GetPrivilegesForGroup(name)
 	if !recurse || err != nil {
 		return

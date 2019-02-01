@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // GetPrivileges gets all privileges for the given user (if you are that user or are cluster-admin)
@@ -34,7 +35,7 @@ func (c *bytemarkClient) GetPrivilegesForAccount(account string) (privileges bra
 }
 
 // GetPrivilegesForGroup gets all privileges lower than your privilege on the given group
-func (c *bytemarkClient) GetPrivilegesForGroup(group GroupName) (privileges brain.Privileges, err error) {
+func (c *bytemarkClient) GetPrivilegesForGroup(group pathers.GroupName) (privileges brain.Privileges, err error) {
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/privileges", string(group.Account), group.Group)
 	if err != nil {
 		return

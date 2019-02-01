@@ -2,10 +2,11 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // CreateGroup sends a request to the API server to create a group with the given name.
-func (c *bytemarkClient) CreateGroup(name GroupName) (err error) {
+func (c *bytemarkClient) CreateGroup(name pathers.GroupName) (err error) {
 	err = c.EnsureGroupName(&name)
 	if err != nil {
 		return
@@ -24,7 +25,7 @@ func (c *bytemarkClient) CreateGroup(name GroupName) (err error) {
 }
 
 // DeleteGroup requests that a given group be deleted. Will return an error if there are VMs in the group.
-func (c *bytemarkClient) DeleteGroup(name GroupName) (err error) {
+func (c *bytemarkClient) DeleteGroup(name pathers.GroupName) (err error) {
 	err = c.EnsureGroupName(&name)
 	if err != nil {
 		return
@@ -38,7 +39,7 @@ func (c *bytemarkClient) DeleteGroup(name GroupName) (err error) {
 }
 
 // GetGroup requests an overview of the group with the given name
-func (c *bytemarkClient) GetGroup(name GroupName) (group brain.Group, err error) {
+func (c *bytemarkClient) GetGroup(name pathers.GroupName) (group brain.Group, err error) {
 	err = c.EnsureGroupName(&name)
 	if err != nil {
 		return
