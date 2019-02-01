@@ -1,0 +1,17 @@
+{
+	"Enable": [
+		"errcheck",
+		"goconst",
+		"goimports",
+		"golint",
+		"ineffassign",
+		"staticcheck",
+		"varcheck",
+		"vetshadow"
+	],
+	"Linters": {
+		"staticcheck": {
+			"Command": "staticcheck --checks all,-ST1005,-ST1000"
+		}
+	}
+}

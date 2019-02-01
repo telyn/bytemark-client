@@ -24,19 +24,6 @@ var testPrivileges = brain.Privileges{
 	},
 }
 
-func testPrivilegesForUser(user string) (privs brain.Privileges) {
-	privs = testPrivileges
-	if user != "" {
-		privs = brain.Privileges{}
-		for _, p := range testPrivileges {
-			if p.Username == user {
-				privs = append(privs, p)
-			}
-		}
-	}
-	return
-}
-
 func TestGetPrivileges(t *testing.T) {
 	testName := testutil.Name(0)
 	rts := testutil.RequestTestSpec{

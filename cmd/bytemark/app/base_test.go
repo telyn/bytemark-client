@@ -57,18 +57,3 @@ func (tw *TestWriter) Write(p []byte) (n int, err error) {
 	tw.t.Log(string(p))
 	return len(p), nil
 }
-
-// baseTestAuthSetup sets up a 'regular' test - with auth, no yubikey.
-// user is test-user
-func BaseTestAuthSetup(t *testing.T, admin bool, commands []cli.Command) (conf *mocks.Config, c *mocks.Client, app *cli.App) {
-	conf, c, app = baseTestSetup(t, admin, commands)
-
-	conf.When("Get", "account").Return("test-account")
-	conf.When("GetIgnoreErr", "token").Return("test-token")
-	conf.When("GetIgnoreErr", "user").Return("test-user")
-	conf.When("GetIgnoreErr", "yubikey").Return("")
-	conf.When("GetIgnoreErr", "2fa-otp").Return("")
-
-	c.When("AuthWithToken", "test-token").Return(nil).Times(1)
-	return conf, c, app
-}

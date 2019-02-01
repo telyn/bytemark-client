@@ -52,31 +52,17 @@ func TestCommandsComplete(t *testing.T) {
 
 type stringPredicate func(string) bool
 
-func checkFlagUsage(f cli.Flag, predicate stringPredicate) bool {
-	switch f := f.(type) {
-	case cli.BoolFlag:
-		return predicate(f.Usage)
-	case cli.BoolTFlag:
-		return predicate(f.Usage)
-	case cli.DurationFlag:
-		return predicate(f.Usage)
-	case cli.Float64Flag:
-		return predicate(f.Usage)
-	case cli.GenericFlag:
-		return predicate(f.Usage)
-	case cli.StringFlag:
-		return predicate(f.Usage)
-	case cli.StringSliceFlag:
-		return predicate(f.Usage)
+func checkFlagUsage(t *testing.T, f cli.Flag, predicate stringPredicate) bool {
+	field := reflect.ValueOf(f).FieldByName("Usage")
+	if !field.IsValid() {
+		t.Errorf("checkFlagUsage doesn't support flags of type %T", f)
+		return false
 	}
-	return false
+	return predicate(field.String())
 }
 
 func isEmpty(s string) bool {
 	return s == ""
-}
-func notEmpty(s string) bool {
-	return s != ""
 }
 
 func firstIsUpper(s string) bool {
@@ -95,13 +81,13 @@ func hasFullStop(s string) bool {
 func TestFlagsHaveUsage(t *testing.T) {
 	testutil.TraverseAllCommands(Commands(true), func(c cli.Command) {
 		for _, f := range c.Flags {
-			if checkFlagUsage(f, isEmpty) {
+			if checkFlagUsage(t, f, isEmpty) {
 				t.Errorf("Command %s's flag %s has empty usage\r\n", c.FullName(), f.GetName())
 			}
 		}
 	})
 	for _, flag := range app.GlobalFlags() {
-		if checkFlagUsage(flag, isEmpty) {
+		if checkFlagUsage(t, flag, isEmpty) {
 			t.Errorf("Global flag %s doesn't have usage.", flag.GetName())
 		}
 	}

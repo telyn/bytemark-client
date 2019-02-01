@@ -20,7 +20,6 @@ func TestShowApiKeys(t *testing.T) {
 
 		apiKeys brain.APIKeys
 		user    brain.User
-		err     error
 	}{{
 		CommandT: testutil.CommandT{
 			Name: "api keys are listed",

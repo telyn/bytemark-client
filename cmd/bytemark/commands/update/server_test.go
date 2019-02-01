@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
 func TestUpdateServer(t *testing.T) {
@@ -21,6 +22,7 @@ func TestUpdateServer(t *testing.T) {
 		Account:        "default-account",
 	}
 	testVM := brain.VirtualMachine{
+		ID:       9310,
 		Name:     "test",
 		Hostname: "test.default",
 		GroupID:  1,
@@ -30,6 +32,12 @@ func TestUpdateServer(t *testing.T) {
 	type move struct {
 		expected bool
 		newName  lib.VirtualMachineName
+	}
+	type swapIPs struct {
+		expected    bool
+		otherVMName lib.VirtualMachineName
+		otherVMID   int
+		swapExtras  bool
 	}
 	tests := []struct {
 		name      string
@@ -44,6 +52,7 @@ func TestUpdateServer(t *testing.T) {
 		cdrom     string
 		eject     bool
 		move      move
+		swapIPs   swapIPs
 		shouldErr bool
 	}{
 		{
@@ -161,8 +170,20 @@ func TestUpdateServer(t *testing.T) {
 			eject:  true,
 		},
 		{
+			name:   "swapping ips",
+			args:   "--swap-ips-with other-vm --server test",
+			vmName: testVMName,
+			vm:     testVM,
+			swapIPs: swapIPs{
+				expected:    true,
+				otherVMName: lib.VirtualMachineName{VirtualMachine: "other-vm", Group: "default", Account: "default-account"},
+				otherVMID:   123,
+				swapExtras:  false,
+			},
+		},
+		{
 			name:      "multiple combined changes",
-			args:      "--new-name new --memory 1 --hwprofile foo --cores 1 --remove-cd --cd-url https://microsoft.com/windows.iso --server test",
+			args:      "--new-name new --memory 1 --hwprofile foo --cores 1 --remove-cd --cd-url https://microsoft.com/windows.iso --server test --swap-ips-with jamiroquai.reggae-reggae.tolkien --swap-extra-ips",
 			vmName:    testVMName,
 			vm:        testVM,
 			hwProfile: "foo",
@@ -178,6 +199,12 @@ func TestUpdateServer(t *testing.T) {
 					Account:        "default-account",
 				},
 			},
+			swapIPs: swapIPs{
+				expected:    true,
+				otherVMName: lib.VirtualMachineName{VirtualMachine: "jamiroquai", Group: "reggae-reggae", Account: "tolkien"},
+				otherVMID:   1400,
+				swapExtras:  true,
+			},
 		},
 	}
 	for _, test := range tests {
@@ -189,7 +216,14 @@ func TestUpdateServer(t *testing.T) {
 			}()
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 			config.When("GetVirtualMachine").Return(defVM)
-			client.When("GetVirtualMachine", test.vmName).Return(test.vm).Times(1)
+			// TODO(telyn): rewrite this hacky getVMTimes stuff once
+			// VirtualMachineIDer is in (see TODO in server.go's swapIPs
+			// function)
+			getVMTimes := 1
+			if test.swapIPs.expected {
+				getVMTimes = 2
+			}
+			client.When("GetVirtualMachine", test.vmName).Return(test.vm).Times(getVMTimes)
 
 			if test.hwProfile != "" {
 				client.When("SetVirtualMachineHardwareProfile", test.vmName, test.hwProfile, nil).Return(nil).Times(1)
@@ -216,6 +250,26 @@ func TestUpdateServer(t *testing.T) {
 
 			if test.eject || test.cdrom != "" {
 				client.When("SetVirtualMachineCDROM", test.vmName, test.cdrom).Return(nil).Times(1)
+			}
+			if test.swapIPs.otherVMID != 0 {
+				client.When("GetVirtualMachine", test.swapIPs.otherVMName).
+					Return(brain.VirtualMachine{ID: test.swapIPs.otherVMID}, nil).
+					Times(1)
+			}
+			if test.swapIPs.expected {
+				req := mocks.Request{
+					T: t,
+				}
+				client.When("BuildRequest", "POST", lib.BrainEndpoint, "/ips/swap_virtual_machine_ips",
+					[]string(nil)).
+					Return(&req, nil).Times(1)
+				defer func() {
+					req.AssertRequestObjectEqual(map[string]interface{}{
+						"virtual_machine_1_id": test.vm.ID,
+						"virtual_machine_2_id": test.swapIPs.otherVMID,
+						"move_additional_ips":  test.swapIPs.swapExtras,
+					})
+				}()
 			}
 
 			args := strings.Split("bytemark update server "+test.args, " ")

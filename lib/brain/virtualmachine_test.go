@@ -93,7 +93,7 @@ func getFixtureVMWithManyIPs() (vm VirtualMachine, v4 []string, v6 []string) {
 func TestAllIPv4Addresses(t *testing.T) {
 	vm, v4fix, _ := getFixtureVMWithManyIPs()
 	v4addrs := vm.AllIPv4Addresses()
-	if 4 != len(v4addrs) {
+	if len(v4addrs) != 4 {
 		t.Error("Too many v4 addresses?????")
 	}
 	seens := make(map[string]bool)
@@ -116,7 +116,7 @@ func TestAllIPv4Addresses(t *testing.T) {
 func TestAllIPv6Addresses(t *testing.T) {
 	vm, _, v6fix := getFixtureVMWithManyIPs()
 	v6addrs := vm.AllIPv6Addresses()
-	if 4 != len(v6addrs) {
+	if len(v6addrs) != 4 {
 		t.Error("Too many v6 addresses?????")
 	}
 	seens := make(map[string]bool)

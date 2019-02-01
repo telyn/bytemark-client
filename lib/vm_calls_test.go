@@ -11,42 +11,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
-func getFixtureVMWithManyIPs() (vm brain.VirtualMachine, v4 []string, v6 []string) {
-	vm = getFixtureVM()
-	vm.NetworkInterfaces = make([]brain.NetworkInterface, 1)
-	vm.NetworkInterfaces[0] = brain.NetworkInterface{
-		Label: "test-nic",
-		Mac:   "FF:FE:FF:FF:FF",
-		IPs: []net.IP{
-			net.IP{192, 168, 1, 16},
-			net.IP{192, 168, 1, 22},
-			net.IP{0xfe, 0x80, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x10},
-			net.IP{0xfe, 0x80, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x01, 0x00},
-		},
-		ExtraIPs: map[string]net.IP{
-			"192.168.2.1":  net.IP{192, 168, 1, 16},
-			"192.168.5.34": net.IP{192, 168, 1, 22},
-			"fe80::1:1": net.IP{0xfe, 0x80, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x01, 0x00},
-			"fe80::2:1": net.IP{0xfe, 0x80, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x10},
-		},
-	}
-	v4 = []string{"192.168.1.16", "192.168.1.22", "192.168.2.1", "192.168.5.34"}
-	v6 = []string{"fe80::10", "fe80::100", "fe80::1:1", "fe80::2:1"}
-	return
-}
-
 func getFixtureVM() (vm brain.VirtualMachine) {
 	disc := getFixtureDisc()
 	nic := getFixtureNic()
