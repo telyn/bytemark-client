@@ -32,7 +32,7 @@ func (g GroupName) String() string {
 func (g GroupName) GroupPath() (string, error) {
 	g.defaultIfNeeded()
 	base, err := g.AccountPath()
-	return base + fmt.Sprintf("/groups/%s", g.Group)
+	return base + fmt.Sprintf("/groups/%s", g.Group), err
 }
 
 // AccountPath returns a Brain URL for the account specified in this GroupName,
