@@ -12,7 +12,7 @@ func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLab
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backup_schedules", server.Account, server.Group, server.VirtualMachine, discLabel)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backup_schedules", string(server.Account), server.Group, server.VirtualMachine, discLabel)
 	if err != nil {
 		return
 	}
@@ -30,7 +30,7 @@ func (c *bytemarkClient) DeleteBackupSchedule(server VirtualMachineName, discLab
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backup_schedules/%s", server.Account, server.Group, server.VirtualMachine, discLabel, strconv.Itoa(id))
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backup_schedules/%s", string(server.Account), server.Group, server.VirtualMachine, discLabel, strconv.Itoa(id))
 	if err != nil {
 		return
 	}

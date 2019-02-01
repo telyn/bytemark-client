@@ -11,7 +11,7 @@ func (c *bytemarkClient) CreateBackup(vm VirtualMachineName, discLabelOrID strin
 		return
 	}
 
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
@@ -25,7 +25,7 @@ func (c *bytemarkClient) DeleteBackup(vm VirtualMachineName, discLabelOrID strin
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID, backupLabelOrID)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups/%s?purge=true", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID, backupLabelOrID)
 	if err != nil {
 		return
 	}
@@ -39,7 +39,7 @@ func (c *bytemarkClient) GetBackups(vm VirtualMachineName, discLabelOrID string)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
@@ -53,7 +53,7 @@ func (c *bytemarkClient) RestoreBackup(vm VirtualMachineName, discLabelOrID stri
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID, backupLabelOrID)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s/backups/%s", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID, backupLabelOrID)
 	if err != nil {
 		return
 	}

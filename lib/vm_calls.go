@@ -15,7 +15,7 @@ func (c *bytemarkClient) CreateVirtualMachine(group GroupName, spec brain.Virtua
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/vm_create", group.Account, group.Group)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/vm_create", string(group.Account), group.Group)
 	if err != nil {
 		return
 	}
@@ -56,7 +56,7 @@ func (c *bytemarkClient) DeleteVirtualMachine(name VirtualMachineName, purge boo
 	if purge {
 		purgePart = "?purge=true"
 	}
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s"+purgePart, name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s"+purgePart, string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (c *bytemarkClient) GetVirtualMachine(name VirtualMachineName) (vm brain.Vi
 		if err != nil {
 			return
 		}
-		r, err = c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", name.Account, name.Group, name.VirtualMachine)
+		r, err = c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s?include_deleted=true&view=overview", string(name.Account), name.Group, name.VirtualMachine)
 	}
 	if err != nil {
 		return
@@ -115,7 +115,7 @@ func (c *bytemarkClient) MoveVirtualMachine(oldName VirtualMachineName, newName 
 	}
 
 	// PUT the change
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", oldName.Account, oldName.Group, oldName.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(oldName.Account), oldName.Group, oldName.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func (c *bytemarkClient) ReimageVirtualMachine(name VirtualMachineName, image br
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/reimage", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/reimage", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -152,7 +152,7 @@ func (c *bytemarkClient) ResetVirtualMachine(name VirtualMachineName) (err error
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/signal", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func (c *bytemarkClient) RestartVirtualMachine(name VirtualMachineName) (err err
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func (c *bytemarkClient) StartVirtualMachine(name VirtualMachineName) (err error
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func (c *bytemarkClient) StopVirtualMachine(name VirtualMachineName) (err error)
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func (c *bytemarkClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff
 	}
 	var r Request
 	if stayoff {
-		r, err = c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+		r, err = c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 		if err != nil {
 			return
 		}
@@ -228,7 +228,7 @@ func (c *bytemarkClient) ShutdownVirtualMachine(name VirtualMachineName, stayoff
 			return
 		}
 	}
-	r, err = c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/signal", name.Account, name.Group, name.VirtualMachine)
+	r, err = c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/signal", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return
 	}
@@ -244,7 +244,7 @@ func (c *bytemarkClient) UndeleteVirtualMachine(name VirtualMachineName) (err er
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -260,7 +260,7 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfile(name VirtualMachineNam
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -284,7 +284,7 @@ func (c *bytemarkClient) SetVirtualMachineHardwareProfileLock(name VirtualMachin
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -305,7 +305,7 @@ func (c *bytemarkClient) SetVirtualMachineMemory(name VirtualMachineName, memory
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -323,7 +323,7 @@ func (c *bytemarkClient) SetVirtualMachineCores(name VirtualMachineName, cores i
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}
@@ -341,7 +341,7 @@ func (c *bytemarkClient) SetVirtualMachineCDROM(name VirtualMachineName, url str
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return err
 	}

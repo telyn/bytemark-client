@@ -2,6 +2,7 @@ package lib
 
 import (
 	auth3 "github.com/BytemarkHosting/auth-client"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 )
 
@@ -132,7 +133,7 @@ func (c *bytemarkClient) EnsureGroupName(group *GroupName) error {
 	return nil
 }
 
-func (c *bytemarkClient) EnsureAccountName(account *string) error {
+func (c *bytemarkClient) EnsureAccountName(account *pathers.AccountName) error {
 	if *account == "" && c.authSession != nil {
 		log.Debug(log.LvlArgs, "validateAccountName called with empty name and a valid auth session - will try to figure out the default by talking to APIs.")
 		if c.urls.Billing == "" {
@@ -144,14 +145,14 @@ func (c *bytemarkClient) EnsureAccountName(account *string) error {
 			log.Debugf(log.LvlArgs, "validateAccountName found %d accounts\r\n", len(brainAccs))
 			if len(brainAccs) > 0 {
 				log.Debugf(log.LvlArgs, "validateAccountName using the first account returned from bigv (%s) as the default\r\n", brainAccs[0].Name)
-				*account = brainAccs[0].Name
+				*account = pathers.AccountName(brainAccs[0].Name)
 			}
 		} else {
 			log.Debug(log.LvlArgs, "validateAccountName finding the default billing account")
 			billAcc, err := c.getDefaultBillingAccount()
 			if err == nil && billAcc.IsValid() {
 				log.Debugf(log.LvlArgs, "validateAccountName found the default billing account - %s\r\n", billAcc.Name)
-				*account = billAcc.Name
+				*account = pathers.AccountName(billAcc.Name)
 			} else if err != nil {
 				return err
 			}

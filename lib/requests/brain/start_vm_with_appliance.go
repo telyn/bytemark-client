@@ -11,7 +11,7 @@ func StartVirtualMachineWithAppliance(client lib.Client, vmName lib.VirtualMachi
 	if err != nil {
 		return err
 	}
-	r, err := client.BuildRequest("PUT", lib.BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", vmName.Account, vmName.Group, vmName.VirtualMachine)
+	r, err := client.BuildRequest("PUT", lib.BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s", string(vmName.Account), vmName.Group, vmName.VirtualMachine)
 	if err != nil {
 		return err
 	}

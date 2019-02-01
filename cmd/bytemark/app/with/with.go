@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/urfave/cli"
 )
 
@@ -128,7 +129,7 @@ func Group(flagName string) func(*app.Context) error {
 
 		groupName := flags.GroupName(c, flagName)
 		if groupName.Account == "" {
-			groupName.Account = c.Config().GetIgnoreErr("account")
+			groupName.Account = pathers.AccountName(c.Config().GetIgnoreErr("account"))
 		}
 		group, err := c.Client().GetGroup(groupName)
 		// this if is a guard against tricky-to-debug nil-pointer errors

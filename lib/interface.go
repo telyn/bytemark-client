@@ -4,6 +4,7 @@ import (
 	auth3 "github.com/BytemarkHosting/auth-client"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/spp"
 )
 
@@ -36,7 +37,7 @@ type Client interface {
 
 	EnsureVirtualMachineName(vm *VirtualMachineName) error
 	EnsureGroupName(group *GroupName) error
-	EnsureAccountName(account *string) error
+	EnsureAccountName(account *pathers.AccountName) error
 
 	//
 	// Auth

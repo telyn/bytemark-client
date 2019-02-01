@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/util/log"
 	"github.com/urfave/cli"
 )
@@ -199,7 +200,7 @@ func findPrivilegesForAccount(c *app.Context, account string, recurse bool) (pri
 	for _, group := range acc.Groups {
 		newPrivs, err := findPrivilegesForGroup(c, lib.GroupName{
 			Group:   group.Name,
-			Account: account,
+			Account: pathers.AccountName(account),
 		}, recurse) // recurse is always true at this point but maybe I'd like to make two flags? recurse-account and recurse-group?
 		if err != nil {
 			return privs, err

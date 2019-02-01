@@ -155,6 +155,9 @@ Here's a tree of the folders in this repo with descriptions of what each is for
 │   │                     writing PrettyPrinters
 │   │                     All the types in lib/billing, lib/brain and lib/spp
 │   │                     should implement PrettyPrinter
+│   ├── pather - Types whose exclusive purpose is to identify API objects and
+│   │            provide URLs for them. Key types include AccountName,
+│   │            GroupName, and VirtualMachineName.
 │   ├── requests - empty package
 │   │   ├── billing - functions that make requests against the billing endpoint
 │   │   └── brain - functions that make requests against the brain endpoint
@@ -244,4 +247,4 @@ To generate the hash, use the following command.
 
   find . -type d \! -path './.*' \! -path './vendor/*' | sort | shasum -a 256
 
-# sha256sum: 3e1f2ab040f164de01286b514cc1ea6424e1e7127c2a1febd32da1de2d763cfb
+# sha256sum: 97818f7e5ab27fa5c6e37840ee1159f0cac168c80e699e1f7f262738e2fea563

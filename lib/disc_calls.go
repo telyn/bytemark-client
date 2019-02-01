@@ -30,7 +30,7 @@ func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc brain.Disc) (e
 
 	labelDiscs(discs, vm.GetDiscLabelOffset())
 
-	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs", name.Account, name.Group, name.VirtualMachine)
+	r, err := c.BuildRequest("POST", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs", string(name.Account), name.Group, name.VirtualMachine)
 	if err != nil {
 		return
 	}
@@ -46,7 +46,7 @@ func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string)
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("DELETE", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s?purge=true", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID)
 
 	if err != nil {
 		return
@@ -63,7 +63,7 @@ func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string,
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
@@ -82,7 +82,7 @@ func (c *bytemarkClient) SetDiscIopsLimit(vm VirtualMachineName, discLabelOrID s
 	if err != nil {
 		return err
 	}
-	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("PUT", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID)
 	if err != nil {
 		return
 	}
@@ -106,7 +106,7 @@ func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (d
 	if err != nil {
 		return
 	}
-	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", vm.Account, vm.Group, vm.VirtualMachine, discLabelOrID)
+	r, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/discs/%s", string(vm.Account), vm.Group, vm.VirtualMachine, discLabelOrID)
 
 	if err != nil {
 		return
