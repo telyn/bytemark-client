@@ -1,7 +1,6 @@
 package pathers
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -32,9 +31,12 @@ func (g GroupName) String() string {
 // invalid
 func (g GroupName) GroupPath() (string, error) {
 	g.defaultIfNeeded()
-	if g.Account == "" {
-		return "", errors.New("no account specified - use GetDefaultAccount to set the Account if none is otherwise specified")
-	}
-	url := fmt.Sprintf("/accounts/%s/groups/%s", string(g.Account), g.Group)
-	return url, nil
+	base, err := g.AccountPath()
+	return base + fmt.Sprintf("/groups/%s", g.Group)
+}
+
+// AccountPath returns a Brain URL for the account specified in this GroupName,
+// or an error if it is blank
+func (g GroupName) AccountPath() (string, error) {
+	return g.Account.AccountPath()
 }
