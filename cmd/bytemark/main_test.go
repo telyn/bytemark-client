@@ -5,12 +5,13 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
 )
 
 var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
-var defGroup = lib.GroupName{Group: "default", Account: "default-account"}
+var defGroup = pathers.GroupName{Group: "default", Account: "default-account"}
 
 func init() {
 	// If we are testing, we want to override the OsExiter,

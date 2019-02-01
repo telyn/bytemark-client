@@ -8,6 +8,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -42,7 +43,7 @@ func TestShowServers(t *testing.T) {
 		config.When("GetIgnoreErr", "account").Return("spokny-stevn")
 		config.When("GetGroup").Return(testutil.DefGroup)
 
-		c.When("GetGroup", lib.GroupName{Group: "ghosts", Account: "spooky-steve"}).Return(brain.Group{
+		c.When("GetGroup", pathers.GroupName{Group: "ghosts", Account: "spooky-steve"}).Return(brain.Group{
 			Name: "default",
 			VirtualMachines: []brain.VirtualMachine{
 				{ID: 1, Name: "old-man-crumbles"},

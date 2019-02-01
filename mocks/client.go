@@ -182,12 +182,12 @@ func (c *Client) GetDiscByID(id int) (disc brain.Disc, err error) {
 	return disc, r.Error(1)
 }
 
-func (c *Client) CreateGroup(name lib.GroupName) error {
+func (c *Client) CreateGroup(name pathers.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
 
-func (c *Client) GetGroup(name lib.GroupName) (brain.Group, error) {
+func (c *Client) GetGroup(name pathers.GroupName) (brain.Group, error) {
 	r := c.Called(name)
 	group, _ := r.Get(0).(brain.Group)
 	return group, r.Error(1)
@@ -198,7 +198,7 @@ func (c *Client) DeleteDisc(name lib.VirtualMachineName, disc string) error {
 	return r.Error(0)
 }
 
-func (c *Client) DeleteGroup(name lib.GroupName) error {
+func (c *Client) DeleteGroup(name pathers.GroupName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
@@ -208,7 +208,7 @@ func (c *Client) DeleteVirtualMachine(name lib.VirtualMachineName, purge bool) e
 	return r.Error(0)
 }
 
-func (c *Client) CreateVirtualMachine(group lib.GroupName, vm brain.VirtualMachineSpec) (brain.VirtualMachine, error) {
+func (c *Client) CreateVirtualMachine(group pathers.GroupName, vm brain.VirtualMachineSpec) (brain.VirtualMachine, error) {
 	r := c.Called(group, vm)
 	rvm, _ := r.Get(0).(brain.VirtualMachine)
 	return rvm, r.Error(1)
@@ -231,9 +231,9 @@ func (c *Client) ParseVirtualMachineName(name string, defaults ...lib.VirtualMac
 	return n, r.Error(1)
 }
 
-func (c *Client) ParseGroupName(name string, defaults ...lib.GroupName) lib.GroupName {
+func (c *Client) ParseGroupName(name string, defaults ...pathers.GroupName) pathers.GroupName {
 	r := c.Called(name, defaults)
-	n, _ := r.Get(0).(lib.GroupName)
+	n, _ := r.Get(0).(pathers.GroupName)
 	return n
 }
 
@@ -344,7 +344,7 @@ func (c *Client) GetPrivilegesForAccount(accountName string) (privs brain.Privil
 	privs, _ = r.Get(0).(brain.Privileges)
 	return privs, r.Error(1)
 }
-func (c *Client) GetPrivilegesForGroup(group lib.GroupName) (privs brain.Privileges, err error) {
+func (c *Client) GetPrivilegesForGroup(group pathers.GroupName) (privs brain.Privileges, err error) {
 	r := c.Called(group)
 	privs, _ = r.Get(0).(brain.Privileges)
 	return privs, r.Error(1)
@@ -443,7 +443,7 @@ func (c *Client) DeleteVLAN(id int) error {
 	r := c.Called(id)
 	return r.Error(0)
 }
-func (c *Client) AdminCreateGroup(name lib.GroupName, vlanNum int) error {
+func (c *Client) AdminCreateGroup(name pathers.GroupName, vlanNum int) error {
 	r := c.Called(name, vlanNum)
 	return r.Error(0)
 }
@@ -515,7 +515,7 @@ func (c *Client) EnsureAccountName(name *pathers.AccountName) error {
 	return nil
 }
 
-func (c *Client) EnsureGroupName(name *lib.GroupName) error {
+func (c *Client) EnsureGroupName(name *pathers.GroupName) error {
 	if name.Account == "" {
 		name.Account = "blank-account-name"
 	}

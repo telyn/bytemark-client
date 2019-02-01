@@ -10,6 +10,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
@@ -518,13 +519,13 @@ func TestDeleteVLAN(t *testing.T) {
 
 func TestPostAdminCreateGroup(t *testing.T) {
 	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group"}`, func(client lib.Client) error {
-		return client.AdminCreateGroup(lib.GroupName{Account: "test-account", Group: "test-group"}, 0)
+		return client.AdminCreateGroup(pathers.GroupName{Account: "test-account", Group: "test-group"}, 0)
 	})
 }
 
 func TestPostAdminCreateGroupWithVLANNum(t *testing.T) {
 	simplePostTest(t, "/admin/groups", `{"account_spec":"test-account","group_name":"test-group","vlan_num":12}`, func(client lib.Client) error {
-		return client.AdminCreateGroup(lib.GroupName{Account: "test-account", Group: "test-group"}, 12)
+		return client.AdminCreateGroup(pathers.GroupName{Account: "test-account", Group: "test-group"}, 12)
 	})
 }
 

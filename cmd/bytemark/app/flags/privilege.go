@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // privArgs is an array of strings which can have an argument shifted off the front.
@@ -28,7 +29,7 @@ func (args *privArgs) shift() (arg string, err error) {
 // PrivilegeFlag is an un-realised brain.Privilege - where the target name has been parsed but hasn't been turned into IDs yet
 type PrivilegeFlag struct {
 	AccountName        string
-	GroupName          *lib.GroupName
+	GroupName          *pathers.GroupName
 	VirtualMachineName *lib.VirtualMachineName
 	Username           string
 	Level              brain.PrivilegeLevel
@@ -55,7 +56,7 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(c *app.Context, args *privArgs) (er
 			}
 		}
 		var vmName lib.VirtualMachineName
-		var groupName lib.GroupName
+		var groupName pathers.GroupName
 		switch pf.TargetType() {
 		case brain.PrivilegeTargetTypeVM:
 			vmName, err = lib.ParseVirtualMachineName(target, c.Config().GetVirtualMachine())

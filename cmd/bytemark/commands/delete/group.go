@@ -11,6 +11,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/util"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/urfave/cli"
 )
 
@@ -82,7 +83,7 @@ func promptForRecursiveDeleteGroup(ctx *app.Context) error {
 	return nil
 }
 
-func deleteVmsInGroup(ctx *app.Context, name lib.GroupName, group *brain.Group) error {
+func deleteVmsInGroup(ctx *app.Context, name pathers.GroupName, group *brain.Group) error {
 	ctx.Log("\nPurging all VMs in %s...", name)
 
 	recurseErr := util.RecursiveDeleteGroupError{Group: name, Errors: map[string]error{}}

@@ -15,7 +15,7 @@ type VirtualMachineName struct {
 
 func (vm VirtualMachineName) String() string {
 	if vm.Group == "" {
-		vm.Group = DefaultGroup
+		vm.Group = pathers.DefaultGroup
 	}
 	if vm.Account == "" {
 		return fmt.Sprintf("%s.%s", vm.VirtualMachine, vm.Group)
@@ -24,8 +24,8 @@ func (vm VirtualMachineName) String() string {
 }
 
 // GroupName returns the group and account of this VirtualMachineName as a group.
-func (vm VirtualMachineName) GroupName() GroupName {
-	return GroupName{
+func (vm VirtualMachineName) GroupName() pathers.GroupName {
+	return pathers.GroupName{
 		Group:   vm.Group,
 		Account: vm.Account,
 	}

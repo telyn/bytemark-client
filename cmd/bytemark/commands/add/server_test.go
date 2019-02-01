@@ -10,6 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/urfave/cli"
 )
 
@@ -71,7 +72,7 @@ func TestCreateServer(t *testing.T) {
 	type createTest struct {
 		Spec                 brain.VirtualMachineSpec
 		ConfigVirtualMachine lib.VirtualMachineName
-		GroupName            lib.GroupName
+		GroupName            pathers.GroupName
 		Args                 []string
 		Output               string
 		ShouldErr            bool
@@ -122,7 +123,7 @@ func TestCreateServer(t *testing.T) {
 				},
 			},
 			ConfigVirtualMachine: lib.VirtualMachineName{Group: "default"},
-			GroupName:            lib.GroupName{Group: "default"},
+			GroupName:            pathers.GroupName{Group: "default"},
 			Args: []string{
 				"bytemark", "add", "server",
 				"--authorized-keys", "test-pubkey",
@@ -163,7 +164,7 @@ func TestCreateServer(t *testing.T) {
 				},
 			},
 
-			GroupName: lib.GroupName{
+			GroupName: pathers.GroupName{
 				Group:   "default",
 				Account: "default-account",
 			},
@@ -177,7 +178,7 @@ func TestCreateServer(t *testing.T) {
 			},
 		}, {
 			ConfigVirtualMachine: testutil.DefVM,
-			GroupName: lib.GroupName{
+			GroupName: pathers.GroupName{
 				Group:   "default",
 				Account: "default-account",
 			},

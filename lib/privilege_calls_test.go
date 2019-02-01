@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
@@ -76,7 +77,7 @@ func TestGetPrivilegesForGroup(t *testing.T) {
 		Response: testPrivileges,
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
-		privileges, err := client.GetPrivilegesForGroup(lib.GroupName{Group: "test-group", Account: "test-account"})
+		privileges, err := client.GetPrivilegesForGroup(pathers.GroupName{Group: "test-group", Account: "test-account"})
 		if err != nil {
 			t.Error(err)
 		}

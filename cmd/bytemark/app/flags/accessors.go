@@ -6,6 +6,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // AccountName returns the named AccountNameFlag. Why does it return the
@@ -46,14 +47,14 @@ func FileContents(c *app.Context, flagname string) string {
 	return ""
 }
 
-// GroupName returns the named flag as a lib.GroupName
-func GroupName(c *app.Context, flagname string) (gp lib.GroupName) {
+// GroupName returns the named flag as a pathers.GroupName
+func GroupName(c *app.Context, flagname string) (gp pathers.GroupName) {
 	gpNameFlag, ok := c.Context.Generic(flagname).(*GroupNameFlag)
 	if !ok {
-		return lib.GroupName{}
+		return pathers.GroupName{}
 	}
 	if gpNameFlag == nil {
-		return lib.GroupName{}
+		return pathers.GroupName{}
 	}
 	return gpNameFlag.GroupName
 }

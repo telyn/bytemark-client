@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/config"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	mock "github.com/maraino/go-mock"
 )
 
@@ -56,9 +57,9 @@ func (c *Config) GetVirtualMachine() lib.VirtualMachineName {
 	return ret.Get(0).(lib.VirtualMachineName)
 }
 
-func (c *Config) GetGroup() lib.GroupName {
+func (c *Config) GetGroup() pathers.GroupName {
 	ret := c.Called()
-	return ret.Get(0).(lib.GroupName)
+	return ret.Get(0).(pathers.GroupName)
 }
 
 func (c *Config) GetAll() (config.Vars, error) {
