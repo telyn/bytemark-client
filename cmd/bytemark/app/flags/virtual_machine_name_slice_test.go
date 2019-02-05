@@ -27,8 +27,17 @@ func TestVirtualMachineNameSliceFlag(t *testing.T) {
 	// String()
 	cfg, client, cliApp := testutil.BaseTestSetup(t, false, []cli.Command{})
 	cfg.When("GetIgnoreErr", "account").Return("default-account")
-	cfg.When("GetGroup").Return(pathers.GroupName{Group: "default-group", Account: "default-account"})
-	cfg.When("GetVirtualMachine").Return(pathers.VirtualMachineName{VirtualMachine: "default-server", GroupName: pathers.GroupName{Group: "default-group", Account: "default-account"}})
+	cfg.When("GetGroup").Return(pathers.GroupName{
+		Group:   "default-group",
+		Account: "default-account",
+	})
+	cfg.When("GetVirtualMachine").Return(pathers.VirtualMachineName{
+		VirtualMachine: "default-server",
+		GroupName: pathers.GroupName{
+			Group:   "default-group",
+			Account: "default-account",
+		},
+	})
 
 	// now some boilerplate to get a context
 	// TODO(telyn): this should probably be refactored out since it'll be
