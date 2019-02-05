@@ -3,7 +3,6 @@ package config
 import (
 	"flag"
 
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
@@ -14,7 +13,7 @@ type Manager interface {
 	GetBool(string) (bool, error)
 	GetV(string) (Var, error)
 	GetSessionValidity() (int, error)
-	GetVirtualMachine() lib.VirtualMachineName
+	GetVirtualMachine() pathers.VirtualMachineName
 	GetGroup() pathers.GroupName
 	GetAll() (Vars, error)
 	Set(string, string, string)

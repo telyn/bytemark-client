@@ -210,7 +210,7 @@ func (c *bytemarkClient) MigrateDisc(disc int, newStoragePool string) (err error
 	return
 }
 
-func (c *bytemarkClient) MigrateVirtualMachine(vmName VirtualMachineName, newHead string) (err error) {
+func (c *bytemarkClient) MigrateVirtualMachine(vmName pathers.VirtualMachineName, newHead string) (err error) {
 	vm, err := c.GetVirtualMachine(vmName)
 	if err != nil {
 		return err
@@ -333,7 +333,7 @@ func (c *bytemarkClient) RegradeDisc(disc int, newGrade string) (err error) {
 	return
 }
 
-func (c *bytemarkClient) UpdateVMMigration(name VirtualMachineName, speed *int64, downtime *int) (err error) {
+func (c *bytemarkClient) UpdateVMMigration(name pathers.VirtualMachineName, speed *int64, downtime *int) (err error) {
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return err

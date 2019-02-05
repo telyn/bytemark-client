@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 )
@@ -15,7 +15,7 @@ func TestScheduleBackups(t *testing.T) {
 	type ScheduleTest struct {
 		Args []string
 
-		Name      lib.VirtualMachineName
+		Name      pathers.VirtualMachineName
 		DiscLabel string
 		Start     string
 		Interval  int
@@ -40,7 +40,7 @@ func TestScheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
-			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
+			Name:       pathers.VirtualMachineName{VirtualMachine: "vm-name", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   86400,
@@ -51,7 +51,7 @@ func TestScheduleBackups(t *testing.T) {
 		{
 			ShouldCall: true,
 			Args:       []string{"vm-name.group.account", "disc-label", "3600"},
-			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "group", Account: "account"},
+			Name:       pathers.VirtualMachineName{VirtualMachine: "vm-name", GroupName: pathers.GroupName{Group: "group", Account: "account"}},
 			DiscLabel:  "disc-label",
 			Start:      "00:00",
 			Interval:   3600,
@@ -59,7 +59,7 @@ func TestScheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"--start", "thursday", "vm-name", "disc-label", "3235"},
-			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
+			Name:       pathers.VirtualMachineName{VirtualMachine: "vm-name", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 			DiscLabel:  "disc-label",
 			Start:      "thursday",
 			Interval:   3235,

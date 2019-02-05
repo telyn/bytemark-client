@@ -8,19 +8,24 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
 
 func TestUpdateDisc(t *testing.T) {
-	defVM := lib.VirtualMachineName{
-		Group:   "default",
-		Account: "default-account",
+	defVM := pathers.VirtualMachineName{
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
-	testVMName := lib.VirtualMachineName{
+	testVMName := pathers.VirtualMachineName{
 		VirtualMachine: "test",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 	testDisc := brain.Disc{
 		Size:         10240,
@@ -29,7 +34,7 @@ func TestUpdateDisc(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      string
-		vmName    lib.VirtualMachineName
+		vmName    pathers.VirtualMachineName
 		discLabel string
 		disc      brain.Disc
 		newSize   int
@@ -86,19 +91,25 @@ func TestUpdateDisc(t *testing.T) {
 }
 
 func TestUpdateDiscServer(t *testing.T) {
-	defVM := lib.VirtualMachineName{
-		Group:   "default",
-		Account: "default-account",
+	defVM := pathers.VirtualMachineName{
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
-	oldVMName := lib.VirtualMachineName{
+	oldVMName := pathers.VirtualMachineName{
 		VirtualMachine: "old-vm",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
-	newVMName := lib.VirtualMachineName{
+	newVMName := pathers.VirtualMachineName{
 		VirtualMachine: "new-vm",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 	newVM := brain.VirtualMachine{
 		ID: 999,

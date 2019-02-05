@@ -4,9 +4,10 @@ import (
 	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
-func (c *bytemarkClient) AddIP(name VirtualMachineName, spec brain.IPCreateRequest) (brain.IPs, error) {
+func (c *bytemarkClient) AddIP(name pathers.VirtualMachineName, spec brain.IPCreateRequest) (brain.IPs, error) {
 	err := c.EnsureVirtualMachineName(&name)
 	if err != nil {
 		return nil, err

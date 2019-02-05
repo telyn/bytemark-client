@@ -10,6 +10,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/billing"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/util"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
@@ -66,7 +67,7 @@ func TestUpdateServerMigrationWithSpeedAndDowntime(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(defVM)
 
-	vmName := lib.VirtualMachineName{VirtualMachine: "vm123", Group: "group", Account: "account"}
+	vmName := pathers.VirtualMachineName{VirtualMachine: "vm123", GroupName: pathers.GroupName{Group: "group", Account: "account"}}
 	speed := int64(8500000000000)
 	downtime := 15
 	c.When("UpdateVMMigration", vmName, &speed, &downtime).Return(nil).Times(1)

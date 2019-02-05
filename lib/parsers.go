@@ -48,7 +48,7 @@ func ParseGroupName(name string, defaults ...pathers.GroupName) (group pathers.G
 }
 
 // ParseVirtualMachineName parses a VM name given in vm[.group[.account[.extrabits]]] format
-func ParseVirtualMachineName(name string, defaults ...VirtualMachineName) (vm VirtualMachineName, err error) {
+func ParseVirtualMachineName(name string, defaults ...pathers.VirtualMachineName) (vm pathers.VirtualMachineName, err error) {
 	if len(defaults) == 0 {
 		vm.Group = ""
 		vm.Account = ""

@@ -14,7 +14,7 @@ import (
 
 func TestGrantPrivilege(t *testing.T) {
 
-	defVM := lib.VirtualMachineName{Group: "default", Account: "default-account"}
+	defVM := pathers.VirtualMachineName{GroupName: pathers.GroupName{Group: "default", Account: "default-account"}}
 	defGroup := pathers.GroupName{Group: "default", Account: "default-account"}
 
 	tests := []struct {
@@ -109,10 +109,12 @@ func TestGrantPrivilege(t *testing.T) {
 				// specific to vm_admin/vm_console
 
 				config.When("GetVirtualMachine").Return(defVM)
-				vm := lib.VirtualMachineName{
+				vm := pathers.VirtualMachineName{
 					VirtualMachine: "test-vm",
-					Group:          "test-group",
-					Account:        "test-account",
+					GroupName: pathers.GroupName{
+						Group:   "test-group",
+						Account: "test-account",
+					},
 				}
 
 				c.When("GetVirtualMachine", vm).Return(brain.VirtualMachine{ID: 333}, nil).Times(1)

@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
@@ -128,7 +128,7 @@ func TestAddIPCommand(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(defVM)
 
-	vm := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
+	vm := pathers.VirtualMachineName{VirtualMachine: "test-server", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}}
 
 	ipcr := brain.IPCreateRequest{
 		Addresses:  1,

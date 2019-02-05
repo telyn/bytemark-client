@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -15,10 +15,13 @@ func TestReimage(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	vmname := lib.VirtualMachineName{
+	vmname := pathers.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "test-group",
-		Account:        "test-account"}
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "test-account",
+		},
+	}
 
 	image := brain.ImageInstall{
 		Distribution:    "symbiosis",
@@ -44,10 +47,13 @@ func TestReimageFileFlags(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	vmname := lib.VirtualMachineName{
+	vmname := pathers.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "test-group",
-		Account:        "test-account"}
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "test-account",
+		},
+	}
 
 	image := brain.ImageInstall{
 		FirstbootScript: "i am the firstboot script! FEAR ME",

@@ -96,10 +96,12 @@ func TestGetPrivilegesForServer(t *testing.T) {
 		Response: testPrivileges,
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
-		privileges, err := client.GetPrivilegesForVirtualMachine(lib.VirtualMachineName{
-			Account:        "test-account",
-			Group:          "test-group",
+		privileges, err := client.GetPrivilegesForVirtualMachine(pathers.VirtualMachineName{
 			VirtualMachine: "test-vm",
+			GroupName: pathers.GroupName{
+				Group:   "test-group",
+				Account: "test-account",
+			},
 		})
 		if err != nil {
 			t.Error(err)

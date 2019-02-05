@@ -8,18 +8,23 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
 func TestUpdateServer(t *testing.T) {
-	defVM := lib.VirtualMachineName{
-		Group:   "default",
-		Account: "default-account",
+	defVM := pathers.VirtualMachineName{
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
-	testVMName := lib.VirtualMachineName{
+	testVMName := pathers.VirtualMachineName{
 		VirtualMachine: "test",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 	testVM := brain.VirtualMachine{
 		ID:       9310,
@@ -31,18 +36,18 @@ func TestUpdateServer(t *testing.T) {
 	}
 	type move struct {
 		expected bool
-		newName  lib.VirtualMachineName
+		newName  pathers.VirtualMachineName
 	}
 	type swapIPs struct {
 		expected    bool
-		otherVMName lib.VirtualMachineName
+		otherVMName pathers.VirtualMachineName
 		otherVMID   int
 		swapExtras  bool
 	}
 	tests := []struct {
 		name      string
 		args      string
-		vmName    lib.VirtualMachineName
+		vmName    pathers.VirtualMachineName
 		vm        brain.VirtualMachine
 		memory    int
 		hwProfile string
@@ -62,10 +67,12 @@ func TestUpdateServer(t *testing.T) {
 			vm:     testVM,
 			move: move{
 				expected: true,
-				newName: lib.VirtualMachineName{
+				newName: pathers.VirtualMachineName{
 					VirtualMachine: "new",
-					Group:          "default",
-					Account:        "default-account",
+					GroupName: pathers.GroupName{
+						Group:   "default",
+						Account: "default-account",
+					},
 				},
 			},
 		},
@@ -76,10 +83,12 @@ func TestUpdateServer(t *testing.T) {
 			vm:     testVM,
 			move: move{
 				expected: true,
-				newName: lib.VirtualMachineName{
+				newName: pathers.VirtualMachineName{
 					VirtualMachine: "test",
-					Group:          "foo",
-					Account:        "default-account",
+					GroupName: pathers.GroupName{
+						Group:   "foo",
+						Account: "default-account",
+					},
 				},
 			},
 		},
@@ -90,10 +99,12 @@ func TestUpdateServer(t *testing.T) {
 			vm:     testVM,
 			move: move{
 				expected: true,
-				newName: lib.VirtualMachineName{
+				newName: pathers.VirtualMachineName{
 					VirtualMachine: "test",
-					Group:          "default",
-					Account:        "other-account",
+					GroupName: pathers.GroupName{
+						Group:   "default",
+						Account: "other-account",
+					},
 				},
 			},
 		},
@@ -176,7 +187,7 @@ func TestUpdateServer(t *testing.T) {
 			vm:     testVM,
 			swapIPs: swapIPs{
 				expected:    true,
-				otherVMName: lib.VirtualMachineName{VirtualMachine: "other-vm", Group: "default", Account: "default-account"},
+				otherVMName: pathers.VirtualMachineName{VirtualMachine: "other-vm", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 				otherVMID:   123,
 				swapExtras:  false,
 			},
@@ -193,15 +204,17 @@ func TestUpdateServer(t *testing.T) {
 			eject:     true,
 			move: move{
 				expected: true,
-				newName: lib.VirtualMachineName{
+				newName: pathers.VirtualMachineName{
 					VirtualMachine: "new",
-					Group:          "default",
-					Account:        "default-account",
+					GroupName: pathers.GroupName{
+						Group:   "default",
+						Account: "default-account",
+					},
 				},
 			},
 			swapIPs: swapIPs{
 				expected:    true,
-				otherVMName: lib.VirtualMachineName{VirtualMachine: "jamiroquai", Group: "reggae-reggae", Account: "tolkien"},
+				otherVMName: pathers.VirtualMachineName{VirtualMachine: "jamiroquai", GroupName: pathers.GroupName{Group: "reggae-reggae", Account: "tolkien"}},
 				otherVMID:   1400,
 				swapExtras:  true,
 			},

@@ -41,7 +41,7 @@ func (e APIError) Error() string {
 	return fmt.Sprintf("HTTP %s %s returned %d\r\n", e.Method, e.URL.String(), e.StatusCode)
 }
 
-// BadNameError is returned when a VirtualMachineName / GroupName or AccountName is invalid.
+// BadNameError is returned when a pathers.VirtualMachineName / GroupName or AccountName is invalid.
 type BadNameError struct {
 	APIError
 	Type         string

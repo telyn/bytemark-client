@@ -488,21 +488,39 @@ func TestPostMigrateDiscWithoutNewStoragePool(t *testing.T) {
 
 func TestPostMigrateVirtualMachineWithNewHead(t *testing.T) {
 	testPostVirtualMachine(t, "/admin/vms/122/migrate", &brain.VirtualMachine{ID: 122}, `{"new_head_spec":"stg-h2"}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		vmName := pathers.VirtualMachineName{
+			VirtualMachine: "def-name",
+			GroupName: pathers.GroupName{
+				Group:   "def-group",
+				Account: "def-account",
+			},
+		}
 		return client.MigrateVirtualMachine(vmName, "stg-h2")
 	})
 }
 
 func TestPostMigrateVirtualMachineWithoutHead(t *testing.T) {
 	testPostVirtualMachine(t, "/admin/vms/121/migrate", &brain.VirtualMachine{ID: 121}, `{}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		vmName := pathers.VirtualMachineName{
+			VirtualMachine: "def-name",
+			GroupName: pathers.GroupName{
+				Group:   "def-group",
+				Account: "def-account",
+			},
+		}
 		return client.MigrateVirtualMachine(vmName, "")
 	})
 }
 
 func TestPostMigrateVirtualMachineInvalidVirtualMachineName(t *testing.T) {
 	testPostVirtualMachine(t, "/will-not-be-called", nil, `{}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		vmName := pathers.VirtualMachineName{
+			VirtualMachine: "def-name",
+			GroupName: pathers.GroupName{
+				Group:   "def-group",
+				Account: "def-account",
+			},
+		}
 		err := client.MigrateVirtualMachine(vmName, "")
 		if _, ok := err.(lib.NotFoundError); ok {
 			return nil
@@ -567,7 +585,13 @@ func TestPostRegradeDisc(t *testing.T) {
 
 func TestPutUpdateVMMigration(t *testing.T) {
 	testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		vmName := pathers.VirtualMachineName{
+			VirtualMachine: "def-name",
+			GroupName: pathers.GroupName{
+				Group:   "def-group",
+				Account: "def-account",
+			},
+		}
 
 		return client.UpdateVMMigration(vmName, nil, nil)
 	})
@@ -575,7 +599,13 @@ func TestPutUpdateVMMigration(t *testing.T) {
 
 func TestPutUpdateVMMigrationWithSpeed(t *testing.T) {
 	testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{"migration_speed":8500000000000}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		vmName := pathers.VirtualMachineName{
+			VirtualMachine: "def-name",
+			GroupName: pathers.GroupName{
+				Group:   "def-group",
+				Account: "def-account",
+			},
+		}
 		speed := int64(8500000000000)
 
 		return client.UpdateVMMigration(vmName, &speed, nil)
@@ -584,7 +614,13 @@ func TestPutUpdateVMMigrationWithSpeed(t *testing.T) {
 
 func TestPutUpdateVMMigrationWithDowntime(t *testing.T) {
 	testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{"migration_downtime":15}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		vmName := pathers.VirtualMachineName{
+			VirtualMachine: "def-name",
+			GroupName: pathers.GroupName{
+				Group:   "def-group",
+				Account: "def-account",
+			},
+		}
 		downtime := 15
 
 		return client.UpdateVMMigration(vmName, nil, &downtime)
@@ -593,7 +629,13 @@ func TestPutUpdateVMMigrationWithDowntime(t *testing.T) {
 
 func TestPutUpdateVMMigrationWithSpeedAndDowntime(t *testing.T) {
 	testPutVirtualMachine(t, "/admin/vms/149/migrate", &brain.VirtualMachine{ID: 149}, `{"migration_downtime":15,"migration_speed":8500000000000}`, func(client lib.Client) error {
-		vmName := lib.VirtualMachineName{Account: "def-account", Group: "def-group", VirtualMachine: "def-name"}
+		vmName := pathers.VirtualMachineName{
+			VirtualMachine: "def-name",
+			GroupName: pathers.GroupName{
+				Group:   "def-group",
+				Account: "def-account",
+			},
+		}
 		speed := int64(8500000000000)
 		downtime := 15
 

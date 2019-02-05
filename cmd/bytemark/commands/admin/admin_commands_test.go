@@ -3,13 +3,13 @@ package admin_test
 import (
 	"math/big"
 
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // These functions are all deprecated, stop using them please
 
-var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
+var defVM = pathers.VirtualMachineName{GroupName: pathers.GroupName{Group: "default", Account: "default-account"}}
 
 func getFixtureVLAN() brain.VLAN {
 	return brain.VLAN{

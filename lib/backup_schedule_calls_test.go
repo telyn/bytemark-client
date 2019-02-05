@@ -6,15 +6,18 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
 func TestCreateBackupSchedule(t *testing.T) {
-	name := lib.VirtualMachineName{
+	name := pathers.VirtualMachineName{
 		VirtualMachine: "labelmaker",
-		Group:          "chocolatefactory",
-		Account:        "wonka",
+		GroupName: pathers.GroupName{
+			Group:   "chocolatefactory",
+			Account: "wonka",
+		},
 	}
 
 	testSchedule := brain.BackupSchedule{
@@ -43,10 +46,12 @@ func TestCreateBackupSchedule(t *testing.T) {
 }
 
 func TestDeleteBackupSchedule(t *testing.T) {
-	name := lib.VirtualMachineName{
+	name := pathers.VirtualMachineName{
 		VirtualMachine: "labelmaker",
-		Group:          "chocolatefactory",
-		Account:        "wonka",
+		GroupName: pathers.GroupName{
+			Group:   "chocolatefactory",
+			Account: "wonka",
+		},
 	}
 
 	rts := testutil.RequestTestSpec{

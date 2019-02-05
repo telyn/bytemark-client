@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -14,10 +14,12 @@ func TestRestoreBackup(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
-	vmname := lib.VirtualMachineName{
+	vmname := pathers.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 
 	config.When("GetVirtualMachine").Return(defVM)

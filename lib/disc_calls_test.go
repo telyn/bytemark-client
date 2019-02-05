@@ -7,6 +7,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 	"github.com/cheekybits/is"
@@ -60,7 +61,7 @@ func TestCreateDisc(t *testing.T) {
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		err := client.CreateDisc(lib.VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, brain.Disc{
+		err := client.CreateDisc(pathers.VirtualMachineName{VirtualMachine: "vm", GroupName: pathers.GroupName{Group: "group", Account: "account"}}, brain.Disc{
 			StorageGrade: "sata",
 			Size:         26400,
 		})
@@ -79,7 +80,7 @@ func TestDeleteDisc(t *testing.T) {
 		AssertRequest: assert.QueryValue("purge", "true"),
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
-		err := client.DeleteDisc(lib.VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666")
+		err := client.DeleteDisc(pathers.VirtualMachineName{VirtualMachine: "vm", GroupName: pathers.GroupName{Group: "group", Account: "account"}}, "666")
 		if err != nil {
 			t.Fatalf("%s err %s", testName, err)
 		}
@@ -106,7 +107,7 @@ func TestResizeDisc(t *testing.T) {
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		err := client.ResizeDisc(lib.VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666", 35)
+		err := client.ResizeDisc(pathers.VirtualMachineName{VirtualMachine: "vm", GroupName: pathers.GroupName{Group: "group", Account: "account"}}, "666", 35)
 		if err != nil {
 			t.Fatalf("%s err %s", testName, err)
 		}
@@ -125,7 +126,7 @@ func TestGetDisc(t *testing.T) {
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
 
-		disc, err := client.GetDisc(lib.VirtualMachineName{VirtualMachine: "vm", Group: "group", Account: "account"}, "666")
+		disc, err := client.GetDisc(pathers.VirtualMachineName{VirtualMachine: "vm", GroupName: pathers.GroupName{Group: "group", Account: "account"}}, "666")
 		if err != nil {
 			t.Fatal(err)
 		}

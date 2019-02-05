@@ -105,7 +105,7 @@ func (c *bytemarkClient) AllowInsecureRequests() {
 	c.allowInsecure = true
 }
 
-func (c *bytemarkClient) EnsureVirtualMachineName(vm *VirtualMachineName) error {
+func (c *bytemarkClient) EnsureVirtualMachineName(vm *pathers.VirtualMachineName) error {
 	if vm.Account == "" {
 		if err := c.EnsureAccountName(&vm.Account); err != nil {
 			return err

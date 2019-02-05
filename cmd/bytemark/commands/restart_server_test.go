@@ -9,6 +9,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 )
 
@@ -16,68 +17,82 @@ func TestRestartServerCommand(t *testing.T) {
 	tests := []struct {
 		name          string
 		input         string
-		vmname        lib.VirtualMachineName
+		vmname        pathers.VirtualMachineName
 		shouldErr     bool
 		applianceBoot bool
 	}{
 		{
 			name:  "RestartWithoutAppliance",
 			input: "test-server.test-group.test-account",
-			vmname: lib.VirtualMachineName{
+			vmname: pathers.VirtualMachineName{
 				VirtualMachine: "test-server",
-				Group:          "test-group",
-				Account:        "test-account",
+				GroupName: pathers.GroupName{
+					Group:   "test-group",
+					Account: "test-account",
+				},
 			},
 		}, {
 			name:  "RestartWithoutApplianceWithDefaultAccount",
 			input: "test-server.test-group",
-			vmname: lib.VirtualMachineName{
+			vmname: pathers.VirtualMachineName{
 				VirtualMachine: "test-server",
-				Group:          "test-group",
-				Account:        "default-account",
+				GroupName: pathers.GroupName{
+					Group:   "test-group",
+					Account: "default-account",
+				},
 			},
 		}, {
 			name:  "RestartWithoutApplianceWithDefaultGroup",
 			input: "test-server",
-			vmname: lib.VirtualMachineName{
+			vmname: pathers.VirtualMachineName{
 				VirtualMachine: "test-server",
-				Group:          "default",
-				Account:        "default-account",
+				GroupName: pathers.GroupName{
+					Group:   "default",
+					Account: "default-account",
+				},
 			},
 		}, {
 			name:  "RestartWithApplianceFlagWithoutAppliance",
 			input: "--appliance test-server",
-			vmname: lib.VirtualMachineName{
+			vmname: pathers.VirtualMachineName{
 				VirtualMachine: "test-server",
-				Group:          "default",
-				Account:        "default-account",
+				GroupName: pathers.GroupName{
+					Group:   "default",
+					Account: "default-account",
+				},
 			},
 			shouldErr: true,
 		}, {
 			name:  "RestartWithApplianceFlag",
 			input: "--appliance rescue test-server",
-			vmname: lib.VirtualMachineName{
+			vmname: pathers.VirtualMachineName{
 				VirtualMachine: "test-server",
-				Group:          "default",
-				Account:        "default-account",
+				GroupName: pathers.GroupName{
+					Group:   "default",
+					Account: "default-account",
+				},
 			},
 			applianceBoot: true,
 		}, {
 			name:  "RestartWithRescueFlag",
 			input: "--rescue test-server",
-			vmname: lib.VirtualMachineName{
+			vmname: pathers.VirtualMachineName{
 				VirtualMachine: "test-server",
-				Group:          "default",
-				Account:        "default-account",
+				GroupName: pathers.GroupName{
+					Group:   "default",
+					Account: "default-account",
+				},
 			},
 			applianceBoot: true,
 		}, {
 			name:  "RestartWithApplianceAndRescueFlag",
 			input: "--appliance a --rescue test-server",
-			vmname: lib.VirtualMachineName{
+			vmname: pathers.VirtualMachineName{
 				VirtualMachine: "test-server",
-				Group:          "default",
-				Account:        "default-account",
+				GroupName: pathers.GroupName{
+					Group:   "default",
+					Account: "default-account",
+				},
 			},
 			shouldErr: true,
 		},
@@ -85,7 +100,7 @@ func TestRestartServerCommand(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config, client, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
-			config.When("GetVirtualMachine").Return(lib.VirtualMachineName{Group: "default", Account: "default-account"})
+			config.When("GetVirtualMachine").Return(pathers.VirtualMachineName{GroupName: pathers.GroupName{Group: "default", Account: "default-account"}})
 			config.When("PanelURL").Return("something.com")
 
 			client.When("ShutdownVirtualMachine", test.vmname, true).Times(1)

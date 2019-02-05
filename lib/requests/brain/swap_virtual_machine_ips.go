@@ -1,13 +1,16 @@
 package brain
 
-import "github.com/BytemarkHosting/bytemark-client/lib"
+import (
+	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
+)
 
 // SwapVirtualMachineIPs swaps all primary IPs (v4 and v6) between two VMs. Both
 // VMs must be powered off. If moveAdditional is provided, the additional IPs
 // are also swapped between the machines.
 // To swap only additional IPs, use multiple RerouteIP calls.. if we've written
 // that already.
-func SwapVirtualMachineIPs(client lib.Client, vmA lib.VirtualMachineName, vmB lib.VirtualMachineName, moveAdditional bool) error {
+func SwapVirtualMachineIPs(client lib.Client, vmA pathers.VirtualMachineName, vmB pathers.VirtualMachineName, moveAdditional bool) error {
 	a, err := client.GetVirtualMachine(vmA)
 	if err != nil {
 		return err

@@ -6,16 +6,16 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
 func TestStartCommand(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
-	vmn := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
+	vmn := pathers.VirtualMachineName{VirtualMachine: "test-server", GroupName: pathers.GroupName{Group: "test-group", Account: "test-account"}}
 
-	config.When("GetVirtualMachine").Return(lib.VirtualMachineName{})
+	config.When("GetVirtualMachine").Return(pathers.VirtualMachineName{})
 
 	c.When("StartVirtualMachine", vmn).Times(1)
 

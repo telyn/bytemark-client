@@ -215,7 +215,7 @@ func (config *config) GetV(name string) (Var, error) {
 }
 
 // GetVirtualMachine returns a VirtualMachineName with the config's default group and account set, and a blank VirtualMachine field
-func (config *config) GetVirtualMachine() (vm lib.VirtualMachineName) {
+func (config *config) GetVirtualMachine() (vm pathers.VirtualMachineName) {
 	vm.Account = pathers.AccountName(config.GetIgnoreErr("account"))
 	vm.Group = config.GetIgnoreErr("group")
 	vm.VirtualMachine = ""

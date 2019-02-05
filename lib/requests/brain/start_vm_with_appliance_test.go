@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	brainMethods "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
@@ -13,16 +14,18 @@ import (
 func TestStartVirtualMachineWithAppliance(t *testing.T) {
 	tests := []struct {
 		applianceName string
-		vm            lib.VirtualMachineName
+		vm            pathers.VirtualMachineName
 		expected      map[string]interface{}
 		shouldErr     bool
 	}{
 		{
 			applianceName: "rescue",
-			vm: lib.VirtualMachineName{
+			vm: pathers.VirtualMachineName{
 				VirtualMachine: "test-vm",
-				Group:          "test-group",
-				Account:        "test-account",
+				GroupName: pathers.GroupName{
+					Group:   "test-group",
+					Account: "test-account",
+				},
 			},
 			expected: map[string]interface{}{
 				"autoreboot_on": true,

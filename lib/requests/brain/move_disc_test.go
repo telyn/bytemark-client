@@ -6,6 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
@@ -22,15 +23,19 @@ func TestMoveDisc(t *testing.T) {
 	oldVM := brain.VirtualMachine{
 		ID: 999,
 	}
-	oldVMName := lib.VirtualMachineName{
+	oldVMName := pathers.VirtualMachineName{
 		VirtualMachine: "vm",
-		Group:          "group",
-		Account:        "account",
+		GroupName: pathers.GroupName{
+			Group:   "group",
+			Account: "account",
+		},
 	}
-	newVMName := lib.VirtualMachineName{
+	newVMName := pathers.VirtualMachineName{
 		VirtualMachine: "new-vm",
-		Group:          "group",
-		Account:        "account",
+		GroupName: pathers.GroupName{
+			Group:   "group",
+			Account: "account",
+		},
 	}
 
 	rts := testutil.RequestTestSpec{

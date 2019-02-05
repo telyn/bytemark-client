@@ -38,17 +38,17 @@ type privWithErr struct {
 func TestAddApiKey(t *testing.T) {
 	// here's all the test data for all the servers, groups and accounts we'll
 	// use in this test
-	serverNames := []lib.VirtualMachineName{
-		{VirtualMachine: "myserver", Group: "default", Account: "default-account"},
-		{VirtualMachine: "myserver2", Group: "test-group", Account: "test-account"},
+	serverNames := []pathers.VirtualMachineName{
+		{VirtualMachine: "myserver", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
+		{VirtualMachine: "myserver2", GroupName: pathers.GroupName{Group: "test-group", Account: "test-account"}},
 	}
 	servers := []brain.VirtualMachine{
 		{ID: 1},
 		{ID: 2},
 	}
 	groupNames := []pathers.GroupName{
-		{Group: "", Account: "default-account"},
-		{Group: "test-group", Account: "test-account"},
+		pathers.GroupName{Group: "", Account: "default-account"},
+		pathers.GroupName{Group: "test-group", Account: "test-account"},
 	}
 	groups := []brain.Group{
 		{ID: 11},
@@ -74,7 +74,7 @@ func TestAddApiKey(t *testing.T) {
 		// the map keys are used for the mock BuildRequest calls' URLs
 		accounts   map[string]accountWithErr
 		groups     map[pathers.GroupName]groupWithErr
-		servers    map[lib.VirtualMachineName]serverWithErr
+		servers    map[pathers.VirtualMachineName]serverWithErr
 		privileges []privWithErr
 		// apiKey is both the apiKey to return and some of its fields will be
 		// used to define the mock
@@ -163,7 +163,7 @@ func TestAddApiKey(t *testing.T) {
 				VirtualMachineID: 1,
 			},
 		}},
-		servers: map[lib.VirtualMachineName]serverWithErr{
+		servers: map[pathers.VirtualMachineName]serverWithErr{
 			serverNames[0]: serverWithErr{VirtualMachine: servers[0]},
 		},
 	}, {
@@ -184,7 +184,7 @@ func TestAddApiKey(t *testing.T) {
 				Label: "test-api-key",
 			},
 		},
-		servers: map[lib.VirtualMachineName]serverWithErr{
+		servers: map[pathers.VirtualMachineName]serverWithErr{
 			serverNames[0]: serverWithErr{VirtualMachine: servers[0]},
 			serverNames[1]: serverWithErr{VirtualMachine: servers[1]},
 		},
@@ -259,7 +259,7 @@ func TestAddApiKey(t *testing.T) {
 		}
 
 		test.Run(t, func(t *testing.T, config *mocks.Config, client *mocks.Client, app *cli.App) {
-			config.When("GetVirtualMachine").Return(lib.VirtualMachineName{Group: "default", Account: "default-account"})
+			config.When("GetVirtualMachine").Return(pathers.VirtualMachineName{GroupName: pathers.GroupName{Group: "default", Account: "default-account"}})
 			config.When("GetGroup").Return(pathers.GroupName{Group: "default", Account: "default-account"})
 			config.When("GetIgnoreErr", "account").Return("default-account")
 			client.When("GetUser", test.user.Username).Return(test.user, nil)

@@ -5,6 +5,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	brainRequests "github.com/BytemarkHosting/bytemark-client/lib/requests/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
@@ -12,15 +13,19 @@ import (
 )
 
 func TestSwapVirtualMachineIPs(t *testing.T) {
-	a := lib.VirtualMachineName{
+	a := pathers.VirtualMachineName{
 		VirtualMachine: "swappo",
-		Group:          "test-group",
-		Account:        "bytemark",
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "bytemark",
+		},
 	}
-	b := lib.VirtualMachineName{
+	b := pathers.VirtualMachineName{
 		VirtualMachine: "swappy",
-		Group:          "test-group",
-		Account:        "bytemark",
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "bytemark",
+		},
 	}
 	vmA := brain.VirtualMachine{
 		ID: 1903,
@@ -31,8 +36,8 @@ func TestSwapVirtualMachineIPs(t *testing.T) {
 	tests := []struct {
 		name string
 
-		nameA          lib.VirtualMachineName
-		nameB          lib.VirtualMachineName
+		nameA          pathers.VirtualMachineName
+		nameB          pathers.VirtualMachineName
 		vmA            brain.VirtualMachine
 		vmB            brain.VirtualMachine
 		moveAdditional bool

@@ -5,11 +5,12 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 )
 
 // GetVM creates a basic RequestTestSpec which expects a GET request for some VM
-func GetVM(vmName lib.VirtualMachineName, vm brain.VirtualMachine) testutil.RequestTestSpec {
+func GetVM(vmName pathers.VirtualMachineName, vm brain.VirtualMachine) testutil.RequestTestSpec {
 	return testutil.RequestTestSpec{
 		Endpoint: lib.BrainEndpoint,
 		Method:   "GET",

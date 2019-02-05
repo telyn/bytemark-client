@@ -6,7 +6,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/with"
 
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/output"
 	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
@@ -220,10 +219,12 @@ func findPrivilegesForGroup(c *app.Context, name pathers.GroupName, recurse bool
 		return
 	}
 	for _, vm := range group.VirtualMachines {
-		vmName := lib.VirtualMachineName{
+		vmName := pathers.VirtualMachineName{
 			VirtualMachine: vm.Name,
-			Group:          name.Group,
-			Account:        name.Account,
+			GroupName: pathers.GroupName{
+				Group:   name.Group,
+				Account: name.Account,
+			},
 		}
 		newPrivs, err := c.Client().GetPrivilegesForVirtualMachine(vmName)
 		if err != nil {
