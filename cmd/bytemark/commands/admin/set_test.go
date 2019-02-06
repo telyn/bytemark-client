@@ -6,7 +6,7 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/admin"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -18,10 +18,12 @@ func TestSetDiscIOPSLimit(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(defVM)
 
-	name := lib.VirtualMachineName{
+	name := pathers.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 
 	c.When("SetDiscIopsLimit", name, "disc-label", 100).Return(nil).Times(1)

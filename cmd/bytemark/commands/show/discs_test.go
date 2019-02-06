@@ -6,8 +6,8 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -17,10 +17,12 @@ func TestShowDiscs(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(testutil.DefVM)
 
-	name := lib.VirtualMachineName{
+	name := pathers.VirtualMachineName{
 		VirtualMachine: "spooky-vm",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 
 	vm := brain.VirtualMachine{

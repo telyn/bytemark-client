@@ -7,7 +7,6 @@ import (
 	appPkg "github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
@@ -118,10 +117,12 @@ func TestDeleteGroup(t *testing.T) {
 						Name: "test-vm",
 					},
 				}
-				client.When("DeleteVirtualMachine", lib.VirtualMachineName{
-					Account:        "test-account",
-					Group:          "test-group",
+				client.When("DeleteVirtualMachine", pathers.VirtualMachineName{
 					VirtualMachine: "test-vm",
+					GroupName: pathers.GroupName{
+						Group:   "test-group",
+						Account: "test-account",
+					},
 				}, true).Return(nil)
 			}
 

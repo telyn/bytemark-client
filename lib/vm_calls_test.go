@@ -67,7 +67,7 @@ func TestMoveVirtualMachine(t *testing.T) {
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		oldName := lib.VirtualMachineName{VirtualMachine: "rename-test", Group: "old-group", Account: "old-account"}
+		oldName := pathers.VirtualMachineName{VirtualMachine: "rename-test", GroupName: pathers.GroupName{Group: "old-group", Account: "old-account"}}
 		newName := oldName
 		newName.VirtualMachine = "new-name"
 
@@ -98,7 +98,7 @@ func TestMoveServerGroup(t *testing.T) {
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		oldName := lib.VirtualMachineName{VirtualMachine: "group-test", Group: "old-group", Account: "old-account"}
+		oldName := pathers.VirtualMachineName{VirtualMachine: "group-test", GroupName: pathers.GroupName{Group: "old-group", Account: "old-account"}}
 		newName := oldName
 		newName.VirtualMachine = "new-name"
 		newName.Group = "new-group"
@@ -126,23 +126,23 @@ func TestGetVirtualMachine(t *testing.T) {
 	}
 
 	rts.Run(t, testName, true, func(client lib.Client) {
-		vm, err := client.GetVirtualMachine(lib.VirtualMachineName{VirtualMachine: "", Group: "default", Account: "account"})
+		vm, err := client.GetVirtualMachine(pathers.VirtualMachineName{VirtualMachine: "", GroupName: pathers.GroupName{Group: "default", Account: "account"}})
 		assert.NotEqual(t, testName, nil, err)
 		if _, ok := err.(lib.BadNameError); !ok {
 			t.Fatalf("Expected BadNameError, got %T", err)
 		}
 
-		vm, err = client.GetVirtualMachine(lib.VirtualMachineName{VirtualMachine: "invalid-vm", Group: "default", Account: "account"})
+		vm, err = client.GetVirtualMachine(pathers.VirtualMachineName{VirtualMachine: "invalid-vm", GroupName: pathers.GroupName{Group: "default", Account: "account"}})
 		assert.NotEqual(t, testName, nil, err)
 
-		vm, err = client.GetVirtualMachine(lib.VirtualMachineName{VirtualMachine: "valid-vm", Group: "", Account: "account"})
+		vm, err = client.GetVirtualMachine(pathers.VirtualMachineName{VirtualMachine: "valid-vm", GroupName: pathers.GroupName{Group: "", Account: "account"}})
 		assert.Equal(t, testName, nil, err)
 
-		vm, err = client.GetVirtualMachine(lib.VirtualMachineName{VirtualMachine: "valid-vm", Group: "default", Account: "account"})
+		vm, err = client.GetVirtualMachine(pathers.VirtualMachineName{VirtualMachine: "valid-vm", GroupName: pathers.GroupName{Group: "default", Account: "account"}})
 		assert.Equal(t, testName, nil, err)
 
 		// Check that being just numeric is valid as well
-		vm, err = client.GetVirtualMachine(lib.VirtualMachineName{VirtualMachine: "123"})
+		vm, err = client.GetVirtualMachine(pathers.VirtualMachineName{VirtualMachine: "123"})
 		assert.Equal(t, testName, nil, err)
 
 		assert.Equal(t, testName, "127.0.0.1", vm.ManagementAddress.String())
@@ -260,10 +260,12 @@ func TestSetVirtualMachineCDROM(t *testing.T) {
 		}),
 	}
 	rts.Run(t, testName, true, func(client lib.Client) {
-		err := client.SetVirtualMachineCDROM(lib.VirtualMachineName{
+		err := client.SetVirtualMachineCDROM(pathers.VirtualMachineName{
 			VirtualMachine: "test-vm",
-			Group:          "test-group",
-			Account:        "test-account",
+			GroupName: pathers.GroupName{
+				Group:   "test-group",
+				Account: "test-account",
+			},
 		}, testurl)
 		if err != nil {
 			t.Fatal(err)

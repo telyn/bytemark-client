@@ -1,3 +1,13 @@
+bytemark-client (4.0) UNRELEASED; urgency=low
+
+  ### New Features
+  * None yet
+
+  ### Changes
+  * Broke API compatibility with 3.x series.
+
+ -- Telyn Roat <telyn@bytemark.co.uk>  Wed, 16 Jan 2019 12:48:41 +0000
+
 bytemark-client (3.5) UNRELEASED; urgency=low
 
   ### New Features:

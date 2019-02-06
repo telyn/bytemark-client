@@ -7,6 +7,7 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/cheekybits/is"
 )
@@ -14,10 +15,12 @@ import (
 func TestDeleteServer(t *testing.T) {
 	is := is.New(t)
 
-	name := lib.VirtualMachineName{
+	name := pathers.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 
 	vm := getFixtureVM()
@@ -61,10 +64,12 @@ func TestDeleteDisc(t *testing.T) {
 		config.When("Force").Return(true)
 		config.When("GetVirtualMachine").Return(defVM)
 
-		name := lib.VirtualMachineName{
+		name := pathers.VirtualMachineName{
 			VirtualMachine: "test-server",
-			Group:          "test-group",
-			Account:        "test-account",
+			GroupName: pathers.GroupName{
+				Group:   "test-group",
+				Account: "test-account",
+			},
 		}
 		c.When("DeleteDisc", name, "666").Return(nil).Times(1)
 
@@ -149,10 +154,12 @@ func TestDeleteBackup(t *testing.T) {
 	is := is.New(t)
 	config, c, app := testutil.BaseTestAuthSetup(t, false, Commands(false))
 
-	vmname := lib.VirtualMachineName{
+	vmname := pathers.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 
 	config.When("GetVirtualMachine").Return(defVM)

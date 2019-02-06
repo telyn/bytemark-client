@@ -6,15 +6,18 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil"
 	"github.com/BytemarkHosting/bytemark-client/lib/testutil/assert"
 )
 
 func TestCreateBackup(t *testing.T) {
-	vm := lib.VirtualMachineName{
+	vm := pathers.VirtualMachineName{
 		VirtualMachine: "test-vm",
-		Group:          "test-group",
-		Account:        "test-account",
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "test-account",
+		},
 	}
 
 	disc := "test-disc"
@@ -61,10 +64,12 @@ func TestCreateBackup(t *testing.T) {
 }
 
 func TestDeleteBackup(t *testing.T) {
-	vm := lib.VirtualMachineName{
+	vm := pathers.VirtualMachineName{
 		VirtualMachine: "test-vm",
-		Group:          "test-group",
-		Account:        "test-account",
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "test-account",
+		},
 	}
 
 	disc := "test-disc"
@@ -85,10 +90,12 @@ func TestDeleteBackup(t *testing.T) {
 }
 
 func TestGetBackups(t *testing.T) {
-	vm := lib.VirtualMachineName{
+	vm := pathers.VirtualMachineName{
 		VirtualMachine: "test-vm",
-		Group:          "test-group",
-		Account:        "test-account",
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "test-account",
+		},
 	}
 
 	disc := "test-disc"
@@ -120,10 +127,12 @@ func TestGetBackups(t *testing.T) {
 }
 
 func TestRestoreBackup(t *testing.T) {
-	vm := lib.VirtualMachineName{
+	vm := pathers.VirtualMachineName{
 		VirtualMachine: "test-vm",
-		Group:          "test-group",
-		Account:        "test-account",
+		GroupName: pathers.GroupName{
+			Group:   "test-group",
+			Account: "test-account",
+		},
 	}
 
 	disc := "test-disc"

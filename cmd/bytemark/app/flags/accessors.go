@@ -4,7 +4,6 @@ import (
 	"net"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
@@ -95,14 +94,14 @@ func Size(c *app.Context, flagname string) int {
 	return 0
 }
 
-// VirtualMachineName returns the named flag as a lib.VirtualMachineName
-func VirtualMachineName(c *app.Context, flagname string) (vm lib.VirtualMachineName) {
+// VirtualMachineName returns the named flag as a pathers.VirtualMachineName
+func VirtualMachineName(c *app.Context, flagname string) (vm pathers.VirtualMachineName) {
 	vmNameFlag, ok := c.Context.Generic(flagname).(*VirtualMachineNameFlag)
 	if !ok {
 		return c.Config().GetVirtualMachine()
 	}
 	if vmNameFlag == nil {
-		return lib.VirtualMachineName{}
+		return pathers.VirtualMachineName{}
 	}
 
 	return vmNameFlag.VirtualMachineName

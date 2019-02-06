@@ -30,7 +30,7 @@ func (args *privArgs) shift() (arg string, err error) {
 type PrivilegeFlag struct {
 	AccountName        string
 	GroupName          *pathers.GroupName
-	VirtualMachineName *lib.VirtualMachineName
+	VirtualMachineName *pathers.VirtualMachineName
 	Username           string
 	Level              brain.PrivilegeLevel
 	Value              string
@@ -55,7 +55,7 @@ func (pf *PrivilegeFlag) fillPrivilegeTarget(c *app.Context, args *privArgs) (er
 				return
 			}
 		}
-		var vmName lib.VirtualMachineName
+		var vmName pathers.VirtualMachineName
 		var groupName pathers.GroupName
 		switch pf.TargetType() {
 		case brain.PrivilegeTargetTypeVM:

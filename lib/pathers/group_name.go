@@ -13,7 +13,7 @@ type GroupName struct {
 // DefaultGroup is the default group name (just the group part - don't add dots!). Defaults to "default". Wow.
 var DefaultGroup = "default"
 
-func (g GroupName) defaultIfNeeded() {
+func (g *GroupName) defaultIfNeeded() {
 	if g.Group == "" {
 		g.Group = DefaultGroup
 	}

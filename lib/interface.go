@@ -35,7 +35,7 @@ type Client interface {
 	// Ensurers
 	//
 
-	EnsureVirtualMachineName(vm *VirtualMachineName) error
+	EnsureVirtualMachineName(vm *pathers.VirtualMachineName) error
 	EnsureGroupName(group *pathers.GroupName) error
 	EnsureAccountName(account *pathers.AccountName) error
 
@@ -97,12 +97,12 @@ type Client interface {
 	// DISCS
 	//
 
-	CreateDisc(vm VirtualMachineName, disc brain.Disc) error
-	DeleteDisc(vm VirtualMachineName, idOrLabel string) error
-	GetDisc(vm VirtualMachineName, idOrLabel string) (brain.Disc, error)
+	CreateDisc(vm pathers.VirtualMachineName, disc brain.Disc) error
+	DeleteDisc(vm pathers.VirtualMachineName, idOrLabel string) error
+	GetDisc(vm pathers.VirtualMachineName, idOrLabel string) (brain.Disc, error)
 	GetDiscByID(id int) (brain.Disc, error)
-	ResizeDisc(vm VirtualMachineName, idOrLabel string, size int) error
-	SetDiscIopsLimit(vm VirtualMachineName, idOrLabel string, iopsLimit int) error
+	ResizeDisc(vm pathers.VirtualMachineName, idOrLabel string, size int) error
+	SetDiscIopsLimit(vm pathers.VirtualMachineName, idOrLabel string, iopsLimit int) error
 
 	//
 	// GROUPS
@@ -117,7 +117,7 @@ type Client interface {
 	// NICS
 	//
 
-	AddIP(name VirtualMachineName, ipcr brain.IPCreateRequest) (brain.IPs, error)
+	AddIP(name pathers.VirtualMachineName, ipcr brain.IPCreateRequest) (brain.IPs, error)
 
 	//
 	// PRIVILEGES
@@ -126,7 +126,7 @@ type Client interface {
 	GetPrivileges(username string) (brain.Privileges, error)
 	GetPrivilegesForAccount(account string) (brain.Privileges, error)
 	GetPrivilegesForGroup(group pathers.GroupName) (brain.Privileges, error)
-	GetPrivilegesForVirtualMachine(vm VirtualMachineName) (brain.Privileges, error)
+	GetPrivilegesForVirtualMachine(vm pathers.VirtualMachineName) (brain.Privileges, error)
 	GrantPrivilege(p brain.Privilege) error
 	RevokePrivilege(p brain.Privilege) error
 
@@ -134,17 +134,17 @@ type Client interface {
 	// BACKUPS
 	//
 
-	CreateBackup(server VirtualMachineName, discLabelOrID string) (brain.Backup, error)
-	DeleteBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) error
-	GetBackups(server VirtualMachineName, discLabelOrID string) (brain.Backups, error)
-	RestoreBackup(server VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
+	CreateBackup(server pathers.VirtualMachineName, discLabelOrID string) (brain.Backup, error)
+	DeleteBackup(server pathers.VirtualMachineName, discLabelOrID string, backupLabelOrID string) error
+	GetBackups(server pathers.VirtualMachineName, discLabelOrID string) (brain.Backups, error)
+	RestoreBackup(server pathers.VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error)
 
 	//
 	// BACKUP SCHEDULES
 	//
 
-	CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, intervalSeconds int) (brain.BackupSchedule, error)
-	DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) error
+	CreateBackupSchedule(server pathers.VirtualMachineName, discLabel string, startDate string, intervalSeconds int) (brain.BackupSchedule, error)
+	DeleteBackupSchedule(server pathers.VirtualMachineName, discLabel string, id int) error
 
 	//
 	// USERS
@@ -162,62 +162,62 @@ type Client interface {
 
 	// DeleteVirtualMachine deletes the named virtual machine.
 	// returns nil on success or an error otherwise.
-	DeleteVirtualMachine(name VirtualMachineName, purge bool) error
+	DeleteVirtualMachine(name pathers.VirtualMachineName, purge bool) error
 
 	// GetVirtualMachine requests an overview of the named VM, regardless of its deletion status.
-	GetVirtualMachine(name VirtualMachineName) (brain.VirtualMachine, error)
+	GetVirtualMachine(name pathers.VirtualMachineName) (brain.VirtualMachine, error)
 
-	// MoveVirtualMachine moves a server from one VirtualMachineName to another.
-	MoveVirtualMachine(old VirtualMachineName, new VirtualMachineName) error
+	// MoveVirtualMachine moves a server from one pathers.VirtualMachineName to another.
+	MoveVirtualMachine(old pathers.VirtualMachineName, new pathers.VirtualMachineName) error
 
 	// ReimageVirtualMachine reimages the named virtual machine. This will wipe everything on the first disk in the vm and install a new OS on top of it.
 	// Note that the machine in question must already be powered off. Once complete, according to the API docs, the vm will be powered on but its autoreboot_on will be false.
-	ReimageVirtualMachine(name VirtualMachineName, image brain.ImageInstall) (err error)
+	ReimageVirtualMachine(name pathers.VirtualMachineName, image brain.ImageInstall) (err error)
 
 	// ResetVirtualMachine resets the named virtual machine. This is like pressing the reset
 	// button on a physical computer. This does not cause a new process to be started, so does not apply any pending hardware changes.
 	// returns nil on success or an error otherwise.
-	ResetVirtualMachine(name VirtualMachineName) (err error)
+	ResetVirtualMachine(name pathers.VirtualMachineName) (err error)
 
 	// RestartVirtualMachine restarts the named virtual machine. This is
 	// returns nil on success or an error otherwise.
-	RestartVirtualMachine(name VirtualMachineName) (err error)
+	RestartVirtualMachine(name pathers.VirtualMachineName) (err error)
 
 	// StartVirtualMachine starts the named virtual machine.
 	// returns nil on success or an error otherwise.
-	StartVirtualMachine(name VirtualMachineName) (err error)
+	StartVirtualMachine(name pathers.VirtualMachineName) (err error)
 
 	// StopVirtualMachine starts the named virtual machine.
 	// returns nil on success or an error otherwise.
-	StopVirtualMachine(name VirtualMachineName) (err error)
+	StopVirtualMachine(name pathers.VirtualMachineName) (err error)
 
 	// ShutdownVirtualMachine sends an ACPI shutdown to the VM. This will cause a graceful shutdown of the machine
 	// returns nil on success or an error otherwise.
-	ShutdownVirtualMachine(name VirtualMachineName, stayoff bool) (err error)
+	ShutdownVirtualMachine(name pathers.VirtualMachineName, stayoff bool) (err error)
 
 	// UndeleteVirtualMachine changes the deleted flag on a VM back to false.
 	// Return nil on success, an error otherwise.
-	UndeleteVirtualMachine(name VirtualMachineName) error
+	UndeleteVirtualMachine(name pathers.VirtualMachineName) error
 
 	// SetVirtualMachineHardwareProfile specifies the hardware profile on a VM. Optionally locks or unlocks h. profile
 	// Return nil on success, an error otherwise.
-	SetVirtualMachineHardwareProfile(name VirtualMachineName, profile string, locked ...bool) (err error)
+	SetVirtualMachineHardwareProfile(name pathers.VirtualMachineName, profile string, locked ...bool) (err error)
 
 	// SetVirtualMachineHardwareProfileLock locks or unlocks the hardware profile of a VM.
 	// Return nil on success, an error otherwise.
-	SetVirtualMachineHardwareProfileLock(name VirtualMachineName, locked bool) (err error)
+	SetVirtualMachineHardwareProfileLock(name pathers.VirtualMachineName, locked bool) (err error)
 
 	// SetVirtualMachineMemory sets the RAM available to a virtual machine in megabytes
 	// Return nil on success, an error otherwise.
-	SetVirtualMachineMemory(name VirtualMachineName, memory int) (err error)
+	SetVirtualMachineMemory(name pathers.VirtualMachineName, memory int) (err error)
 
 	// SetVirtualMachineCores sets the number of CPUs available to a virtual machine
 	// Return nil on success, an error otherwise.
-	SetVirtualMachineCores(name VirtualMachineName, cores int) (err error)
+	SetVirtualMachineCores(name pathers.VirtualMachineName, cores int) (err error)
 
 	// SetVirtualMachineCDROM sets the URL of a CD to attach to a virtual machine. Set url to "" to remove the CD.
 	// Returns nil on success, an error otherwise.
-	SetVirtualMachineCDROM(name VirtualMachineName, url string) (err error)
+	SetVirtualMachineCDROM(name pathers.VirtualMachineName, url string) (err error)
 
 	//
 	// ADMIN
@@ -238,7 +238,7 @@ type Client interface {
 	GetStoppedEligibleVMs() (brain.VirtualMachines, error)
 	GetRecentVMs() (brain.VirtualMachines, error)
 	MigrateDisc(disc int, newStoragePool string) error
-	MigrateVirtualMachine(vmName VirtualMachineName, newHead string) error
+	MigrateVirtualMachine(vmName pathers.VirtualMachineName, newHead string) error
 	DeleteVLAN(id int) error
 	AdminCreateGroup(name pathers.GroupName, vlanNum int) error
 	CreateIPRange(ipRange string, vlanNum int) error
@@ -247,7 +247,7 @@ type Client interface {
 	EmptyStoragePool(idOrLabel string) error
 	EmptyHead(idOrLabel string) error
 	RegradeDisc(disc int, newGrade string) error
-	UpdateVMMigration(name VirtualMachineName, speed *int64, downtime *int) error
+	UpdateVMMigration(name pathers.VirtualMachineName, speed *int64, downtime *int) error
 	CreateUser(username string, privilege string) error
 	UpdateHead(idOrLabel string, options UpdateHead) error
 	UpdateTail(idOrLabel string, options UpdateTail) error

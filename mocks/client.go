@@ -105,7 +105,7 @@ func (c *Client) ReadDefinitions() (lib.Definitions, error) {
 	return defs, r.Error(1)
 }
 
-func (c *Client) AddIP(name lib.VirtualMachineName, spec brain.IPCreateRequest) (brain.IPs, error) {
+func (c *Client) AddIP(name pathers.VirtualMachineName, spec brain.IPCreateRequest) (brain.IPs, error) {
 	r := c.Called(name, spec)
 	ips, _ := r.Get(0).(brain.IPs)
 	return ips, r.Error(1)
@@ -165,12 +165,12 @@ func (c *Client) GetAccounts() (accounts lib.Accounts, err error) {
 	return acc, r.Error(1)
 }
 
-func (c *Client) CreateDisc(name lib.VirtualMachineName, disc brain.Disc) error {
+func (c *Client) CreateDisc(name pathers.VirtualMachineName, disc brain.Disc) error {
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
 
-func (c *Client) GetDisc(name lib.VirtualMachineName, discId string) (disc brain.Disc, err error) {
+func (c *Client) GetDisc(name pathers.VirtualMachineName, discId string) (disc brain.Disc, err error) {
 	r := c.Called(name, discId)
 	disc, _ = r.Get(0).(brain.Disc)
 	return disc, r.Error(1)
@@ -193,7 +193,7 @@ func (c *Client) GetGroup(name pathers.GroupName) (brain.Group, error) {
 	return group, r.Error(1)
 }
 
-func (c *Client) DeleteDisc(name lib.VirtualMachineName, disc string) error {
+func (c *Client) DeleteDisc(name pathers.VirtualMachineName, disc string) error {
 	r := c.Called(name, disc)
 	return r.Error(0)
 }
@@ -203,7 +203,7 @@ func (c *Client) DeleteGroup(name pathers.GroupName) error {
 	return r.Error(0)
 }
 
-func (c *Client) DeleteVirtualMachine(name lib.VirtualMachineName, purge bool) error {
+func (c *Client) DeleteVirtualMachine(name pathers.VirtualMachineName, purge bool) error {
 	r := c.Called(name, purge)
 	return r.Error(0)
 }
@@ -214,20 +214,20 @@ func (c *Client) CreateVirtualMachine(group pathers.GroupName, vm brain.VirtualM
 	return rvm, r.Error(1)
 }
 
-func (c *Client) GetVirtualMachine(name lib.VirtualMachineName) (vm brain.VirtualMachine, err error) {
+func (c *Client) GetVirtualMachine(name pathers.VirtualMachineName) (vm brain.VirtualMachine, err error) {
 	r := c.Called(name)
 	vm, _ = r.Get(0).(brain.VirtualMachine)
 	return vm, r.Error(1)
 }
 
-func (c *Client) MoveVirtualMachine(oldName lib.VirtualMachineName, newName lib.VirtualMachineName) error {
+func (c *Client) MoveVirtualMachine(oldName pathers.VirtualMachineName, newName pathers.VirtualMachineName) error {
 	r := c.Called(oldName, newName)
 	return r.Error(0)
 }
 
-func (c *Client) ParseVirtualMachineName(name string, defaults ...lib.VirtualMachineName) (lib.VirtualMachineName, error) {
+func (c *Client) ParseVirtualMachineName(name string, defaults ...pathers.VirtualMachineName) (pathers.VirtualMachineName, error) {
 	r := c.Called(name, defaults)
-	n, _ := r.Get(0).(lib.VirtualMachineName)
+	n, _ := r.Get(0).(pathers.VirtualMachineName)
 	return n, r.Error(1)
 }
 
@@ -242,92 +242,92 @@ func (c *Client) ParseAccountName(name string, defaults ...string) string {
 	return r.String(0)
 }
 
-func (c *Client) ReimageVirtualMachine(name lib.VirtualMachineName, image brain.ImageInstall) error {
+func (c *Client) ReimageVirtualMachine(name pathers.VirtualMachineName, image brain.ImageInstall) error {
 	r := c.Called(name, image)
 	return r.Error(0)
 }
 
-func (c *Client) ResetVirtualMachine(name lib.VirtualMachineName) error {
+func (c *Client) ResetVirtualMachine(name pathers.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
 
-func (c *Client) ResizeDisc(name lib.VirtualMachineName, id string, size int) error {
+func (c *Client) ResizeDisc(name pathers.VirtualMachineName, id string, size int) error {
 	r := c.Called(name, id, size)
 	return r.Error(0)
 }
 
-func (c *Client) SetDiscIopsLimit(name lib.VirtualMachineName, id string, size int) error {
+func (c *Client) SetDiscIopsLimit(name pathers.VirtualMachineName, id string, size int) error {
 	r := c.Called(name, id, size)
 	return r.Error(0)
 }
 
-func (c *Client) RestartVirtualMachine(name lib.VirtualMachineName) error {
+func (c *Client) RestartVirtualMachine(name pathers.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
-func (c *Client) SetVirtualMachineCDROM(name lib.VirtualMachineName, url string) error {
+func (c *Client) SetVirtualMachineCDROM(name pathers.VirtualMachineName, url string) error {
 	r := c.Called(name, url)
 	return r.Error(0)
 }
-func (c *Client) SetVirtualMachineCores(name lib.VirtualMachineName, cores int) error {
+func (c *Client) SetVirtualMachineCores(name pathers.VirtualMachineName, cores int) error {
 	r := c.Called(name, cores)
 	return r.Error(0)
 }
-func (c *Client) SetVirtualMachineHardwareProfile(name lib.VirtualMachineName, hwprofile string, locked ...bool) error {
+func (c *Client) SetVirtualMachineHardwareProfile(name pathers.VirtualMachineName, hwprofile string, locked ...bool) error {
 	r := c.Called(name, hwprofile, locked)
 	return r.Error(0)
 }
-func (c *Client) SetVirtualMachineHardwareProfileLock(name lib.VirtualMachineName, locked bool) error {
+func (c *Client) SetVirtualMachineHardwareProfileLock(name pathers.VirtualMachineName, locked bool) error {
 	r := c.Called(name, locked)
 	return r.Error(0)
 }
-func (c *Client) SetVirtualMachineMemory(name lib.VirtualMachineName, memory int) error {
+func (c *Client) SetVirtualMachineMemory(name pathers.VirtualMachineName, memory int) error {
 	r := c.Called(name, memory)
 	return r.Error(0)
 }
-func (c *Client) StartVirtualMachine(name lib.VirtualMachineName) error {
+func (c *Client) StartVirtualMachine(name pathers.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
-func (c *Client) StopVirtualMachine(name lib.VirtualMachineName) error {
+func (c *Client) StopVirtualMachine(name pathers.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
-func (c *Client) ShutdownVirtualMachine(name lib.VirtualMachineName, stayoff bool) error {
+func (c *Client) ShutdownVirtualMachine(name pathers.VirtualMachineName, stayoff bool) error {
 	r := c.Called(name, stayoff)
 	return r.Error(0)
 }
 
-func (c *Client) UndeleteVirtualMachine(name lib.VirtualMachineName) error {
+func (c *Client) UndeleteVirtualMachine(name pathers.VirtualMachineName) error {
 	r := c.Called(name)
 	return r.Error(0)
 }
 
-func (c *Client) CreateBackup(server lib.VirtualMachineName, discLabelOrID string) (brain.Backup, error) {
+func (c *Client) CreateBackup(server pathers.VirtualMachineName, discLabelOrID string) (brain.Backup, error) {
 	r := c.Called(server, discLabelOrID)
 	snap, _ := r.Get(0).(brain.Backup)
 	return snap, r.Error(1)
 }
-func (c *Client) DeleteBackup(server lib.VirtualMachineName, discLabelOrID string, backupLabelOrID string) error {
+func (c *Client) DeleteBackup(server pathers.VirtualMachineName, discLabelOrID string, backupLabelOrID string) error {
 	r := c.Called(server, discLabelOrID, backupLabelOrID)
 	return r.Error(0)
 }
-func (c *Client) CreateBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, start string, interval int) (brain.BackupSchedule, error) {
+func (c *Client) CreateBackupSchedule(server pathers.VirtualMachineName, discLabelOrID string, start string, interval int) (brain.BackupSchedule, error) {
 	r := c.Called(server, discLabelOrID, start, interval)
 	sched, _ := r.Get(0).(brain.BackupSchedule)
 	return sched, r.Error(1)
 }
-func (c *Client) DeleteBackupSchedule(server lib.VirtualMachineName, discLabelOrID string, id int) error {
+func (c *Client) DeleteBackupSchedule(server pathers.VirtualMachineName, discLabelOrID string, id int) error {
 	r := c.Called(server, discLabelOrID, id)
 	return r.Error(0)
 }
-func (c *Client) GetBackups(server lib.VirtualMachineName, discLabelOrID string) (brain.Backups, error) {
+func (c *Client) GetBackups(server pathers.VirtualMachineName, discLabelOrID string) (brain.Backups, error) {
 	r := c.Called(server, discLabelOrID)
 	snaps, _ := r.Get(0).(brain.Backups)
 	return snaps, r.Error(1)
 }
-func (c *Client) RestoreBackup(server lib.VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error) {
+func (c *Client) RestoreBackup(server pathers.VirtualMachineName, discLabelOrID string, backupLabelOrID string) (brain.Backup, error) {
 	r := c.Called(server, discLabelOrID, backupLabelOrID)
 	snap, _ := r.Get(0).(brain.Backup)
 
@@ -349,7 +349,7 @@ func (c *Client) GetPrivilegesForGroup(group pathers.GroupName) (privs brain.Pri
 	privs, _ = r.Get(0).(brain.Privileges)
 	return privs, r.Error(1)
 }
-func (c *Client) GetPrivilegesForVirtualMachine(vm lib.VirtualMachineName) (privs brain.Privileges, err error) {
+func (c *Client) GetPrivilegesForVirtualMachine(vm pathers.VirtualMachineName) (privs brain.Privileges, err error) {
 	r := c.Called(vm)
 	privs, _ = r.Get(0).(brain.Privileges)
 	return privs, r.Error(1)
@@ -431,7 +431,7 @@ func (c *Client) MigrateDisc(disc int, newStoragePool string) error {
 	r := c.Called(disc, newStoragePool)
 	return r.Error(0)
 }
-func (c *Client) MigrateVirtualMachine(vmName lib.VirtualMachineName, newHead string) error {
+func (c *Client) MigrateVirtualMachine(vmName pathers.VirtualMachineName, newHead string) error {
 	r := c.Called(vmName, newHead)
 	return r.Error(0)
 }
@@ -471,11 +471,11 @@ func (c *Client) ReifyDisc(id int) error {
 	r := c.Called(id)
 	return r.Error(0)
 }
-func (c *Client) ApproveVM(name lib.VirtualMachineName, powerOn bool) error {
+func (c *Client) ApproveVM(name pathers.VirtualMachineName, powerOn bool) error {
 	r := c.Called(name, powerOn)
 	return r.Error(0)
 }
-func (c *Client) RejectVM(name lib.VirtualMachineName, reason string) error {
+func (c *Client) RejectVM(name pathers.VirtualMachineName, reason string) error {
 	r := c.Called(name, reason)
 	return r.Error(0)
 }
@@ -483,7 +483,7 @@ func (c *Client) RegradeDisc(disc int, newGrade string) error {
 	r := c.Called(disc, newGrade)
 	return r.Error(0)
 }
-func (c *Client) UpdateVMMigration(name lib.VirtualMachineName, speed *int64, downtime *int) error {
+func (c *Client) UpdateVMMigration(name pathers.VirtualMachineName, speed *int64, downtime *int) error {
 	r := c.Called(name, speed, downtime)
 	return r.Error(0)
 }
@@ -525,7 +525,7 @@ func (c *Client) EnsureGroupName(name *pathers.GroupName) error {
 	return nil
 }
 
-func (c *Client) EnsureVirtualMachineName(name *lib.VirtualMachineName) error {
+func (c *Client) EnsureVirtualMachineName(name *pathers.VirtualMachineName) error {
 	if name.Account == "" {
 		name.Account = "blank-account-name"
 	}

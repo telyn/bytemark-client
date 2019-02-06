@@ -76,7 +76,7 @@ func createServer(c *app.Context) (err error) {
 	}
 	spec.IPs = ipspec
 
-	groupName := name.GroupName()
+	groupName := name.GroupName
 	err = c.Client().EnsureGroupName(&groupName)
 	if err != nil {
 		return

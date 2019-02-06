@@ -190,7 +190,7 @@ func TestShowServerCommand(t *testing.T) {
 	config, c, app := testutil.BaseTestAuthSetup(t, false, commands)
 
 	config.When("GetVirtualMachine").Return(defVM)
-	vmname := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "test-group", Account: "test-account"}
+	vmname := pathers.VirtualMachineName{VirtualMachine: "test-server", GroupName: pathers.GroupName{Group: "test-group", Account: "test-account"}}
 	vm := getFixtureVM()
 	c.When("GetVirtualMachine", vmname).Return(&vm, nil).Times(1)
 
@@ -240,7 +240,7 @@ func TestShowDisc(t *testing.T) {
 		err           error
 		shouldErr     bool
 		args          string
-		vm            lib.VirtualMachineName
+		vm            pathers.VirtualMachineName
 		discLabelOrID string
 	}{
 		{ // 0 - fully specified flags
@@ -250,7 +250,7 @@ func TestShowDisc(t *testing.T) {
 				StorageGrade: "sata",
 			},
 			args:          "bytemark show disc --server fliff --disc faff",
-			vm:            lib.VirtualMachineName{VirtualMachine: "fliff", Group: "default", Account: "default-account"},
+			vm:            pathers.VirtualMachineName{VirtualMachine: "fliff", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 			discLabelOrID: "faff",
 		}, { // 1 - flags from args
 			disc: brain.Disc{
@@ -259,7 +259,7 @@ func TestShowDisc(t *testing.T) {
 				StorageGrade: "sata",
 			},
 			args:          "bytemark show disc fliff faff",
-			vm:            lib.VirtualMachineName{VirtualMachine: "fliff", Group: "default", Account: "default-account"},
+			vm:            pathers.VirtualMachineName{VirtualMachine: "fliff", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 			discLabelOrID: "faff",
 		}, { // 2 - no disc
 			args:      "bytemark show disc fliff",
@@ -273,7 +273,7 @@ func TestShowDisc(t *testing.T) {
 				Label:        "faff",
 				StorageGrade: "sata",
 			},
-			vm:            lib.VirtualMachineName{},
+			vm:            pathers.VirtualMachineName{},
 			args:          "bytemark show disc --disc 42",
 			discLabelOrID: "42",
 		},

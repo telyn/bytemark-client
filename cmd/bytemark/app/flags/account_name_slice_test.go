@@ -6,7 +6,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app/flags"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
@@ -28,8 +27,17 @@ func TestAccountNameSliceFlag(t *testing.T) {
 	// String()
 	cfg, client, cliApp := testutil.BaseTestSetup(t, false, []cli.Command{})
 	cfg.When("GetIgnoreErr", "account").Return("default-account")
-	cfg.When("GetGroup").Return(pathers.GroupName{Group: "default-group", Account: "default-account"})
-	cfg.When("GetVirtualMachine").Return(lib.VirtualMachineName{VirtualMachine: "default-server", Group: "default-group", Account: "default-account"})
+	cfg.When("GetGroup").Return(pathers.GroupName{
+		Group:   "default-group",
+		Account: "default-account",
+	})
+	cfg.When("GetVirtualMachine").Return(pathers.VirtualMachineName{
+		VirtualMachine: "default-server",
+		GroupName: pathers.GroupName{
+			Group:   "default-group",
+			Account: "default-account",
+		},
+	})
 
 	// now some boilerplate to get a context
 	// TODO(telyn): this should probably be refactored out since it'll be

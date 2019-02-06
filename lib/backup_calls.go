@@ -2,10 +2,11 @@ package lib
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // CreateBackup creates a backup of the given disc, returning the backup if it was successful.
-func (c *bytemarkClient) CreateBackup(vm VirtualMachineName, discLabelOrID string) (backup brain.Backup, err error) {
+func (c *bytemarkClient) CreateBackup(vm pathers.VirtualMachineName, discLabelOrID string) (backup brain.Backup, err error) {
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return
@@ -20,7 +21,7 @@ func (c *bytemarkClient) CreateBackup(vm VirtualMachineName, discLabelOrID strin
 	return
 }
 
-func (c *bytemarkClient) DeleteBackup(vm VirtualMachineName, discLabelOrID string, backupLabelOrID string) (err error) {
+func (c *bytemarkClient) DeleteBackup(vm pathers.VirtualMachineName, discLabelOrID string, backupLabelOrID string) (err error) {
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return
@@ -34,7 +35,7 @@ func (c *bytemarkClient) DeleteBackup(vm VirtualMachineName, discLabelOrID strin
 	return
 }
 
-func (c *bytemarkClient) GetBackups(vm VirtualMachineName, discLabelOrID string) (backups brain.Backups, err error) {
+func (c *bytemarkClient) GetBackups(vm pathers.VirtualMachineName, discLabelOrID string) (backups brain.Backups, err error) {
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return
@@ -48,7 +49,7 @@ func (c *bytemarkClient) GetBackups(vm VirtualMachineName, discLabelOrID string)
 	return
 }
 
-func (c *bytemarkClient) RestoreBackup(vm VirtualMachineName, discLabelOrID string, backupLabelOrID string) (backup brain.Backup, err error) {
+func (c *bytemarkClient) RestoreBackup(vm pathers.VirtualMachineName, discLabelOrID string, backupLabelOrID string) (backup brain.Backup, err error) {
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return

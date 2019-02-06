@@ -6,8 +6,8 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -17,7 +17,7 @@ func TestCreateDiskCommand(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(testutil.DefVM)
 
-	name := lib.VirtualMachineName{VirtualMachine: "test-server", Group: "default", Account: "default-account"}
+	name := pathers.VirtualMachineName{VirtualMachine: "test-server", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}}
 	c.When("GetVirtualMachine", name).Return(&brain.VirtualMachine{Hostname: "test-server.default.default-account.endpoint"})
 
 	disc := brain.Disc{Size: 35 * 1024, StorageGrade: "archive"}

@@ -5,8 +5,8 @@ import (
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/cheekybits/is"
 )
 
@@ -16,10 +16,12 @@ func TestCreateBackup(t *testing.T) {
 
 	config.When("GetVirtualMachine").Return(testutil.DefVM)
 
-	vmname := lib.VirtualMachineName{
+	vmname := pathers.VirtualMachineName{
 		VirtualMachine: "test-server",
-		Group:          "default",
-		Account:        "default-account",
+		GroupName: pathers.GroupName{
+			Group:   "default",
+			Account: "default-account",
+		},
 	}
 
 	c.When("CreateBackup", vmname, "test-disc").Return(brain.Backup{}, nil).Times(1)

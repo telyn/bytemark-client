@@ -2,11 +2,12 @@ package brain
 
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // StartVirtualMachineWithAppliance starts the named virtual machine using the named appliance.
 // returns nil on success or an error otherwise.
-func StartVirtualMachineWithAppliance(client lib.Client, vmName lib.VirtualMachineName, applianceName string) (err error) {
+func StartVirtualMachineWithAppliance(client lib.Client, vmName pathers.VirtualMachineName, applianceName string) (err error) {
 	err = client.EnsureVirtualMachineName(&vmName)
 	if err != nil {
 		return err

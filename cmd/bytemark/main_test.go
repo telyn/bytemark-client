@@ -3,14 +3,13 @@ package main
 import (
 	"testing"
 
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	mock "github.com/maraino/go-mock"
 	"github.com/urfave/cli"
 )
 
-var defVM = lib.VirtualMachineName{Group: "default", Account: "default-account"}
+var defVM = pathers.VirtualMachineName{GroupName: pathers.GroupName{Group: "default", Account: "default-account"}}
 var defGroup = pathers.GroupName{Group: "default", Account: "default-account"}
 
 func init() {

@@ -45,7 +45,7 @@ func (c *bytemarkClient) GetPrivilegesForGroup(group pathers.GroupName) (privile
 }
 
 // GetPrivilegesForVirtualMachine gets all privileges lower than your privilege on the given virtual machine
-func (c *bytemarkClient) GetPrivilegesForVirtualMachine(vm VirtualMachineName) (privileges brain.Privileges, err error) {
+func (c *bytemarkClient) GetPrivilegesForVirtualMachine(vm pathers.VirtualMachineName) (privileges brain.Privileges, err error) {
 	req, err := c.BuildRequest("GET", BrainEndpoint, "/accounts/%s/groups/%s/virtual_machines/%s/privileges", string(vm.Account), vm.Group, vm.VirtualMachine)
 	if err != nil {
 		return

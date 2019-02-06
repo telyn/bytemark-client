@@ -3,11 +3,12 @@ package flags
 import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/app"
 	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // VirtualMachineNameFlag is used for all --server flags, or should be at least.
 type VirtualMachineNameFlag struct {
-	VirtualMachineName lib.VirtualMachineName
+	VirtualMachineName pathers.VirtualMachineName
 	Value              string
 }
 

@@ -4,10 +4,11 @@ import (
 	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // CreateBackupSchedule creates a new backup schedule starting at the given date, with backups occurring every interval seconds
-func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLabel string, startDate string, interval int) (sched brain.BackupSchedule, err error) {
+func (c *bytemarkClient) CreateBackupSchedule(server pathers.VirtualMachineName, discLabel string, startDate string, interval int) (sched brain.BackupSchedule, err error) {
 	err = c.EnsureVirtualMachineName(&server)
 	if err != nil {
 		return
@@ -25,7 +26,7 @@ func (c *bytemarkClient) CreateBackupSchedule(server VirtualMachineName, discLab
 }
 
 // DeleteBackupSchedule deletes the given backup schedule
-func (c *bytemarkClient) DeleteBackupSchedule(server VirtualMachineName, discLabel string, id int) (err error) {
+func (c *bytemarkClient) DeleteBackupSchedule(server pathers.VirtualMachineName, discLabel string, id int) (err error) {
 	err = c.EnsureVirtualMachineName(&server)
 	if err != nil {
 		return

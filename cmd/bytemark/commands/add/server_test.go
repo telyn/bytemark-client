@@ -8,7 +8,6 @@ import (
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/commands/add"
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
 	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/urfave/cli"
@@ -71,7 +70,7 @@ func TestCreateServerHasCorrectFlags(t *testing.T) {
 func TestCreateServer(t *testing.T) {
 	type createTest struct {
 		Spec                 brain.VirtualMachineSpec
-		ConfigVirtualMachine lib.VirtualMachineName
+		ConfigVirtualMachine pathers.VirtualMachineName
 		GroupName            pathers.GroupName
 		Args                 []string
 		Output               string
@@ -122,7 +121,7 @@ func TestCreateServer(t *testing.T) {
 					IPv6: "fe80::123",
 				},
 			},
-			ConfigVirtualMachine: lib.VirtualMachineName{Group: "default"},
+			ConfigVirtualMachine: pathers.VirtualMachineName{GroupName: pathers.GroupName{Group: "default"}},
 			GroupName:            pathers.GroupName{Group: "default"},
 			Args: []string{
 				"bytemark", "add", "server",
@@ -217,10 +216,12 @@ func TestCreateServer(t *testing.T) {
 		config, c, app := testutil.BaseTestAuthSetup(t, false, commands.Commands)
 		config.When("GetVirtualMachine").Return(test.ConfigVirtualMachine)
 
-		vmname := lib.VirtualMachineName{
+		vmname := pathers.VirtualMachineName{
 			VirtualMachine: test.Spec.VirtualMachine.Name,
-			Group:          test.GroupName.Group,
-			Account:        test.GroupName.Account,
+			GroupName: pathers.GroupName{
+				Group:   test.GroupName.Group,
+				Account: test.GroupName.Account,
+			},
 		}
 
 		postGpName := test.GroupName

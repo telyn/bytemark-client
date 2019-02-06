@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/BytemarkHosting/bytemark-client/cmd/bytemark/testutil"
-	"github.com/BytemarkHosting/bytemark-client/lib"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 	"github.com/BytemarkHosting/bytemark-client/mocks"
 	"github.com/urfave/cli"
 )
@@ -15,7 +15,7 @@ func TestUnscheduleBackups(t *testing.T) {
 	tests := []struct {
 		Args []string
 
-		Name      lib.VirtualMachineName
+		Name      pathers.VirtualMachineName
 		DiscLabel string
 		ID        int
 
@@ -31,14 +31,14 @@ func TestUnscheduleBackups(t *testing.T) {
 		},
 		{
 			Args:       []string{"vm-name"},
-			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
+			Name:       pathers.VirtualMachineName{VirtualMachine: "vm-name", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 			ShouldCall: false,
 			ShouldErr:  true,
 			BaseTestFn: testutil.BaseTestSetup,
 		},
 		{
 			Args:       []string{"vm-name", "disc-label"},
-			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
+			Name:       pathers.VirtualMachineName{VirtualMachine: "vm-name", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 			ShouldCall: false,
 			ShouldErr:  true,
 			BaseTestFn: testutil.BaseTestSetup,
@@ -46,7 +46,7 @@ func TestUnscheduleBackups(t *testing.T) {
 		{
 			ShouldCall: true,
 			Args:       []string{"vm-name", "disc-label", "324"},
-			Name:       lib.VirtualMachineName{VirtualMachine: "vm-name", Group: "default", Account: "default-account"},
+			Name:       pathers.VirtualMachineName{VirtualMachine: "vm-name", GroupName: pathers.GroupName{Group: "default", Account: "default-account"}},
 			DiscLabel:  "disc-label",
 			ID:         324,
 			BaseTestFn: testutil.BaseTestAuthSetup,

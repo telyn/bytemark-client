@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 func labelDiscs(discs []brain.Disc, offset ...int) {
@@ -21,7 +22,7 @@ func labelDiscs(discs []brain.Disc, offset ...int) {
 }
 
 // CreateDisc creates the given Disc and attaches it to the given virtual machine.
-func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc brain.Disc) (err error) {
+func (c *bytemarkClient) CreateDisc(name pathers.VirtualMachineName, disc brain.Disc) (err error) {
 	vm, err := c.GetVirtualMachine(name)
 	if err != nil {
 		return
@@ -41,7 +42,7 @@ func (c *bytemarkClient) CreateDisc(name VirtualMachineName, disc brain.Disc) (e
 }
 
 // DeleteDisc removes the specified disc from the given virtual machine
-func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string) (err error) {
+func (c *bytemarkClient) DeleteDisc(vm pathers.VirtualMachineName, discLabelOrID string) (err error) {
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return
@@ -58,7 +59,7 @@ func (c *bytemarkClient) DeleteDisc(vm VirtualMachineName, discLabelOrID string)
 }
 
 // ResizeDisc resizes the specified disc to the given size in megabytes
-func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
+func (c *bytemarkClient) ResizeDisc(vm pathers.VirtualMachineName, discLabelOrID string, sizeMB int) (err error) {
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return err
@@ -77,7 +78,7 @@ func (c *bytemarkClient) ResizeDisc(vm VirtualMachineName, discLabelOrID string,
 }
 
 // SetDiscIopsLimit sets the IOPS limit of the specified disc
-func (c *bytemarkClient) SetDiscIopsLimit(vm VirtualMachineName, discLabelOrID string, iopsLimit int) (err error) {
+func (c *bytemarkClient) SetDiscIopsLimit(vm pathers.VirtualMachineName, discLabelOrID string, iopsLimit int) (err error) {
 	err = c.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return err
@@ -97,7 +98,7 @@ func (c *bytemarkClient) SetDiscIopsLimit(vm VirtualMachineName, discLabelOrID s
 
 // GetDisc returns the specified disc from the given virtual machine.
 // if discLabelOrID is a number then vm is ignored.
-func (c *bytemarkClient) GetDisc(vm VirtualMachineName, discLabelOrID string) (disc brain.Disc, err error) {
+func (c *bytemarkClient) GetDisc(vm pathers.VirtualMachineName, discLabelOrID string) (disc brain.Disc, err error) {
 	if id, atoiErr := strconv.Atoi(discLabelOrID); atoiErr == nil {
 		return c.GetDiscByID(id)
 

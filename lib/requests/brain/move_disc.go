@@ -3,10 +3,11 @@ package brain
 import (
 	"github.com/BytemarkHosting/bytemark-client/lib"
 	"github.com/BytemarkHosting/bytemark-client/lib/brain"
+	"github.com/BytemarkHosting/bytemark-client/lib/pathers"
 )
 
 // MoveDisc moves the specified disc from its current server to a given server
-func MoveDisc(client lib.Client, vm lib.VirtualMachineName, discLabelOrID string, newVMName lib.VirtualMachineName) (err error) {
+func MoveDisc(client lib.Client, vm pathers.VirtualMachineName, discLabelOrID string, newVMName pathers.VirtualMachineName) (err error) {
 	err = client.EnsureVirtualMachineName(&vm)
 	if err != nil {
 		return err
